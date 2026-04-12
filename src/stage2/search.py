@@ -12,8 +12,8 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from qdrant_client.models import FusionQuery, Prefetch, SparseVector
 
-from notanotherspotlight.db import COLLECTION_NAME, get_qdrant_client
-from notanotherspotlight.embeddings import embed_dense_query, embed_sparse_query
+from src.stage2.db import COLLECTION_NAME, get_qdrant_client
+from src.stage2.embeddings import embed_dense_query, embed_sparse_query
 
 
 # ---------------------------------------------------------------------------

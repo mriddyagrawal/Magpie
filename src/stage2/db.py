@@ -19,8 +19,8 @@ from qdrant_client.models import (
     VectorParams,
 )
 
-from notanotherspotlight.embeddings import DENSE_VECTOR_SIZE, embed_dense, embed_sparse
-from notanotherspotlight.parser import ParsedSummary
+from src.stage2.embeddings import DENSE_VECTOR_SIZE, embed_dense, embed_sparse
+from src.stage2.parser import ParsedSummary
 
 COLLECTION_NAME = "summaries"
 

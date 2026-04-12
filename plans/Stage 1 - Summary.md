@@ -77,10 +77,10 @@ An OSS alternative (**Marker**) is recorded in [Future Plans.md](Future%20Plans.
 
 ```
 # single file
-uv run python3 summarize.py <path-to-file>
+uv run python3 src/summarize.py <path-to-file>
 
 # batch a whole directory (recursive), parallelized
-uv run python3 summarize.py <path-to-dir> [--concurrency 6] [--force]
+uv run python3 src/summarize.py <path-to-dir> [--concurrency 6] [--force]
 ```
 
 - Single-file mode prints the `FileSummary` as pretty-printed JSON to stdout and writes the `.md` summary. Non-zero exit on unrecoverable error.
@@ -101,7 +101,8 @@ NotAnotherSpotlight/
 ├── Plans/
 │   ├── Stage 1 - Summary.md
 │   └── Future Plans.md
-├── summarize.py
+├── src/
+│   └── summarize.py
 ├── Summaries/              (generated, one <hash>.md per file)
 └── Test Content/           (input, gitignored)
 ```
@@ -122,7 +123,7 @@ Managed by `uv`. Python 3.11+.
 ## Acceptance criteria for Stage 1
 
 1. `uv sync` installs cleanly.
-2. With a valid `MOONSHOT_API_KEY` in `.env`, running `uv run python3 summarize.py "Test Content/Lab 1 - Doubly-Linked Lists.pdf"` prints a valid `FileSummary` JSON and writes `Summaries/<hash>.md`.
+2. With a valid `MOONSHOT_API_KEY` in `.env`, running `uv run python3 src/summarize.py "Test Content/Lab 1 - Doubly-Linked Lists.pdf"` prints a valid `FileSummary` JSON and writes `Summaries/<hash>.md`.
 3. Same works for a PNG in `Test Content/` (e.g. an Uber reservation screenshot).
 4. Same works for `.md`, `.py`, `.docx`, `.xlsx`.
 5. Image-only PDFs (e.g. `Hotel YQuantum Receipt.pdf`, `MLK Letter.pdf`) summarize successfully via the Kimi vision fallback (`pymupdf` → PNG per page → image content blocks).

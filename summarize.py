@@ -30,6 +30,8 @@ DOCX_EXTS = {".docx"}
 XLSX_EXTS = {".xlsx", ".xlsm"}
 
 MAX_TEXT_CHARS = 120_000
+PDF_VISION_DPI = 150
+PDF_VISION_MAX_PAGES = 20
 
 REPO_ROOT = Path(__file__).resolve().parent
 SUMMARIES_DIR = REPO_ROOT / "Summaries"
@@ -92,6 +94,19 @@ def extract_pdf_text(path: Path) -> str:
     return "\n\n".join(chunks)
 
 
+def render_pdf_pages_as_png(path: Path) -> list[bytes]:
+    import pymupdf
+
+    images: list[bytes] = []
+    with pymupdf.open(str(path)) as doc:
+        for i, page in enumerate(doc):
+            if i >= PDF_VISION_MAX_PAGES:
+                break
+            pix = page.get_pixmap(dpi=PDF_VISION_DPI)
+            images.append(pix.tobytes("png"))
+    return images
+
+
 def extract_docx_text(path: Path) -> str:
     from docx import Document
 
@@ -134,10 +149,22 @@ def build_user_message(path: Path) -> list:
 
     if ext in PDF_EXTS:
         text = extract_pdf_text(path).strip()
-        if not text:
-            raise SummarizeError(f"could not extract text from PDF (may be image-only): {path}")
-        text = text[:MAX_TEXT_CHARS]
-        return [f"{name_hint}\nContent type: pdf\n\n---\n{text}"]
+        if text:
+            text = text[:MAX_TEXT_CHARS]
+            return [f"{name_hint}\nContent type: pdf\n\n---\n{text}"]
+        try:
+            pages = render_pdf_pages_as_png(path)
+        except Exception as e:
+            raise SummarizeError(f"could not render scanned PDF pages: {path}: {e}") from e
+        if not pages:
+            raise SummarizeError(f"PDF has no pages: {path}")
+        msg: list = [
+            f"{name_hint}\nContent type: pdf (scanned / image-only — {len(pages)} page(s) "
+            f"sent as images). Summarize the document as a whole."
+        ]
+        for page_png in pages:
+            msg.append(BinaryContent(data=page_png, media_type="image/png"))
+        return msg
 
     if ext in DOCX_EXTS:
         text = extract_docx_text(path).strip()

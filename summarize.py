@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import hashlib
 import json
 import os
@@ -199,9 +200,9 @@ def write_summary(path: Path, summary: FileSummary) -> Path:
     return out_path
 
 
-def summarize_one(agent: Agent[None, FileSummary], path: Path) -> FileSummary:
+async def summarize_one(agent: Agent[None, FileSummary], path: Path) -> FileSummary:
     message = build_user_message(path)
-    result = agent.run_sync(message)
+    result = await agent.run(message)
     write_summary(path, result.output)
     return result.output
 
@@ -213,7 +214,12 @@ def find_supported_files(root: Path) -> list[Path]:
     )
 
 
-def run_batch(agent: Agent[None, FileSummary], root: Path, force: bool) -> None:
+async def run_batch(
+    agent: Agent[None, FileSummary],
+    root: Path,
+    force: bool,
+    concurrency: int,
+) -> None:
     from tqdm import tqdm
 
     files = find_supported_files(root)
@@ -222,20 +228,29 @@ def run_batch(agent: Agent[None, FileSummary], root: Path, force: bool) -> None:
 
     skipped = 0
     errors: list[tuple[Path, str]] = []
-    bar = tqdm(files, desc="summarizing", unit="file")
-    for path in bar:
-        bar.set_postfix_str(path.name[:40])
+    sem = asyncio.Semaphore(concurrency)
+    bar = tqdm(total=len(files), desc="summarizing", unit="file")
+
+    async def worker(path: Path) -> None:
+        nonlocal skipped
         try:
             if not force and summary_path_for(path).exists():
                 skipped += 1
-                continue
-            summarize_one(agent, path)
+                return
+            async with sem:
+                bar.set_postfix_str(path.name[:40])
+                await summarize_one(agent, path)
         except SummarizeError as e:
             errors.append((path, str(e)))
             tqdm.write(f"  skip: {e}")
-        except Exception as e:  # API errors, decode errors, etc.
+        except Exception as e:
             errors.append((path, f"{type(e).__name__}: {e}"))
             tqdm.write(f"  error on {path.name}: {type(e).__name__}: {e}")
+        finally:
+            bar.update(1)
+
+    await asyncio.gather(*(worker(p) for p in files))
+    bar.close()
 
     done = len(files) - skipped - len(errors)
     print(f"\ndone: {done} summarized, {skipped} already-cached, {len(errors)} errors")
@@ -251,6 +266,8 @@ def main() -> None:
     parser.add_argument("path", help="File or directory to summarize.")
     parser.add_argument("--force", action="store_true",
                         help="Re-summarize even if a summary already exists for the file's hash.")
+    parser.add_argument("--concurrency", type=int, default=6,
+                        help="Max files summarized in parallel during batch mode (default: 6).")
     args = parser.parse_args()
 
     path = Path(args.path)
@@ -260,14 +277,14 @@ def main() -> None:
     agent = build_agent()
 
     if path.is_dir():
-        run_batch(agent, path, force=args.force)
+        asyncio.run(run_batch(agent, path, force=args.force, concurrency=args.concurrency))
         return
 
+    if not args.force and summary_path_for(path).exists():
+        print(f"already summarized: {summary_path_for(path).relative_to(REPO_ROOT)}")
+        return
     try:
-        if not args.force and summary_path_for(path).exists():
-            print(f"already summarized: {summary_path_for(path).relative_to(REPO_ROOT)}")
-            return
-        summary = summarize_one(agent, path)
+        summary = asyncio.run(summarize_one(agent, path))
     except SummarizeError as e:
         sys.exit(f"error: {e}")
     print(json.dumps(summary.model_dump(), indent=2, ensure_ascii=False))

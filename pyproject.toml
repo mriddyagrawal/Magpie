@@ -1,0 +1,18 @@
+[project]
+name = "notanotherspotlight"
+version = "0.1.0"
+description = "RAG-style semantic search over the local file system."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic-ai>=0.0.14",
+    "pydantic>=2.8",
+    "pypdf>=4.3",
+    "python-dotenv>=1.0",
+    "python-docx>=1.1",
+    "openpyxl>=3.1",
+    "tqdm>=4.66",
+]
+
+[tool.uv]
+package = false

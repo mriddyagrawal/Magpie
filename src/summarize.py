@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Literal
 
 from dotenv import load_dotenv
+from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, BinaryContent, NativeOutput
 from pydantic_ai.models.openai import OpenAIChatModel
@@ -32,8 +33,10 @@ XLSX_EXTS = {".xlsx", ".xlsm"}
 MAX_TEXT_CHARS = 120_000
 PDF_VISION_DPI = 150
 PDF_VISION_MAX_PAGES = 20
+HASH_CHUNK = 1 << 20  # 1 MiB
+API_MAX_RETRIES = 5
 
-REPO_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
 SUMMARIES_DIR = REPO_ROOT / "Summaries"
 
 ContentType = Literal["image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other"]
@@ -77,40 +80,72 @@ def build_agent() -> Agent[None, FileSummary]:
         sys.exit("error: MOONSHOT_API_KEY not set (put it in .env)")
     model_name = os.environ.get("MOONSHOT_MODEL", "kimi-k2.5")
     base_url = os.environ.get("MOONSHOT_BASE_URL", "https://api.moonshot.ai/v1")
-    model = OpenAIChatModel(
-        model_name,
-        provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    client = AsyncOpenAI(
+        api_key=api_key,
+        base_url=base_url,
+        max_retries=API_MAX_RETRIES,
     )
+    model = OpenAIChatModel(model_name, provider=OpenAIProvider(openai_client=client))
     return Agent(model, output_type=NativeOutput(FileSummary), system_prompt=SYSTEM_PROMPT)
 
 
 def extract_pdf_text(path: Path) -> str:
     from pypdf import PdfReader
+    from pypdf.errors import PdfReadError
 
-    reader = PdfReader(str(path))
-    chunks = []
-    for page in reader.pages:
-        chunks.append(page.extract_text() or "")
+    try:
+        reader = PdfReader(str(path))
+    except (PdfReadError, OSError) as e:
+        raise SummarizeError(f"could not open PDF {path}: {e}") from e
+
+    if reader.is_encrypted:
+        raise SummarizeError(f"PDF is password-protected: {path}")
+
+    chunks: list[str] = []
+    total = 0
+    try:
+        for page in reader.pages:
+            t = page.extract_text() or ""
+            chunks.append(t)
+            total += len(t)
+            if total >= MAX_TEXT_CHARS:
+                break
+    except PdfReadError as e:
+        raise SummarizeError(f"PDF parse error while reading pages: {path}: {e}") from e
     return "\n\n".join(chunks)
 
 
 def render_pdf_pages_as_png(path: Path) -> list[bytes]:
     import pymupdf
 
+    try:
+        doc = pymupdf.open(str(path))
+    except Exception as e:
+        raise SummarizeError(f"could not open PDF for rendering: {path}: {e}") from e
+
     images: list[bytes] = []
-    with pymupdf.open(str(path)) as doc:
+    try:
+        if doc.needs_pass:
+            raise SummarizeError(f"PDF is password-protected: {path}")
         for i, page in enumerate(doc):
             if i >= PDF_VISION_MAX_PAGES:
                 break
             pix = page.get_pixmap(dpi=PDF_VISION_DPI)
             images.append(pix.tobytes("png"))
+    finally:
+        doc.close()
     return images
 
 
 def extract_docx_text(path: Path) -> str:
     from docx import Document
+    from docx.opc.exceptions import PackageNotFoundError
 
-    doc = Document(str(path))
+    try:
+        doc = Document(str(path))
+    except (PackageNotFoundError, OSError) as e:
+        raise SummarizeError(f"not a valid .docx file: {path}: {e}") from e
+
     parts: list[str] = [p.text for p in doc.paragraphs if p.text.strip()]
     for table in doc.tables:
         for row in table.rows:
@@ -122,18 +157,25 @@ def extract_docx_text(path: Path) -> str:
 
 def extract_xlsx_text(path: Path) -> str:
     from openpyxl import load_workbook
+    from openpyxl.utils.exceptions import InvalidFileException
 
-    wb = load_workbook(str(path), data_only=True, read_only=True)
+    try:
+        wb = load_workbook(str(path), data_only=True, read_only=True)
+    except (InvalidFileException, OSError) as e:
+        raise SummarizeError(f"not a valid .xlsx file: {path}: {e}") from e
+
     parts: list[str] = []
-    for sheet_name in wb.sheetnames:
-        ws = wb[sheet_name]
-        parts.append(f"## Sheet: {sheet_name}")
-        for row in ws.iter_rows(values_only=True):
-            if not any(cell is not None and str(cell).strip() for cell in row):
-                continue
-            parts.append(",".join("" if cell is None else str(cell) for cell in row))
-        parts.append("")
-    wb.close()
+    try:
+        for sheet_name in wb.sheetnames:
+            ws = wb[sheet_name]
+            parts.append(f"## Sheet: {sheet_name}")
+            for row in ws.iter_rows(values_only=True):
+                if not any(cell is not None and str(cell).strip() for cell in row):
+                    continue
+                parts.append(",".join("" if cell is None else str(cell) for cell in row))
+            parts.append("")
+    finally:
+        wb.close()
     return "\n".join(parts)
 
 
@@ -206,11 +248,15 @@ def render_markdown(summary: FileSummary, source_rel: str) -> str:
 
 
 def hash_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(HASH_CHUNK), b""):
+            h.update(chunk)
+    return h.hexdigest()[:16]
 
 
-def summary_path_for(path: Path) -> Path:
-    return SUMMARIES_DIR / f"{hash_file(path)}.md"
+def summary_path_for_digest(digest: str) -> Path:
+    return SUMMARIES_DIR / f"{digest}.md"
 
 
 def source_rel_path(path: Path) -> str:
@@ -220,17 +266,19 @@ def source_rel_path(path: Path) -> str:
         return str(path.resolve())
 
 
-def write_summary(path: Path, summary: FileSummary) -> Path:
+def write_summary(path: Path, summary: FileSummary, digest: str) -> Path:
     SUMMARIES_DIR.mkdir(exist_ok=True)
-    out_path = summary_path_for(path)
+    out_path = summary_path_for_digest(digest)
     out_path.write_text(render_markdown(summary, source_rel_path(path)), encoding="utf-8")
     return out_path
 
 
-async def summarize_one(agent: Agent[None, FileSummary], path: Path) -> FileSummary:
-    message = build_user_message(path)
+async def summarize_one(
+    agent: Agent[None, FileSummary], path: Path, digest: str
+) -> FileSummary:
+    message = await asyncio.to_thread(build_user_message, path)
     result = await agent.run(message)
-    write_summary(path, result.output)
+    await asyncio.to_thread(write_summary, path, result.output, digest)
     return result.output
 
 
@@ -261,12 +309,13 @@ async def run_batch(
     async def worker(path: Path) -> None:
         nonlocal skipped
         try:
-            if not force and summary_path_for(path).exists():
+            digest = await asyncio.to_thread(hash_file, path)
+            if not force and summary_path_for_digest(digest).exists():
                 skipped += 1
                 return
             async with sem:
                 bar.set_postfix_str(path.name[:40])
-                await summarize_one(agent, path)
+                await summarize_one(agent, path, digest)
         except SummarizeError as e:
             errors.append((path, str(e)))
             tqdm.write(f"  skip: {e}")
@@ -307,15 +356,17 @@ def main() -> None:
         asyncio.run(run_batch(agent, path, force=args.force, concurrency=args.concurrency))
         return
 
-    if not args.force and summary_path_for(path).exists():
-        print(f"already summarized: {summary_path_for(path).relative_to(REPO_ROOT)}")
+    digest = hash_file(path)
+    out_path = summary_path_for_digest(digest)
+    if not args.force and out_path.exists():
+        print(f"already summarized: {out_path.relative_to(REPO_ROOT)}")
         return
     try:
-        summary = asyncio.run(summarize_one(agent, path))
+        summary = asyncio.run(summarize_one(agent, path, digest))
     except SummarizeError as e:
         sys.exit(f"error: {e}")
     print(json.dumps(summary.model_dump(), indent=2, ensure_ascii=False))
-    print(f"\nwrote: {summary_path_for(path).relative_to(REPO_ROOT)}")
+    print(f"\nwrote: {out_path.relative_to(REPO_ROOT)}")
 
 
 if __name__ == "__main__":

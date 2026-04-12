@@ -1,4 +1,4 @@
-"""CLI entrypoint: python -m notanotherspotlight <command>."""
+"""CLI entrypoint: python -m src.stage2 <command>."""
 
 from __future__ import annotations
 
@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 
 def cmd_ingest(args: argparse.Namespace) -> None:
     """Parse summaries, embed, and upsert into Qdrant."""
-    from notanotherspotlight.db import create_collection, upsert_summaries
-    from notanotherspotlight.parser import load_all_summaries
+    from src.stage2.db import create_collection, upsert_summaries
+    from src.stage2.parser import load_all_summaries
 
     summaries_dir = Path(args.summaries_dir)
     summaries = load_all_summaries(summaries_dir)
@@ -28,7 +28,7 @@ def cmd_ingest(args: argparse.Namespace) -> None:
 
 def cmd_search(args: argparse.Namespace) -> None:
     """Rewrite question via Kimi, then hybrid search Qdrant."""
-    from notanotherspotlight.search import search_summaries
+    from src.stage2.search import search_summaries
 
     results = search_summaries(args.question, top_k=args.top_k)
 

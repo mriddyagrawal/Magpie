@@ -18,5 +18,8 @@ dependencies = [
     "fastembed>=0.4",
 ]
 
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
 [tool.uv]
 package = false

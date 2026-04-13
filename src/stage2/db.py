@@ -33,11 +33,11 @@ def get_qdrant_client() -> QdrantClient:
     if _client is not None:
         return _client
 
-    url = os.environ.get("Qdrant_CLUSTER_ENDPOINT")
-    api_key = os.environ.get("Qdrant_API_KEY")
+    url = os.environ.get("QDRANT_CLUSTER_ENDPOINT")
+    api_key = os.environ.get("QDRANT_API_KEY")
     if not url or not api_key:
         sys.exit(
-            "error: Qdrant_CLUSTER_ENDPOINT and Qdrant_API_KEY must be set in .env"
+            "error: QDRANT_CLUSTER_ENDPOINT and QDRANT_API_KEY must be set in .env"
         )
 
     _client = QdrantClient(url=url, api_key=api_key)

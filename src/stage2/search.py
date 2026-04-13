@@ -41,6 +41,9 @@ REWRITE_SYSTEM_PROMPT = (
 )
 
 
+_rewrite_agent: Agent[None, SearchQuery] | None = None
+
+
 def _build_rewrite_agent() -> Agent[None, SearchQuery]:
     api_key = os.environ.get("MOONSHOT_API_KEY")
     if not api_key:
@@ -56,8 +59,10 @@ def _build_rewrite_agent() -> Agent[None, SearchQuery]:
 
 def rewrite_query(question: str) -> SearchQuery:
     """Send a raw user question to Kimi and get back a structured SearchQuery."""
-    agent = _build_rewrite_agent()
-    result = agent.run_sync(question)
+    global _rewrite_agent
+    if _rewrite_agent is None:
+        _rewrite_agent = _build_rewrite_agent()
+    result = _rewrite_agent.run_sync(question)
     return result.output
 
 
@@ -74,21 +79,18 @@ class SearchResult:
     score: float
 
 
-def search_summaries(question: str, top_k: int = 5) -> list[SearchResult]:
-    """Full pipeline: rewrite the question via Kimi, then hybrid search Qdrant.
+def run_search(sq: SearchQuery, top_k: int = 5) -> list[SearchResult]:
+    """Run hybrid search for an already-rewritten SearchQuery.
 
-    Returns up to top_k results ranked by Reciprocal Rank Fusion of
-    dense (semantic) and sparse (BM25) scores.
+    Split out from `search_summaries` so callers (e.g. `pipeline.ask`) can log
+    the rewritten query alongside the retrieval results.
     """
-    sq = rewrite_query(question)
-
     # Combine the rewritten query with keywords for a richer embedding input.
     dense_text = sq.query + " " + " ".join(sq.keywords)
     dense_vec = embed_dense_query(dense_text)
 
-    # Keywords feed the sparse/BM25 side for exact-match boosting.
-    sparse_text = sq.query + " " + " ".join(sq.keywords)
-    sparse_idx, sparse_val = embed_sparse_query(sparse_text)
+    # Same text feeds BM25 for exact-match boosting.
+    sparse_idx, sparse_val = embed_sparse_query(dense_text)
 
     client = get_qdrant_client()
 
@@ -109,9 +111,19 @@ def search_summaries(question: str, top_k: int = 5) -> list[SearchResult]:
 
     return [
         SearchResult(
-            summary=point.payload.get("summary", ""),
-            path=point.payload.get("source_path", ""),
+            summary=(point.payload or {}).get("summary", ""),
+            path=(point.payload or {}).get("source_path", ""),
             score=point.score,
         )
         for point in results.points
     ]
+
+
+def search_summaries(question: str, top_k: int = 5) -> list[SearchResult]:
+    """Full pipeline: rewrite the question via Kimi, then hybrid search Qdrant.
+
+    Returns up to top_k results ranked by Reciprocal Rank Fusion of
+    dense (semantic) and sparse (BM25) scores.
+    """
+    sq = rewrite_query(question)
+    return run_search(sq, top_k)

@@ -18,7 +18,7 @@ from pydantic_ai import Agent, NativeOutput
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
-from content import (
+from src.content import (
     IMAGE_EXTS,
     SUPPORTED_EXTS,
     SummarizeError,

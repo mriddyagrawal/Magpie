@@ -25,7 +25,7 @@ from pydantic_ai import Agent, NativeOutput
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 
-from content import SummarizeError, build_content_blocks
+from src.content import SummarizeError, build_content_blocks
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent

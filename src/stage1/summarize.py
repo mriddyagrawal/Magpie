@@ -1,4 +1,15 @@
-"""Stage 1: summarize a single local file via Moonshot Kimi + PydanticAI."""
+"""Stage 1: summarize a single local file via Moonshot Kimi + PydanticAI.
+
+Incremental by default. Tracks state in `Test Summaries/_manifest.json`:
+- Unchanged files (same byte size) are skipped without hashing.
+- Changed files (new byte size) are re-summarized; the old summary file is
+  hard-deleted; the manifest row is updated and its `ingested_at` cleared
+  so Stage 2 re-ingests.
+- Files that vanished from disk are hard-deleted from the manifest and their
+  summary files removed (batch mode only; single-file mode doesn't prune).
+
+Pass `--force` to re-summarize everything regardless of size.
+"""
 
 from __future__ import annotations
 
@@ -24,6 +35,7 @@ from src.content import (
     SummarizeError,
     build_content_blocks,
 )
+from src.manifest import Manifest
 
 
 MAX_TEXT_CHARS = 120_000
@@ -31,7 +43,7 @@ PDF_VISION_MAX_PAGES = 20
 HASH_CHUNK = 1 << 20  # 1 MiB
 API_MAX_RETRIES = 5
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SUMMARIES_DIR = REPO_ROOT / "Test Summaries"
 
 ContentType = Literal["image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other"]
@@ -102,10 +114,6 @@ def hash_file(path: Path) -> str:
     return h.hexdigest()[:16]
 
 
-def summary_path_for_digest(digest: str) -> Path:
-    return SUMMARIES_DIR / f"{digest}.md"
-
-
 def source_rel_path(path: Path) -> str:
     try:
         return str(path.resolve().relative_to(REPO_ROOT))
@@ -113,20 +121,76 @@ def source_rel_path(path: Path) -> str:
         return str(path.resolve())
 
 
-def write_summary(path: Path, summary: FileSummary, digest: str) -> Path:
+def write_summary_at(out_path: Path, summary: FileSummary, source_rel: str) -> None:
     SUMMARIES_DIR.mkdir(exist_ok=True)
-    out_path = summary_path_for_digest(digest)
-    out_path.write_text(render_markdown(summary, source_rel_path(path)), encoding="utf-8")
-    return out_path
+    out_path.write_text(render_markdown(summary, source_rel), encoding="utf-8")
+
+
+def _delete_summary_file(rel_summary: str) -> None:
+    p = REPO_ROOT / rel_summary
+    if p.exists():
+        p.unlink()
+
+
+def bootstrap_manifest_from_existing(manifest) -> int:
+    """Back-fill an empty manifest from the `Source:` line of existing summary files.
+
+    Only runs when the manifest is empty but `Test Summaries/*.md` files exist
+    (e.g. on first use after the manifest feature lands). Idempotent no-op if
+    the manifest already has entries.
+    """
+    if manifest.entries:
+        return 0
+    if not SUMMARIES_DIR.is_dir():
+        return 0
+
+    count = 0
+    for md in sorted(SUMMARIES_DIR.glob("*.md")):
+        try:
+            with md.open(encoding="utf-8") as f:
+                first_line = f.readline()
+        except OSError:
+            continue
+        if not first_line.startswith("Source:"):
+            continue
+        source_rel = first_line.removeprefix("Source:").strip()
+        source_path = REPO_ROOT / source_rel
+        if not source_path.is_file():
+            continue
+        try:
+            size = source_path.stat().st_size
+        except OSError:
+            continue
+        manifest.mark_summarized(source_rel, size, str(md.relative_to(REPO_ROOT)))
+        count += 1
+
+    if count:
+        manifest.save()
+    return count
 
 
 async def summarize_one(
-    agent: Agent[None, FileSummary], path: Path, digest: str
-) -> FileSummary:
+    agent: Agent[None, FileSummary],
+    path: Path,
+    source_rel: str,
+    old_summary_rel: str | None,
+) -> tuple[FileSummary, str]:
+    """Hash, summarize, write; returns (summary, new_summary_rel_path).
+
+    Caller decides whether to delete `old_summary_rel` after updating the manifest.
+    We don't delete inside this function because a failure (API 429, etc.)
+    must not leave the filesystem in a state that disagrees with the manifest.
+    """
+    digest = await asyncio.to_thread(hash_file, path)
+    out_path = SUMMARIES_DIR / f"{digest}.md"
     message = await asyncio.to_thread(build_user_message, path)
     result = await agent.run(message)
-    await asyncio.to_thread(write_summary, path, result.output, digest)
-    return result.output
+    await asyncio.to_thread(write_summary_at, out_path, result.output, source_rel)
+
+    new_summary_rel = str(out_path.relative_to(REPO_ROOT))
+    if old_summary_rel and old_summary_rel != new_summary_rel:
+        await asyncio.to_thread(_delete_summary_file, old_summary_rel)
+    return result.output, new_summary_rel
 
 
 def find_supported_files(root: Path) -> list[Path]:
@@ -144,25 +208,56 @@ async def run_batch(
 ) -> None:
     from tqdm import tqdm
 
+    manifest = Manifest()
+    bootstrapped = bootstrap_manifest_from_existing(manifest)
+    if bootstrapped:
+        print(f"bootstrapped manifest from {bootstrapped} existing summary files")
     files = find_supported_files(root)
     if not files:
         sys.exit(f"no supported files found under {root}")
 
+    # Prune manifest rows whose source files no longer exist (hard delete).
+    # Scoped to files under the walked `root` to avoid nuking rows for files
+    # outside this run's scope.
+    try:
+        root_rel = str(root.resolve().relative_to(REPO_ROOT)) + os.sep
+    except ValueError:
+        root_rel = None
+    existing_rels = {source_rel_path(p) for p in files}
+    pruned = 0
+    if root_rel is not None:
+        for rel in list(manifest.paths()):
+            if rel.startswith(root_rel) and rel not in existing_rels:
+                entry = manifest.drop(rel)
+                if entry:
+                    _delete_summary_file(entry.summary_file)
+                    pruned += 1
+
     skipped = 0
     errors: list[tuple[Path, str]] = []
     sem = asyncio.Semaphore(concurrency)
+    manifest_lock = asyncio.Lock()
     bar = tqdm(total=len(files), desc="summarizing", unit="file")
 
     async def worker(path: Path) -> None:
         nonlocal skipped
+        rel = source_rel_path(path)
         try:
-            digest = await asyncio.to_thread(hash_file, path)
-            if not force and summary_path_for_digest(digest).exists():
+            size = path.stat().st_size
+            async with manifest_lock:
+                existing = manifest.get(rel)
+            if not force and existing is not None and existing.size == size:
                 skipped += 1
                 return
+
+            old_summary_rel = existing.summary_file if existing else None
+
             async with sem:
                 bar.set_postfix_str(path.name[:40])
-                await summarize_one(agent, path, digest)
+                _, new_summary_rel = await summarize_one(agent, path, rel, old_summary_rel)
+
+            async with manifest_lock:
+                manifest.mark_summarized(rel, size, new_summary_rel)
         except SummarizeError as e:
             errors.append((path, str(e)))
             tqdm.write(f"  skip: {e}")
@@ -172,15 +267,45 @@ async def run_batch(
         finally:
             bar.update(1)
 
-    await asyncio.gather(*(worker(p) for p in files))
-    bar.close()
+    try:
+        await asyncio.gather(*(worker(p) for p in files))
+    finally:
+        bar.close()
+        manifest.save()
 
     done = len(files) - skipped - len(errors)
-    print(f"\ndone: {done} summarized, {skipped} already-cached, {len(errors)} errors")
+    print(
+        f"\ndone: {done} summarized, {skipped} unchanged, "
+        f"{pruned} pruned (deleted), {len(errors)} errors"
+    )
     if errors:
         print("errors:")
         for p, msg in errors:
             print(f"  - {source_rel_path(p)}: {msg}")
+
+
+async def run_single(agent: Agent[None, FileSummary], path: Path, force: bool) -> None:
+    manifest = Manifest()
+    bootstrapped = bootstrap_manifest_from_existing(manifest)
+    if bootstrapped:
+        print(f"bootstrapped manifest from {bootstrapped} existing summary files")
+    rel = source_rel_path(path)
+    size = path.stat().st_size
+
+    existing = manifest.get(rel)
+    if not force and existing is not None and existing.size == size:
+        print(f"unchanged (already summarized): {existing.summary_file}")
+        return
+
+    old_summary_rel = existing.summary_file if existing else None
+    try:
+        summary, new_summary_rel = await summarize_one(agent, path, rel, old_summary_rel)
+    except SummarizeError as e:
+        sys.exit(f"error: {e}")
+    manifest.mark_summarized(rel, size, new_summary_rel)
+    manifest.save()
+    print(json.dumps(summary.model_dump(), indent=2, ensure_ascii=False))
+    print(f"\nwrote: {new_summary_rel}")
 
 
 def main() -> None:
@@ -188,7 +313,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Summarize a local file (or directory) via Kimi.")
     parser.add_argument("path", help="File or directory to summarize.")
     parser.add_argument("--force", action="store_true",
-                        help="Re-summarize even if a summary already exists for the file's hash.")
+                        help="Re-summarize every file, ignoring the manifest.")
     parser.add_argument("--concurrency", type=int, default=6,
                         help="Max files summarized in parallel during batch mode (default: 6).")
     args = parser.parse_args()
@@ -201,19 +326,8 @@ def main() -> None:
 
     if path.is_dir():
         asyncio.run(run_batch(agent, path, force=args.force, concurrency=args.concurrency))
-        return
-
-    digest = hash_file(path)
-    out_path = summary_path_for_digest(digest)
-    if not args.force and out_path.exists():
-        print(f"already summarized: {out_path.relative_to(REPO_ROOT)}")
-        return
-    try:
-        summary = asyncio.run(summarize_one(agent, path, digest))
-    except SummarizeError as e:
-        sys.exit(f"error: {e}")
-    print(json.dumps(summary.model_dump(), indent=2, ensure_ascii=False))
-    print(f"\nwrote: {out_path.relative_to(REPO_ROOT)}")
+    else:
+        asyncio.run(run_single(agent, path, force=args.force))
 
 
 if __name__ == "__main__":

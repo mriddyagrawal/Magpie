@@ -73,9 +73,21 @@ def create_collection(*, recreate: bool = False) -> None:
     )
 
 
-def _point_id(summary_file: str) -> str:
-    """Deterministic point ID from the summary filename hash."""
-    return hashlib.md5(summary_file.encode()).hexdigest()
+def _point_id(key: str) -> str:
+    """Deterministic point ID from a string key, formatted as a dashed UUID.
+
+    Callers pass the **source path** (repo-relative), not the summary file name.
+    Source paths are stable across re-summarizations; summary filenames change
+    (the filename is the content digest). A stable point ID means Qdrant
+    upsert cleanly overwrites in place on content change instead of leaking
+    an orphan point at the old digest.
+
+    We emit the MD5 as a dashed UUID (8-4-4-4-12) because that's how Qdrant
+    canonicalizes IDs it stores; returning the dashed form here keeps
+    `_point_id(...)` and `str(scrolled_point.id)` comparable in set math.
+    """
+    h = hashlib.md5(key.encode()).hexdigest()
+    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
 
 
 def _build_embedding_text(s: ParsedSummary) -> str:
@@ -114,7 +126,7 @@ def upsert_summaries(summaries: list[ParsedSummary]) -> int:
         ):
             points.append(
                 PointStruct(
-                    id=_point_id(s.summary_file),
+                    id=_point_id(s.source_path),
                     vector={
                         "dense": dense_vec,
                         "sparse": SparseVector(indices=sparse_idx, values=sparse_val),
@@ -130,3 +142,35 @@ def upsert_summaries(summaries: list[ParsedSummary]) -> int:
         total += len(points)
 
     return total
+
+
+def get_all_point_ids() -> set[str]:
+    """Return the set of all point IDs currently in the collection.
+
+    Used for orphan cleanup: after incremental ingest, any point whose ID
+    isn't in the expected set (from the manifest) gets hard-deleted.
+    """
+    client = get_qdrant_client()
+    ids: set[str] = set()
+    offset = None
+    while True:
+        points, offset = client.scroll(
+            collection_name=COLLECTION_NAME,
+            limit=512,
+            offset=offset,
+            with_payload=False,
+            with_vectors=False,
+        )
+        ids.update(str(p.id) for p in points)
+        if offset is None:
+            break
+    return ids
+
+
+def delete_points(ids: list[str]) -> int:
+    """Hard-delete the given point IDs. Returns count deleted."""
+    if not ids:
+        return 0
+    client = get_qdrant_client()
+    client.delete(collection_name=COLLECTION_NAME, points_selector=ids)
+    return len(ids)

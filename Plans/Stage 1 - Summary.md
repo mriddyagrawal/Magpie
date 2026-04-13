@@ -86,7 +86,7 @@ uv run python3 -m src.stage1.summarize <path-to-dir> [--concurrency 6] [--force]
 - Single-file mode prints the `FileSummary` as pretty-printed JSON to stdout and writes the `.md` summary. Non-zero exit on unrecoverable error.
 - Batch mode walks the directory, filters to supported extensions, runs summarization concurrently (default 6 in-flight requests, async + semaphore), shows a `tqdm` progress bar, and continues past per-file failures. Prints a `done: X summarized, Y already-cached, Z errors` tally at the end with the list of errors.
 - Summaries are written to `Test Summaries/<sha256-of-file-bytes-first-16-hex>.md`. Each file starts with `Source: <repo-relative-path>` followed by the rendered markdown summary.
-- Re-running on the same directory is cheap: files whose hash already has a summary are skipped unless `--force` is passed.
+- Stage 1 is **incremental by default** via `Test Summaries/_manifest.json` (see `src/manifest.py`). Each source file's `size` is recorded; unchanged files are skipped without hashing. Files that vanished from disk are hard-deleted from the manifest *and* their summary files are removed. The first run auto-bootstraps the manifest from existing `Test Summaries/*.md` (parses each one's `Source:` line — no API calls). `--force` re-summarizes everything.
 
 ## Project layout after Stage 1
 

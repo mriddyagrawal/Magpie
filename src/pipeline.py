@@ -25,6 +25,8 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
+from pathlib import Path
+
 from src.answer import Answer, answer_question, build_answer_agent
 from src.stage2.search import SearchQuery, SearchResult, raw_query, rewrite_query, run_search
 
@@ -85,6 +87,118 @@ async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> Pipeli
 
 def ask_sync(question: str, *, top_k: int = 5, rewrite: bool = False) -> PipelineResult:
     return asyncio.run(ask(question, top_k=top_k, rewrite=rewrite))
+
+
+DEFAULT_SOURCE_DIR = "Test Content"
+
+
+async def sync_files(
+    source_dir: Path | str | None = None,
+    *,
+    concurrency: int = 6,
+    force_summarize: bool = False,
+    force_ingest: bool = False,
+) -> None:
+    """Bring the manifest, Test Summaries/, and Qdrant into sync with `source_dir`.
+
+    1. Stage 1: summarize new + changed files under `source_dir`. Hard-delete
+       manifest rows (and their summary .md files) whose source has vanished.
+    2. Stage 2: ingest newly-summarized / re-summarized rows into Qdrant.
+       Hard-delete Qdrant points that no longer correspond to any manifest row.
+
+    At the end, the manifest, the Test Summaries/ directory, and the Qdrant
+    collection are all in agreement.
+
+    `source_dir` defaults to "Test Content" at the repo root, so `sync_files()`
+    with no arguments works from any CWD. Relative paths are resolved against
+    the repo root; absolute paths are used as-is.
+
+    `force_summarize=True` re-summarizes every file even if size is unchanged.
+    `force_ingest=True` drops + recreates the Qdrant collection before re-embedding.
+    """
+    from src.manifest import REPO_ROOT
+    from src.stage1.summarize import build_agent as build_summarize_agent, run_batch
+    from src.stage2.__main__ import ingest_from_manifest
+
+    if source_dir is None:
+        source_dir = DEFAULT_SOURCE_DIR
+    source_dir = Path(source_dir)
+    if not source_dir.is_absolute():
+        source_dir = REPO_ROOT / source_dir
+    if not source_dir.is_dir():
+        raise ValueError(f"not a directory: {source_dir}")
+
+    summ_agent = build_summarize_agent()
+    await run_batch(summ_agent, source_dir, force=force_summarize, concurrency=concurrency)
+    # ingest_from_manifest is sync (embedding + Qdrant network calls), so run
+    # it in a thread to keep the event loop free if the caller is async.
+    await asyncio.to_thread(ingest_from_manifest, force=force_ingest)
+
+
+def sync_files_sync(
+    source_dir: Path | str | None = None,
+    *,
+    concurrency: int = 6,
+    force_summarize: bool = False,
+    force_ingest: bool = False,
+) -> None:
+    asyncio.run(sync_files(
+        source_dir,
+        concurrency=concurrency,
+        force_summarize=force_summarize,
+        force_ingest=force_ingest,
+    ))
+
+
+def reset() -> dict:
+    """Factory reset: remove all summaries, the manifest, and the Qdrant collection.
+
+    Destructive. No confirmation prompt — the caller (e.g. the CLI layer) is
+    responsible for asking the user first. Returns a stats dict with counts
+    of what was removed so callers can log or display.
+
+    Filesystem cleanup happens first; Qdrant failures are logged but don't
+    abort the local cleanup (so a reset still works offline or when the
+    cluster is unreachable).
+    """
+    from src.manifest import DEFAULT_MANIFEST_PATH, REPO_ROOT
+    from src.stage2.db import COLLECTION_NAME, get_qdrant_client
+
+    summaries_dir = REPO_ROOT / "Test Summaries"
+
+    # Delete every summary .md file (keep the directory itself).
+    deleted_summaries = 0
+    if summaries_dir.is_dir():
+        for md in summaries_dir.glob("*.md"):
+            md.unlink()
+            deleted_summaries += 1
+
+    # Remove the manifest + any leftover .tmp from an interrupted save.
+    manifest_removed = False
+    if DEFAULT_MANIFEST_PATH.exists():
+        DEFAULT_MANIFEST_PATH.unlink()
+        manifest_removed = True
+    tmp = DEFAULT_MANIFEST_PATH.with_suffix(DEFAULT_MANIFEST_PATH.suffix + ".tmp")
+    if tmp.exists():
+        tmp.unlink()
+
+    # Drop the Qdrant collection. Don't fail the reset if Qdrant is down.
+    collection_dropped = False
+    qdrant_error: str | None = None
+    try:
+        client = get_qdrant_client()
+        if client.collection_exists(COLLECTION_NAME):
+            client.delete_collection(COLLECTION_NAME)
+            collection_dropped = True
+    except Exception as e:
+        qdrant_error = f"{type(e).__name__}: {e}"
+
+    return {
+        "summaries_deleted": deleted_summaries,
+        "manifest_removed": manifest_removed,
+        "collection_dropped": collection_dropped,
+        "qdrant_error": qdrant_error,
+    }
 
 
 def main() -> None:

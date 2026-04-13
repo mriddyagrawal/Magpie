@@ -23,11 +23,8 @@ from pathlib import Path
 from typing import Literal
 
 from dotenv import load_dotenv
-from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, NativeOutput
-from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.openai import OpenAIProvider
 
 from src.content import (
     IMAGE_EXTS,
@@ -35,13 +32,13 @@ from src.content import (
     SummarizeError,
     build_content_blocks,
 )
+from src.llm import build_chat_model
 from src.manifest import Manifest
 
 
 MAX_TEXT_CHARS = 120_000
 PDF_VISION_MAX_PAGES = 20
 HASH_CHUNK = 1 << 20  # 1 MiB
-API_MAX_RETRIES = 5
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SUMMARIES_DIR = REPO_ROOT / "Test Summaries"
@@ -63,23 +60,19 @@ SYSTEM_PROMPT = (
     "You are a file-summarization assistant. Given a single file's content, "
     "produce a FileSummary: a short `title`, a dense 2-5 sentence `summary`, "
     "the `content_type`, 3-10 `keywords`, and `key_entities`. "
-    "Be specific and factual. Do not invent content that is not present."
+    "Be specific and factual. Do not invent content that is not present. "
+    "Output RAW JSON only — do not wrap the response in markdown code fences "
+    "like ```json, and do not include any prose before or after the JSON object."
 )
 
 
 def build_agent() -> Agent[None, FileSummary]:
-    api_key = os.environ.get("MOONSHOT_API_KEY")
-    if not api_key:
-        sys.exit("error: MOONSHOT_API_KEY not set (put it in .env)")
-    model_name = os.environ.get("MOONSHOT_MODEL", "kimi-k2.5")
-    base_url = os.environ.get("MOONSHOT_BASE_URL", "https://api.moonshot.ai/v1")
-    client = AsyncOpenAI(
-        api_key=api_key,
-        base_url=base_url,
-        max_retries=API_MAX_RETRIES,
+    return Agent(
+        build_chat_model(),
+        output_type=NativeOutput(FileSummary),
+        system_prompt=SYSTEM_PROMPT,
+        retries=3,
     )
-    model = OpenAIChatModel(model_name, provider=OpenAIProvider(openai_client=client))
-    return Agent(model, output_type=NativeOutput(FileSummary), system_prompt=SYSTEM_PROMPT)
 
 
 def build_user_message(path: Path) -> list:

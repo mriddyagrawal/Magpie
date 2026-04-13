@@ -2,9 +2,20 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 import time
 from pathlib import Path
+
+# The workspace root has `package = false` (it isn't packaged, it's just a
+# workspace root), so the `src/*` modules aren't reachable via the normal
+# dependency path when `ns` runs as an installed console script. Prepend the
+# repo root to sys.path so `from src.pipeline import ...` works. `__file__`
+# resolves to cli/notspotlight/repl.py under uv's editable workspace install,
+# so parents[2] is the repo root.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 from dotenv import load_dotenv
 from prompt_toolkit import PromptSession
@@ -153,9 +164,62 @@ def _run_query(question: str) -> None:
         print_error(str(e))
 
 
-def main() -> None:
-    load_dotenv()
+def _cmd_sync(source_dir: str | None) -> int:
+    """Summarize new/changed files and ingest them into Qdrant."""
+    from src.pipeline import DEFAULT_SOURCE_DIR, sync_files_sync
 
+    target = source_dir or DEFAULT_SOURCE_DIR
+    console.print(f"\n[bold blue]Syncing[/bold blue] [dim]{target}[/dim] ...\n")
+    try:
+        t0 = time.monotonic()
+        sync_files_sync(source_dir)
+        elapsed = time.monotonic() - t0
+        console.print(f"\n[green]✓ Sync complete[/green] [dim]({elapsed:.1f}s)[/dim]\n")
+        return 0
+    except Exception as e:
+        print_error(f"sync failed: {type(e).__name__}: {e}")
+        return 1
+
+
+def _cmd_reset(assume_yes: bool) -> int:
+    """Wipe all summaries, the manifest, and the Qdrant collection."""
+    from src.pipeline import reset
+
+    console.print(
+        "\n[yellow bold]This will delete:[/yellow bold]\n"
+        "  • every file in Test Summaries/\n"
+        "  • Test Summaries/_manifest.json\n"
+        "  • the 'summaries' Qdrant collection\n"
+    )
+    if not assume_yes:
+        try:
+            confirm = input("Type 'yes' to continue: ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            console.print("\n[dim]Aborted.[/dim]")
+            return 1
+        if confirm != "yes":
+            console.print("[dim]Aborted.[/dim]")
+            return 1
+
+    try:
+        stats = reset()
+    except Exception as e:
+        print_error(f"reset failed: {type(e).__name__}: {e}")
+        return 1
+
+    console.print(
+        f"\n[green]✓ Reset complete[/green]\n"
+        f"  [dim]summaries deleted:[/dim] {stats['summaries_deleted']}\n"
+        f"  [dim]manifest removed:[/dim] {stats['manifest_removed']}\n"
+        f"  [dim]Qdrant collection dropped:[/dim] {stats['collection_dropped']}"
+    )
+    if stats.get("qdrant_error"):
+        console.print(f"  [yellow]qdrant warning:[/yellow] {stats['qdrant_error']}")
+    console.print()
+    return 0
+
+
+def _run_repl() -> None:
     print_banner()
 
     session: PromptSession = PromptSession(
@@ -180,6 +244,45 @@ def main() -> None:
             continue
 
         _run_query(text)
+
+
+def main() -> None:
+    load_dotenv()
+
+    parser = argparse.ArgumentParser(
+        prog="ns",
+        description="NotAnotherSpotlight — interactive RAG search over your local files.",
+    )
+    parser.add_argument(
+        "--sync",
+        nargs="?",
+        const="",
+        metavar="DIR",
+        help=(
+            "Summarize + ingest new/changed files (and prune deleted ones). "
+            "Optional DIR overrides the default (Test Content/). Exits when done."
+        ),
+    )
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Delete all summaries, the manifest, and the Qdrant collection. Prompts to confirm.",
+    )
+    parser.add_argument(
+        "-y", "--yes",
+        action="store_true",
+        help="Skip the confirmation prompt on --reset.",
+    )
+    args = parser.parse_args()
+
+    if args.reset:
+        sys.exit(_cmd_reset(assume_yes=args.yes))
+
+    if args.sync is not None:
+        # argparse gives us "" when --sync was passed with no argument.
+        sys.exit(_cmd_sync(source_dir=args.sync or None))
+
+    _run_repl()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: notspotlight
+Version: 0.1.0
+Summary: Interactive CLI for NotAnotherSpotlight.
+Requires-Python: >=3.11
+Requires-Dist: notanotherspotlight
+Requires-Dist: prompt-toolkit>=3.0
+Requires-Dist: rich>=13.0

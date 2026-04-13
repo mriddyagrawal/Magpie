@@ -15,6 +15,7 @@ class ParsedSummary:
     content_type: str
     keywords: list[str] = field(default_factory=list)
     key_entities: list[str] = field(default_factory=list)
+    identifiers: list[str] = field(default_factory=list)
     summary_file: str = ""
 
 
@@ -62,6 +63,7 @@ def parse_summary_file(path: Path) -> ParsedSummary:
     content_type = _extract_bold_field(text, "Content type")
     keywords = _split_comma_list(_extract_bold_field(text, "Keywords"))
     key_entities = _split_comma_list(_extract_bold_field(text, "Key entities"))
+    identifiers = _split_comma_list(_extract_bold_field(text, "Identifiers"))
 
     return ParsedSummary(
         source_path=source_path,
@@ -70,6 +72,7 @@ def parse_summary_file(path: Path) -> ParsedSummary:
         content_type=content_type,
         keywords=keywords,
         key_entities=key_entities,
+        identifiers=identifiers,
         summary_file=str(path),
     )
 

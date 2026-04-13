@@ -91,10 +91,18 @@ def _point_id(key: str) -> str:
 
 
 def _build_embedding_text(s: ParsedSummary) -> str:
-    """Combine fields into a single string for dense embedding."""
+    """Combine fields into a single string for both dense + BM25 embedding.
+
+    Includes key_entities and identifiers so BM25 can match exact tokens
+    (order numbers, dates, product names) that dense embeddings tend to wash out.
+    """
     parts = [s.title, s.summary]
     if s.keywords:
         parts.append(", ".join(s.keywords))
+    if s.key_entities:
+        parts.append(", ".join(s.key_entities))
+    if s.identifiers:
+        parts.append(", ".join(s.identifiers))
     return " ".join(parts)
 
 

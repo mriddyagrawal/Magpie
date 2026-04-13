@@ -48,21 +48,55 @@ ContentType = Literal["image", "pdf", "docx", "xlsx", "text", "code", "markdown"
 
 class FileSummary(BaseModel):
     title: str = Field(description="Short human-readable title for the file (<=80 chars).")
-    summary: str = Field(description="Dense 2-5 sentence summary of what the file contains.")
+    summary: str = Field(
+        description=(
+            "Comprehensive 3-7 sentence summary covering what the file is and the headline "
+            "facts (merchant/author, dates, totals, key items). Write natural prose but include "
+            "discriminator tokens verbatim — names, dates, totals — so retrieval can match them."
+        )
+    )
     content_type: ContentType = Field(description="What kind of content the file is.")
     keywords: list[str] = Field(description="3-10 topical keywords/tags for retrieval.")
     key_entities: list[str] = Field(
-        description="Named entities: people, orgs, places, products, paths, function names, IDs."
+        description=(
+            "Named entities mentioned in the file: people, organizations, places, products, "
+            "branches/locations, file paths, function/class names. One entity per item, "
+            "copied verbatim from the source."
+        )
+    )
+    identifiers: list[str] = Field(
+        description=(
+            "Exact-match tokens that uniquely distinguish this file from similar ones. "
+            "Copy capitalization, punctuation, and formatting EXACTLY as in the source. "
+            "Include any of: order/transaction/receipt/invoice/slip/register/store/cashier numbers, "
+            "barcodes, SKUs, dates in their original format (e.g. '25 May 2022', '05/04/23'), "
+            "version strings, error codes, URLs, exact prices with currency. "
+            "Empty list only if the file genuinely has none."
+        )
     )
 
 
 SYSTEM_PROMPT = (
-    "You are a file-summarization assistant. Given a single file's content, "
-    "produce a FileSummary: a short `title`, a dense 2-5 sentence `summary`, "
-    "the `content_type`, 3-10 `keywords`, and `key_entities`. "
-    "Be specific and factual. Do not invent content that is not present. "
-    "Output RAW JSON only — do not wrap the response in markdown code fences "
-    "like ```json, and do not include any prose before or after the JSON object."
+    "You are a file-summarization assistant. Given a single file's content, produce a "
+    "FileSummary with: `title`, `summary`, `content_type`, `keywords`, `key_entities`, "
+    "`identifiers`.\n\n"
+    "CRITICAL — preserve discriminators verbatim. The downstream retrieval system uses "
+    "BOTH dense embeddings (semantic) and BM25 (exact-token) over your output. For BM25 "
+    "to find a file later, the discriminating tokens must appear verbatim somewhere in "
+    "`summary`, `key_entities`, or `identifiers`. Be aggressive about capturing:\n"
+    "- All numeric IDs (order #, transaction #, receipt #, invoice #, slip #, register #, "
+    "store #, cashier ID, barcode, SKU)\n"
+    "- All dates in their ORIGINAL format (e.g. '25 May 2022', '05/04/23', '08-May-21')\n"
+    "- Merchant / store / organization name AND branch / location\n"
+    "- Full product / line-item names exactly as printed\n"
+    "- Totals, subtotals, exact prices and currency symbols\n"
+    "- For non-receipt files: file paths, function/class names, version strings, "
+    "error codes, URLs\n\n"
+    "Be specific and factual. Do not invent content that is not present. If a field "
+    "would be empty (e.g. `identifiers` for a code file), return an empty list — do "
+    "not pad with guesses.\n\n"
+    "Output RAW JSON only — do not wrap the response in markdown code fences like "
+    "```json, and do not include any prose before or after the JSON object."
 )
 
 
@@ -89,13 +123,15 @@ def build_user_message(path: Path) -> list:
 def render_markdown(summary: FileSummary, source_rel: str) -> str:
     keywords = ", ".join(summary.keywords) if summary.keywords else "—"
     entities = ", ".join(summary.key_entities) if summary.key_entities else "—"
+    identifiers = ", ".join(summary.identifiers) if summary.identifiers else "—"
     return (
         f"Source: {source_rel}\n\n"
         f"# {summary.title}\n\n"
         f"{summary.summary}\n\n"
         f"**Content type:** {summary.content_type}\n\n"
         f"**Keywords:** {keywords}\n\n"
-        f"**Key entities:** {entities}\n"
+        f"**Key entities:** {entities}\n\n"
+        f"**Identifiers:** {identifiers}\n"
     )
 
 

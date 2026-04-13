@@ -1,0 +1,22 @@
+[project]
+name = "notspotlight"
+version = "0.1.0"
+description = "Interactive CLI for NotAnotherSpotlight."
+requires-python = ">=3.11"
+dependencies = [
+    "notanotherspotlight",
+    "prompt-toolkit>=3.0",
+    "rich>=13.0",
+]
+
+[project.scripts]
+notspotlight = "notspotlight.repl:main"
+ns = "notspotlight.repl:main"
+nas = "notspotlight.repl:main"
+
+[tool.uv.sources]
+notanotherspotlight = { workspace = true }
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

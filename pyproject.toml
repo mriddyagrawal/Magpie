@@ -18,8 +18,15 @@ dependencies = [
     "fastembed>=0.4",
 ]
 
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
 [dependency-groups]
 dev = ["pytest>=8.0"]
 
 [tool.uv]
-package = false
+workspace = { members = ["cli"] }

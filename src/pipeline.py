@@ -26,7 +26,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 from src.answer import Answer, answer_question, build_answer_agent
-from src.stage2.search import SearchQuery, SearchResult, rewrite_query, run_search
+from src.stage2.search import SearchQuery, SearchResult, raw_query, rewrite_query, run_search
 
 
 @dataclass
@@ -40,21 +40,26 @@ class PipelineResult:
     sources_used: list[str]             # Subset of retrieved paths Kimi cited
 
 
-async def ask(question: str, *, top_k: int = 5) -> PipelineResult:
+async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> PipelineResult:
     """Run the full retrieve -> answer pipeline for one question.
 
-    1. `rewrite_query(question)` — Kimi turns the raw question into a
-       keyword-rich `SearchQuery`.
+    1. **Query construction.** If `rewrite=True`, Kimi expands the question
+       into a keyword-rich `SearchQuery` (~20s LLM round-trip). If False
+       (default), we skip the rewrite and send the raw question to the
+       embedders — faster, and usually fine for question sets that already
+       contain good entity names / document terms.
     2. `run_search(sq, top_k)` — Qdrant hybrid search (dense + BM25 via RRF)
        over the summary index.
     3. `answer_question(agent, question, paths)` — read the retrieved files,
        send them with the question to Kimi, get a grounded answer + citations.
 
-    Keeping the two halves of search separate (rewrite, then search) lets us
-    surface the rewritten query in `PipelineResult.search_query` for eval and
-    debugging.
+    `PipelineResult.search_query` always carries the query we actually sent
+    to the embedders (rewritten or raw), so eval and debugging see the truth.
     """
-    sq: SearchQuery = await asyncio.to_thread(rewrite_query, question)
+    if rewrite:
+        sq: SearchQuery = await asyncio.to_thread(rewrite_query, question)
+    else:
+        sq = raw_query(question)
     retrieved = await asyncio.to_thread(run_search, sq, top_k)
     if not retrieved:
         return PipelineResult(
@@ -78,8 +83,8 @@ async def ask(question: str, *, top_k: int = 5) -> PipelineResult:
     )
 
 
-def ask_sync(question: str, *, top_k: int = 5) -> PipelineResult:
-    return asyncio.run(ask(question, top_k=top_k))
+def ask_sync(question: str, *, top_k: int = 5, rewrite: bool = False) -> PipelineResult:
+    return asyncio.run(ask(question, top_k=top_k, rewrite=rewrite))
 
 
 def main() -> None:
@@ -90,11 +95,13 @@ def main() -> None:
     parser.add_argument("question", help="The natural-language question.")
     parser.add_argument("--top-k", type=int, default=5,
                         help="Number of files to retrieve from Qdrant (default: 5).")
+    parser.add_argument("--rewrite", action="store_true",
+                        help="Enable Kimi query rewriting (off by default — adds ~20s per call).")
     parser.add_argument("--json", action="store_true",
                         help="Emit JSON instead of human-readable output.")
     args = parser.parse_args()
 
-    result = ask_sync(args.question, top_k=args.top_k)
+    result = ask_sync(args.question, top_k=args.top_k, rewrite=args.rewrite)
 
     if args.json:
         print(json.dumps({

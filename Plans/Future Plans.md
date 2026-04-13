@@ -62,7 +62,7 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 
 **What:** Track every summarized source file in a **manifest** so we can answer three questions cheaply at sync time: (a) which files on disk are missing from the DB? (b) which files on disk have changed since we last summarized them? (c) which DB rows point at files that no longer exist on disk?
 
-**Proposed shape:** `Summaries/_manifest.jsonl` (or a SQLite DB once we have > ~10k files). One row per source path:
+**Proposed shape:** `Test Summaries/_manifest.jsonl` (or a SQLite DB once we have > ~10k files). One row per source path:
 
 ```json
 {
@@ -81,7 +81,7 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 2. For each file, `stat()` it and look up `path` in the manifest.
    - **mtime + size match** → skip. No hashing, no API call, no DB write. This is the 99% case and is cheap.
    - **mtime or size differ** → rehash. If the new digest matches the manifest's digest (metadata drift only — touch, rsync, backup restore), just update `mtime`/`size` in the manifest.
-   - **digest differs** → the content genuinely changed. Re-summarize, write a new `Summaries/<new-digest>.md`, update the manifest row, and mark the old digest's DB row as `status=deprecated` (keep the vector; filter it out at retrieval time by default).
+   - **digest differs** → the content genuinely changed. Re-summarize, write a new `Test Summaries/<new-digest>.md`, update the manifest row, and mark the old digest's DB row as `status=deprecated` (keep the vector; filter it out at retrieval time by default).
    - **No manifest row** → new file; summarize from scratch, add row.
 3. After walking, any manifest row whose `path` no longer exists on disk → mark `status=deleted`. Keep the summary file and the DB row, but filter them at retrieval.
 
@@ -94,7 +94,7 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 
 **Why we did NOT do it now:**
 
-- Stage 1 currently uses the content-addressed `Summaries/<digest>.md` layout as a de facto cache. It works for the "stateless re-run everything" case, which is where we are. The manifest only pays off once we have (a) a vector DB that can hold stale rows, and (b) corpora that are big enough that rehashing hurts.
+- Stage 1 currently uses the content-addressed `Test Summaries/<digest>.md` layout as a de facto cache. It works for the "stateless re-run everything" case, which is where we are. The manifest only pays off once we have (a) a vector DB that can hold stale rows, and (b) corpora that are big enough that rehashing hurts.
 - Premature: before Stage 2 exists, there is no vector DB to keep in sync with the filesystem. Filesystem-only consistency is already handled by the hash-keyed summary files.
 
 **When to revisit:** immediately after Stage 2 lands. The manifest should be written at the same time as the first vector insertion — otherwise we build up "ghost" vectors on day one.

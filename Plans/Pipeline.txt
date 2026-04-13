@@ -1,5 +1,5 @@
 Step 1: PARSER (parser.py)
-  Summaries/*.md  →  ParsedSummary objects
+  Test Summaries/*.md  →  ParsedSummary objects
   (just text extraction, no AI involved)
         ↓
 Step 2: EMBEDDING (embeddings.py)

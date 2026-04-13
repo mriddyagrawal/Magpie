@@ -17,21 +17,21 @@ SAMPLE = ParsedSummary(
     content_type="pdf",
     keywords=["Breeze Airways", "Greenville-Spartanburg", "Flight Receipt"],
     key_entities=["Mridul Agrawal", "Rahul Ranjan Sah"],
-    summary_file="Summaries/8c2bbf673a91ef8d.md",
+    summary_file="Test Summaries/8c2bbf673a91ef8d.md",
 )
 
 
 def test_point_id_deterministic():
     """Same summary_file must always produce the same point ID."""
-    id1 = _point_id("Summaries/8c2bbf673a91ef8d.md")
-    id2 = _point_id("Summaries/8c2bbf673a91ef8d.md")
+    id1 = _point_id("Test Summaries/8c2bbf673a91ef8d.md")
+    id2 = _point_id("Test Summaries/8c2bbf673a91ef8d.md")
     assert id1 == id2
 
 
 def test_point_id_unique():
     """Different summary_files must produce different point IDs."""
-    id1 = _point_id("Summaries/8c2bbf673a91ef8d.md")
-    id2 = _point_id("Summaries/ee0b5a0cf8c431f7.md")
+    id1 = _point_id("Test Summaries/8c2bbf673a91ef8d.md")
+    id2 = _point_id("Test Summaries/ee0b5a0cf8c431f7.md")
     assert id1 != id2
 
 

@@ -77,6 +77,6 @@ def parse_summary_file(path: Path) -> ParsedSummary:
 def load_all_summaries(summaries_dir: Path) -> list[ParsedSummary]:
     """Load and parse all .md files from the summaries directory."""
     if not summaries_dir.is_dir():
-        raise FileNotFoundError(f"Summaries directory not found: {summaries_dir}")
+        raise FileNotFoundError(f"summaries directory not found: {summaries_dir}")
     files = sorted(summaries_dir.glob("*.md"))
     return [parse_summary_file(f) for f in files]

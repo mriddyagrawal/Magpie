@@ -32,7 +32,7 @@ HASH_CHUNK = 1 << 20  # 1 MiB
 API_MAX_RETRIES = 5
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SUMMARIES_DIR = REPO_ROOT / "Summaries"
+SUMMARIES_DIR = REPO_ROOT / "Test Summaries"
 
 ContentType = Literal["image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other"]
 

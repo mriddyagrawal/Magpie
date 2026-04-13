@@ -1,6 +1,6 @@
 """Tests for the summary markdown parser.
 
-Ground truth: Summaries/8c2bbf673a91ef8d.md
+Ground truth: Test Summaries/8c2bbf673a91ef8d.md
 Source: Test Content/Flight GSP - Hartford Receipt.pdf
 Title: Breeze Airways Flight Receipt: Greenville-Spartanburg to Bradley
 Content type: pdf
@@ -10,7 +10,7 @@ from pathlib import Path
 
 from src.stage2.parser import load_all_summaries, parse_summary_file
 
-SUMMARIES_DIR = Path(__file__).resolve().parents[2] / "Summaries"
+SUMMARIES_DIR = Path(__file__).resolve().parents[2] / "Test Summaries"
 FLIGHT_SUMMARY = SUMMARIES_DIR / "8c2bbf673a91ef8d.md"
 
 

@@ -220,3 +220,94 @@ Summary: This spreadsheet tracks the Fall 2024 financial budget...
 
 ...up to 5 results
 ```
+
+---
+
+## Pipeline (Stage 2 + Stage 4 combined)
+
+```
+┌─────────────────────────────┐
+│  User Question              │
+│  "how much was the flight?" │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  Steps 4-6: Search          │
+│  (as above)                 │
+│  OUT: top-k paths + scores  │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  Step 7: Read Source Docs   │
+│  IN:  top-k file paths      │
+│  OUT: extracted text/images │
+│       from original files   │
+│  (via src/content.py)       │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  Step 8: Kimi Answer        │
+│  IN:  question + file       │
+│       contents              │
+│  OUT: Answer                │
+│       {answer: "The flight  │
+│        cost $170.45...",    │
+│        sources_used:        │
+│        ["Test Content/      │
+│         Flight GSP..."]}    │
+└─────────────────────────────┘
+```
+
+---
+
+## Interactive CLI (notspotlight)
+
+```
+┌─────────────────────────────┐
+│  User launches CLI          │
+│  $ notspotlight / ns / nas  │
+│  $ just chat                │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  Banner + Suggestions       │
+│  REPL loop starts           │
+│  (prompt_toolkit)           │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  User types question        │
+│  "how much was the flight?" │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  Step-by-step progress:     │
+│  ✓ Using raw query (0.0s)   │
+│  ✓ Query embedded (0.3s)    │
+│  ✓ Qdrant searched (0.2s)   │
+│  ✓ Answer generated (5.1s)  │
+│  Total: 5.6s                │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  Display:                   │
+│  ┌ Retrieved Documents ──┐  │
+│  │ #1 [0.871] Flight.pdf │  │
+│  │ #2 [0.342] Avelo.pdf  │  │
+│  └───────────────────────┘  │
+│  ╭─ Answer ──────────────╮  │
+│  │ The flight cost        │  │
+│  │ $170.45 USD...         │  │
+│  ╰───────────────────────╯  │
+│  Sources used:              │
+│    → Flight GSP - Hartford  │
+│      Receipt.pdf            │
+└─────────────────────────────┘
+```

@@ -19,12 +19,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from dotenv import load_dotenv  # noqa: E402
-from tqdm import tqdm  # noqa: E402
+from dotenv import load_dotenv
+from tqdm import tqdm
 
-from answer import answer_question, build_answer_agent  # noqa: E402
+from src.answer import answer_question, build_answer_agent
 
 
 QUESTIONS_FILE = REPO_ROOT / "Test Questions" / "questions.jsonl"

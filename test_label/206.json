@@ -1,0 +1,296 @@
+[
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Tiger Chips Seasoned\nCheese (83g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cheetos Crunchy\nDangerously Cheesy (81g)",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 4.91 is already included in\nthe total amount.",
+            "Cheetos Puffs Dangerously\n1 5.00\n5.00\nCheesy (81g)",
+            "Tiger Chips Seasoned\n2 5.00\n10.00\nCheese (83g)\nCandies",
+            "Halls Candies Fresh Mint (9\n8 5.00\n40.00\nPcs)",
+            "Molto Fino Bastrami (85g)\n2 6.00\n12.00",
+            "Harvest Fava Beans Plain\n1 16.00 16.00\nOffer 2*1 (400g)",
+            "Harvest Fava Beans\n1 22.00 22.00\nStrained With Tahina 2\npieces* (400g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Cheetos Puffs Dangerously\nCheesy (81g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many Harvest Fava Beans Plain Offer 2*1 were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cheetos Crunchy were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Harvest Fava Beans Strained With Tahina 2 pieces cost?",
+        "answer": "22.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 4.91",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 115.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total discount amount?",
+        "answer": "-EGP 25.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 100.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 115.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Cheetos Crunchy\nDangerously Cheesy (81g)",
+            "Tiger Chips Seasoned\nCheese (83g)",
+            "Halls Candies Fresh Mint (9\nPcs)",
+            "Molto Fino Bastrami (85g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 100.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#279-4444722",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Halls Candies Fresh Mint were ordered?",
+        "answer": "8",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Halls Candies Fresh Mint (9\nPcs)",
+        "source": "Human"
+    },
+    {
+        "question": "How much did one Cheetos Crunchy cost?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Tiger Chips Seasoned Cheese cost?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Harvest Fava Beans Plain Offer 2*1 cost?",
+        "answer": "16.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cheetos Crunchy\nDangerously Cheesy (81g)",
+                "quantity": "2",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Cheetos Puffs Dangerously\nCheesy (81g)",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Tiger Chips Seasoned\nCheese (83g)",
+                "quantity": "2",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Halls Candies Fresh Mint (9\nPcs)",
+                "quantity": "8",
+                "total_price": "40.00"
+            },
+            {
+                "item": "Molto Fino Bastrami (85g)",
+                "quantity": "2",
+                "total_price": "12.00"
+            },
+            {
+                "item": "Harvest Fava Beans Plain\nOffer 2*1 (400g)",
+                "quantity": "1",
+                "total_price": "16.00"
+            },
+            {
+                "item": "Harvest Fava Beans\nStrained With Tahina 2\npieces* (400g)",
+                "quantity": "1",
+                "total_price": "22.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Molto Fino Bastrami cost?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Cheetos Puffs Dangerously Cheesy cost?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Harvest Fava Beans Strained With Tahina 2 pieces were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "24/07/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many Molto Fino Bastrami were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 100.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Halls Candies Fresh Mint cost?",
+        "answer": "40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Tiger Chips Seasoned Cheese were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cheetos Puffs Dangerously Cheesy were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#279-4444722",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the 2 Cheetos Crunchy cost?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

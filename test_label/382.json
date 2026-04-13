@@ -1,0 +1,271 @@
+[
+    {
+        "question": "What is the register number?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "D's Candy Palmier 425g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "LE0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "4/10/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE15.96",
+            "D's Candy Palmier 425g\nLE130.\n1\nLE130.0\n00\n0*",
+            "Danone Light Yogurt 170\nLE10.0\n1\nLE10.00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE15.96",
+        "source": "Human"
+    },
+    {
+        "question": "What kind of receipt is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "How many D's Candy Palmier 425g were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the Gourmet Cheese Cracke?",
+        "answer": "LE39.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "4/10/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Gourmet Cheese Cracke",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "LE179.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:24:44 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Gourmet Cheese Crackers were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": [
+            "Gourmet Cheese Cracke",
+            "D's Candy Palmier 425g",
+            "Danone Light Yogurt 170"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "How many Danone Light Yogurt 170 were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "12:24:44 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1312422",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Danone Light Yogurt 170?",
+        "answer": "LE10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Mostaf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1312422",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "3GOURMET\nFOOD STORES",
+        "source": "Human"
+    },
+    {
+        "question": "What was the sales tax percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE179.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 39.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 130.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:24:44 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Gourmet Cheese Cracke",
+                "quantity": "1",
+                "total_price": "LE39.00"
+            },
+            {
+                "item": "D's Candy Palmier 425g",
+                "quantity": "1",
+                "total_price": "LE130.0"
+            },
+            {
+                "item": "Danone Light Yogurt 170",
+                "quantity": "1",
+                "total_price": "LE10.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE179.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the net amount?",
+        "answer": "LE179.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE179.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the D's Candy Palmier 425g?",
+        "answer": "LE130.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Arkan, Sheikh Zayed, Giza, 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Danone Light Yogurt 170",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales tax amount?",
+        "answer": "LE15.96",
+        "source": "GPT"
+    }
+]

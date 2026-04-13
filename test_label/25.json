@@ -1,0 +1,383 @@
+[
+    {
+        "question": "What is the price of a JERSEY SET - JUMPSUIT with item number 8681382901288?",
+        "answer": "119.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 129.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "7/30/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 119.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "7/30/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "LE 1,934.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "TEMA RETAIL\nEG",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1,934.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "237.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 129.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "010300000000046197",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:26",
+        "source": "Human"
+    },
+    {
+        "question": "What kind of item is the 'UNDERWEAR KEY'?",
+        "answer": "PYJAMAS SET SHORT-SLEEVE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "JERSEY BODY - T-SHIRT SHORT-SLEEVED"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 149.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the JERSEY BODY - T-SHIRT SHORT-SLEEVED with item number 8681385551367?",
+        "answer": "129.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1,934.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales VAT (14%)\n:\nLE 237.50",
+            "JERSEY TROUSERS\n8681380240655\n1\n129.00\n129.00",
+            "UNDERWEAR KEY PYJAMAS SET SHORT-SLEEVE\n8681386028318\n1\n119.00\n119.00",
+            "JERSEY BODY - T-SHIRT SHORT-SLEEVED\n8681385551367\n1\n129.00\n129.00",
+            "JERSEY BODY - T-SHIRT SHORT-SLEEVED\n8681381155781\n1\n99.00\n99.00",
+            "JERSEY BODY - T-SHIRT SHORT-SLEEVED\n4065717050966\n1\n89.00\n89.00",
+            "JERSEY TROUSERS\n8681380005704\n1\n199.00\n199.00",
+            "JERSEY TROUSERS - LEGGINGS\n8681386449625\n1\n69.00\n69.00",
+            "JERSEY BODY - T-SHIRT SHORT-SLEEVED\n4065717348391\n1\n129.00\n129.00",
+            "JERSEY TROUSERS - LEGGINGS\n8681386450331\n1\n34.00\n34.00",
+            "JERSEY TROUSERS - LEGGINGS\n8681381462490\n79.00\n79.00",
+            "JERSEY TROUSERS - LEGGINGS\n8681386448468\n1\n59.00\n59.00",
+            "JERSEY TROUSERS - LEGGINGS\n8681388936208\n1\n34.00\n34.00",
+            "JERSEY TANKTOP\n8681385701847\n69.00\n69.00",
+            "JERSEY BODY - T-SHIRT SHORT-SLEEVED\n8681386253352\n1\n44.00\n44.00",
+            "JERSEY BODY - T-SHIRT SHORT-SLEEVED\n8681381546985\n7\n69.00\n69.00",
+            "WOVEN TROUSERS\n8681386441971\n49.00\n49.00",
+            "VOVEN TROUSERS\n8681386443036\n1\n99.00\n99.00",
+            "WOVEN TROUSERS\n8681386194211\n1\n69.00",
+            "69.00",
+            "JERSEY SET - JUMPSUIT\n8681382901288\n1\n119.00\n119.00",
+            "JERSEY TROUSERS\n8681384273840\n1\n99.00\n99.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the warranty period for product return?",
+        "answer": "30 days",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "LC WAIKIKI",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "0000287084",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "LE 237.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "010300000000046197",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the JERSEY BODY with item number 8681386253352?",
+        "answer": "44.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the JERSEY TROUSERS with item number 8681384220417?",
+        "answer": "149.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "JERSEY TROUSERS",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the JERSEY TROUSERS with item number 8681380005704?",
+        "answer": "199.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "SUN CITY WALL, CAIRO, EGY",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount without VAT?",
+        "answer": "LE 1,696.50",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "JERSEY TROUSERS",
+                "quantity": "1",
+                "total_price": "149.00"
+            },
+            {
+                "item": "JERSEY TROUSERS",
+                "quantity": "1",
+                "total_price": "129.00"
+            },
+            {
+                "item": "UNDERWEAR KEY PYJAMAS SET SHORT-SLEEVE",
+                "quantity": "1",
+                "total_price": "119.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "129.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "99.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "89.00"
+            },
+            {
+                "item": "JERSEY TROUSERS",
+                "quantity": "1",
+                "total_price": "199.00"
+            },
+            {
+                "item": "JERSEY TROUSERS - LEGGINGS",
+                "quantity": "1",
+                "total_price": "69.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "129.00"
+            },
+            {
+                "item": "JERSEY TROUSERS - LEGGINGS",
+                "quantity": "1",
+                "total_price": "34.00"
+            },
+            {
+                "item": "JERSEY TROUSERS - LEGGINGS",
+                "quantity": "1",
+                "total_price": "79.00"
+            },
+            {
+                "item": "JERSEY TROUSERS - LEGGINGS",
+                "quantity": "1",
+                "total_price": "59.00"
+            },
+            {
+                "item": "JERSEY TROUSERS - LEGGINGS",
+                "quantity": "1",
+                "total_price": "34.00"
+            },
+            {
+                "item": "JERSEY TANKTOP",
+                "quantity": "1",
+                "total_price": "69.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "44.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "7",
+                "total_price": "69.00"
+            },
+            {
+                "item": "WOVEN TROUSERS",
+                "quantity": "1",
+                "total_price": "49.00"
+            },
+            {
+                "item": "VOVEN TROUSERS",
+                "quantity": "1",
+                "total_price": "99.00"
+            },
+            {
+                "item": "WOVEN TROUSERS",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "69.00"
+            },
+            {
+                "item": "JERSEY SET - JUMPSUIT",
+                "quantity": "1",
+                "total_price": "119.00"
+            },
+            {
+                "item": "JERSEY TROUSERS",
+                "quantity": "1",
+                "total_price": "99.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "JERSEY TROUSERS",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "1,696.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of a JERSEY TROUSERS - LEGGINGS with item number 8681386450331?",
+        "answer": "34.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the item with number 8681381155781?",
+        "answer": "99.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1,934.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "UNDERWEAR KEY PYJAMAS SET SHORT-SLEEVE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What currency is used?",
+        "answer": "LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "MOHANED SALAH",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased in total?",
+        "answer": "21",
+        "source": "GPT"
+    }
+]

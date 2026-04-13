@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "2795.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount paid in pounds?",
+        "answer": "95.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website address?",
+        "answer": "www.luluhypermarket.com",
+        "source": "GPT"
+    },
+    {
+        "question": "How many days can you return fresh food?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "19.04.2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Lulu Hypermarket,",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "2795.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "38205",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "The Park Mall, 5th Settlement, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who authorized the sale?",
+        "answer": "Shaimaa Farghaly Hussen",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the CR Number?",
+        "answer": "66533",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 2795.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many days can you return other items?",
+        "answer": "30",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "2795.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Lulu Hypermarket",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "17:09",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store POS number?",
+        "answer": "3912",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the parking free coupon value?",
+        "answer": "150.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax card number?",
+        "answer": "447-599-798",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "38205",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1 x\n2795.00\nV6\nبَار خن بيزجن\nBrgn M&c Water Dispenser BY90 2795.00\nPARKING FREE COUPON\n150. 001 Coup"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the item purchased?",
+        "answer": "Brgn H&C Water Dispenser BY90",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the credit sale amount?",
+        "answer": "2700.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:09",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Brgn M&c Water Dispenser BY90",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount for the purchase?",
+        "answer": "2795.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Who served the customer?",
+        "answer": "Mustafa Khaled Mahmoud Mahmoud",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:09",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Brgn M&c Water Dispenser BY90",
+                "quantity": "1",
+                "total_price": "2795.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "+201275898394",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "19.04.2022",
+        "source": "GPT"
+    }
+]

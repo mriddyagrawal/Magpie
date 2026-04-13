@@ -1,0 +1,323 @@
+[
+    {
+        "question": "What is the transaction number?",
+        "answer": "10036890",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 19.13,
+        "source": "Human"
+    },
+    {
+        "question": "What was purchased for 9.50?",
+        "answer": "Fruits Lolli",
+        "source": "GPT"
+    },
+    {
+        "question": "What was purchased for 50.00?",
+        "answer": "Caesar S",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "9944697\n10036890",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "6/30/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "198.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Tostino",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:56:40 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the smoked Turk?",
+        "answer": "59.40",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the Tostinos?",
+        "answer": "19.13",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "METRO",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "oked Turk 0.27\n220.00",
+            "59.40\nTostino 0.255067\n75.00",
+            "19.13",
+            "1\nCaesar S\n50.00\n50.00",
+            "1\nCorn Flake\n29.99",
+            "29.99",
+            "1",
+            "3.25\nCho",
+            "3.25",
+            "1",
+            "Let",
+            "13.99",
+            "13.99",
+            "Wit",
+            "9.50",
+            "1\n9.50",
+            "Dunt",
+            "Lolli",
+            "1\n12.99\n12.99"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the care number?",
+        "answer": "19073",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Tostinos per kg?",
+        "answer": "75.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "198.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "10:56:40 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the email address for suggestions?",
+        "answer": "care@mansourgro",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Caesar S",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "oked Turk",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:56:40 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How much Tostinos was purchased?",
+        "answer": "0.255067 Kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 50.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "oked Turk",
+                "quantity": "0.27",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Tostino",
+                "quantity": "0.255067",
+                "total_price": "59.40"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "19.13"
+            },
+            {
+                "item": "Caesar S",
+                "quantity": "1",
+                "total_price": "50.00"
+            },
+            {
+                "item": "Corn Flake",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "29.99"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Cho",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "3.25"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Let",
+                "quantity": "1",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "19",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "198.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 59.4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "METRO\nMANSOUR",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Smoked Turk per kg?",
+        "answer": "220.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "19",
+        "source": "Human"
+    },
+    {
+        "question": "How much Smoked Turk was purchased?",
+        "answer": "0.27 Kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "198.25",
+        "source": "Human"
+    },
+    {
+        "question": "What was purchased for 29.99?",
+        "answer": "Corn Flake and Biscuit Cho",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website?",
+        "answer": "www.metro-markets.c",
+        "source": "GPT"
+    },
+    {
+        "question": "What was purchased for 13.99?",
+        "answer": "o Dunt Wit",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What was purchased for 3.25?",
+        "answer": "Iceberg Let",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "6/30/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.255067",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "0.27",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

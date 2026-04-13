@@ -1,0 +1,257 @@
+[
+    {
+        "question": "What is the street address?",
+        "answer": "45 Main Street",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "BONELESS WINGS SPEC",
+        "source": "Human"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "555149",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "$10.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "BONELESS WINGS SPEC"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the establishment?",
+        "answer": "General Poor's Tavern",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the tax?",
+        "answer": "$0.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:30pm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "GENERAL POOR'S",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal with tax?",
+        "answer": "$10.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "40",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was ordered?",
+        "answer": "40 boneless wings spec",
+        "source": "GPT"
+    },
+    {
+        "question": "What city and state is the establishment located in?",
+        "answer": "Hackensack, NJ",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number of the establishment?",
+        "answer": "(201)487-5882",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What type of food is being sold?",
+        "answer": "Wings",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Check#:555149",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "$10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Is the restaurant thanking the customer?",
+        "answer": "yes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "$10.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the closing word on the receipt?",
+        "answer": "TIM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "40 BONELESS WINGS SPEC\n$10.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "$10.70",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the zip code?",
+        "answer": "07601",
+        "source": "GPT"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "0",
+        "source": "GPT"
+    },
+    {
+        "question": "Is the receipt handwritten or printed?",
+        "answer": "printed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the check?",
+        "answer": "04/10/16",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "BONELESS WINGS SPEC",
+                "quantity": "40",
+                "total_price": "$10.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "$10.70",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:30pm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "$10.70",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "$0.70",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the check from?",
+        "answer": "12:30pm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Date:04/10/16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of 40 boneless wings?",
+        "answer": "$10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the server?",
+        "answer": "Veronique",
+        "source": "GPT"
+    }
+]

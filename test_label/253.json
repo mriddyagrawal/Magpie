@@ -1,0 +1,281 @@
+[
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "26.18\nVAT value of EGP 8.61 is already included in\nthe total",
+            "Carton (1.5L*12)\nBiscuits, Wafers & Cakes",
+            "Molto Mini Croissants With\nChocolate & Hazelnut\n2 5.00\n10.00\nCream (90g)\nLong-Life Milk",
+            "Juhayna Skimmed Milk (1L)\n1\n17.23\n17.23\nJuice",
+            "Juhayna Classic Apple (1L)\n1\n10.85 10.85"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 17.23,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Molto Mini Croissants With\nChocolate & Hazelnut\nCream (90g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Carton (1.5L*12)\nBiscuits, Wafers & Cakes",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#816-2196727",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount of the discount?",
+        "answer": "-EGP 5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Molto Mini Croissants With\nChocolate & Hazelnut\nCream (90g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Molto Mini Croissant with Chocolate & Hazelnut Cream?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 86.03",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of Molto Mini Croissants?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order before discounts and delivery?",
+        "answer": "86.03",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-EGP 64.85",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "8 January, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 91.03",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 91.03",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Water\nNestle Natural Water",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 91.03",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many cartons of Nestle Natural Water were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of Juhayna Classic Apple juice?",
+        "answer": "10.85",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Molto Mini Croissants with Chocolate & Hazelnut Cream were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many bags were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "26.18",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of Juhayna Skimmed Milk?",
+        "answer": "17.23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 47.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Juhayna Skimmed Milk (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total of the order?",
+        "answer": "91.03",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Water\nNestle Natural Water",
+                "quantity": "1",
+                "total_price": "47.95"
+            },
+            {
+                "item": "Carton (1.5L*12)\nBiscuits, Wafers & Cakes",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Molto Mini Croissants With\nChocolate & Hazelnut\nCream (90g)",
+                "quantity": "2",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Juhayna Skimmed Milk (1L)",
+                "quantity": "1",
+                "total_price": "17.23"
+            },
+            {
+                "item": "Juhayna Classic Apple (1L)",
+                "quantity": "1",
+                "total_price": "10.85"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#816-2196727",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the water?",
+        "answer": "47.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "04:00 PM - 05:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website address?",
+        "answer": "www.breadfast.com",
+        "source": "GPT"
+    }
+]

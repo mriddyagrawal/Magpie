@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the order?",
+        "answer": "EGP 36.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What kind of paste was ordered?",
+        "answer": "Knorr Tomato Sauce (360g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 26.24",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Lay's chips?",
+        "answer": "6.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Indomie Superm\nVegetables Noodles\n(110g)",
+        "source": "Human"
+    },
+    {
+        "question": "What kind of instant noodles were ordered?",
+        "answer": "Indomie Supermi Vegetables Noodles (110g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of chips was ordered?",
+        "answer": "Lay's Gourmet Mexican Fiery Chipotle (60g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery cost?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "13 July, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the Indomie noodles?",
+        "answer": "4.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Knorr Tomato Sauce\n(360g)\nInstant Noodles",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Lay's chips were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 6.25,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 36.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Lay's Gourmet\nMexican Fiery\n(60g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What items were ordered that were in the 'Chips' category?",
+        "answer": "Lay's Gourmet Mexican Fiery Chipotle (60g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the Knorr Tomato Sauce?",
+        "answer": "15.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 15.99,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "How many Indomie noodles were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#131-4678781",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 2.",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Lay's Gourmet\nMexican Fiery\n(60g)",
+                "quantity": "1",
+                "total_price": "6.25"
+            },
+            {
+                "item": "Knorr Tomato Sauce\n(360g)\nInstant Noodles",
+                "quantity": "1",
+                "total_price": "15.99"
+            },
+            {
+                "item": "Indomie Superm\nVegetables Noodles\n(110g)",
+                "quantity": "1",
+                "total_price": "4.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What items were ordered that were in the 'Pastes' category?",
+        "answer": "Knorr Tomato Sauce (360g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT value of this order?",
+        "answer": "EGP 2.73",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 4.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Knorr Tomato Sauces were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#131-4678781",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 26.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "value of EGP 2.",
+            "Knorr Tomato Sauce\n1\n15.99 15.99\n(360g)\nInstant Noodles",
+            "Indomie Superm\n1 4.00\n4.00\nVegetables Noodles\n(110g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 36.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 36.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "03:00 AM - 04:00 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store the order was from?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What payment method was used for the order?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    }
+]

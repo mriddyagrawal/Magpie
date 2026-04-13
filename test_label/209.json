@@ -1,0 +1,281 @@
+[
+    {
+        "question": "What is the item description of the first item?",
+        "answer": "Gourmet Chia Seeds 650g",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website address of gourmet?",
+        "answer": "www.gourmetegypt.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 210.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "CarmencitaSmkdSpnshSwtPPrka75g"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the account number?",
+        "answer": "88000034541",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Gourmet Chia Seeds 650g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item description of the fourth item?",
+        "answer": "Pantufla WomenSlippr Teddy Bear",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much were the website delivery charges?",
+        "answer": "25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of the CarmencitaSmkdSpnshSwtPPrka75g item?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "28.86",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store where the purchase was made?",
+        "answer": "Gourmet Food Stores",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the reference number?",
+        "answer": "Not specified",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Pantufla WomenSlippr TeddyBear",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "568",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the online amount?",
+        "answer": "568",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Dalia El Hamamsu",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "a.ali",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "CCMW000951227",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "101",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Rosemary 100g, Gourmet Fresh",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the VAT?",
+        "answer": "28.86",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the work order number?",
+        "answer": "191087",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "568",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "568",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:02 pm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 118.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "CarmencitaSmkdSpnshSwtPPrka75g",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT 14%\n28.86",
+            "1\nRosemary 100g, Gourmet Fresh\n20",
+            "2\nCarmencitaSmkdSpnshSwtPPrka75g\n118",
+            "1\nPantufla WomenSlippr TeddyBear\n210",
+            "1\nWebsite Delivery Charges\n25"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:02 pm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of one Gourmet Chia Seeds?",
+        "answer": "195",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "02/26/2022 02:02 pm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount of the bill?",
+        "answer": "568",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the due date for the order?",
+        "answer": "02/26/2022 05:00 pm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 195.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "191087",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "02/26/2022",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Gourmet Chia Seeds 650g",
+                "quantity": "1",
+                "total_price": "195"
+            },
+            {
+                "item": "Rosemary 100g, Gourmet Fresh",
+                "quantity": "1",
+                "total_price": "20"
+            },
+            {
+                "item": "CarmencitaSmkdSpnshSwtPPrka75g",
+                "quantity": "2",
+                "total_price": "118"
+            },
+            {
+                "item": "Pantufla WomenSlippr TeddyBear",
+                "quantity": "1",
+                "total_price": "210"
+            },
+            {
+                "item": "Website Delivery Charges",
+                "quantity": "1",
+                "total_price": "25"
+            }
+        ],
+        "source": "Human"
+    }
+]

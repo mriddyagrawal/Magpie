@@ -1,0 +1,303 @@
+[
+    {
+        "question": "How many Dasani Natural Water Cartons were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Soft Breads were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Nescafe 2-in-1 Free Suger?",
+        "answer": "3.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 51.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Lamar Orange Juice?",
+        "answer": "25.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 302.30",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 23.72",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price for the Dasani Natural Water Cartons?",
+        "answer": "51.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 210.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Soft Bread?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal amount?",
+        "answer": "EGP 302.30",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 210.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Nescafe 2-in-1 Free Suger were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT value?",
+        "answer": "EGP 23.72",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the Lamar Orange Juice?",
+        "answer": "25.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price for the Soft Bread?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Soft Bread",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "5 Soft Bread",
+                "quantity": "1",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Dasani Natural Water\nCarton (1.5L *12)\nCoffee",
+                "quantity": "1",
+                "total_price": "51.00"
+            },
+            {
+                "item": "Nescafe 2-in-1 Free Suger\n(10g)\nJuice",
+                "quantity": "1",
+                "total_price": "3.00"
+            },
+            {
+                "item": "Lamar Orange Juice (1L)",
+                "quantity": "1",
+                "total_price": "25.00"
+            },
+            {
+                "item": "Dove Intensive Repair Oil",
+                "quantity": "1",
+                "total_price": "47.30"
+            },
+            {
+                "item": "Sunshine Tuna Chunks\nDiet (185g)\nOats & Muesli",
+                "quantity": "1",
+                "total_price": "25.00"
+            },
+            {
+                "item": "Sante Granola Fruit with\nStrawberry, Cranberry &\nRaspberry (350g)\nOlls",
+                "quantity": "1",
+                "total_price": "65.00"
+            },
+            {
+                "item": "Slite Sunflower Oil (2.25L)",
+                "quantity": "1",
+                "total_price": "76.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Lamar Orange Juice were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "9",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "5 Soft Bread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price for the Nescafe 2-in-1 Free Suger?",
+        "answer": "3.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 210.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Soft Bread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#79-3697372",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "9",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 3.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#79-3697372",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Nescafe 2-in-1 Free Suger\n(10g)\nJuice",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Dasani Natural Water Cartons?",
+        "answer": "51.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "7 May, 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount code?",
+        "answer": "SJW",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 210.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Dasani Natural Water\nCarton (1.5L *12)\nCoffee",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total discount applied?",
+        "answer": "-EGP 2.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 23.72 is already included in\nthe total amount.",
+            "5 Soft Bread\n1 10.00 10.00\nWater",
+            "Dasani Natural Water\n1 51.00 51.00\nCarton (1.5L *12)\nCoffee",
+            "Nescafe 2-in-1 Free Suger\n1 3.00\n3.00\n(10g)\nJuice",
+            "Lamar Orange Juice (1L)\n1 25.00 25.00",
+            "Dove Intensive Repair Oil\n1 47.30 47.30\nReplacement (300ml)\nCanned Fish",
+            "Sunshine Tuna Chunks\n1 25.00 25.00\nDiet (185g)\nOats & Muesli",
+            "Sante Granola Fruit with\n1 65.00 65.00\nStrawberry, Cranberry &\nRaspberry (350g)\nOlls",
+            "Slite Sunflower Oil (2.25L)\n1 76.00 76.00"
+        ],
+        "source": "Human"
+    }
+]

@@ -1,0 +1,257 @@
+[
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "MERIT FILTER"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number?",
+        "answer": "379",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "04/02/23",
+        "source": "GPT"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount of the first item?",
+        "answer": "104.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 104.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the establishment?",
+        "answer": "CFC2 - El OROBA",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the establishment?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "104.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:54",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount paid?",
+        "answer": "104.00 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the description of the item?",
+        "answer": "MERIT FILTER",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the third item?",
+        "answer": "-104.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000208-P20000091709",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "10:54",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the number below the barcode?",
+        "answer": "T202000106850",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "04/02/23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the staff name?",
+        "answer": "Ahmed Ramadan Trans",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What word is above the barcode?",
+        "answer": "Welcome",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item on the list?",
+        "answer": "MERIT FILTER",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "MERIT FILTER",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Item No .:\n379\nMERIT FILTER\n2 pcs @ 52.00\n104.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Emarat Misr",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "104.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many pieces were bought?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "MERIT FILTER",
+                "quantity": "2",
+                "total_price": "104.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:54",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price per piece?",
+        "answer": "52.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "104.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the second item?",
+        "answer": "104.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the number to the right of the location?",
+        "answer": "106850",
+        "source": "GPT"
+    }
+]

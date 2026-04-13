@@ -1,0 +1,300 @@
+[
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Green House - Beet Root\n(5 Pieces)",
+                "quantity": "1",
+                "total_price": "35.00"
+            },
+            {
+                "item": "Linan Farms Medjool On\nThe Go (50g)",
+                "quantity": "4",
+                "total_price": "48.00"
+            },
+            {
+                "item": "Soft Drinks",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "7up Free (330ml)\nCake",
+                "quantity": "3",
+                "total_price": "18.00"
+            },
+            {
+                "item": "Chocolate Pound Cake",
+                "quantity": "1",
+                "total_price": "85.00"
+            },
+            {
+                "item": "Tarweaa Sambosak\nSpinach (10 Pieces)",
+                "quantity": "1",
+                "total_price": "55.00"
+            },
+            {
+                "item": "Tagen Setto Okra With\nMeat Tagine (900g)",
+                "quantity": "1",
+                "total_price": "60.00"
+            },
+            {
+                "item": "Levantine Egypt Shish\nTawook Main Entrée\n(1KG)",
+                "quantity": "1",
+                "total_price": "300.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-EGP 38.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#314-4087087",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 573.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT value included in the total amount?",
+        "answer": "EGP 6.26",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the final total amount?",
+        "answer": "EGP 573.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Linan Farms Medjool On\nThe Go (50g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Green House - Beet Root\n(5 Pieces)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Soft Drinks",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "04:00 PM - 05:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 35.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 601.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 601.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the promo code for a free delivery?",
+        "answer": "FRGT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of dates?",
+        "answer": "48.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 573.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 573.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 6.26 is already included in\nthe total amount.",
+            "Linan Farms Medjool On\n4 12.00\n48.00\nThe Go (50g)",
+            "Soft Drinks",
+            "7up Free (330ml)\n3 6.00\n18.00\nCake",
+            "Chocolate Pound Cake\n1 85.00\n85.00",
+            "Tarweaa Sambosak\nSpinach (10 Pieces)\n1 55.00\n55.00",
+            "Tagen Setto Okra With\nMeat Tagine (900g)\n1 60.00\n60.00",
+            "Levantine Egypt Shish\nTawook Main Entrée\n1 300.00 300.00\n(1KG)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 18.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of vegetables?",
+        "answer": "35.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many 7up Free (330ml) were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Linan Farms Medjool On\nThe Go (50g)",
+            "7up Free (330ml)\nCake"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#314-4087087",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of Chocolate Pound Cake?",
+        "answer": "85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many pieces of Tarweaa Sambosak Spinach were ordered?",
+        "answer": "10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 6.26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Tagen Setto Okra With Meat Tagine?",
+        "answer": "60.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 48.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "7up Free (330ml)\nCake",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Soft Drinks?",
+        "answer": "18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many pieces of Green House - Beet Root were ordered?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "3 June. 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of Levantine Egypt Shish Tawook Main Entrée?",
+        "answer": "300.00",
+        "source": "GPT"
+    }
+]

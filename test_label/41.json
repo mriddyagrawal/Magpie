@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the price of the second item?",
+        "answer": "125.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "8/12/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "250.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "66920",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "3:25:31 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "66920",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "ACTIV ABOU ALAA",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "COLOR\nNON\nBAG/ACTIV/BCKFW21-18",
+                "quantity": "1",
+                "total_price": "125.00"
+            },
+            {
+                "item": "COLOR:\n16\nBAG/ACTIVN/ME100-2019",
+                "quantity": "1",
+                "total_price": "125.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "250.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "COLOR\nNON\nBAG/ACTIV/BCKFW21-18",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "250.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the second item were bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the first item?",
+        "answer": "125.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "COLOR:\n16\nBAG/ACTIVN/ME100-2019",
+        "source": "Human"
+    },
+    {
+        "question": "What is the size of the second item?",
+        "answer": "16",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "250.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:25:31 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1\nCOLOR\nNON\n125.00\n125.00\nBAG/ACTIV/BCKFW21-18\n0\n026100\n006728",
+            "1\nCOLOR:\n16\n125.00\n125.00\nBAG/ACTIVN/ME100-2019\n0\n023493\n000050"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "Who is the cashier?",
+        "answer": "DEGLA",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item description?",
+        "answer": "BAG/ACTIVN/ME100-2015",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "250.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the color of the second item?",
+        "answer": "16",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the first item were bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Wadi Degla",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:25:31 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 125.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item description?",
+        "answer": "BAG/ACTIV/BCKFW21-18",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "8/12/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "250.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the size of the first item?",
+        "answer": "NON",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the color of the first item?",
+        "answer": "NON",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "ACTIV\nABOU ALAA",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 125.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many units were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    }
+]

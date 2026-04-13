@@ -1,0 +1,256 @@
+[
+    {
+        "question": "What is the VAT rate?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date and time of the transaction?",
+        "answer": "OCT 01 2022 08:14 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the product?",
+        "answer": "EGP 275.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount paid via cheque?",
+        "answer": "EGP 275.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the product including tax?",
+        "answer": "EGP 275.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the entertainment tax percentage?",
+        "answer": "10%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 275.00",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "PAID CHEQUE",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "warfarha 275 EGP",
+                "quantity": "1",
+                "total_price": "EGP 275.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:14 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the card number?",
+        "answer": "14935218",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 275.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "3927252",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the business on the receipt?",
+        "answer": "MAJID AL FUTTAIM LEISURE & ENTERTAINMENT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cheque number?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "warfarha 275 EGP",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the location?",
+        "answer": "Magic Planet - Cairo Festival City, Nasr City - Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What type of receipt is it?",
+        "answer": "SALE RECEIPT CUSTOMER COPY",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the entertainment tax included?",
+        "answer": "EGP 21.93",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 275.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount paid?",
+        "answer": "EGP 275.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the VAT amount?",
+        "answer": "EGP 33.77",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Oct 01 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the POS number?",
+        "answer": "1472",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Entertainment Tax 10%\nEGP 21.93",
+            "VAT 14%\nEGP 33.77"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many of the product were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the product purchased?",
+        "answer": "Waffarha 275 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 275.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:14 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "3927252",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the Tax Registration Number (TRN)?",
+        "answer": "416-200-869",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "MAJID AL FUTTAIM LEISURE &\nENTERTAINMENT",
+        "source": "Human"
+    }
+]

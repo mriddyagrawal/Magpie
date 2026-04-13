@@ -1,0 +1,271 @@
+[
+    {
+        "question": "What is the total amount?",
+        "answer": "LE 1,197.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "TEMA RETAIL EG",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "160100000000111758",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "349.00"
+            },
+            {
+                "item": "WOVEN TROUSERS",
+                "quantity": "1",
+                "total_price": "449.00"
+            },
+            {
+                "item": "WOVEN BLOUSE - SHIRT LON -SLEFUED",
+                "quantity": "1.0",
+                "total_price": "399.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 349.0,
+        "source": "Human"
+    },
+    {
+        "question": "How much was the price for the JERSEY BODY T-SHIRT SHORT-SLEEVED?",
+        "answer": "349.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "0000322239",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "09-Jul-22",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the WOVEN TROUSERS?",
+        "answer": "449.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's location?",
+        "answer": "SKY PLAZA MALL, EL SHEROUK, CAIRO",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "17:26",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "LE 1,050.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales VAT (14%)\nLE 147.00",
+            "WOVEN TROUSERS\n8683110787348\n449.00",
+            "WOVEN BLOUSE - SHIRT LON -SLEFUED\n8683110371493\n1.0\n399.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1,197.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many WOVEN BLOUSE - SHIRT LON-SLEEVED were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount without VAT?",
+        "answer": "LE 1,050.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "09-Jul-22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the POS ID?",
+        "answer": "EG16POS01",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "160100000000111758",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "TEMA RETAIL EG",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "147.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "WOVEN TROUSERS",
+        "source": "Human"
+    },
+    {
+        "question": "How many WOVEN TROUSERS were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 399.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": [
+            "JERSEY BODY T-SHIRT SHORT-SLEEVED",
+            "WOVEN TROUSERS",
+            "WOVEN BLOUSE - SHIRT LON-SLEEVED"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier ID?",
+        "answer": "2917",
+        "source": "GPT"
+    },
+    {
+        "question": "How many JERSEY BODY T-SHIRT SHORT-SLEEVED were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1,197.00",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the price of the WOVEN BLOUSE - SHIRT LON-SLEEVED?",
+        "answer": "399.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's VAT number?",
+        "answer": "379-456-249",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 449.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "WOVEN BLOUSE - SHIRT LON -SLEFUED",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1,197.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of sales VAT?",
+        "answer": "LE 147.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "MARIAM MAGED",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    }
+]

@@ -1,0 +1,285 @@
+[
+    {
+        "question": "What is the customer service number?",
+        "answer": "15134",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "BRN 193\nBLAZER 2BUTTON S.BRST\n60R\n1\n3999.99 1600.00 1600.00 2399.99\n4000000056928\nSale",
+            "NVY 114\nC111BZ4-S18-70N-S252\n62R\n1\n2999.99 1200.00 1200.00 1799.99\n4000000033546\nSale",
+            "MIX 1\nSTOCK LEFT OVER\n44\n1\n499.99\n299.99\n299.99\n200.00\n4000000078424\nSale",
+            "MIX 5\nSTOCK LEFT OVER\n44\n1\n449.99\n269.99\n269.99\n180.00\n4000000078354\nSale",
+            "AQUA\n\"T-SHIRT S/SLEEVE\"\nXL\n1\n249.99\n125.00\n125.00\n124.99\n4000000057956\nSale",
+            "FSH 050\nC123SM1-S18-03N-S037\nXX\n1\n359.99\n144.00\n144.00\n215.99\n4000000032797\nSale"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "MIX 1\nSTOCK LEFT OVER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "8559.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the first item before discount?",
+        "answer": "3999.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the size of the third item?",
+        "answer": "44",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the authentication number?",
+        "answer": "3023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the net receipt amount?",
+        "answer": "3638.98",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the tax amount?",
+        "answer": "446.89",
+        "source": "GPT"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Credit Card - Fawry",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 180.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount for the third item?",
+        "answer": "200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total receipt amount?",
+        "answer": "8559.94",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the final price of the second item?",
+        "answer": "1200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "BLAZER 2BUTTON S.BRST",
+                "quantity": "1",
+                "total_price": "2399.99"
+            },
+            {
+                "item": "NVY 114\nC111BZ4-S18-70N-S252",
+                "quantity": "1",
+                "total_price": "1799.99"
+            },
+            {
+                "item": "MIX 1\nSTOCK LEFT OVER",
+                "quantity": "1",
+                "total_price": "200.00"
+            },
+            {
+                "item": "MIX 5\nSTOCK LEFT OVER",
+                "quantity": "1",
+                "total_price": "180.00"
+            },
+            {
+                "item": "AQUA\n\"T-SHIRT S/SLEEVE\"",
+                "quantity": "1",
+                "total_price": "124.99"
+            },
+            {
+                "item": "FSH 050\nC123SM1-S18-03N-S037",
+                "quantity": "1",
+                "total_price": "215.99"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "8559.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "C111BZ4-S18-70N-S252",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "8559.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 200.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the third item purchased?",
+        "answer": "STOCK LEFT OVER",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "CONCRETE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 1799.99,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "BLAZER 2BUTTON S.BRST",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "MIX 5\nSTOCK LEFT OVER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount of the first item?",
+        "answer": "2399.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Sep 15, 22",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were sold?",
+        "answer": "6",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:20 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:20 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "Sep 15, 22 6:20 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "446.89",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total discount amount?",
+        "answer": "4920.96",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the type of the receipt?",
+        "answer": "Regular",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "16155",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "NVY 114\nC111BZ4-S18-70N-S252",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "BLAZER 2BUTTON S.BRST",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "16155",
+        "source": "Human"
+    },
+    {
+        "question": "What is the website for the Concrete Icons Club?",
+        "answer": "http://www.concrete.com.eg/lconsClub",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 2399.99,
+        "source": "Human"
+    }
+]

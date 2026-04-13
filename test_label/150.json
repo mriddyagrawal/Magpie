@@ -1,0 +1,311 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Coca Cola Zero\n(1.45L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "14 August, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1412-11172224",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the fourth item purchased?",
+        "answer": "24 White Eggs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery charge?",
+        "answer": "12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the second item purchased?",
+        "answer": "Touml - Batenekh (200g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Atyab Beef\nLuncheon With\nOlives (200g)",
+                "quantity": "1",
+                "total_price": "45.50"
+            },
+            {
+                "item": "Roumi - Batarekh\n(200g)",
+                "quantity": "1",
+                "total_price": "49.00"
+            },
+            {
+                "item": "Khoshala New\nZealand Cheddar\nCheese (200g)",
+                "quantity": "1",
+                "total_price": "85.00"
+            },
+            {
+                "item": "24 White Eggs",
+                "quantity": "1",
+                "total_price": "128.00"
+            },
+            {
+                "item": "Dasani Natural\nWater Carton\n(1.5L*12)",
+                "quantity": "1",
+                "total_price": "83.50"
+            },
+            {
+                "item": "Coca Cola Zero\n(1.45L)",
+                "quantity": "5",
+                "total_price": "65.00"
+            },
+            {
+                "item": "Nescafe Gold\nDecaf Coffee (95g)",
+                "quantity": "1",
+                "total_price": "184.50"
+            },
+            {
+                "item": "Juhayna Full\nCream Milk (1L)",
+                "quantity": "1",
+                "total_price": "32.00"
+            },
+            {
+                "item": "Juhayna Classic\nMango (235ml)",
+                "quantity": "1",
+                "total_price": "5.75"
+            },
+            {
+                "item": "Private Super Thin\nMaxi Twin Pack\n(16 Pads)",
+                "quantity": "1",
+                "total_price": "52.99"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 45.68",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 1,310.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "10",
+        "source": "Human"
+    },
+    {
+        "question": "What was the fifth item purchased?",
+        "answer": "Dasani Natural Water Carton (1.5L*12)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Khoshala New\nZealand Cheddar\nCheese (200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What was the third item purchased?",
+        "answer": "Khokhaia New Zatar Cheddar Cheese (200g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total of Alyab Roof?",
+        "answer": "45.50",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 45.68 is",
+            "Roumi - Batarekh\n1 49.00\n49.00\n(200g)",
+            "Khoshala New\n85.00\n85.00\nZealand Cheddar\nCheese (200g)",
+            "24 White Eggs\n1 128.00 128.00",
+            "Dasani Natural\n1\n83.50\n83.50\nWater Carton\n(1.5L*12)",
+            "Coca Cola Zero\n5 13.00\n65.00\n(1.45L)",
+            "Nescafe Gold\n1 184.50 184.50\nDecaf Coffee (95g)",
+            "Juhayna Full\n1 32.00\n32.00\nCream Milk (1L)",
+            "Juhayna Classic\n1 5.75\n5.75\nMango (235ml)",
+            "Private Super Thin\n1 52.99\n52.99\nMaxi Twin Pack\n(16 Pads)\n1 595.45"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total of Touml - Batenekh (200g)?",
+        "answer": "49.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 85.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the commercial register number?",
+        "answer": "101472",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "14 August, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 128.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "24 White Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 1,326.69",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "03:00 PM - 04:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 1,310.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Alyab Roof",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "1310.04",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1412-11172204",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total of Dasani Natural Water Carton (1.5L*12)?",
+        "answer": "83.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "28.25",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 10,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 1,310.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Roumi - Batarekh\n(200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT value?",
+        "answer": "45.68",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 49.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sub total?",
+        "answer": "595.45",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total of 24 White Eggs?",
+        "answer": "128.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 45.5,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Atyab Beef\nLuncheon With\nOlives (200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total of Khokhaia New Zatar Cheddar Cheese (200g)?",
+        "answer": "85.00",
+        "source": "GPT"
+    }
+]

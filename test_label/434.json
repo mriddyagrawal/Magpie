@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the hotline number?",
+        "answer": "19969",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "2.46",
+        "source": "Human"
+    },
+    {
+        "question": "How many protein snacks tomato basil were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount of the transaction?",
+        "answer": "50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "08:53:06 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the VAT amount?",
+        "answer": "2.46",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Water 600 ml",
+                "quantity": "4.000@5",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Protein snacks cheese &spices 60 Gram",
+                "quantity": "1.000@15.00",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Protein snacks tomato basil 60 Gram",
+                "quantity": "1.000@15.00",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "50.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@15.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:53:06 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What was the change due?",
+        "answer": "-50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Water 600 ml",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2023-07-10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Protein snacks tomato basil 60 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "50.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Protein snacks cheese &spices 60 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-07-10",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n2.46",
+            "1.000@15.00 LE\n15 LE\nProtein snacks cheese &spices 60 Gram",
+            "1.000@15.00 LE\n15 L.E\nProtein snacks tomato basil 60 Gram"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "4.000@5",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "846332",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "846332",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "mohamed elsayed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.000@15.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were sold?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "How many water bottles were purchased?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many protein snacks cheese & spices were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "47.54",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "47.54",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "50.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:53:06 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "Mall Of Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    }
+]

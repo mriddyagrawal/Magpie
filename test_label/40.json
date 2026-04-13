@@ -1,0 +1,275 @@
+[
+    {
+        "question": "What is the price of one Lino Rings Sicilian Tomato With Oat?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the delivery fee?",
+        "answer": "EGP 20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Wonderville Vanilla Cup Ice Cream?",
+        "answer": "13.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How many sheets of tissue are there in the White Value Pack Tissue?",
+        "answer": "707",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Freska Fingers Wafer with Chocolate?",
+        "answer": "3.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 76.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the order?",
+        "answer": "EGP 76.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "White Value Pack Tissue\n(707Sheets)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 26.99,
+        "source": "Human"
+    },
+    {
+        "question": "How many White Value Pack Tissue were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 13.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#319-5828179",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Wonderville Vanilla Cup Ice\nCream (150ml)",
+                "quantity": "1",
+                "total_price": "13.50"
+            },
+            {
+                "item": "Freska Fingers Wafer With\nChocolate (1 Pcs)",
+                "quantity": "2",
+                "total_price": "6.50"
+            },
+            {
+                "item": "Lino Rings Sicilian Tomato\nWith Oat (60g)",
+                "quantity": "1",
+                "total_price": "10.00"
+            },
+            {
+                "item": "White Value Pack Tissue\n(707Sheets)",
+                "quantity": "1",
+                "total_price": "26.99"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Freska Fingers Wafer with Chocolate were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 3.31",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "09:00 PM - 10:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 6.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Wonderville Vanilla Cup Ice\nCream (150ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "EGP 3.31",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Wonderville Vanilla Cup Ice Creams were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 56.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 76.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Freska Fingers Wafer With\nChocolate (1 Pcs)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Lino Rings Sicilian Tomato\nWith Oat (60g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many Lino Rings Sicilian Tomato With Oat were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 56.99",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 3.31 is already included in\nthe total amount.",
+            "Freska Fingers Wafer With\nChocolate (1 Pcs)\n2 3.25\n6.50",
+            "Lino Rings Sicilian Tomato\nWith Oat (60g)\n1 10.00 10.00",
+            "White Value Pack Tissue\n1 26.99\n(707Sheets)\n26.99"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "3 October, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the unit of measure for the Wonderville Ice cream?",
+        "answer": "150ml",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one White Value Pack Tissue?",
+        "answer": "26.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address?",
+        "answer": "Rana I, Heliopolis",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 76.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#319-5828179",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Freska Fingers Wafer With\nChocolate (1 Pcs)"
+        ],
+        "source": "Human"
+    }
+]

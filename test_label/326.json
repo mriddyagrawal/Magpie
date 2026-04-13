@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 393.3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "GourmetRoastTurkeyW/Pap",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE689.04",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Maadi Degla, Maadi, Cairo, 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Giourmet Roast TurkeyW/Pap",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the second item?",
+        "answer": "LE295.68",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1105398",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "0.59",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 295.6,
+        "source": "Human"
+    },
+    {
+        "question": "How much change was given back?",
+        "answer": "LE110.96",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "LE689.04",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE689.04",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "GourmetRoastTurkeyW/Pap\nLE660.\n0.59\nLE393.3\n00\n6\n6",
+            "GourmetRoastTurkeyW/Pap\nLE660.\n0.44\nLE295.6\n00\n8\n8"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "27/12/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Giourmet Roast TurkeyW/Pap",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the first item?",
+        "answer": "LE393.36",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "27/12/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:48:25 A",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE689.04",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "LE800.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "228-097-517",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the currency used?",
+        "answer": "LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "Nour El",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:48:25 A",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "GourmetRoastTurkeyW/Pap",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "GourmetRoastTurkeyW/Pap",
+                "quantity": "0.59",
+                "total_price": "LE393.3"
+            },
+            {
+                "item": "GourmetRoastTurkeyW/Pap",
+                "quantity": "0.44",
+                "total_price": "LE295.6"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "10:48:25 A",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Gourmet",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.44",
+        "source": "Human"
+    },
+    {
+        "question": "How much quantity was purchased for the first item?",
+        "answer": "0.596",
+        "source": "GPT"
+    },
+    {
+        "question": "How much quantity was purchased for the second item?",
+        "answer": "0.448",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Giourmet Roast TurkeyW/Pap?",
+        "answer": "LE660.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1105398",
+        "source": "Human"
+    }
+]

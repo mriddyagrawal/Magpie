@@ -1,0 +1,291 @@
+[
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "290.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Unsalted Roasted Sun Flower",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "MÊM Chocolate kg",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "290.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2021-12-06",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:32:07",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "290.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Maamoul Cinnamon offers",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Twin Tower Zayed",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Unsalted Roasted Sun Flower\n0.250@90.00 L.E\n22\n5 L.E",
+            "MÊM Chocolate kg\n0.333@120.00\nL.E\n40 L.E",
+            "Chocolate Peanuts kg\n0.353@85.00 L.E\n30 L.E",
+            "Maamoul Cinnamon offers\n1.000@60.00 L.E\n60 L.E",
+            "Maamoul & Chocolate White offers\n1.000@80.00 L.E\n80 L.E",
+            "Jiola Wafer 585 Gold Box\n1.000@55.00 L.E\n55 L.E",
+            "Maamoul date (Piece)\n1.000@3.00 L.E\n3 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "41950",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "290.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the third item cost?",
+        "answer": "30 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 225.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the first item purchased?",
+        "answer": "Unsalted Roasted Sun Flower",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "0.250@90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:32:07",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the last item purchased?",
+        "answer": "Maamoul date (Piece)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the type of document?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the second item cost?",
+        "answer": "40 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "mahmoud mohaned kammal",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.000@60.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "06:32:07 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.333@120.00",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the first item cost?",
+        "answer": "22.5 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Unsalted Roasted Sun Flower",
+                "quantity": "0.250@90.00",
+                "total_price": "22\n5"
+            },
+            {
+                "item": "MÊM Chocolate kg",
+                "quantity": "0.333@120.00",
+                "total_price": "40"
+            },
+            {
+                "item": "Chocolate Peanuts kg",
+                "quantity": "0.353@85.00",
+                "total_price": "30"
+            },
+            {
+                "item": "Maamoul Cinnamon offers",
+                "quantity": "1.000@60.00",
+                "total_price": "60"
+            },
+            {
+                "item": "Maamoul & Chocolate White offers",
+                "quantity": "1.000@80.00",
+                "total_price": "80"
+            },
+            {
+                "item": "Jiola Wafer 585 Gold Box",
+                "quantity": "1.000@55.00",
+                "total_price": "55"
+            },
+            {
+                "item": "Maamoul date (Piece)",
+                "quantity": "1.000@3.00",
+                "total_price": "3"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "Chocolate Peanuts kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "0.353@85.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2021-12-06",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What was the quantity and price per unit of the first item?",
+        "answer": "0.250@90.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "41950",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 60.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Chocolate Peanuts kg",
+        "source": "Human"
+    },
+    {
+        "question": "What was the second item purchased?",
+        "answer": "M&M Chocolate kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Twin Tower Zayed",
+        "source": "GPT"
+    }
+]

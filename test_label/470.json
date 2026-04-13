@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the company's website?",
+        "answer": "www.gourmetegypt.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.06",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "2:52:00 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "880000033566",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Delivery Charge 40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Villars Dark Choc & Coffee",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "m.ism",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the sales tax?",
+        "answer": "LE23.21",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Mahmoud Marz",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1338140",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 149.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE1,148.40",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the order made?",
+        "answer": "2:52:00 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Norwegian Salmon Whole",
+                "quantity": "1.06",
+                "total_price": "LE959"
+            },
+            {
+                "item": "Villars Dark Choc & Coffee",
+                "quantity": "1",
+                "total_price": "LE149."
+            },
+            {
+                "item": "Delivery Charge 40",
+                "quantity": "1",
+                "total_price": "0"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "2:52:00 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Norwegian Salmon Whole",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 0.0,
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased",
+        "answer": "Norwegian Salmon Whole, Villars Dark Choc & Coffee, Delivery Charge 40",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "30482",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "BGOURMET\nFOOD STORES",
+        "source": "Human"
+    },
+    {
+        "question": "What is the reference number?",
+        "answer": "ccm3259209",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery address of the customer?",
+        "answer": "كمبوند المروج من جمال عبد الناصر عماره 15 الدور 3 شقه 37 باسم محمود مرزوق",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "L.E 1814",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number",
+        "answer": "10",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE23.21",
+            "Villars Dark Choc & Coffee\nLE149\n1\nLE149.\n00",
+            "Delivery Charge 40\nLE40\n1\nLE40.0\n00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "20/10/20",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 959.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of money saved?",
+        "answer": "LE665.60",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE1,148.40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the due date for this order?",
+        "answer": "20/10/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE1,148.40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the discount?",
+        "answer": "LE666.60",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer account number?",
+        "answer": "880000033566",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "L.E 1814",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the net amount?",
+        "answer": "LE1,148.40",
+        "source": "GPT"
+    },
+    {
+        "question": "What date was the order made?",
+        "answer": "20/10/20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the invoice number?",
+        "answer": "880000033566",
+        "source": "GPT"
+    }
+]

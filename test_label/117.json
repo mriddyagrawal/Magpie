@@ -1,0 +1,269 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 0.2,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Juhayna Greek\nYogurt 5% Fat Full\n(180g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "09:00 AM - 10:00 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total value of the first item?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the third item purchased?",
+        "answer": "المبلغ المستحق",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one of the second item?",
+        "answer": "17.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Lamar Apple Drink\n(200ml)\nGreek Yogurt"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Juhayna Greek Yogurt 5% Fat Full (180g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 156.20",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Lamar Apple Drink (200ml)",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Lamar Apple Drink\n(200ml)\nGreek Yogurt",
+                "quantity": "2",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Juhayna Greek\nYogurt 5% Fat Full\n(180g)",
+                "quantity": "1",
+                "total_price": "17.50"
+            },
+            {
+                "item": "Other",
+                "quantity": "1",
+                "total_price": "0.20"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 17.5,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of BGP 3.51",
+            "Juhayna Greek\n1\n17.50\n17.50\nYogurt 5% Fat Full\n(180g)\n1",
+            "Other\n0.20\n0.20"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "3.51",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one of the first item?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the second item were bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the language used in the text in the box?",
+        "answer": "Arabic",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 146.20",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the third item were bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 156.20",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total value?",
+        "answer": "156.20",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery cost?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "How many bags were used?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the first item were bought?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "17 April, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many cartons were used?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total value of the third item?",
+        "answer": "0.20",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 156.20",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "146.20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Lamar Apple Drink\n(200ml)\nGreek Yogurt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Other",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total value of the second item?",
+        "answer": "17.50",
+        "source": "GPT"
+    }
+]

@@ -1,0 +1,285 @@
+[
+    {
+        "question": "How much is the Red Cheddar?",
+        "answer": "LE43.20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "AlproCoconutDrinkProfe",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "m.ashr",
+        "source": "GPT"
+    },
+    {
+        "question": "What time did the transaction take place?",
+        "answer": "11:19:43 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "591766",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Red Cheddar",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 97.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "0.18",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Norwegian Salmon Steak\nLE182.\n1\nLE182.7\n75",
+            "AlproCoconutDrinkProfe\nLE97.0\n1\nLE97.00\n0",
+            "Red Cheddar\nLE300.\n0.14\nLE43.20\n00",
+            "Italian Cherry Mozzarella\nLE325.\n0.18\nLE60.45\n00",
+            "Basil Green Org 50,Gour\nLE27.0\n1\nLE27.00\n0",
+            "Potatoes Org 1kg, Gour\nLE38.0\n1\nLE3 .00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE448.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "29/9/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "waterWay, 5 Settlement, Cairo, 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the net amount?",
+        "answer": "LE448.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "29/9/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 182.7,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Norwegian Salmon Steak",
+                "quantity": "1",
+                "total_price": "LE182.7"
+            },
+            {
+                "item": "AlproCoconutDrinkProfe",
+                "quantity": "1",
+                "total_price": "LE97.00"
+            },
+            {
+                "item": "Red Cheddar",
+                "quantity": "0.14",
+                "total_price": "LE43.20"
+            },
+            {
+                "item": "Italian Cherry Mozzarella",
+                "quantity": "0.18",
+                "total_price": "LE60.45"
+            },
+            {
+                "item": "Basil Green Org 50,Gour",
+                "quantity": "1",
+                "total_price": "LE27.00"
+            },
+            {
+                "item": "Potatoes Org 1kg, Gour",
+                "quantity": "1",
+                "total_price": "LE3 .00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales tax percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "0.14",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Norwegian Salmon Steak",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the Italian Cherry Mozzarella?",
+        "answer": "LE60.45",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Italian Cherry Mozzarella",
+        "source": "Human"
+    },
+    {
+        "question": "How much was saved on the transaction?",
+        "answer": "LE32.25",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Alpro Coconut Drink Profe?",
+        "answer": "LE97.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Norwegian Salmon Steak?",
+        "answer": "LE182.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE448.10",
+        "source": "Human"
+    },
+    {
+        "question": "What was the discount amount?",
+        "answer": "LE32.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 43.2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "LE480.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 60.45,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE448.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:19:43 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How much change was due?",
+        "answer": "LE0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Potatoes Org 1kg, Gour?",
+        "answer": "LE38.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "591766",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "L.E 480.05",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:19:43 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the Basil Green Org 50, Gour?",
+        "answer": "LE27.00",
+        "source": "GPT"
+    }
+]

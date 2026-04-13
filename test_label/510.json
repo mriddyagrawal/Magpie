@@ -1,0 +1,285 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:29",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 28.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Lulu Hypermarket",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Lulu Hypermarket , Emerald - Twin Plaza",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of El Arosa Kenyan Tea 40g?",
+        "answer": "8.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of KingM Flour Tortillas Large 5?",
+        "answer": "13.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "El Arosa Kenyan Tea 40g",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's phone number?",
+        "answer": "0225983555",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "90.40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:29",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Emerald Twin Plaza, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "KingM Flour Tortillas Large 5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "El Arosa Kenyan Tea 40g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 13.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "320580",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's fax number?",
+        "answer": "0225983556",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "KingM Flour Tortillas Large 5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the fifth item purchased?",
+        "answer": "Basma Strawberry 400gm",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "90.40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "90.40",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Dorit Flam. Hot#1 SwtC/P 41-45",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "KingM Flour Tortillas Large 5",
+                "quantity": "1",
+                "total_price": "13.95"
+            },
+            {
+                "item": "El Arosa Kenyan Tea 40g",
+                "quantity": "1",
+                "total_price": "8.00"
+            },
+            {
+                "item": "Aria UHT Milk FullCrm 1L",
+                "quantity": "1",
+                "total_price": "28.00"
+            },
+            {
+                "item": "Basma Strawberry\n400gm",
+                "quantity": "1",
+                "total_price": "14.95"
+            },
+            {
+                "item": "Green House Fig 400gm",
+                "quantity": "1",
+                "total_price": "20.50"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sixth item purchased?",
+        "answer": "Green House Fig 400gm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Aria UHT Milk FullCrm 1L",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Green House Fig 400gm?",
+        "answer": "20.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of Basma Strawberry 400gm?",
+        "answer": "14.95",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the fourth item purchased?",
+        "answer": "Aria UHT Milk FullCrm 1L",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "90.40",
+        "source": "Human"
+    },
+    {
+        "question": "What was the time of purchase?",
+        "answer": "20:29",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the date of purchase?",
+        "answer": "04.09.2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Dorit Flam. Hot#1 SwtC/P 41-45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Dorit Flam.Hot#1 SwtC/P 41-45",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "6221333000718\nرقائق دوريتوس بالفلفل حار وحلو\n1 x\n5.00\nVO\nDorit Flam. Hot#1 SwtC/P 41-45\n10000177\n5.00",
+            "6223000680018\nتورتيلا دقيق قمح كبيرة كينج ام\n1 x\n13.95\nVO\nKingM Flour Tortillas Large 5\n10000165\n13.95",
+            "6222002300153\n1 x\n8.00\nVO\nشاي كيني العروسة\nEl Arosa Kenyan Tea 40g\n10008185\n8.00",
+            "6223007944304\n1 x\n28.00\nVO\nحليب كامل الدسم اريا\nAria UHT Milk FullCrm 1L\n10000026\n28.00",
+            "6223000370308\n1 X\n14.95\nVO\nفراولة بسمة\nBasma Strawberry\n400gm\n14.95\n10000155",
+            "6222014701368\n1 x\n20.50\nVO\nزمان البيت الأخضر\nGreen House Fig 400gm\n10000155\n20.50"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Aria UHT Milk FullCrm 1L?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the commercial register number?",
+        "answer": "66533",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Dorit Flam.Hot#1 SwtC/P 41-45?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "04.09.2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 8.0,
+        "source": "Human"
+    }
+]

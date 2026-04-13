@@ -1,0 +1,257 @@
+[
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "21/06/23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "21/06/23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "88.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "88.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the barcode number?",
+        "answer": "T2111000075521",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the company at the top of the receipt?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Marlboro Crafted Gol",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "88.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Is the cash amount positive or negative?",
+        "answer": "negative",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the full name of the branch?",
+        "answer": "Emarat Misr-El Rehab (2011)",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the staff member associated with the transaction?",
+        "answer": "Mohamed Safi-E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cash amount?",
+        "answer": "-88.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What currency is used in the transaction?",
+        "answer": "LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000211-P1000058457",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the establishment",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "How many pieces of the item were bought?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 88.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "Marlboro Crafted Gol",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Marlboro Crafted Gol",
+                "quantity": "2",
+                "total_price": "88.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is printed above the barcode?",
+        "answer": "Welcome",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of each piece?",
+        "answer": "44.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "75521",
+        "source": "GPT"
+    },
+    {
+        "question": "What does the column on the right say?",
+        "answer": "Amount",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "امارات مصر.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number?",
+        "answer": "18306",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "18:37",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Marlboro Crafted Gol"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Item No .:\n18306\nMarlboro Crafted Gol\n2 pcs @ 44.00\n88.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "18:37",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "88.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "18:37",
+        "source": "GPT"
+    }
+]

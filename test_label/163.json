@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "152.11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "04:49:18 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": ".552@170.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Golden Egyption Raisins kg",
+                "quantity": ".552@170.00",
+                "total_price": "75.07"
+            },
+            {
+                "item": "Black Raisin",
+                "quantity": "1.642@150.00",
+                "total_price": "77.04"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abutüf®",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "04:49:18 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Black Raisin",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the change due?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.642@150.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1475867",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 75.07,
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": "Golden Egyption Raisins kg and Black Raisin",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store slogan?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1475867",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT.\n0.00",
+            "Black Raisin\n1.642@150.00\n.E\n77.04 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the transaction?",
+        "answer": "152.11 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the amount tendered?",
+        "answer": "152.11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-11-25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Credit Card (NBE)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the weight and price per unit of the Golden Egyption Raisins?",
+        "answer": "0.552 kg @ 170.00 L.E per kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total cost of the Black Raisins?",
+        "answer": "77.04 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Ahmed Osama",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "0.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "152.11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the weight and price per unit of the Black Raisins?",
+        "answer": "0.642 kg @ 150.00 L.E per kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Golden Egyption Raisins kg",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "152.11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total cost of the Golden Egyption Raisins?",
+        "answer": "75.07 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 77.04,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2023-11-25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "04:49:18 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "152.11",
+        "source": "Human"
+    }
+]

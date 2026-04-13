@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "*61,28",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "23.12.2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the Tax registration number?",
+        "answer": "447-567-098",
+        "source": "GPT"
+    },
+    {
+        "question": "What items are not eligible for return or exchange?",
+        "answer": "underwears and socks",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Defacto",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Long Sleev",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the purchase?",
+        "answer": "499,00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "القيمة\n%14\n*61,28"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "*499,00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "*499,00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sale number?",
+        "answer": "01500343 7473 4911",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "Long Sleev",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Alex City Center, Egypt_Alexanderia",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Defacto",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 49900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the value of tax?",
+        "answer": "61,23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the support email address?",
+        "answer": "support@defacto.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount paid?",
+        "answer": "499,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date and time in the sales slip at the bottom right?",
+        "answer": "23/12/22 20:24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the code of the sale?",
+        "answer": "8683522092825",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the currency of purchase?",
+        "answer": "EGYPTIAN POUND",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "23.12.2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the return/exchange period?",
+        "answer": "30 days",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "8683522092825",
+        "source": "Human"
+    },
+    {
+        "question": "What is the S code of the sale?",
+        "answer": "S1240AZ",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the contact number?",
+        "answer": "+20 103 345 58 58",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Long Sleev",
+                "quantity": "1",
+                "total_price": "*499,00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "*499,00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the receipt?",
+        "answer": "20:24",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sale Receipt",
+        "source": "GPT"
+    }
+]

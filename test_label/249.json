@@ -1,0 +1,273 @@
+[
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Red Bull White Edition\n(250ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 174.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Skittles Crazy Sours (160g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 18.94 is already included in\nthe total amount.",
+            "Red Bull White Edition\n1\n26.25\n26.25\n(250ml)",
+            "Breadfast Smoked\n1 85.00 85.00\nVietnamese Cashews\n(200g)",
+            "Lamar Cranberry Juice\n1\n7.00\n7.00\n(200ml)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Lamar Cranberry Juice?",
+        "answer": "7.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 7.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 154.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 154.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 36.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Lamar Cranberry Juice\n(200ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for Breadfast Smoked Vietnamese Cashews?",
+        "answer": "85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 18.94",
+        "source": "Human"
+    },
+    {
+        "question": "How many Skittles Crazy Sours were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Skittles Crazy Sours?",
+        "answer": "36.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "EGP 20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 174.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Breadfast Smoked\nVietnamese Cashews\n(200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 26.25,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for Skittles Crazy Sours?",
+        "answer": "36.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for Lamar Cranberry Juice?",
+        "answer": "7.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#618-5866755",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Red Bull White Edition were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 85.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Red Bull White Edition?",
+        "answer": "26.25",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Skittles Crazy Sours (160g)",
+                "quantity": "1",
+                "total_price": "36.00"
+            },
+            {
+                "item": "Red Bull White Edition\n(250ml)",
+                "quantity": "1",
+                "total_price": "26.25"
+            },
+            {
+                "item": "Breadfast Smoked\nVietnamese Cashews\n(200g)",
+                "quantity": "1",
+                "total_price": "85.00"
+            },
+            {
+                "item": "Lamar Cranberry Juice\n(200ml)",
+                "quantity": "1",
+                "total_price": "7.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many Lamar Cranberry Juices were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 174.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for Red Bull White Edition?",
+        "answer": "26.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Breadfast Smoked Vietnamese Cashews were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "09:00 PM - 10:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Breadfast Smoked Vietnamese Cashews?",
+        "answer": "85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "6 October, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 174.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#618-5866755",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    }
+]

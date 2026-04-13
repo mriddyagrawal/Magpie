@@ -1,0 +1,275 @@
+[
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 14.9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Dunkin' Egypt - Mobil 90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the CR No.?",
+        "answer": "56466",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the call number?",
+        "answer": "453",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What type of service was used?",
+        "answer": "Dine In",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "453",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 90.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Vat(14.0%)\nEGP 11.05",
+            "1 Dunkin' Iced Dark Roast Large\nEGP 24.55",
+            "2 1 Donut\nEGP 14.90",
+            "Discount - Go Large (EGP 14.90)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the donuts?",
+        "answer": "EGP 14.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Discount - Go Large (EGP",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "1 Donut",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Toasted Turkey N' Cheddar",
+                "quantity": "1",
+                "total_price": "EGP 39.46"
+            },
+            {
+                "item": "Dunkin' Iced Dark Roast Large",
+                "quantity": "1",
+                "total_price": "EGP 24.55"
+            },
+            {
+                "item": "1 Donut",
+                "quantity": "2",
+                "total_price": "EGP 14.90"
+            },
+            {
+                "item": "Discount - Go Large (EGP",
+                "quantity": "1",
+                "total_price": "14.90)"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Dunkin' Iced Dark Roast Large?",
+        "answer": "EGP 24.55",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many donuts were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Alamar Foods Egypt.",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount of the bill?",
+        "answer": "EGP 90.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "252553",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Dunkin'",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:36:11 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many Dunkin' Iced Dark Roast Large were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 11.05",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 24.55,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 14.9,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time of the check?",
+        "answer": "2021/10/27 02:36:11 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Toasted Turkey N' Cheddar were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 78.91",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Dunkin' Iced Dark Roast Large",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT No.?",
+        "answer": "382107586",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:36:11 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 39.46,
+        "source": "Human"
+    },
+    {
+        "question": "What is the official receipt number?",
+        "answer": "508683",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "EGP 78.91",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2021/10/27",
+        "source": "Human"
+    },
+    {
+        "question": "What was the VAT amount?",
+        "answer": "EGP 11.05",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Toasted Turkey N' Cheddar",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "1 Donut"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time the receipt was printed?",
+        "answer": "2021/10/27 02:36:55 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Toasted Turkey N' Cheddar?",
+        "answer": "EGP 39.46",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Alamar Foods Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    }
+]

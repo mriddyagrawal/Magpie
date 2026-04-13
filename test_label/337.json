@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 134.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the order?",
+        "answer": "EGP 116.49",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#521-4584404",
+        "source": "GPT"
+    },
+    {
+        "question": "How many '5 Brown Baladi Bread' were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the '5 Petits Pains'?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "5 July, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How many 'Marble Pound Cake' was ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many '5 Petits Pains' were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the fruit ordered?",
+        "answer": "Crimson Red Grapes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 116.49",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the '5 Mini Plain Muffins'?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Petits Pains",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Brown Baladi\nBread\nFruits",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "FreshSource -\nCrimson Red Grapes\n(500g)\nMuffins",
+                "quantity": "1",
+                "total_price": "15.00"
+            },
+            {
+                "item": "Mini Plain Muffins",
+                "quantity": "1",
+                "total_price": "30.00"
+            },
+            {
+                "item": "Marble Pound Cake\nOther",
+                "quantity": "1",
+                "total_price": "75.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#521-4584404",
+        "source": "Human"
+    },
+    {
+        "question": "How many '5 Mini Plain Muffins' were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "FreshSource -\nCrimson Red Grapes\n(500g)\nMuffins",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the '5 Brown Baladi Bread'?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the 'Crimson Red Grapes (500g)'?",
+        "answer": "15.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 116.49",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 3.96",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Brown Baladi\nBread\nFruits",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal amount?",
+        "answer": "EGP 134.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Petits Pains",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 116.49",
+        "source": "Human"
+    },
+    {
+        "question": "How many 'Crimson Red Grapes (500g)' were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 15.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the 'المبلغ المستحق'?",
+        "answer": "2.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Mini Plain Muffins",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 3.96 is already\nInduded in",
+            "5 Brown Baladi\n1 6.00\n6.00\nBread\nFruits",
+            "FreshSource -\n1\n15.00\n15.00\nCrimson Red Grapes\n(500g)\nMuffins",
+            "5 Mini Plain Muffins\n1 30.00 30.00\nCake",
+            "Marble Pound Cake\n1 75.00 75.00\nOther"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-EGP 27.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the 'Marble Pound Cake'?",
+        "answer": "75.00",
+        "source": "GPT"
+    }
+]

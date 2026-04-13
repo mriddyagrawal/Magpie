@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost per liter?",
+        "answer": "EGP 9.25/ℓ",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the value of VAT?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "CUSTOMER RECEIPT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the Total station?",
+        "answer": "TOTAL Mehwar",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website mentioned at the end of the receipt?",
+        "answer": "WWW.FACEBOOK.COM/TOTAL",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "24-12-2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 250.03",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the number 1422020108 in the receipt?",
+        "answer": "This is unknown",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22:03:33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "BONJOUR",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 250.03",
+        "source": "Human"
+    },
+    {
+        "question": "What was the pump number used?",
+        "answer": "8",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many liters were bought?",
+        "answer": "27.03",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What does the receipt encourage you to do?",
+        "answer": "Join the Facebook page",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "*Gasoline92",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "22:03:33",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 250.03",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "24-12-2022",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "*Gasoline92\n1\nEGP 250.03\n(PUMP\n8; 27.03 @ * EGP 9.25/0)\n*"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "Where does the receipt say to enjoy premium service?",
+        "answer": "at BONJOUR",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22:03:33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "27.03",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "*Gasoline92",
+                "quantity": "27.03",
+                "total_price": "EGP 250.03"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the greeting on the receipt?",
+        "answer": "BONJOUR",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What kind of transaction is this?",
+        "answer": "MANUAL TRANSACTION",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "21-629872-1624141",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the company in the receipt?",
+        "answer": "TotalEnergies",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the number 14 in the receipt?",
+        "answer": "This is unknown",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 250.03,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount in words?",
+        "answer": "Two hundred and fifty Egyptian pounds and three piastres",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 250.03",
+        "source": "Human"
+    },
+    {
+        "question": "What was the article purchased?",
+        "answer": "*Gasoline92",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

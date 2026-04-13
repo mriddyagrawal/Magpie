@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the location of the store?",
+        "answer": "ChillOut AlShouyfat",
+        "source": "GPT"
+    },
+    {
+        "question": "How much change was given?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "240.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "ChillOut AlShouyfat",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Golden Raisins Iranian kg",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.000@40.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tagline of the store?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": "Delicious Mix 400 g, Chinese Crackers Cheese 225G, Golden Raisins Iranian kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "240.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Chinese Crackers Cheese 225G",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n7.37",
+            "Chinese Crackers Cheese 225G\n1.000@40.00 L.E\n40 L.E",
+            "Golden Raisins Iranian kg\n0.500@120.00\nL.E\n60 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount tendered?",
+        "answer": "240.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "0.500@120.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Delicious Mix 400 g",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the Chinese Crackers Cheese 225G?",
+        "answer": "40 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount of the transaction?",
+        "answer": "240.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the Golden Raisins Iranian kg?",
+        "answer": "60 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Delicious Mix 400 g",
+                "quantity": "1.000@140.00",
+                "total_price": "140"
+            },
+            {
+                "item": "Chinese Crackers Cheese 225G",
+                "quantity": "1.000@40.00",
+                "total_price": "40"
+            },
+            {
+                "item": "Golden Raisins Iranian kg",
+                "quantity": "0.500@120.00",
+                "total_price": "60"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "91482",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.000@140.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "91482",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:30:03 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "02:30:03 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:30:03 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "Credit Card (NBE)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-02-11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-02-11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "232.63",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the Delicious Mix 400g?",
+        "answer": "140 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 140.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "240.00",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Alaa Adel",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 60.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "7.37",
+        "source": "Human"
+    }
+]

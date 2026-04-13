@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the Abu Auf Sahlab?",
+        "answer": "45 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "-100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the second item purchased?",
+        "answer": "Abu Auf Sahlab 250 g",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n12.28",
+            "Abu Auf Sahlab 250 g\n1.000@45.00 L.E\n45 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "mahmoud tarek saad",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "87.72",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "100.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the first item purchased?",
+        "answer": "Cocoa Powder 250grm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "87.72",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-01-01",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.000@45.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 55.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-01-01",
+        "source": "GPT"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Abu Auf Sahlab 250 g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu Auf®",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the hotline number mentioned?",
+        "answer": "19969",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "12.28",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cash tendered?",
+        "answer": "200.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "01:43:39 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.000@55.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cocoa Powder 250grm",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 45.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "01:43:39 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the branch name mentioned on the receipt?",
+        "answer": "Shoubra",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "22192",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "100.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "01:43:39 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount of the cocoa powder?",
+        "answer": "55 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "12.28",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cocoa Powder 250grm",
+                "quantity": "1.000@55.00",
+                "total_price": "55"
+            },
+            {
+                "item": "Abu Auf Sahlab 250 g",
+                "quantity": "1.000@45.00",
+                "total_price": "45"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "100.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's tagline?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    }
+]

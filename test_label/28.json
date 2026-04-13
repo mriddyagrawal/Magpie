@@ -1,0 +1,273 @@
+[
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Chick pannfr",
+                "quantity": "1",
+                "total_price": "$\n74.55"
+            },
+            {
+                "item": "Chick pannfr",
+                "quantity": "1",
+                "total_price": "$\n74.55"
+            },
+            {
+                "item": "COOKIE",
+                "quantity": "1",
+                "total_price": "$\n17.55"
+            },
+            {
+                "item": "CAN SODA",
+                "quantity": "1",
+                "total_price": "$\n13.15"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "10/22/22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "$\n204.97",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "17:48:34",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Subway Sandwiches & Salads",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "0000070875",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one can soda?",
+        "answer": "13.15",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website mentioned on the receipt?",
+        "answer": "www.global.subway.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "CAN SODA",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store number?",
+        "answer": "70980",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "$\n179.80",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one chick pannfr?",
+        "answer": "74.55",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "How many chick pannfr were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many can sodas were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the register id?",
+        "answer": "Dwr1 TRDT 102222",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Chick pannfr",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 74.55,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "COOKIE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "179.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:48:34",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of change due?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "56",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales Tx\n$\n25.17",
+            "Chick pannfr\n1\nT $\n74.55\n1524",
+            "COOKIE\n1\nT $\n17.55\n10011",
+            "CAN SODA\n1\nT $\n13.15\n10583"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 13.15,
+        "source": "Human"
+    },
+    {
+        "question": "What type of food is sold at this store?",
+        "answer": "Subway Sandwiches & Salads",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "$\n25.17",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "0000070875",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "$\n204.97",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "10/22/22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sales tax amount?",
+        "answer": "25.17",
+        "source": "GPT"
+    },
+    {
+        "question": "How many cookies were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 17.55,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 74.55,
+        "source": "Human"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "Cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:48:34",
+        "source": "Human"
+    },
+    {
+        "question": "What is the clerk number?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "$\n204.97",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one cookie?",
+        "answer": "17.55",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Chick pannfr",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "204.97",
+        "source": "GPT"
+    }
+]

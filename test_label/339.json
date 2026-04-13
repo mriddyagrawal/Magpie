@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE 996.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "KNITWEAR VEST-JACKET",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "JERSEY BODY - T-SHIRT SHORT-SLEEVED ACTIVE SPORT",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "How much was paid in cash?",
+        "answer": "698.00 and 298.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "22-Dec-22",
+        "source": "Human"
+    },
+    {
+        "question": "How many knitwear vest-jackets were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "LC WAIKIKI",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "SALES RECEIPT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "LE 873.68",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE 996.00",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the purchase made?",
+        "answer": "16:32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Jersey body T-shirt?",
+        "answer": "149.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the retailer?",
+        "answer": "TENA RETAIL EG",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "15050000000001 3377",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 199.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "TUNA RETAIL EG",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of purchase?",
+        "answer": "996.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "JERSEY SHORTS",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales VAT (14%).\nLE 122.32",
+            "8682110573185\n1\n199.00\n199.00\nJERSEY BODY - T-SHIRT SHORT-SLEEVED ACTIVE SPORT",
+            "8683114083422\n1\n149.00\n149.00\nJERSEY BODY - T-SHIRT SHORT-SLEEVED ACTIVE SPORT\n8682114083422\nI\n149.00\n149.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "JERSEY BODY - T-SHIRT SHORT-SLEEVED ACTIVE SPORT",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount without VAT?",
+        "answer": "873.68",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 149.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE 996.00",
+        "source": "Human"
+    },
+    {
+        "question": "How much was saved on the purchase?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many jersey shorts were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE 122.32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 499.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "JERSEY SHORTS",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "JERSEY BODY - T-SHIRT SHORT-SLEEVED ACTIVE SPORT",
+        "source": "GPT"
+    },
+    {
+        "question": "How many total items were purchased?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "16:32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "22-Dec-22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one jersey short?",
+        "answer": "199.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "16:32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of VAT?",
+        "answer": "122.32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Knitwear vest jacket?",
+        "answer": "499.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "JERSEY SHORTS",
+                "quantity": "1",
+                "total_price": "499.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED ACTIVE SPORT",
+                "quantity": "1",
+                "total_price": "199.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED ACTIVE SPORT",
+                "quantity": "1",
+                "total_price": "149.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many T-shirts were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    }
+]

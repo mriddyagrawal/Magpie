@@ -1,0 +1,267 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "134.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "beef barbecue",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "beef barbecue",
+                "quantity": "1",
+                "total_price": "110.526"
+            },
+            {
+                "item": "fried noodles w\nvegetables",
+                "quantity": "1",
+                "total_price": "47.368"
+            },
+            {
+                "item": "2\nbeef,prawn,veg,\nrolls",
+                "quantity": "1",
+                "total_price": "60.520"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the service charge?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022/10/09",
+        "source": "Human"
+    },
+    {
+        "question": "What is the ENT Tax?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the order?",
+        "answer": "134.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 47.368,
+        "source": "Human"
+    },
+    {
+        "question": "Was a visa card used for this transaction?",
+        "answer": "No",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the fried noodles with vegetables?",
+        "answer": "47.37",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "134.99",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the order placed?",
+        "answer": "06:05:41",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of beef, prawn, veg rolls?",
+        "answer": "60.52",
+        "source": "GPT"
+    },
+    {
+        "question": "What kind of order is this?",
+        "answer": "Tak Away",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "16.58",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How many beef, prawn, veg rolls were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the net price of the order?",
+        "answer": "218.41",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many beef barbecue items were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "fried noodles w\nvegetables",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "134.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Peking",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 60.52,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:05:41",
+        "source": "Human"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "32",
+        "source": "GPT"
+    },
+    {
+        "question": "How many fried noodles with vegetables were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "2\nbeef,prawn,veg,\nrolls",
+        "source": "Human"
+    },
+    {
+        "question": "How much discount was applied?",
+        "answer": "100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "218.41",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:05:41",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the beef barbecue?",
+        "answer": "110.53",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "ENT Tax\n0.00",
+            "VAT :\n16.58",
+            "2\n1\n60.52\n60.520\nbeef,prawn,veg,\nrolls"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "PEKIN",
+        "source": "Human"
+    },
+    {
+        "question": "What is the chk status of the order?",
+        "answer": "Opened",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the order?",
+        "answer": "2022/10/09",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 110.526,
+        "source": "Human"
+    },
+    {
+        "question": "How many customers were listed?",
+        "answer": "0",
+        "source": "GPT"
+    }
+]

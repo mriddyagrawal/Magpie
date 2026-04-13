@@ -1,0 +1,285 @@
+[
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.000@30.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's phone number?",
+        "answer": "01026389395",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "01:32:37 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "590.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "590.00",
+        "source": "Human"
+    },
+    {
+        "question": "In which area is the store located?",
+        "answer": "Madinaty Fashion Area",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@175.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.000@15.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n5.53",
+            "1.000@15.00 L.E\nTurkish Coffee Single Cup\n15 L.E",
+            "1.000@175.00\nAbu auf Pistachio 275 Gram\nL.E\n175 L.E",
+            "1.000@90.00 L.E\n90 L.E\nCitrus Honey Squeeze 400gm",
+            "1.000@160.00\nL.E\n160 L.E\nAbu auf Cashew 275 Gram",
+            "1.000@120.00\nL.E\n120 L.E\nAbu Auf Raw Almond 275 Gram"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2023-08-12",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's address?",
+        "answer": "Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.000@90.00",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Cappuccino Cup cost?",
+        "answer": "30 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did Citrus Honey Squeeze cost?",
+        "answer": "90 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the shipping?",
+        "answer": "584.47",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Turkish Coffee Single Cup cost?",
+        "answer": "15 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did Abu Auf Pistachio cost?",
+        "answer": "175 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 175.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "590.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 15.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "5.53",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Abu auf Pistachio 275 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "188591",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cappuccino Cup",
+        "source": "Human"
+    },
+    {
+        "question": "What is the tagline of the store?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Citrus Honey Squeeze 400gm",
+        "source": "Human"
+    },
+    {
+        "question": "How much did Abu auf Cashew cost?",
+        "answer": "160 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Mariem Essam",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "محمد مدحت",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "01:32:37 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did Abu Auf Raw Almond cost?",
+        "answer": "120 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Turkish Coffee Single Cup",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-08-12",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "590.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 90.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cappuccino Cup",
+                "quantity": "1.000@30.00",
+                "total_price": "30"
+            },
+            {
+                "item": "Turkish Coffee Single Cup",
+                "quantity": "1.000@15.00",
+                "total_price": "15"
+            },
+            {
+                "item": "Abu auf Pistachio 275 Gram",
+                "quantity": "1.000@175.00",
+                "total_price": "175"
+            },
+            {
+                "item": "Citrus Honey Squeeze 400gm",
+                "quantity": "1.000@90.00",
+                "total_price": "90"
+            },
+            {
+                "item": "Abu auf Cashew 275 Gram",
+                "quantity": "1.000@160.00",
+                "total_price": "160"
+            },
+            {
+                "item": "Abu Auf Raw Almond 275 Gram",
+                "quantity": "1.000@120.00",
+                "total_price": "120"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "01:32:37 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "584.47",
+        "source": "Human"
+    }
+]

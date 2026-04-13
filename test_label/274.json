@@ -1,0 +1,289 @@
+[
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 104.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal before discounts and fees?",
+        "answer": "121.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 3.03",
+        "source": "Human"
+    },
+    {
+        "question": "How many kilograms of Tomatoes were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 104.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "11 February, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Frico Mild Gouda (200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1114-2528353",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 121.75",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the Soft Breads?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 104.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the quantity of Close Up Menthol Fresh ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1114-2528353",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 12.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the Frico Mild Gouda?",
+        "answer": "33.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 104.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the Baladi Breads?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total cost of the Tomatoes?",
+        "answer": "19.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "03:00 PM-04:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 33.75,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Petits Pains",
+                "quantity": "2",
+                "total_price": "12.00"
+            },
+            {
+                "item": "Baladi Bread",
+                "quantity": "5",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Tomatoes (1Kg)",
+                "quantity": "2",
+                "total_price": "19.00"
+            },
+            {
+                "item": "Frico Mild Gouda (200g)",
+                "quantity": "1",
+                "total_price": "33.75"
+            },
+            {
+                "item": "Afia Sunflower Oil (800ml)",
+                "quantity": "1",
+                "total_price": "32.00"
+            },
+            {
+                "item": "Close Up Menthol Fresh\n(100ml)",
+                "quantity": "1",
+                "total_price": "20.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the Afia Sunflower Oil?",
+        "answer": "32.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 19.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Tomatoes (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Petits Pains",
+        "source": "Human"
+    },
+    {
+        "question": "How many Soft Breads were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What quantity of Afia Sunflower Oil was ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Petits Pains",
+            "Baladi Bread",
+            "Tomatoes (1Kg)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 3.03 is\nin",
+            "5 Baladi Bread\n5.00\n5.00\nVegetables",
+            "Tomatoes (1Kg)\n2 9.50\n19.00\nFresh Cheese",
+            "Frico Mild Gouda (200g)\n1 33.75\n33.75\nOils",
+            "Afia Sunflower Oil (800ml)\n1\n32.00\n32.00",
+            "Close Up Menthol Fresh\n1 20.00 20.00\n(100ml)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the delivery discount?",
+        "answer": "-EGP 2.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the 25% invitation discount?",
+        "answer": "-EGP 25.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total cost of the Close Up Menthol Fresh?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "How many Baladi Breads were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Baladi Bread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Frico Mild Gouda that was ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    }
+]

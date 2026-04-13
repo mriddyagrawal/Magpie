@@ -1,0 +1,282 @@
+[
+    {
+        "question": "How many Temry Chicken Fresh Chicken Legs (1kg) were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of 1 Temry Chicken Fresh Chicken Fillet (1Kg)?",
+        "answer": "154.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one I amar Semi Skimmed Milk (1L)?",
+        "answer": "23.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 448.45",
+        "source": "Human"
+    },
+    {
+        "question": "How many 24 White Eggs were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 448.45",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Temry Chicken\nFresh Chicken\nLegs (1kg)",
+                "quantity": "2",
+                "total_price": "150.00"
+            },
+            {
+                "item": "Temry Chicken\nFresh Chicken\nFillet (1Kg)",
+                "quantity": "1",
+                "total_price": "154.95"
+            },
+            {
+                "item": "Temry Chicken\nFresh Whole\nChicken\n(1100/1200g)",
+                "quantity": "1",
+                "total_price": "99.00"
+            },
+            {
+                "item": "24 White Eggs",
+                "quantity": "1",
+                "total_price": "87.00"
+            },
+            {
+                "item": "I amar Semi\nSkimmed Milk (1L)",
+                "quantity": "2",
+                "total_price": "47.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Temry Chicken Fresh Chicken Legs (1kg)?",
+        "answer": "75.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 154.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Temry Chicken Fresh Chicken Fillet (1Kg) were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 537.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 99.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 150.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 537.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the 2 I amar Semi Skimmed Milk (1L)?",
+        "answer": "47.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Temry Chicken\nFresh Chicken\nLegs (1kg)",
+            "I amar Semi\nSkimmed Milk (1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 87.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of 1 Temry Chicken Fresh Whole Chicken (1100/1200g)?",
+        "answer": "99.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 448.45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Temry Chicken Fresh Whole Chicken (1100/1200g)?",
+        "answer": "99.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Temry Chicken\nFresh Whole\nChicken\n(1100/1200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#258-6572767",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#258-6572767",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Temry Chicken Fresh Whole Chicken (1100/1200g) were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many I amar Semi Skimmed Milk (1L) were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 0 is already included in\nthe total amount.",
+            "Temry Chicken -\n1 154.95 154.95\nFresh Chicken\nFillet (1Kg)",
+            "Temry Chicken -\n1 99.00\n99.00\nFresh Whole\nChicken\n(1100/1200g)",
+            "24 White Eggs\n1 87.00\n87.00",
+            "I amar Semi\n2 23.50\n47.00\nSkimmed Milk (1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one order of 24 White Eggs?",
+        "answer": "87.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of 2 Temry Chicken Fresh Chicken Legs (1kg)?",
+        "answer": "150.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 448.45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "24 White Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery charge?",
+        "answer": "EGP 12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Temry Chicken\nFresh Chicken\nFillet (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Temry Chicken\nFresh Chicken\nLegs (1kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the order of 24 White Eggs?",
+        "answer": "87.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Temry Chicken Fresh Chicken Fillet (1Kg)?",
+        "answer": "154.95",
+        "source": "GPT"
+    }
+]

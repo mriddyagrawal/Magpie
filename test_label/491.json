@@ -1,0 +1,309 @@
+[
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "(خيار (1 كيلو جرام",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the next item on the list after Nescafe?",
+        "answer": "Halwani Tahini Halva",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the next item on the list after tomato?",
+        "answer": "Nescafe 2 in 1 without sugar",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "×4\n5 عيش بلدي",
+            "الضحى أرز مصري (1\n×1\nكيلو)",
+            "12.6 ج.م",
+            "×1\n(خيار (1 كيلو جرام\n11.2 ج.م",
+            "×1\n(1 طماطم (كيلو جرام\n8.4 ج.م",
+            "نسكافيه 2 في 1 بدون\n×5\nسكر (10 جرام)\n8 ج.م\nحلواني حلاوة طحينية\n×1\nسادة (575 جرام)\n28.4 ج.م",
+            "جبنة براميلي (350 جرام) 19 ج.م",
+            "×1\nريتش لانشون بيف\n17.4 ج.م",
+            "×1\nبالفلفل الاسود (250\nجرام)",
+            "فريش روتس - كوسه\n×1\n(1 كيلو)\n14.36 ج.م\nC"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of tomato?",
+        "answer": "1 kg",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does Halwani Tahini Halva cost?",
+        "answer": "28.4 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does the Al Doha Egyptian rice cost?",
+        "answer": "12.6 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of rice is on the list?",
+        "answer": "Al Doha Egyptian rice",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Nescafe 2 in 1 without sugar were purchased?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 12.6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "×1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "×1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much does 1 kg of tomato cost?",
+        "answer": "8.4 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the next item on the list after cucumber?",
+        "answer": "Tomato",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of cucumber?",
+        "answer": "1 kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the last item on the list?",
+        "answer": "Fresh Roots - Zucchini",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does 1 kg of cucumber cost?",
+        "answer": "11.2 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 11.2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "5 عيش بلدي",
+        "source": "Human"
+    },
+    {
+        "question": "What is the next item on the list after rice?",
+        "answer": "Cucumber",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much does Barameli cheese cost?",
+        "answer": "19 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Nescafe 2 in 1 without sugar cost",
+        "answer": "8 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item on the list?",
+        "answer": "5 pieces of balady bread",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "5 عيش بلدي",
+                "quantity": "×4",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "الضحى أرز مصري (1",
+                "quantity": "×1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "12.6"
+            },
+            {
+                "item": "(خيار (1 كيلو جرام",
+                "quantity": "×1",
+                "total_price": "11.2"
+            },
+            {
+                "item": "(1 طماطم (كيلو جرام",
+                "quantity": "×1",
+                "total_price": "8.4"
+            },
+            {
+                "item": "نسكافيه 2 في 1 بدون\nسكر (10 جرام)\nحلواني حلاوة طحينية\nسادة (575 جرام)",
+                "quantity": "×1",
+                "total_price": "28.4"
+            },
+            {
+                "item": "جبنة براميلي (350 جرام)",
+                "quantity": "1",
+                "total_price": "19"
+            },
+            {
+                "item": "ريتش لانشون بيف",
+                "quantity": "×1",
+                "total_price": "17.4"
+            },
+            {
+                "item": "بالفلفل الاسود (250",
+                "quantity": "×1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "فريش روتس - كوسه",
+                "quantity": "1",
+                "total_price": "14.36"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "الضحى أرز مصري (1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the next item on the list after Halva?",
+        "answer": "Barameli cheese",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of the Al Doha Egyptian rice?",
+        "answer": "1 kg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the 5 pieces of balady bread cost?",
+        "answer": "12 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of bread?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "×4",
+        "source": "Human"
+    }
+]

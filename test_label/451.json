@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE 227.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": "JERSEY BODY - T-SHIRT SHORT-SLEEVED, ACCESSORIES SOCKS TRAINER LINER",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "7/31/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "27.68",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the purchase?",
+        "answer": "17:09",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "LE 199.12",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "LC WAIKIKI, SUN CITY MALL, CAIRO, EGY",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "ACCESSORIES SOCKS TRAINER LINER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 39.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many of the second item was bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 149.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier ID?",
+        "answer": "3350",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE 227.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the first item was bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE 227.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "0000241562",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "ACCESSORIES SOCKS TRAINER LINER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "010400000000032446",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the sales VAT?",
+        "answer": "27.88 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "TENA RETAIL EG",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "ISLAN VAHED",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the POS ID?",
+        "answer": "E601POS04",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total number of items purchased?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:09",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the first item?",
+        "answer": "149.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:09",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales VAT (14%)\nLE 27.68",
+            "ACCESSORIES SOCKS TRAINER LINER\n8681381640201\n1\n39.00\n39.00",
+            "ACCESSORIES SOCKS TRAINER LINER\n8681382562953\n1\n39.00\n39.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "TEMA RETAIL EG",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount without VAT?",
+        "answer": "199.12 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "7/31/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 39.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "379-456-249",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "010400000000032446",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the second item?",
+        "answer": "39.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "JERSEY BODY - T-SHIRT SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "149.00"
+            },
+            {
+                "item": "ACCESSORIES SOCKS TRAINER LINER",
+                "quantity": "1",
+                "total_price": "39.00"
+            },
+            {
+                "item": "ACCESSORIES SOCKS TRAINER LINER",
+                "quantity": "1",
+                "total_price": "39.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "227.00 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "How much change was given back?",
+        "answer": "11.00 LE",
+        "source": "GPT"
+    }
+]

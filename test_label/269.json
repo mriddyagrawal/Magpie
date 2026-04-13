@@ -1,0 +1,333 @@
+[
+    {
+        "question": "How much did the Americana Frozen Green Beans cost?",
+        "answer": "10.50 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 9.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-6.25 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Knorr Vegetable Broth cost?",
+        "answer": "7.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 310.85",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Hero Baby Good Morning 8 Cereal cost?",
+        "answer": "34.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#3021-3628933",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Pledge Furniture Polish Original cost?",
+        "answer": "37.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Clarel White Liquid Bleach cost?",
+        "answer": "20.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Pico Cherry\nTomatoes (250g)",
+                "quantity": "1",
+                "total_price": "9.50"
+            },
+            {
+                "item": "Fresh Roots - White\nOnion (1Kg)",
+                "quantity": "1",
+                "total_price": "9.95"
+            },
+            {
+                "item": "Tamrtna Seaady\nDates (500g)\nBaby Food",
+                "quantity": "1",
+                "total_price": "26.00"
+            },
+            {
+                "item": "Hero Baby Good\nMorning 8 Cereal\nwith Milk (150g)",
+                "quantity": "1",
+                "total_price": "34.00"
+            },
+            {
+                "item": "Pledge Furniture\nPolish Original\n(300ml)\nShampoo",
+                "quantity": "1",
+                "total_price": "37.00"
+            },
+            {
+                "item": "Tresemme Shampoo\nKeratin Smooth &\nStraight Low\nSulphate With Argan\nOil (200ml)",
+                "quantity": "1",
+                "total_price": "38.40"
+            },
+            {
+                "item": "Clorel White Liquid\nBleach Pack of 2\n(1050ml)",
+                "quantity": "1",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Gourmet Frozen\nMeat Balls (475g)",
+                "quantity": "1",
+                "total_price": "65.00"
+            },
+            {
+                "item": "Givrex Frozen Green\nPeas & Carrots\n(400g)",
+                "quantity": "1",
+                "total_price": "14.00"
+            },
+            {
+                "item": "Americana Frozen\nGreen Beans (400g)\nRice",
+                "quantity": "1",
+                "total_price": "10.50"
+            },
+            {
+                "item": "Al Doha Egyptian\nRice (1kg)\nSpices & Seasoning",
+                "quantity": "1",
+                "total_price": "21.75"
+            },
+            {
+                "item": "Alsaeed Syrian\nCoriander Grinder\n(30g)",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Knorr Vegetable\nBroth 12 Cubes\n(108g)",
+                "quantity": "1",
+                "total_price": "7.00"
+            },
+            {
+                "item": "Americana Fava\nPlain Beans 20% Off\n(400g)",
+                "quantity": "1",
+                "total_price": "8.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the order?",
+        "answer": "310.85 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Tamrtna Seaady\nDates (500g)\nBaby Food",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "1 May, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Givrex Frozen Green Peas & Carrots cost?",
+        "answer": "14.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Hero Baby Good\nMorning 8 Cereal\nwith Milk (150g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 310.85",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Pico Cherry\nTomatoes (250g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "307.10 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Americana Fava Plain Beans cost?",
+        "answer": "8.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#3021-3628933",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 307.10",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Gourmet Frozen Meat Balls cost?",
+        "answer": "65.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Tresemme Shampoo cost?",
+        "answer": "38.40 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Alsaeed Syrian Coriander Grinder cost?",
+        "answer": "6.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Fresh Roots - White Onion cost?",
+        "answer": "9.95 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 310.85",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "14",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the delivery cost?",
+        "answer": "10.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 9.95,
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Tamrtna Seaady Dates cost?",
+        "answer": "26.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Al Doha Egyptian Rice cost?",
+        "answer": "21.75 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of # GP 9.54",
+            "Fresh Roots - White\n1 9.95\n9.95\nOnion (1Kg)",
+            "Tamrtna Seaady\nDates (500g)\n1 26.00 26.00\nBaby Food",
+            "Hero Baby Good\nMorning 8 Cereal\n1 34.00 34.00\nwith Milk (150g)",
+            "Pledge Furniture\n1 37.00 37.00\nPolish Original\n(300ml)\nShampoo",
+            "Tresemme Shampoo\n1 38.40 38.40\nKeratin Smooth &\nStraight Low\nSulphate With Argan\nOil (200ml)\nBleach",
+            "Clorel White Liquid\n1 20.00 20.00\nBleach Pack of 2\n(1050ml)",
+            "Gourmet Frozen\n1\n65.00 65.00\nMeat Balls (475g)",
+            "Givrex Frozen Green\n1 14.00 14.00\nPeas & Carrots\n(400g)",
+            "Americana Frozen\n1 10,50\n10.50\nGreen Beans (400g)\nRice",
+            "Al Doha Egyptian\n1 21.75 21.75\nRice (1kg)\nSpices & Seasoning",
+            "Alsaeed Syrian\n1 6.00\n6.00\nCoriander Grinder\n(30g)",
+            "Knorr Vegetable\n1 7.00\n7.00\nBroth 12 Cubes\n(108g)",
+            "Americana Fava\n1 8.00\n8.00\nPlain Beans 20% Off\n(400g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 26.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 34.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Fresh Roots - White\nOnion (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Pico Cherry Tomatoes cost?",
+        "answer": "9.50 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "14",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 14,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "9.54",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    }
+]

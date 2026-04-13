@@ -1,0 +1,359 @@
+[
+    {
+        "question": "What was the total cost of the order?",
+        "answer": "1,890.94",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the grape leaves?",
+        "answer": "70.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 17,
+        "source": "Human"
+    },
+    {
+        "question": "How much was one Cappuccino?",
+        "answer": "50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the start time of the transaction?",
+        "answer": "09:59 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 0.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1,890.94",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the extra milk?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "17",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the Pistachio Milk Cake?",
+        "answer": "99.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 70.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the end time of the transaction?",
+        "answer": "11:35 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the total for Cappuccino?",
+        "answer": "100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What table was this for?",
+        "answer": "12",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cappuccinos were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:35 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "chicken Dreams",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1,890.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 0.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Turkish Coffees were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "17",
+        "source": "Human"
+    },
+    {
+        "question": "How many Chicken Dreams were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the total cost of the Frappe?",
+        "answer": "55.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "1,481.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "BREAD BASKET WELCOME",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "chicken Dreams",
+            "TURKISH RICE",
+            "CAPPUCCINO",
+            "HOT CHOCOLATE",
+            "TURKISH COFFE",
+            "PREMIUM MINERAL WATE",
+            "MANGO JUICE"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 358.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "01176",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Hot Chocolates were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT\n232.22",
+            "grape leaves\n70.00",
+            "chicken Dreams\n2 pcs @ 179.00\n358.00",
+            "TURKISH RICE\n2 pcs @ 0.00\n0.00",
+            "PISTACHIO MILK CAKE\n99.00",
+            "CAPPUCCINO\n2 pcs @ 50.00\n100.00",
+            "HOT CHOCOLATE\n2 pcs @ 65.00\n130.00",
+            "TURKISH COFFE\n3 pcs @ 40.00\n120.00",
+            "EXTRA MILK\n10.00",
+            "ADD FLAVOR CARAMEL\n20.00",
+            "PREMIUM MINERAL WATE\n2 pcs @ 25.00\n50.00",
+            "FRENSH FRIES\n50.00",
+            "Shish Tavouk\n165.00",
+            "BURGHUAL RICE\n0.00",
+            "MANGO JUICE\n5 pcs @ 45.00\n225.00",
+            "FRAPPE\n55.00",
+            "Coca-Cola\n29.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "grape leaves",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Ozel",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Mango Juices were ordered?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "ozel",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:35 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the total for Hot Chocolate?",
+        "answer": "130.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "13/05/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "TURKISH RICE",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the total for Chicken Dreams?",
+        "answer": "358.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1,890.94",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much was one Chicken Dream?",
+        "answer": "179.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "232.22",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "BREAD BASKET WELCOME",
+                "quantity": "1",
+                "total_price": "0.00"
+            },
+            {
+                "item": "grape leaves",
+                "quantity": "1",
+                "total_price": "70.00"
+            },
+            {
+                "item": "chicken Dreams",
+                "quantity": "2",
+                "total_price": "358.00"
+            },
+            {
+                "item": "TURKISH RICE",
+                "quantity": "2",
+                "total_price": "0.00"
+            },
+            {
+                "item": "PISTACHIO MILK CAKE",
+                "quantity": "1",
+                "total_price": "99.00"
+            },
+            {
+                "item": "CAPPUCCINO",
+                "quantity": "2",
+                "total_price": "100.00"
+            },
+            {
+                "item": "HOT CHOCOLATE",
+                "quantity": "2",
+                "total_price": "130.00"
+            },
+            {
+                "item": "TURKISH COFFE",
+                "quantity": "3",
+                "total_price": "120.00"
+            },
+            {
+                "item": "EXTRA MILK",
+                "quantity": "1",
+                "total_price": "10.00"
+            },
+            {
+                "item": "ADD FLAVOR CARAMEL",
+                "quantity": "1",
+                "total_price": "20.00"
+            },
+            {
+                "item": "PREMIUM MINERAL WATE",
+                "quantity": "2",
+                "total_price": "50.00"
+            },
+            {
+                "item": "FRENSH FRIES",
+                "quantity": "1",
+                "total_price": "50.00"
+            },
+            {
+                "item": "Shish Tavouk",
+                "quantity": "1",
+                "total_price": "165.00"
+            },
+            {
+                "item": "BURGHUAL RICE",
+                "quantity": "1",
+                "total_price": "0.00"
+            },
+            {
+                "item": "MANGO JUICE",
+                "quantity": "5",
+                "total_price": "225.00"
+            },
+            {
+                "item": "FRAPPE",
+                "quantity": "1",
+                "total_price": "55.00"
+            },
+            {
+                "item": "Coca-Cola",
+                "quantity": "1",
+                "total_price": "29.00"
+            }
+        ],
+        "source": "Human"
+    }
+]

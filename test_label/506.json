@@ -1,0 +1,281 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of shipping?",
+        "answer": "EGP 12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Mega Chocolate Ice Cream were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Veet Cream Sensitive Skin Twin Pack Offer 15%(100ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 368.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 98.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 355.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 33.25,
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "11648343-619",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#619-11648343",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Mega Chocolate Ice Cream (85ml)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Nivea Natural Fairness Body Cream Evens Tone Complex With Vitamin C?",
+        "answer": "55.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of Nivea Natural Fairness Body Cream Evens Tone Complex With Vitamin C?",
+        "answer": "55.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "10:00 PM - 11:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Nivea Natural Fairness Body Cream Evens Tone Complex With Vitamin C were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the method of payment?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "value of 22.9 EGP is already included in the total",
+            "Nivea Natural Fairness Body Cream Evens Tone Complex\n1 55.25\n55.25\nWith Vitamin C (100ml)",
+            "Nivea Natural Fairness Cream For All Skin Type (50ml)\n1 33.25\n33.25",
+            "Veet Cream Sensitive Skin Twin Pack Offer 15%(100ml)\n1 98.00\n98.00",
+            "Vanish Stain Remover Liquid (900ml)\n1 145.00\n145.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Mega Chocolate Ice Cream (85ml)",
+                "quantity": "2",
+                "total_price": "24.00"
+            },
+            {
+                "item": "Nivea Natural Fairness Body Cream Evens Tone Complex\nWith Vitamin C (100ml)",
+                "quantity": "1",
+                "total_price": "55.25"
+            },
+            {
+                "item": "Nivea Natural Fairness Cream For All Skin Type (50ml)",
+                "quantity": "1",
+                "total_price": "33.25"
+            },
+            {
+                "item": "Veet Cream Sensitive Skin Twin Pack Offer 15%(100ml)",
+                "quantity": "1",
+                "total_price": "98.00"
+            },
+            {
+                "item": "Vanish Stain Remover Liquid (900ml)",
+                "quantity": "1",
+                "total_price": "145.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of Nivea Natural Fairness Cream For All Skin Type?",
+        "answer": "33.25",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Nivea Natural Fairness Cream For All Skin Type were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "22.9 EGP",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "6 September, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 24.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 368.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item on the list?",
+        "answer": "Mega Chocolate Ice Cream (85ml)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the third item on the list?",
+        "answer": "Nivea Natural Fairness Cream For All Skin Type (50ml)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Mega Chocolate Ice Cream (85ml)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the order?",
+        "answer": "EGP 368.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 368.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 55.25,
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item on the list?",
+        "answer": "Nivea Natural Fairness Body Cream Evens Tone Complex With Vitamin C (100ml)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount without shipping?",
+        "answer": "EGP 355.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Nivea Natural Fairness Cream For All Skin Type?",
+        "answer": "33.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "6 September, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Nivea Natural Fairness Cream For All Skin Type (50ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Mega Chocolate Ice Cream?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of Mega Chocolate Ice Cream?",
+        "answer": "24.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Nivea Natural Fairness Body Cream Evens Tone Complex\nWith Vitamin C (100ml)",
+        "source": "Human"
+    }
+]

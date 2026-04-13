@@ -1,0 +1,291 @@
+[
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 24.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item on the order list?",
+        "answer": "Raw Chips Sea Salt (53g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the fourth item on the order list?",
+        "answer": "EL Sabor Nacho Salt (100g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the order?",
+        "answer": "Fri, 5 Aug 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 44.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the order?",
+        "answer": "EGP 44.44",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does the Sunshine Fancy Tuna Chunks cost?",
+        "answer": "EGP 24.5",
+        "source": "GPT"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "Paid in cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 44.44",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Oreo Chocolate\nBiscuits With Vanilla\nCream 3 Pcs (28.5g)",
+                "quantity": "1x",
+                "total_price": "EGP 3"
+            },
+            {
+                "item": "Raw Chips Sea\nSalt (53g)",
+                "quantity": "1x",
+                "total_price": "EGP 6.75"
+            },
+            {
+                "item": "Sunshine Fancy\nTuna Chunks\n(170g)",
+                "quantity": "1x",
+                "total_price": "EGP 24.5"
+            },
+            {
+                "item": "EL Sabor Nacho\nSalt (100g)",
+                "quantity": "1x",
+                "total_price": "EGP 25"
+            },
+            {
+                "item": "Twix Twin\nChocolate (50g)",
+                "quantity": "1x",
+                "total_price": "EGP 12.5"
+            },
+            {
+                "item": "Bounty Coconut\nChocolate (57g)",
+                "quantity": "1x",
+                "total_price": "EGP 16.5"
+            },
+            {
+                "item": "Farm Frites Pomme\nFrites (1Kg)",
+                "quantity": "1x",
+                "total_price": "EGP 33"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the fifth item on the order list?",
+        "answer": "Twix Twin Chocolate (50g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 3.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the full delivery address?",
+        "answer": "مدينة الشروق الحي السابع، المجاورة ٢ فيلا ٥٨ El Shorouk City, شقة ٦",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does the Twix Twin Chocolate cost?",
+        "answer": "EGP 12.5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 25.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Raw Chips Sea\nSalt (53g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item on the order list?",
+        "answer": "Oreo Chocolate Biscuits With Vanilla Cream 3 Pcs (28.5g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "05:20 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sixth item on the order list?",
+        "answer": "Bounty Coconut Chocolate (57g)",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does the Raw Chips Sea Salt cost?",
+        "answer": "EGP 6.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery location?",
+        "answer": "home",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were ordered?",
+        "answer": "7",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the order number?",
+        "answer": "514-5057115",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 6.75,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 44.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1x\nOreo Chocolate\nEGP 3\nBiscuits With Vanilla\nCream 3 Pcs (28.5g)",
+            "1x\nRaw Chips Sea\nEGP 6.75\nSalt (53g)",
+            "1x\nSunshine Fancy\nEGP 24.5\nTuna Chunks\n(170g)",
+            "1x\nEL Sabor Nacho\nEGP 25\nSalt (100g)",
+            "1x\nTwix Twin\nEGP 12.5\nChocolate (50g)",
+            "1x\nBounty Coconut\nEGP 16.5\nChocolate (57g)",
+            "1x\nFarm Frites Pomme EGP 33\nFrites (1Kg)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "05:20 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the Bounty Coconut Chocolate cost?",
+        "answer": "EGP 16.5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the EL Sabor Nacho Salt cost?",
+        "answer": "EGP 25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the order delivered?",
+        "answer": "05:20 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Oreo Chocolate\nBiscuits With Vanilla\nCream 3 Pcs (28.5g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item on the order list?",
+        "answer": "Sunshine Fancy Tuna Chunks (170g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "5 Aug 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#514-5057115",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "EL Sabor Nacho\nSalt (100g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Sunshine Fancy\nTuna Chunks\n(170g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the Oreo Chocolate Biscuits cost?",
+        "answer": "EGP 3",
+        "source": "GPT"
+    }
+]

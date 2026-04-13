@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "46.73",
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the restaurant?",
+        "answer": "8030 Renaissance Parkway, Durham, NC 27713",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was ordered with ground beef?",
+        "answer": "Taco Salad",
+        "source": "GPT"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What did they add to the taco salad?",
+        "answer": "Chicken Fajita",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "05/18/2019",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of the receipt?",
+        "answer": "12:25 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the loyalty program called?",
+        "answer": "Uncle Julio's Loyalty Program",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "46.73",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the balance due?",
+        "answer": "46.73",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Taco Salad",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:25 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of ground beef?",
+        "answer": "8.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the taco salad?",
+        "answer": "15.49",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "46.73",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "43.47",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the table number?",
+        "answer": "57/1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Pechuga de Pollo",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What was the tax amount?",
+        "answer": "3.26",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "05/18/2019",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Pechuga de Pollo?",
+        "answer": "18.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 15.49,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "3.26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "43.47",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:25 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Taco Salad\n15.49\nGround Beef\nAdd Chicken Fajita\n8.99",
+            "Pechuga de Pollo\n18.99"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the full name of the server?",
+        "answer": "ANASTASHIA",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Taco Salad",
+                "quantity": "1",
+                "total_price": "15.49"
+            },
+            {
+                "item": "Pechuga de Pollo",
+                "quantity": "1",
+                "total_price": "18.99"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the restaurant?",
+        "answer": "(984) 329-2900",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item called which costs 18.99?",
+        "answer": "Pechuga de Pollo",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "46.73",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 18.99,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the server?",
+        "answer": "ANASTASHIA",
+        "source": "GPT"
+    },
+    {
+        "question": "Is there a cost to join the loyalty program?",
+        "answer": "Free",
+        "source": "GPT"
+    }
+]

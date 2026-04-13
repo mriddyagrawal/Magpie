@@ -1,0 +1,294 @@
+[
+    {
+        "question": "How much is one of the second item?",
+        "answer": "10.87",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "214.49",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 12.8,
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of two mixing bowls?",
+        "answer": "96.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the Wafeer D/Wash.Lqd Ylw.Lemn 41 cost?",
+        "answer": "35.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the first item were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the third item on the receipt?",
+        "answer": "9.97",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Lulu Hypermarket, The Park Mall",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount spent?",
+        "answer": "214.49",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "M/D Mixing Bowl Lrg.30677 Blu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one mixing bowl?",
+        "answer": "48.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "M/D Mixing Bowl Lrg.30677 Blu",
+            "Arabic Bread 5's"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 10.87,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "M/D Mixing Bowl Lrg.30677 Blu",
+                "quantity": "2",
+                "total_price": "96.00"
+            },
+            {
+                "item": "Egyptian Pasta",
+                "quantity": "1",
+                "total_price": "10.87"
+            },
+            {
+                "item": "Egyptian Pasta",
+                "quantity": "1",
+                "total_price": "9.97"
+            },
+            {
+                "item": "Egyptian Pasta",
+                "quantity": "1",
+                "total_price": "12.80"
+            },
+            {
+                "item": "Lactel Natural Yogurt 105g 12",
+                "quantity": "1",
+                "total_price": "31.95"
+            },
+            {
+                "item": "Arabic Bread 5's",
+                "quantity": "2",
+                "total_price": "17.90"
+            },
+            {
+                "item": "Wafeer D/Wash.Lqd Ylw.Lemn 41",
+                "quantity": "1",
+                "total_price": "35.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How much did 2 Lactel Natural Yogurt items cost?",
+        "answer": "8.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sixth item on the receipt?",
+        "answer": "Lactel Natural Yogurt 105g 12",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "16.03.2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 9.97,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "6224007306772\nسلطانية مزج كبيرة إم ديزاين\n2 x\n48.00\nV6\nM/D Mixing Bowl Lrg.30677 Blu\n96.00",
+            "9969319010876\n1\nمكرونة مصرية\nVO\nEgyptian Pasta\n10.87",
+            "9969316009972\n1\nVO\nEgyptian Pasta\nمكرونة مصرية\n9.97",
+            "9969311012809\n1\nVo\nEgyptian Pasta\nمكرونة مصرية\n12.80",
+            "6223003777906\n1 x\n31.95\nVO\nزبادى طبيعى لاكتيل\nLactel Natural Yogurt 105g 12\n31.95",
+            "0000003284568\n2 x\n8.95\nVO\nخبز عربى 5حة\nArabic Bread 5's\n17.90",
+            "6223002551293\n1 x\n35.00\nVO\nسائل غسيل محون لمون أمفر وفير\nWafeer D/Wash.Lqd Ylw.Lemn 41\n35.00\nPARKING FREE COUPON_\nCoup."
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "214.49",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased on the receipt?",
+        "answer": "سلطانية مزج كبيرة إم ديزاين / M/D Mixing Bowl Lrg. 30677 Blu",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the fifth item on the receipt?",
+        "answer": "12.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 96.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Egyptian Pasta",
+        "source": "Human"
+    },
+    {
+        "question": "What is the eighth item on the receipt?",
+        "answer": "Wafeer D/Wash.Lqd Ylw.Lemn 41",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "214.49",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Egyptian Pasta",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "16.03.2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the seventh item on the receipt?",
+        "answer": "Arabic Bread 5's",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the Arabic Bread 5's?",
+        "answer": "17.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "39794",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item on the list?",
+        "answer": "Egyptian Pasta",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the full address of the store?",
+        "answer": "Lulu Hypermarket, The Park Mall 5th Settlement, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the fourth item on the receipt?",
+        "answer": "Egyptian Pasta",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "+201275898394",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:32",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Egyptian Pasta",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Lulu Hypermarket",
+        "source": "GPT"
+    }
+]

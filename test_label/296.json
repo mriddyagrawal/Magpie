@@ -1,0 +1,311 @@
+[
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Gradient Kuwaiti Lycra\nScarf",
+        "source": "Human"
+    },
+    {
+        "question": "How many No Thread Bonnets were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the product code of the Kuwaiti Cotton Scarf?",
+        "answer": "[71011013444231]",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the reference number for the transaction?",
+        "answer": "Ab-Posr-20220916-065733",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "2022-09-16",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cotton Kuwaitis were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 80.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Le voile",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-09-16",
+        "source": "Human"
+    },
+    {
+        "question": "How many Gradient Kuwaiti Lycra Scarves were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total price?",
+        "answer": "700.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "18:57:33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "700.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the product code of the Gradient Kuwaiti Lycra Scarf?",
+        "answer": "[10011010775800]",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Cotton Kuwaiti",
+        "source": "Human"
+    },
+    {
+        "question": "How many Cotton Lycra Multiway Turbans were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "700.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Gradient Kuwaiti Lycra Scarf?",
+        "answer": "220.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "No Thread Bonnet",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "No Thread Bonnet",
+                "quantity": "2",
+                "total_price": "80.00"
+            },
+            {
+                "item": "Cotton Kuwaiti",
+                "quantity": "1",
+                "total_price": "150.00"
+            },
+            {
+                "item": "Gradient Kuwaiti Lycra\nScarf",
+                "quantity": "1",
+                "total_price": "220.00"
+            },
+            {
+                "item": "Kuwaiti Cotton Scarf",
+                "quantity": "1",
+                "total_price": "150.00"
+            },
+            {
+                "item": "Cotton Lycra Multiway\nTurban",
+                "quantity": "1",
+                "total_price": "100.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the No Thread Bonnet?",
+        "answer": "80.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 150.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the grand total?",
+        "answer": "700.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 220.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the product code of the No Thread Bonnet?",
+        "answer": "[42022323021700]",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the paid amount?",
+        "answer": "700.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the change given?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 150.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Ab-Posr-20220916-065733",
+        "source": "Human"
+    },
+    {
+        "question": "What is the product code of the Cotton Kuwaiti?",
+        "answer": "[10011013149000]",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Cotton Kuwaiti?",
+        "answer": "150.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "18:57:33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the product code of the Cotton Lycra Multiway Turban?",
+        "answer": "[59022525341217]",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Cotton Lycra Multiway Turban?",
+        "answer": "100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's branch?",
+        "answer": "Abbas 2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "No Thread Bonnet\n[42022323021700]\n2 × 40.00\n80.00",
+            "Cotton Kuwaiti\n[10011013149000]\n1 X 150.00\n150.00",
+            "Gradient Kuwaiti Lycra\nScarf [10011010775800]\n1 X 220.00\n220.00",
+            "Kuwaiti Cotton Scarf\n[71011013444231]\n1 X 150.00\n150.00",
+            "Cotton Lycra Multiway\nTurban [59022525341217]\n1 × 100.00\n100.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Kuwaiti Cotton Scarf?",
+        "answer": "150.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Kuwaiti Cotton Scarves were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "No Thread Bonnet"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Kuwaiti Cotton Scarf",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "700.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "voile",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the purchase made?",
+        "answer": "18:57:33",
+        "source": "GPT"
+    },
+    {
+        "question": "What are the last four digits of the card used?",
+        "answer": "1903",
+        "source": "GPT"
+    }
+]

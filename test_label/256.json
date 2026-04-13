@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Meat House Frozen Beef Shawarma?",
+        "answer": "157.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total due amount?",
+        "answer": "EGP 141.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 72.25,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount before the current balance deduction?",
+        "answer": "EGP 266.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 259.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 3.62",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1217-8819792",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "12 April, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the payment method used?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the Heinz Mustard were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Juhayna Milk Lactose Free & Skimmed (1L)?",
+        "answer": "72.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount applied?",
+        "answer": "-EGP 5.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Juhayna Milk Lactose Free & Skimmed (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "07:00 PM - 08:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What company is the order from?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 141.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Meat House Frozen Beef Shawarma (400g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 141.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1217-8819792",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 29.5,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 3.62 is already included in the total amount.",
+            "Juhayna Milk Lactose Free & Skimmed (1L)\n1 72.25\n72.25",
+            "Heinz Mustard (235g)\n1 29.50\n29.50"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Heinz Mustard (235g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the Meat House Frozen Beef Shawarma were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the Juhayna Milk Lactose Free & Skimmed were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first product listed in the order?",
+        "answer": "Meat House Frozen Beef Shawarma (400g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-EGP 125.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Heinz Mustard?",
+        "answer": "29.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Meat House Frozen Beef Shawarma (400g)",
+                "quantity": "1",
+                "total_price": "157.50"
+            },
+            {
+                "item": "Juhayna Milk Lactose Free & Skimmed (1L)",
+                "quantity": "1",
+                "total_price": "72.25"
+            },
+            {
+                "item": "Heinz Mustard (235g)",
+                "quantity": "1",
+                "total_price": "29.50"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item in the order?",
+        "answer": "Heinz Mustard (235g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery charge?",
+        "answer": "EGP 12.50 via Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 259.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 157.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 141.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "12 April, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second product listed in the order?",
+        "answer": "Juhayna Milk Lactose Free & Skimmed (1L)",
+        "source": "GPT"
+    }
+]

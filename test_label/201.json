@@ -1,0 +1,318 @@
+[
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 559.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "48.01",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 70.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 83.45,
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item on the receipt?",
+        "answer": "Breadfast Fresh Mango Juice (1L)",
+        "source": "GPT"
+    },
+    {
+        "question": "How many kiwis were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "EGP 12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Lamar Full Cream Milk (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 66.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2313-7984156",
+        "source": "Human"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-EGP 3.26",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the order before the balance?",
+        "answer": "EGP 562.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2313-7984156",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "48.01",
+            "Dasani Natural Water Carton (600ml*20)\n1 83.45\n83.45",
+            "Pepsi Diet Plastic Bottle (400ml)\n11 6.00\n66.00",
+            "Lamar Full Cream Milk (1L)\n1 31.00\n31.00",
+            "Kiwi (500g)\n2 23.50\n47.00",
+            "Carrots (500g)\n1 12.50\n12.50",
+            "ReallyGood Mozzarella Sticks by Breadfast (295g)\n1 64.00\n64.00",
+            "ReallyGood Potato Croquette by Breadfast (300g)\n1 48.00\n48.00",
+            "Heinz Mayonnaise (180g)\n1 24.75\n24.75",
+            "Daria Pomegranate Molasses (350ml)\n1 46.25\n46.25",
+            "Verde Stevia Sweet Sugar (50 Sachet)\n1 63.75\n63.75"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the carrots cost?",
+        "answer": "12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of sugar was ordered?",
+        "answer": "Verde Stevia Sweet Sugar",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cost of one ReallyGood Mozzarella Sticks by Breadfast?",
+        "answer": "64.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "23 February, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What brand of mayonnaise was ordered?",
+        "answer": "Heinz",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Pepsi Diet Plastic Bottle (400ml)",
+            "Kiwi (500g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 31.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 559.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the pomegranate molasses?",
+        "answer": "Daria Pomegranate Molasses",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Dasani Natural Water Carton (600ml*20)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 559.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 556.70",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-EGP 6.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 11,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Pepsi Diet Plastic Bottle (400ml)",
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Lamar Full Cream Milk cost?",
+        "answer": "31.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Breadfast Fresh Mango Juice (1L)",
+                "quantity": "1",
+                "total_price": "70.00"
+            },
+            {
+                "item": "Dasani Natural Water Carton (600ml*20)",
+                "quantity": "1",
+                "total_price": "83.45"
+            },
+            {
+                "item": "Pepsi Diet Plastic Bottle (400ml)",
+                "quantity": "11",
+                "total_price": "66.00"
+            },
+            {
+                "item": "Lamar Full Cream Milk (1L)",
+                "quantity": "1",
+                "total_price": "31.00"
+            },
+            {
+                "item": "Kiwi (500g)",
+                "quantity": "2",
+                "total_price": "47.00"
+            },
+            {
+                "item": "Carrots (500g)",
+                "quantity": "1",
+                "total_price": "12.50"
+            },
+            {
+                "item": "ReallyGood Mozzarella Sticks by Breadfast (295g)",
+                "quantity": "1",
+                "total_price": "64.00"
+            },
+            {
+                "item": "ReallyGood Potato Croquette by Breadfast (300g)",
+                "quantity": "1",
+                "total_price": "48.00"
+            },
+            {
+                "item": "Heinz Mayonnaise (180g)",
+                "quantity": "1",
+                "total_price": "24.75"
+            },
+            {
+                "item": "Daria Pomegranate Molasses (350ml)",
+                "quantity": "1",
+                "total_price": "46.25"
+            },
+            {
+                "item": "Verde Stevia Sweet Sugar (50 Sachet)",
+                "quantity": "1",
+                "total_price": "63.75"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of one ReallyGood Potato Croquette?",
+        "answer": "48.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 556.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the Tax ID?",
+        "answer": "538-096-330",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "04:00 PM - 05:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Breadfast Fresh Mango Juice (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "11",
+        "source": "Human"
+    },
+    {
+        "question": "How many Pepsi Diet Plastic Bottles were ordered?",
+        "answer": "11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 559.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "23 February, 2023",
+        "source": "GPT"
+    }
+]

@@ -1,0 +1,289 @@
+[
+    {
+        "question": "What is the total cost of GALAXY JEXLS EVO?",
+        "answer": "870.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many RAFFAELLO were purchased?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "2,047.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What time is on the slip?",
+        "answer": "3:38",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cost of MERIT FILTER?",
+        "answer": "104.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "07-11-22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 330.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000401-P1000072172",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of MARLBORO BOX?",
+        "answer": "48.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many MERIT FILTER were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date on the slip?",
+        "answer": "07-11-22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item number for MERIT FILTER?",
+        "answer": "379",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "RAFFAELLO T15 150GM",
+            "GALAXY JEXLS EVO 1 6",
+            "MERIT FILTER"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "28\n232 72",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "2,047.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "MARLBORO BOX pcs",
+        "source": "Human"
+    },
+    {
+        "question": "Who is the staff member?",
+        "answer": "Mohamed Solaim Trans",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:38",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "ROCHER TRIPACK T16/ pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number for ROCHER TRIPACK?",
+        "answer": "3613",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "A\n14\n1,662 28\n232 72\n1,895 00",
+            "Item No .:\n3613\nROCHER TRIPACK T16/ pcs\n135.00 A",
+            "Item No .:\n11074\nGALAXY JEXLS EVO 1 6\n2 pcs @ 435.00\n870.00 A",
+            "Item No .:\n371\nMARLBORO BOX pcs\n48.00",
+            "Item No.\n379\nMERIT FILTER\n2 pcs @ 52.00\n104.00",
+            "Item No .:\n8370\nGALAXY JEWELS 900GM pcs\n560.00 A"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "2,047.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many GALAXY JEXLS EVO were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "RAFFAELLO T15 150GM",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "RAFFAELLO T15 150GM",
+                "quantity": "3",
+                "total_price": "330.00"
+            },
+            {
+                "item": "ROCHER TRIPACK T16/ pcs",
+                "quantity": "1",
+                "total_price": "135.00"
+            },
+            {
+                "item": "GALAXY JEXLS EVO 1 6",
+                "quantity": "2",
+                "total_price": "870.00"
+            },
+            {
+                "item": "MARLBORO BOX pcs",
+                "quantity": "1",
+                "total_price": "48.00"
+            },
+            {
+                "item": "MERIT FILTER",
+                "quantity": "2",
+                "total_price": "104.00"
+            },
+            {
+                "item": "GALAXY JEWELS 900GM pcs",
+                "quantity": "1",
+                "total_price": "560.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the station?",
+        "answer": "Omara station",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the RAFFAELLO?",
+        "answer": "330.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number for MARLBORO BOX?",
+        "answer": "371",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 135.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number for RAFFAELLO?",
+        "answer": "7045",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 48.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 870.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:38",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "2,047.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "GALAXY JEXLS EVO 1 6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number for GALAXY JEXLS EVO?",
+        "answer": "11074",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item number for GALAXY JEWELS?",
+        "answer": "8370",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cost of the ROCHER TRIPACK?",
+        "answer": "135.00",
+        "source": "GPT"
+    }
+]

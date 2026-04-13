@@ -1,0 +1,348 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Raw Kettle Potatoes Sea Salt?",
+        "answer": "5.40 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Cleo Salted Rice Cakes 20g",
+            "Juhayna Greek Yoghurt 5%F"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "1/3/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:49:43 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many Egyptian Growers Baladi Eggs were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "فاطمه ابو الحسن",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "KettleCookedSeaSaltChips1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "1024.322",
+        "source": "Human"
+    },
+    {
+        "question": "What was the tendered cash amount?",
+        "answer": "1,000.00 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "908779",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "9:49:43 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cleo Salted Rice Cakes 20g",
+                "quantity": "4",
+                "total_price": "LE36.00"
+            },
+            {
+                "item": "Raw KettlePotutoesSenSalt5",
+                "quantity": "1",
+                "total_price": "LE5.40"
+            },
+            {
+                "item": "KettleCookedSeaSaltChips1",
+                "quantity": "1",
+                "total_price": "LE81.00"
+            },
+            {
+                "item": "GourmetRoastBeef W.Blk Pe",
+                "quantity": "0.16",
+                "total_price": "LE89.67"
+            },
+            {
+                "item": "Gourmet Smoked Turkey Br",
+                "quantity": "0.21",
+                "total_price": "LE93.68"
+            },
+            {
+                "item": "Emi French Emmental",
+                "quantity": "0.21",
+                "total_price": "LE151.2"
+            },
+            {
+                "item": "Jack Jalapeno Cheese",
+                "quantity": "0.11",
+                "total_price": "LE35.64"
+            },
+            {
+                "item": "Pringles Salt & Vinegar 40g",
+                "quantity": "1",
+                "total_price": "LE31.50"
+            },
+            {
+                "item": "Pringles Barbecue 130g",
+                "quantity": "1",
+                "total_price": "LE72.00"
+            },
+            {
+                "item": "DinaFarms FullCream Milk 8",
+                "quantity": "1",
+                "total_price": "LE27.00"
+            },
+            {
+                "item": "Juhayna Greek Yoghurt 5%F",
+                "quantity": "2",
+                "total_price": "LE44.10"
+            },
+            {
+                "item": "Kiri Greek 6pc",
+                "quantity": "1",
+                "total_price": "LE37.80"
+            },
+            {
+                "item": "Kirl Greek 6pc",
+                "quantity": "1",
+                "total_price": "LE37.80"
+            },
+            {
+                "item": "Habba Habba Egyptian Rice",
+                "quantity": "1",
+                "total_price": "LE30.00"
+            },
+            {
+                "item": "EgyptianGrowersBaladiEggs",
+                "quantity": "1",
+                "total_price": "LE97.20"
+            },
+            {
+                "item": "Lurpak Unsalted Butter 100",
+                "quantity": "1",
+                "total_price": "LE54.90"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE924.89",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount before discounts?",
+        "answer": "1024.322 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Kiri Greek 6pc were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Cleo Salted Rice Cakes 20g\nLE9.00\n4\nLE36.00",
+            "Raw KettlePotutoesSenSalt5\nLE5.40\n1\nLE5.40",
+            "KettleCookedSeaSaltChips1\nLE81.0\n1\nLE81.00\n0",
+            "GourmetRoastBeef W.Blk Pe\nLE553.\n0.16\nLE89.67\n50\n2",
+            "Gourmet Smoked Turkey Br\nLE441.\n0.21\nLE93.68\n90\n199\n6",
+            "Emi French Emmental\nLE720.\n0.21\nLE151.2\n00\n0",
+            "Jack Jalapeno Cheese\nLE324.\n0.11\nLE35.64\n00",
+            "Pringles Salt & Vinegar 40g\nLE31.5\n1\nLE31.50\n0",
+            "Pringles Barbecue 130g\nLE72.0\n1\nLE72.00\n0",
+            "DinaFarms FullCream Milk 8\nLE27.0\n1\nLE27.00",
+            "Juhayna Greek Yoghurt 5%F\nLE22.0\n2\nLE44.10",
+            "Kiri Greek 6pc\nLE37.8\n1\nLE37.80\n0",
+            "Kirl Greek 6pc\nLE37.8\n1\nLE37.80\n0",
+            "Habba Habba Egyptian Rice\nLE30.0\n1\nLE30.00\n0",
+            "EgyptianGrowersBaladiEggs\nLE97.2\n1\nLE97.20",
+            "Lurpak Unsalted Butter 100\nLES4.8\n1\nLE54.90\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt RR",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 5.4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did they save?",
+        "answer": "99.43 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of Cleo Salted Rice Cakes?",
+        "answer": "36.00 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 16,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:49:43 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Raw KettlePotutoesSenSalt5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 81.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Kettle Cooked Sea Salt Chips?",
+        "answer": "81.00 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the discount amount?",
+        "answer": "99.43 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "1/3/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 36.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE924.89",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "GourmetRoastBeef W.Blk Pe",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cleo Salted Rice Cakes 20g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "908779",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Bouri, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Pringles Barbecue were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "0.16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE924.89",
+        "source": "Human"
+    },
+    {
+        "question": "What is the account number?",
+        "answer": "880000012877",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the net amount?",
+        "answer": "924.89 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the change amount?",
+        "answer": "75.11 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 89.67,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    }
+]

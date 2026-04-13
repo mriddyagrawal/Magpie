@@ -1,0 +1,375 @@
+[
+    {
+        "question": "What is the cashier's name?",
+        "answer": "Aya Ahmed Mohamed",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n266.95",
+            "Floride Orange juice 600 G\n2.000@35.00 L.E\n70 L.E",
+            "Floride Orange juice 600 G\n2.000@35.00 L.E\n70 L.E\n3.000@154.00",
+            "Delicious Mix 400 g\nL.E\n462 L.E",
+            "Floride Apple juice 600 G\n4.000@35.00 L.E\n140 L.E",
+            "Tamarind 400 gram\n6.000@30.00 L.E\n180 L.E",
+            "Kamar al din samo 400 g\n8.000@39.99 L.E\n319.92\nL.E",
+            "Sobia Cans 500g\n6.000@60.00 L.E\n360 L.E",
+            "Coconut 250 gram\n6.000@24.00 L.E\n144 L.E",
+            "Kamar al din abu auf Powder 600 G\n6.000@35.00 L.E\n210 L.E",
+            "Turkey Figs 300g\n6.000@45.00 L.E\n270 L.E",
+            "Raisins 250 gram\n6.000@35.00 L.E\n210 L.E",
+            "Maamoul date (Box)\n1.000@39.00 L.E\n39 L.E",
+            "Maamoul & Chocolate Mix offers\n1.000@88.00 L.E\n88 L.E",
+            "Tamarind 400 gram\n1.000@30.00 L.E\n30 L.E",
+            "Floride pineapple juice 600 G\n1.000@35.00 L.E\n35 L.E",
+            "Rio Pretzels Cheese 300g\n1.000@35.00 L.E\n35 L.E",
+            "Rio Pretzels BBQ 300g\n1.000@35.00 L.E\n35 L.E",
+            "Sobla Cans 500g\n1.000@60.00 L.E\n60 L.E",
+            "Maamoul Cinnamon offers\n1.000@66.00 L.E\n66 L.E",
+            "Floride Apple juice 600 G\n2.000@35.00 L.E\nO L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total discount?",
+        "answer": "140.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was paid using Etisalat Emerald?",
+        "answer": "2800.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Floride Orange juice 600 G",
+                "quantity": "2.000@35.00",
+                "total_price": "O"
+            },
+            {
+                "item": "Floride Orange juice 600 G",
+                "quantity": "2.000@35.00",
+                "total_price": "70"
+            },
+            {
+                "item": "Floride Orange juice 600 G",
+                "quantity": "3.000@154.00",
+                "total_price": "70"
+            },
+            {
+                "item": "Delicious Mix 400 g",
+                "quantity": "1",
+                "total_price": "462"
+            },
+            {
+                "item": "Floride Apple juice 600 G",
+                "quantity": "4.000@35.00",
+                "total_price": "140"
+            },
+            {
+                "item": "Tamarind 400 gram",
+                "quantity": "6.000@30.00",
+                "total_price": "180"
+            },
+            {
+                "item": "Kamar al din samo 400 g",
+                "quantity": "8.000@39.99",
+                "total_price": "319.92"
+            },
+            {
+                "item": "Sobia Cans 500g",
+                "quantity": "6.000@60.00",
+                "total_price": "360"
+            },
+            {
+                "item": "Coconut 250 gram",
+                "quantity": "6.000@24.00",
+                "total_price": "144"
+            },
+            {
+                "item": "Kamar al din abu auf Powder 600 G",
+                "quantity": "6.000@35.00",
+                "total_price": "210"
+            },
+            {
+                "item": "Turkey Figs 300g",
+                "quantity": "6.000@45.00",
+                "total_price": "270"
+            },
+            {
+                "item": "Raisins 250 gram",
+                "quantity": "6.000@35.00",
+                "total_price": "210"
+            },
+            {
+                "item": "Maamoul date (Box)",
+                "quantity": "1.000@39.00",
+                "total_price": "39"
+            },
+            {
+                "item": "Maamoul & Chocolate Mix offers",
+                "quantity": "1.000@88.00",
+                "total_price": "88"
+            },
+            {
+                "item": "Tamarind 400 gram",
+                "quantity": "1.000@30.00",
+                "total_price": "30"
+            },
+            {
+                "item": "Floride pineapple juice 600 G",
+                "quantity": "1.000@35.00",
+                "total_price": "35"
+            },
+            {
+                "item": "Rio Pretzels Cheese 300g",
+                "quantity": "1.000@35.00",
+                "total_price": "35"
+            },
+            {
+                "item": "Rio Pretzels BBQ 300g",
+                "quantity": "1.000@35.00",
+                "total_price": "35"
+            },
+            {
+                "item": "Sobla Cans 500g",
+                "quantity": "1.000@60.00",
+                "total_price": "60"
+            },
+            {
+                "item": "Maamoul Cinnamon offers",
+                "quantity": "1.000@66.00",
+                "total_price": "66"
+            },
+            {
+                "item": "Floride Apple juice 600 G",
+                "quantity": "2.000@35.00",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "21",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Delicious Mix 400 g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "2823.92",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Sheraton Hurghada",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Sheraton Hurghada",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Floride Orange juice 600 G",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-04-09",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "213183",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did 6 Kamar al din abu auf Powder 600 G cost?",
+        "answer": "210 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-04-09",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2.000@35.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "266.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 70.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 17,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the purchase?",
+        "answer": "2556.97",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "266.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2.000@35.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's slogan?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 70.0,
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "02:13:03 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website address?",
+        "answer": "www.abu-auf.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "3.000@154.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Floride Orange juice 600 G",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 462.0,
+        "source": "Human"
+    },
+    {
+        "question": "How much did 3 Delicious Mix 400 g cost?",
+        "answer": "462 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How many units of Floride Orange juice 600 G were purchased?",
+        "answer": "6",
+        "source": "GPT"
+    },
+    {
+        "question": "How many total items were sold?",
+        "answer": "16",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "21",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "2823.92",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "2823.92",
+        "source": "Human"
+    },
+    {
+        "question": "How many Tamarind 400 gram were bought?",
+        "answer": "7",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:13:03 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many Coconut 250 gram items were bought?",
+        "answer": "6",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "2556.97",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the cost for 6 Sobla Cans?",
+        "answer": "360 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:13:03 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Floride Orange juice 600 G",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was used?",
+        "answer": "25.00 L.E",
+        "source": "GPT"
+    }
+]

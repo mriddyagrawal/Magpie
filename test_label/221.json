@@ -1,0 +1,267 @@
+[
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:11:40 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "157.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Stone Rosemary 25g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's email address for support?",
+        "answer": "support@abu-auf.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "0.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2021-10-30",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "157.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "Khaled Mamdouh",
+        "source": "GPT"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": "Quinoa White 400g, Stone nutmeg 100g, Stone Rosemary 25g",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount of change due?",
+        "answer": "-43.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's location?",
+        "answer": "City Center Almaza",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's website?",
+        "answer": "www.abu-auf.com",
+        "source": "GPT"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "200.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "02:11:40 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Quinoa White400g",
+                "quantity": "1.000@75.00",
+                "total_price": "75"
+            },
+            {
+                "item": "Stone nutmeg 100g",
+                "quantity": "1.000@70.00",
+                "total_price": "70 L"
+            },
+            {
+                "item": "Stone Rosemary 25g",
+                "quantity": "1.000@12.00",
+                "total_price": "12LE"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 75.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 12.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's tagline?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 70.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@12.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "AbuA",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Stone nutmeg 100g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2021-10-30",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.000@70.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n0.00",
+            "Stone nutmeg 100g\n1.000@70.00 L.E\n70 L E",
+            "Stone Rosemary 25g\n1.000@12.00 L.E\n12LE"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "157.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Quinoa White400g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's hotline number?",
+        "answer": "19969",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were sold in total?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "395761",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "157.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "395761",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "02:11:40 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.000@75.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "157.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    }
+]

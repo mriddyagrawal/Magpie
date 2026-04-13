@@ -1,0 +1,264 @@
+[
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number for L&M LIGHT BOX?",
+        "answer": "385",
+        "source": "GPT"
+    },
+    {
+        "question": "How many L&M LIGHT BOX were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "186.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "L&M LIGHT BOX",
+            "MARLBORO GOLD"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who is the staff member?",
+        "answer": "Mahmoud Abdel-",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000210-P2000138597",
+        "source": "GPT"
+    },
+    {
+        "question": "How much cash was given?",
+        "answer": "200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one MARLBORO GOLD?",
+        "answer": "54.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "L&M LIGHT BOX",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 78.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "12:41",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "186.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the MARLBORO GOLD?",
+        "answer": "108.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:41",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "186.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one L&M LIGHT BOX?",
+        "answer": "39.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the change given?",
+        "answer": "14.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:41",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "MARLBORO GOLD",
+        "source": "Human"
+    },
+    {
+        "question": "How many MARLBORO GOLD were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number for MARLBORO GOLD?",
+        "answer": "373",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "L&M LIGHT BOX",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "177.444",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the L&M LIGHT BOX?",
+        "answer": "78.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "186.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Item No .:\n385\nL&M LIGHT BOX\n2 pcs @ 39.00\n78.00",
+            "Item No .:\n373\nMARLBORO GOLD\n2 pcs @ 54.00\n108.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "L&M LIGHT BOX",
+                "quantity": "2",
+                "total_price": "78.00"
+            },
+            {
+                "item": "MARLBORO GOLD",
+                "quantity": "2",
+                "total_price": "108.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 108.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "05/04/23",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "MARLBORO GOLD",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "05/04/23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Emarat Misr",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

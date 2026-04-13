@@ -25,10 +25,15 @@ SUGGESTIONS = [
 
 
 def print_banner() -> None:
+    from src.llm import active_model_name, active_provider
+
     suggestions = "\n".join(f"  [dim italic]{s}[/dim italic]" for s in SUGGESTIONS)
+    provider = active_provider().name
+    model = active_model_name()
     console.print(
         Panel(
             "[bold]NotAnotherSpotlight[/bold]  v0.1.0\n"
+            f"[dim]Model:[/dim] [cyan]{model}[/cyan] [dim](via {provider})[/dim]\n"
             "Type your question and press Enter. Type [bold].help[/bold] for commands.\n\n"
             "[bold]Try asking:[/bold]\n"
             f"{suggestions}",

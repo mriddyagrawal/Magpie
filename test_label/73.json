@@ -1,0 +1,273 @@
+[
+    {
+        "question": "How much did the Egyptian salted seeds cost?",
+        "answer": "52 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the first item purchased?",
+        "answer": "Egyptian salted seeds 400 gm",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were sold?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-01-01",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-01-01",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "08:55:43 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's slogan?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "194.82",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@45.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.250@90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "56960",
+        "source": "Human"
+    },
+    {
+        "question": "What was the second item purchased?",
+        "answer": "Unsalted Roasted Sun Flower",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "56960",
+        "source": "GPT"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Credit Card (ALEX)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:55:43 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 52.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Premium Olive Oí1 500 ML",
+        "source": "Human"
+    },
+    {
+        "question": "What is the street address of the store?",
+        "answer": "Damietta El Bahr St.",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 22.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "209.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Egyptian salted seeds 400 gm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "14.68",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 90.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Unsalted Roasted Sun Flower",
+        "source": "Human"
+    },
+    {
+        "question": "What was the third item purchased?",
+        "answer": "Roasted Pumpkin Seeds 300 gm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for all items?",
+        "answer": "209.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "209.50",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n14.68",
+            "Unsalted Roasted Sun Flower\n0.250@90.00 LE\n22.5 L.E",
+            "Roasted Pumpkin Seeds 300 gm\n1.000@45.00 L.E\n45 L E",
+            "Premium Olive Oí1 500 ML\n1.000090.00 L.E\n90 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Egyptian salted seeds 400 gm",
+                "quantity": "1",
+                "total_price": "52"
+            },
+            {
+                "item": "Unsalted Roasted Sun Flower",
+                "quantity": "0.250@90.00",
+                "total_price": "22.5"
+            },
+            {
+                "item": "Roasted Pumpkin Seeds 300 gm",
+                "quantity": "1.000@45.00",
+                "total_price": "45"
+            },
+            {
+                "item": "Premium Olive Oí1 500 ML",
+                "quantity": "1",
+                "total_price": "90"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How much of the Unsalted Roasted Sun Flower was purchased?",
+        "answer": "0.250",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 45.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount of VAT?",
+        "answer": "14.68",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the fourth item purchased?",
+        "answer": "Premium Olive Oil 500 ML",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu Auf®",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:55:43 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Roasted Pumpkin Seeds 300 gm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "209.50",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Khaled Waleed Fathy",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Default",
+        "source": "GPT"
+    }
+]

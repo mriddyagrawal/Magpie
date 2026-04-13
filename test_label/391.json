@@ -1,0 +1,264 @@
+[
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 169.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "KNITWEAR VEST-JACKET",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE 298.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "LC WAIKIKI",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "LE 261.41",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the jersey dress short-sleeved were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the change amount?",
+        "answer": "LE 2.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the knitwear vest-jacket were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What are the names of the items purchased?",
+        "answer": [
+            "KNITWEAR VEST-JACKET",
+            "JERSEY DRESS SHORT-SLEEVED"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "0000098887",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT number?",
+        "answer": "379-456-249",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "250400000000076722",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "LC WAIKIKI",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "250400000000076722",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE 298.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE 36.59",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales VAT amount?",
+        "answer": "LE 36.59",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "JERSEY DRESS SHORT-SLEEVED",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales VAT (14%).\n:\nLE 36.59",
+            "JERSEY DRESS SHORT-SLEEVED\n8681386340564\n1\n129.00\n129.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE 298.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "4/11/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "14:02",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "KNITWEAR VEST-JACKET",
+                "quantity": "1",
+                "total_price": "169.00"
+            },
+            {
+                "item": "JERSEY DRESS SHORT-SLEEVED",
+                "quantity": "1",
+                "total_price": "129.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the Cashier ID?",
+        "answer": "3427",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 129.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount without VAT?",
+        "answer": "LE 261.41",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was paid?",
+        "answer": "LE 300.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "4/11/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the jersey dress short-sleeved?",
+        "answer": "129.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "14:02",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "LE 298.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the POS ID?",
+        "answer": "EG25P0S04",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the knitwear vest-jacket?",
+        "answer": "169.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "14:02",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "AMR ALAAELDIN",
+        "source": "GPT"
+    }
+]

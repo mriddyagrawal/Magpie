@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "205.46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 86.86,
+        "source": "Human"
+    },
+    {
+        "question": "What is the fifth item purchased?",
+        "answer": "Coconut 250 gram",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 32.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "68174",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "-74.74",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "300.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How many total items were sold?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:07:02 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:07:02 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Smoked Mix",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.202@430.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the first item?",
+        "answer": "50.4 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n19.80",
+            "Smoked Mix\n0.202@430.00\nL.E\n86.86 L.E",
+            "Walnuts in shell 250 gram\n1.000@32.00 L.E\n32 L.E",
+            "Almonds in shell 250 gram\n1.000@32.00 L.E\n32 L.E",
+            "Coconut 250 gram\n1.000@24.00 L.E\n24 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 32.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 50.4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-04-06",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "225.26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Dried Apricots Large Size 2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the fourth item purchased?",
+        "answer": "Almonds in shell 250 gram",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.000@32.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "225.26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Almonds in shell 250 gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-04-06",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "225.26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the fifth item?",
+        "answer": "24 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "10:07:02 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "0.168@300.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Walnuts in shell 250 gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Smoked Mix",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the cashier?",
+        "answer": "saed essam abdelhady",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "68174",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "19.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "225.26",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "Walnuts in shell 250 gram",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount of the second item?",
+        "answer": "86.86 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount of the third item?",
+        "answer": "32 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the fourth item?",
+        "answer": "32 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Dried Apricots Large Size 2",
+                "quantity": "0.168@300.00",
+                "total_price": "50.4"
+            },
+            {
+                "item": "Smoked Mix",
+                "quantity": "0.202@430.00",
+                "total_price": "86.86"
+            },
+            {
+                "item": "Walnuts in shell 250 gram",
+                "quantity": "1.000@32.00",
+                "total_price": "32"
+            },
+            {
+                "item": "Almonds in shell 250 gram",
+                "quantity": "1.000@32.00",
+                "total_price": "32"
+            },
+            {
+                "item": "Coconut 250 gram",
+                "quantity": "1.000@24.00",
+                "total_price": "24"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Dried Apricots Large Size 2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "19.80",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@32.00",
+        "source": "Human"
+    }
+]

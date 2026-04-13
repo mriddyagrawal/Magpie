@@ -1,0 +1,278 @@
+[
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Gourmet Fresh ShishTa\nLE110.\n0.55\nLE60.50\n00",
+            "Lemon garlic chicken br\nLE199.\n0.48\nLE96.71\n00\n598",
+            "Frozen Herbed Chicken\nLE100.\n00\n1\nLE100.9",
+            "Certified Angus Beef Bur\nLE180.\n1\nLE180.0\n00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 180.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE437.21",
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": [
+            "Gourmet Fresh Shish Ta",
+            "Lemon garlic chicken br",
+            "Frozen Herbed Chicken",
+            "Certified Angus Beef Bur"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 100.9,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Gourmet Fresh ShishTa",
+                "quantity": "0.55",
+                "total_price": "LE60.50"
+            },
+            {
+                "item": "Lemon garlic chicken br",
+                "quantity": "0.48",
+                "total_price": "LE96.71"
+            },
+            {
+                "item": "Frozen Herbed Chicken",
+                "quantity": "1",
+                "total_price": "LE100.9"
+            },
+            {
+                "item": "Certified Angus Beef Bur",
+                "quantity": "1",
+                "total_price": "LE180.0"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Lemon garlic chicken br?",
+        "answer": "LE199.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of Gourmet Fresh Shish Ta?",
+        "answer": "LE60.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE437.21",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 96.71,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Gourmet Fresh Shish Ta?",
+        "answer": "LE110.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1089939",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of Certified Angus Beef Bur?",
+        "answer": "LE180.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Certified Angus Beef Bur",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Lemon garlic chicken br?",
+        "answer": "LE96.71",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Lemon garlic chicken br",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 60.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of purchase?",
+        "answer": "LE437.21",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "0.55",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Frozen Herbed Chicken?",
+        "answer": "LE100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1089939",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Gourmet Fresh ShishTa",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "11/2/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "m.kara",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of Lemon garlic chicken br purchased?",
+        "answer": "0.48598",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "11/2/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:15:32 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE437.21",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Frozen Herbed Chicken",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "City Stars, Naser City, Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of Frozen Herbed Chicken purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:15:32 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.48",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of transaction?",
+        "answer": "12:15:32 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of Frozen Herbed Chicken?",
+        "answer": "LE100.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of Gourmet Fresh Shish Ta purchased?",
+        "answer": "0.55",
+        "source": "GPT"
+    }
+]

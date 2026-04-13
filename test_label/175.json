@@ -1,0 +1,281 @@
+[
+    {
+        "question": "How many Pumpkin Tajines were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the table number?",
+        "answer": "6",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Baladi Salad",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Cream Caramel?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Baladi Salad?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Molokhya W.Chicken",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Greek Salad?",
+        "answer": "18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the restaurant?",
+        "answer": "17 El Merghany St Heliopolis",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 130.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "228.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Molokhya W.Chicken"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many Greek Salads were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Molokhya W.Chicken were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "28/10/21",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Greek Salad",
+                "quantity": "1",
+                "total_price": "18.00"
+            },
+            {
+                "item": "Baladi Salad",
+                "quantity": "1",
+                "total_price": "12.00"
+            },
+            {
+                "item": "Molokhya W.Chicken",
+                "quantity": "2",
+                "total_price": "130.00"
+            },
+            {
+                "item": "Pumpkin Tajine",
+                "quantity": "1",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Cream Caramel",
+                "quantity": "1",
+                "total_price": "20.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of VAT?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Molokhya W.Chicken?",
+        "answer": "130.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the restaurant's motto?",
+        "answer": "Food With Passion",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "228.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Greek Salad",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "The Restaurant Heliopolis Club",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "228.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "228.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "28/10/21",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "28.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "5:26 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Pumpkin Tajine",
+        "source": "Human"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Pumpkin Tajine?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "5:26 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "54",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Baladi Salads were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Heliopolis Sporting Club",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 18.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Cream Caramels were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n28.00",
+            "1 Baladi Salad\n12.00",
+            "2 Molokhya W.Chicken\n130.00",
+            "1 Pumpkin Tajine\n20.00",
+            "1 Cream Caramel\n20.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "5:26 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 12.0,
+        "source": "Human"
+    }
+]

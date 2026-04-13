@@ -1,0 +1,285 @@
+[
+    {
+        "question": "How many total short sleeves were purchased",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "DeFacto",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of clothing was labeled 'Athlete'?",
+        "answer": "Athlete",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22.00",
+        "source": "Human"
+    },
+    {
+        "question": "How was the purchase paid for?",
+        "answer": "CREDIT CARD",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Woven Dres",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "DEFACTO",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Athlete item?",
+        "answer": "99,00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "Where in the country is the store located?",
+        "answer": "Alex - San Stefano",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "01/08/21",
+        "source": "Human"
+    },
+    {
+        "question": "What country is the store in?",
+        "answer": "Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Short Slee",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "*634,00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 5900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Woven Dres",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Woven Dres",
+                "quantity": "1",
+                "total_price": "*179,00"
+            },
+            {
+                "item": "Short Slee",
+                "quantity": "1",
+                "total_price": "*69.00"
+            },
+            {
+                "item": "Maternity",
+                "quantity": "1",
+                "total_price": "*99,00"
+            },
+            {
+                "item": "Short Slee",
+                "quantity": "1",
+                "total_price": "*59,00"
+            },
+            {
+                "item": "Athlete",
+                "quantity": "1",
+                "total_price": "*99,00"
+            },
+            {
+                "item": "Short",
+                "quantity": "1",
+                "total_price": "*129,00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What time was the purchase?",
+        "answer": "22:00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "*77,86",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 69.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Maternity item?",
+        "answer": "99,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the first Short Slee?",
+        "answer": "69,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 9900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "8682863925823\nU4749A6\nWoven Dres\n%14\n*179,00",
+            "8682863033405\nU3410AZ\nShort Slee\n%14\n*69.00",
+            "8682863054462\nU6498AZ\nMaternity\n%14\n*99,00",
+            "8682447978344\nK1507AZ\nShort Slee\n%14\n*59,00",
+            "8682863369306\nU4976AZ\nAthlete\n%14\n*99,00",
+            "8682863088252\nU3804AZ\nShort\n%14\n*129,00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the second Short Slee?",
+        "answer": "59,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sale number?",
+        "answer": "0190 0438 6579 2431",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Woven Dres?",
+        "answer": "179,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "*634,00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the date of the purchase?",
+        "answer": "01.08.2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of clothing was labeled 'Maternity'?",
+        "answer": "Maternity",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the tax amount?",
+        "answer": "77.86",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total cost of all the items before tax?",
+        "answer": "634.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the last Short item?",
+        "answer": "129,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Short Slee",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 17900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "*634,00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the last item purchased?",
+        "answer": "Short",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Maternity",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

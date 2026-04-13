@@ -1,0 +1,278 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:40:28 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Italian FiorDiLatte Mozzarella?",
+        "answer": "260.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "GOURMET",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the total price for the BiagiOrganic Tomato Pulp35?",
+        "answer": "LE80.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE217.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "BiagiOrganicTomato Puip35",
+        "source": "Human"
+    },
+    {
+        "question": "How many Sante Crisp Bread, 150g were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE9.82",
+            "Sante Crisp Bread, 150g\nLE40.0\n1\nLE40.00\n0",
+            "BiagiOrganicTomato Puip35\nLE40.0\n1\nLE40.00\n0",
+            "BiagiOrganicTomato Pulp35\nLE40.0\n1\nLE40.00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Sante Crisp Bread, 150g?",
+        "answer": "LE40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE217.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "ItalianFiorDiLatteMozzarella",
+                "quantity": "0.37",
+                "total_price": "LE97.76"
+            },
+            {
+                "item": "Sante Crisp Bread, 150g",
+                "quantity": "1",
+                "total_price": "LE40.00"
+            },
+            {
+                "item": "BiagiOrganicTomato Puip35",
+                "quantity": "1",
+                "total_price": "LE40.00"
+            },
+            {
+                "item": "BiagiOrganicTomato Pulp35",
+                "quantity": "1",
+                "total_price": "LE40.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "363607",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price for the BiagiOrganic Tomato Pulp35?",
+        "answer": "LE40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the total price for the Sante Crisp Bread, 150g?",
+        "answer": "LE40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Gourmet Food Stores",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "9/5/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE217.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 97.76,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "0.37",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "9/5/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales tax percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Sante Crisp Bread, 150g",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "11:40:28 P",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount of cash tendered?",
+        "answer": "LE250.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE9.82",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "BiagiOrganicTomato Pulp35",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "363607",
+        "source": "Human"
+    },
+    {
+        "question": "How many BiagiOrganic Tomato Pulp35 were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "m.ashraf",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the total price for the Italian FiorDiLatte Mozzarella?",
+        "answer": "LE97.76",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Italian FiorDiLatte Mozzarella were purchased?",
+        "answer": "0.37",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "ItalianFiorDiLatteMozzarella",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:40:28 P",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": [
+            "Italian FiorDiLatte Mozzarella",
+            "Sante Crisp Bread, 150g",
+            "BiagiOrganic Tomato Pulp35",
+            "BiagiOrganic Tomato Pulp35"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "WaterWay, 5 Settlement, Cairo",
+        "source": "GPT"
+    }
+]

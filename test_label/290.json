@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the cost of one KK R/C Car 3699-P8 item?",
+        "answer": "249.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 335.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:04",
+        "source": "Human"
+    },
+    {
+        "question": "How many Rivoli ShwrGel Sens.Eleganc 3 items were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "KK R/C Car 3699-P8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Cu.Cu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Rivoli ShwrGel Sens.Eleganc 3"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the cost of one Rivoli ShwrGel Sens.Eleganc 3 item?",
+        "answer": "144.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Rivoli ShwrGel Sens.Eleganc 3",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Kamena H/Soap 2n1 AB Lavndr 4 items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "13.09.2023",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "873.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "589788",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "589788",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Rivoli ShwrGel Sens.Eleganc 3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the card number used for payment?",
+        "answer": "200200**********",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Kamena H/Soap 2n1 AB Lavndr 4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "KK R/C Car 3699-P8",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Rivoli ShwrGel Sens.Eleganc 3",
+                "quantity": "2",
+                "total_price": "289.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "873.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 289.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:04",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of change received?",
+        "answer": "27.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the receipt?",
+        "answer": "873.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the value of the EGP paid with the card?",
+        "answer": "200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 249.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the commercial record number?",
+        "answer": "66533",
+        "source": "GPT"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "The Park Mall, 5th Settlement, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's phone number?",
+        "answer": "+201275898394",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cost of one Kamena H/Soap 2n1 AB Lavndr 4 item?",
+        "answer": "335.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "6223006127548\n2 x\nV6\nجل استحمام ريفولي\n144.50\nRivoli ShwrGel Sens.Eleganc 3\n289.00",
+            "10000722",
+            "6223000912058\n1 x\n335.00\nV6\nمابون كغسل اليدين كامينا\nKamena H/Soap 2n1 AB Lavndr 4\n10008145\n335.00",
+            "6920180333030\n1 x\n249.00\nV6\nسيارة لعبة بالريموت\nKK R/C Car 3699-P8\n249.00",
+            "10005194\nPARKING FREE COUPON_\n(\n150.00) Coup.\n:"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "873.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Lulu Hypermarket",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Kamena H/Soap 2n1 AB Lavndr 4",
+        "source": "GPT"
+    },
+    {
+        "question": "How many KK R/C Car 3699-P8 items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the registeration number of the store?",
+        "answer": "447599798",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

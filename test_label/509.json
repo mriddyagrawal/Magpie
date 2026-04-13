@@ -1,0 +1,333 @@
+[
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the email address of the company?",
+        "answer": "sherif.elgabaly85@gmail.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 873.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 873.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 873.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the invoice number?",
+        "answer": "1000444063",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1000444063",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 26.84,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 30.79,
+        "source": "Human"
+    },
+    {
+        "question": "What is the invoice date?",
+        "answer": "13-09-2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax amount?",
+        "answer": "EGP 107.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "- 46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "- 445",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "- 45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "- JA45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 765.86",
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the company?",
+        "answer": "11 hassan amin al orouba haram Giza, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 107.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal amount?",
+        "answer": "EGP 765.86",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order date?",
+        "answer": "08-09-2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "1011307210908",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "873.10",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "08-09-2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the company issuing the invoice?",
+        "answer": "TEMA RETAIL EG S.A.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 26.84,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 62.37,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 873.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "14",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "8681366109341 - 45\n1\n34.00\n34.00\n3.40\n30.60\n26.84",
+            "8681366109358 - 445\n1\n34.00\n34.00\n3.40\n30.60\n26.84",
+            "8681364687100 - JA45\n1\n79.00\n79.00\n7.90\n71.10\n62.37",
+            "8681388953434 - 46\n1\n39.00\n39.00\n3.90\n35.10\n30.79",
+            "8681388952987 - 45\n1\n44.00\n44.00\n4.40\n39.60\n34.74",
+            "8681387652840 - 45\n1\n54.00\n54.00\n5.40\n48.60\n42.63",
+            "8681388811826 - 45\n1\n54.00\n54.00\n5.40\n48.60\n42.63",
+            "8681387320459 - 45\n1\n49.00\n49.00\n4.90\n44.10\n38.68",
+            "8681385524255 - 45\n1\n79.00\n79.00\n7.90\n71.10\n62.37",
+            "8681386234504 - 45\n1\n89.00\n89.00\n8.90\n80.10\n70.26\nطقم لباس النوم - 8681361069459\n1\n54.00\n54.00\n5.40\n48.60\n42.63",
+            "8681386225380 - 8\n1\n69.00\n69.00\n6.90\n62.10\n54.47\nقميص بلا أكمام - 8681384573957\n1\n99.00\n99.00\n9.90\n89.10\n78.16",
+            "8681385668737 - JA45\n1\n49.00\n49.00\n4.90\n44.10\n38.68\nبلا أكمام",
+            "قميص\n- 8681384378835\n1\n44.00\n44.00\n4.40\n39.60\n34.74\nقميص بلا أكمام - 8683106357449\n1\n89.00\n89.00\n8.90\n80.10\n70.26",
+            "Cod Fee - 8681359248811\n1\n10.00\n10.00\n0.00\n10.00\n8.77"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the unit price of the first item?",
+        "answer": "34.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total discount?",
+        "answer": "EGP 95.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount on the third item?",
+        "answer": "7.90",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "- 45",
+                "quantity": "1",
+                "total_price": "26.84"
+            },
+            {
+                "item": "- 445",
+                "quantity": "1",
+                "total_price": "26.84"
+            },
+            {
+                "item": "- JA45",
+                "quantity": "1",
+                "total_price": "62.37"
+            },
+            {
+                "item": "- 46",
+                "quantity": "1",
+                "total_price": "30.79"
+            },
+            {
+                "item": "- 45",
+                "quantity": "1",
+                "total_price": "34.74"
+            },
+            {
+                "item": "- 45",
+                "quantity": "1",
+                "total_price": "42.63"
+            },
+            {
+                "item": "- 45",
+                "quantity": "1",
+                "total_price": "42.63"
+            },
+            {
+                "item": "- 45",
+                "quantity": "1",
+                "total_price": "38.68"
+            },
+            {
+                "item": "- 45",
+                "quantity": "1",
+                "total_price": "62.37"
+            },
+            {
+                "item": "- 45",
+                "quantity": "1",
+                "total_price": "42.63"
+            },
+            {
+                "item": "8681386225380 - 8",
+                "quantity": "1",
+                "total_price": "78.16"
+            },
+            {
+                "item": "8681385668737 - JA45",
+                "quantity": "1",
+                "total_price": "38.68"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "70.26"
+            },
+            {
+                "item": "Cod Fee",
+                "quantity": "1",
+                "total_price": "8.77"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the 11th item?",
+        "answer": "طقم لباس النوم",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price (without tax) for the first item?",
+        "answer": "26.84",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "14",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "LC WAIKIKI",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the customer?",
+        "answer": "شريف عبد السلام",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number?",
+        "answer": "00201150872444",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store name?",
+        "answer": "LC WAIKIKI",
+        "source": "GPT"
+    }
+]

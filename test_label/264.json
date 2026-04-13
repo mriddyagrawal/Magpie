@@ -1,0 +1,269 @@
+[
+    {
+        "question": "What was the price of the third item?",
+        "answer": "LE159.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the second item purchased?",
+        "answer": "GE Lady Fingers 22pc",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 65.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "GE Lady Fingers 22pc\nLE65.0\n1\nLE65.00\n0",
+            "GE Lady Fingers 22pc\nLE65.0\n1\nLE65.00\n0",
+            "Ambrosi Mascarpone Ch\nLE159.\n2 LE318.0\n00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's address?",
+        "answer": "WaterWay, 5 Settlement, Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the first item?",
+        "answer": "LE65.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the first item purchased?",
+        "answer": "GE Lady Fingers 22pc",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "GE Lady Fingers 22pc",
+                "quantity": "1",
+                "total_price": "LE65.00"
+            },
+            {
+                "item": "GE Lady Fingers 22pc",
+                "quantity": "1",
+                "total_price": "LE65.00"
+            },
+            {
+                "item": "Ambrosi Mascarpone Ch",
+                "quantity": "2",
+                "total_price": "LE318.0"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "18/5/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount of the purchase?",
+        "answer": "LE448.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "6:42:58 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount for the third item?",
+        "answer": "LE318.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE448.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the second item were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the first item were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Ahmed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "GE Lady Fingers 22pc",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "18/5/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE448.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "GE Lady Fingers 22pc",
+        "source": "Human"
+    },
+    {
+        "question": "What was the third item purchased?",
+        "answer": "Ambrosi Mascarpone Ch",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE448.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:42:58 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 65.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 318.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Ambrosi Mascarpone Ch",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount for the first item?",
+        "answer": "LE65.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the second item?",
+        "answer": "LE65.0",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:42:58 P",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the third item were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "719979",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount for the second item?",
+        "answer": "LE65.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "719979",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Ambrosi Mascarpone Ch"
+        ],
+        "source": "Human"
+    }
+]

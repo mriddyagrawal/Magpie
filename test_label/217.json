@@ -1,0 +1,291 @@
+[
+    {
+        "question": "What is the price of one Gourmet Baladi Bread 5pc?",
+        "answer": "LE5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "598709",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Tamarind Julce 750ml",
+        "source": "Human"
+    },
+    {
+        "question": "How many Anuket Castor Oil 120ml were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Anuket Lemongrass Oil 120?",
+        "answer": "LE159.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Anuket Lemongrass Oil 120 were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the register number?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Anuket Castor Oil 120ml",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE39.79",
+            "Anuket Castor Oil 120ml\nLE105.\n1\nLE105.0\n00\n0+",
+            "Anuket Lemongrass OII 120\nLE159.\n1\nLE159.0\n00\n0+",
+            "Rosemary 25g, Nature Work\nLE12.0\n1\nLE12.00\n0",
+            "Tumeric Fresh, Thailand\nLE455.\n0.04\nLE20.48\n00",
+            "Gourmet Baladi Bread 5pc\nLE5.00\n1\nLE5.00",
+            "Gourmet Fresh Qatayef 500\nLE25.0\n1\nLE25.00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Arkan Sheikh Zayed Giza 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of Rosemary 25g Nature Work?",
+        "answer": "LE12.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "LE386.48",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Gourmet Baladi Bread 5pc were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Anuket Castor Oil 120ml?",
+        "answer": "LE105.",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Gourmet Food Stores",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 12.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE386.48",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Gourmet Fresh Qatayef 500?",
+        "answer": "LE25.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 105.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 60.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE386.48",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 159.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "598709",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:50:44 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many Tumeric Fresh, Thailand were purchased?",
+        "answer": "0.04",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE39.79",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "11/04/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "11/04/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "3:50:44 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Ahmed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Rosemary 25g, Nature Work",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:50:44 PM",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Tamarind Julce 750ml",
+                "quantity": "1",
+                "total_price": "LE60.00"
+            },
+            {
+                "item": "Anuket Castor Oil 120ml",
+                "quantity": "1",
+                "total_price": "LE105.0"
+            },
+            {
+                "item": "Anuket Lemongrass OII 120",
+                "quantity": "1",
+                "total_price": "LE159.0"
+            },
+            {
+                "item": "Rosemary 25g, Nature Work",
+                "quantity": "1",
+                "total_price": "LE12.00"
+            },
+            {
+                "item": "Tumeric Fresh, Thailand",
+                "quantity": "1",
+                "total_price": "LE20.48"
+            },
+            {
+                "item": "Gourmet Baladi Bread 5pc",
+                "quantity": "1",
+                "total_price": "LE5.00"
+            },
+            {
+                "item": "Gourmet Fresh Qatayef 500",
+                "quantity": "1",
+                "total_price": "LE25.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Anuket Lemongrass OII 120",
+        "source": "Human"
+    },
+    {
+        "question": "How many Tamarind Juice 750ml were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Tamarind Juice 750ml?",
+        "answer": "LE60.0",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Gourmet Fresh Qatayef 500 were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE386.48",
+        "source": "Human"
+    }
+]

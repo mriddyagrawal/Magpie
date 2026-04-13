@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items sold?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What kind of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "419013",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the branch location?",
+        "answer": "Negmet Heliopolis",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "440.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu Auf®",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "54.03",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2023-12-10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store on the receipt?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Popcorn Caramel & Chocolate 100 GR",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-12-10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Popcorn Caramel 100 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "419013",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount spent on all items?",
+        "answer": "440.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n54.03",
+            "Popcorn Caramel 100 Gram\n1.000@20.00 L.E\n20 L.E",
+            "Popcorn Caramel & Chocolate 100 GR\n1.000@20.00 L.E\n20 L.E",
+            "Popcorn Salted & Caramel 100 Gram\n1.000@20.00 L.E\n20 L.E",
+            "White Bag Tourist with Zippers\n1.000@20.00 L.E\nO L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "440.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.000@20.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.000@20.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's tagline?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "440.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Popcorn Caramel & Cinnamon 100 Gram",
+                "quantity": "19.000@20.00",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Popcorn Caramel 100 Gram",
+                "quantity": "1.000@20.00",
+                "total_price": "20"
+            },
+            {
+                "item": "Popcorn Caramel & Chocolate 100 GR",
+                "quantity": "1.000@20.00",
+                "total_price": "20"
+            },
+            {
+                "item": "Popcorn Salted & Caramel 100 Gram",
+                "quantity": "1.000@20.00",
+                "total_price": "20"
+            },
+            {
+                "item": "White Bag Tourist with Zippers",
+                "quantity": "1.000@20.00",
+                "total_price": "O"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Popcorn Caramel & Cinnamon 100 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "-60.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount tendered?",
+        "answer": "500.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@20.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price per unit for Popcorn Caramel & Cinnamon?",
+        "answer": "20.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:37:59 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many registers were used?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "54.03",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Popcorn Caramel & Cinnamon 100 Gram",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the cashier?",
+        "answer": "Mostafa AbdElRadi",
+        "source": "GPT"
+    },
+    {
+        "question": "What quantity of Popcorn Caramel & Cinnamon was bought?",
+        "answer": "19.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Popcorn Salted & Caramel 100 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:37:59 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "19.000@20.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "08:37:59 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "385.97",
+        "source": "Human"
+    }
+]

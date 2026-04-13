@@ -1,0 +1,271 @@
+[
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "8.97",
+        "source": "Human"
+    },
+    {
+        "question": "What is the feedback call number?",
+        "answer": "01201200061",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "04/01/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal before VAT?",
+        "answer": "64.04",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "04:58 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Aqua 600 ML cost?",
+        "answer": "11.40",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "CILANTRO",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT\n8.97",
+            "Blueberry Muffin\n26.32",
+            "Aqua 600 ML\n11.40"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What items were ordered?",
+        "answer": [
+            "Americano",
+            "Blueberry Muffin",
+            "Aqua 600 ML"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "Who took the order?",
+        "answer": "3796",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Blueberry Muffin",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "73.01",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "73.01",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Aqua 600 ML",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Blueberry Muffin cost?",
+        "answer": "26.32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 26.32,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total balance due?",
+        "answer": "73.01",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Americano",
+        "source": "Human"
+    },
+    {
+        "question": "What is the table number?",
+        "answer": "T1",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Americano",
+                "quantity": "1",
+                "total_price": "26.32"
+            },
+            {
+                "item": "Blueberry Muffin",
+                "quantity": "1",
+                "total_price": "26.32"
+            },
+            {
+                "item": "Aqua 600 ML",
+                "quantity": "1",
+                "total_price": "11.40"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the order?",
+        "answer": "04/01/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the commercial register number?",
+        "answer": "153630",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the VAT?",
+        "answer": "8.97",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "64.04",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Americano cost?",
+        "answer": "26.32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Cilantro",
+        "source": "GPT"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the order type?",
+        "answer": "Take Away",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the outlet location?",
+        "answer": "Mohandssin",
+        "source": "GPT"
+    },
+    {
+        "question": "What shift was the order taken in?",
+        "answer": "Afternoon",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 11.4,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the tax record number?",
+        "answer": "200-183-095",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What was the opening time?",
+        "answer": "04:58 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "04:58 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the serial number of the order?",
+        "answer": "619074",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 26.32,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "73.01",
+        "source": "Human"
+    }
+]

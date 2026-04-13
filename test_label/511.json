@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price for Adalia Lemons?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many local bananas were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many mini plain muffins were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 78.69",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 78.69",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price for Rich Beef Luncheon Plain?",
+        "answer": "25.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Baladi Lemon?",
+        "answer": "7.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 25.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Rich Beef Luncheon Plain?",
+        "answer": "25.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Adalia Lemon?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total discount amount?",
+        "answer": "-17.20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Adalia Lemon (500g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price for Baladi Lemons?",
+        "answer": "7.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "78.69",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Adalia Lemons were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Local Bananas (5\nPieces)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 18.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 86.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many Rich Beef Luncheon Plain were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Baladi Lemons\n(500g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "86.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the local bananas?",
+        "answer": "18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Adalia Lemon (500g)\n1\n5.00\n5.00",
+            "Baladi Lemons\n1\n7.50\n7.50\n(500g)\nFruits",
+            "Local Bananas (5\n1\n18.00 18.00\nPieces)\nCold Cuts",
+            "Rich Beef Luncheon\n1\n25.50 25.50\nPlain (250g)\nMuffins",
+            "5 Mini Plain Muffins\n1 30.00 30.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many Baladi Lemons were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 7.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one pack of 5 mini plain muffins?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Rich Beef Luncheon",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Adalia Lemon (500g)",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Baladi Lemons\n(500g)",
+                "quantity": "1",
+                "total_price": "7.50"
+            },
+            {
+                "item": "Local Bananas (5\nPieces)",
+                "quantity": "1",
+                "total_price": "18.00"
+            },
+            {
+                "item": "Rich Beef Luncheon",
+                "quantity": "1",
+                "total_price": "25.50"
+            },
+            {
+                "item": "5 Mini Plain Muffins",
+                "quantity": "1",
+                "total_price": "30.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 78.69",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2118-2646704",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "21 February, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2118-2646704",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    }
+]

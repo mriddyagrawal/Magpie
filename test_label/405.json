@@ -1,0 +1,345 @@
+[
+    {
+        "question": "What is the price of the Crystal Corn Oil 2.2 L?",
+        "answer": "LE88.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE506.63",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "0.25",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1\nLE10.50\nRich Bake Petit Pain\nLE10.5\n0",
+            "Rich Bake Petit Pain\nLE10.8\n1\nLE10.50",
+            "Traditional Roumy Wax W.P\nLE140.\n0.22\nLE30.80\n00",
+            "Dutch Gouda Cheese\nLE175.\n0.25\nLE44.80\n00\n6",
+            "Taste Smoked Turkey Breast\nLE272.\n0.15\nLE42.43\n00",
+            "GourmetBeef Pastrami W.Ga\nLE300.\n0.24\nLE73.20\n00\n4",
+            "GourmetBeef Pastrami W.Ga\nLE300.\n0.23\nLE71.40\n00",
+            "Almaral Skimmed Milk Tetra\nLE17.0\n1\nLE17.00\n0",
+            "Almaral Skimmed Milk Tetra\nLE17.0\n1\n0\nLE16.75",
+            "LE17.00\nLamar Full Cream Milk 1L\nLE16.7\n1\n5",
+            "Lamar Full Cream Milk 1L\nLE16.7\n1\nLE16.75\n5",
+            "Lamar Full Cream Milk 1L\nLE16.7\n1\nLE16.75\n5",
+            "Lamar Skimmed Milk 1L\nLE16.7\n1\nLE16.75\n5",
+            "LE88.00",
+            "Crystal Corn Oll 2.2 L\nLE88.0\n1\n0",
+            "Al Alamya Red Eggs 10pcs\nLE34.0\n1\nLE34.00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Lamar Skimmed Milk 1L?",
+        "answer": "LE16.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Rich Bake Petit Pain",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "11/09/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 10.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "LE506.63",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Rich Bake Petit Pain",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Rich Bake Petit Pain",
+                "quantity": "1",
+                "total_price": "LE10.50"
+            },
+            {
+                "item": "Rich Bake Petit Pain",
+                "quantity": "1",
+                "total_price": "LE10.50"
+            },
+            {
+                "item": "Traditional Roumy Wax W.P",
+                "quantity": "0.22",
+                "total_price": "LE30.80"
+            },
+            {
+                "item": "Dutch Gouda Cheese",
+                "quantity": "0.25",
+                "total_price": "LE44.80"
+            },
+            {
+                "item": "Taste Smoked Turkey Breast",
+                "quantity": "0.15",
+                "total_price": "LE42.43"
+            },
+            {
+                "item": "GourmetBeef Pastrami W.Ga",
+                "quantity": "0.24",
+                "total_price": "LE73.20"
+            },
+            {
+                "item": "GourmetBeef Pastrami W.Ga",
+                "quantity": "0.23",
+                "total_price": "LE71.40"
+            },
+            {
+                "item": "Almaral Skimmed Milk Tetra",
+                "quantity": "1",
+                "total_price": "LE17.00"
+            },
+            {
+                "item": "Almaral Skimmed Milk Tetra",
+                "quantity": "1",
+                "total_price": "LE16.75"
+            },
+            {
+                "item": "Lamar Full Cream Milk 1L",
+                "quantity": "1",
+                "total_price": "LE17.00"
+            },
+            {
+                "item": "Lamar Full Cream Milk 1L",
+                "quantity": "1",
+                "total_price": "LE16.75"
+            },
+            {
+                "item": "Lamar Full Cream Milk 1L",
+                "quantity": "1",
+                "total_price": "LE16.75"
+            },
+            {
+                "item": "Lamar Skimmed Milk 1L",
+                "quantity": "1",
+                "total_price": "LE16.75"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "LE88.00"
+            },
+            {
+                "item": "Crystal Corn Oll 2.2 L",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Al Alamya Red Eggs 10pcs",
+                "quantity": "1",
+                "total_price": "LE34.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 10,
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of GourmetBeef Pastrami W.Ga when 8 units were purchased?",
+        "answer": "LE71.40",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE506.63",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Almarai Skimmed Milk Tetra?",
+        "answer": "LE17.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Dutch Gouda Cheese",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:53:26 AM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 44.8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:53:26 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the receipt generated?",
+        "answer": "9:53:26 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 30.8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE506.63",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many grams of Dutch Gouda Cheese was purchased?",
+        "answer": "0.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "827710",
+        "source": "GPT"
+    },
+    {
+        "question": "How many units of Lamar Full Cream Milk 1L was purchased?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 10.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Dutch Gouda Cheese?",
+        "answer": "LE44.80",
+        "source": "GPT"
+    },
+    {
+        "question": "How many grams of Taste Smoked Turkey Breast was purchased?",
+        "answer": "0.15",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "11/09/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Traditional Roumy Wax W.P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "w.mohse",
+        "source": "GPT"
+    },
+    {
+        "question": "How many grams of Traditional Roumy Wax was purchased?",
+        "answer": "0.22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of GourmetBeef Pastrami W.Ga when 3 units were purchased?",
+        "answer": "LE73.20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "GOURMET\nFOOD",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "827710",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Rich Bake Petit Pain?",
+        "answer": "LE10.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Taste Smoked Turkey Breast?",
+        "answer": "LE42.43",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "0.22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the Traditional Roumy Wax?",
+        "answer": "LE30.80",
+        "source": "GPT"
+    }
+]

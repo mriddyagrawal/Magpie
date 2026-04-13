@@ -1,0 +1,288 @@
+[
+    {
+        "question": "What is the total tax?",
+        "answer": "4.05",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of a single Elano Mineral Water?",
+        "answer": "7.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "122.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:08 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "10:08 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of a single Pretzo Mini Stick?",
+        "answer": "21.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of a single Ck Turkish Coffee?",
+        "answer": "26.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of a single Mixy Chili Snack?",
+        "answer": "23.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "127.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of a single Sun Top Orange Juice?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "00000317273",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 21.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total?",
+        "answer": "127.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Lago Hazelnut Wafer 45",
+            "Elano Mineral Water 60"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "@circle K",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 23.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 26.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Ck Turkish Coffee S\n26.00\n1\n26.00",
+            "Mixy Chili Snacks 167G\n23.00\n1\n23.00",
+            "Pretzo Mini Sticks Tom\n21.00\n1\n21.00",
+            "Lago Hazelnut Wafer 45\n12.00\n2\n24.00",
+            "Sun Top Orange Juice 2\n12.00\n1\n12.00",
+            "Elano Mineral Water 60\n7.00\n3\n21.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Pretzo Mini Sticks Tom",
+        "source": "Human"
+    },
+    {
+        "question": "How many Ck Turkish Coffees were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Sun Top Orange Juices were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Mixy Chili Snacks were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Mixy Chili Snacks 167G",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 24.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the employee number?",
+        "answer": "880",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "127.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many Lago Hazelnut Wafers were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Lago Hazelnut Wafer 45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Ck Turkish Coffee S",
+                "quantity": "1",
+                "total_price": "26.00"
+            },
+            {
+                "item": "Mixy Chili Snacks 167G",
+                "quantity": "1",
+                "total_price": "23.00"
+            },
+            {
+                "item": "Pretzo Mini Sticks Tom",
+                "quantity": "1",
+                "total_price": "21.00"
+            },
+            {
+                "item": "Lago Hazelnut Wafer 45",
+                "quantity": "2",
+                "total_price": "24.00"
+            },
+            {
+                "item": "Sun Top Orange Juice 2",
+                "quantity": "1",
+                "total_price": "12.00"
+            },
+            {
+                "item": "Elano Mineral Water 60",
+                "quantity": "3",
+                "total_price": "21.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "7/26/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of a single Lago Hazelnut Wafer?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "7/26/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:08 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "122.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "127.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "4.05",
+        "source": "Human"
+    },
+    {
+        "question": "How many Pretzo Mini Sticks were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Ck Turkish Coffee S",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store name?",
+        "answer": "MANSOURA",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Elano Mineral Waters were purchased?",
+        "answer": "3",
+        "source": "GPT"
+    }
+]

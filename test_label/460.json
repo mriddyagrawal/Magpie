@@ -1,0 +1,275 @@
+[
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 103.74,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Almonds Halves",
+                "quantity": "9",
+                "total_price": "91"
+            },
+            {
+                "item": "Prunes wit pits",
+                "quantity": "0.150@365.00",
+                "total_price": "55.48"
+            },
+            {
+                "item": "Prunes viit pits",
+                "quantity": "1",
+                "total_price": "54.75"
+            },
+            {
+                "item": "Almonds Halves",
+                "quantity": "1",
+                "total_price": "103.74"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Almonds Halves"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.150@365.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the slogan of the store?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:59:48 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 55.48,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "37.45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Almonds Halves",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total of the purchase?",
+        "answer": "304.97",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "809358",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Almonds Halves",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n37.45",
+            "Prunes wit pits\nL.E\n55.48 L.E\n0.150@365.00",
+            "Prunes viit pits\n54.75 LE",
+            "L.E\nAlmonds Halves\n0.2283:455.00\n103.74\nL.E\n٤٫٫٤"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Abdelrahman Jahin",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "267.52",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "9",
+        "source": "Human"
+    },
+    {
+        "question": "What is the shipping cost?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "267.32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Prunes wit pits",
+        "source": "Human"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "304.97",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "How was the purchase paid for?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-11-19",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total discount?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "37.45",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu Auf",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "809358",
+        "source": "Human"
+    },
+    {
+        "question": "How many almonds halves were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total tendered?",
+        "answer": "304.97",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "9",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one of the Almond Halves purchase?",
+        "answer": "91 L.E and 103.74 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Prunes viit pits",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 91.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "304.97",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were sold?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 54.75,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "304.97",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "11:59:48 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many prunes with pits were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-11-19",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:59:48 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one of the Prunes with pits purchase?",
+        "answer": "55.48 L.E and 54.75 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What city is the store in?",
+        "answer": "Cairo, Egypt",
+        "source": "GPT"
+    }
+]

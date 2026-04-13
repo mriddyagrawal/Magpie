@@ -1,0 +1,300 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 46.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 9.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "How many Pringles Potato Chips Hot & Spicy were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Kinder Joy Chocolate For Girls were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 185.35",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Oreo Chocolate Biscuits?",
+        "answer": "8.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Nestle Oreo Ice Cream Sandwiches?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 11.46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of one Dasani Natural Water Carton?",
+        "answer": "51.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does one Kitkat Chocolate 4 Fingers cost?",
+        "answer": "9.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Nestle Oreo Ice Cream Sandwiches were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Kitkat Chocolate 4 Fingers\n(41.5g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of Twix Twin Chocolate Offer?",
+        "answer": "46.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 11.46 is already included in\nlhe total amount.",
+            "Nestle Oreo Ice Cream\n2 15.00 30.00\nSandwich (135ml)\nChocolate",
+            "Twix Twin Chocolate Offer\n1 46.00 46.00\n5×2 + 1 Free (50g)",
+            "Kitkat Chocolate 4 Fingers\n1 9.00\n9.00\n(41.5g)",
+            "Kinder Joy Chocolate For\n1 15.00\n15.00\nGirls (20g)\nBiscuits, Wafers & Cakes",
+            "8.00\nOreo Chocolate Biscuits\n2 4.00\nWith Vanilla Cream 6 Pcs\n(57g)\nWater",
+            "Dasani Natural Water\n1 51.00 51.00\nCarton (600ml*20)\nChips",
+            "Pringles Potato Chips Hot\n1 30.00\n30.00\n& Spicy (130g)\nOther\nPrevious due amount\n1 0.15\n0.15"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many Oreo Chocolate Biscuits were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Nestle Oreo Ice Cream\nSandwich (135ml)\nChocolate",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of one Kinder Joy Chocolate for Girls?",
+        "answer": "15.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#3121-2427346",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the order after discount?",
+        "answer": "185.35",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cost of Pringles Potato Chips?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#3121-3427340",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 185.35",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 219.15",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Croissants\n5 Mini Plain Croissants\nIce Cream",
+                "quantity": "1",
+                "total_price": "30.00"
+            },
+            {
+                "item": "Nestle Oreo Ice Cream\nSandwich (135ml)\nChocolate",
+                "quantity": "2",
+                "total_price": "30.00"
+            },
+            {
+                "item": "Twix Twin Chocolate Offer\n5×2 + 1 Free (50g)",
+                "quantity": "1",
+                "total_price": "46.00"
+            },
+            {
+                "item": "Kitkat Chocolate 4 Fingers\n(41.5g)",
+                "quantity": "1",
+                "total_price": "9.00"
+            },
+            {
+                "item": "Kinder Joy Chocolate For\nGirls (20g)\nBiscuits, Wafers & Cakes",
+                "quantity": "1",
+                "total_price": "15.00"
+            },
+            {
+                "item": "Oreo Chocolate Biscuits\nWith Vanilla Cream 6 Pcs\n(57g)\nWater",
+                "quantity": "2",
+                "total_price": "8.00"
+            },
+            {
+                "item": "Dasani Natural Water\nCarton (600ml*20)\nChips",
+                "quantity": "1",
+                "total_price": "51.00"
+            },
+            {
+                "item": "Pringles Potato Chips Hot\n& Spicy (130g)\nOther\nPrevious due amount",
+                "quantity": "1",
+                "total_price": "30.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Kitkat Chocolate 4 Fingers were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many Mini Plain Croissants were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Twix Twin Chocolate Offers were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Croissants\n5 Mini Plain Croissants\nIce Cream",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Nestle Oreo Ice Cream\nSandwich (135ml)\nChocolate",
+            "Oreo Chocolate Biscuits\nWith Vanilla Cream 6 Pcs\n(57g)\nWater"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Twix Twin Chocolate Offer\n5×2 + 1 Free (50g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many Dasani Natural Water Cartons were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does one Mini Plain Croissant cost?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "31 January, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 185.35",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 30.0,
+        "source": "Human"
+    }
+]

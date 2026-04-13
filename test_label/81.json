@@ -1,0 +1,297 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the restaurant located in?",
+        "answer": "International Market Place",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "$88.62",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 11.8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the reservation email?",
+        "answer": "Reservations@YauatchaWaikiki.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "$88.62",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Tender Branch Hibiscus?",
+        "answer": "8.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the Sesame Prawn Toast?",
+        "answer": "11.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "$88.62",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Poached Beijing Dumpling?",
+        "answer": "5.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Yauatcha",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "How many Seafood Puffs were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the tax?",
+        "answer": "3.82",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 10.8,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Tender Branch Hibiscus",
+                "quantity": "1",
+                "total_price": "8.00"
+            },
+            {
+                "item": "Seafood Puff",
+                "quantity": "1",
+                "total_price": "10.80"
+            },
+            {
+                "item": "Sesame Prawn Toast",
+                "quantity": "1",
+                "total_price": "11.80"
+            },
+            {
+                "item": "Beancurd Prawn Cheung Fun",
+                "quantity": "1",
+                "total_price": "10.80"
+            },
+            {
+                "item": "XO Scallop Dumpling",
+                "quantity": "1",
+                "total_price": "8.80"
+            },
+            {
+                "item": "Poached Beijing Dumpling",
+                "quantity": "1",
+                "total_price": "5.80"
+            },
+            {
+                "item": "Spinach Dumpling",
+                "quantity": "1",
+                "total_price": "6.80"
+            },
+            {
+                "item": "Tea Smoked Pork Ribs",
+                "quantity": "1",
+                "total_price": "22.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "88.62",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Sesame Prawn Toast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the restaurant?",
+        "answer": "808-739-9318",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the table number?",
+        "answer": "84/1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 10.8,
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Spinach Dumpling cost?",
+        "answer": "6.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 8.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Tender Branch Hibiscus",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "$3.82",
+        "source": "Human"
+    },
+    {
+        "question": "How many XO Scallop Dumplings were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the most expensive item ordered?",
+        "answer": "Tea Smoked Pork Ribs",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does the Beancurd Prawn Cheung Fun cost?",
+        "answer": "10.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address of the restaurant?",
+        "answer": "2330 Kalakaua Ave Ste 326, Honolulu, Hawaii 96815",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1 Tender Branch Hibiscus\n8.00",
+            "1 Seafood Puff\n10.80",
+            "1 Sesame Prawn Toast\n11.80",
+            "1 Beancurd Prawn Cheung Fun 10.80",
+            "1 XO Scallop Dumpling\n8.80",
+            "1 Poached Beijing Dumpling\n5.80",
+            "1 Spinach Dumpling\n6.80",
+            "1 Tea Smoked Pork Ribs\n22.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "1867",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal amount?",
+        "answer": "84.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Seafood Puff",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Beancurd Prawn Cheung Fun",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "唐茶苑 YAUATCHA",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of one Tea Smoked Pork Ribs?",
+        "answer": "22.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "Is gratuity included?",
+        "answer": "No",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "$84.80",
+        "source": "Human"
+    }
+]

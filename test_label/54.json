@@ -1,0 +1,269 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "8:53:47P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "$62.85",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "$69.76",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "8:53:47P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "13-Jul-2018",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "$69.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "13-Jul-2018",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 19.95,
+        "source": "Human"
+    },
+    {
+        "question": "What kind of order is this?",
+        "answer": "Dine In",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "$6.91",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the table number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "$62.85",
+        "source": "GPT"
+    },
+    {
+        "question": "How many guests?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "34. Vegetarian Dish",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1\n26.Fish Goulash\n$19.95",
+            "7\n30.Dullet\n$20.95",
+            "1\n34. Vegetarian Dish\n$21.95"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the zip code of the restaurant?",
+        "answer": "22314",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 21.95,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 20.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "30.Dullet"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "30.Dullet",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "$69.76",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the Fish Goulash?",
+        "answer": "$19.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "26.Fish Goulash",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "8:53:47P",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Vegetarian Dish?",
+        "answer": "$21.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number of the restaurant?",
+        "answer": "7037179740",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "How many items of Fish Goulash were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "How much is the Dullet?",
+        "answer": "$20.95",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items of Dullet were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "HAWWI ETHIOPIAN RESTAU",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "Mosa",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "000016",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax amount?",
+        "answer": "$6.91",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "HAWWI ETHIOPIAN RESTAU",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the street address of the restaurant?",
+        "answer": "1125 QUEEN ST",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the city and state of the restaurant?",
+        "answer": "ALEXANDRIA, VA",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "26.Fish Goulash",
+                "quantity": "1",
+                "total_price": "$19.95"
+            },
+            {
+                "item": "30.Dullet",
+                "quantity": "7",
+                "total_price": "$20.95"
+            },
+            {
+                "item": "34. Vegetarian Dish",
+                "quantity": "1",
+                "total_price": "$21.95"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "$69.76",
+        "source": "Human"
+    }
+]

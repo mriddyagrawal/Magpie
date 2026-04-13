@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "3874471",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:57:41 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item code for the COKE ZERO CAN?",
+        "answer": "7354",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the cash tendered?",
+        "answer": "LE33.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT\n_E0.00",
+            "15828\nKITKAT DARK 4\nFINGERS 41.53M\nLE18.00",
+            "3475\nALFAYSAL PATTE\nLE6.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the ALFAYSAL PATTE?",
+        "answer": "LE6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "LE33.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "ALFAYSAL PATTE",
+        "source": "Human"
+    },
+    {
+        "question": "What was the third item?",
+        "answer": "ALFAYSAL PATTE",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the first item purchased?",
+        "answer": "COKE ZERO CAN 300ML",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "#03/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "L=33.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "_E0.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item?",
+        "answer": "KITKAT DARK 4 FINGERS 41.53M",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "L=33.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the KITKAT DARK 4 FINGERS 41.53M?",
+        "answer": "LE18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item code for the KITKAT DARK 4 FINGERS 41.53M?",
+        "answer": "15828",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the COKE ZERO CAN 300ML?",
+        "answer": "LE9.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "LE0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "eslam",
+        "source": "GPT"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 18.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 9.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:57:41 AM",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "COKE ZERO CAN\n300ML",
+                "quantity": "1",
+                "total_price": "LE9.00"
+            },
+            {
+                "item": "KITKAT DARK 4\nFINGERS 41.53M",
+                "quantity": "1",
+                "total_price": "LE18.00"
+            },
+            {
+                "item": "ALFAYSAL PATTE",
+                "quantity": "1",
+                "total_price": "LE6.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item code for the ALFAYSAL PATTE?",
+        "answer": "3475",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "LE0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Ellaçame",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "KITKAT DARK 4\nFINGERS 41.53M",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "L=33.00",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "11:57:41 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "08/03/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "COKE ZERO CAN\n300ML",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "3874471",
+        "source": "GPT"
+    }
+]

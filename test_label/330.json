@@ -1,0 +1,299 @@
+[
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 303.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Nestle Nido 1+ Powdered Milk?",
+        "answer": "57.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Almarai Premium Butter\n(200g)\nFree",
+                "quantity": "1",
+                "total_price": "61.00"
+            },
+            {
+                "item": "[B] Almarai Premium Butter\nUnsalted (200g)",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Juhayna Full Cream Milk (1L)",
+                "quantity": "1",
+                "total_price": "19.50"
+            },
+            {
+                "item": "Nestle Nido 1+ Powdered Milk\n(288g)",
+                "quantity": "1",
+                "total_price": "57.00"
+            },
+            {
+                "item": "Pledge Furniture Polish\nOriginal (300ml)",
+                "quantity": "1",
+                "total_price": "37.00"
+            },
+            {
+                "item": "Glassy Set Of 2 Liquid Glass\n& Window Cleaners (600ml)\nOlls",
+                "quantity": "1",
+                "total_price": "32.00"
+            },
+            {
+                "item": "Slite Sunflower Oil (2.25L)",
+                "quantity": "1",
+                "total_price": "76.00"
+            },
+            {
+                "item": "Cook's lodized Table Salt\n(700g)",
+                "quantity": "3",
+                "total_price": "21.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the current balance?",
+        "answer": "-EGP 0.18",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is Pledge Furniture Polish Original?",
+        "answer": "37.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 303.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Cook's lodized Table Salt\n(700g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Long-Life Milk\nAlmarai Premium Butter\n1 61.00 61.00\nUnsalted (200g) + Almarai\nMilk\nFree",
+            "Rayeb\n(220ml)\n[B] Almarai Premium Butter\n1\nUnsalted (200g)\n[B] AlMarai Rayeb (220ml)\n1",
+            "Juhayna Full Cream Milk (1L)\n1 19.50\n19.50\nPowdered Milk",
+            "Nestle Nido 1+ Powdered Milk\n1 57.00 57.00\n(288g)",
+            "Pledge Furniture Polish\n1 37.00 37.00\nOriginal (300ml)",
+            "Glassy Set Of 2 Liquid Glass\n1 32.00 32.00\n& Window Cleaners (600ml)\nOlls",
+            "Slite Sunflower Oil (2.25L)\n1 76.00 76.00\nSpices & Seasoning",
+            "Cook's lodized Table Salt\n3 7.00\n21.00\n(700g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#611-3686388",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of Almarai Premium Butter Unsalted?",
+        "answer": "61.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#611-3686388",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 57.0,
+        "source": "Human"
+    },
+    {
+        "question": "What city is this order from?",
+        "answer": "6th of October City",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Juhayna Full Cream Milk (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Slite Sunflower Oil?",
+        "answer": "76.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Almarai Premium Butter\n(200g)\nFree",
+        "source": "Human"
+    },
+    {
+        "question": "How much does Cook's lodized Table Salt cost?",
+        "answer": "21.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "[B] Almarai Premium Butter\nUnsalted (200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 301.32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 301.32",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "How much does Juhayna Full Cream Milk cost?",
+        "answer": "19.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 19.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "02:00 PM - 03:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the tax ID number?",
+        "answer": "538-096-330",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 301.32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the discount?",
+        "answer": "-EGP 12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "6 May, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Nestle Nido 1+ Powdered Milk\n(288g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 61.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer service email?",
+        "answer": "cx@breadfast.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price after the discount and delivery?",
+        "answer": "EGP 301.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 301.32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price for the Glassy set of liquid glass and window cleaners?",
+        "answer": "32.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    }
+]

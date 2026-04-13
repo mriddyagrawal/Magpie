@@ -164,15 +164,21 @@ def _run_query(question: str) -> None:
         print_error(str(e))
 
 
-def _cmd_sync(source_dir: str | None) -> int:
+def _cmd_sync(source_dir: str | None, concurrency: int) -> int:
     """Summarize new/changed files and ingest them into Qdrant."""
+    from src.llm import active_model_name, active_provider
     from src.pipeline import DEFAULT_SOURCE_DIR, sync_files_sync
 
     target = source_dir or DEFAULT_SOURCE_DIR
-    console.print(f"\n[bold blue]Syncing[/bold blue] [dim]{target}[/dim] ...\n")
+    console.print(
+        f"\n[bold blue]Syncing[/bold blue] [dim]{target}[/dim] "
+        f"[dim](concurrency={concurrency})[/dim] "
+        f"[dim]using[/dim] [cyan]{active_model_name()}[/cyan] "
+        f"[dim](via {active_provider().name})[/dim]\n"
+    )
     try:
         t0 = time.monotonic()
-        sync_files_sync(source_dir)
+        sync_files_sync(source_dir, concurrency=concurrency)
         elapsed = time.monotonic() - t0
         console.print(f"\n[green]✓ Sync complete[/green] [dim]({elapsed:.1f}s)[/dim]\n")
         return 0
@@ -264,6 +270,16 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=6,
+        metavar="N",
+        help=(
+            "Parallel LLM calls during --sync (default: 6). "
+            "Drop to 1 or 2 for rate-limited providers (e.g. Gemma free tier on OpenRouter)."
+        ),
+    )
+    parser.add_argument(
         "--reset",
         action="store_true",
         help="Delete all summaries, the manifest, and the Qdrant collection. Prompts to confirm.",
@@ -280,7 +296,7 @@ def main() -> None:
 
     if args.sync is not None:
         # argparse gives us "" when --sync was passed with no argument.
-        sys.exit(_cmd_sync(source_dir=args.sync or None))
+        sys.exit(_cmd_sync(source_dir=args.sync or None, concurrency=args.concurrency))
 
     _run_repl()
 

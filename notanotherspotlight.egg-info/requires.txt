@@ -1,0 +1,11 @@
+pydantic-ai>=0.0.14
+pydantic>=2.8
+pypdf>=4.3
+python-dotenv>=1.0
+python-docx>=1.1
+openpyxl>=3.1
+tqdm>=4.66
+qdrant-client>=1.9
+sentence-transformers>=3.0
+pymupdf>=1.24
+fastembed>=0.4

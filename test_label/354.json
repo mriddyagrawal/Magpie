@@ -1,0 +1,273 @@
+[
+    {
+        "question": "What is the phone number?",
+        "answer": "228-097-517",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Kellogg's Corn Flakes?",
+        "answer": "LE199.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "Egyptian Growers Baladie",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE545.88",
+        "source": "Human"
+    },
+    {
+        "question": "What items include 'Hamburg Beef Burger'?",
+        "answer": "Hamburg Beef Burger W/",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE545.88",
+        "source": "Human"
+    },
+    {
+        "question": "What item is listed first?",
+        "answer": "KelloggsCorn FlakesFros",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Kellogg's Corn Flakes were bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What quantity of Egyptian Growers Baladie were bought?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Mostaf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "EgyptianGrowersBaladiE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:21:52 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 121.4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE545.88",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1221029",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "6/8/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of receipt is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 104.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Arkan Sheikh Zayed, Giza 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.27",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 121.4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1221029",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "6/8/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total price of one Hamburg Beef Burger W/",
+        "answer": "LE121.44",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:21:52 P",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "KelloggsCornFlakesFros",
+                "quantity": "1",
+                "total_price": "LE199.0"
+            },
+            {
+                "item": "Hamburg Beef Burger W/",
+                "quantity": "0.27",
+                "total_price": "LE121.4"
+            },
+            {
+                "item": "Hamburg Beef Burger W/",
+                "quantity": "0.27",
+                "total_price": "LE121.4"
+            },
+            {
+                "item": "EgyptianGrowersBaladiE",
+                "quantity": "1",
+                "total_price": "LE104.0"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Hamburg Beef Burger W/",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "10:21:52 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 199.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Hamburg Beef Burgers were bought in total?",
+        "answer": "1.54",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "KelloggsCornFlakesFros",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "0.27",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "KelloggsCornFlakesFros\nLE199.\n1\nLE199.0\n00\n0",
+            "Hamburg Beef Burger W/\nLE440.\n0.27\nLE121.4\n00",
+            "Hamburg Beef Burger W/\nLE440.\n0.27\nLE121.4\n00\n4",
+            "EgyptianGrowersBaladiE\nLE104.\nLE104.0\n00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "LE545.88",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "LE45.88",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Egyptian Growers Baladie",
+        "answer": "LE104.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Hamburg Beef Burger W/",
+        "source": "Human"
+    }
+]

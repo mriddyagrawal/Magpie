@@ -1,0 +1,273 @@
+[
+    {
+        "question": "Where is the store located?",
+        "answer": "3 Brazil Street, Cairo, 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "11/02/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales tax percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 3500.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "GreekYogurt Berries&Muesli23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:00:00 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Norwegian S.Salmon Brown W",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:00:00 AM",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 90.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 60.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Gourmet Food Stores",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the account number?",
+        "answer": "880000051982",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the fourth item purchased?",
+        "answer": "Fresh Sliced Cucumber",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the change?",
+        "answer": "LE91.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Norwegian S.Salmon Brown W",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Fresh Sliced Cucumber",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Norwegian S.Salmon Brown W",
+                "quantity": "1",
+                "total_price": "LE90.00€"
+            },
+            {
+                "item": "Evian Mineral Water 500ml",
+                "quantity": "1",
+                "total_price": "LE24.00*"
+            },
+            {
+                "item": "GreekYogurtBerries&Muesli23",
+                "quantity": "1",
+                "total_price": "LE60.00*"
+            },
+            {
+                "item": "Fresh Sliced Cucumber",
+                "quantity": "1",
+                "total_price": "LE35,00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE209.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Evian Mineral Water 500ml",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "GreekYogurtBerries&Muesli23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the fourth item purchased?",
+        "answer": "LE35.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "H.hafez",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "1:51:06 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 24.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "LE209.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE21.37",
+            "Evian Mineral Water 500ml\nLE24.00\n1\nLE24.00*",
+            "GreekYogurtBerries&Muesli23\nLE60.00\n1\nLE60.00*",
+            "Fresh Sliced Cucumber\nLE35.00\n1\nLE35,00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the first item purchased?",
+        "answer": "LE90.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the second item purchased?",
+        "answer": "LE24.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE209.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Evian Mineral Water 500ml",
+        "source": "GPT"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "LE300.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the third item purchased?",
+        "answer": "LE60.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE209.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1624739",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE21.37",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "11/02/2022",
+        "source": "GPT"
+    }
+]

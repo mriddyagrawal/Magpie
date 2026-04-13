@@ -1,0 +1,256 @@
+[
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of this transaction?",
+        "answer": "23-12-22",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Simplified TAX Invoice",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "29-12-22/05:57/6540/60201/103/116",
+        "source": "Human"
+    },
+    {
+        "question": "What is the Commercial Registration number?",
+        "answer": "31136",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "26168112",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "30.702",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of tax?",
+        "answer": "4.298",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "35.000",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the change due?",
+        "answer": "(65.000)",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store where this purchase was made?",
+        "answer": "Max",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "05:57",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "4.298",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "35.000",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Orient International Trading LTD\nMax",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier number?",
+        "answer": "139750",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 35000.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the Tax Card number?",
+        "answer": "278-900-437",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "35.000",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount tendered?",
+        "answer": "100.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "cosmatic tool",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's email address?",
+        "answer": "mx.cfc@landmarkgroup.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount before tax?",
+        "answer": "30.702",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "٣٥,٠٠٠\n٤٫٢٩٨\n٣٠ ضريبة",
+            "35.000\n4.298\n30.702\nV14"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was purchased?",
+        "answer": "cosmatic tool",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "29-12-22/05:57/6540/60201/103/116",
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "CFC Mall, Block 67-Road No.90, 5th Settlement-New Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount to be paid?",
+        "answer": "35.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the unit price excluding VAT?",
+        "answer": "30.702",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "29-12-22/05:57/6540/60201/103/116",
+        "source": "Human"
+    },
+    {
+        "question": "What is the website for the store?",
+        "answer": "www.maxfashion.com",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "cosmatic tool",
+                "quantity": "1",
+                "total_price": "٣٥٫٠٠٠"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the company's name?",
+        "answer": "Orient International Trading LTD",
+        "source": "GPT"
+    }
+]

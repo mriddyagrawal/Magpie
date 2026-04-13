@@ -1,0 +1,297 @@
+[
+    {
+        "question": "What is the name of item 4?",
+        "answer": "ValleDelSole SwetCornT",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one C.G Solid White Tuna Veg?",
+        "answer": "LE31.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the Tender Chicken Breast?",
+        "answer": "LE97.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "679786",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Tender Chicken Breasts",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 50.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Hisham Youssry",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one ValleDelSole SwetCornT?",
+        "answer": "LE50.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE24.56",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "ValleDelSole SwetCornT",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "ValleDelSole SwetCornT",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:11:38 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the C.G Solid White Tuna Veg?",
+        "answer": "LE31.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Tender Chicken Breast?",
+        "answer": "LE97.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "How many ValleDelSole SwetCornT were purchased?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE436.61",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:11:38 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "Ahmed",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "30/10/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE436.61",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the C.G White TunainWater&?",
+        "answer": "LE32.50",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Tender Chicken Breasts",
+                "quantity": "1",
+                "total_price": "LE97.00"
+            },
+            {
+                "item": "ValleDelSole SwetCornT",
+                "quantity": "1",
+                "total_price": "LE50.00"
+            },
+            {
+                "item": "ValleDelSole SwetCornT",
+                "quantity": "1",
+                "total_price": "LE50.00"
+            },
+            {
+                "item": "ValleDelSole SwetCornT",
+                "quantity": "1",
+                "total_price": "LE50.00"
+            },
+            {
+                "item": "ValleDelSole SwetCornT",
+                "quantity": "1",
+                "total_price": "LE50.00"
+            },
+            {
+                "item": "C.G White TunainWater&",
+                "quantity": "1",
+                "total_price": "LE32.50"
+            },
+            {
+                "item": "C.G Solid WhiteTuna Veg",
+                "quantity": "1",
+                "total_price": "LE31.00"
+            },
+            {
+                "item": "Pineapple Honey, Kenya",
+                "quantity": "1.29",
+                "total_price": "LE76.11"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 50.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Tender Chicken Breasts were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many C.G Solid White Tuna Veg were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many C.G White TunainWater& were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the account number?",
+        "answer": "880000043759",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales Tax 14%\nLE24.56",
+            "ValleDelSole SwetCornT\nLE50.0\n1\nLE50.00\n0\n*",
+            "ValleDelSole SwetCornT\nLE50.0\n1\nLE50.00",
+            "ValleDelSole SwetCornT\nLE50.0\n1\nLE50.00\n0",
+            "ValleDelSole SwetCornT\nLE50.0\n1\nLE50.00\n0",
+            "C.G White TunainWater&\nLE32.5\n1\nLE32.50\n0",
+            "C.G Solid WhiteTuna Veg\nLE31.0\n1\nLE31.00\n0",
+            "Pineapple Honey, Kenya\nLE59.0\n1.29 LE76.11\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of sales tax?",
+        "answer": "LE24.56",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "30/10/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE436.61",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one C.G White TunainWater&?",
+        "answer": "LE32.5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "679786",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction processed?",
+        "answer": "11:11:38 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 97.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of four ValleDelSole SwetCornT?",
+        "answer": "LE200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 50.0,
+        "source": "Human"
+    }
+]

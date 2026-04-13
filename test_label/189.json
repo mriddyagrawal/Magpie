@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the second item purchased?",
+        "answer": "معلقة اكل مدهب 6 ق Meridien",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1208220025970",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "ملعقة شاى 6ق 130",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 186.1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the second item?",
+        "answer": "186.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "15:29",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1395113200024\nOri 54.99\nصينية مدورة روزانا رقم 2 ابيض\nQty 1\n*\n54.99\n54.9",
+            "1373059700076\nمعلقة اكل مدهب 6ق Meridien\nOri\n186.99\nQty 1\n186.99\n186.1",
+            "1319059700220\nملعقة شاى 6ق 130\nOri\n49.99\nQty 1\n* 49.99\n49.9",
+            "1340063900077\nصينية نادين مقاس 3 الوان\nOri\n101.99\nQty 1\n101.99\n101.9",
+            "1325217200009\nمدور حلة (18-20-24-28) + مقلاية\nOri\n1,349.99\nQty 1\n*\n1,349.99\n1,34!"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Al Morshedy Marts",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount of cash given?",
+        "answer": "1,800.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "15:29",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "معلقة اكل مدهب 6ق Meridien",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the return policy?",
+        "answer": "30 days with original invoice and merchandise in original condition",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 54.9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "ملعقة شاي 6 ق 130",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the fourth item?",
+        "answer": "101.99",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "صينية مدورة روزانا رقم 2 ابيض",
+                "quantity": "1",
+                "total_price": "54.9"
+            },
+            {
+                "item": "معلقة اكل مدهب 6ق Meridien",
+                "quantity": "1",
+                "total_price": "186.1"
+            },
+            {
+                "item": "ملعقة شاى 6ق 130",
+                "quantity": "1",
+                "total_price": "49.9"
+            },
+            {
+                "item": "صينية نادين مقاس 3 الوان",
+                "quantity": "1",
+                "total_price": "101.9"
+            },
+            {
+                "item": "مدور حلة (18-20-24-28) + مقلاية",
+                "quantity": "1",
+                "total_price": "1,34!"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the fourth item purchased?",
+        "answer": "صينية نادين مقاس 3 الوان",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "صينية مدورة روزانا رقم 2 ابيض",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Al Morshedy Marts",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "صينية مدورة روزانا رقم 2 ابيض",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the third item?",
+        "answer": "49.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the fifth item?",
+        "answer": "1,349.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the first item?",
+        "answer": "54.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "20/05/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "1,743.95",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "20/05/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1,743.95",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "15:29",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1,743.95",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the change?",
+        "answer": "(56.05)",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 101.9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "صينية نادين مقاس 3 الوان",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier number?",
+        "answer": "1314",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1,743.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "1208220025970",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 49.9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the fifth item purchased?",
+        "answer": "مدور حلة (18)-20)24-(28) + مقلاية",
+        "source": "GPT"
+    }
+]

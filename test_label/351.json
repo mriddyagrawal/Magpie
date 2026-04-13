@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 12.28",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used for Qnb?",
+        "answer": "EGP 49.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the purchase made?",
+        "answer": "9:25 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used for Lucky Hd3?",
+        "answer": "EGP 50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax card number?",
+        "answer": "220-232-997",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "7 Lebanon St Intersection Of Hegaz St Gzert El Arab, Mohandeseen, Giza, Giza",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "16104325205-234-14165",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the pants?",
+        "answer": "EGP 99.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "EGP 99.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 99.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 99.99,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 99.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 99.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Self Colorful Patterned\nPants - White",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the GST amount?",
+        "answer": "EGP 12.28",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 99.99",
+        "source": "Human"
+    },
+    {
+        "question": "Is the GST included in the product price?",
+        "answer": "Yes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "28/10/2021,",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Self Colorful Patterned\nPants - White",
+                "quantity": "1",
+                "total_price": "EGP 99.99"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the color of the purchased pants?",
+        "answer": "White",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 99.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "16104325205-234-14165",
+        "source": "Human"
+    },
+    {
+        "question": "What is the size of the purchased pants?",
+        "answer": "S",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "93123 Self Colorful Patterned Pants - White MULTICOLOR/S",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the commercial registration number?",
+        "answer": "375400",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many times can the product be exchanged?",
+        "answer": "Once",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:25 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:25 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the final total?",
+        "answer": "EGP 99.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "28/10/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "GST (14%)\nEGP 12.28"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the GST percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "RAVIN'",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "AAVİN'",
+        "source": "Human"
+    }
+]

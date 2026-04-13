@@ -19,19 +19,16 @@ from pathlib import Path
 from typing import Sequence
 
 from dotenv import load_dotenv
-from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, NativeOutput
-from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.openai import OpenAIProvider
 
 from src.content import SummarizeError, build_content_blocks
+from src.llm import build_chat_model
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
-API_MAX_RETRIES = 5
 
 
 class Answer(BaseModel):
@@ -57,23 +54,19 @@ SYSTEM_PROMPT = (
     "do not invent facts. "
     "In `sources_used`, include only the exact file paths (copied verbatim from the "
     "'--- File N: <path> ---' headers) that your answer actually depends on. "
-    "Do not list files you consulted but did not actually use."
+    "Do not list files you consulted but did not actually use. "
+    "Output RAW JSON only — do not wrap the response in markdown code fences "
+    "like ```json, and do not include any prose before or after the JSON object."
 )
 
 
 def build_answer_agent() -> Agent[None, Answer]:
-    api_key = os.environ.get("MOONSHOT_API_KEY")
-    if not api_key:
-        sys.exit("error: MOONSHOT_API_KEY not set (put it in .env)")
-    model_name = os.environ.get("MOONSHOT_MODEL", "kimi-k2.5")
-    base_url = os.environ.get("MOONSHOT_BASE_URL", "https://api.moonshot.ai/v1")
-    client = AsyncOpenAI(
-        api_key=api_key,
-        base_url=base_url,
-        max_retries=API_MAX_RETRIES,
+    return Agent(
+        build_chat_model(),
+        output_type=NativeOutput(Answer),
+        system_prompt=SYSTEM_PROMPT,
+        retries=3,
     )
-    model = OpenAIChatModel(model_name, provider=OpenAIProvider(openai_client=client))
-    return Agent(model, output_type=NativeOutput(Answer), system_prompt=SYSTEM_PROMPT)
 
 
 def _resolve(p: str | Path) -> Path:

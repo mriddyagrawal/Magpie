@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Cooks Cornstarch 240g?",
+        "answer": "LE18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:29:29 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1014380",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE237.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 90.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Gourmet Mascarpone Ch",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was spent on Cooks Cornstarch 240g?",
+        "answer": "LE18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cooks Cornstarch 240g was purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE18.05",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:29:29 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 18.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "0.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "Falcon L.Aluminium FoilP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Bouri, New Cairo, Egypt, 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Gourmet Mascarpone Ch",
+                "quantity": "0.25",
+                "total_price": "LE90.00"
+            },
+            {
+                "item": "Cooks Cornstarch 240g",
+                "quantity": "1",
+                "total_price": "LE18.00"
+            },
+            {
+                "item": "Falcon L.AluminiumFoilP",
+                "quantity": "1",
+                "total_price": "LE129.0"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Falcon L.Aluminium FoilP?",
+        "answer": "LE129.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much Gourmet Mascarpone Ch was bought?",
+        "answer": "0.25",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was spent on Gourmet Mascarpone Ch?",
+        "answer": "LE90.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1014380",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does the Gourmet Mascarpone Ch cost per unit?",
+        "answer": "LE360.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Falcon L.AluminiumFoilP",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "3/10/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "3/10/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "10:29:29 P",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE18.05",
+            "Cooks Cornstarch 240g\nLE18.0\n1\nLE18.00\n0",
+            "Falcon L.AluminiumFoilP\nLE129.\n1\nLE129.0\n00\n0*"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE237.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Gourmet Mascarpone Ch",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount spent?",
+        "answer": "LE237.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Cooks Cornstarch 240g",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total sales tax?",
+        "answer": "LE18.05",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Cooks Cornstarch 240g",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE237.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 129.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt RR",
+        "source": "Human"
+    },
+    {
+        "question": "How many Falcon L.Aluminium FoilP was purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "Moham",
+        "source": "GPT"
+    }
+]

@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "1. 10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 7.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "37.60",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the receipt printed?",
+        "answer": "7:06 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "7:06 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Butter Noodles",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "36.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Glass Imp Stout",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Oatmeal Stout",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Ashland Amber?",
+        "answer": "4.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Caldera Brewery & Restaurant",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the tax amount?",
+        "answer": "1.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Caldera Brewery & Restaurant",
+        "source": "Human"
+    },
+    {
+        "question": "What is the server's name?",
+        "answer": "Hope",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the Oatmeal Stout?",
+        "answer": "4.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "#20071",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Glass Imp Stout\n5.00",
+            "Ashland Amber\n4.75",
+            "Butter Noodles\n7.00",
+            "Oatmeal Stout\n4.75",
+            "Mahi Mahi TACO\n15.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What does the restaurant sell to go?",
+        "answer": "Cans, bottles and growlers",
+        "source": "GPT"
+    },
+    {
+        "question": "What phrase was printed below the balance due?",
+        "answer": "Cheers from Caldera Brewery & Restaurant Please Drive Carefully",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Ashland Amber",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Mahi Mahi TACO?",
+        "answer": "15.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "12/28/2017",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "37.60",
+        "source": "Human"
+    },
+    {
+        "question": "What is the balance due?",
+        "answer": "37.60",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "37.60",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address of the restaurant?",
+        "answer": "590 Clover Lane, Ashland, OR",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "12/28/2017",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 4.75,
+        "source": "Human"
+    },
+    {
+        "question": "What items were ordered?",
+        "answer": "Glass Imp Stout, Ashland Amber, Butter Noodles, Oatmeal Stout, Mahi Mahi TACO",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the Butter Noodles?",
+        "answer": "7.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Glass Imp Stout",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Ashland Amber",
+                "quantity": "1",
+                "total_price": "4.75"
+            },
+            {
+                "item": "Butter Noodles",
+                "quantity": "1",
+                "total_price": "7.00"
+            },
+            {
+                "item": "Oatmeal Stout",
+                "quantity": "1",
+                "total_price": "4.75"
+            },
+            {
+                "item": "Mahi Mahi TACO",
+                "quantity": "1",
+                "total_price": "15.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "36.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "37.60",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Glass Imp Stout?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "7:06 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number of the restaurant?",
+        "answer": "(541) 482-HOPS",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 4.75,
+        "source": "Human"
+    }
+]

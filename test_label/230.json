@@ -1,0 +1,267 @@
+[
+    {
+        "question": "How much did the Heinz Ketchup cost?",
+        "answer": "26.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 7.52 is already included in\nthe total amount.",
+            "Heinz Ketchup + Hot\n1 26.50 26.50\nKetchup Free (513g+200g)\nKitchen Supplies",
+            "Four Garbage Bags\n1\n36.25 36.25\n(90cm*120cm-10 Pcs)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "Who is the delivery person?",
+        "answer": "Nourhan Khaled",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the promotional offer?",
+        "answer": "Free delivery on your next order with code FDW for 3 days",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 125.33",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT value?",
+        "answer": "EGP 7.52",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery time?",
+        "answer": "10:00 AM - 11:00 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 36.25,
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 118.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-EGP 1.55",
+        "source": "GPT"
+    },
+    {
+        "question": "How many brown eggs were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 7.52",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one order of 24 brown eggs?",
+        "answer": "56.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Heinz Ketchup + Hot\nKetchup Free (513g+200g)\nKitchen Supplies",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 56.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the delivery date?",
+        "answer": "26 October, 2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount of this order?",
+        "answer": "EGP 127.20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2610-1679814",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 118.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 125.33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Maadi",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "24 Brown Eggs\nDressings & Sauces",
+        "source": "Human"
+    },
+    {
+        "question": "How many bags are there?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 26.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-EGP 1.87",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 125.33",
+        "source": "Human"
+    },
+    {
+        "question": "How many sets of garbage bags were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Four Garbage Bags\n(90cm*120cm-10 Pcs)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 125.33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2610-1679814",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "24 Brown Eggs\nDressings & Sauces",
+                "quantity": "1",
+                "total_price": "56.00"
+            },
+            {
+                "item": "Heinz Ketchup + Hot\nKetchup Free (513g+200g)\nKitchen Supplies",
+                "quantity": "1",
+                "total_price": "26.50"
+            },
+            {
+                "item": "Four Garbage Bags\n(90cm*120cm-10 Pcs)",
+                "quantity": "1",
+                "total_price": "36.25"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    }
+]

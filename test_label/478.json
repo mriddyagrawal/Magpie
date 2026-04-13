@@ -1,0 +1,287 @@
+[
+    {
+        "question": "What is the total amount?",
+        "answer": "122.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What size are the Schweppes Gold Pineapple?",
+        "answer": "300ml",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount?",
+        "answer": "-11.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "124.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Nestle Natural Water\nCarton (600ml*20)\nSoft Drinks",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the Nestle Natural Water Carton (600ml*20) cost?",
+        "answer": "67.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many bottles of Nestle Natural Water (600ml) were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many kg of cucumbers were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 122.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Domty Feta Cheese\nPlus (500g)\nWater",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 124.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 67.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 122.50",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the Schweppes Gold Pineapple cost?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 23.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Cucumbers (1Kg)\n1\n12.00 12.00\nBranded Cheese",
+            "Domty Feta Cheese\n1\n23.00 23.00\nPlus (500g)\nWater",
+            "Nestle Natural Water\n2\n3.00\n6.00\n(600ml)",
+            "Nestle Natural Water\n1\n67.00 67.00\nCarton (600ml*20)\nSoft Drinks",
+            "Schweppes Gold\n1\n6.00\n6.00\nPineapple (300ml)\nFruits",
+            "Local Red Grapes\n1\n10.00 10.00\n(500g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How much do the cucumbers cost?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the business?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How much do the Local Red Grapes cost?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cucumbers (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the Domty Feta Cheese Plus cost?",
+        "answer": "23.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#215-4533942",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost for the Nestle Natural Water (600ml)?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the payment method used?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What size are the Local Red Grapes?",
+        "answer": "500g",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#215-4533942",
+        "source": "Human"
+    },
+    {
+        "question": "How many grams of domty feta cheese were ordered?",
+        "answer": "500",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Local Red Grapes were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Nestle Natural Water\n(600ml)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Nestle Natural Water\n(600ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 12.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many  Schweppes Gold Pineapple were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cucumbers (1Kg)",
+                "quantity": "1",
+                "total_price": "12.00"
+            },
+            {
+                "item": "Domty Feta Cheese\nPlus (500g)\nWater",
+                "quantity": "1",
+                "total_price": "23.00"
+            },
+            {
+                "item": "Nestle Natural Water\n(600ml)",
+                "quantity": "2",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Nestle Natural Water\nCarton (600ml*20)\nSoft Drinks",
+                "quantity": "1",
+                "total_price": "67.00"
+            },
+            {
+                "item": "Schweppes Gold\nPineapple (300ml)\nFruits",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Local Red Grapes\n(500g)",
+                "quantity": "1",
+                "total_price": "10.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 122.50",
+        "source": "Human"
+    }
+]

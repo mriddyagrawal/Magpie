@@ -1,0 +1,287 @@
+[
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 444",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Roumi - Batarekh (200g)?",
+        "answer": "24.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 112.97",
+        "source": "Human"
+    },
+    {
+        "question": "How many Coca Cola Bottle Pack Of 4 (330ml) were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT\nof EGP 444",
+            "Roumi - Medium\n1\n23.00 23.00\n(200g)",
+            "Roumi - Batarekh\n1 24.95 24.95\n(200g)\nCold Cuts",
+            "Rich Smoked Turkey\n1 40.00 40.00\nBreast (250g)\nSoft Drinks",
+            "Coca Cola Bottle\n2 20.00 40.00\nPack Of 4 (330ml)\n[B] Coca Cola Bottle\n8\n(330ml)\nToast and Brown Bread",
+            "White Toast\n1 24.00 24.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Brown Baladi Bread?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Roumi - Medium (200g)?",
+        "answer": "23.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Brown Baladi Breads were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "5 Brown Baladi",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Roumi - Medium\n(200g)",
+                "quantity": "1",
+                "total_price": "23.00"
+            },
+            {
+                "item": "Roumi - Batarekh\n(200g)",
+                "quantity": "1",
+                "total_price": "24.95"
+            },
+            {
+                "item": "Rich Smoked Turkey\n(250g)",
+                "quantity": "1",
+                "total_price": "40.00"
+            },
+            {
+                "item": "Coca Cola Bottle\nPack Of 4 (330ml)\n[B] Coca Cola Bottle\n(330ml)",
+                "quantity": "2",
+                "total_price": "40.00"
+            },
+            {
+                "item": "White Toast",
+                "quantity": "1",
+                "total_price": "24.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 157.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Roumi - Medium\n(200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 23.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many [B] Coca Cola Bottle (330ml) were ordered?",
+        "answer": "8",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Coca Cola Bottle Pack Of 4 (330ml)?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Roumi - Batarekh\n(200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one White Toast?",
+        "answer": "24.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Rich Smoked Turkey Breast (250g)?",
+        "answer": "40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Rich Smoked Turkey Breast (250g) were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1023-2898354",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 157.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the cold cut ordered?",
+        "answer": "Rich Smoked Turkey Breast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1023-2898354",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 24.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 112.97",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 112.97",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many White Toasts were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What kind of cheese is ordered?",
+        "answer": "Roumi",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Roumi - Batarekh (200g) were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Coca Cola Bottle\nPack Of 4 (330ml)\n[B] Coca Cola Bottle\n(330ml)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "5 Brown Baladi",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Rich Smoked Turkey\n(250g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many Roumi - Medium (200g) were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 6.0,
+        "source": "Human"
+    }
+]

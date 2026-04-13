@@ -1,0 +1,291 @@
+[
+    {
+        "question": "How much was the tax?",
+        "answer": "1.44",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of a 'FF' item?",
+        "answer": "1.60",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "TAX 8.00%\n1.44",
+            "3X3\n4.35\n›\nGR S only",
+            "FF\n1.60",
+            "FF Animal\n3.50",
+            "Lg Coke\n1.70",
+            "Med Coke\n1.50",
+            "Shk\n2.05"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What time was the order placed?",
+        "answer": "3:02 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "$19.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 1.6,
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the 'FF Animal' item?",
+        "answer": "3.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "ADAM EL",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2013-08-10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:02 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 3.3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount due?",
+        "answer": "$19.44",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "25",
+        "source": "GPT"
+    },
+    {
+        "question": "What does 'Db1Dbl' stand for?",
+        "answer": "Double Double",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of a 'Med Coke'?",
+        "answer": "1.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the guest number?",
+        "answer": "25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 4.35,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "3X3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:02 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the 'Db1Dbl' item?",
+        "answer": "3.30",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "$19.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What does 'GR S only' stand for?",
+        "answer": "Grilled Onions Only",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "$19.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "IN-N-OUT BURGER ESCONDIDO",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Db1Db1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 3.5,
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of 'C Shk'?",
+        "answer": "2.05",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the tax rate?",
+        "answer": "8.00%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "FF Animal",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "2013-08-10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "FF",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of a 'Lg Coke'?",
+        "answer": "1.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "IN-N-OUT BURGER ESCONDIDO",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "1.44",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the '3X3' item?",
+        "answer": "4.35",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Db1Db1",
+                "quantity": "1",
+                "total_price": "3.30"
+            },
+            {
+                "item": "3X3",
+                "quantity": "1",
+                "total_price": "4.35"
+            },
+            {
+                "item": "FF",
+                "quantity": "1",
+                "total_price": "1.60"
+            },
+            {
+                "item": "FF Animal",
+                "quantity": "1",
+                "total_price": "3.50"
+            },
+            {
+                "item": "Lg Coke",
+                "quantity": "1",
+                "total_price": "1.70"
+            },
+            {
+                "item": "Med Coke",
+                "quantity": "1",
+                "total_price": "1.50"
+            },
+            {
+                "item": "Shk",
+                "quantity": "1",
+                "total_price": "2.05"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What does 'FF Animal' stand for?",
+        "answer": "French Fries Animal Style",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the receipt printed?",
+        "answer": "3:04 PM",
+        "source": "GPT"
+    }
+]

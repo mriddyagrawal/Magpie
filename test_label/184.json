@@ -1,0 +1,271 @@
+[
+    {
+        "question": "What is the VAT amount?",
+        "answer": "EGP 17.68",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the change given back?",
+        "answer": "EGP 56.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the printed date and time?",
+        "answer": "2022/10/07 12:46:52 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the call number?",
+        "answer": "80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the branch location?",
+        "answer": "Korba branch",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:46:14 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022/10/07",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Americano",
+                "quantity": "1",
+                "total_price": "EGP 54.00"
+            },
+            {
+                "item": "Turkey Sandwich",
+                "quantity": "1",
+                "total_price": "EGP 80.00"
+            },
+            {
+                "item": "mineral water",
+                "quantity": "1",
+                "total_price": "EGP 10.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 144.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the mineral water?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 126.32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Americano",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "mineral water",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT(14.0%)\nEGP 17.68",
+            "1\nTurkey Sandwich\nEGP 80.00",
+            "1\nmineral water\nEGP 10.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What time was the check printed?",
+        "answer": "2022/10/07 12:46:14 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Americanos were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the coffee shop?",
+        "answer": "NINE TWO NINE",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 54.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount paid in cash?",
+        "answer": "EGP 200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 144.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 80.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Turkey Sandwiches were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the closer's name?",
+        "answer": "hesham",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many mineral waters were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "120762",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 144.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Turkey Sandwich?",
+        "answer": "EGP 80.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the Americano?",
+        "answer": "EGP 54.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Turkey Sandwich",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 126.32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "NINE TWO NINE",
+        "source": "Human"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "Cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 144.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What items were ordered?",
+        "answer": [
+            "Americano",
+            "Turkey Sandwich",
+            "mineral water"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:46:14 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 17.68",
+        "source": "Human"
+    }
+]

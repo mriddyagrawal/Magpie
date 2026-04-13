@@ -1,0 +1,295 @@
+[
+    {
+        "question": "What is the total amount of the order before any discounts?",
+        "answer": "EGP 400.40",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "24 White Eggs",
+                "quantity": "1",
+                "total_price": "56.75"
+            },
+            {
+                "item": "Juhayna Rayeb Milk\n(440ml)",
+                "quantity": "1",
+                "total_price": "9.70"
+            },
+            {
+                "item": "Juhayna Rayeb Green\nTea & Lemon (440ml)\nFlavored Milk",
+                "quantity": "1",
+                "total_price": "9.70"
+            },
+            {
+                "item": "Juhayna Mix Chocolate\nPack Of 4 (200ml)",
+                "quantity": "4",
+                "total_price": "80.00"
+            },
+            {
+                "item": "Nescafe Gold Instant\nCoffee (50g)",
+                "quantity": "1",
+                "total_price": "50.50"
+            },
+            {
+                "item": "Americana Fava Plain\nBeans 20% Off Pack Of\n2 (400g)",
+                "quantity": "2",
+                "total_price": "29.50"
+            },
+            {
+                "item": "Juhayna Full Cream Milk\nCarton (6*1L)",
+                "quantity": "2",
+                "total_price": "213.50"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 80.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Juhayna Rayeb Milk\n(440ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Juhayna Full Cream Milk?",
+        "answer": "213.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2917-3193178",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the two Americana Fava Plain Beans?",
+        "answer": "29.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 449.65",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Juhayna Mix Chocolate\nPack Of 4 (200ml)",
+            "Americana Fava Plain\nBeans 20% Off Pack Of\n2 (400g)",
+            "Juhayna Full Cream Milk\nCarton (6*1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many Juhayna Full Cream Milk were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT value included in the total amount?",
+        "answer": "EGP 6.2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 388.80",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "29 March, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Mostafa Aboulezz",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 6.2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Juhayna Rayeb Green\nTea & Lemon (440ml)\nFlavored Milk",
+        "source": "Human"
+    },
+    {
+        "question": "What is the current balance deducted from the order?",
+        "answer": "EGP 11.60",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "24 White Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Americana Fava Plain Beans ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 56.75,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 388.80",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total discount?",
+        "answer": "EGP 59.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2917-3193178",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 6.2 is already included in the\ntotal amount.",
+            "Juhayna Rayeb Milk\n1 9.70\n9.70\n(440ml)",
+            "Juhayna Rayeb Green\n1 9.70\n9.70\nTea & Lemon (440ml)\nFlavored Milk",
+            "Juhayna Mix Chocolate\n4 20.00\n80.00\nPack Of 4 (200ml)\n[B] Juhayna Mix\n16\nChocolate (200ml)\nCoffee",
+            "Nescafe Gold Instant\n1 50.50\n50.50\nCoffee (50g)",
+            "Americana Fava Plain\n2\n14.75\n29.50\nBeans 20% Off Pack Of\n2 (400g)\nLong-Life Milk",
+            "Juhayna Full Cream Milk\n2 106.75 213.50\nCarton (6*1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the 24 White Eggs?",
+        "answer": "56.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 9.7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Juhayna Rayeb Milk (440ml)?",
+        "answer": "9.70",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Nescafe Gold Instant Coffee (50g)?",
+        "answer": "50.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Juhayna Mix Chocolate\nPack Of 4 (200ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 9.7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 449.65",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "07:00 PM - 08:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Juhayna Rayeb Milk were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total due after balance deduction?",
+        "answer": "EGP 388.80",
+        "source": "GPT"
+    },
+    {
+        "question": "How many packs of Juhayna Mix Chocolate were ordered?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 388.80",
+        "source": "Human"
+    }
+]

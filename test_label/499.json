@@ -1,0 +1,284 @@
+[
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#312-7100224",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of the Breadfast Salted Tortilla Chips?",
+        "answer": "EGP 49.5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal cost of the order?",
+        "answer": "EGP 129.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Breadfast Sea Salt Pretzels?",
+        "answer": "EGP 13.5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the second item ordered?",
+        "answer": "Pringles Potato Chips Original (40g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery address?",
+        "answer": "مدينة الشروق الحي السابع المجاورة ٢ فيلا ٥٨ El Shorouk City",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the delivery?",
+        "answer": "EGP 20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Breadfast Sea Salt\nPretzels (120g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "07:31 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order date?",
+        "answer": "Sat, 31 Dec 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the order delivered?",
+        "answer": "07:31 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the fifth item?",
+        "answer": "Bebeto Jelly Cola (35g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 129.75",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Sweet Corn (3 Pieces)",
+                "quantity": "1x",
+                "total_price": "EGP 36"
+            },
+            {
+                "item": "Pringles Potato Chips\nOriginal (40g)",
+                "quantity": "1x",
+                "total_price": "EGP 20"
+            },
+            {
+                "item": "Breadfast Sea Salt\nPretzels (120g)",
+                "quantity": "1x",
+                "total_price": "EGP 13.5"
+            },
+            {
+                "item": "Breadfast Salted\nTortilla Chips (250g)",
+                "quantity": "1x",
+                "total_price": "EGP 49.5"
+            },
+            {
+                "item": "Bebeto Jelly Cola\n(35g)",
+                "quantity": "1x",
+                "total_price": "EGP 10.75"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the fourth item ordered?",
+        "answer": "Breadfast Salted Tortilla Chips (250g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Pringles Potato Chips\nOriginal (40g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the first item ordered?",
+        "answer": "Sweet Corn (3 Pieces)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "31 Dec 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Paid in cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 149.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of Pringles Potato Chips?",
+        "answer": "EGP 20",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Breadfast Salted\nTortilla Chips (250g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of sweet corn?",
+        "answer": "EGP 36",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the third item?",
+        "answer": "Breadfast Sea Salt Pretzels (120g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "07:31 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 149.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Sweet Corn (3 Pieces)",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of the Bebeto Jelly Cola?",
+        "answer": "EGP 10.75",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 149.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "How much was saved?",
+        "answer": "EGP 11.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 49.5,
+        "source": "Human"
+    },
+    {
+        "question": "How many points are you eligible for?",
+        "answer": "129",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1x\nSweet Corn (3 Pieces) EGP 36",
+            "1x\nPringles Potato Chips\nEGP 20\nOriginal (40g)",
+            "1x\nBreadfast Sea Salt\nEGP 13.5\nPretzels (120g)",
+            "1x\nBreadfast Salted\nEGP 49.5\nTortilla Chips (250g)",
+            "1x\nBebeto Jelly Cola\nEGP 10.75\n(35g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 36.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items were ordered?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#312-7100224",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 13.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 149.75",
+        "source": "GPT"
+    }
+]

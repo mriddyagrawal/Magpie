@@ -1,0 +1,270 @@
+[
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of change due?",
+        "answer": "LE0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What date was the receipt generated?",
+        "answer": "16/11/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "M.Ahm",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Mexican Chicken Bowls were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the account number?",
+        "answer": "880000051174",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 180.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:52:04 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Vegetarian Vegan Bowl?",
+        "answer": "LE165.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1092015",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Mexican Chicken Bowl?",
+        "answer": "LE180.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Norwegian S. Salmon Bro were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 155.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Mexican Chicken Bowl",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "16/11/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Norwegian S. Salmon Bro?",
+        "answer": "LE155.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the card auth number?",
+        "answer": "0530",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE500.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many Vegetarian Vegan Bowls were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Mexican Chicken Bowl",
+                "quantity": "1",
+                "total_price": "LE180.0"
+            },
+            {
+                "item": "Vegetarian Vegan Bowl",
+                "quantity": "1",
+                "total_price": "LE165.0"
+            },
+            {
+                "item": "Norwegian S.Salmon Bro",
+                "quantity": "1",
+                "total_price": "LE155.0"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Hesham El Bahra",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:52:04 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the receipt generated?",
+        "answer": "3:52:04 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "LE500.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What are the two invoice numbers?",
+        "answer": [
+            "880000051174",
+            "Hesham El Bahrawi"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Norwegian S.Salmon Bro",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE500.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Mexican Chicken Bowl\nLE180\n1\nLE180.0\n00\n0",
+            "Vegetarian Vegan Bowl\nLE165.\n1\nLE165.0\n00\n0",
+            "Norwegian S.Salmon Bro\nLE155.\n1\nLE155.0\n00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE500.00",
+        "source": "Human"
+    },
+    {
+        "question": "What form of payment was used?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 165.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1092015",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Gourmet Food Stores",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Vegetarian Vegan Bowl",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Maadi Degla, Maadi, Cairo, 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

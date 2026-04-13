@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the location of the restaurant?",
+        "answer": "Downtown",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "73.68",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sub total?",
+        "answer": "73.68",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the table number?",
+        "answer": "69",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Turkish Plain, Dark D?",
+        "answer": "23.68",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "22/10/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 11.4,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Turkish Plain, Dark D",
+                "quantity": "1",
+                "total_price": "23.68"
+            },
+            {
+                "item": "Latte Frappe Reguiar",
+                "quantity": "1",
+                "total_price": "38.60"
+            },
+            {
+                "item": "Aqua 600 ML",
+                "quantity": "1",
+                "total_price": "11.40"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the outlet name?",
+        "answer": "Downtown",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the opening?",
+        "answer": "03:05 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "03:05 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who took the order?",
+        "answer": "cilantro1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "84.00",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the Latte Frappe Regular?",
+        "answer": "38.60",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "CILANTRO",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Latte Frappe Reguiar",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "84.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the serial number?",
+        "answer": "162694",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 23.68,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "10 32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "CILANTRO",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Turkish Plain, Dark D",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the shift?",
+        "answer": "Morning Sh",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT?",
+        "answer": "10.32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the survey link?",
+        "answer": "https//www.surveymonkey.com/r/DownT",
+        "source": "GPT"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Aqua 600 ML?",
+        "answer": "11.40",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 38.6,
+        "source": "Human"
+    },
+    {
+        "question": "What items were ordered?",
+        "answer": "Turkish Plain, Dark D, Latte Frappe Regular, Aqua 600 ML",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the balance due?",
+        "answer": "84.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "84.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Aqua 600 ML",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "22/10/2021",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT\n10 32",
+            "Latte Frappe Reguiar\n38.60",
+            "Aqua 600 ML\n11.40"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What items are shown on the receipt?",
+        "answer": "Turkish Plain, Dark D, Latte Frappe Regular, Aqua 600 ML",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order type?",
+        "answer": "Take Away",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "03:05 PM",
+        "source": "Human"
+    }
+]

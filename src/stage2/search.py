@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-import os
-import sys
 from dataclasses import dataclass
 
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, NativeOutput
-from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.openai import OpenAIProvider
 from qdrant_client.models import FusionQuery, Prefetch, SparseVector
 
+from src.llm import build_chat_model
 from src.stage2.db import COLLECTION_NAME, get_qdrant_client
 from src.stage2.embeddings import embed_dense_query, embed_sparse_query
 
@@ -37,7 +34,9 @@ REWRITE_SYSTEM_PROMPT = (
     "rewrite it into a SearchQuery: a dense `query` string that captures the full "
     "intent in keyword-rich language, and a `keywords` list of 3-8 specific terms "
     "(names, amounts, dates, document types) that should match exactly. "
-    "Do not answer the question — only produce the search query."
+    "Do not answer the question — only produce the search query. "
+    "Output RAW JSON only — do not wrap the response in markdown code fences "
+    "like ```json, and do not include any prose before or after the JSON object."
 )
 
 
@@ -45,16 +44,12 @@ _rewrite_agent: Agent[None, SearchQuery] | None = None
 
 
 def _build_rewrite_agent() -> Agent[None, SearchQuery]:
-    api_key = os.environ.get("MOONSHOT_API_KEY")
-    if not api_key:
-        sys.exit("error: MOONSHOT_API_KEY not set (put it in .env)")
-    model_name = os.environ.get("MOONSHOT_MODEL", "kimi-k2.5")
-    base_url = os.environ.get("MOONSHOT_BASE_URL", "https://api.moonshot.ai/v1")
-    model = OpenAIChatModel(
-        model_name,
-        provider=OpenAIProvider(base_url=base_url, api_key=api_key),
+    return Agent(
+        build_chat_model(),
+        output_type=NativeOutput(SearchQuery),
+        system_prompt=REWRITE_SYSTEM_PROMPT,
+        retries=3,
     )
-    return Agent(model, output_type=NativeOutput(SearchQuery), system_prompt=REWRITE_SYSTEM_PROMPT)
 
 
 def rewrite_query(question: str) -> SearchQuery:

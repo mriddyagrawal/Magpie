@@ -1,0 +1,300 @@
+[
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Pepsi Bottle (250ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 15.14",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 147.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-EGP 0.75",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Pepsi Cans were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 147.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Pepsi Bottle?",
+        "answer": "5.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What time is the delivery scheduled for?",
+        "answer": "04:00 PM - 05:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Breadfast Fresh Lemon-Mint Juice (275ml)",
+                "quantity": "1",
+                "total_price": "27.00"
+            },
+            {
+                "item": "Pepsi Can (320ml)",
+                "quantity": "2",
+                "total_price": "16.00"
+            },
+            {
+                "item": "Pepsi Bottle (250ml)",
+                "quantity": "2",
+                "total_price": "11.00"
+            },
+            {
+                "item": "Schweppes Tangerine Can (250ml)",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Nescafe 2-in-1 Free Sugar (10g)",
+                "quantity": "1",
+                "total_price": "4.75"
+            },
+            {
+                "item": "Trident Sugar Free Spearmint Gum (5 Pcs)",
+                "quantity": "1",
+                "total_price": "10.25"
+            },
+            {
+                "item": "Trident Mixed Berries Gum (5 Pcs)",
+                "quantity": "1",
+                "total_price": "10.25"
+            },
+            {
+                "item": "Magical Jelly Fruit (80-90g)",
+                "quantity": "1",
+                "total_price": "45.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How much was one Magical Jelly Fruit?",
+        "answer": "45.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 129.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1811-10082793",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 11.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "18 June, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "18 June, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the first product on the list?",
+        "answer": "Breadfast Fresh Lemon-Mint Juice (275ml)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Schweppes Tangerine Can (250ml)",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the Nescafé 2-in-1 Free Sugar?",
+        "answer": "4.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Breadfast Fresh Lemon-Mint Juice (275ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 129.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the order before current balance is applied?",
+        "answer": "EGP 148.25",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the discount applied to the order?",
+        "answer": "EGP 1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 147.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of all Schweppes Tangerine Cans?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1811-10082793",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 16.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.breadfast.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Pepsi Can (320ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the tax ID?",
+        "answer": "538-096-330",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the delivery fee?",
+        "answer": "EGP 20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Pepsi Can (320ml)",
+            "Pepsi Bottle (250ml)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "value of EGP 15.14 is already included in\ntotal",
+            "Pepsi Can (320ml)\n2 8.00\n16.00",
+            "Pepsi Bottle (250ml)\n2 5.50\n11.00",
+            "Schweppes Tangerine Can (250ml)\n1 5.00\n5.00",
+            "Nescafe 2-in-1 Free Sugar (10g)\n1 4.75\n4.75",
+            "Trident Sugar Free Spearmint Gum (5 Pcs)\n1 10.25\n10.25",
+            "Trident Mixed Berries Gum (5 Pcs)\n1 10.25\n10.25",
+            "Magical Jelly Fruit (80-90g)\n1 45.00\n45.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 147.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 27.0,
+        "source": "Human"
+    },
+    {
+        "question": "What type of gum was ordered?",
+        "answer": "Trident Sugar Free Spearmint Gum and Trident Mixed Berries Gum",
+        "source": "GPT"
+    },
+    {
+        "question": "Where can customer experience be reached?",
+        "answer": "cx@breadfast.com",
+        "source": "GPT"
+    }
+]

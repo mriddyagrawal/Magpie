@@ -92,22 +92,22 @@ Callable as `python -m notanotherspotlight <command>`. Lazy imports per command 
 
 ```
 # Ingest all summaries into Qdrant
-python -m notanotherspotlight ingest [--summaries-dir "Test Summaries"] [--force]
+python -m src.stage2 ingest [--force]
 
 # Search documents
-python -m notanotherspotlight search "your question" [--top-k 5]
+python -m src.stage2 search "your question" [--top-k 5] [--rewrite]
 ```
 
 | Command | What it does |
 |---|---|
-| `ingest` | Parses `Test Summaries/*.md`, embeds via MiniLM + BM25, upserts into Qdrant Cloud. Skips collection creation if it already exists unless `--force` is passed (drops + recreates). |
-| `search` | Sends question to Kimi for query rewriting, embeds the rewritten query, runs hybrid search in Qdrant, prints top-K results as summary + path + score. |
+| `ingest` | **Manifest-driven and incremental.** Walks `Test Summaries/_manifest.json`, upserts only rows whose `ingested_at` is unset (new summaries + Stage-1 re-summarizations). Embeds via MiniLM + BM25. After upsert, any Qdrant point whose ID isn't in the manifest gets hard-deleted (orphan cleanup). Point IDs are keyed on **source path** (stable across re-summarizations), stored as dashed UUIDs. `--force` drops the collection, clears every `ingested_at`, then re-ingests from scratch. |
+| `search` | Sends question to Kimi for query rewriting (if `--rewrite`; off by default — saves ~20s/call), embeds the query, runs hybrid search in Qdrant, prints top-K results as summary + path + score. |
 
 | Flag | Default | Description |
 |---|---|---|
-| `--summaries-dir` | `Test Summaries` | Path to the directory containing summary `.md` files. |
-| `--force` | off | Drop and recreate the Qdrant collection before ingesting. |
+| `--force` | off | Drop + recreate the Qdrant collection, reset manifest's `ingested_at`, then ingest everything. |
 | `--top-k` | `5` | Number of search results to return. |
+| `--rewrite` | off | Enable Kimi query rewriting in `search` (adds ~20s per call). |
 
 ## Project Layout After Stage 2
 

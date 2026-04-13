@@ -58,7 +58,19 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 
 ---
 
-## 4. Data lifecycle, updates & deletions (the "expired passport" problem)
+## 4. Data lifecycle, updates & deletions — IMPLEMENTED (see `src/manifest.py`)
+
+> **Promoted from Future Plans to shipped.** `Test Summaries/_manifest.json` now
+> tracks every source file's `size`, `summary_file`, `summarized_at`, `ingested_at`.
+> Stage 1 skips files whose size hasn't changed (no hashing in the common case).
+> Stage 2 skips summaries already in Qdrant. Missing source files are hard-deleted
+> from both the manifest, `Test Summaries/`, and Qdrant. The simplification from
+> the original design: we use `size` alone for change detection (dropped `mtime`
+> and lazy-`digest` comparison), because byte-identical size changes are rare in
+> practice and one column is easier to reason about. Everything below is the
+> original design doc, kept for context.
+
+### Original design (kept for reference)
 
 **What:** Track every summarized source file in a **manifest** so we can answer three questions cheaply at sync time: (a) which files on disk are missing from the DB? (b) which files on disk have changed since we last summarized them? (c) which DB rows point at files that no longer exist on disk?
 

@@ -27,10 +27,10 @@ def cmd_ingest(args: argparse.Namespace) -> None:
 
 
 def cmd_search(args: argparse.Namespace) -> None:
-    """Rewrite question via Kimi, then hybrid search Qdrant."""
+    """Rewrite question via Kimi (optional), then hybrid search Qdrant."""
     from src.stage2.search import search_summaries
 
-    results = search_summaries(args.question, top_k=args.top_k)
+    results = search_summaries(args.question, top_k=args.top_k, rewrite=args.rewrite)
 
     if not results:
         print("no results found.")
@@ -55,8 +55,8 @@ def main() -> None:
     ingest_p = sub.add_parser("ingest", help="Embed and store summaries in Qdrant.")
     ingest_p.add_argument(
         "--summaries-dir",
-        default="Summaries",
-        help="Path to the summaries directory (default: Summaries).",
+        default="Test Summaries",
+        help="Path to the summaries directory (default: 'Test Summaries').",
     )
     ingest_p.add_argument(
         "--force",
@@ -72,6 +72,11 @@ def main() -> None:
         type=int,
         default=5,
         help="Number of results to return (default: 5).",
+    )
+    search_p.add_argument(
+        "--rewrite",
+        action="store_true",
+        help="Enable Kimi query rewriting (off by default — adds ~20s per call).",
     )
 
     args = parser.parse_args()

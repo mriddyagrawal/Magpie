@@ -85,7 +85,7 @@ uv run python3 -m src.stage1.summarize <path-to-dir> [--concurrency 6] [--force]
 
 - Single-file mode prints the `FileSummary` as pretty-printed JSON to stdout and writes the `.md` summary. Non-zero exit on unrecoverable error.
 - Batch mode walks the directory, filters to supported extensions, runs summarization concurrently (default 6 in-flight requests, async + semaphore), shows a `tqdm` progress bar, and continues past per-file failures. Prints a `done: X summarized, Y already-cached, Z errors` tally at the end with the list of errors.
-- Summaries are written to `Summaries/<sha256-of-file-bytes-first-16-hex>.md`. Each file starts with `Source: <repo-relative-path>` followed by the rendered markdown summary.
+- Summaries are written to `Test Summaries/<sha256-of-file-bytes-first-16-hex>.md`. Each file starts with `Source: <repo-relative-path>` followed by the rendered markdown summary.
 - Re-running on the same directory is cheap: files whose hash already has a summary are skipped unless `--force` is passed.
 
 ## Project layout after Stage 1
@@ -107,7 +107,7 @@ NotAnotherSpotlight/
 │   ├── pipeline.py
 │   ├── stage1/summarize.py
 │   └── stage2/ (db, embeddings, parser, search)
-├── Summaries/              (generated, one <hash>.md per file)
+├── Test Summaries/              (generated, one <hash>.md per file)
 └── Test Content/           (input, gitignored)
 ```
 
@@ -127,7 +127,7 @@ Managed by `uv`. Python 3.11+.
 ## Acceptance criteria for Stage 1
 
 1. `uv sync` installs cleanly.
-2. With a valid `MOONSHOT_API_KEY` in `.env`, running `uv run python3 -m src.stage1.summarize "Test Content/Lab 1 - Doubly-Linked Lists.pdf"` prints a valid `FileSummary` JSON and writes `Summaries/<hash>.md`.
+2. With a valid `MOONSHOT_API_KEY` in `.env`, running `uv run python3 -m src.stage1.summarize "Test Content/Lab 1 - Doubly-Linked Lists.pdf"` prints a valid `FileSummary` JSON and writes `Test Summaries/<hash>.md`.
 3. Same works for a PNG in `Test Content/` (e.g. an Uber reservation screenshot).
 4. Same works for `.md`, `.py`, `.docx`, `.xlsx`.
 5. Image-only PDFs (e.g. `Hotel YQuantum Receipt.pdf`, `MLK Letter.pdf`) summarize successfully via the Kimi vision fallback (`pymupdf` → PNG per page → image content blocks).

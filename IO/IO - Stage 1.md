@@ -41,7 +41,7 @@
 ┌─────────────────────────────┐
 │  Step 4: Markdown Write     │
 │  IN:  FileSummary + path    │
-│  OUT: Summaries/<hash>.md   │
+│  OUT: Test Summaries/<hash>.md   │
 └─────────────────────────────┘
 ```
 
@@ -117,7 +117,7 @@ Breeze Airways\nFlight Receipt\nConfirmation: R2NDSL\n..."
 
 **Input:** `FileSummary` object + source file path
 
-**Output:** Markdown file at `Summaries/<sha256-first-16-hex>.md`
+**Output:** Markdown file at `Test Summaries/<sha256-first-16-hex>.md`
 ```markdown
 Source: Test Content/Flight GSP - Hartford Receipt.pdf
 

@@ -119,11 +119,31 @@ def run_search(sq: SearchQuery, top_k: int = 5) -> list[SearchResult]:
     ]
 
 
-def search_summaries(question: str, top_k: int = 5) -> list[SearchResult]:
-    """Full pipeline: rewrite the question via Kimi, then hybrid search Qdrant.
+def raw_query(question: str) -> SearchQuery:
+    """Build a SearchQuery from the raw user question, skipping the Kimi rewrite.
 
-    Returns up to top_k results ranked by Reciprocal Rank Fusion of
-    dense (semantic) and sparse (BM25) scores.
+    Useful when rewrite latency dominates and the raw question is already
+    keyword-rich. Pair with the Future-Plans item on asymmetric search /
+    HyDE when quality regresses on vague queries.
     """
-    sq = rewrite_query(question)
+    return SearchQuery(query=question, keywords=[])
+
+
+def search_summaries(
+    question: str,
+    top_k: int = 5,
+    *,
+    rewrite: bool = True,
+) -> list[SearchResult]:
+    """Retrieve top-k summaries from Qdrant for a user question.
+
+    If `rewrite` is True (default): Kimi expands the question into a dense
+    keyword-rich query + explicit keyword list, then hybrid search.
+    If False: the raw question goes directly to the embedders. Saves ~20s
+    (one LLM round-trip) per call but may hurt recall on short / vague queries.
+
+    Returns up to top_k results ranked by Reciprocal Rank Fusion of dense
+    (semantic) and sparse (BM25) scores.
+    """
+    sq = rewrite_query(question) if rewrite else raw_query(question)
     return run_search(sq, top_k)

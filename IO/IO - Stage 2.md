@@ -6,7 +6,7 @@
 
 ```
 ┌─────────────────────────────┐
-│  Summaries/*.md             │
+│  Test Summaries/*.md             │
 │  (from Stage 1)             │
 └─────────────┬───────────────┘
               │
@@ -108,9 +108,9 @@
 
 ### Step 1: Parse Summaries
 
-**Input:** `Summaries/*.md` files (produced by Stage 1)
+**Input:** `Test Summaries/*.md` files (produced by Stage 1)
 ```
-Summaries/8c2bbf673a91ef8d.md
+Test Summaries/8c2bbf673a91ef8d.md
 ```
 
 **Output:** `ParsedSummary` object
@@ -122,7 +122,7 @@ ParsedSummary(
     content_type="pdf",
     keywords=["Breeze Airways", "flight", "receipt", "R2NDSL"],
     key_entities=["Mridul Agrawal", "Rahul Ranjan Sah", "Breeze Airways"],
-    summary_file="Summaries/8c2bbf673a91ef8d.md",
+    summary_file="Test Summaries/8c2bbf673a91ef8d.md",
 )
 ```
 

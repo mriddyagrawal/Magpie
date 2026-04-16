@@ -35,6 +35,10 @@ REWRITE_SYSTEM_PROMPT = (
     "intent in keyword-rich language, and a `keywords` list of 3-8 specific terms "
     "(names, amounts, dates, document types) that should match exactly. "
     "Do not answer the question — only produce the search query. "
+    "If prior conversation turns are provided, use them to resolve pronouns and "
+    "references in the current question (e.g. 'what about its prerequisites?' → "
+    "the subject from the previous turn). The rewrite should be self-contained: "
+    "a search engine seeing only the rewritten query must have enough context. "
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
 )
@@ -52,12 +56,47 @@ def _build_rewrite_agent() -> Agent[None, SearchQuery]:
     )
 
 
-def rewrite_query(question: str) -> SearchQuery:
-    """Send a raw user question to Kimi and get back a structured SearchQuery."""
+def _build_rewrite_prompt(
+    question: str,
+    history: list[tuple[str, str]] | None,
+) -> str:
+    if not history:
+        return question
+    lines = ["Previous conversation turns:"]
+    for i, (q, a) in enumerate(history, 1):
+        lines.append(f"[Turn {i}] Q: {q}")
+        lines.append(f"[Turn {i}] A: {a}")
+    lines.append("")
+    lines.append(f"Current question: {question}")
+    return "\n".join(lines)
+
+
+def rewrite_query(
+    question: str,
+    history: list[tuple[str, str]] | None = None,
+) -> SearchQuery:
+    """Send a raw user question to Kimi and get back a structured SearchQuery.
+
+    If `history` is provided (list of (question, answer) tuples from prior turns),
+    prepend it as context so the rewriter can resolve references like 'it',
+    'that course', 'the same thing' to the actual subject.
+    """
     global _rewrite_agent
     if _rewrite_agent is None:
         _rewrite_agent = _build_rewrite_agent()
-    result = _rewrite_agent.run_sync(question)
+    result = _rewrite_agent.run_sync(_build_rewrite_prompt(question, history))
+    return result.output
+
+
+async def rewrite_query_async(
+    question: str,
+    history: list[tuple[str, str]] | None = None,
+) -> SearchQuery:
+    """Async variant of rewrite_query — safe to call inside an existing event loop."""
+    global _rewrite_agent
+    if _rewrite_agent is None:
+        _rewrite_agent = _build_rewrite_agent()
+    result = await _rewrite_agent.run(_build_rewrite_prompt(question, history))
     return result.output
 
 

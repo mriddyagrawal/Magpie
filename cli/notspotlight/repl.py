@@ -24,6 +24,7 @@ from rich.console import Console
 
 from notspotlight.display import (
     console,
+    file_link,
     print_banner,
     print_error,
     print_help,
@@ -36,11 +37,13 @@ HISTORY_FILE = Path.home() / ".notspotlight_history"
 # Session state
 _rewrite = False
 _top_k = 5
+_history_enabled = False
+_history: list[tuple[str, str]] = []  # (question, answer) pairs from this session
 
 
 def _handle_dot_command(cmd: str) -> bool:
     """Handle dot-commands. Returns True if the input was a command."""
-    global _rewrite, _top_k
+    global _rewrite, _top_k, _history_enabled, _history
 
     parts = cmd.strip().split()
     if not parts or not parts[0].startswith("."):
@@ -60,6 +63,21 @@ def _handle_dot_command(cmd: str) -> bool:
                 print_setting("rewrite", "off")
             else:
                 print_error("usage: .rewrite on/off")
+        case ".history":
+            if len(parts) < 2:
+                state = "on" if _history_enabled else "off"
+                print_setting("history", f"{state} ({len(_history)} turns stored)")
+            elif parts[1] in ("on", "true", "1"):
+                _history_enabled = True
+                print_setting("history", "on")
+            elif parts[1] in ("off", "false", "0"):
+                _history_enabled = False
+                print_setting("history", "off")
+            elif parts[1] == "clear":
+                _history.clear()
+                print_setting("history", "cleared")
+            else:
+                print_error("usage: .history on/off/clear")
         case ".top-k":
             if len(parts) < 2:
                 print_setting("top-k", str(_top_k))
@@ -87,79 +105,102 @@ def _detail(key: str, value: str) -> None:
     console.print(f"    [dim]{key}:[/dim] {value}")
 
 
-def _run_query(question: str) -> None:
-    """Run the pipeline step-by-step with live internal tooling output."""
-    from src.answer import Answer, answer_question_sync, build_answer_agent
+async def _run_query_async(question: str) -> None:
+    """Async body of _run_query. All LLM calls happen in one event loop so
+    httpx client cleanup never sees a closed loop."""
+    import asyncio
+
+    from src.answer import Answer, answer_question, build_answer_agent
     from src.pipeline import PipelineResult
-    from src.stage2.search import SearchQuery, raw_query, rewrite_query, run_search
+    from src.stage2.search import (
+        SearchQuery,
+        raw_query,
+        rewrite_query_async,
+        run_search,
+    )
 
+    t_total = time.monotonic()
+    console.print()
+
+    # Step 1: Query construction
+    if _rewrite:
+        t0 = time.monotonic()
+        history_arg = _history if _history_enabled and _history else None
+        with console.status("[bold blue]  ◦ Rewriting query via Kimi...", spinner="dots"):
+            sq: SearchQuery = await rewrite_query_async(question, history=history_arg)
+        _step("Query rewritten", t0)
+        _detail("dense query", sq.query)
+        _detail("keywords", ", ".join(sq.keywords) if sq.keywords else "(none)")
+        if history_arg:
+            _detail("history", f"{len(history_arg)} prior turn(s) sent")
+    else:
+        sq = raw_query(question)
+        console.print("  [green]✓[/green] Using raw query [dim](rewrite off)[/dim]")
+        _detail("query", sq.query[:80])
+
+    # Step 2: Embed query
+    t0 = time.monotonic()
+    with console.status("[bold blue]  ◦ Embedding query (MiniLM + BM25)...", spinner="dots"):
+        from src.stage2.embeddings import embed_dense_query, embed_sparse_query
+        dense_text = sq.query + " " + " ".join(sq.keywords)
+        dense_vec = await asyncio.to_thread(embed_dense_query, dense_text)
+        sparse_idx, sparse_val = await asyncio.to_thread(embed_sparse_query, dense_text)
+    _step("Query embedded", t0)
+    _detail("dense vector", f"{len(dense_vec)} dims")
+    _detail("sparse terms", f"{len(sparse_idx)} active terms")
+
+    # Step 3: Qdrant search
+    t0 = time.monotonic()
+    with console.status("[bold blue]  ◦ Searching Qdrant (dense + BM25 hybrid)...", spinner="dots"):
+        retrieved = await asyncio.to_thread(run_search, sq, _top_k)
+    _step("Qdrant searched", t0)
+    _detail("results", f"{len(retrieved)} documents")
+    for i, r in enumerate(retrieved[:3], 1):
+        _detail(f"  #{i}", f"[{r.score:.3f}] {file_link(r.path)}")
+    if len(retrieved) > 3:
+        _detail("", f"...and {len(retrieved) - 3} more")
+
+    if not retrieved:
+        console.print("\n[yellow]No matching documents found.[/yellow]\n")
+        return
+
+    # Step 4: Read source documents + generate answer
+    paths = list(dict.fromkeys(r.path for r in retrieved if r.path))
+    answer_history = _history if _history_enabled and _history else None
+    t0 = time.monotonic()
+    with console.status("[bold blue]  ◦ Reading source files and asking Kimi...", spinner="dots"):
+        agent = build_answer_agent()
+        ans: Answer = await answer_question(agent, question, paths, history=answer_history)
+    _step("Answer generated", t0)
+    _detail("sources cited", f"{len(ans.sources_used)} files")
+    if answer_history:
+        _detail("history", f"{len(answer_history)} prior turn(s) sent to answerer")
+    for p in ans.sources_used:
+        _detail("", f"[cyan]→[/cyan] {file_link(p)}")
+
+    # Total time
+    elapsed = time.monotonic() - t_total
+    console.print(f"\n  [bold]Total: {elapsed:.1f}s[/bold]\n")
+
+    result = PipelineResult(
+        question=question,
+        search_query=sq,
+        retrieved=retrieved,
+        answer=ans.answer,
+        sources_used=ans.sources_used,
+    )
+    print_result(result)
+
+    # Record this turn for future history-aware rewrites.
+    _history.append((question, ans.answer))
+
+
+def _run_query(question: str) -> None:
+    """Sync entry point. Runs the full query in a single event loop so
+    httpx client cleanup fires while the loop is still alive."""
+    import asyncio
     try:
-        t_total = time.monotonic()
-        console.print()
-
-        # Step 1: Query construction
-        if _rewrite:
-            t0 = time.monotonic()
-            with console.status("[bold blue]  ◦ Rewriting query via Kimi...", spinner="dots"):
-                sq: SearchQuery = rewrite_query(question)
-            _step("Query rewritten", t0)
-            _detail("dense query", sq.query)
-            _detail("keywords", ", ".join(sq.keywords) if sq.keywords else "(none)")
-        else:
-            sq = raw_query(question)
-            console.print("  [green]✓[/green] Using raw query [dim](rewrite off)[/dim]")
-            _detail("query", sq.query[:80])
-
-        # Step 2: Embed query
-        t0 = time.monotonic()
-        with console.status("[bold blue]  ◦ Embedding query (MiniLM + BM25)...", spinner="dots"):
-            from src.stage2.embeddings import embed_dense_query, embed_sparse_query
-            dense_text = sq.query + " " + " ".join(sq.keywords)
-            dense_vec = embed_dense_query(dense_text)
-            sparse_idx, sparse_val = embed_sparse_query(dense_text)
-        _step("Query embedded", t0)
-        _detail("dense vector", f"{len(dense_vec)} dims")
-        _detail("sparse terms", f"{len(sparse_idx)} active terms")
-
-        # Step 3: Qdrant search
-        t0 = time.monotonic()
-        with console.status("[bold blue]  ◦ Searching Qdrant (dense + BM25 hybrid)...", spinner="dots"):
-            retrieved = run_search(sq, _top_k)
-        _step("Qdrant searched", t0)
-        _detail("results", f"{len(retrieved)} documents")
-        for i, r in enumerate(retrieved[:3], 1):
-            _detail(f"  #{i}", f"[{r.score:.3f}] {r.path}")
-        if len(retrieved) > 3:
-            _detail("", f"...and {len(retrieved) - 3} more")
-
-        if not retrieved:
-            console.print("\n[yellow]No matching documents found.[/yellow]\n")
-            return
-
-        # Step 4: Read source documents + generate answer
-        paths = [r.path for r in retrieved if r.path]
-        t0 = time.monotonic()
-        with console.status("[bold blue]  ◦ Reading source files and asking Kimi...", spinner="dots"):
-            agent = build_answer_agent()
-            ans: Answer = answer_question_sync(agent, question, paths)
-        _step("Answer generated", t0)
-        _detail("sources cited", f"{len(ans.sources_used)} files")
-        for p in ans.sources_used:
-            _detail("", f"[cyan]→[/cyan] {p}")
-
-        # Total time
-        elapsed = time.monotonic() - t_total
-        console.print(f"\n  [bold]Total: {elapsed:.1f}s[/bold]\n")
-
-        result = PipelineResult(
-            question=question,
-            search_query=sq,
-            retrieved=retrieved,
-            answer=ans.answer,
-            sources_used=ans.sources_used,
-        )
-        print_result(result)
-
+        asyncio.run(_run_query_async(question))
     except Exception as e:
         print_error(str(e))
 
@@ -289,6 +330,21 @@ def main() -> None:
         action="store_true",
         help="Skip the confirmation prompt on --reset.",
     )
+    parser.add_argument(
+        "--history",
+        action="store_true",
+        help=(
+            "Start the REPL with conversation history enabled. Prior Q&A turns "
+            "are sent to the query rewriter so follow-up questions can resolve "
+            "references like 'its prerequisites'. Requires rewrite mode to take "
+            "effect (toggle with .rewrite on)."
+        ),
+    )
+    parser.add_argument(
+        "--rewrite",
+        action="store_true",
+        help="Start the REPL with Kimi query rewriting enabled.",
+    )
     args = parser.parse_args()
 
     if args.reset:
@@ -297,6 +353,12 @@ def main() -> None:
     if args.sync is not None:
         # argparse gives us "" when --sync was passed with no argument.
         sys.exit(_cmd_sync(source_dir=args.sync or None, concurrency=args.concurrency))
+
+    global _history_enabled, _rewrite
+    if args.history:
+        _history_enabled = True
+    if args.rewrite:
+        _rewrite = True
 
     _run_repl()
 

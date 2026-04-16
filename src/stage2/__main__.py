@@ -30,6 +30,7 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
         create_collection,
         delete_points,
         get_all_point_ids,
+        upsert_csv_rows,
         upsert_summaries,
     )
     from src.stage2.parser import parse_summary_file
@@ -52,28 +53,69 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
 
     upserted = 0
     if todo_paths:
-        parsed = []
+        # Split into CSV entries (summary_file is None) and regular entries.
+        csv_paths = []
+        regular_paths = []
         for rel in todo_paths:
             entry = manifest.get(rel)
             assert entry is not None
-            summary_path = REPO_ROOT / entry.summary_file
-            if not summary_path.exists():
-                print(f"  warn: summary missing, skipping: {entry.summary_file}", file=sys.stderr)
-                continue
-            parsed.append(parse_summary_file(summary_path))
+            if entry.summary_file is None:
+                csv_paths.append(rel)
+            else:
+                regular_paths.append(rel)
 
-        upserted = upsert_summaries(parsed)
-        ingested_paths = {p.source_path for p in parsed}
-        for rel in todo_paths:
-            if rel in ingested_paths:
+        # Regular files: parse summary markdown → embed → upsert.
+        if regular_paths:
+            parsed = []
+            parsed_rels: list[str] = []
+            for rel in regular_paths:
+                entry = manifest.get(rel)
+                assert entry is not None
+                summary_path = REPO_ROOT / entry.summary_file
+                if not summary_path.exists():
+                    print(f"  warn: summary missing, skipping: {entry.summary_file}", file=sys.stderr)
+                    continue
+                parsed.append(parse_summary_file(summary_path))
+                parsed_rels.append(rel)
+
+            upserted += upsert_summaries(parsed)
+            # Mark every rel we successfully parsed. Duplicates (multiple rels
+            # pointing at the same .md, e.g. identical PDFs in different
+            # folders) all get marked even though they collapse to one Qdrant
+            # point — without this they'd re-upsert on every sync.
+            for rel in parsed_rels:
                 manifest.mark_ingested(rel)
+
+        # CSV files: embed each row directly → upsert.
+        for rel in csv_paths:
+            entry = manifest.get(rel)
+            assert entry is not None
+            csv_path = REPO_ROOT / rel
+            if not csv_path.exists():
+                print(f"  warn: CSV missing, skipping: {rel}", file=sys.stderr)
+                continue
+            row_count = upsert_csv_rows(csv_path, rel)
+            entry.row_count = row_count
+            manifest.mark_ingested(rel)
+            upserted += row_count
+
         manifest.save()
         print(f"upserted {upserted} points into Qdrant")
     else:
         print("manifest says nothing needs ingestion.")
 
     # Orphan cleanup: points in Qdrant whose source is no longer in the manifest.
-    expected_ids = {_point_id(rel) for rel in manifest.paths()}
+    expected_ids: set[str] = set()
+    for rel in manifest.paths():
+        entry = manifest.get(rel)
+        assert entry is not None
+        if entry.row_count is not None and entry.row_count > 0:
+            expected_ids.update(
+                _point_id(f"{rel}::row:{i}") for i in range(entry.row_count)
+            )
+        else:
+            expected_ids.add(_point_id(rel))
+
     actual_ids = get_all_point_ids()
     orphans = actual_ids - expected_ids
     orphans_deleted = 0

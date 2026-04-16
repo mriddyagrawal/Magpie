@@ -44,9 +44,10 @@ def _now_iso() -> str:
 @dataclass
 class Entry:
     size: int
-    summary_file: str
-    summarized_at: str
+    summary_file: str | None = None
+    summarized_at: str = ""
     ingested_at: str | None = None
+    row_count: int | None = None
 
 
 class Manifest:
@@ -107,7 +108,7 @@ class Manifest:
 
     # ---- mutations ------------------------------------------------------
 
-    def mark_summarized(self, rel_path: str, size: int, summary_file: str) -> None:
+    def mark_summarized(self, rel_path: str, size: int, summary_file: str | None) -> None:
         """Record a successful summarization. Clears ingested_at so stage 2 re-ingests."""
         self.entries[rel_path] = Entry(
             size=size,

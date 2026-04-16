@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from rich.console import Console
@@ -13,6 +14,16 @@ if TYPE_CHECKING:
     from src.pipeline import PipelineResult
 
 console = Console()
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def file_link(rel_path: str) -> str:
+    """Format a repo-relative path as a clickable rich link (file:// URL)."""
+    if not rel_path:
+        return rel_path
+    abs_path = (_REPO_ROOT / rel_path).resolve()
+    return f"[link=file://{abs_path}]{rel_path}[/link]"
 
 
 SUGGESTIONS = [
@@ -48,6 +59,7 @@ def print_help() -> None:
     table.add_column()
     table.add_row(".help", "Show this help")
     table.add_row(".rewrite on/off", "Toggle Kimi query rewriting (default: off)")
+    table.add_row(".history on/off/clear", "Send prior Q&A to the rewriter (needs .rewrite on)")
     table.add_row(".top-k N", "Set number of results to retrieve")
     table.add_row(".clear", "Clear the screen")
     table.add_row("exit / quit / Ctrl+D", "Exit")
@@ -63,7 +75,7 @@ def print_result(result: PipelineResult) -> None:
         table.add_column("Score", width=7)
         table.add_column("Path")
         for i, r in enumerate(result.retrieved, 1):
-            table.add_row(str(i), f"{r.score:.3f}", r.path)
+            table.add_row(str(i), f"{r.score:.3f}", file_link(r.path))
         console.print(table)
         console.print()
 
@@ -74,7 +86,7 @@ def print_result(result: PipelineResult) -> None:
     if result.sources_used:
         console.print("[bold]Sources used:[/bold]")
         for p in result.sources_used:
-            console.print(f"  [cyan]→[/cyan] {p}")
+            console.print(f"  [cyan]→[/cyan] {file_link(p)}")
     else:
         console.print("[dim]Sources used: (none)[/dim]")
     console.print()

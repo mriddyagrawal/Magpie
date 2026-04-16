@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import csv
 import hashlib
 import json
 import os
@@ -155,7 +156,20 @@ def write_summary_at(out_path: Path, summary: FileSummary, source_rel: str) -> N
     out_path.write_text(render_markdown(summary, source_rel), encoding="utf-8")
 
 
-def _delete_summary_file(rel_summary: str) -> None:
+def _count_csv_rows(path: Path) -> int:
+    """Return the number of data rows (excluding header) in a CSV file."""
+    try:
+        with path.open(encoding="utf-8") as f:
+            reader = csv.reader(f)
+            next(reader, None)  # skip header
+            return sum(1 for _ in reader)
+    except (UnicodeDecodeError, csv.Error) as e:
+        raise SummarizeError(f"cannot read CSV {path}: {e}") from e
+
+
+def _delete_summary_file(rel_summary: str | None) -> None:
+    if rel_summary is None:
+        return
     p = REPO_ROOT / rel_summary
     if p.exists():
         p.unlink()
@@ -198,6 +212,35 @@ def bootstrap_manifest_from_existing(manifest) -> int:
     return count
 
 
+MAX_429_RETRIES = 6
+
+
+async def _run_with_retry(agent: Agent[None, FileSummary], message: list, label: str):
+    """Call agent.run() with automatic retry + backoff on 429 rate-limit errors."""
+    from pydantic_ai.exceptions import ModelHTTPError
+
+    for attempt in range(1, MAX_429_RETRIES + 1):
+        try:
+            return await agent.run(message)
+        except ModelHTTPError as e:
+            if e.status_code != 429 or attempt == MAX_429_RETRIES:
+                raise
+            # Try to parse retryDelay from the response body; fall back to exponential backoff.
+            wait = 2 ** attempt
+            if isinstance(e.body, dict):
+                meta = e.body.get("metadata", {})
+                raw = meta.get("raw", "")
+                if isinstance(raw, str):
+                    import re
+                    m = re.search(r'"retryDelay":\s*"(\d+)s?"', raw)
+                    if m:
+                        wait = int(m.group(1)) + 1
+            from tqdm import tqdm
+            tqdm.write(f"  429 on {label}, retry {attempt}/{MAX_429_RETRIES} in {wait}s")
+            await asyncio.sleep(wait)
+    raise RuntimeError("unreachable")
+
+
 async def summarize_one(
     agent: Agent[None, FileSummary],
     path: Path,
@@ -213,7 +256,7 @@ async def summarize_one(
     digest = await asyncio.to_thread(hash_file, path)
     out_path = SUMMARIES_DIR / f"{digest}.md"
     message = await asyncio.to_thread(build_user_message, path)
-    result = await agent.run(message)
+    result = await _run_with_retry(agent, message, path.name)
     await asyncio.to_thread(write_summary_at, out_path, result.output, source_rel)
 
     new_summary_rel = str(out_path.relative_to(REPO_ROOT))
@@ -281,6 +324,20 @@ async def run_batch(
 
             old_summary_rel = existing.summary_file if existing else None
 
+            # CSVs: register in manifest without LLM summarization.
+            if path.suffix.lower() == ".csv":
+                row_count = await asyncio.to_thread(_count_csv_rows, path)
+                # Delete old summary .md if migrating from LLM-summarized CSV.
+                if old_summary_rel:
+                    await asyncio.to_thread(_delete_summary_file, old_summary_rel)
+                async with manifest_lock:
+                    manifest.mark_summarized(rel, size, summary_file=None)
+                    entry = manifest.get(rel)
+                    assert entry is not None
+                    entry.row_count = row_count
+                tqdm.write(f"  csv: {path.name} ({row_count} rows)")
+                return
+
             async with sem:
                 bar.set_postfix_str(path.name[:40])
                 _, new_summary_rel = await summarize_one(agent, path, rel, old_summary_rel)
@@ -327,6 +384,23 @@ async def run_single(agent: Agent[None, FileSummary], path: Path, force: bool) -
         return
 
     old_summary_rel = existing.summary_file if existing else None
+
+    # CSVs: register without LLM summarization.
+    if path.suffix.lower() == ".csv":
+        try:
+            row_count = _count_csv_rows(path)
+        except SummarizeError as e:
+            sys.exit(f"error: {e}")
+        if old_summary_rel:
+            _delete_summary_file(old_summary_rel)
+        manifest.mark_summarized(rel, size, summary_file=None)
+        entry = manifest.get(rel)
+        assert entry is not None
+        entry.row_count = row_count
+        manifest.save()
+        print(f"csv registered: {rel} ({row_count} rows)")
+        return
+
     try:
         summary, new_summary_rel = await summarize_one(agent, path, rel, old_summary_rel)
     except SummarizeError as e:
@@ -343,8 +417,8 @@ def main() -> None:
     parser.add_argument("path", help="File or directory to summarize.")
     parser.add_argument("--force", action="store_true",
                         help="Re-summarize every file, ignoring the manifest.")
-    parser.add_argument("--concurrency", type=int, default=6,
-                        help="Max files summarized in parallel during batch mode (default: 6).")
+    parser.add_argument("--concurrency", type=int, default=3,
+                        help="Max files summarized in parallel during batch mode (default: 3).")
     args = parser.parse_args()
 
     path = Path(args.path)

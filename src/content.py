@@ -21,6 +21,7 @@ CODE_EXTS = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
              ".sh", ".sql", ".json", ".yaml", ".yml", ".toml"}
 TEXT_EXTS = {".txt"}
 MD_EXTS = {".md", ".markdown"}
+CSV_EXTS = {".csv"}
 PDF_EXTS = {".pdf"}
 DOCX_EXTS = {".docx"}
 XLSX_EXTS = {".xlsx", ".xlsm"}
@@ -29,6 +30,7 @@ PDF_VISION_DPI = 150
 
 SUPPORTED_EXTS = (
     set(IMAGE_EXTS)
+    | CSV_EXTS
     | PDF_EXTS
     | DOCX_EXTS
     | XLSX_EXTS
@@ -177,6 +179,15 @@ def build_content_blocks(
         if not text:
             raise SummarizeError(f"xlsx appears empty: {path}")
         return [f"Content type: xlsx\n\n---\n{text[:max_chars]}"]
+
+    if ext in CSV_EXTS:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as e:
+            raise SummarizeError(f"file is not valid UTF-8 text: {path}") from e
+        if not text.strip():
+            raise SummarizeError(f"csv appears empty: {path}")
+        return [f"Content type: csv\n\n---\n{text[:max_chars]}"]
 
     if ext in MD_EXTS or ext in TEXT_EXTS or ext in CODE_EXTS:
         ctype = "markdown" if ext in MD_EXTS else ("code" if ext in CODE_EXTS else "text")

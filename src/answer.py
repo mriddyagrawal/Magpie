@@ -52,6 +52,16 @@ SYSTEM_PROMPT = (
     "Answer the user's question using ONLY the files provided in the message. "
     "If the files do not contain the information needed to answer, say so explicitly — "
     "do not invent facts. "
+    "Be concise. Default to the shortest answer that directly addresses the "
+    "question — one sentence or a brief list is usually enough. Do not restate "
+    "the question, add background context, or enumerate details the user didn't "
+    "ask for. If the user wants more detail, they will ask a follow-up. "
+    "Exception: if the question is explicitly comparative, aggregative, or asks "
+    "for a list ('which courses...', 'what are all...'), return the full list. "
+    "If prior conversation turns are included, use them to interpret the user's "
+    "current question (resolve references like 'that', 'it', 'the same course'), "
+    "but still ground your answer in the files — do not recycle a prior answer "
+    "without checking the current files. "
     "In `sources_used`, include only the exact file paths (copied verbatim from the "
     "'--- File N: <path> ---' headers) that your answer actually depends on. "
     "Do not list files you consulted but did not actually use. "
@@ -87,11 +97,17 @@ async def answer_question(
     agent: Agent[None, Answer],
     question: str,
     file_paths: Sequence[str | Path],
+    history: list[tuple[str, str]] | None = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
     Missing or unreadable files are skipped with a stderr warning. If *every*
     path is unusable, raises SummarizeError.
+
+    If `history` is provided (list of (question, answer) tuples from prior
+    turns), it's prepended to the message so the model can resolve references
+    like 'it' or 'the same course'. The model is still instructed to ground
+    its answer in the current files, not recycle prior answers.
     """
     if not question.strip():
         raise ValueError("question is empty")
@@ -129,11 +145,21 @@ async def answer_question(
         raise SummarizeError("no files could be read (all were unsupported or empty)")
 
     # Assemble the chat message
-    message: list = [
-        f"Question: {question}\n\n"
-        "Answer the question strictly from the files below. "
-        "Cite the exact file paths (from the '--- File N: <path> ---' headers) in `sources_used`."
-    ]
+    intro_parts: list[str] = []
+    if history:
+        intro_parts.append("Previous conversation turns:")
+        for i, (q, a) in enumerate(history, 1):
+            intro_parts.append(f"[Turn {i}] Q: {q}")
+            intro_parts.append(f"[Turn {i}] A: {a}")
+        intro_parts.append("")
+    intro_parts.append(f"Current question: {question}")
+    intro_parts.append("")
+    intro_parts.append(
+        "Answer the current question strictly from the files below. "
+        "Cite the exact file paths (from the '--- File N: <path> ---' headers) "
+        "in `sources_used`."
+    )
+    message: list = ["\n".join(intro_parts)]
     for i, (display, blocks) in enumerate(per_file_blocks, 1):
         message.append(f"\n--- File {i}: {display} ---")
         message.extend(blocks)

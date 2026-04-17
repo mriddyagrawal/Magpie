@@ -25,20 +25,51 @@ from src.stage2.parser import ParsedSummary
 
 COLLECTION_NAME = "summaries"
 
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_DEFAULT_LOCAL_PATH = _REPO_ROOT / "qdrant_data"
+
 _client: QdrantClient | None = None
 
 
 def get_qdrant_client() -> QdrantClient:
-    """Return a cached Qdrant Cloud client, reading credentials from env vars."""
+    """Return a cached Qdrant client.
+
+    Selected by `QDRANT_PROVIDER` env var (default: ``cloud``):
+
+    - ``cloud``   — remote Qdrant Cloud cluster via HTTPS + API key. Requires
+                    ``QDRANT_CLUSTER_ENDPOINT`` and ``QDRANT_API_KEY``.
+    - ``local``   — embedded Qdrant persisted to a local directory. No server,
+                    no network. Directory path is taken from
+                    ``QDRANT_LOCAL_PATH`` (default: ``./qdrant_data`` at the
+                    repo root). Data persists across runs; delete the folder
+                    to wipe the index.
+    """
     global _client
     if _client is not None:
         return _client
+
+    provider = os.environ.get("QDRANT_PROVIDER", "cloud").strip().lower()
+
+    if provider == "local":
+        path = Path(os.environ.get("QDRANT_LOCAL_PATH") or _DEFAULT_LOCAL_PATH)
+        if not path.is_absolute():
+            path = _REPO_ROOT / path
+        path.mkdir(parents=True, exist_ok=True)
+        _client = QdrantClient(path=str(path))
+        return _client
+
+    if provider != "cloud":
+        sys.exit(
+            f"error: QDRANT_PROVIDER={provider!r} is unknown. "
+            f"Valid values: cloud, local."
+        )
 
     url = os.environ.get("QDRANT_CLUSTER_ENDPOINT")
     api_key = os.environ.get("QDRANT_API_KEY")
     if not url or not api_key:
         sys.exit(
-            "error: QDRANT_CLUSTER_ENDPOINT and QDRANT_API_KEY must be set in .env"
+            "error: QDRANT_CLUSTER_ENDPOINT and QDRANT_API_KEY must be set in .env "
+            "(or set QDRANT_PROVIDER=local to use embedded Qdrant)."
         )
 
     _client = QdrantClient(url=url, api_key=api_key)

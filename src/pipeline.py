@@ -95,7 +95,7 @@ DEFAULT_SOURCE_DIR = "Test Content"
 async def sync_files(
     source_dir: Path | str | None = None,
     *,
-    concurrency: int = 6,
+    concurrency: int = 1,
     force_summarize: bool = False,
     force_ingest: bool = False,
 ) -> None:
@@ -138,7 +138,7 @@ async def sync_files(
 def sync_files_sync(
     source_dir: Path | str | None = None,
     *,
-    concurrency: int = 6,
+    concurrency: int = 1,
     force_summarize: bool = False,
     force_ingest: bool = False,
 ) -> None:

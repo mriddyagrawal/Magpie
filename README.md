@@ -76,6 +76,29 @@ A few decisions shape the whole system:
 - An always-on background daemon. You run sync when you want the index refreshed.
 - A replacement for full-text search over every file on your disk. It's scoped to the folders you point it at.
 
+## LLM backends
+
+Three interchangeable providers, selected via the `LLM_PROVIDER` environment variable. Flipping the variable is all it takes to swap — no code changes, no re-indexing. Prompts, schemas, and retrieval logic are identical across all three.
+
+- **`moonshot`** *(default)* — Moonshot Kimi via their OpenAI-compatible API. Vision-capable, structured output via native JSON mode.
+- **`openrouter`** — OpenRouter gateway. Any model they front (Gemma, Claude, GPT, Llama, etc.) works; same OpenAI-compatible protocol.
+- **`local`** — On-device inference via `mlx-vlm` on Apple Silicon. Defaults to `mlx-community/gemma-3n-E2B-it-4bit` (~2GB, fits comfortably on an 8GB machine). No API key, no network calls for inference. Files never leave the machine.
+
+The cloud providers rely on native structured output (the model is constrained to emit valid JSON matching the schema). The local provider has no equivalent mechanism, so structured output goes through a repair pipeline — direct parse, strip markdown fences, extract a JSON object by brace match, fall back to a minimal valid structure on hard failures. The pipeline never crashes on a malformed response.
+
+### Local inference (Apple Silicon)
+
+When `LLM_PROVIDER=local`:
+
+- **Requirements**: Apple Silicon Mac, macOS, ~4GB free disk (~2GB model + runtime), 8GB+ RAM.
+- **First run**: the model downloads automatically from Hugging Face on first use (~2GB for E2B, ~4GB for E4B). Subsequent runs load from the local HF cache in ~10-20 seconds.
+- **Latency**: ~2-6s per text call, 4-12s per image-bearing call. Noticeably slower than cloud, but bounded and predictable.
+- **Concurrency**: keep `--concurrency 1` for `ns --sync`. Local inference is single-GPU; parallel workers contend for the same hardware and increase memory pressure without throughput benefit. Cloud providers with generous rate limits can handle more.
+- **More memory available?** On 16GB+ Macs, switch to the larger `mlx-community/gemma-3n-E4B-it-4bit` (~4GB) for better quality: `LOCAL_MODEL=mlx-community/gemma-3n-E4B-it-4bit` in `.env`.
+- **Quality caveat**: Gemma 3n E2B/E4B are small models. Summaries may be less detailed and rewritten queries less precise than what cloud models produce. The repair layer keeps the pipeline running, but expect noisier output until prompts are tuned specifically for local inference. That tuning is deliberately out of scope for the initial port.
+
+Run `ns` the same way regardless of provider. Only `.env` changes.
+
 ## Provenance and test corpus
 
 The project is developed against a mix of test content to stress different parts of the pipeline:

@@ -11,6 +11,7 @@ src/content.py
 src/llm.py
 src/manifest.py
 src/pipeline.py
+src/split_courses.py
 src/stage1/__init__.py
 src/stage1/summarize.py
 src/stage2/__init__.py
@@ -20,3 +21,4 @@ src/stage2/embeddings.py
 src/stage2/parser.py
 src/stage2/search.py
 tests/test_manifest.py
+tests/test_mlx_smoke.py

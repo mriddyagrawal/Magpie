@@ -25,7 +25,6 @@ from typing import Literal
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, NativeOutput
 
 from src.content import (
     IMAGE_EXTS,
@@ -33,7 +32,7 @@ from src.content import (
     SummarizeError,
     build_content_blocks,
 )
-from src.llm import build_chat_model
+from src.llm import ChatAgent, active_provider, build_agent as _build_chat_agent
 from src.manifest import Manifest
 
 
@@ -101,13 +100,39 @@ SYSTEM_PROMPT = (
 )
 
 
-def build_agent() -> Agent[None, FileSummary]:
-    return Agent(
-        build_chat_model(),
-        output_type=NativeOutput(FileSummary),
-        system_prompt=SYSTEM_PROMPT,
-        retries=3,
-    )
+LOCAL_SYSTEM_PROMPT = """You are a file analyzer. Given a file's content, output a JSON object describing what the file is and the details someone might use to find it later via keyword search.
+
+The JSON MUST have exactly these keys (and only these keys):
+- title (string, <=80 chars)
+- summary (string, 3-7 sentences of natural prose)
+- content_type (one of: "image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other")
+- keywords (list of 3-10 topical words)
+- key_entities (list of named entities: people, organisations, places, products, branches — copied verbatim from the file)
+- identifiers (list of exact tokens that uniquely distinguish this file: numeric IDs, dates in their ORIGINAL format, SKUs, version strings, exact prices with currency, URLs — copied verbatim)
+
+EXAMPLE:
+Input:
+Filename: flight-receipt.pdf
+Content type: pdf
+Delta Airlines - Flight Receipt
+Passenger: Jane Doe
+Flight DL1492, Atlanta ATL -> Hartford BDL, 25 May 2022
+Confirmation code: ABC123
+Total charged: $247.50
+
+Output:
+{"title": "Delta flight DL1492 Atlanta to Hartford - Jane Doe", "summary": "Delta Airlines flight receipt for passenger Jane Doe. Flight DL1492 from Atlanta ATL to Hartford BDL on 25 May 2022. Confirmation code ABC123. Total charged: $247.50.", "content_type": "pdf", "keywords": ["flight", "receipt", "airline", "delta", "travel"], "key_entities": ["Delta Airlines", "Jane Doe", "Atlanta ATL", "Hartford BDL"], "identifiers": ["DL1492", "25 May 2022", "ABC123", "$247.50"]}
+
+Now analyze the file below. Return ONLY the JSON object - no markdown fences, no code blocks, no commentary. Start with { and end with }."""
+
+
+def build_agent() -> ChatAgent[FileSummary]:
+    # No fallback — hard-fail on parse errors so the file is skipped cleanly
+    # (matches cloud behavior). The next `ns --sync` will retry it.
+    # Cloud providers use PydanticAI's NativeOutput which enforces the schema
+    # natively; local Gemma 3n needs a few-shot example to stay in JSON mode.
+    prompt = LOCAL_SYSTEM_PROMPT if active_provider().name == "local" else SYSTEM_PROMPT
+    return _build_chat_agent(prompt, FileSummary, None)
 
 
 def build_user_message(path: Path) -> list:
@@ -215,14 +240,23 @@ def bootstrap_manifest_from_existing(manifest) -> int:
 MAX_429_RETRIES = 6
 
 
-async def _run_with_retry(agent: Agent[None, FileSummary], message: list, label: str):
-    """Call agent.run() with automatic retry + backoff on 429 rate-limit errors."""
-    from pydantic_ai.exceptions import ModelHTTPError
+async def _run_with_retry(agent: ChatAgent[FileSummary], message: list, label: str) -> FileSummary:
+    """Call agent.run() with automatic retry + backoff on 429 rate-limit errors.
+
+    Only meaningful for cloud providers (ModelHTTPError never raised by local).
+    For local, the loop runs once and returns successfully.
+    """
+    try:
+        from pydantic_ai.exceptions import ModelHTTPError
+    except ImportError:  # pragma: no cover — pydantic_ai is always installed
+        ModelHTTPError = None  # type: ignore[assignment]
 
     for attempt in range(1, MAX_429_RETRIES + 1):
         try:
             return await agent.run(message)
-        except ModelHTTPError as e:
+        except Exception as e:
+            if ModelHTTPError is None or not isinstance(e, ModelHTTPError):
+                raise
             if e.status_code != 429 or attempt == MAX_429_RETRIES:
                 raise
             # Try to parse retryDelay from the response body; fall back to exponential backoff.
@@ -242,7 +276,7 @@ async def _run_with_retry(agent: Agent[None, FileSummary], message: list, label:
 
 
 async def summarize_one(
-    agent: Agent[None, FileSummary],
+    agent: ChatAgent[FileSummary],
     path: Path,
     source_rel: str,
     old_summary_rel: str | None,
@@ -253,16 +287,25 @@ async def summarize_one(
     We don't delete inside this function because a failure (API 429, etc.)
     must not leave the filesystem in a state that disagrees with the manifest.
     """
+    from src.llm import JSONParseError
+
     digest = await asyncio.to_thread(hash_file, path)
     out_path = SUMMARIES_DIR / f"{digest}.md"
     message = await asyncio.to_thread(build_user_message, path)
-    result = await _run_with_retry(agent, message, path.name)
-    await asyncio.to_thread(write_summary_at, out_path, result.output, source_rel)
+    try:
+        summary = await _run_with_retry(agent, message, path.name)
+    except JSONParseError as e:
+        # Re-raise as SummarizeError so worker() prints a "skip:" line and
+        # leaves the manifest untouched — next sync will retry.
+        raise SummarizeError(
+            f"model output could not be parsed into FileSummary for {path.name}"
+        ) from e
+    await asyncio.to_thread(write_summary_at, out_path, summary, source_rel)
 
     new_summary_rel = str(out_path.relative_to(REPO_ROOT))
     if old_summary_rel and old_summary_rel != new_summary_rel:
         await asyncio.to_thread(_delete_summary_file, old_summary_rel)
-    return result.output, new_summary_rel
+    return summary, new_summary_rel
 
 
 def find_supported_files(root: Path) -> list[Path]:
@@ -273,12 +316,18 @@ def find_supported_files(root: Path) -> list[Path]:
 
 
 async def run_batch(
-    agent: Agent[None, FileSummary],
+    agent: ChatAgent[FileSummary],
     root: Path,
     force: bool,
     concurrency: int,
 ) -> None:
     from tqdm import tqdm
+
+    # Pre-load the local model before the tqdm bar starts so the 20-30s
+    # Gemma load doesn't look like "stuck on first file."
+    if active_provider().name == "local":
+        from src.llm import get_model
+        get_model()
 
     manifest = Manifest()
     bootstrapped = bootstrap_manifest_from_existing(manifest)
@@ -417,8 +466,8 @@ def main() -> None:
     parser.add_argument("path", help="File or directory to summarize.")
     parser.add_argument("--force", action="store_true",
                         help="Re-summarize every file, ignoring the manifest.")
-    parser.add_argument("--concurrency", type=int, default=3,
-                        help="Max files summarized in parallel during batch mode (default: 3).")
+    parser.add_argument("--concurrency", type=int, default=1,
+                        help="Max files summarized in parallel during batch mode (default: 1).")
     args = parser.parse_args()
 
     path = Path(args.path)

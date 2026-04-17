@@ -5,10 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, NativeOutput
 from qdrant_client.models import FusionQuery, Prefetch, SparseVector
 
-from src.llm import build_chat_model
+from src.llm import ChatAgent, build_agent
 from src.stage2.db import COLLECTION_NAME, get_qdrant_client
 from src.stage2.embeddings import embed_dense_query, embed_sparse_query
 
@@ -44,16 +43,14 @@ REWRITE_SYSTEM_PROMPT = (
 )
 
 
-_rewrite_agent: Agent[None, SearchQuery] | None = None
+_REWRITE_FALLBACK = SearchQuery(query="", keywords=[])
 
 
-def _build_rewrite_agent() -> Agent[None, SearchQuery]:
-    return Agent(
-        build_chat_model(),
-        output_type=NativeOutput(SearchQuery),
-        system_prompt=REWRITE_SYSTEM_PROMPT,
-        retries=3,
-    )
+_rewrite_agent: ChatAgent[SearchQuery] | None = None
+
+
+def _build_rewrite_agent() -> ChatAgent[SearchQuery]:
+    return build_agent(REWRITE_SYSTEM_PROMPT, SearchQuery, _REWRITE_FALLBACK)
 
 
 def _build_rewrite_prompt(
@@ -75,7 +72,7 @@ def rewrite_query(
     question: str,
     history: list[tuple[str, str]] | None = None,
 ) -> SearchQuery:
-    """Send a raw user question to Kimi and get back a structured SearchQuery.
+    """Send a raw user question to the LLM and get back a structured SearchQuery.
 
     If `history` is provided (list of (question, answer) tuples from prior turns),
     prepend it as context so the rewriter can resolve references like 'it',
@@ -84,8 +81,11 @@ def rewrite_query(
     global _rewrite_agent
     if _rewrite_agent is None:
         _rewrite_agent = _build_rewrite_agent()
-    result = _rewrite_agent.run_sync(_build_rewrite_prompt(question, history))
-    return result.output
+    sq = _rewrite_agent.run_sync([_build_rewrite_prompt(question, history)])
+    # Fallback tweak: if parse failed, empty `query` is unhelpful; substitute the raw question.
+    if not sq.query:
+        sq = SearchQuery(query=question, keywords=sq.keywords)
+    return sq
 
 
 async def rewrite_query_async(
@@ -96,8 +96,10 @@ async def rewrite_query_async(
     global _rewrite_agent
     if _rewrite_agent is None:
         _rewrite_agent = _build_rewrite_agent()
-    result = await _rewrite_agent.run(_build_rewrite_prompt(question, history))
-    return result.output
+    sq = await _rewrite_agent.run([_build_rewrite_prompt(question, history)])
+    if not sq.query:
+        sq = SearchQuery(query=question, keywords=sq.keywords)
+    return sq
 
 
 # ---------------------------------------------------------------------------

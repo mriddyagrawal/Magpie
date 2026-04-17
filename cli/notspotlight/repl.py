@@ -313,11 +313,12 @@ def main() -> None:
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=6,
+        default=1,
         metavar="N",
         help=(
-            "Parallel LLM calls during --sync (default: 6). "
-            "Drop to 1 or 2 for rate-limited providers (e.g. Gemma free tier on OpenRouter)."
+            "Parallel LLM calls during --sync (default: 1). "
+            "Raise for cloud providers with ample rate limits; keep at 1 for "
+            "LLM_PROVIDER=local (single-GPU inference) or rate-limited cloud tiers."
         ),
     )
     parser.add_argument(

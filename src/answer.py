@@ -20,10 +20,9 @@ from typing import Sequence
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, NativeOutput
 
 from src.content import SummarizeError, build_content_blocks
-from src.llm import build_chat_model
+from src.llm import ChatAgent, build_agent
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -70,13 +69,14 @@ SYSTEM_PROMPT = (
 )
 
 
-def build_answer_agent() -> Agent[None, Answer]:
-    return Agent(
-        build_chat_model(),
-        output_type=NativeOutput(Answer),
-        system_prompt=SYSTEM_PROMPT,
-        retries=3,
-    )
+_ANSWER_FALLBACK = Answer(
+    answer="(model output could not be parsed into Answer)",
+    sources_used=[],
+)
+
+
+def build_answer_agent() -> ChatAgent[Answer]:
+    return build_agent(SYSTEM_PROMPT, Answer, _ANSWER_FALLBACK)
 
 
 def _resolve(p: str | Path) -> Path:
@@ -94,7 +94,7 @@ def _display_path(abs_path: Path) -> str:
 
 
 async def answer_question(
-    agent: Agent[None, Answer],
+    agent: ChatAgent[Answer],
     question: str,
     file_paths: Sequence[str | Path],
     history: list[tuple[str, str]] | None = None,
@@ -164,8 +164,7 @@ async def answer_question(
         message.append(f"\n--- File {i}: {display} ---")
         message.extend(blocks)
 
-    result = await agent.run(message)
-    ans = result.output
+    ans = await agent.run(message)
 
     # Defensive: drop any path the model invented that wasn't in our input
     input_paths = {display for display, _ in per_file_blocks}
@@ -178,7 +177,7 @@ async def answer_question(
 
 
 def answer_question_sync(
-    agent: Agent[None, Answer],
+    agent: ChatAgent[Answer],
     question: str,
     file_paths: Sequence[str | Path],
 ) -> Answer:

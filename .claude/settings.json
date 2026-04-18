@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//mnt/hardisk/Project-Democratize-Furman-Information/videos/**)"
+    ]
+  }
+}

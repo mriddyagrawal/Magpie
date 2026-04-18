@@ -25,6 +25,7 @@ CSV_EXTS = {".csv"}
 PDF_EXTS = {".pdf"}
 DOCX_EXTS = {".docx"}
 XLSX_EXTS = {".xlsx", ".xlsm"}
+ALT_EXTS = {".alt"}
 
 PDF_VISION_DPI = 150
 
@@ -38,6 +39,9 @@ SUPPORTED_EXTS = (
     | TEXT_EXTS
     | CODE_EXTS
 )
+# `.alt` is handled by `build_content_blocks` at answer time, but is deliberately
+# NOT in SUPPORTED_EXTS — Stage 1's walker should skip .alt so it doesn't try to
+# LLM-summarize them. Stage 3 owns .alt discovery and ingest.
 
 
 class SummarizeError(RuntimeError):
@@ -196,5 +200,18 @@ def build_content_blocks(
         except UnicodeDecodeError as e:
             raise SummarizeError(f"file is not valid UTF-8 text: {path}") from e
         return [f"Content type: {ctype}\n\n---\n{text[:max_chars]}"]
+
+    if ext in ALT_EXTS:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as e:
+            raise SummarizeError(f"file is not valid UTF-8 text: {path}") from e
+        if not text.strip():
+            raise SummarizeError(f"alt file appears empty: {path}")
+        return [
+            "Content type: alt (structured sidecar for a too-large source "
+            "file — treat this YAML as the authoritative content; the "
+            "referenced binary is not loaded).\n\n---\n" + text[:max_chars]
+        ]
 
     raise SummarizeError(f"unsupported file type '{ext}' for {path}")

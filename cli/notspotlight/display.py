@@ -26,7 +26,7 @@ def file_link(rel_path: str) -> str:
     return f"[link=file://{abs_path}]{rel_path}[/link]"
 
 
-SUGGESTIONS = [
+FALLBACK_SUGGESTIONS = [
     "How much was the flight to Hartford?",
     "What is Plato's education system for philosopher rulers?",
     "How much did the DS/ML club spend on hackathons?",
@@ -38,7 +38,10 @@ SUGGESTIONS = [
 def print_banner() -> None:
     from src.llm import active_model_name, active_provider
 
-    suggestions = "\n".join(f"  [dim italic]{s}[/dim italic]" for s in SUGGESTIONS)
+    from notspotlight.suggestions import load_suggestions
+
+    qs = load_suggestions() or FALLBACK_SUGGESTIONS
+    suggestions = "\n".join(f"  [dim italic]{s}[/dim italic]" for s in qs)
     provider = active_provider().name
     model = active_model_name()
     console.print(
@@ -53,6 +56,17 @@ def print_banner() -> None:
     )
 
 
+def print_suggestions(questions: list[str]) -> None:
+    """Render a fresh list of question hints (used by the .suggest command)."""
+    body = "\n".join(f"  [dim italic]{q}[/dim italic]" for q in questions)
+    console.print(
+        Panel(
+            f"[bold]Try asking:[/bold]\n{body}",
+            border_style="blue",
+        )
+    )
+
+
 def print_help() -> None:
     table = Table(show_header=False, box=None, padding=(0, 2))
     table.add_column(style="bold cyan")
@@ -61,6 +75,7 @@ def print_help() -> None:
     table.add_row(".rewrite on/off", "Toggle Kimi query rewriting (default: off)")
     table.add_row(".history on/off/clear", "Send prior Q&A to the rewriter (needs .rewrite on)")
     table.add_row(".top-k N", "Set number of results to retrieve")
+    table.add_row(".suggest [refresh]", "Show question hints (add 'refresh' to regenerate)")
     table.add_row(".clear", "Clear the screen")
     table.add_row("exit / quit / Ctrl+D", "Exit")
     console.print(table)

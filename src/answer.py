@@ -79,8 +79,17 @@ def build_answer_agent() -> ChatAgent[Answer]:
     return build_agent(SYSTEM_PROMPT, Answer, _ANSWER_FALLBACK)
 
 
+def _strip_fragment(p: str) -> str:
+    """Remove any '#...' fragment (e.g. '#scene:00:20') from a source path.
+
+    Stage 3 uses fragments on `.alt` source paths to give per-scene Qdrant
+    points unique IDs. The answer step only needs the underlying file.
+    """
+    return p.split("#", 1)[0]
+
+
 def _resolve(p: str | Path) -> Path:
-    path = Path(p)
+    path = Path(_strip_fragment(str(p)))
     if not path.is_absolute():
         path = REPO_ROOT / path
     return path
@@ -114,10 +123,17 @@ async def answer_question(
     if not file_paths:
         raise SummarizeError("no file paths provided")
 
-    # Resolve + filter
+    # Resolve + filter. Dedup on the post-fragment-strip path so multiple
+    # retrieval hits at different `#scene:...` fragments of the same .alt
+    # collapse to a single file read.
     valid: list[tuple[str, Path]] = []
+    seen: set[str] = set()
     for p in file_paths:
         abs_path = _resolve(p)
+        key = str(abs_path)
+        if key in seen:
+            continue
+        seen.add(key)
         if not abs_path.is_file():
             print(f"  warn: skipping missing file: {p}", file=sys.stderr)
             continue

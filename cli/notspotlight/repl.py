@@ -30,6 +30,7 @@ from notspotlight.display import (
     print_help,
     print_result,
     print_setting,
+    print_suggestions,
 )
 
 HISTORY_FILE = Path.home() / ".notspotlight_history"
@@ -89,6 +90,26 @@ def _handle_dot_command(cmd: str) -> bool:
                     print_error("usage: .top-k N (integer)")
         case ".clear":
             console.clear()
+        case ".suggest":
+            import asyncio
+
+            from notspotlight.suggestions import force_regenerate, load_suggestions
+
+            if len(parts) > 1 and parts[1] in ("refresh", "new", "regen"):
+                with console.status("[bold blue]  ◦ Regenerating suggestions...", spinner="dots"):
+                    qs = asyncio.run(force_regenerate())
+                if not qs:
+                    print_error("could not generate suggestions (empty library or LLM failure)")
+                    return True
+            else:
+                qs = load_suggestions()
+                if not qs:
+                    print_error(
+                        "no suggestions cached yet — run `ns --sync` first, "
+                        "or `.suggest refresh` to force-generate now"
+                    )
+                    return True
+            print_suggestions(qs)
         case _:
             print_error(f"unknown command: {parts[0]}  (type .help)")
     return True
@@ -222,10 +243,22 @@ def _cmd_sync(source_dir: str | None, concurrency: int) -> int:
         sync_files_sync(source_dir, concurrency=concurrency)
         elapsed = time.monotonic() - t0
         console.print(f"\n[green]✓ Sync complete[/green] [dim]({elapsed:.1f}s)[/dim]\n")
-        return 0
     except Exception as e:
         print_error(f"sync failed: {type(e).__name__}: {e}")
         return 1
+
+    # Best-effort: refresh REPL question hints if the library changed.
+    import asyncio
+
+    from notspotlight.suggestions import regenerate_if_stale
+    from src.manifest import Manifest
+
+    try:
+        with console.status("[bold blue]Refreshing question hints...", spinner="dots"):
+            asyncio.run(regenerate_if_stale(len(Manifest().entries)))
+    except Exception as e:
+        console.print(f"[yellow]suggestion refresh skipped: {type(e).__name__}: {e}[/yellow]")
+    return 0
 
 
 def _cmd_reset(assume_yes: bool) -> int:

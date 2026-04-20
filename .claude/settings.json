@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Read(//mnt/hardisk/Project-Democratize-Furman-Information/videos/**)"
+      "Read(//mnt/hardisk/Project-Democratize-Furman-Information/videos/**)",
+      "Bash(gh repo *)"
     ]
   }
 }

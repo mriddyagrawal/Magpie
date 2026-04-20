@@ -35,6 +35,23 @@ FALLBACK_SUGGESTIONS = [
 ]
 
 
+def _fast_tier_line() -> str:
+    """Best-effort detection of the fast-tier model + device for the banner.
+
+    Runs at REPL start, so we shield against torch import failures (e.g.
+    torch not yet installed in a mid-setup state) and just omit the line.
+    """
+    try:
+        from src.stage1_fast.device import detect_device
+        cfg = detect_device()
+        return (
+            f"[dim]Fast tier:[/dim] [cyan]{cfg.model_id}[/cyan] "
+            f"[dim]on {cfg.device} ({cfg.dtype}, batch {cfg.batch_size})[/dim]"
+        )
+    except Exception:  # pylint: disable=broad-except
+        return "[dim]Fast tier:[/dim] [yellow](not available)[/yellow]"
+
+
 def print_banner() -> None:
     from src.llm import active_model_name, active_provider
 
@@ -47,7 +64,8 @@ def print_banner() -> None:
     console.print(
         Panel(
             "[bold]NotAnotherSpotlight[/bold]  v0.1.0\n"
-            f"[dim]Model:[/dim] [cyan]{model}[/cyan] [dim](via {provider})[/dim]\n"
+            f"[dim]Answer model:[/dim] [cyan]{model}[/cyan] [dim](via {provider})[/dim]\n"
+            f"{_fast_tier_line()}\n"
             "Type your question and press Enter. Type [bold].help[/bold] for commands.\n\n"
             "[bold]Try asking:[/bold]\n"
             f"{suggestions}",
@@ -88,9 +106,17 @@ def print_result(result: PipelineResult) -> None:
         table = Table(title="Retrieved Documents", border_style="dim")
         table.add_column("#", style="dim", width=3)
         table.add_column("Score", width=7)
+        table.add_column("Tier", width=8)
         table.add_column("Path")
+        tier_color = {"summary": "green", "fast": "magenta", "both": "cyan"}
         for i, r in enumerate(result.retrieved, 1):
-            table.add_row(str(i), f"{r.score:.3f}", file_link(r.path))
+            color = tier_color.get(r.tier, "white")
+            table.add_row(
+                str(i),
+                f"{r.score:.3f}",
+                f"[{color}]{r.tier}[/{color}]",
+                file_link(r.path),
+            )
         console.print(table)
         console.print()
 

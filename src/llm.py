@@ -61,8 +61,22 @@ PROVIDERS: dict[str, ProviderConfig] = {
         api_key_env="OPENROUTER_API_KEY",
         model_env="OPENROUTER_MODEL",
         base_url_env="OPENROUTER_BASE_URL",
-        default_model="google/gemma-4-26b-a4b-it:free",
+        # Gemini 2.0 Flash on the free tier: vision-capable, structured output
+        # support works well with pydantic-ai, ~20 RPM quota.
+        default_model="google/gemini-2.0-flash-exp:free",
         default_base_url="https://openrouter.ai/api/v1",
+    ),
+    # Local Ollama daemon on Linux / Windows / Intel-Mac (anything with
+    # an OpenAI-compatible local server). No API key needed — the daemon
+    # ignores auth. Default model is a 3B vision-capable Qwen that fits
+    # alongside ColPali on a 6 GB GPU.
+    "ollama": ProviderConfig(
+        name="ollama",
+        api_key_env="OLLAMA_API_KEY",
+        model_env="OLLAMA_MODEL",
+        base_url_env="OLLAMA_BASE_URL",
+        default_model="qwen2.5vl:3b",
+        default_base_url="http://localhost:11434/v1",
     ),
     "local": ProviderConfig(
         name="local",
@@ -77,7 +91,7 @@ PROVIDERS: dict[str, ProviderConfig] = {
 
 def active_provider() -> ProviderConfig:
     """Return the `ProviderConfig` pointed at by the current `LLM_PROVIDER`."""
-    name = os.environ.get("LLM_PROVIDER", "moonshot").strip().lower()
+    name = os.environ.get("LLM_PROVIDER", "openrouter").strip().lower()
     if name not in PROVIDERS:
         sys.exit(
             f"error: LLM_PROVIDER={name!r} is unknown. "
@@ -110,10 +124,15 @@ def build_chat_model() -> OpenAIChatModel:
         )
     api_key = os.environ.get(cfg.api_key_env)
     if not api_key:
-        sys.exit(
-            f"error: {cfg.api_key_env} not set for provider {cfg.name!r} "
-            f"(put it in .env or change LLM_PROVIDER)"
-        )
+        # Ollama's local server ignores the Authorization header; we pass a
+        # placeholder so the OpenAI client doesn't refuse to send the request.
+        if cfg.name == "ollama":
+            api_key = "ollama"
+        else:
+            sys.exit(
+                f"error: {cfg.api_key_env} not set for provider {cfg.name!r} "
+                f"(put it in .env or change LLM_PROVIDER)"
+            )
     model = os.environ.get(cfg.model_env, cfg.default_model)
     base_url = os.environ.get(cfg.base_url_env, cfg.default_base_url)
     client = AsyncOpenAI(api_key=api_key, base_url=base_url, max_retries=API_MAX_RETRIES)

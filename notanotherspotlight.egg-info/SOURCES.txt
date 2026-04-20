@@ -15,10 +15,17 @@ src/pipeline.py
 src/split_courses.py
 src/stage1/__init__.py
 src/stage1/summarize.py
+src/stage1_fast/__init__.py
+src/stage1_fast/__main__.py
+src/stage1_fast/device.py
+src/stage1_fast/index.py
+src/stage1_fast/model.py
+src/stage1_fast/router.py
 src/stage2/__init__.py
 src/stage2/__main__.py
 src/stage2/db.py
 src/stage2/embeddings.py
+src/stage2/fast_db.py
 src/stage2/parser.py
 src/stage2/search.py
 src/stage3/__init__.py

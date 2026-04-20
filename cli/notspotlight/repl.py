@@ -19,6 +19,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from dotenv import load_dotenv
 from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import FileHistory
 from rich.console import Console
 
@@ -34,6 +35,36 @@ from notspotlight.display import (
 )
 
 HISTORY_FILE = Path.home() / ".notspotlight_history"
+
+# Dot-command menu shown when user starts their input with "."
+DOT_COMMANDS: list[tuple[str, str]] = [
+    (".help", "Show help"),
+    (".rewrite", "Toggle Kimi query rewriting (on/off)"),
+    (".history", "Toggle conversation history (on/off/clear)"),
+    (".top-k", "Set number of results to retrieve"),
+    (".suggest", "Show question hints (add 'refresh' to regenerate)"),
+    (".clear", "Clear the screen"),
+]
+
+
+class DotCommandCompleter(Completer):
+    """Suggests dot-commands only when the user's input starts with a dot.
+
+    Keeps the completion dropdown from shadowing normal question typing —
+    the dropdown only appears once the user has typed the leading `.`.
+    """
+
+    def get_completions(self, document, complete_event):
+        text = document.text_before_cursor
+        if not text.startswith("."):
+            return
+        for cmd, meta in DOT_COMMANDS:
+            if cmd.startswith(text):
+                yield Completion(
+                    cmd,
+                    start_position=-len(text),
+                    display_meta=meta,
+                )
 
 # Session state
 _rewrite = False
@@ -175,9 +206,18 @@ async def _run_query_async(question: str) -> None:
     with console.status("[bold blue]  ◦ Searching Qdrant (dense + BM25 hybrid)...", spinner="dots"):
         retrieved = await asyncio.to_thread(run_search, sq, _top_k)
     _step("Qdrant searched", t0)
-    _detail("results", f"{len(retrieved)} documents")
+    tier_counts: dict[str, int] = {}
+    for r in retrieved:
+        tier_counts[r.tier] = tier_counts.get(r.tier, 0) + 1
+    tier_breakdown = ", ".join(f"{v} {k}" for k, v in sorted(tier_counts.items()))
+    _detail("results", f"{len(retrieved)} documents ({tier_breakdown})")
+    tier_color = {"summary": "green", "fast": "magenta", "both": "cyan"}
     for i, r in enumerate(retrieved[:3], 1):
-        _detail(f"  #{i}", f"[{r.score:.3f}] {file_link(r.path)}")
+        color = tier_color.get(r.tier, "white")
+        _detail(
+            f"  #{i}",
+            f"[{r.score:.3f}] [bold {color}]{r.tier}[/bold {color}] {file_link(r.path)}",
+        )
     if len(retrieved) > 3:
         _detail("", f"...and {len(retrieved) - 3} more")
 
@@ -226,21 +266,56 @@ def _run_query(question: str) -> None:
         print_error(str(e))
 
 
-def _cmd_sync(source_dir: str | None, concurrency: int) -> int:
-    """Summarize new/changed files and ingest them into Qdrant."""
+def _cmd_sync(
+    source_dir: str | None,
+    concurrency: int,
+    do_fast: bool = True,
+    do_summary: bool = True,
+    force_ingest: bool = False,
+) -> int:
+    """Run the two-tier sync: fast tier (ColPali) + summary tier (LLM)."""
     from src.llm import active_model_name, active_provider
     from src.pipeline import DEFAULT_SOURCE_DIR, sync_files_sync
 
     target = source_dir or DEFAULT_SOURCE_DIR
+    tiers = []
+    if do_fast:
+        tiers.append("fast")
+    if do_summary:
+        tiers.append("summary")
+    tiers_label = " + ".join(tiers) if tiers else "(nothing)"
+
     console.print(
         f"\n[bold blue]Syncing[/bold blue] [dim]{target}[/dim] "
-        f"[dim](concurrency={concurrency})[/dim] "
-        f"[dim]using[/dim] [cyan]{active_model_name()}[/cyan] "
-        f"[dim](via {active_provider().name})[/dim]\n"
+        f"[dim](tiers: {tiers_label}, concurrency={concurrency})[/dim]"
     )
+    if do_summary:
+        console.print(
+            f"[dim]Summary model:[/dim] [cyan]{active_model_name()}[/cyan] "
+            f"[dim](via {active_provider().name})[/dim]"
+        )
+    if do_fast:
+        try:
+            from src.stage1_fast.device import detect_device
+            cfg = detect_device()
+            console.print(
+                f"[dim]Fast tier:[/dim] [cyan]{cfg.model_id}[/cyan] "
+                f"[dim](on {cfg.device}, {cfg.dtype})[/dim]"
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            console.print(f"[yellow]fast-tier model unavailable: {e}[/yellow]")
+            do_fast = False
+    console.print()
+
     try:
         t0 = time.monotonic()
-        sync_files_sync(source_dir, concurrency=concurrency)
+        sync_files_sync(
+            source_dir,
+            concurrency=concurrency,
+            do_fast=do_fast,
+            do_summary=do_summary,
+            force_ingest=force_ingest,
+        )
         elapsed = time.monotonic() - t0
         console.print(f"\n[green]✓ Sync complete[/green] [dim]({elapsed:.1f}s)[/dim]\n")
     except Exception as e:
@@ -304,6 +379,8 @@ def _run_repl() -> None:
 
     session: PromptSession = PromptSession(
         history=FileHistory(str(HISTORY_FILE)),
+        completer=DotCommandCompleter(),
+        complete_while_typing=True,
     )
 
     while True:
@@ -355,6 +432,32 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--fast-only",
+        action="store_true",
+        help=(
+            "During --sync, run ONLY the ColPali fast tier (no LLM summaries). "
+            "Best for instant onboarding; no API cost."
+        ),
+    )
+    parser.add_argument(
+        "--summary-only",
+        action="store_true",
+        help=(
+            "During --sync, run ONLY the LLM summary tier (skip ColPali). "
+            "Use when no GPU is available or for debugging the legacy path."
+        ),
+    )
+    parser.add_argument(
+        "--reingest",
+        action="store_true",
+        help=(
+            "Force re-push of all summaries to Qdrant. Use after switching "
+            "Qdrant clusters, changing credentials, or if the collection was "
+            "dropped. Clears all `ingested_at` markers in the manifest and "
+            "recreates the `summaries` collection from scratch."
+        ),
+    )
+    parser.add_argument(
         "--reset",
         action="store_true",
         help="Delete all summaries, the manifest, and the Qdrant collection. Prompts to confirm.",
@@ -385,8 +488,17 @@ def main() -> None:
         sys.exit(_cmd_reset(assume_yes=args.yes))
 
     if args.sync is not None:
+        if args.fast_only and args.summary_only:
+            print_error("--fast-only and --summary-only are mutually exclusive")
+            sys.exit(2)
         # argparse gives us "" when --sync was passed with no argument.
-        sys.exit(_cmd_sync(source_dir=args.sync or None, concurrency=args.concurrency))
+        sys.exit(_cmd_sync(
+            source_dir=args.sync or None,
+            concurrency=args.concurrency,
+            do_fast=not args.summary_only,
+            do_summary=not args.fast_only,
+            force_ingest=args.reingest,
+        ))
 
     global _history_enabled, _rewrite
     if args.history:

@@ -48,6 +48,8 @@ class Entry:
     summarized_at: str = ""
     ingested_at: str | None = None
     row_count: int | None = None
+    fast_indexed_at: str | None = None  # set when the file lands in fast_tier
+    fast_pages: int | None = None        # page count indexed into fast_tier
 
 
 class Manifest:
@@ -126,3 +128,26 @@ class Manifest:
     def drop(self, rel_path: str) -> Entry | None:
         """Remove a row and return the dropped Entry (or None if it wasn't there)."""
         return self.entries.pop(rel_path, None)
+
+    # ---- fast-tier helpers ---------------------------------------------
+
+    def needs_fast_indexing(self, rel_path: str, current_size: int) -> bool:
+        """True if this file isn't yet in the fast tier, or its size changed."""
+        entry = self.entries.get(rel_path)
+        if entry is None or entry.fast_indexed_at is None:
+            return True
+        return entry.size != current_size
+
+    def mark_fast_indexed(self, rel_path: str, size: int, pages: int) -> None:
+        """Record a successful fast-tier indexing. Preserves any summary state."""
+        entry = self.entries.get(rel_path)
+        if entry is None:
+            self.entries[rel_path] = Entry(
+                size=size,
+                fast_indexed_at=_now_iso(),
+                fast_pages=pages,
+            )
+        else:
+            entry.size = size
+            entry.fast_indexed_at = _now_iso()
+            entry.fast_pages = pages

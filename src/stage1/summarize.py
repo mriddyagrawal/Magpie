@@ -320,6 +320,7 @@ async def run_batch(
     root: Path,
     force: bool,
     concurrency: int,
+    skip_fast_tier: bool = False,
 ) -> None:
     from tqdm import tqdm
 
@@ -334,6 +335,11 @@ async def run_batch(
     if bootstrapped:
         print(f"bootstrapped manifest from {bootstrapped} existing summary files")
     files = find_supported_files(root)
+    if skip_fast_tier:
+        # Don't double-process files the fast tier already covers (PDFs ≤50p,
+        # images). Routes are decided by `src.stage1_fast.router.route_file`.
+        from src.stage1_fast.router import route_file
+        files = [p for p in files if route_file(p) != "fast"]
     if not files:
         sys.exit(f"no supported files found under {root}")
 

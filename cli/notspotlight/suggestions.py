@@ -32,21 +32,37 @@ MAX_CHARS_PER_SUMMARY = 400
 class Suggestions(BaseModel):
     questions: list[str] = Field(
         description=(
-            f"Exactly {N_QUESTIONS} natural-language questions a user might "
-            "ask to locate files in this library. Each question must reference "
-            "at least one concrete detail (name, date, merchant, topic, or "
-            "identifier) from the provided summaries — not generic prompts."
+            f"Exactly {N_QUESTIONS} short, concrete retrieval-style prompts a "
+            "user would type to pull a specific piece of information out of "
+            "their files. Imperative or short-question form, not analytical."
         )
     )
 
 
 SYSTEM_PROMPT = (
     "You are a UX assistant for a local file-search product. Given a sample "
-    "of file summaries from a user's library, generate example questions the "
-    f"user might realistically ask to find these files. Produce exactly "
-    f"{N_QUESTIONS} diverse questions covering different files in the sample. "
-    "Each question must reference at least one concrete detail (a name, date, "
-    "merchant, topic, or identifier) so it's specific, not generic. "
+    "of file summaries from a user's library, generate example prompts the "
+    f"user might type to FETCH a specific piece of information. Produce "
+    f"exactly {N_QUESTIONS} diverse prompts covering different files.\n\n"
+    "Each prompt must be:\n"
+    "- SHORT (under ~12 words) and conversational, like a search query or DM\n"
+    "- CONCRETE — ask for a specific artifact: a code excerpt, an email "
+    "address, a phone number, a date, a total, a contact, a quote, a table "
+    "value, a step-by-step procedure\n"
+    "- Often imperative ('give me…', 'find the…', 'what's the…') not "
+    "analytical ('analyze…', 'summarize…', 'compare…')\n"
+    "- Anchored to one concrete detail copied from the summary (a name, "
+    "course code, merchant, topic) so it targets a specific file\n\n"
+    "Good examples:\n"
+    "- 'give me the code excerpt for hydrogen atom excitation'\n"
+    "- 'email for PAL student support'\n"
+    "- 'how much was the United Airlines flight?'\n"
+    "- 'what date is the CSC 105 final?'\n"
+    "- 'total on the Target receipt'\n\n"
+    "Bad examples (too abstract / analytical / long):\n"
+    "- 'What are the main themes across the physics assignments?'\n"
+    "- 'How does the author argue for X in the Plato reading?'\n"
+    "- 'Explain the methodology used in the simulation code'\n\n"
     "Output RAW JSON only — no markdown fences, no commentary."
 )
 

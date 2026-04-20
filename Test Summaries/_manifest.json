@@ -3,1575 +3,1575 @@
     "size": 104815,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:52Z",
+    "ingested_at": "2026-04-20T00:47:25Z",
     "row_count": 119
   },
   "Test Content/courses_by_dept/ACC.csv": {
     "size": 5408,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:53Z",
+    "ingested_at": "2026-04-20T00:47:25Z",
     "row_count": 13
   },
   "Test Content/courses_by_dept/AFS.csv": {
     "size": 3424,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:53Z",
+    "ingested_at": "2026-04-20T00:47:26Z",
     "row_count": 3
   },
   "Test Content/courses_by_dept/ANT.csv": {
     "size": 12849,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:53Z",
+    "ingested_at": "2026-04-20T00:47:26Z",
     "row_count": 24
   },
   "Test Content/courses_by_dept/ARB.csv": {
     "size": 399,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:53Z",
+    "ingested_at": "2026-04-20T00:47:26Z",
     "row_count": 2
   },
   "Test Content/courses_by_dept/ART.csv": {
     "size": 27432,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:54Z",
+    "ingested_at": "2026-04-20T00:47:26Z",
     "row_count": 58
   },
   "Test Content/courses_by_dept/AST.csv": {
     "size": 6719,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:54Z",
+    "ingested_at": "2026-04-20T00:47:26Z",
     "row_count": 14
   },
   "Test Content/courses_by_dept/BIO.csv": {
     "size": 26951,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:55Z",
+    "ingested_at": "2026-04-20T00:47:27Z",
     "row_count": 59
   },
   "Test Content/courses_by_dept/BUS.csv": {
     "size": 19099,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:56Z",
+    "ingested_at": "2026-04-20T00:47:27Z",
     "row_count": 38
   },
   "Test Content/courses_by_dept/CHM.csv": {
     "size": 16480,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:56Z",
+    "ingested_at": "2026-04-20T00:47:28Z",
     "row_count": 30
   },
   "Test Content/courses_by_dept/CHN.csv": {
     "size": 7408,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:56Z",
+    "ingested_at": "2026-04-20T00:47:28Z",
     "row_count": 20
   },
   "Test Content/courses_by_dept/CLS.csv": {
     "size": 9982,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:56Z",
+    "ingested_at": "2026-04-20T00:47:28Z",
     "row_count": 30
   },
   "Test Content/courses_by_dept/COM.csv": {
     "size": 19527,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:57Z",
+    "ingested_at": "2026-04-20T00:47:28Z",
     "row_count": 43
   },
   "Test Content/courses_by_dept/CSC.csv": {
     "size": 13705,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:57Z",
+    "ingested_at": "2026-04-20T00:47:29Z",
     "row_count": 36
   },
   "Test Content/courses_by_dept/DAN.csv": {
     "size": 2212,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:58Z",
+    "ingested_at": "2026-04-20T00:47:29Z",
     "row_count": 4
   },
   "Test Content/courses_by_dept/DSC.csv": {
     "size": 477,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:58Z",
+    "ingested_at": "2026-04-20T00:47:29Z",
     "row_count": 1
   },
   "Test Content/courses_by_dept/ECN.csv": {
     "size": 14130,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:58Z",
+    "ingested_at": "2026-04-20T00:47:29Z",
     "row_count": 31
   },
   "Test Content/courses_by_dept/EDU.csv": {
     "size": 25575,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:59Z",
+    "ingested_at": "2026-04-20T00:47:30Z",
     "row_count": 57
   },
   "Test Content/courses_by_dept/EES.csv": {
     "size": 15991,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:54:59Z",
+    "ingested_at": "2026-04-20T00:47:30Z",
     "row_count": 37
   },
   "Test Content/courses_by_dept/ENG.csv": {
     "size": 33703,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:00Z",
+    "ingested_at": "2026-04-20T00:47:31Z",
     "row_count": 67
   },
   "Test Content/courses_by_dept/EST.csv": {
     "size": 752,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:00Z",
+    "ingested_at": "2026-04-20T00:47:31Z",
     "row_count": 2
   },
   "Test Content/courses_by_dept/FRN.csv": {
     "size": 18853,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:00Z",
+    "ingested_at": "2026-04-20T00:47:31Z",
     "row_count": 44
   },
   "Test Content/courses_by_dept/FST.csv": {
     "size": 1864,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:00Z",
+    "ingested_at": "2026-04-20T00:47:31Z",
     "row_count": 3
   },
   "Test Content/courses_by_dept/FYW.csv": {
     "size": 62455,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:01Z",
+    "ingested_at": "2026-04-20T00:47:32Z",
     "row_count": 121
   },
   "Test Content/courses_by_dept/GGY.csv": {
     "size": 971,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:01Z",
+    "ingested_at": "2026-04-20T00:47:32Z",
     "row_count": 3
   },
   "Test Content/courses_by_dept/GRK.csv": {
     "size": 3974,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:02Z",
+    "ingested_at": "2026-04-20T00:47:32Z",
     "row_count": 12
   },
   "Test Content/courses_by_dept/GRM.csv": {
     "size": 14966,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:02Z",
+    "ingested_at": "2026-04-20T00:47:32Z",
     "row_count": 35
   },
   "Test Content/courses_by_dept/HSC.csv": {
     "size": 22366,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:02Z",
+    "ingested_at": "2026-04-20T00:47:33Z",
     "row_count": 39
   },
   "Test Content/courses_by_dept/HST.csv": {
     "size": 32056,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:03Z",
+    "ingested_at": "2026-04-20T00:47:33Z",
     "row_count": 82
   },
   "Test Content/courses_by_dept/HUM.csv": {
     "size": 3289,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:03Z",
+    "ingested_at": "2026-04-20T00:47:33Z",
     "row_count": 8
   },
   "Test Content/courses_by_dept/IDS.csv": {
     "size": 5241,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:03Z",
+    "ingested_at": "2026-04-20T00:47:33Z",
     "row_count": 14
   },
   "Test Content/courses_by_dept/IGD.csv": {
     "size": 1049,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:04Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 1
   },
   "Test Content/courses_by_dept/ITL.csv": {
     "size": 398,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:04Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 2
   },
   "Test Content/courses_by_dept/JPN.csv": {
     "size": 5449,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:04Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 16
   },
   "Test Content/courses_by_dept/LAS.csv": {
     "size": 2349,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:04Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 5
   },
   "Test Content/courses_by_dept/LNG.csv": {
     "size": 4384,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:04Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 10
   },
   "Test Content/courses_by_dept/LTN.csv": {
     "size": 4490,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:04Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 13
   },
   "Test Content/courses_by_dept/MEM.csv": {
     "size": 619,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:04Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 1
   },
   "Test Content/courses_by_dept/MES.csv": {
     "size": 400,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:05Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 1
   },
   "Test Content/courses_by_dept/MHC.csv": {
     "size": 425,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:05Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 1
   },
   "Test Content/courses_by_dept/MLL.csv": {
     "size": 6367,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:05Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 14
   },
   "Test Content/courses_by_dept/MSL.csv": {
     "size": 5491,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:05Z",
+    "ingested_at": "2026-04-20T00:47:34Z",
     "row_count": 9
   },
   "Test Content/courses_by_dept/MTH.csv": {
     "size": 17952,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:05Z",
+    "ingested_at": "2026-04-20T00:47:35Z",
     "row_count": 38
   },
   "Test Content/courses_by_dept/MUS.csv": {
     "size": 43447,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:07Z",
+    "ingested_at": "2026-04-20T00:47:36Z",
     "row_count": 151
   },
   "Test Content/courses_by_dept/MXP.csv": {
     "size": 41624,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:08Z",
+    "ingested_at": "2026-04-20T00:47:36Z",
     "row_count": 84
   },
   "Test Content/courses_by_dept/NSC.csv": {
     "size": 1413,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:08Z",
+    "ingested_at": "2026-04-20T00:47:37Z",
     "row_count": 3
   },
   "Test Content/courses_by_dept/PHL.csv": {
     "size": 16175,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:08Z",
+    "ingested_at": "2026-04-20T00:47:37Z",
     "row_count": 41
   },
   "Test Content/courses_by_dept/PHY.csv": {
     "size": 12853,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:09Z",
+    "ingested_at": "2026-04-20T00:47:37Z",
     "row_count": 28
   },
   "Test Content/courses_by_dept/POL.csv": {
     "size": 31137,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:09Z",
+    "ingested_at": "2026-04-20T00:47:38Z",
     "row_count": 88
   },
   "Test Content/courses_by_dept/PSY.csv": {
     "size": 20607,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:10Z",
+    "ingested_at": "2026-04-20T00:47:38Z",
     "row_count": 42
   },
   "Test Content/courses_by_dept/PTH.csv": {
     "size": 2205,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:10Z",
+    "ingested_at": "2026-04-20T00:47:38Z",
     "row_count": 6
   },
   "Test Content/courses_by_dept/PVS.csv": {
     "size": 785,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:10Z",
+    "ingested_at": "2026-04-20T00:47:38Z",
     "row_count": 2
   },
   "Test Content/courses_by_dept/REL.csv": {
     "size": 36450,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:11Z",
+    "ingested_at": "2026-04-20T00:47:39Z",
     "row_count": 83
   },
   "Test Content/courses_by_dept/SCI.csv": {
     "size": 1773,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:11Z",
+    "ingested_at": "2026-04-20T00:47:39Z",
     "row_count": 5
   },
   "Test Content/courses_by_dept/SOC.csv": {
     "size": 15555,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:12Z",
+    "ingested_at": "2026-04-20T00:47:39Z",
     "row_count": 31
   },
   "Test Content/courses_by_dept/SPN.csv": {
     "size": 21665,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:12Z",
+    "ingested_at": "2026-04-20T00:47:40Z",
     "row_count": 44
   },
   "Test Content/courses_by_dept/STAT.csv": {
     "size": 457,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:12Z",
+    "ingested_at": "2026-04-20T00:47:40Z",
     "row_count": 1
   },
   "Test Content/courses_by_dept/SUS.csv": {
     "size": 12100,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:13Z",
+    "ingested_at": "2026-04-20T00:47:40Z",
     "row_count": 27
   },
   "Test Content/courses_by_dept/TFA.csv": {
     "size": 1345,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:13Z",
+    "ingested_at": "2026-04-20T00:47:40Z",
     "row_count": 2
   },
   "Test Content/courses_by_dept/THA.csv": {
     "size": 14022,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:13Z",
+    "ingested_at": "2026-04-20T00:47:40Z",
     "row_count": 35
   },
   "Test Content/courses_by_dept/UST.csv": {
     "size": 119,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:13Z",
+    "ingested_at": "2026-04-20T00:47:40Z",
     "row_count": 1
   },
   "Test Content/courses_by_dept/WGS.csv": {
     "size": 4399,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:13Z",
+    "ingested_at": "2026-04-20T00:47:41Z",
     "row_count": 9
   },
   "Test Content/courses_by_ger/FL.csv": {
     "size": 16872,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:14Z",
+    "ingested_at": "2026-04-20T00:47:41Z",
     "row_count": 40
   },
   "Test Content/courses_by_ger/FYW.csv": {
     "size": 10307,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:14Z",
+    "ingested_at": "2026-04-20T00:47:41Z",
     "row_count": 17
   },
   "Test Content/courses_by_ger/HA.csv": {
     "size": 24677,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:15Z",
+    "ingested_at": "2026-04-20T00:47:41Z",
     "row_count": 56
   },
   "Test Content/courses_by_ger/HB.csv": {
     "size": 45485,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:16Z",
+    "ingested_at": "2026-04-20T00:47:42Z",
     "row_count": 87
   },
   "Test Content/courses_by_ger/IEJ.csv": {
     "size": 28395,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:16Z",
+    "ingested_at": "2026-04-20T00:47:43Z",
     "row_count": 45
   },
   "Test Content/courses_by_ger/MB.csv": {
     "size": 2930,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:16Z",
+    "ingested_at": "2026-04-20T00:47:43Z",
     "row_count": 3
   },
   "Test Content/courses_by_ger/MR.csv": {
     "size": 7461,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:16Z",
+    "ingested_at": "2026-04-20T00:47:43Z",
     "row_count": 10
   },
   "Test Content/courses_by_ger/NE.csv": {
     "size": 23303,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:17Z",
+    "ingested_at": "2026-04-20T00:47:43Z",
     "row_count": 40
   },
   "Test Content/courses_by_ger/NW.csv": {
     "size": 4461,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:17Z",
+    "ingested_at": "2026-04-20T00:47:43Z",
     "row_count": 9
   },
   "Test Content/courses_by_ger/NWL.csv": {
     "size": 17685,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:17Z",
+    "ingested_at": "2026-04-20T00:47:43Z",
     "row_count": 24
   },
   "Test Content/courses_by_ger/TA.csv": {
     "size": 62411,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:19Z",
+    "ingested_at": "2026-04-20T00:47:45Z",
     "row_count": 139
   },
   "Test Content/courses_by_ger/UQ.csv": {
     "size": 23940,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:19Z",
+    "ingested_at": "2026-04-20T00:47:45Z",
     "row_count": 51
   },
   "Test Content/courses_by_ger/VP.csv": {
     "size": 26899,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:20Z",
+    "ingested_at": "2026-04-20T00:47:46Z",
     "row_count": 56
   },
   "Test Content/courses_by_ger/WC.csv": {
     "size": 46661,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:21Z",
+    "ingested_at": "2026-04-20T00:47:46Z",
     "row_count": 101
   },
   "Test Content/courses_by_ger/WR.csv": {
     "size": 29199,
     "summary_file": null,
     "summarized_at": "2026-04-16T18:51:59Z",
-    "ingested_at": "2026-04-16T18:55:23Z",
+    "ingested_at": "2026-04-20T00:47:47Z",
     "row_count": 53
   },
   "Test Content/exam_course_equivalencies-Mar-2026.pdf": {
     "size": 330233,
     "summary_file": "Test Summaries/57c29f91f87f1a88.md",
     "summarized_at": "2026-04-16T03:49:10Z",
-    "ingested_at": "2026-04-16T03:49:20Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/asia/documents/2023/constitution_constitutionbylaws_2256627.docx": {
     "size": 19581,
     "summary_file": "Test Summaries/f7078f358ed28381.md",
     "summarized_at": "2026-04-16T04:43:23Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/asia/documents/2024/constitution_constitutionbylaws_2386628.docx": {
     "size": 19544,
     "summary_file": "Test Summaries/79569869483b1f19.md",
     "summarized_at": "2026-04-16T04:43:22Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/asia/documents/2025/constitution_asia_club_constitution-25-26docx_2499245.docx": {
     "size": 19959,
     "summary_file": "Test Summaries/e1bd5c6ff16c6da3.md",
     "summarized_at": "2026-04-16T04:43:22Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/asia/documents/2025/constitution_constitutionbylaws_2499819.docx": {
     "size": 19544,
     "summary_file": "Test Summaries/79569869483b1f19.md",
     "summarized_at": "2026-04-16T04:43:23Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/badmintonclub/documents/2020/constitution_constitutionbylaws_1831869.docx": {
     "size": 26952,
     "summary_file": "Test Summaries/345d44c7c44a18ea.md",
     "summarized_at": "2026-04-16T04:43:21Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/badmintonclub/documents/2021/constitution_constitutionbylaws_1967201.docx": {
     "size": 27367,
     "summary_file": "Test Summaries/9bd3b99ebad9bcc9.md",
     "summarized_at": "2026-04-16T04:43:28Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/badmintonclub/documents/2022/constitution_constitutionbylaws_2100723.docx": {
     "size": 27460,
     "summary_file": "Test Summaries/dc8290e8d8977cda.md",
     "summarized_at": "2026-04-16T04:43:29Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/badmintonclub/documents/2023/constitution_constitutionbylaws_2256500.docx": {
     "size": 27746,
     "summary_file": "Test Summaries/1ce28ecc8141e0a3.md",
     "summarized_at": "2026-04-16T04:43:30Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/badmintonclub/documents/2024/constitution_constitutionbylaws_2386597.docx": {
     "size": 19339,
     "summary_file": "Test Summaries/7a0d18e0971d7824.md",
     "summarized_at": "2026-04-16T04:43:29Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/badmintonclub/documents/2025/constitution_constitutionbylaws_2499778.docx": {
     "size": 19648,
     "summary_file": "Test Summaries/2e9be97363137931.md",
     "summarized_at": "2026-04-16T04:43:30Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/climbingclub/documents/2023/constitution_constitutionbylaws_2231909.pdf": {
     "size": 88291,
     "summary_file": "Test Summaries/1e7f69538a634207.md",
     "summarized_at": "2026-04-16T04:43:36Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/climbingclub/documents/2024/constitution_constitutionbylaws_2386658.pdf": {
     "size": 88291,
     "summary_file": "Test Summaries/1e7f69538a634207.md",
     "summarized_at": "2026-04-16T04:43:36Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/climbingclub/documents/2025/constitution_constitutionbylaws_2499863.pdf": {
     "size": 88291,
     "summary_file": "Test Summaries/1e7f69538a634207.md",
     "summarized_at": "2026-04-16T04:43:37Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/data_science/documents/2023/constitution_constitutionbylaws_2176363.pdf": {
     "size": 66124,
     "summary_file": "Test Summaries/bf1080e7da717abe.md",
     "summarized_at": "2026-04-16T04:43:36Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/data_science/documents/2023/constitution_constitutionbylaws_2256562.pdf": {
     "size": 65818,
     "summary_file": "Test Summaries/5bba6ddcaaa226b2.md",
     "summarized_at": "2026-04-16T04:43:37Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/data_science/documents/2024/constitution_constitutionbylaws_2386661.pdf": {
     "size": 65818,
     "summary_file": "Test Summaries/5bba6ddcaaa226b2.md",
     "summarized_at": "2026-04-16T04:43:42Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/data_science/documents/2025/constitution_constitutionbylaws_2499833.pdf": {
     "size": 65818,
     "summary_file": "Test Summaries/5bba6ddcaaa226b2.md",
     "summarized_at": "2026-04-16T04:43:42Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/engineering/documents/2023/constitution_constitutionbylaws_2273890.docx": {
     "size": 24809,
     "summary_file": "Test Summaries/c81d4f969184ee9c.md",
     "summarized_at": "2026-04-16T04:44:06Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/engineering/documents/2024/constitution_constitutionbylaws_2386640.pdf": {
     "size": 141772,
     "summary_file": "Test Summaries/1e74350e221547e1.md",
     "summarized_at": "2026-04-16T04:43:46Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/engineering/documents/2025/constitution_constitutionbylaws_2499836.pdf": {
     "size": 141772,
     "summary_file": "Test Summaries/1e74350e221547e1.md",
     "summarized_at": "2026-04-16T04:44:07Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/exploration-of-vocation-and-ministry/documents/2018/constitution_constitutionbylaws_775050.pdf": {
     "size": 122910,
     "summary_file": "Test Summaries/19696120e8b2b978.md",
     "summarized_at": "2026-04-16T04:43:49Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/exploration-of-vocation-and-ministry/documents/2023/constitution_constitutionbylaws_2256496.docx": {
     "size": 13482,
     "summary_file": "Test Summaries/029d17e35bde369d.md",
     "summarized_at": "2026-04-16T04:44:05Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/exploration-of-vocation-and-ministry/documents/2024/constitution_constitutionbylaws_2386593.docx": {
     "size": 649274,
     "summary_file": "Test Summaries/43633483fccd3234.md",
     "summarized_at": "2026-04-16T04:44:01Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/exploration-of-vocation-and-ministry/documents/2025/constitution_constitutionbylaws_2499773.docx": {
     "size": 649274,
     "summary_file": "Test Summaries/43633483fccd3234.md",
     "summarized_at": "2026-04-16T04:44:04Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/fraternity-and-sorority-life/documents/2023/other_deferred_recruitment_faq_2282857.pdf": {
     "size": 32643,
     "summary_file": "Test Summaries/7070d9a4ddd8e9a0.md",
     "summarized_at": "2026-04-16T04:44:07Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-international-student-associatio/documents/2018/constitution_constitutionbylaws_775064.docx": {
     "size": 164070,
     "summary_file": "Test Summaries/cd19e7bb7ab3cf6b.md",
     "summarized_at": "2026-04-16T04:44:11Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-international-student-associatio/documents/2020/constitution_constitutionbylaws_1792362.docx": {
     "size": 15980,
     "summary_file": "Test Summaries/3abed1626c896206.md",
     "summarized_at": "2026-04-16T04:44:11Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-international-student-associatio/documents/2021/constitution_constitutionbylaws_1968539.docx": {
     "size": 15980,
     "summary_file": "Test Summaries/3abed1626c896206.md",
     "summarized_at": "2026-04-16T04:44:13Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-international-student-associatio/documents/2022/constitution_constitutionbylaws_2109427.docx": {
     "size": 16205,
     "summary_file": "Test Summaries/bf0a96a55fd776ec.md",
     "summarized_at": "2026-04-16T04:44:14Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-international-student-associatio/documents/2023/constitution_constitutionbylaws_2256550.docx": {
     "size": 16205,
     "summary_file": "Test Summaries/bf0a96a55fd776ec.md",
     "summarized_at": "2026-04-16T04:44:14Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-international-student-associatio/documents/2024/constitution_constitutionbylaws_2386647.docx": {
     "size": 16009,
     "summary_file": "Test Summaries/de83a7f861f986f0.md",
     "summarized_at": "2026-04-16T04:44:18Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2018/constitution_constitutionbylaws_697341.pdf": {
     "size": 99314,
     "summary_file": "Test Summaries/cdaef8bced389bdc.md",
     "summarized_at": "2026-04-16T04:44:20Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2018/constitution_constitutionbylaws_752964.pdf": {
     "size": 99314,
     "summary_file": "Test Summaries/cdaef8bced389bdc.md",
     "summarized_at": "2026-04-16T04:44:21Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2020/constitution_constitutionbylaws_1793936.pdf": {
     "size": 99314,
     "summary_file": "Test Summaries/cdaef8bced389bdc.md",
     "summarized_at": "2026-04-16T04:44:24Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2021/constitution_constitutionbylaws_1976158.pdf": {
     "size": 99314,
     "summary_file": "Test Summaries/cdaef8bced389bdc.md",
     "summarized_at": "2026-04-16T04:44:23Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2022/constitution_constitutionbylaws_2114063.pdf": {
     "size": 99314,
     "summary_file": "Test Summaries/cdaef8bced389bdc.md",
     "summarized_at": "2026-04-16T04:45:08Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2023/constitution_constitutionbylaws_2256551.pdf": {
     "size": 99314,
     "summary_file": "Test Summaries/cdaef8bced389bdc.md",
     "summarized_at": "2026-04-16T04:44:29Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2024/constitution_constitutionbylaws_2386648.docx": {
     "size": 25482,
     "summary_file": "Test Summaries/4714593b56355cb9.md",
     "summarized_at": "2026-04-16T04:44:30Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-investment-club/documents/2025/constitution_constitutionbylaws_2499848.docx": {
     "size": 25555,
     "summary_file": "Test Summaries/b3d96d6a3639c623.md",
     "summarized_at": "2026-04-16T04:45:08Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2017/constitution_constitutionbylaws_689100.docx": {
     "size": 30023,
     "summary_file": "Test Summaries/aa58e28f0504c254.md",
     "summarized_at": "2026-04-16T04:45:09Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2018/constitution_constitutionbylaws_752967.docx": {
     "size": 29940,
     "summary_file": "Test Summaries/f2d2184994643648.md",
     "summarized_at": "2026-04-16T04:45:09Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2018/constitution_constitutionbylaws_752968.docx": {
     "size": 29940,
     "summary_file": "Test Summaries/f2d2184994643648.md",
     "summarized_at": "2026-04-16T04:45:09Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2020/constitution_constitutionbylaws_1792366.docx": {
     "size": 14766,
     "summary_file": "Test Summaries/9e87f7dfb66a6502.md",
     "summarized_at": "2026-04-16T04:45:13Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2022/constitution_constitutionbylaws_2100630.pdf": {
     "size": 97725,
     "summary_file": "Test Summaries/70f8abd7bf391e3d.md",
     "summarized_at": "2026-04-16T04:45:16Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2023/constitution_constitutionbylaws_2256555.pdf": {
     "size": 138589,
     "summary_file": "Test Summaries/51deacfea9045b83.md",
     "summarized_at": "2026-04-16T04:45:17Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2024/constitution_constitutionbylaws_2386654.pdf": {
     "size": 138589,
     "summary_file": "Test Summaries/51deacfea9045b83.md",
     "summarized_at": "2026-04-16T04:45:17Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-outdoors-club/documents/2025/constitution_constitutionbylaws_2499857.pdf": {
     "size": 138589,
     "summary_file": "Test Summaries/51deacfea9045b83.md",
     "summarized_at": "2026-04-16T04:45:17Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2018/constitution_constitutionbylaws_694460.docx": {
     "size": 34694,
     "summary_file": "Test Summaries/caca8be0c8703470.md",
     "summarized_at": "2026-04-16T04:45:28Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2018/constitution_constitutionbylaws_752976.docx": {
     "size": 26002,
     "summary_file": "Test Summaries/ef9f49ed7734e542.md",
     "summarized_at": "2026-04-16T04:45:25Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2019/constitution_constitutionbylaws_1084652.pdf": {
     "size": 128639,
     "summary_file": "Test Summaries/f825a20beb268bb9.md",
     "summarized_at": "2026-04-16T04:45:26Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2019/constitution_fusab_constitution-final-fall19docx_1538159.docx": {
     "size": 33502,
     "summary_file": "Test Summaries/43d5ed3b5f2b45f2.md",
     "summarized_at": "2026-04-16T04:45:30Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2020/constitution_constitutionbylaws_1792295.docx": {
     "size": 33375,
     "summary_file": "Test Summaries/7a3ce33b7c6e4946.md",
     "summarized_at": "2026-04-16T04:45:29Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2021/constitution_constitutionbylaws_1967919.pdf": {
     "size": 115137,
     "summary_file": "Test Summaries/ea0df3c316096565.md",
     "summarized_at": "2026-04-16T04:45:37Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2021/constitution_constitutionbylaws_2021_2004351.docx": {
     "size": 37624,
     "summary_file": "Test Summaries/a55199d8ff30429d.md",
     "summarized_at": "2026-04-16T04:45:37Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2022/constitution_constitutionbylaws_2101689.pdf": {
     "size": 111966,
     "summary_file": "Test Summaries/b9dc7d29dd57d6a3.md",
     "summarized_at": "2026-04-16T04:45:39Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2023/constitution_constitutionbylaws_2256561.pdf": {
     "size": 158620,
     "summary_file": "Test Summaries/4ff0e8e59371988a.md",
     "summarized_at": "2026-04-16T04:45:39Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2024/constitution_constitutionbylaws_2386660.docx": {
     "size": 33086,
     "summary_file": "Test Summaries/1c4316ca02c95466.md",
     "summarized_at": "2026-04-16T04:46:10Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2025/2026_FUSAB_Finance_Guidelines.pdf": {
     "size": 309022,
     "summary_file": "Test Summaries/d2b7d651bc1a27a9.md",
     "summarized_at": "2026-04-16T04:46:04Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2025/Professional_Services_Contract_(1).docx": {
     "size": 54088,
     "summary_file": "Test Summaries/bbdfe4b7e6434db1.md",
     "summarized_at": "2026-04-16T04:45:56Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2025/constitution_constitutionbylaws_2499865.pdf": {
     "size": 270862,
     "summary_file": "Test Summaries/92c0260d613685a4.md",
     "summarized_at": "2026-04-16T04:46:06Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furman-university-student-activities-board/documents/2025/other_professional_services_contractdocx_2410218.docx": {
     "size": 54088,
     "summary_file": "Test Summaries/bbdfe4b7e6434db1.md",
     "summarized_at": "2026-04-16T04:45:59Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/furmanuniversity/documents/2025/other_credit_card_reader_confidentiality_agreementdocx_2517275.docx": {
     "size": 24513,
     "summary_file": "Test Summaries/76b65464e45bdd1d.md",
     "summarized_at": "2026-04-16T04:46:02Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/fuscuba/documents/2025/constitution_constitutionbylaws_2432553.docx": {
     "size": 18561,
     "summary_file": "Test Summaries/a265d3139ee51f90.md",
     "summarized_at": "2026-04-16T04:46:05Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/fuscuba/documents/2025/constitution_constitutionbylaws_2499809.docx": {
     "size": 18561,
     "summary_file": "Test Summaries/a265d3139ee51f90.md",
     "summarized_at": "2026-04-16T04:46:08Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2018/constitution_constitutionbylaws_716072.docx": {
     "size": 51063,
     "summary_file": "Test Summaries/d9eed1dee2b0b868.md",
     "summarized_at": "2026-04-16T04:46:17Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2020/constitution_constitutionbylaws_1793939.pdf": {
     "size": 253712,
     "summary_file": "Test Summaries/704519e28f0688e8.md",
     "summarized_at": "2026-04-16T04:46:19Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2021/constitution_constitutionbylaws_1967930.pdf": {
     "size": 253712,
     "summary_file": "Test Summaries/704519e28f0688e8.md",
     "summarized_at": "2026-04-16T04:46:18Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2022/constitution_constitutionbylaws_2102432.pdf": {
     "size": 253712,
     "summary_file": "Test Summaries/704519e28f0688e8.md",
     "summarized_at": "2026-04-16T04:46:22Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2022/constitution_constitutionbylaws_2143941.docx": {
     "size": 59121,
     "summary_file": "Test Summaries/50406e0a6b4ba2bb.md",
     "summarized_at": "2026-04-16T04:46:23Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2023/constitution_constitutionbylaws_2256573.docx": {
     "size": 57135,
     "summary_file": "Test Summaries/1b3ec17b74937a7b.md",
     "summarized_at": "2026-04-16T04:46:27Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2023/constitution_ifc_constitution_bylaws_2023_2266138.pdf": {
     "size": 206088,
     "summary_file": "Test Summaries/bfb0963cbd6d77d2.md",
     "summarized_at": "2026-04-16T04:46:29Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2024/constitution_constitutionbylaws_2386673.docx": {
     "size": 1813135,
     "summary_file": "Test Summaries/e871efd918b34cb9.md",
     "summarized_at": "2026-04-16T04:46:31Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/interfraternity-council/documents/2025/constitution_constitutionbylaws_2499877.docx": {
     "size": 1825254,
     "summary_file": "Test Summaries/8effcc9731cd89f8.md",
     "summarized_at": "2026-04-16T04:46:35Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/internationalstudents/documents/2019/constitution_constitutionbylaws_1483732.docx": {
     "size": 11493,
     "summary_file": "Test Summaries/9a790059a43900fd.md",
     "summarized_at": "2026-04-16T04:47:05Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/orgs.csv": {
     "size": 171724,
     "summary_file": null,
     "summarized_at": "2026-04-16T04:32:51Z",
-    "ingested_at": "2026-04-16T04:50:34Z",
+    "ingested_at": "2026-04-20T00:47:49Z",
     "row_count": 236
   },
   "Test Content/syncdin_orgs/paladinmma/documents/2022/constitution_constitutionbylaws_2141508.docx": {
     "size": 15681,
     "summary_file": "Test Summaries/a753e498f72854ad.md",
     "summarized_at": "2026-04-16T04:46:33Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/paladinmma/documents/2023/constitution_constitutionbylaws_2256590.docx": {
     "size": 20459,
     "summary_file": "Test Summaries/97ae0b503b17f545.md",
     "summarized_at": "2026-04-16T04:47:06Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/paladinmma/documents/2023/constitution_paladin_mma_consitution_revised-2023docx_2254721.docx": {
     "size": 17133,
     "summary_file": "Test Summaries/66adcf41f8c2dddc.md",
     "summarized_at": "2026-04-16T04:47:06Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/paladinmma/documents/2024/constitution_constitutionbylaws_2386691.docx": {
     "size": 20459,
     "summary_file": "Test Summaries/97ae0b503b17f545.md",
     "summarized_at": "2026-04-16T04:46:55Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/paladinmma/documents/2025/constitution_constitutionbylaws_2499898.docx": {
     "size": 23341,
     "summary_file": "Test Summaries/565e30f06959ae88.md",
     "summarized_at": "2026-04-16T04:47:08Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2018/constitution_constitutionbylaws_698004.docx": {
     "size": 52728,
     "summary_file": "Test Summaries/57d4414a8870b77c.md",
     "summarized_at": "2026-04-16T04:47:06Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2020/constitution_constitutionbylaws_1792315.pdf": {
     "size": 125892,
     "summary_file": "Test Summaries/2685d0c3904b1800.md",
     "summarized_at": "2026-04-16T04:47:14Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2020/constitution_panhellenic_bylaws_update_as_of_march_2020pdf_1811551.pdf": {
     "size": 125892,
     "summary_file": "Test Summaries/6a96ce653d70df29.md",
     "summarized_at": "2026-04-16T04:47:15Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2020/other_recruitment_counselor_guidelines_2020-2021pdf_1813287.pdf": {
     "size": 36866,
     "summary_file": "Test Summaries/c738de30c5745689.md",
     "summarized_at": "2026-04-16T04:47:13Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2020/other_recruitment_rules_2020-2021_2pdf_1859836.pdf": {
     "size": 88695,
     "summary_file": "Test Summaries/9762787fa9adbd37.md",
     "summarized_at": "2026-04-16T04:47:14Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2021/constitution_constitutionbylaws_1967935.pdf": {
     "size": 114034,
     "summary_file": "Test Summaries/49daea2b2c29628a.md",
     "summarized_at": "2026-04-16T04:47:17Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2022/constitution_constitutionbylaws_2101394.docx": {
     "size": 31026,
     "summary_file": "Test Summaries/b69cd0acd9a5b60d.md",
     "summarized_at": "2026-04-16T04:47:22Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2023/constitution_constitutionbylaws_2256592.pdf": {
     "size": 137960,
     "summary_file": "Test Summaries/c0f8ec6e609b8c8e.md",
     "summarized_at": "2026-04-16T04:47:23Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2024/constitution_constitutionbylaws_2386694.pdf": {
     "size": 136156,
     "summary_file": "Test Summaries/f60cfb481c1b5465.md",
     "summarized_at": "2026-04-16T04:47:24Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2025/constitution_constitutionbylaws_2499901.pdf": {
     "size": 136156,
     "summary_file": "Test Summaries/f60cfb481c1b5465.md",
     "summarized_at": "2026-04-16T04:47:24Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/panhellenic-council/documents/2026/constitution_panhellenic_bylaws_-_nov_2025docx_2535301.docx": {
     "size": 87534,
     "summary_file": "Test Summaries/543b21d8dc3fca5b.md",
     "summarized_at": "2026-04-16T04:47:27Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2018/constitution_constitutionbylaws_694465.docx": {
     "size": 25181,
     "summary_file": "Test Summaries/1f047a14ecaadfbb.md",
     "summarized_at": "2026-04-16T04:47:30Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2018/constitution_constitutionbylaws_752998.docx": {
     "size": 25392,
     "summary_file": "Test Summaries/c327d9c3367fecef.md",
     "summarized_at": "2026-04-16T04:47:32Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2018/constitution_furman_student_organization_advisor_guidelinespdf_747846.pdf": {
     "size": 483537,
     "summary_file": "Test Summaries/75fb8669c0e66331.md",
     "summarized_at": "2026-04-16T04:47:35Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2019/constitution_constitutionbylaws_1084700.docx": {
     "size": 35471,
     "summary_file": "Test Summaries/abf593fc44d61377.md",
     "summarized_at": "2026-04-16T04:47:36Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2020/constitution_constitutionbylaws_1792372.docx": {
     "size": 35455,
     "summary_file": "Test Summaries/6befcb8fa24ce301.md",
     "summarized_at": "2026-04-16T04:48:10Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2021/constitution_constitutionbylaws_1967941.docx": {
     "size": 35632,
     "summary_file": "Test Summaries/586a52082d442c73.md",
     "summarized_at": "2026-04-16T04:48:10Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2022/constitution_constitutionbylaws_2102427.pdf": {
     "size": 1750281,
     "summary_file": "Test Summaries/506ef07c441761d8.md",
     "summarized_at": "2026-04-16T04:48:07Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2023/constitution_constitutionbylaws_2256614.pdf": {
     "size": 1750281,
     "summary_file": "Test Summaries/506ef07c441761d8.md",
     "summarized_at": "2026-04-16T04:48:06Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2024/constitution_constitutionbylaws_2024_2316076.pdf": {
     "size": 141138,
     "summary_file": "Test Summaries/e86fe859762e8f9d.md",
     "summarized_at": "2026-04-16T04:48:11Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2024/constitution_constitutionbylaws_2386704.pdf": {
     "size": 141138,
     "summary_file": "Test Summaries/e86fe859762e8f9d.md",
     "summarized_at": "2026-04-16T04:48:16Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/residential-life-council/documents/2025/constitution_constitutionbylaws_2499911.pdf": {
     "size": 137444,
     "summary_file": "Test Summaries/c6d1d1b617d0bcc7.md",
     "summarized_at": "2026-04-16T04:48:17Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/sexual-harassment-and-rape-prevention-committee/documents/2018/constitution_sharp_committee_minutes_2-15-18docx_705737.docx": {
     "size": 33992,
     "summary_file": "Test Summaries/7a837590eb13da80.md",
     "summarized_at": "2026-04-16T04:48:23Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/sexual-harassment-and-rape-prevention-committee/documents/2018/other_campus_diversity_title_ix_and_evidentiary_standardspdf_967812.pdf": {
     "size": 1111780,
     "summary_file": "Test Summaries/7892ba6698612628.md",
     "summarized_at": "2026-04-16T04:48:25Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/sexual-harassment-and-rape-prevention-committee/documents/2019/other_sharp_committee_minutes_10-31-19docx_1554689.docx": {
     "size": 32892,
     "summary_file": "Test Summaries/5cc1f4b31810cdd0.md",
     "summarized_at": "2026-04-16T04:48:20Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/sexual-harassment-and-rape-prevention-committee/documents/2020/other_sharp_committee_minutes_1-30-20_finaldocx_1636040.docx": {
     "size": 34033,
     "summary_file": "Test Summaries/6a5b5d10918a60f8.md",
     "summarized_at": "2026-04-16T04:48:26Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/sexual-harassment-and-rape-prevention-committee/documents/2020/other_sharp_research_wake_forestdocx_1656168.docx": {
     "size": 14541,
     "summary_file": "Test Summaries/eb553e909daf0e41.md",
     "summarized_at": "2026-04-16T04:48:25Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2017/constitution_constitutionbylaws_688726.docx": {
     "size": 49048,
     "summary_file": "Test Summaries/afc5f016953296fc.md",
     "summarized_at": "2026-04-16T04:48:27Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2018/constitution_constitutionbylaws_775065.docx": {
     "size": 49048,
     "summary_file": "Test Summaries/afc5f016953296fc.md",
     "summarized_at": "2026-04-16T04:48:31Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2018/constitution_sdc_constitution_updated_december_2017docx_696229.docx": {
     "size": 49236,
     "summary_file": "Test Summaries/c7fd621917c45951.md",
     "summarized_at": "2026-04-16T04:48:33Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2018/other_w-9_formpdf_742270.pdf": {
     "size": 119331,
     "summary_file": "Test Summaries/83c33a821ebe3079.md",
     "summarized_at": "2026-04-16T04:48:41Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2019/constitution_constitutionbylaws_1442605.docx": {
     "size": 49236,
     "summary_file": "Test Summaries/c7fd621917c45951.md",
     "summarized_at": "2026-04-16T04:48:34Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2020/constitution_constitutionbylaws_1792792.docx": {
     "size": 54947,
     "summary_file": "Test Summaries/3b954c9d2a7efede.md",
     "summarized_at": "2026-04-16T04:48:36Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2021/constitution_constitutionbylaws_1967943.pdf": {
     "size": 191116,
     "summary_file": "Test Summaries/9d92c43fecc84abc.md",
     "summarized_at": "2026-04-16T04:49:08Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2022/constitution_constitutionbylaws_2106126.docx": {
     "size": 58547,
     "summary_file": "Test Summaries/b9e11ba254a084b8.md",
     "summarized_at": "2026-04-16T04:49:10Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2022/other_sdc_resource_guide_pdf_2137835.pdf": {
     "size": 423801,
     "summary_file": "Test Summaries/5ba8c4dc89ccea44.md",
     "summarized_at": "2026-04-16T04:48:44Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2023/constitution_constitutionbylaws_2256624.pdf": {
     "size": 180942,
     "summary_file": "Test Summaries/cec3bad03c31ff77.md",
     "summarized_at": "2026-04-16T04:49:00Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2024/constitution_constitutionbylaws_2386715.docx": {
     "size": 45804,
     "summary_file": "Test Summaries/f04cf05323996b50.md",
     "summarized_at": "2026-04-16T04:49:07Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2024/constitution_sdc_constitution_bylaws_updated_august_2024docx_2394780.docx": {
     "size": 45804,
     "summary_file": "Test Summaries/f04cf05323996b50.md",
     "summarized_at": "2026-04-16T04:49:11Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-diversity-council/documents/2025/constitution_constitutionbylaws_2499921.docx": {
     "size": 46067,
     "summary_file": "Test Summaries/76fc7a9ca9a9b0fd.md",
     "summarized_at": "2026-04-16T04:49:11Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2021/constitution_sga_bylaws_updated_221docx_1892950.docx": {
     "size": 61651,
     "summary_file": "Test Summaries/6c9933806d1db83b.md",
     "summarized_at": "2026-04-16T04:49:17Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2021/constitution_sga_constitution_221docx_1880271.docx": {
     "size": 258218,
     "summary_file": "Test Summaries/692420d84fce9d2c.md",
     "summarized_at": "2026-04-16T04:49:16Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2021/constitution_sga_constitution__221pdf_1880270.pdf": {
     "size": 210879,
     "summary_file": "Test Summaries/167b3320364a058e.md",
     "summarized_at": "2026-04-16T04:49:17Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2021/constitution_sga_constitution_updated_321docx_1892949.docx": {
     "size": 258317,
     "summary_file": "Test Summaries/256e96d6bd0dbda9.md",
     "summarized_at": "2026-04-16T04:49:19Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2023/constitution_constitutionbylaws_2256625.docx": {
     "size": 100240,
     "summary_file": "Test Summaries/e993ba8b6cc6094b.md",
     "summarized_at": "2026-04-16T04:49:19Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2023/other_how_to_set-up-payment-electionspdf_2254955.pdf": {
     "size": 451779,
     "summary_file": "Test Summaries/f08512419ad43fd2.md",
     "summarized_at": "2026-04-16T04:49:20Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2024/constitution_by_laws_update_april_2024pdf_2316222.pdf": {
     "size": 630018,
     "summary_file": "Test Summaries/f51e288f046f75be.md",
     "summarized_at": "2026-04-16T04:49:28Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2024/constitution_constitutionbylaws_2386716.pdf": {
     "size": 188417,
     "summary_file": "Test Summaries/385c6e2b7bbcc153.md",
     "summarized_at": "2026-04-16T04:49:25Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2024/constitution_sga_constitution_2022pdf_2405364.pdf": {
     "size": 276168,
     "summary_file": "Test Summaries/e13f6679f2e43989.md",
     "summarized_at": "2026-04-16T04:49:30Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2024/other_sga_campaign_regulations_2024-2025pdf_2364136.pdf": {
     "size": 81640,
     "summary_file": "Test Summaries/ddb95a176e8086db.md",
     "summarized_at": "2026-04-16T04:49:30Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2025/2026-27_SGA_Budget_Request_Worksheet (1).xlsx": {
     "size": 12134,
     "summary_file": "Test Summaries/702fcbb13024a426.md",
     "summarized_at": "2026-04-16T04:49:27Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2025/25-26_SGA_Financial_Procedures (1).pdf": {
     "size": 827511,
     "summary_file": "Test Summaries/ef3ca36c3f6cd960.md",
     "summarized_at": "2026-04-16T04:49:36Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2025/August_2025_Finance_Presentation_Power_Point (1).pdf": {
     "size": 2803972,
     "summary_file": "Test Summaries/2c1bce2e191b014c.md",
     "summarized_at": "2026-04-16T04:50:11Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2025/Fundraising_and_Revenue_Guidelines (1).pdf": {
     "size": 514237,
     "summary_file": "Test Summaries/ff2e7e79efe14494.md",
     "summarized_at": "2026-04-16T04:49:38Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/student-government-association/documents/2025/constitution_constitutionbylaws_2499922.docx": {
     "size": 39332,
     "summary_file": "Test Summaries/e8e327a5fd5460ca.md",
     "summarized_at": "2026-04-16T04:50:10Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/thepaladin/documents/2019/constitution_constitutionbylaws_1442612.docx": {
     "size": 20393,
     "summary_file": "Test Summaries/89dd7ab7a50fe8ae.md",
     "summarized_at": "2026-04-16T04:50:09Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/thepaladin/documents/2020/constitution_constitutionbylaws_1792385.docx": {
     "size": 13040,
     "summary_file": "Test Summaries/668c94b41e66deef.md",
     "summarized_at": "2026-04-16T04:50:04Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/thepaladin/documents/2021/constitution_constitutionbylaws_1968531.docx": {
     "size": 27380,
     "summary_file": "Test Summaries/da17639b6619c2ab.md",
     "summarized_at": "2026-04-16T04:50:00Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/thepaladin/documents/2022/constitution_constitutionbylaws_2101262.docx": {
     "size": 30111,
     "summary_file": "Test Summaries/3e33e5687553044f.md",
     "summarized_at": "2026-04-16T04:50:08Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/thepaladin/documents/2023/constitution_constitutionbylaws_2256635.docx": {
     "size": 23318,
     "summary_file": "Test Summaries/92085ad96cd670aa.md",
     "summarized_at": "2026-04-16T04:50:07Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/thepaladin/documents/2024/constitution_constitutionbylaws_2386721.pdf": {
     "size": 47832,
     "summary_file": "Test Summaries/5b4cf344222d10b5.md",
     "summarized_at": "2026-04-16T04:50:13Z",
-    "ingested_at": "2026-04-16T04:57:25Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/thepaladin/documents/2025/constitution_constitutionbylaws_2499926.pdf": {
     "size": 47832,
     "summary_file": "Test Summaries/5b4cf344222d10b5.md",
     "summarized_at": "2026-04-16T04:50:13Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/ydsa/documents/2023/constitution_constitutionbylaws_2176367.pdf": {
     "size": 60562,
     "summary_file": "Test Summaries/ee0b52eb6591a5ac.md",
     "summarized_at": "2026-04-16T04:50:16Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/ydsa/documents/2023/constitution_constitutionbylaws_2256567.pdf": {
     "size": 62273,
     "summary_file": "Test Summaries/f016dca8697d20ae.md",
     "summarized_at": "2026-04-16T04:50:17Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/ydsa/documents/2024/constitution_constitutionbylaws_2386668.docx": {
     "size": 756498,
     "summary_file": "Test Summaries/a9c1cc8823f92dc1.md",
     "summarized_at": "2026-04-16T04:50:19Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/ydsa/documents/2024/constitution_fuydsa_constitutionbylaws_2024pdf_2313509.pdf": {
     "size": 67640,
     "summary_file": "Test Summaries/2d43aac19e47fe4d.md",
     "summarized_at": "2026-04-16T04:50:20Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   },
   "Test Content/syncdin_orgs/ydsa/documents/2025/constitution_constitutionbylaws_2499872.docx": {
     "size": 757212,
     "summary_file": "Test Summaries/7b3831fa747c7aed.md",
     "summarized_at": "2026-04-16T04:50:21Z",
-    "ingested_at": "2026-04-16T04:50:32Z",
+    "ingested_at": "2026-04-20T00:47:24Z",
     "row_count": null
   }
 }

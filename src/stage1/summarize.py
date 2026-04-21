@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import csv
+import io
 import hashlib
 import json
 import os
@@ -181,14 +182,30 @@ def write_summary_at(out_path: Path, summary: FileSummary, source_rel: str) -> N
     out_path.write_text(render_markdown(summary, source_rel), encoding="utf-8")
 
 
+def _open_csv_text(path: Path) -> io.StringIO:
+    """Read a CSV as text, trying UTF-8 first then falling back to Latin-1.
+
+    Latin-1 never raises UnicodeDecodeError (every byte maps to a character),
+    so it's a safe fallback for legacy CSVs (e.g. Excel exports with
+    accented characters saved in a non-UTF-8 encoding). We decode the full
+    file up front so the caller gets a stream where iteration can't fail
+    on a late bad byte, then hand back a StringIO for csv.reader.
+    """
+    raw = path.read_bytes()
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        text = raw.decode("latin-1")
+    return io.StringIO(text)
+
+
 def _count_csv_rows(path: Path) -> int:
     """Return the number of data rows (excluding header) in a CSV file."""
     try:
-        with path.open(encoding="utf-8") as f:
-            reader = csv.reader(f)
-            next(reader, None)  # skip header
-            return sum(1 for _ in reader)
-    except (UnicodeDecodeError, csv.Error) as e:
+        reader = csv.reader(_open_csv_text(path))
+        next(reader, None)  # skip header
+        return sum(1 for _ in reader)
+    except csv.Error as e:
         raise SummarizeError(f"cannot read CSV {path}: {e}") from e
 
 
@@ -320,6 +337,7 @@ async def run_batch(
     root: Path,
     force: bool,
     concurrency: int,
+    skip_fast_tier: bool = False,
 ) -> None:
     from tqdm import tqdm
 
@@ -334,6 +352,11 @@ async def run_batch(
     if bootstrapped:
         print(f"bootstrapped manifest from {bootstrapped} existing summary files")
     files = find_supported_files(root)
+    if skip_fast_tier:
+        # Don't double-process files the fast tier already covers (PDFs ≤50p,
+        # images). Routes are decided by `src.stage1_fast.router.route_file`.
+        from src.stage1_fast.router import route_file
+        files = [p for p in files if route_file(p) != "fast"]
     if not files:
         sys.exit(f"no supported files found under {root}")
 

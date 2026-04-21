@@ -75,10 +75,22 @@ def _batched(xs: list, size: int) -> Iterable[list]:
         yield xs[i : i + size]
 
 
-def index_file(path: Path, manifest: Manifest) -> tuple[int, bool]:
+def index_file(
+    path: Path,
+    manifest: Manifest,
+    *,
+    pool_factor: int = 1,
+) -> tuple[int, bool]:
     """Index one file into fast_tier. Returns (pages_upserted, was_skipped).
 
     Raises on any hard failure (the caller decides whether to continue the batch).
+
+    `pool_factor` enables HierarchicalTokenPooler over the encoded multi-vectors
+    before upsert. `pool_factor=1` (default) skips pooling entirely — critical
+    for financial / discriminator-heavy content where patch-level fidelity is
+    the whole point. `pool_factor=2` halves patch count per page at ~100% recall
+    retention for general-content (see Clavié et al. 2024). The router decides
+    when pooling is safe; this function trusts it.
     """
     from src.stage1_fast.model import encode_images, get_model
     from src.stage2.fast_db import upsert_pages_batch
@@ -93,12 +105,20 @@ def index_file(path: Path, manifest: Manifest) -> tuple[int, bool]:
     if not images:
         return 0, True
 
+    pooler = None
+    if pool_factor > 1:
+        from colpali_engine.compression.token_pooling import HierarchicalTokenPooler
+        pooler = HierarchicalTokenPooler()
+
     _, _, cfg = get_model()
     pages_to_upsert: list[tuple[str, int, list]] = []
     page_idx = 0
 
     for batch in _batched(images, cfg.batch_size):
         tensor = encode_images(batch)          # (B, n_patches, 128)
+        if pooler is not None:
+            # Pools the token dim from n_patches down to ~n_patches/pool_factor.
+            tensor = pooler.pool_embeddings(tensor, pool_factor=pool_factor)
         # Move off-GPU, upcast to float so Qdrant receives plain Python floats.
         cpu_batch = tensor.float().cpu().tolist()
         for page_vectors in cpu_batch:

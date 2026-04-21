@@ -18,6 +18,8 @@ Requires-Dist: fastembed>=0.4
 Requires-Dist: colpali-engine>=0.3
 Requires-Dist: pathspec>=0.12
 Requires-Dist: pyyaml>=6.0
+Requires-Dist: python-pptx>=1.0
+Requires-Dist: trafilatura>=1.12
 Requires-Dist: mlx-vlm>=0.1.0; sys_platform == "darwin" and platform_machine == "arm64"
 Requires-Dist: ipykernel
 Requires-Dist: jupyter

@@ -9,7 +9,8 @@
       "Bash(git -C /mnt/hardisk/rememex log -p -n 8 --stat)",
       "Read(//mnt/hardisk/rememex/src-tauri/src/indexer/**)",
       "WebFetch(domain:api.pullpush.io)",
-      "Bash(uv run *)"
+      "Bash(uv run *)",
+      "Bash(gh api *)"
     ]
   }
 }

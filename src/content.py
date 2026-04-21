@@ -19,12 +19,15 @@ IMAGE_EXTS = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
 CODE_EXTS = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
              ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
              ".sh", ".sql", ".json", ".yaml", ".yml", ".toml"}
-TEXT_EXTS = {".txt"}
+TEXT_EXTS = {".txt", ".log"}
 MD_EXTS = {".md", ".markdown"}
 CSV_EXTS = {".csv"}
 PDF_EXTS = {".pdf"}
 DOCX_EXTS = {".docx"}
 XLSX_EXTS = {".xlsx", ".xlsm"}
+PPTX_EXTS = {".pptx"}
+HTML_EXTS = {".html", ".htm"}
+IPYNB_EXTS = {".ipynb"}
 ALT_EXTS = {".alt"}
 
 PDF_VISION_DPI = 150
@@ -38,6 +41,9 @@ SUPPORTED_EXTS = (
     | MD_EXTS
     | TEXT_EXTS
     | CODE_EXTS
+    | PPTX_EXTS
+    | HTML_EXTS
+    | IPYNB_EXTS
 )
 # `.alt` is handled by `build_content_blocks` at answer time, but is deliberately
 # NOT in SUPPORTED_EXTS — Stage 1's walker should skip .alt so it doesn't try to
@@ -62,16 +68,54 @@ def extract_pdf_text(path: Path, max_chars: int) -> str:
 
     chunks: list[str] = []
     total = 0
+
+    # Bookmark-based TOC first. For long documents (books, textbooks, manuals)
+    # the reader often asks "what's in this?" — the structured chapter list
+    # answers that in a few hundred tokens, where sequential page extraction
+    # would waste the whole budget on the preface.
+    toc_block = _extract_pdf_toc(path)
+    if toc_block:
+        chunks.append(toc_block)
+        total += len(toc_block)
+
     try:
         for page in reader.pages:
+            if total >= max_chars:
+                break
             t = page.extract_text() or ""
             chunks.append(t)
             total += len(t)
-            if total >= max_chars:
-                break
     except PdfReadError as e:
         raise SummarizeError(f"PDF parse error while reading pages: {path}: {e}") from e
     return "\n\n".join(chunks)
+
+
+def _extract_pdf_toc(path: Path) -> str:
+    """Return a formatted bookmark-based table of contents for a PDF, or "".
+
+    Uses pymupdf's `doc.get_toc()` which reads the /Outlines object — the
+    structured chapter index most publishers embed. Returns empty string if
+    the PDF has no bookmarks (e.g. homemade scans, short receipts, etc.).
+    """
+    try:
+        import pymupdf
+    except ImportError:
+        return ""
+    try:
+        doc = pymupdf.open(str(path))
+    except Exception:  # pylint: disable=broad-except
+        return ""
+    try:
+        toc = doc.get_toc() or []
+    finally:
+        doc.close()
+    if not toc:
+        return ""
+    lines = ["## Table of Contents"]
+    for level, title, _page in toc:
+        indent = "  " * max(level - 1, 0)
+        lines.append(f"{indent}- {title}")
+    return "\n".join(lines)
 
 
 def render_pdf_pages_as_png(path: Path, max_pages: int) -> list[bytes]:
@@ -112,6 +156,101 @@ def extract_docx_text(path: Path) -> str:
             if any(cells):
                 parts.append("\t".join(cells))
     return "\n".join(parts)
+
+
+def extract_pptx_text(path: Path) -> str:
+    """Extract slide titles + bullet text + speaker notes from a .pptx.
+
+    Returns concatenated text with one "## Slide N" header per slide so
+    retrieval hits carry slide context. Skips images / charts / SmartArt —
+    text only. Image-heavy decks are expected to be additionally routed
+    through T4 (ColPali) for visual retrieval.
+    """
+    from pptx import Presentation
+    from pptx.exc import PackageNotFoundError
+
+    try:
+        prs = Presentation(str(path))
+    except (PackageNotFoundError, OSError) as e:
+        raise SummarizeError(f"not a valid .pptx file: {path}: {e}") from e
+
+    parts: list[str] = []
+    for i, slide in enumerate(prs.slides, start=1):
+        slide_bits: list[str] = [f"## Slide {i}"]
+        for shape in slide.shapes:
+            if hasattr(shape, "text") and shape.text.strip():
+                slide_bits.append(shape.text)
+        notes = slide.notes_slide if slide.has_notes_slide else None
+        if notes is not None:
+            note_text = notes.notes_text_frame.text.strip() if notes.notes_text_frame else ""
+            if note_text:
+                slide_bits.append(f"[notes] {note_text}")
+        if len(slide_bits) > 1:
+            parts.append("\n".join(slide_bits))
+    return "\n\n".join(parts)
+
+
+def extract_html_text(path: Path) -> str:
+    """Extract clean article text from an .html/.htm file via trafilatura.
+
+    Strips boilerplate (nav, header/footer, ad chrome, script/style). If
+    extraction yields no usable content (e.g. JS-only SPAs that render
+    nothing on the server), raises SummarizeError.
+    """
+    import trafilatura
+
+    try:
+        raw = path.read_bytes()
+    except OSError as e:
+        raise SummarizeError(f"could not read html {path}: {e}") from e
+
+    text = trafilatura.extract(raw, include_comments=False, include_tables=True) or ""
+    text = text.strip()
+    if not text:
+        # Fallback: lossy UTF-8 decode of the raw bytes, so SPAs don't
+        # silently vanish — the user at least gets whatever static content
+        # the HTML carried, tags and all.
+        try:
+            text = raw.decode("utf-8", errors="ignore").strip()
+        except Exception:  # pylint: disable=broad-except
+            text = ""
+    if not text:
+        raise SummarizeError(f"html extracted empty text: {path}")
+    return text
+
+
+def extract_ipynb_text(path: Path) -> str:
+    """Extract code + markdown cell sources from a Jupyter notebook.
+
+    Skips cell outputs (often noisy, sometimes binary). Cell boundaries are
+    surfaced with a "# Cell N (type)" header so retrieval hits know which
+    cell a match came from.
+    """
+    import json as _json
+
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError) as e:
+        raise SummarizeError(f"could not read ipynb {path}: {e}") from e
+    try:
+        nb = _json.loads(raw)
+    except _json.JSONDecodeError as e:
+        raise SummarizeError(f"ipynb is not valid JSON: {path}: {e}") from e
+
+    cells = nb.get("cells", [])
+    if not isinstance(cells, list):
+        raise SummarizeError(f"ipynb has no cells list: {path}")
+
+    parts: list[str] = []
+    for i, cell in enumerate(cells, start=1):
+        ctype = cell.get("cell_type", "unknown")
+        source = cell.get("source", "")
+        if isinstance(source, list):
+            source = "".join(source)
+        source = source.strip()
+        if source:
+            parts.append(f"# Cell {i} ({ctype})\n{source}")
+    return "\n\n".join(parts)
 
 
 def extract_xlsx_text(path: Path) -> str:
@@ -183,6 +322,22 @@ def build_content_blocks(
         if not text:
             raise SummarizeError(f"xlsx appears empty: {path}")
         return [f"Content type: xlsx\n\n---\n{text[:max_chars]}"]
+
+    if ext in PPTX_EXTS:
+        text = extract_pptx_text(path).strip()
+        if not text:
+            raise SummarizeError(f"pptx appears empty: {path}")
+        return [f"Content type: pptx\n\n---\n{text[:max_chars]}"]
+
+    if ext in HTML_EXTS:
+        text = extract_html_text(path).strip()
+        return [f"Content type: html\n\n---\n{text[:max_chars]}"]
+
+    if ext in IPYNB_EXTS:
+        text = extract_ipynb_text(path).strip()
+        if not text:
+            raise SummarizeError(f"ipynb appears empty: {path}")
+        return [f"Content type: ipynb\n\n---\n{text[:max_chars]}"]
 
     if ext in CSV_EXTS:
         try:

@@ -15,11 +15,17 @@ from pathlib import Path
 from src.content import (
     CSV_EXTS,
     DOCX_EXTS,
+    HTML_EXTS,
+    IPYNB_EXTS,
     PDF_EXTS,
+    PPTX_EXTS,
     SummarizeError,
     XLSX_EXTS,
     extract_docx_text,
+    extract_html_text,
+    extract_ipynb_text,
     extract_pdf_text,
+    extract_pptx_text,
     extract_xlsx_text,
 )
 from src.ingest.common import (
@@ -48,6 +54,18 @@ def _extract(path: Path) -> tuple[str, str]:
     if ext in XLSX_EXTS:
         text = extract_xlsx_text(path)
         return text, "xlsx"
+
+    if ext in PPTX_EXTS:
+        text = extract_pptx_text(path)
+        return text, "pptx"
+
+    if ext in HTML_EXTS:
+        text = extract_html_text(path)
+        return text, "html"
+
+    if ext in IPYNB_EXTS:
+        text = extract_ipynb_text(path)
+        return text, "ipynb"
 
     if ext in CSV_EXTS:
         try:

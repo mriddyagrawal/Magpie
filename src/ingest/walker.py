@@ -92,13 +92,14 @@ async def _run_tier(
 
 # Extensions the router knows how to peek. Anything else is silently skipped.
 _CONSIDERED_EXTS = {
-    ".txt", ".md", ".markdown",
+    ".txt", ".md", ".markdown", ".log",
     ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
     ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
     ".sh", ".sql",
     ".json", ".yaml", ".yml", ".toml",
     ".csv",
     ".pdf", ".docx", ".xlsx", ".xlsm",
+    ".pptx", ".html", ".htm", ".ipynb",
     ".png", ".jpg", ".jpeg", ".webp", ".gif",
 }
 
@@ -266,7 +267,29 @@ def _delete_if_exists(rel_path: str) -> None:
         p.unlink()
 
 
-async def run_batch(root: Path, *, force: bool = False, concurrency: int = 4) -> None:
+def _format_decision_line(path: Path, decision: RouteDecision, source_rel: str) -> str:
+    """One-line per-file summary for `--verbose` mode."""
+    if decision.skipped:
+        return f"  SKIP  {source_rel:<60}  ({decision.skip_reason})"
+    primary = _choose_primary_tier(decision) or "-"
+    route_str = "+".join(decision.routes) if decision.routes else "-"
+    badge = f"[{primary}]" if route_str == primary else f"[{route_str}]"
+    detail = (
+        f"visual={decision.visual_score} sens={decision.sensitivity_score} "
+        f"crit={decision.criticality}"
+    )
+    if decision.t4_cost_mb > 0:
+        detail += f" t4_mb={decision.t4_cost_mb:.1f} t4_s={decision.t4_cost_s:.0f}"
+    return f"  {badge:<10}  {source_rel:<60}  ({detail})"
+
+
+async def run_batch(
+    root: Path,
+    *,
+    force: bool = False,
+    concurrency: int = 4,
+    verbose: bool = False,
+) -> None:
     from tqdm import tqdm
 
     load_dotenv()
@@ -359,6 +382,9 @@ async def run_batch(root: Path, *, force: bool = False, concurrency: int = 4) ->
                     primary = _choose_primary_tier(decision)
                     if primary:
                         stats[primary] += 1
+
+                if verbose:
+                    tqdm.write(_format_decision_line(path, decision, rel))
         except SummarizeError as e:
             stats["errors"] += 1
             tqdm.write(f"  skip: {rel}: {e}")
@@ -387,13 +413,28 @@ async def run_batch(root: Path, *, force: bool = False, concurrency: int = 4) ->
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="nas-ingest",
-        description="Router-driven batch ingest (Plans/Indexing Tiers.md).",
+        description=(
+            "Router-driven ingest — walks a directory, writes summaries, "
+            "and pushes them to Qdrant in one command. "
+            "See Plans/Indexing Tiers.md."
+        ),
     )
     parser.add_argument("path", help="Directory to walk.")
     parser.add_argument("--force", action="store_true",
                         help="Re-ingest every file regardless of manifest state.")
     parser.add_argument("--concurrency", type=int, default=4,
                         help="Max concurrent files (default: 4).")
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="Print per-file routing decision (tier + scores + criticality).")
+    parser.add_argument(
+        "--no-push",
+        action="store_true",
+        help=(
+            "Skip the Stage 2 Qdrant push at the end. Leaves new summaries in "
+            "Test Summaries/ with `ingested_at=None`; run `python -m src.stage2 "
+            "ingest` later to push them manually."
+        ),
+    )
     args = parser.parse_args()
 
     root = Path(args.path)
@@ -401,7 +442,41 @@ def main() -> None:
         sys.exit(f"error: no such path: {root}")
     if not root.is_dir():
         sys.exit(f"error: ingest walker expects a directory, got: {root}")
-    asyncio.run(run_batch(root, force=args.force, concurrency=args.concurrency))
+    asyncio.run(run_batch(
+        root,
+        force=args.force,
+        concurrency=args.concurrency,
+        verbose=args.verbose,
+    ))
+
+    # Stage 2 push: read the manifest, embed new/changed rows, upsert into
+    # Qdrant. This is the step users most often forgot to run — folding it in
+    # here means a single invocation makes the corpus searchable.
+    if args.no_push:
+        print(
+            "\nstage 2 push skipped (--no-push). "
+            "Run `python -m src.stage2 ingest` to make new summaries searchable."
+        )
+        return
+    print("\npushing new summaries to Qdrant...")
+    try:
+        from src.stage2.__main__ import ingest_from_manifest
+        stats = ingest_from_manifest(force=False)
+        print(
+            f"qdrant: upserted {stats['upserted']} points, "
+            f"{stats['orphans_deleted']} orphans cleaned, "
+            f"{stats['total_points']} total manifest rows"
+        )
+    except RuntimeError as e:
+        # Empty manifest is fine (everything was unchanged/skipped); anything
+        # else likely means missing Qdrant creds — tell the user and bail soft.
+        print(f"stage 2 push skipped: {e}", file=sys.stderr)
+    except Exception as e:  # pylint: disable=broad-except
+        print(
+            f"stage 2 push failed: {type(e).__name__}: {e}\n"
+            f"run `python -m src.stage2 ingest` manually to retry.",
+            file=sys.stderr,
+        )
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ CriticalitySource = Literal["user", "auto", "default"]
 # File-type buckets (extension only — routing goes deeper with peek)
 # ---------------------------------------------------------------------------
 
-TEXT_EXTS = {".txt", ".md", ".markdown"}
+TEXT_EXTS = {".txt", ".md", ".markdown", ".log"}
 CODE_EXTS = {
     ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
     ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
@@ -48,6 +48,9 @@ CSV_EXTS = {".csv"}
 PDF_EXTS = {".pdf"}
 DOCX_EXTS = {".docx"}
 XLSX_EXTS = {".xlsx", ".xlsm"}
+PPTX_EXTS = {".pptx"}
+HTML_EXTS = {".html", ".htm"}
+IPYNB_EXTS = {".ipynb"}
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
 
@@ -418,6 +421,134 @@ def _peek_xlsx(path: Path) -> PeekResult:
     )
 
 
+def _peek_pptx(path: Path) -> PeekResult:
+    """Count slides and image-to-paragraph-ish ratio. Pulls a text sample."""
+    size = path.stat().st_size
+    err: str | None = None
+    n_slides = 0
+    n_image_shapes = 0
+    n_text_paragraphs = 0
+    pieces: list[str] = []
+    try:
+        from pptx import Presentation  # deferred
+        from pptx.exc import PackageNotFoundError
+    except ImportError as e:
+        return PeekResult(
+            path=path, ext=path.suffix.lower(), size_bytes=size,
+            page_count=0, text_density=0, extractable=False,
+            image_ratio=0.0, row_count=None, image_dims=None,
+            peek_text="", peek_error=f"python-pptx unavailable: {e}",
+        )
+    try:
+        prs = Presentation(str(path))
+    except (PackageNotFoundError, OSError) as e:
+        return PeekResult(
+            path=path, ext=path.suffix.lower(), size_bytes=size,
+            page_count=0, text_density=0, extractable=False,
+            image_ratio=0.0, row_count=None, image_dims=None,
+            peek_text="", peek_error=f"pptx open failed: {e}",
+        )
+
+    for slide in prs.slides:
+        n_slides += 1
+        for shape in slide.shapes:
+            # Picture shapes have shape_type == 13 (MSO_SHAPE_TYPE.PICTURE)
+            if getattr(shape, "shape_type", None) == 13:
+                n_image_shapes += 1
+            text = getattr(shape, "text", "") or ""
+            if text.strip():
+                n_text_paragraphs += 1
+                if sum(len(p) for p in pieces) < PEEK_TEXT_MAX_CHARS:
+                    pieces.append(text)
+    peek_text = "\n".join(pieces)[:PEEK_TEXT_MAX_CHARS]
+    image_ratio = (
+        n_image_shapes / n_text_paragraphs if n_text_paragraphs > 0
+        else (1.0 if n_image_shapes > 0 else 0.0)
+    )
+    _, extractable = _decode_peek(peek_text.encode("utf-8"))
+    return PeekResult(
+        path=path, ext=path.suffix.lower(), size_bytes=size,
+        page_count=n_slides,
+        text_density=len(peek_text) // max(n_slides, 1),
+        extractable=extractable,
+        image_ratio=image_ratio,
+        row_count=None, image_dims=None,
+        peek_text=peek_text, peek_error=err,
+    )
+
+
+def _peek_html(path: Path) -> PeekResult:
+    """Extract clean text via trafilatura; report its length + extractability."""
+    size = path.stat().st_size
+    err: str | None = None
+    clean = ""
+    try:
+        import trafilatura  # deferred
+    except ImportError as e:
+        return PeekResult(
+            path=path, ext=path.suffix.lower(), size_bytes=size,
+            page_count=0, text_density=0, extractable=False,
+            image_ratio=0.0, row_count=None, image_dims=None,
+            peek_text="", peek_error=f"trafilatura unavailable: {e}",
+        )
+    try:
+        raw = path.read_bytes()
+        clean = trafilatura.extract(raw, include_comments=False) or ""
+    except OSError as e:
+        err = f"html read failed: {e}"
+    except Exception as e:  # pylint: disable=broad-except
+        err = f"trafilatura failed: {type(e).__name__}: {e}"
+
+    clean = clean.strip()
+    peek_text = clean[:PEEK_TEXT_MAX_CHARS]
+    _, extractable = _decode_peek(peek_text.encode("utf-8"))
+    return PeekResult(
+        path=path, ext=path.suffix.lower(), size_bytes=size,
+        page_count=1, text_density=len(peek_text),
+        extractable=extractable, image_ratio=0.0,
+        row_count=None, image_dims=None,
+        peek_text=peek_text, peek_error=err,
+    )
+
+
+def _peek_ipynb(path: Path) -> PeekResult:
+    """Count cells, extract a text sample from the first few."""
+    import json as _json
+    size = path.stat().st_size
+    err: str | None = None
+    cells: list = []
+    pieces: list[str] = []
+    try:
+        raw = path.read_text(encoding="utf-8")
+        nb = _json.loads(raw)
+        cells = nb.get("cells", []) if isinstance(nb, dict) else []
+    except (OSError, UnicodeDecodeError) as e:
+        err = f"ipynb read failed: {e}"
+    except _json.JSONDecodeError as e:
+        err = f"ipynb is not valid JSON: {e}"
+
+    for cell in cells:
+        if not isinstance(cell, dict):
+            continue
+        source = cell.get("source", "")
+        if isinstance(source, list):
+            source = "".join(source)
+        if isinstance(source, str) and source.strip():
+            pieces.append(source)
+        if sum(len(p) for p in pieces) >= PEEK_TEXT_MAX_CHARS:
+            break
+    peek_text = "\n".join(pieces)[:PEEK_TEXT_MAX_CHARS]
+    _, extractable = _decode_peek(peek_text.encode("utf-8"))
+    return PeekResult(
+        path=path, ext=path.suffix.lower(), size_bytes=size,
+        page_count=len(cells),
+        text_density=len(peek_text) // max(len(cells), 1),
+        extractable=extractable, image_ratio=0.0,
+        row_count=None, image_dims=None,
+        peek_text=peek_text, peek_error=err,
+    )
+
+
 def _peek_image(path: Path) -> PeekResult:
     size = path.stat().st_size
     dims: tuple[int, int] | None = None
@@ -466,6 +597,12 @@ def peek(path: Path) -> PeekResult:
         return _peek_docx(path)
     if ext in XLSX_EXTS:
         return _peek_xlsx(path)
+    if ext in PPTX_EXTS:
+        return _peek_pptx(path)
+    if ext in HTML_EXTS:
+        return _peek_html(path)
+    if ext in IPYNB_EXTS:
+        return _peek_ipynb(path)
     if ext in IMAGE_EXTS:
         return _peek_image(path)
 
@@ -890,6 +1027,80 @@ def decide(
             skip_reason=None, notes=notes,
         )
 
+    # --- PPTX --------------------------------------------------------------
+
+    if ext in PPTX_EXTS:
+        if p.peek_error or p.page_count == 0:
+            return _skip_decision(f"pptx unreadable: {p.peek_error or 'empty'}", p)
+
+        # Image-heavy decks need T4 (ColPali) alongside T2 for visual retrieval;
+        # text-heavy decks are fine with T2 alone (or T3+T2 if critical).
+        image_heavy = p.image_ratio >= 0.5
+
+        if image_heavy and not colpali_disabled:
+            t4_fits_per_file = (
+                t4_mb <= T4_MAX_STORAGE_MB_PER_FILE
+                and t4_s <= (
+                    T4_MAX_SECONDS_PER_FILE_GPU if gpu_available
+                    else T4_MAX_SECONDS_PER_FILE_CPU
+                )
+            )
+            t4_fits_budget = (t4_budget_used_mb + t4_mb) <= budget_cap
+            if t4_fits_per_file and t4_fits_budget:
+                routes = (["T3", "T2", "T4"]
+                          if criticality == "critical" else ["T2", "T4"])
+                notes.append(f"pptx image-heavy → {'+'.join(routes)}")
+                return RouteDecision(
+                    routes=routes, visual_score=vs, sensitivity_score=ss,
+                    t4_cost_mb=t4_mb, t4_cost_s=t4_s,
+                    criticality=criticality, criticality_source=crit_source,
+                    skip_reason=None, notes=notes,
+                )
+            notes.append(
+                f"pptx image-heavy, T4 gated off "
+                f"({'over_per_file_cap' if not t4_fits_per_file else 'budget_exhausted'})"
+            )
+
+        routes = ["T3", "T2"] if criticality == "critical" else ["T2"]
+        notes.append(f"pptx text-heavy → {'+'.join(routes)}")
+        return RouteDecision(
+            routes=routes, visual_score=vs, sensitivity_score=ss,
+            t4_cost_mb=t4_mb, t4_cost_s=t4_s,
+            criticality=criticality, criticality_source=crit_source,
+            skip_reason=None, notes=notes,
+        )
+
+    # --- HTML --------------------------------------------------------------
+
+    if ext in HTML_EXTS:
+        if not p.extractable or p.text_density == 0:
+            return _skip_decision("html extracted empty — likely JS-only SPA", p)
+        routes = ["T3", "T2"] if criticality == "critical" else ["T2"]
+        notes.append(f"html → {'+'.join(routes)}")
+        return RouteDecision(
+            routes=routes, visual_score=vs, sensitivity_score=ss,
+            t4_cost_mb=0.0, t4_cost_s=0.0,
+            criticality=criticality, criticality_source=crit_source,
+            skip_reason=None, notes=notes,
+        )
+
+    # --- IPYNB -------------------------------------------------------------
+
+    if ext in IPYNB_EXTS:
+        if p.peek_error:
+            return _skip_decision(f"ipynb unreadable: {p.peek_error}", p)
+        if p.page_count == 0:
+            return _skip_decision("ipynb has no cells", p)
+        # Notebooks are "text once parsed" — same routing as text-native docs.
+        routes = ["T3", "T2"] if criticality == "critical" else ["T2"]
+        notes.append(f"ipynb ({p.page_count} cells) → {'+'.join(routes)}")
+        return RouteDecision(
+            routes=routes, visual_score=vs, sensitivity_score=ss,
+            t4_cost_mb=0.0, t4_cost_s=0.0,
+            criticality=criticality, criticality_source=crit_source,
+            skip_reason=None, notes=notes,
+        )
+
     # --- Images ------------------------------------------------------------
 
     if ext in IMAGE_EXTS:
@@ -929,3 +1140,162 @@ def decide(
 
     # --- Unknown -----------------------------------------------------------
     return _skip_decision(f"unsupported extension: {ext or '(none)'}", p)
+
+
+# ---------------------------------------------------------------------------
+# CLI: `python -m src.router <file>` — inspect a single file's routing decision
+# ---------------------------------------------------------------------------
+
+def _detect_gpu() -> bool:
+    """Best-effort: detect CUDA or MPS without importing torch unless present."""
+    try:
+        import torch  # deferred
+    except ImportError:
+        return False
+    try:
+        if torch.cuda.is_available():
+            return True
+        if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            return True
+    except Exception:  # pylint: disable=broad-except
+        pass
+    return False
+
+
+def _cli_explain_file(path: Path, gpu: bool) -> int:
+    """Print the full routing decision for one file."""
+    peeked = peek(path)
+    nasconfig = load_nasconfig(path)
+    decision = decide(peeked, nasconfig=nasconfig, gpu_available=gpu)
+
+    print(f"path:          {path}")
+    print(f"ext:           {peeked.ext}")
+    print(f"size_bytes:    {peeked.size_bytes:,}")
+    if peeked.page_count:
+        print(f"pages:         {peeked.page_count}")
+    if peeked.row_count is not None:
+        print(f"rows:          {peeked.row_count:,}")
+    if peeked.image_dims:
+        print(f"image_dims:    {peeked.image_dims[0]}x{peeked.image_dims[1]}")
+    print(f"text_density:  {peeked.text_density}")
+    print(f"extractable:   {peeked.extractable}")
+    if peeked.peek_error:
+        print(f"peek_error:    {peeked.peek_error}")
+    print()
+    print(f"visual_score:       {decision.visual_score}")
+    print(f"sensitivity_score:  {decision.sensitivity_score}")
+    print(f"criticality:        {decision.criticality}  (source: {decision.criticality_source})")
+    if decision.t4_cost_mb > 0:
+        print(
+            f"t4_cost:            {decision.t4_cost_mb:.1f} MB, "
+            f"{decision.t4_cost_s:.0f}s {'(gpu)' if gpu else '(cpu)'}"
+        )
+    print(f"gpu_detected:       {'yes' if gpu else 'no'}")
+    print()
+    if decision.skipped:
+        print(f"decision:      SKIP ({decision.skip_reason})")
+    else:
+        print(f"decision:      run {'+'.join(decision.routes)}")
+    if decision.notes:
+        print("notes:")
+        for n in decision.notes:
+            print(f"  - {n}")
+    return 0
+
+
+def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
+    """Walk `root`, print one compact line per candidate, tally by tier.
+
+    Respects `.gitignore` / `.nasignore` + built-in defaults (same rules the
+    ingest walker uses). No side effects — nothing is written, no LLM.
+    """
+    # Deferred imports: only hit the walker/ignore modules in directory mode.
+    from src.ingest.ignore import IgnoreRules
+    from src.ingest.walker import find_candidates
+
+    files, ignored = find_candidates(root, ignore_rules=IgnoreRules.from_root(root))
+    if not files and ignored == 0:
+        print(f"no indexable files under {root}")
+        return 0
+
+    tally: dict[str, int] = {"T0": 0, "T1": 0, "T2": 0, "T3": 0, "T4": 0, "SKIP": 0}
+    multi_tier = 0
+    shown = 0
+
+    for f in files:
+        peeked = peek(f)
+        nasconfig = load_nasconfig(f)
+        d = decide(peeked, nasconfig=nasconfig, gpu_available=gpu)
+        if d.skipped:
+            tally["SKIP"] += 1
+            badge = "SKIP"
+            detail = d.skip_reason or ""
+        else:
+            route_str = "+".join(d.routes) if d.routes else "-"
+            badge = f"[{route_str}]"
+            for t in d.routes:
+                tally[t] = tally.get(t, 0) + 1
+            if len(d.routes) > 1:
+                multi_tier += 1
+            detail = (
+                f"visual={d.visual_score} sens={d.sensitivity_score} crit={d.criticality}"
+            )
+            if d.t4_cost_mb > 0:
+                detail += f" t4_mb={d.t4_cost_mb:.1f}"
+
+        try:
+            rel = str(f.relative_to(root))
+        except ValueError:
+            rel = str(f)
+
+        if limit is None or shown < limit:
+            print(f"  {badge:<10}  {rel:<70}  ({detail})")
+            shown += 1
+        elif shown == limit:
+            remaining = len(files) - shown
+            print(f"  ... +{remaining} more (pass --limit 0 to see all)")
+            shown += 1
+
+    print()
+    print(
+        f"summary: {len(files)} candidates — "
+        f"T0={tally['T0']} T1={tally['T1']} T2={tally['T2']} "
+        f"T3={tally['T3']} T4={tally['T4']} SKIP={tally['SKIP']} "
+        f"(multi-tier={multi_tier}, ignored={ignored}, gpu={'yes' if gpu else 'no'})"
+    )
+    return 0
+
+
+def main() -> None:
+    import argparse as _argparse
+    parser = _argparse.ArgumentParser(
+        prog="nas-router",
+        description=(
+            "Inspect what tier a file (or every file in a directory) would route to. "
+            "No ingest, no LLM, no writes."
+        ),
+    )
+    parser.add_argument("path", help="File or directory to inspect.")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=50,
+        help="For directories: max per-file lines to print (default: 50, 0 = all).",
+    )
+    args = parser.parse_args()
+
+    target = Path(args.path)
+    if not target.exists():
+        print(f"error: no such path: {target}")
+        raise SystemExit(1)
+
+    gpu = _detect_gpu()
+    limit = None if args.limit == 0 else args.limit
+
+    if target.is_dir():
+        raise SystemExit(_cli_explain_dir(target.resolve(), gpu, limit=limit))
+    raise SystemExit(_cli_explain_file(target, gpu))
+
+
+if __name__ == "__main__":
+    main()

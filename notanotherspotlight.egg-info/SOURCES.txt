@@ -17,6 +17,7 @@ src/split_courses.py
 src/ingest/__init__.py
 src/ingest/__main__.py
 src/ingest/common.py
+src/ingest/ignore.py
 src/ingest/ripgrep.py
 src/ingest/tier0.py
 src/ingest/tier1.py

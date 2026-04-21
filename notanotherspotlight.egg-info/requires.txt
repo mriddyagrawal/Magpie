@@ -12,6 +12,8 @@ fastembed>=0.4
 colpali-engine>=0.3
 pathspec>=0.12
 pyyaml>=6.0
+python-pptx>=1.0
+trafilatura>=1.12
 ipykernel
 jupyter
 notebook

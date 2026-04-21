@@ -16,8 +16,6 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from pydantic_ai import Agent
-
 from src.ingest.common import (
     SUMMARIES_DIR,
     TierOutcome,
@@ -25,6 +23,7 @@ from src.ingest.common import (
     summary_rel_path,
     write_summary,
 )
+from src.llm import ChatAgent
 from src.stage1.summarize import (
     FileSummary,
     _run_with_retry,
@@ -36,14 +35,16 @@ from src.stage1.summarize import (
 async def run_async(
     path: Path,
     source_rel: str,
-    agent: Agent[None, FileSummary],
+    agent: ChatAgent[FileSummary],
 ) -> TierOutcome:
     """Run the LLM summary and write <hash>_t3.md. Retries on 429 like Stage 1."""
     digest = await asyncio.to_thread(hash_file, path)
     out_path = SUMMARIES_DIR / f"{digest}_t3.md"
     message = await asyncio.to_thread(build_user_message, path)
-    result = await _run_with_retry(agent, message, path.name)
-    body_markdown = render_markdown(result.output, source_rel)
+    # _run_with_retry returns the parsed FileSummary directly (ChatAgent.run()
+    # already unwraps the PydanticAI RunResult). Do NOT do .output here.
+    summary = await _run_with_retry(agent, message, path.name)
+    body_markdown = render_markdown(summary, source_rel)
     await asyncio.to_thread(write_summary, out_path, body_markdown)
     return TierOutcome(
         summary_file_rel=summary_rel_path(out_path),
@@ -51,6 +52,6 @@ async def run_async(
     )
 
 
-def run(path: Path, source_rel: str, agent: Agent[None, FileSummary]) -> TierOutcome:
+def run(path: Path, source_rel: str, agent: ChatAgent[FileSummary]) -> TierOutcome:
     """Sync convenience wrapper — runs the async path via asyncio.run."""
     return asyncio.run(run_async(path, source_rel, agent))

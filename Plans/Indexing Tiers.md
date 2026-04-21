@@ -129,10 +129,19 @@ retrieval would miss this entirely.
   recall loss.
 - Binary quantization with rescoring: ~32× reduction, used only if a user
   opts into a "tiny disk" mode. Default is int8.
-- **Never mean-pool or attention-pool patches.** The value of ColPali is that
-  the signal lives in specific patches (the cell with the total, the corner
-  with the signature). Pooling averages discriminators into noise — the exact
-  failure mode we're avoiding on financial docs.
+- **Never mean-pool or attention-pool patches — by default.** The value of
+  ColPali is that the signal lives in specific patches (the cell with the
+  total, the corner with the signature). Pooling averages discriminators
+  into noise — the exact failure mode we're avoiding on financial docs.
+
+> **Carve-out (shipped 2026-04-21):** `.pptx` files route through T4 with
+> `pool_factor=2` (HierarchicalTokenPooler — ~50% storage reduction at
+> ~100% recall retention per Clavié et al. 2024). Everything else still
+> routes with `pool_factor=1` — no pooling. Educational slide decks tolerate
+> pooling because the signal is slide-level semantic ("which slide explains
+> X"), not patch-level discriminator. The whitelist lives at
+> [src/ingest/tier4.py:POOL_SAFE_EXTS](../src/ingest/tier4.py); expanding
+> it is gated on a real-data recall benchmark (see [backlog G4](backlog_20Apr26.md)).
 
 ## The router — how a file gets to its tier
 

@@ -47,7 +47,6 @@ class Entry:
     summary_file: str | None = None
     summarized_at: str = ""
     ingested_at: str | None = None
-    row_count: int | None = None
     fast_indexed_at: str | None = None  # set when the file lands in fast_tier
     fast_pages: int | None = None        # page count indexed into fast_tier
     # Router audit trail (src/router.py + Plans/Indexing Tiers.md). Defaults

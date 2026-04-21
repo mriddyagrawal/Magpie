@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Sequence
@@ -53,6 +52,21 @@ SYSTEM_PROMPT = (
     "Answer the user's question using ONLY the files provided in the message. "
     "If the files do not contain the information needed to answer, say so explicitly — "
     "do not invent facts. "
+    "IMPORTANT — terminology and unit mapping. The absence of the user's exact "
+    "phrase does NOT mean the file lacks the information. Before concluding that "
+    "a file does not cover a topic, check whether the file discusses the same "
+    "concept under a different name, a synonym, an abbreviation, or a different "
+    "unit. When it does, answer from what the file states and briefly note the "
+    "mapping. Concrete examples you should handle this way: "
+    "(1) 'beats per second' → the file's 'BPM / beats per minute / tempo' — "
+    "answer with the tempo/BPM definition and note that beats-per-second = BPM ÷ 60; "
+    "(2) 'prereqs' → the file's 'prerequisites'; "
+    "(3) 'bank fees' → the file's 'service charges'; "
+    "(4) 'how long is the class' → the file's 'duration' or 'credit hours'. "
+    "This is grounded answering, not invention — you are reporting what the file "
+    "says and identifying it as the equivalent concept. Do NOT bridge genuinely "
+    "distinct concepts (e.g. don't answer a question about pitch using a file "
+    "that only discusses rhythm). "
     "Be concise. Default to the shortest answer that directly addresses the "
     "question — one sentence or a brief list is usually enough. Do not restate "
     "the question, add background context, or enumerate details the user didn't "
@@ -159,6 +173,36 @@ async def answer_question(
         entry = manifest.get(display)
         return entry is not None and "T0" in (entry.routes or [])
 
+    def _summary_supplement(display: str) -> str | None:
+        """Return the T3 LLM summary text for `display`, if any.
+
+        Used as supplementary context alongside the raw file. The summary is
+        what keeps scanned PDFs / huge textbooks answerable: pypdf often
+        extracts near-nothing from scans, and the scanned-fallback only
+        renders the first 5 pages — but the T3 summary has the full
+        chapter list. Labeled explicitly so the model knows it's a distilled
+        overview, not raw file content.
+        """
+        if manifest is None:
+            return None
+        entry = manifest.get(display)
+        if entry is None or not entry.summary_file:
+            return None
+        summary_path = REPO_ROOT / entry.summary_file
+        try:
+            body = summary_path.read_text(encoding="utf-8")
+        except OSError:
+            return None
+        body = body.strip()
+        if not body:
+            return None
+        return (
+            "Content type: llm-summary (distilled overview of the file — use "
+            "alongside the raw content below, especially when the raw "
+            "extraction is thin or the file is large)\n\n---\n"
+            f"{body}"
+        )
+
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
@@ -187,6 +231,15 @@ async def answer_question(
         except SummarizeError as e:
             print(f"  warn: skipping {display}: {e}", file=sys.stderr)
             continue
+
+        # Prepend the T3 LLM summary (if we have one) as supplementary context.
+        # Critical for scanned PDFs where raw extraction yields near-nothing,
+        # and for very long files where the first-N-pages window misses the
+        # user's target content (TOCs, later chapters, etc.).
+        supplement = _summary_supplement(display)
+        if supplement is not None:
+            blocks = [supplement, *blocks]
+
         per_file_blocks.append((display, blocks))
 
     if not per_file_blocks:
@@ -203,9 +256,13 @@ async def answer_question(
     intro_parts.append(f"Current question: {question}")
     intro_parts.append("")
     intro_parts.append(
-        "Answer the current question strictly from the files below. "
-        "Cite the exact file paths (from the '--- File N: <path> ---' headers) "
-        "in `sources_used`."
+        "Answer the current question using the files below. Follow the "
+        "system-prompt guidance on terminology/unit mapping — if the file "
+        "covers the concept under a different name, abbreviation, or unit "
+        "(e.g. 'BPM' when the user asks about 'beats per second'), answer "
+        "from what the file states and note the mapping rather than declaring "
+        "the information absent. Cite the exact file paths (from the "
+        "'--- File N: <path> ---' headers) in `sources_used`."
     )
     message: list = ["\n".join(intro_parts)]
     for i, (display, blocks) in enumerate(per_file_blocks, 1):
@@ -214,14 +271,41 @@ async def answer_question(
 
     ans = await agent.run(message)
 
-    # Defensive: drop any path the model invented that wasn't in our input
+    # Defensive: drop any path the model invented that wasn't in our input.
+    # Match is whitespace-tolerant — the model sometimes collapses double-spaces
+    # or normalizes separators when echoing paths with spaces (e.g. "101 mus"),
+    # which would cause a valid citation to be filtered out as a hallucination.
     input_paths = {display for display, _ in per_file_blocks}
-    filtered = [s for s in ans.sources_used if s in input_paths]
-    if len(filtered) != len(ans.sources_used):
-        dropped = [s for s in ans.sources_used if s not in input_paths]
+    normalized_input = {_normalize_path_for_match(p): p for p in input_paths}
+
+    filtered: list[str] = []
+    dropped: list[str] = []
+    for s in ans.sources_used:
+        if s in input_paths:
+            filtered.append(s)
+            continue
+        canonical = normalized_input.get(_normalize_path_for_match(s))
+        if canonical is not None:
+            filtered.append(canonical)
+        else:
+            dropped.append(s)
+    if dropped:
         print(f"  warn: dropped hallucinated source paths: {dropped}", file=sys.stderr)
     ans.sources_used = filtered
     return ans
+
+
+def _normalize_path_for_match(p: str) -> str:
+    """Collapse whitespace and URL-decode so LLM-echoed paths match our originals.
+
+    The model occasionally renders paths with collapsed spaces or %20-encoded
+    spaces even when instructed to copy verbatim. Without normalization those
+    echoes get filtered out as hallucinations and the user sees "Sources used:
+    (none)" for an answer that did come from a real file.
+    """
+    import urllib.parse as _up
+    decoded = _up.unquote(p)
+    return " ".join(decoded.split()).strip()
 
 
 def answer_question_sync(

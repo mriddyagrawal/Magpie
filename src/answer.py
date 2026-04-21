@@ -22,7 +22,9 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from src.content import SummarizeError, build_content_blocks
+from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
 from src.llm import ChatAgent, build_agent
+from src.manifest import Manifest
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -142,16 +144,46 @@ async def answer_question(
     if not valid:
         raise SummarizeError("all provided file paths were missing or invalid")
 
+    # Manifest lets us see which retrieved files were routed to T0 (not
+    # fully embedded). For those, ripgrep pulls the most likely relevant
+    # lines so the LLM gets real content even though we skipped exhaustive
+    # indexing at ingest.
+    try:
+        manifest = await asyncio.to_thread(Manifest)
+    except Exception:  # pylint: disable=broad-except
+        manifest = None
+
+    def _is_t0(display: str) -> bool:
+        if manifest is None:
+            return False
+        entry = manifest.get(display)
+        return entry is not None and "T0" in (entry.routes or [])
+
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
         try:
-            blocks = await asyncio.to_thread(
-                build_content_blocks,
-                abs_path,
-                max_chars=ANSWER_MAX_CHARS_PER_FILE,
-                max_pdf_pages=ANSWER_MAX_PDF_PAGES,
-            )
+            if _is_t0(display):
+                # T0 files: skip the whole-file read and lean on ripgrep.
+                hits = await asyncio.to_thread(ripgrep_search, abs_path, question)
+                hits_text = format_hits_block(abs_path, hits)
+                if hits_text:
+                    blocks = [
+                        f"Content type: t0-ripgrep (full file not embedded; "
+                        f"below are the lines matching your question)\n\n---\n{hits_text}"
+                    ]
+                else:
+                    blocks = [
+                        f"Content type: t0-ripgrep\n\n---\n"
+                        f"(no matching lines in {abs_path.name}; file not embedded at ingest)"
+                    ]
+            else:
+                blocks = await asyncio.to_thread(
+                    build_content_blocks,
+                    abs_path,
+                    max_chars=ANSWER_MAX_CHARS_PER_FILE,
+                    max_pdf_pages=ANSWER_MAX_PDF_PAGES,
+                )
         except SummarizeError as e:
             print(f"  warn: skipping {display}: {e}", file=sys.stderr)
             continue

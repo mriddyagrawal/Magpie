@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Read(//mnt/hardisk/Project-Democratize-Furman-Information/videos/**)",
-      "Bash(gh repo *)"
+      "Bash(gh repo *)",
+      "Bash(git -C /mnt/hardisk/rememex log --oneline -n 80)",
+      "WebFetch(domain:redlib.catsarch.com)",
+      "WebFetch(domain:safereddit.com)",
+      "Bash(git -C /mnt/hardisk/rememex log -p -n 8 --stat)",
+      "Read(//mnt/hardisk/rememex/src-tauri/src/indexer/**)",
+      "WebFetch(domain:api.pullpush.io)",
+      "Bash(uv run *)"
     ]
   }
 }

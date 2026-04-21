@@ -53,14 +53,20 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
 
     upserted = 0
     if todo_paths:
-        # Split into CSV entries (summary_file is None) and regular entries.
+        # `summary_file is None` covers two unrelated cases:
+        #   1. CSVs — registered without an LLM summary; row-by-row ingested here.
+        #   2. Fast-tier-only files (images/PDFs routed to ColPali) — they live
+        #      in a separate collection and must NOT be opened as CSV text
+        #      (binary signatures like PNG's \x89 blow up the UTF-8 decoder).
         csv_paths = []
         regular_paths = []
         for rel in todo_paths:
             entry = manifest.get(rel)
             assert entry is not None
             if entry.summary_file is None:
-                csv_paths.append(rel)
+                if rel.lower().endswith(".csv"):
+                    csv_paths.append(rel)
+                # else: fast-tier-only — skip summary-collection ingest.
             else:
                 regular_paths.append(rel)
 

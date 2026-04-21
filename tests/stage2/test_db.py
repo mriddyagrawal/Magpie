@@ -17,6 +17,7 @@ SAMPLE = ParsedSummary(
     content_type="pdf",
     keywords=["Breeze Airways", "Greenville-Spartanburg", "Flight Receipt"],
     key_entities=["Mridul Agrawal", "Rahul Ranjan Sah"],
+    identifiers=["R2NDSL", "$170.45"],
     summary_file="Test Summaries/8c2bbf673a91ef8d.md",
 )
 
@@ -54,10 +55,24 @@ def test_embedding_text_contains_keywords():
     assert "Flight Receipt" in text
 
 
-def test_embedding_text_excludes_entities():
-    """Key entities feed BM25 via the full text, not the dense embedding input."""
+def test_embedding_text_includes_entities():
+    """Key entities MUST be in the embedded text — discriminators for BM25.
+
+    Updated from the original `excludes_entities` test: we deliberately
+    include entities + identifiers in the embedding text now so BM25 can
+    match verbatim tokens (names, order numbers, exact amounts) that dense
+    embeddings tend to wash out. See `src/stage2/db.py:_build_embedding_text`.
+    """
     text = _build_embedding_text(SAMPLE)
-    assert "Mridul Agrawal" not in text
+    assert "Mridul Agrawal" in text
+    assert "Rahul Ranjan Sah" in text
+
+
+def test_embedding_text_includes_identifiers():
+    """Same reasoning: exact-match tokens (order #, dates, totals) reach BM25."""
+    text = _build_embedding_text(SAMPLE)
+    assert "R2NDSL" in text
+    assert "$170.45" in text
 
 
 def test_embedding_text_excludes_source_path():

@@ -78,7 +78,7 @@ def _sample_summary_blobs(n: int) -> list[str]:
     for p in sampled:
         try:
             text = p.read_text(encoding="utf-8")
-        except OSError:
+        except (OSError, UnicodeDecodeError):
             continue
         blobs.append(text[:MAX_CHARS_PER_SUMMARY])
     return blobs

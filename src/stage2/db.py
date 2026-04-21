@@ -197,7 +197,9 @@ def upsert_csv_rows(csv_path: Path, source_rel: str) -> int:
 
     from tqdm import tqdm
 
-    with csv_path.open(encoding="utf-8") as f:
+    from src.stage1.summarize import _open_csv_text
+
+    with _open_csv_text(csv_path) as f:
         reader = csv_mod.DictReader(f)
         headers = reader.fieldnames or []
         rows = list(reader)

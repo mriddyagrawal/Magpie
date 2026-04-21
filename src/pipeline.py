@@ -98,27 +98,26 @@ async def sync_files(
     concurrency: int = 1,
     force_summarize: bool = False,
     force_ingest: bool = False,
+    do_fast: bool = True,
+    do_summary: bool = True,
 ) -> None:
-    """Bring the manifest, Test Summaries/, and Qdrant into sync with `source_dir`.
+    """Bring the manifest, summaries, and both Qdrant collections in sync.
 
-    1. Stage 1: summarize new + changed files under `source_dir`. Hard-delete
-       manifest rows (and their summary .md files) whose source has vanished.
-    2. Stage 2: ingest newly-summarized / re-summarized rows into Qdrant.
-       Hard-delete Qdrant points that no longer correspond to any manifest row.
+    Two-tier pipeline (see `Plans/IO - Colpali.md`):
 
-    At the end, the manifest, the Test Summaries/ directory, and the Qdrant
-    collection are all in agreement.
+    1. **Fast tier** (if `do_fast`): ColPali multi-vectors for PDFs ≤50 pages
+       and images. GPU-bound, no LLM cost.
+    2. **Summary tier** (if `do_summary`): LLM summaries for everything else
+       (PDFs >50p, .docx, .xlsx, .csv, code, markdown). When both tiers run
+       in the same call, the summary tier auto-skips files already covered
+       by the fast tier.
 
-    `source_dir` defaults to "Test Content" at the repo root, so `sync_files()`
-    with no arguments works from any CWD. Relative paths are resolved against
-    the repo root; absolute paths are used as-is.
-
-    `force_summarize=True` re-summarizes every file even if size is unchanged.
-    `force_ingest=True` drops + recreates the Qdrant collection before re-embedding.
+    Prints per-tier wall-clock timing at the end so you can compare ColPali
+    vs. LLM-summarize throughput side by side.
     """
+    import time
+
     from src.manifest import REPO_ROOT
-    from src.stage1.summarize import build_agent as build_summarize_agent, run_batch
-    from src.stage2.__main__ import ingest_from_manifest
 
     if source_dir is None:
         source_dir = DEFAULT_SOURCE_DIR
@@ -128,11 +127,53 @@ async def sync_files(
     if not source_dir.is_dir():
         raise ValueError(f"not a directory: {source_dir}")
 
-    summ_agent = build_summarize_agent()
-    await run_batch(summ_agent, source_dir, force=force_summarize, concurrency=concurrency)
-    # ingest_from_manifest is sync (embedding + Qdrant network calls), so run
-    # it in a thread to keep the event loop free if the caller is async.
-    await asyncio.to_thread(ingest_from_manifest, force=force_ingest)
+    timings: dict[str, float] = {}
+
+    if do_fast:
+        from src.stage1_fast.index import run_fast_batch
+        print("\n━━━ Fast tier (ColPali) ━━━")
+        t0 = time.monotonic()
+        await asyncio.to_thread(run_fast_batch, source_dir)
+        timings["fast (ColPali)"] = time.monotonic() - t0
+
+    if do_summary:
+        from src.stage1.summarize import (
+            build_agent as build_summarize_agent,
+            run_batch,
+        )
+        from src.stage2.__main__ import ingest_from_manifest
+
+        print("\n━━━ Summary tier (LLM) ━━━")
+        t0 = time.monotonic()
+        summ_agent = build_summarize_agent()
+        # The router is the source of truth: a file is fast-tier OR summary-tier.
+        # Summary tier should never process fast-tier-routed files, regardless
+        # of whether we're also running the fast batch in this same sync call.
+        await run_batch(
+            summ_agent,
+            source_dir,
+            force=force_summarize,
+            concurrency=concurrency,
+            skip_fast_tier=True,
+        )
+        timings["summary LLM summarize"] = time.monotonic() - t0
+
+        print("\n━━━ Summary tier (Qdrant ingest) ━━━")
+        t0 = time.monotonic()
+        await asyncio.to_thread(ingest_from_manifest, force=force_ingest)
+        timings["summary Qdrant ingest"] = time.monotonic() - t0
+
+    if timings:
+        print("\n━━━ Tier timings ━━━")
+        width = max(len(k) for k in timings)
+        total = 0.0
+        for tier, elapsed in timings.items():
+            mins, secs = divmod(elapsed, 60)
+            print(f"  {tier.ljust(width)} : {int(mins):>3}m {secs:04.1f}s")
+            total += elapsed
+        if len(timings) > 1:
+            mins, secs = divmod(total, 60)
+            print(f"  {'total'.ljust(width)} : {int(mins):>3}m {secs:04.1f}s")
 
 
 def sync_files_sync(
@@ -141,12 +182,16 @@ def sync_files_sync(
     concurrency: int = 1,
     force_summarize: bool = False,
     force_ingest: bool = False,
+    do_fast: bool = True,
+    do_summary: bool = True,
 ) -> None:
     asyncio.run(sync_files(
         source_dir,
         concurrency=concurrency,
         force_summarize=force_summarize,
         force_ingest=force_ingest,
+        do_fast=do_fast,
+        do_summary=do_summary,
     ))
 
 

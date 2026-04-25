@@ -132,6 +132,28 @@ DEFAULT_IGNORE_PATTERNS: tuple[str, ...] = (
     # the walker applies a sibling-density rule: folders where images
     # dominate and no documents live are treated as asset libraries and
     # their images are skipped — see src/ingest/walker.py.
+    #
+    # Common-secret filenames — never index, even with `--force`. Most secret
+    # locations (`.ssh/`, `.gnupg/`, `.aws/`) are dot-folders, already pruned
+    # by the walker. These patterns cover loose secret files that could land
+    # outside dot-folders (e.g. a project's `.env` inside its source tree).
+    # Keep narrow — false positives silently drop legitimate user content.
+    ".env",
+    ".env.*",
+    ".npmrc",
+    ".netrc",
+    ".pgpass",
+    ".git-credentials",
+    "id_rsa",
+    "id_rsa.*",
+    "id_ed25519",
+    "id_ed25519.*",
+    "id_ecdsa",
+    "id_ecdsa.*",
+    "id_dsa",
+    "id_dsa.*",
+    "*.pfx",
+    "*.p12",
 )
 
 

@@ -125,10 +125,19 @@ def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
 
     Returns an empty list if the collection doesn't exist yet (e.g. fresh
     setup, or the user has only run --fast-only syncs).
+
+    Asserts the configured embedding model's dim matches the collection's
+    stored dim before issuing the query — if you swap the dense model
+    (e.g. MiniLM-384 → E5-base-768) the index becomes incompatible, and
+    silently sending a 768-d vector at a 384-d collection either errors
+    cryptically or returns garbage. Fail loudly with re-index instructions.
     """
+    from src.stage2.db import assert_dense_dim_match
+
     client = get_qdrant_client()
     if not client.collection_exists(COLLECTION_NAME):
         return []
+    assert_dense_dim_match(client, COLLECTION_NAME)
 
     dense_text = sq.query + " " + " ".join(sq.keywords)
     dense_vec = embed_dense_query(dense_text)

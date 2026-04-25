@@ -52,6 +52,31 @@ SYSTEM_PROMPT = (
     "Answer the user's question using ONLY the files provided in the message. "
     "If the files do not contain the information needed to answer, say so explicitly — "
     "do not invent facts. "
+    "\n\n"
+    "STRICT GROUNDING RULES — these are inviolable:\n"
+    "1. EVERY substantive claim in your answer must be directly supported by "
+    "text actually visible in the file content blocks. Do NOT add information "
+    "from your training data that isn't explicitly present in the files — even "
+    "if you know it to be true and even if it would round out the answer. "
+    "Helpful expansion is harmful here; the user is checking what THEIR FILES "
+    "say, not what the world knows.\n"
+    "2. If the files cover a topic narrowly (e.g., Dirac delta in an "
+    "electrodynamics text), do NOT expand the answer to cover adjacent areas "
+    "(applications in other fields, historical context, modern variants, "
+    "related concepts) unless those areas are also explicitly discussed in "
+    "the files. Stay in the lane the files cover.\n"
+    "3. EVERY page citation must point to a page whose content you actually "
+    "used. Do not attach a citation to a claim you generated from general "
+    "knowledge. Do not include 'decorative' citations (pages that happen to "
+    "be in the file content but didn't contribute the cited fact).\n"
+    "4. EVERY file used in your answer must appear in `sources_used`. If "
+    "different bullets / sentences pull content from different files, list "
+    "ALL contributing files. Do not attribute content from file A to file B. "
+    "If you can't tell which file a piece of information came from, omit it.\n"
+    "5. When in doubt between completeness and faithfulness, choose "
+    "faithfulness. A short, accurate answer that cites the right files beats "
+    "a comprehensive-looking answer that mixes sources or extrapolates.\n"
+    "\n"
     "IMPORTANT — terminology and unit mapping. The absence of the user's exact "
     "phrase does NOT mean the file lacks the information. Before concluding that "
     "a file does not cover a topic, check whether the file discusses the same "
@@ -77,9 +102,37 @@ SYSTEM_PROMPT = (
     "current question (resolve references like 'that', 'it', 'the same course'), "
     "but still ground your answer in the files — do not recycle a prior answer "
     "without checking the current files. "
-    "In `sources_used`, include only the exact file paths (copied verbatim from the "
-    "'--- File N: <path> ---' headers) that your answer actually depends on. "
-    "Do not list files you consulted but did not actually use. "
+    "In `sources_used`, include only the file paths your answer actually "
+    "depends on. The path itself must be copied verbatim from the "
+    "'--- File N: <path> ---' headers — but you MAY append page references "
+    "after the path using this exact format: "
+    "`<path>  [book pp. 254-258 / PDF pp. 269-273]`. Use this format only "
+    "when the file has page anchors (you'll see '## PDF page N (book p. X)' "
+    "headers in the file content). Do NOT invent page numbers; cite only the "
+    "anchors that actually appear in what you read. "
+    "\n\n"
+    "Mathematical notation: PREFER Unicode math symbols — they render "
+    "cleanly in plain-text terminals (which is what most users see). "
+    "Use ∂ ∫ ∑ ∏ √ ⇒ ⇔ ≈ ≠ ≤ ≥ ∇ × · ± ∞ α β γ θ φ ψ ω π Δ where they "
+    "express the equation. Use Unicode subscripts/superscripts where useful "
+    "(x², q̇, m₁). Only fall back to LaTeX `$...$` (inline) or `$$...$$` "
+    "(display) for structures Unicode can't express clearly: fractions like "
+    "$\\frac{a}{b}$, multi-line sums, integrals with limits. "
+    "Source PDFs often have OCR-garbled math (e.g. 'd/dt' shown as 'dldt', "
+    "'∂' shown as 'a', subscripts split across spaces, em-dashes for minus "
+    "signs). Use your knowledge of standard physics/math notation to "
+    "reconstruct the correct expression — never copy garbled OCR verbatim. "
+    "If you can't reliably reconstruct, describe the equation in plain "
+    "language instead. "
+    "\n\n"
+    "Page numbers belong in `sources_used` ONLY. Do NOT pepper the answer "
+    "prose with `[book p. N / PDF p. M]` annotations — they clutter the "
+    "reading experience and the user already sees the consolidated page "
+    "list at the bottom. The only exception: if the user explicitly asked "
+    "'where' or 'on what page', you may give a single short citation in "
+    "the prose using the form 'page N' (book page; the PDF page is in "
+    "sources_used). Otherwise keep the prose clean. "
+    "\n\n"
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
 )
@@ -123,6 +176,7 @@ async def answer_question(
     question: str,
     file_paths: Sequence[str | Path],
     history: list[tuple[str, str]] | None = None,
+    search_keywords: list[str] | None = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -133,6 +187,11 @@ async def answer_question(
     turns), it's prepended to the message so the model can resolve references
     like 'it' or 'the same course'. The model is still instructed to ground
     its answer in the current files, not recycle prior answers.
+
+    If `search_keywords` is provided (the SearchQuery's keywords list from
+    the rewriter), long PDFs are lazy-chunked: rather than send the LLM the
+    first N chars (cover + preface for a 700-page book), we pick the pages
+    matching those keywords. Without keywords, behavior is unchanged.
     """
     if not question.strip():
         raise ValueError("question is empty")
@@ -227,6 +286,7 @@ async def answer_question(
                     abs_path,
                     max_chars=ANSWER_MAX_CHARS_PER_FILE,
                     max_pdf_pages=ANSWER_MAX_PDF_PAGES,
+                    search_keywords=search_keywords,
                 )
         except SummarizeError as e:
             print(f"  warn: skipping {display}: {e}", file=sys.stderr)
@@ -264,6 +324,36 @@ async def answer_question(
         "the information absent. Cite the exact file paths (from the "
         "'--- File N: <path> ---' headers) in `sources_used`."
     )
+
+    # If the user is asking an enumeration ("all my receipts" / "list every
+    # X" / "what stuff did I do in Y") query, the strict-grounding rules
+    # alone cause the LLM to cherry-pick a few "safe" representative items
+    # and drop borderline matches. Enumeration questions need the opposite
+    # stance: be exhaustive, include every file that plausibly fits, and
+    # let borderline cases in with a short hedge rather than dropping them.
+    # B1's classifier is the existing mechanism — re-run it here so the
+    # answer stage sees the same class the search layer used. Pure regex,
+    # no LLM call, cheap to run.
+    from src.stage2.query_classify import QueryClass, classify as _classify_q
+    if _classify_q(question) is QueryClass.LIST_ALL:
+        intro_parts.append(
+            ""
+        )
+        intro_parts.append(
+            "ENUMERATION MODE: this is a 'list all' / 'give me every X' "
+            "question. Be EXHAUSTIVE — include every file in the input "
+            "that plausibly fits the user's category. Do NOT cherry-pick "
+            "a few representative examples and drop the rest. If a file's "
+            "membership in the category is uncertain, include it with a "
+            "short hedge (e.g. '(possibly also a receipt)' / 'related: ...') "
+            "rather than omitting. The strict grounding rules still apply "
+            "— every line you write must be supported by visible file "
+            "text — but for enumeration queries, err on the side of "
+            "INCLUDING borderline matches rather than excluding them. "
+            "List every contributing file in `sources_used`, not just the "
+            "headline few."
+        )
+
     message: list = ["\n".join(intro_parts)]
     for i, (display, blocks) in enumerate(per_file_blocks, 1):
         message.append(f"\n--- File {i}: {display} ---")
@@ -275,20 +365,41 @@ async def answer_question(
     # Match is whitespace-tolerant — the model sometimes collapses double-spaces
     # or normalizes separators when echoing paths with spaces (e.g. "101 mus"),
     # which would cause a valid citation to be filtered out as a hallucination.
+    # We ALSO accept an optional trailing `[book pp. N-M / PDF pp. X-Y]` page
+    # suffix on each path: the bare path is verified against input_paths, but
+    # the suffix is preserved in the output so the user sees both numbers.
     input_paths = {display for display, _ in per_file_blocks}
     normalized_input = {_normalize_path_for_match(p): p for p in input_paths}
+
+    import re as _re
+    _SUFFIX_RE = _re.compile(r"\s*(\[[^\]]*\])\s*$")
 
     filtered: list[str] = []
     dropped: list[str] = []
     for s in ans.sources_used:
-        if s in input_paths:
-            filtered.append(s)
-            continue
-        canonical = normalized_input.get(_normalize_path_for_match(s))
-        if canonical is not None:
-            filtered.append(canonical)
+        # Split off the page-citation suffix (if present) so we verify the
+        # bare path against input_paths but keep the suffix for display.
+        m = _SUFFIX_RE.search(s)
+        if m:
+            page_suffix = m.group(1)
+            bare = s[: m.start()].rstrip()
         else:
+            page_suffix = ""
+            bare = s
+
+        if bare in input_paths:
+            canonical = bare
+        else:
+            canonical = normalized_input.get(_normalize_path_for_match(bare))
+
+        if canonical is None:
             dropped.append(s)
+            continue
+
+        filtered.append(
+            f"{canonical}  {page_suffix}" if page_suffix else canonical
+        )
+
     if dropped:
         print(f"  warn: dropped hallucinated source paths: {dropped}", file=sys.stderr)
     ans.sources_used = filtered
@@ -302,9 +413,20 @@ def _normalize_path_for_match(p: str) -> str:
     spaces even when instructed to copy verbatim. Without normalization those
     echoes get filtered out as hallucinations and the user sees "Sources used:
     (none)" for an answer that did come from a real file.
+
+    Also strips a trailing page-citation suffix like
+    `  [book pp. 254-258 / PDF pp. 269-273]` or
+    `  [PDF p. 7]` — added per system-prompt instruction so the user sees
+    page info in the sources_used line. The canonical comparison is against
+    the raw path; the suffix is recovered separately if we want to display it.
     """
     import urllib.parse as _up
+    import re as _re
     decoded = _up.unquote(p)
+    # Strip a trailing bracketed page-info suffix. The LLM is told to format
+    # it as `<path>  [book pp. N-M / PDF pp. X-Y]` — we accept any [...]
+    # block at the end of the string for forgiveness.
+    decoded = _re.sub(r"\s*\[[^\]]*\]\s*$", "", decoded)
     return " ".join(decoded.split()).strip()
 
 

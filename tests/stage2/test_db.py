@@ -7,7 +7,18 @@ Verifies the IO contract:
 - Point IDs are deterministic from summary_file
 """
 
-from src.stage2.db import _build_embedding_text, _point_id
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from src.stage2.db import (
+    COLLECTION_NAME,
+    DenseDimMismatchError,
+    _build_embedding_text,
+    _point_id,
+    assert_dense_dim_match,
+)
+from src.stage2.embeddings import DENSE_VECTOR_SIZE
 from src.stage2.parser import ParsedSummary
 
 SAMPLE = ParsedSummary(
@@ -79,3 +90,82 @@ def test_embedding_text_excludes_source_path():
     """Source path is metadata, not part of the embedding."""
     text = _build_embedding_text(SAMPLE)
     assert "Test Content/" not in text
+
+
+# ---------------------------------------------------------------------------
+# B3 — embedding-dimension mismatch detection
+# ---------------------------------------------------------------------------
+
+
+def _mock_collection_info(dense_size: int | None) -> MagicMock:
+    """Build a Qdrant get_collection() response with the given dense vector size."""
+    info = MagicMock()
+    info.config = MagicMock()
+    info.config.params = MagicMock()
+    if dense_size is None:
+        info.config.params.vectors = {}
+    else:
+        dense_cfg = MagicMock()
+        dense_cfg.size = dense_size
+        info.config.params.vectors = {"dense": dense_cfg}
+    return info
+
+
+@patch("src.stage2.db.get_qdrant_client")
+def test_assert_dim_match_passes_on_correct_dim(mock_client):
+    """When the stored dim equals the configured one, no exception."""
+    client = mock_client.return_value
+    client.collection_exists.return_value = True
+    client.get_collection.return_value = _mock_collection_info(DENSE_VECTOR_SIZE)
+
+    # Should not raise.
+    assert_dense_dim_match(collection=COLLECTION_NAME)
+
+
+@patch("src.stage2.db.get_qdrant_client")
+def test_assert_dim_match_raises_on_mismatch(mock_client):
+    """Mismatch raises DenseDimMismatchError with both sizes + remediation hint."""
+    wrong_size = DENSE_VECTOR_SIZE + 384  # E5-base would be 768 vs MiniLM's 384
+    client = mock_client.return_value
+    client.collection_exists.return_value = True
+    client.get_collection.return_value = _mock_collection_info(wrong_size)
+
+    with pytest.raises(DenseDimMismatchError) as excinfo:
+        assert_dense_dim_match(collection=COLLECTION_NAME)
+
+    err = excinfo.value
+    assert err.expected == DENSE_VECTOR_SIZE
+    assert err.found == wrong_size
+    assert err.collection == COLLECTION_NAME
+    # Message mentions both sizes and tells user how to fix
+    msg = str(err)
+    assert str(DENSE_VECTOR_SIZE) in msg
+    assert str(wrong_size) in msg
+    assert "ingest --force" in msg
+
+
+@patch("src.stage2.db.get_qdrant_client")
+def test_assert_dim_match_noop_on_missing_collection(mock_client):
+    """Fresh setup — collection doesn't exist yet — should pass silently."""
+    client = mock_client.return_value
+    client.collection_exists.return_value = False
+
+    assert_dense_dim_match(collection=COLLECTION_NAME)
+    # get_collection must NOT be called — that would error on a missing collection
+    client.get_collection.assert_not_called()
+
+
+@patch("src.stage2.db.get_qdrant_client")
+def test_assert_dim_match_handles_collection_with_no_dense(mock_client):
+    """A collection that has no `dense` named vector → no-op (nothing to compare).
+
+    Defensive against schema migrations or stale configs from earlier versions
+    of the project that used a different vector layout.
+    """
+    client = mock_client.return_value
+    client.collection_exists.return_value = True
+    info = _mock_collection_info(dense_size=None)
+    client.get_collection.return_value = info
+
+    # Should not raise.
+    assert_dense_dim_match(collection=COLLECTION_NAME)

@@ -306,7 +306,52 @@ Test Summaries/
 .ipynb_checkpoints/
 package-lock.json  yarn.lock  pnpm-lock.yaml  poetry.lock  uv.lock
 Cargo.lock  Gemfile.lock  go.sum
+
+# Common-secret filenames (never indexed even with --force):
+.env  .env.*  .npmrc  .netrc  .pgpass  .git-credentials
+id_rsa  id_rsa.*  id_ed25519  id_ed25519.*  id_ecdsa  id_ecdsa.*  id_dsa  id_dsa.*
+*.pfx  *.p12
 ```
+
+## Hidden paths (dot-folders + dotfiles)
+
+Walking from a home directory routinely encounters `.config/`, `.codex/`,
+`.antigravity/`, `.cache/`, `.claude/`, `.vscode/`, etc. — at home-dir
+scale these dominate the candidate list with files the user has zero
+interest in searching.
+
+**Three-level policy:**
+
+1. **Dot-folders are pruned during traversal.** The walker uses `os.walk`
+   and removes any directory whose name starts with `.` from the
+   children list before descending. This means `.config/` and friends
+   are never even *listed*, let alone peeked. The walk root itself can
+   still be a dot-folder if you point us at one explicitly
+   (`python -m src.ingest /home/you/.codex` works).
+2. **Loose dotfiles default to skipped.** A leaf-name `.foo` in any
+   walked folder is skipped by default — no peek, no router call.
+3. **A small allowlist of useful dotfiles is indexed anyway.** Shell
+   rcs and editor configs carry real user content and are surfaced:
+
+   ```
+   .bashrc .bash_profile .bash_aliases .bash_logout
+   .zshrc .zprofile .zshenv .zlogin .zlogout
+   .profile .kshrc .cshrc .tcshrc .inputrc .dircolors
+   .vimrc .nvimrc .gvimrc
+   .tmux.conf .screenrc
+   .gitconfig .gitattributes .editorconfig
+   .condarc
+   ```
+
+   See `_USEFUL_DOTFILE_NAMES` in [src/ingest/walker.py](../src/ingest/walker.py).
+   Add to it if you want to opt in more by default; we keep the list
+   conservative so config secrets (`.env`, `.netrc`, `.pgpass`,
+   `.git-credentials`) stay out.
+
+**Edge case:** a `.bashrc` *inside* a dot-folder
+(e.g. `~/.config/.bashrc`) is still skipped — the parent-folder prune
+outranks the leaf allowlist. The walker's intent is "we don't traverse
+dot-folders," not "we look for allowlisted leaves anywhere."
 
 ---
 

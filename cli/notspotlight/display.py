@@ -19,11 +19,39 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def file_link(rel_path: str) -> str:
-    """Format a repo-relative path as a clickable rich link (file:// URL)."""
+    """Format a repo-relative path as a clickable rich link (file:// URL).
+
+    The answer LLM may append a page-citation suffix to a path (per the
+    `sources_used` format rule in src/answer.py:SYSTEM_PROMPT), e.g.:
+
+        /path/to/textbook.pdf  [book pp. 254-258 / PDF pp. 269-273]
+
+    The bracketed suffix MUST be rendered outside the rich [link] tag —
+    otherwise Rich tries to parse the inner `[book pp...]` as nested
+    markup, which raises MarkupError and crashes the answer display.
+    Suffix is shown as dim text following the clickable link, both
+    visually distinguished from the path and safely outside markup.
+    """
     if not rel_path:
         return rel_path
-    abs_path = (_REPO_ROOT / rel_path).resolve()
-    return f"[link=file://{abs_path}]{rel_path}[/link]"
+
+    import re
+    from rich.markup import escape
+
+    # Split the path from any trailing `[...]` page-citation suffix.
+    m = re.search(r"\s*(\[[^\]]*\])\s*$", rel_path)
+    if m:
+        suffix = m.group(1)
+        bare = rel_path[: m.start()].rstrip()
+    else:
+        suffix = ""
+        bare = rel_path
+
+    abs_path = (_REPO_ROOT / bare).resolve()
+    link = f"[link=file://{abs_path}]{escape(bare)}[/link]"
+    if suffix:
+        return f"{link} [dim]{escape(suffix)}[/dim]"
+    return link
 
 
 FALLBACK_SUGGESTIONS = [
@@ -134,7 +162,15 @@ def print_result(result: PipelineResult) -> None:
 
 
 def print_error(msg: str) -> None:
-    console.print(f"[red bold]Error:[/red bold] {msg}")
+    """Print an error line to the console.
+
+    Escapes Rich markup characters in `msg` so error messages that contain
+    `[...]` brackets (paths with page suffixes, regex output, JSON snippets,
+    even prior MarkupErrors) don't trigger a second markup parse failure
+    inside the error path.
+    """
+    from rich.markup import escape
+    console.print(f"[red bold]Error:[/red bold] {escape(msg)}")
 
 
 def print_setting(key: str, value: str) -> None:

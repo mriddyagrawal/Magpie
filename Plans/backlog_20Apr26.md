@@ -37,12 +37,7 @@ Conventions:
 - **Why not yet:** Needs B1 first (we need the classifier to gate on). Plus a small prompt engineering loop.
 - **Revisit trigger:** Right after B1 lands.
 
-### B3. R6 — Embedding-dimension mismatch detection
-- **What:** At search time, assert the configured embedding model's dim equals the stored collection's dim. On mismatch: auto-reindex if possible, else error loudly with "the dense model was changed; run `ns reindex --force`."
-- **Effort:** S.
-- **Why:** rememex `search.rs:67` — they added this assertion *after* a user-reported silent-garbage bug. Same class of bug we'll hit the first time someone swaps MiniLM for E5-Base.
-- **Why not yet:** Minor, but genuinely cheap. Cheapest item on this whole backlog per unit of user-pain-avoided.
-- **Revisit trigger:** Do it before any embedding-model swap work.
+### ~~B3. R6 — Embedding-dimension mismatch detection~~ — ✅ Shipped 2026-04-25. See [IO/IO - shipped_20Apr26.md §H12](../IO/IO%20-%20shipped_20Apr26.md). Now any subsequent embedding-model swap raises `DenseDimMismatchError` with a re-index instruction, instead of silent garbage.
 
 ### ~~B4. Cross-encoder reranker~~ — ✅ Shipped 2026-04-24 (default off, opt-in via REPL `.rerank on`). See [IO/IO - shipped_20Apr26.md §A9](../IO/IO%20-%20shipped_20Apr26.md). Verification pending E4 activation. Future expansion: bigger model (`bge-reranker-v2-m3`) once `RERANK_MODEL` env-var swap is benchmarked.
 
@@ -67,12 +62,59 @@ Conventions:
 - **Why not yet:** Meaningful only once we have a measurable baseline to beat (see D1).
 - **Revisit trigger:** Ship the non-agentic baseline, eval it, then A/B against an agentic loop.
 
-### B8. Semantra-style window chunking for long text-native PDFs
-- **What:** For text-native PDFs over some threshold (say >50 pages), augment the T2 whole-file text dump with **overlapping token-window chunks** á la [Semantra](https://github.com/freedmand/semantra) — default `128_0_16` (128 tokens, 16-token overlap). Each chunk gets its own Qdrant point with `source_path`, `page_num`, and `char_offset` payload fields. Retrieval returns both whole-file summary hits and chunk-level hits; the answer stage uses chunk `page_num` to cite "page 237" instead of the whole file. Reuse the existing dense+sparse embeddings; no new model.
+### B10. Vocabulary-aware T2 summary templating
+- **What:** When T2 generates a summary for a file with an obvious **content type** (a receipt, an invoice, a flight booking, a hotel reservation, a tax form, a transcript), prepend a small canonical-vocabulary tag to the summary body so retrieval matches category-style queries. Examples:
+  - Receipt PDF whose body says *"Uber ride from GSP to Furman, $36.94"* → summary body starts with `"Receipt / expense / transaction record: ..."` then the original text.
+  - Hotel booking PDF → `"Lodging receipt / hotel reservation / accommodation expense: ..."`
+  - Flight ticket → `"Transportation receipt / flight booking / airfare: ..."`
+- **Effort:** S to M. Detection is heuristic (filename hints + content patterns: `$\d+\.\d+`, `Order #`, `confirmation number`, `boarding pass`, etc.). The router already does similar work in `compute_sensitivity_score`; reuse those signals.
+- **Why:** Real failure observed 2026-04-25 — query *"give me all the receipts that I have on my laptop by type"* retrieved 7 of ~15 actual receipts in top-20. The missing 8 were mostly Uber screenshot PNGs, Hotel YQuantum, Flight Yale-GSP, etc. Their summaries say things like *"Uber ride"* / *"American Airlines flight booking"* — the user's query expansion (`receipt, sales slip, voucher, expense`) didn't connect to the file vocabulary. Index-side enrichment fixes this once instead of asking the rewriter to enumerate every transit/lodging synonym at query time.
+- **Why not yet:** Wait for user-side testing of the new ENUMERATION-MODE prompt fix (shipped 2026-04-25). If that alone makes the cherry-picking better, retrieval recall might be sufficient already. If real receipts still don't surface in top-20, ship B10.
+- **Revisit trigger:** Run the receipts query post-prompt-fix. If <80% of corpus receipts are in top-20, ship B10.
+- **Related:** B11 is the query-side counterpart (enrich the query instead of the index). They're complementary — both improve the same recall metric, attacked from opposite ends.
+
+### B12. T4 robustness on weird image variants (16-bit PNG, palette PNG, GIF edge cases)
+- **What:** Wrap the per-image encode in `src/stage1_fast/index.py:index_file` so that PIL/torch failures on edge-case image formats (16-bit grayscale PNG, palette-mode PNG, indexed-color GIF, CMYK JPEG, EXIF-rotated images) skip cleanly with a clear error message instead of leaking torch tracebacks. Concretely: catch `RuntimeError` (torch dtype mismatches like `c10::Half != float`), `OSError` (PIL truncated images), `ValueError` (unsupported color modes) inside the encode loop; mark the file with `skip_reason="t4_encode_failed: <type>"` in the manifest and continue.
+- **Effort:** S. ~20 lines; the worker's outer `except Exception` already keeps the walker running, so this is purely about cleaner error reporting + mark-skipped behavior.
+- **Why:** Real failure observed 2026-04-26 on a home-directory ingest — many app-icon PNGs from `.antigravity/` and `.codex/` triggered `RuntimeError: expected mat1 and mat2 to have the same dtype, but got: c10::Half != float`. Most of those are now skipped by the dot-folder prune (shipped 2026-04-26), but the underlying ColPali fragility remains: a legitimate user image with an unusual color mode would still crash. The walker continues but the error is noisy and the file silently never gets indexed.
+- **Reproducer once we have one:** save a 16-bit grayscale PNG and a palette-mode PNG to a corpus folder, run `python -m src.ingest <dir>`, observe both crash. Fix should normalize to RGB float32 in the encoder's preprocessing path.
+- **Why not yet:** Now that dot-folder pruning catches the high-volume case (app icons), the remaining surface is small. Defer until a real user image crashes T4.
+- **Revisit trigger:** Any non-`.antigravity/.codex` user image triggers `c10::Half != float` or similar dtype/shape errors during ingest.
+- **Related:** None directly. Pure robustness.
+
+### B11. Domain-aware synonym expansion in the rewriter
+- **What:** When the rewriter's LLM detects that the user's query is about a recognizable category (receipts, courses, lectures, papers, music, photos), expand the keyword list with the **specific vocabulary that documents in that category actually use** — not just synonyms of the user's word.
+  - "receipts" → also include `Uber ride, hotel reservation, flight ticket, airfare, rental car, lodging, transit, parking, food expense, voucher, booking confirmation, invoice, refund` ...
+  - "lectures" → also include `slides, presentation, syllabus, lesson notes, handout, pptx, transcript`
+  - "papers" → also include `paper, draft, manuscript, preprint, arxiv, study, paper.pdf`
+- **Effort:** S. One paragraph addition to `REWRITE_SYSTEM_PROMPT` instructing the rewriter to generate domain-specific vocabulary, not just synonyms of the surface term. No code structure changes; pure prompt work.
+- **Why:** Same root cause as B10 — vocabulary mismatch between user's category word and the documents' actual language. B10 fixes it at index time; B11 fixes it at query time. Both work; together they overlap usefully (a corpus indexed before B10 still benefits from B11).
+- **Risk:** This is the kind of prompt change that drifts toward the synonym-enumeration anti-pattern. Discipline: tell the rewriter to use **one principle** ("expand to vocabulary documents actually use") rather than enumerating example domains. Trust the LLM to apply the principle universally; never list "receipts → Uber, hotel, flight" as an example pair the way I almost did in my earlier overshoot.
+- **Why not yet:** Same trigger as B10 — wait for the ENUMERATION-MODE prompt fix to be tested first, then see if recall is good enough.
+- **Revisit trigger:** Same as B10. Ship together if either is needed.
+
+### B9. Answer-side citation verification — programmatic hallucination check
+- **What:** After the LLM produces an answer, programmatically verify every page citation it emitted. For each `[book p. N / PDF p. M]` citation, look up page M's actual text (we already have the file content in scope at answer time — the lazy-chunk blocks include `## PDF page N (book p. M)` anchors), compute a similarity / containment score against the cited claim's surrounding sentences, and flag (or strip) citations that don't match.
+- **Effort:** M to L. Multiple sub-pieces:
+  - Citation parser: regex `(\[book p\. (\d+) / PDF p\. (\d+)\])` plus surrounding-sentence extractor.
+  - Page-text lookup: maintain a `pdf_path → {pdf_page: text}` map built from the lazy-chunk content blocks before the LLM call.
+  - Similarity / containment metric. Cheapest reasonable: extract proper-noun + numeric tokens from the cited sentence, check if ≥50% appear in the cited page text. Better: small cross-encoder pass `(claim, page_text) → score` (we already have ms-marco-MiniLM loaded for B4 rerank — reuse it).
+  - Threshold + behavior: above threshold → keep citation as-is; below → strip the citation (so the answer text loses the false reference but the user still sees the source file in `sources_used`); if many citations fail → warn the user inline that the answer may be partially ungrounded.
+  - Optionally: programmatically rewrite `sources_used` so each cited file has only its **verified-cited** pages listed.
+- **Why:** Real hallucination caught 2026-04-25 — LLM answered "what's a Dirac delta function?" with content from BOTH Griffiths electrodynamics AND UnderstandingDeepLearning textbooks but listed only Griffiths in `sources_used` and attributed all citations (including a "Machine Learning Application" bullet that came from the deep-learning textbook) to Griffiths page 440/454. The cited pages of Griffiths don't actually contain ML content. This shape of hallucination is the most dangerous: well-formatted, plausible, with real-looking page numbers — only catchable by checking the actual file. Prompt-level "strict grounding rules" (shipped 2026-04-25, see [IO §H14](../IO/IO%20-%20shipped_20Apr26.md)) reduce the rate but don't guarantee correctness.
+- **Why not yet:** Prompt-level constraints are the cheaper first lever — they're free, easy to iterate, and effective enough for most LLMs (especially paid ones like Kimi). Citation verification is necessary only if hallucinations persist after (a) strict prompt rules and (b) using a more disciplined LLM. Build this if real-data testing shows the prompt + Kimi combination still produces wrong-source citations.
+- **Revisit trigger:** A reproducible hallucinated citation on Kimi (or another paid model) where the cited page text does not match the cited claim. Don't pre-build before that signal.
+- **Related:** **H9** (answer-prompt de-hacking) and **H14** (strict grounding rules in answer prompt) are the cheap upstream mitigations. B9 is the structural belt-and-suspenders.
+- **What:** Upfront overlapping token-window chunks á la [Semantra](https://github.com/freedmand/semantra) (default `128_0_16`) for text-native files where the **lazy** approach (H13, shipped 2026-04-25) doesn't apply: research papers, dense unstructured docs, files without bookmark TOCs. Each chunk → its own Qdrant point with `page_num` payload.
 - **Effort:** M.
-- **Why:** Today a 400-page text-native PDF goes through T2 as **one** embedding — "what's on page 237?" retrieves the whole-file vector with no page-level signal. Semantra's entire pitch is this chunking, and it's why their recall on long docs beats naive file-level RAG. See transcript discussion 2026-04-21 where the Taylor textbook (808 pages) returned only the cover + preface because no chunking surfaced the TOC or later chapters. Complements B5 (hierarchical summaries) but solves a different problem: B5 gives you section-level *summaries*, B8 gives you raw-text chunk *matches* with page anchors.
-- **Why not yet:** Router refactor consumed ingest. Also a multiplier on Qdrant point count (50-page PDF → ~5× more points) — want B5 or a storage-vs-recall measurement first to make sure we're not exploding the summary collection for content where the file-level vector is already sufficient.
-- **Revisit trigger:** First text-native PDF over 100 pages lands in the index AND a realistic "page N covers X" query misses because retrieval only has the file-level vector. Or whenever we ship B5 — build both together, they share infrastructure.
+- **Why lazy isn't enough for these files:** The lazy approach (H13) only kicks in *after* a file has been retrieved at the index level. For research papers / transcripts / no-TOC PDFs, the relevant term isn't in the file-level summary, so retrieval can't find the file at all → lazy never gets a chance. Upfront chunking is the only way to make sub-section terms findable.
+- **What's deliberately NOT in scope (covered by lazy, H13):**
+  - Textbooks / manuals with bookmark TOCs (file findable via TOC in summary; lazy picks the right page at answer time)
+  - Short docs (<10 pages of dense content; T2's single embedding is sufficient)
+- **Why not yet:** No observed failure on the user's corpus that fits the "research paper / no TOC / dense" shape. Storage cost for B8 on the 3 textbooks would be ~80 MB; cost on a typical research-paper-heavy corpus would be ~5-10 MB per paper.
+- **Router-side trigger needed first:** add a "would benefit from upfront chunking" flag to the router decision (`text_density > N AND page_count > 5 AND has_bookmark_toc == False`). Ship that as a logging-only signal first, see how often it fires on real corpora, then build B8 if the flag fires often enough to matter.
+- **Revisit trigger:** A real query against a research-paper-shaped file misses because of the dilution. The trigger: user asks "did this paper use ResNet" → wrong answer → that's the signal.
+- **Related:** Complements **H13** (lazy chunking, shipped). The two together = "upfront chunk where you must, lazy-chunk where you can."
 
 ---
 
@@ -176,25 +218,7 @@ Conventions:
 - **Why:** User explicitly asked "did we use 0.8 for colpali" — we're on `>=0.3`. Version drift is a quiet risk.
 - **Revisit trigger:** Next dep-refresh pass.
 
-### E4. Qdrant standalone binary upgrade — reclaim fast_tier storage (✅ wiring shipped 2026-04-24)
-- **What:** Move from `QdrantClient(path=...)` embedded mode to the **Qdrant Rust binary** spawned as a subprocess on `localhost:6333`. Same binary as Qdrant Cloud, supports int8/fp16/binary quantization. Deliberately NOT Docker — chosen so the same subprocess pattern carries forward to end-user shipping (see E5).
-- **Status:** Wiring shipped 2026-04-24:
-  - `just qdrant-install` / `qdrant-up` / `qdrant-down` / `qdrant-status` targets in [justfile](../justfile). Binary + data live on `/mnt/hardisk/qdrant/` by default (env-overridable) so the root drive doesn't fill up.
-  - [src/stage2/db.py:get_qdrant_client](../src/stage2/db.py) loosened: `QDRANT_API_KEY` is now optional when `QDRANT_CLUSTER_ENDPOINT` is on localhost (loopback-host detection via `_is_localhost_url`). Cloud auth still required for non-localhost URLs.
-  - 143 tests still pass.
-- **Activation requires (user-side, not yet done):**
-  1. `just qdrant-install` — pulls the Qdrant binary one time.
-  2. `just qdrant-up` — starts it as a background process.
-  3. `.env`: switch to `QDRANT_PROVIDER=cloud` + `QDRANT_CLUSTER_ENDPOINT=http://localhost:6333` (no API key needed).
-  4. Re-ingest one root to populate the new server.
-- **Why this matters:** Local/embedded Qdrant is a **Python reimplementation**, not the Rust server. It silently drops every advanced feature — confirmed via `just fast-tier-config`:
-  ```
-  VECTOR PARAMS:           scalar int8 requested
-  COLLECTION ACTIVE QC:    None  ← Python shim ignored it
-  ```
-  Standalone Rust binary honors the request → fast_tier drops from ~1 MB/page to ~130 KB/page (8×).
-- **Revisit trigger after activation:** (a) fast_tier passes 2 GB; (b) need binary or fp16 quantization; (c) shipping mode (E5) is being built.
-- **Related:** E1 (Qdrant local-Docker docs) is now superseded by these `just` targets. E5 (the shipping path) reuses the same subprocess pattern.
+### ~~E4. Qdrant standalone binary upgrade — reclaim fast_tier storage~~ — ✅ Wiring shipped 2026-04-24. See [IO/IO - shipped_20Apr26.md §H10](../IO/IO%20-%20shipped_20Apr26.md). **User-side activation pending:** `just qdrant-install && just qdrant-up`, then `.env` swap to `QDRANT_PROVIDER=cloud` + `http://localhost:6333`, then re-ingest. Until activated, fast_tier stays at 1 MB/page.
 
 ### E5. Bundle Qdrant binary for end-user distribution (future)
 - **What:** When packaging the app for non-developer users (pipx wheel / Tauri shell), embed the Qdrant binary inside the distribution and spawn it on app launch via the same subprocess pattern E4 introduced. End user installs the app like any other (`pipx install notspotlight` or download a `.dmg`/`.exe`); the app spawns Qdrant transparently in the background. No Docker, no separate Qdrant install step, user sees nothing beyond a one-time "setting up your local index..." spinner.
@@ -332,13 +356,30 @@ Conventions:
 
 ## Next up (prioritized slice, ~1 sprint)
 
-1. **A1** (Stage 3 video smoke test) — finish what we paused.
-2. **G3** (T3 + T2 additive in walker) — ships what our design doc already promises.
-3. **B3** (dim-mismatch detection) — cheapest preventive fix on the whole list.
-4. **D1 + D2** (benchmark + competitors table) — trust artifacts before anything public-facing.
-5. **C3** (JSON Schema for `.nasconfig.yaml`) + **C2** (REPL score breakdown) — small UX polish that makes the product feel finished.
+**Updated 2026-04-25** based on what shipped this session (B1, B4, C7, E4 wiring, plus the H1-H11 cluster — see [IO/IO - shipped_20Apr26.md](../IO/IO%20-%20shipped_20Apr26.md) §A8/A9/A7/H1-H11).
 
-Everything in B (except B3), C1/C4/C5/C6, E2/E3, F, and G1/G2 stays in backlog until a specific trigger fires.
+**Immediate (user action, not code):**
+1. **Activate E4** — `just qdrant-install && just qdrant-up`, swap `.env` to localhost, re-ingest one root. Without this, fast_tier stays uncompressed at 1 MB/page.
+2. **Run `just recover-fast-tier`** to restore the 42 lost `fast_indexed_at` rows from the H6 bug. Requires closing the REPL first (Qdrant local single-writer lock).
+
+**Next code work, ordered:**
+1. **B3** (dim-mismatch detection) — S effort, single biggest preventive fix. Ship before any embedding-model swap.
+2. **D1 + D2** (benchmark + competitors table) — trust artifacts before public release. Now that the search/answer stack has stabilized (B1, B4, prompts), the benchmark numbers won't be moving targets.
+3. **G3** (T3 + T2 additive in walker) — ships what `Plans/Indexing Tiers.md` already promises. Walker currently runs only the primary tier; multi-tier files leave their non-primary work undone.
+4. **A1** (Stage 3 video `.alt` smoke test) — finish what we paused before the router refactor.
+5. **C2** (REPL score breakdown) + **C3** (.nasconfig.yaml JSON Schema) — small polish that makes the product feel finished.
+
+**Pending real-data signal (don't pre-build):**
+- **B8** (Semantra-style chunking for long text-native PDFs) — only worth it if the textbook section-level queries (e.g. "what's in chapter 13 of Taylor") keep failing after E4 activation. Confirmed root cause for the Liouville-style failure; storage cost is ~80 MB for >50-page threshold (cheap relative to E4 savings). Build when the user asks about chapter content and the file-level summary keeps coming up short.
+- **B2** (HyDE on conceptual queries) — only worth it if B1+B4 still misses on factoid queries the user actually types. Depends on extending B1's classifier with a CONCEPTUAL class first.
+- **Sibling-density rule tuning** (mediasources-4ed parent folder still slips through because it has 2 CSVs + 1 TXT among its hundreds of decorative images, defeating the strict "0 documents" gate). Fix: switch from `0 docs` to a ratio-based rule (e.g. `≥10:1 image:doc`). Real bug observed 2026-04-25; flagged but not a tagged backlog item yet.
+- **Default rerank to OFF** instead of opt-in. The auto-suppression for LIST_ALL helps, but rerank also collapses duplicate content (scanned + text-native versions of the same book) and sometimes returns thinner answers as a result. Watch real-data behavior; flip the default if regressions outnumber wins.
+
+**Long-tail (won't trigger soon):**
+- B5, B6, B7 — each waits for a measurable failure mode in real use.
+- C1 (filesystem watcher), C4 (MCP server), C5 (pipx wheel), C6 (Tauri shell) — adoption-path items for after Phase-1.
+- E2 (Ollama benchmarking), E3 (ColPali version bump), E5 (bundle Qdrant for end-users) — pre-launch chores.
+- F1-F4 (file-type coverage), G1-G2 (architecture revisits), H1-H2 (test infrastructure) — opportunistic.
 
 ---
 

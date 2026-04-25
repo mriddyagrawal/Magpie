@@ -36,6 +36,7 @@ from src.router import (
     PeekResult,
     RouteDecision,
     Tier,
+    USEFUL_DOTFILE_NAMES as _USEFUL_DOTFILE_NAMES,
     decide,
     load_nasconfig,
     peek,
@@ -110,6 +111,17 @@ _CONSIDERED_EXTS = {
 }
 
 
+# `_USEFUL_DOTFILE_NAMES` is imported from src.router so the router's `peek`
+# / `decide` see the same set as the walker's filter. Single source of truth
+# lives in router because router is the deeper module (walker imports from
+# router; the reverse would be a circular dependency).
+#
+# Deliberately NOT included in that allowlist:
+#   .env, .npmrc, .netrc, .pgpass, .git-credentials  → secrets
+#   .gitignore                                        → meta-only, not content
+#   .DS_Store, .ipynb_checkpoints                     → OS / app cruft
+
+
 # Extensions of files we consider "documents" (as opposed to images). Used by
 # the asset-library-folder heuristic: a folder with many images and zero docs
 # is treated as an asset library and its images are skipped wholesale.
@@ -166,6 +178,29 @@ def _asset_library_folders(paths: list[Path]) -> set[Path]:
     }
 
 
+def _include_dotfiles_for(
+    dirpath: Path,
+    *,
+    walk_root: Path,
+    cache: dict[Path, bool],
+) -> bool:
+    """Whether `dirpath` opts in to indexing dotfiles / dot-folders.
+
+    Reads `.nasconfig.yaml` walking up from `dirpath` toward (but not past)
+    `walk_root`'s parent. Caches per-directory results so a deep walk of
+    one tree doesn't reload nasconfig for every leaf folder.
+    """
+    if dirpath in cache:
+        return cache[dirpath]
+    try:
+        cfg = load_nasconfig(dirpath, stop_at=walk_root.parent)
+    except Exception:  # pylint: disable=broad-except
+        cfg = {}
+    flag = bool(cfg.get("include_dotfiles", False))
+    cache[dirpath] = flag
+    return flag
+
+
 def find_candidates(
     root: Path,
     *,
@@ -177,24 +212,65 @@ def find_candidates(
     defaults (`node_modules/`, `__pycache__/`, `.git/`, etc.). If omitted,
     rules are built from `root` on the fly.
 
-    On top of explicit ignore rules, a **structural** filter runs: folders
-    dominated by images with no documents are treated as asset libraries
-    and their images are dropped from the candidate set. This catches the
-    common "stock photos next to no documents" case without needing a
-    naming-based pattern — see `_asset_library_folders()`.
+    Three filter layers run in order:
+
+    1. **Dot-folder prune** during traversal — dot-folders (`.config/`,
+       `.codex/`, `.antigravity/`, `.cache/`, etc.) are pruned in-place
+       so their contents are never even listed. App caches and IDE state
+       at home-directory scale explode the candidate list otherwise.
+    2. **Leaf-dotfile filter** — leaf-name dotfiles default to skipped,
+       except the small `_USEFUL_DOTFILE_NAMES` allowlist (`.bashrc`,
+       `.vimrc`, `.gitconfig`, etc.) which actually carry user content.
+    3. **Asset-library folder rule** — folders dominated by images with
+       zero documents are treated as asset libraries and their images
+       are dropped wholesale (post-walk, structural).
+
+    Both layers (1) and (2) are **disabled** for a subtree when its
+    nearest-ancestor `.nasconfig.yaml` says `include_dotfiles: true`. The
+    built-in default ignore patterns (secrets, `node_modules/`, etc.)
+    still apply — opting in to dotfiles doesn't disable safety rails.
+
+    `os.walk` (not `Path.rglob`) is used so step 1 can mutate the
+    children list in-place during traversal — `rglob` doesn't expose
+    a prune hook.
     """
     rules = ignore_rules if ignore_rules is not None else IgnoreRules.from_root(root)
     pre_accepted: list[Path] = []
     ignored = 0
-    for p in root.rglob("*"):
-        if not p.is_file() or p.name.startswith("."):
-            continue
-        if p.suffix.lower() not in _CONSIDERED_EXTS:
-            continue
-        if rules.is_ignored(p):
-            ignored += 1
-            continue
-        pre_accepted.append(p)
+    nasconfig_cache: dict[Path, bool] = {}
+
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirpath_p = Path(dirpath)
+        include_dot = _include_dotfiles_for(
+            dirpath_p, walk_root=root.resolve(), cache=nasconfig_cache,
+        )
+
+        # Prune dot-folders during traversal — unless the user opted in. Note
+        # we do NOT count these in `ignored`: they're a category-skip, not a
+        # per-file ignore-rule hit.
+        if not include_dot:
+            dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+
+        for fname in filenames:
+            # Leaf dotfile filter — allowlisted ones survive (.bashrc et al.),
+            # and `include_dotfiles: true` lets all of them through.
+            if fname.startswith("."):
+                if not include_dot and fname not in _USEFUL_DOTFILE_NAMES:
+                    continue
+            p = dirpath_p / fname
+            if not p.is_file():
+                continue
+            if p.suffix.lower() not in _CONSIDERED_EXTS:
+                # Useful dotfiles (and any dotfile under `include_dotfiles: true`
+                # that has no extension) bypass the considered-ext check.
+                if fname not in _USEFUL_DOTFILE_NAMES and not (
+                    include_dot and fname.startswith(".")
+                ):
+                    continue
+            if rules.is_ignored(p):
+                ignored += 1
+                continue
+            pre_accepted.append(p)
 
     asset_folders = _asset_library_folders(pre_accepted)
     accepted: list[Path] = []

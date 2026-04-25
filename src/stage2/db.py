@@ -104,16 +104,87 @@ def _is_localhost_url(url: str) -> bool:
     return host in _LOCALHOST_HOSTS
 
 
+class DenseDimMismatchError(RuntimeError):
+    """Raised when the configured embedding model's dimension differs from
+    the dimension stored in the existing Qdrant collection.
+
+    This is a silent-corruption class of bug — if you swap the embedding model
+    (e.g., MiniLM-384 → E5-base-768) and try to query an index built with the
+    old model, every search either errors with a cryptic Qdrant message OR,
+    worse, silently returns garbage when the client truncates/zero-pads
+    vectors to fit. The fix is to fail loudly with a re-index instruction.
+    """
+
+    def __init__(self, expected: int, found: int, collection: str) -> None:
+        super().__init__(
+            f"dense vector dim mismatch in collection {collection!r}: "
+            f"current embedding model produces {expected}-d vectors, but the "
+            f"existing collection stores {found}-d. The dense model was "
+            f"changed; the index is incompatible. Run "
+            f"`python -m src.stage2 ingest --force` to drop and recreate "
+            f"the collection with the new model."
+        )
+        self.expected = expected
+        self.found = found
+        self.collection = collection
+
+
+def assert_dense_dim_match(
+    client: QdrantClient | None = None,
+    collection: str = COLLECTION_NAME,
+) -> None:
+    """Verify the stored collection's dense dim matches `DENSE_VECTOR_SIZE`.
+
+    No-op when the collection doesn't exist yet (first run); the upcoming
+    `create_collection` call will use the right dim. When the collection DOES
+    exist, mismatch raises `DenseDimMismatchError` with a clear remediation.
+
+    `client` is optional; when omitted the cached client from
+    `get_qdrant_client()` is used. Callers that already have a client should
+    pass it through so test mocks aren't bypassed (and so we don't construct
+    a second client just for the dim check).
+    """
+    if client is None:
+        client = get_qdrant_client()
+    if not client.collection_exists(collection):
+        return
+    info = client.get_collection(collection)
+    # Multi-named-vectors layout: vectors is a dict keyed by name.
+    vectors = info.config.params.vectors
+    if isinstance(vectors, dict):
+        dense_cfg = vectors.get("dense")
+    else:
+        dense_cfg = vectors  # single-vector legacy
+    if dense_cfg is None:
+        return  # collection has no dense vectors at all; nothing to check
+    found_size = getattr(dense_cfg, "size", None)
+    # Only raise when we have a CONCRETE integer size that disagrees. Anything
+    # else (None, MagicMock, missing attribute) → no-op. Defensive against
+    # collection configs we don't fully understand and against test mocks
+    # that don't provide a real config shape.
+    if not isinstance(found_size, int) or found_size == DENSE_VECTOR_SIZE:
+        return
+    raise DenseDimMismatchError(
+        expected=DENSE_VECTOR_SIZE, found=found_size, collection=collection
+    )
+
+
 def create_collection(*, recreate: bool = False) -> None:
     """Create the summaries collection with dense + sparse vector config.
 
-    If recreate is True, drops and recreates the collection.
+    If recreate is True, drops and recreates the collection. Otherwise asserts
+    that any existing collection's dense dim matches the current model — if
+    it doesn't, raises `DenseDimMismatchError` rather than letting cryptic
+    Qdrant errors leak through downstream upsert / search.
     """
     client = get_qdrant_client()
 
     if recreate:
         client.delete_collection(COLLECTION_NAME)
     elif client.collection_exists(COLLECTION_NAME):
+        # Existing collection: enforce dim match before returning. Silent
+        # mismatch would corrupt every subsequent upsert / search.
+        assert_dense_dim_match(client, COLLECTION_NAME)
         return
 
     client.create_collection(

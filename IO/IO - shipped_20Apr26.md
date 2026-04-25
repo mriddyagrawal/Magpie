@@ -93,6 +93,41 @@ Conventions:
   included `node_modules/*` and `dist/*` now ingests exactly 2 files
   (`src/app.py`, `README.md`) with 4 ignored — zero effort from the user.
 
+### A8. Adaptive query router — list/enumeration top_k widening (B1)
+- **Status:** Shipped 2026-04-24. Pure-regex classifier; no LLM, no network.
+- **Where:**
+  - [src/stage2/query_classify.py](../src/stage2/query_classify.py) — `QueryClass` enum (`LIST_ALL` / `GENERAL`), `classify(question)`, `RetrievalConfig`, `config_for(klass)`. 10 enumeration patterns covering imperative list verbs ("list X", "show me X", "give me X", "enumerate X"), "what topics", "what / which X did I learn", "every X", "all my/the X", "contents of X", "everything about X".
+  - [src/stage2/search.py:run_search](../src/stage2/search.py) — accepts optional `question` kwarg. Only **widens** top_k (5 → 20 for LIST_ALL) when the class wants more than the caller asked for. Explicit small (`--top-k 3`) and large (`.top-k 50`) caller values are both respected.
+  - [cli/notspotlight/repl.py](../cli/notspotlight/repl.py) + [src/pipeline.py](../src/pipeline.py) — both pass raw `question` through to `run_search` so classification fires.
+  - [tests/stage2/test_query_classify.py](../tests/stage2/test_query_classify.py) — 45 new tests (24 LIST_ALL parametrized, 17 GENERAL parametrized, plus config / enum / round-trip).
+- **Why it mattered:** 2026-04-21 transcript symptom — "what topics did I learn in AI class" returned 1 Propositional Logic file when the user's `sem6/343/` folder has 26 indexed AI-course files. Fixed top_k=5 cannot serve enumeration queries no matter how good the ranker is. Widening to 20 lets same-folder semantic clustering surface the rest.
+- **Design rule that emerged:** the classifier only **widens, never narrows**. If the caller passes top_k=3, they get 3 — even if the class default is 5. Explicit user intent always wins.
+- **Verification still pending:** activates after E4 + re-ingest. Test: run "what topics did I learn in AI class" — expect 15-20 of `sem6/343/`'s files to surface, not just Propositional Logic.
+- **Follow-ups:** [B2](../Plans/backlog_20Apr26.md) HyDE depends on extending the classifier with a CONCEPTUAL class. [B4](../IO/IO%20-%20shipped_20Apr26.md) reranker stacks orthogonally — A9.
+
+### A9. Cross-encoder reranker — opt-in second-pass ranking (B4)
+- **Status:** Shipped 2026-04-24. Default OFF (per rememex postmortem warning that always-on rerankers shipped 2 ranking-regression bugs); opt-in via REPL `.rerank on`.
+- **Where:**
+  - [src/stage2/rerank.py](../src/stage2/rerank.py) — `rerank(query, candidates, top_k)` runs candidates through `cross-encoder/ms-marco-MiniLM-L-6-v2` (~80 MB, downloads on first use, cached via `lru_cache`). Score-rewrites each `SearchResult.score` to carry the cross-encoder value (no more opaque RRF=0.016 noise — REPL now shows real, comparable numbers like 0.92 / 0.71 / 0.45).
+  - [src/stage2/search.py:run_search](../src/stage2/search.py) — accepts `rerank=False` kwarg. When True, fetches `top_k * RERANK_OVERSAMPLE` (=10× → 50 for top_k=5) RRF-fused candidates, reranks, returns top_k. Off by default; backward-compatible.
+  - [cli/notspotlight/repl.py](../cli/notspotlight/repl.py) — new `_rerank` session state + `.rerank on/off` dot-command + dropdown menu entry. Spinner status changes label when active.
+  - [tests/stage2/test_rerank.py](../tests/stage2/test_rerank.py) — 7 tests, all mocking `_load_model` so no model download in CI: reordering by score, top_k truncation, empty input no-op, single-candidate short-circuit, (query, summary) pair construction, summary-empty fallback to path, tier-field preservation.
+- **Why it mattered:** Hybrid dense + BM25 + ColPali gets the candidate set right *most* of the time, but on disambiguator-heavy queries (multiple files about the same topic, same vocabulary, only one is the correct match) the fusion can put the wrong one at rank 1. A cross-encoder reads `(query, doc)` together — much more discriminating than vector cosines — at the cost of one model forward pass per candidate.
+- **Anti-patterns avoided:** (1) no silent threshold filtering — every input candidate gets a score, truncation is by `top_k` only; (2) score is exposed to user, not opaque; (3) opt-in by default, so factoid queries (where rerankers occasionally regress) aren't paying the latency cost without consent.
+- **Layered with A8:** B1 (A8) widens the candidate window, B4 (A9) re-orders the candidates we got. They stack — turn both on for "what topics did I learn" type queries. Test plan post-E4: query without rerank, query with rerank, compare which list of 20 actually contains more sem6/343/ files.
+
+### A7. Asset-folder cleanup — sibling-density rule + threshold bump (C7)
+- **Status:** Shipped 2026-04-21. Replaces brittle path-pattern `.nasignore` proposal with a structural rule, after user feedback that "people don't name paths in the most intuitive manner."
+- **Where:**
+  - [src/ingest/ignore.py](../src/ingest/ignore.py) — added `**/*_extracted/{ppt,word,xl}/media/**` to DEFAULT_IGNORE_PATTERNS (Microsoft OOXML spec, not user naming). Brittle filename patterns intentionally omitted.
+  - [src/router.py:73](../src/router.py#L73) — `IMAGE_THUMBNAIL_MIN_DIM` raised 200 → 600 px. Real document scans are ≥1200 px; decorative clip-art is typically ≤500 px.
+  - [src/ingest/walker.py](../src/ingest/walker.py) — `_asset_library_folders()` flags any folder with ≥15 images and 0 documents as an asset library, drops its images from the candidate set. `find_candidates` now returns `(accepted, ignored, asset_lib_skipped)`.
+  - [tests/ingest/test_walker.py](../tests/ingest/test_walker.py) + [test_ignore.py](../tests/ingest/test_ignore.py) — two new tests (sibling docs save the folder, subfolder docs don't save the parent), all 3-tuple callers updated. 176 tests pass.
+- **Why it mattered:** ~576 MB of the 612 MB fast_tier was decorative single-page images (mediasources-4ed clip-art, pptx-extracted slide assets). Path-pattern `.nasignore` would have been brittle to the user's actual naming variability. The structural rule catches the **shape** of asset libraries regardless of folder name — including 3 subfolders inside `mediasources-4ed/` (`kid-in-bg-seq`, `kids-blue`, `fish`) the rule found independently.
+- **Decision rule that emerged:** path patterns where paths are tool-mandated (Office decomposition, `node_modules/`, `__pycache__/`); structural rules where paths are human-chosen. Documented across [IO/IO - Human.md](IO%20-%20Human.md) 2026-04-21 transcript.
+- **Expected savings on re-ingest:** ~434 images dropped (~433 MB est.). Re-ingest pending — change shipped, effect activates on `python -m src.ingest <root>`.
+- **Follow-ups:** [E4](../Plans/backlog_20Apr26.md) — Qdrant Docker server for real quantization is the next storage lever once C7's savings are booked. [B8](../Plans/backlog_20Apr26.md) — Semantra-style chunking for long text-native PDFs (separate retrieval-quality concern).
+
 ### A6. Ripgrep as query-time enrichment for T0 files
 - **Status:** Shipped. Answer step detects T0 files via manifest,
   runs ripgrep for tokens in the user's question, prepends matching

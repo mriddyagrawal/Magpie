@@ -127,13 +127,28 @@ class Manifest:
     # ---- mutations ------------------------------------------------------
 
     def mark_summarized(self, rel_path: str, size: int, summary_file: str | None) -> None:
-        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests."""
-        self.entries[rel_path] = Entry(
-            size=size,
-            summary_file=summary_file,
-            summarized_at=_now_iso(),
-            ingested_at=None,
-        )
+        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests.
+
+        Mutates the existing entry rather than replacing it. Other fields owned
+        by **other indexing paths** — fast-tier state (`fast_indexed_at`,
+        `fast_pages`) and the router audit trail (`routes`, scores,
+        `criticality`, etc.) — must NOT be wiped when this tier completes its
+        own work. A real bug existed before 2026-04-25 where this method
+        replaced the entry wholesale, silently zeroing out `fast_indexed_at`
+        on any file that was first ColPali-indexed and then re-summarized;
+        the fast-tier vectors still lived in Qdrant but the manifest forgot
+        about them, so subsequent ingests would re-encode unnecessarily.
+        Symmetric to `mark_fast_indexed` (which correctly mutates) and
+        `mark_routed` (also mutates).
+        """
+        entry = self.entries.get(rel_path)
+        if entry is None:
+            entry = Entry(size=size)
+            self.entries[rel_path] = entry
+        entry.size = size
+        entry.summary_file = summary_file
+        entry.summarized_at = _now_iso()
+        entry.ingested_at = None  # re-ingest needed since the summary changed
 
     def mark_ingested(self, rel_path: str) -> None:
         entry = self.entries.get(rel_path)
@@ -144,6 +159,46 @@ class Manifest:
     def drop(self, rel_path: str) -> Entry | None:
         """Remove a row and return the dropped Entry (or None if it wasn't there)."""
         return self.entries.pop(rel_path, None)
+
+    def clean_stale(self) -> dict[str, int]:
+        """Drop manifest rows whose source file no longer exists on disk, and
+        delete the orphaned summary markdown for each.
+
+        Used to clean up manifest pollution from earlier ingest runs whose
+        sources have since been deleted (the typical case: pytest fixture
+        directories under `/tmp/...` that vanished after the test ran).
+
+        The walker's per-run prune at `walker.py:run_batch` only touches
+        entries under the walked root — `/tmp/...` entries linger if the
+        user ingests `/home/me/sem6` instead. This method does an
+        unconditional sweep across the whole manifest.
+
+        Qdrant orphan cleanup happens automatically on the next stage 2
+        ingest run (it diffs `manifest.paths()` against `get_all_point_ids()`
+        and deletes the difference). Caller is responsible for triggering
+        that — either by re-ingesting or by running `python -m src.stage2 ingest`.
+
+        Returns `{"dropped": N, "summaries_removed": M}`. Caller must call
+        `save()` afterward to persist.
+        """
+        dropped = 0
+        summaries_removed = 0
+        for rel in list(self.paths()):
+            # Manifest keys may be repo-relative or absolute. Resolve to abs.
+            abs_path = REPO_ROOT / rel if not rel.startswith("/") else Path(rel)
+            if abs_path.is_file():
+                continue
+            entry = self.drop(rel)
+            dropped += 1
+            if entry and entry.summary_file:
+                summary_abs = REPO_ROOT / entry.summary_file
+                if summary_abs.is_file():
+                    try:
+                        summary_abs.unlink()
+                        summaries_removed += 1
+                    except OSError:
+                        pass  # best-effort; manifest still cleaned
+        return {"dropped": dropped, "summaries_removed": summaries_removed}
 
     def mark_routed(
         self,
@@ -198,3 +253,60 @@ class Manifest:
             entry.size = size
             entry.fast_indexed_at = _now_iso()
             entry.fast_pages = pages
+
+    def reconcile_from_fast_tier(self) -> dict[str, int]:
+        """Rebuild lost `fast_indexed_at` / `fast_pages` from Qdrant fast_tier.
+
+        Recovery method for the pre-2026-04-25 `mark_summarized` bug that
+        wiped fast-tier fields when a previously-T4-indexed file got
+        re-summarized. The Qdrant fast_tier collection still holds the
+        vectors — this scrolls it, counts pages per source path, and
+        re-stamps the manifest with the recovered state. Caller must
+        `save()` afterward.
+
+        Returns `{"recovered": N, "missing_in_manifest": M}` where the
+        second count tracks paths that have fast_tier vectors but no
+        manifest row at all (rare; would require manual investigation).
+        """
+        # Local import — avoids a load-time cycle and keeps this method
+        # callable in tests without spinning up Qdrant unless invoked.
+        from collections import Counter
+        from src.stage2.db import get_qdrant_client
+        from src.stage2.fast_db import FAST_COLLECTION_NAME
+
+        client = get_qdrant_client()
+        if not client.collection_exists(FAST_COLLECTION_NAME):
+            return {"recovered": 0, "missing_in_manifest": 0}
+
+        # Scroll the entire fast_tier collection, counting pages per source.
+        page_counts: Counter[str] = Counter()
+        offset = None
+        while True:
+            points, offset = client.scroll(
+                collection_name=FAST_COLLECTION_NAME,
+                limit=512,
+                offset=offset,
+                with_payload=True,
+                with_vectors=False,
+            )
+            for p in points:
+                src = (p.payload or {}).get("source_path")
+                if src:
+                    page_counts[src] += 1
+            if offset is None:
+                break
+
+        recovered = 0
+        missing = 0
+        for src_path, n_pages in page_counts.items():
+            entry = self.entries.get(src_path)
+            if entry is None:
+                missing += 1
+                continue
+            # Only restore if the field is currently empty — don't blow away
+            # a freshly-set timestamp.
+            if entry.fast_indexed_at is None:
+                entry.fast_indexed_at = _now_iso()
+                entry.fast_pages = n_pages
+                recovered += 1
+        return {"recovered": recovered, "missing_in_manifest": missing}

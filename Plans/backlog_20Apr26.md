@@ -28,12 +28,7 @@ Conventions:
 
 ## B. Retrieval-quality gaps (rememex learnings still owed)
 
-### B1. R1 — Adaptive query router
-- **What:** Classify incoming queries into {ExactMatch, ExactSymbol, Keyword, Conceptual} via ~150 lines of regex, vary the Dense/BM25 RRF weights per class. HyDE fires only for Conceptual.
-- **Effort:** S.
-- **Why:** rememex commit `c50b526` plus `d2d69e4`. Today's `run_search` applies a single RRF weight to every query — a conceptual "what do I owe next month" and a symbol "parseConfig" compete on the same scoring curve. Rememex's query router lifted Recall@5 visibly in their resume benchmark.
-- **Why not yet:** Router refactor consumed the ingest side. Query side untouched.
-- **Revisit trigger:** After benchmark-on-real-data (see D1) shows the biggest misses are either (a) symbol queries being drowned by dense score, or (b) conceptual queries missing because BM25 dominates. Either justifies R1.
+### ~~B1. R1 — Adaptive query router~~ — ✅ Shipped 2026-04-24 (LIST_ALL slice). See [IO/IO - shipped_20Apr26.md §A8](../IO/IO%20-%20shipped_20Apr26.md). Verification pending E4 activation. Future expansion: CONCEPTUAL / EXACT_SYMBOL classes when B2 / B6 land.
 
 ### B2. R4 — HyDE gated on Conceptual queries
 - **What:** For Conceptual-class queries only, use the local `ChatAgent` to produce a hypothetical declarative summary, embed *that*, and use it as the dense query. Raw query fed to BM25 side.
@@ -49,12 +44,7 @@ Conventions:
 - **Why not yet:** Minor, but genuinely cheap. Cheapest item on this whole backlog per unit of user-pain-avoided.
 - **Revisit trigger:** Do it before any embedding-model swap work.
 
-### B4. Cross-encoder reranker (bge-reranker-v2-m3)
-- **What:** Pull top-50 from Qdrant, rerun `(query, doc)` through a small cross-encoder, keep top-5 to feed Stage 4. Disabled by default with threshold=0, opt-in via flag.
-- **Effort:** M.
-- **Why:** [Plans/Future Plans.md](Future%20Plans.md) item #6. rememex shipped this and then hit two ranking bugs from it (`651feda`, `c733881`). The anti-pattern to avoid is **silent threshold filtering** — always show scores, always default threshold=0.
-- **Why not yet:** Only earns its keep on disambiguator-heavy corpora; unclear yet whether our dense+sparse+tier-fusion is enough.
-- **Revisit trigger:** After benchmarking shows recall@5 leaving obvious disambiguator misses.
+### ~~B4. Cross-encoder reranker~~ — ✅ Shipped 2026-04-24 (default off, opt-in via REPL `.rerank on`). See [IO/IO - shipped_20Apr26.md §A9](../IO/IO%20-%20shipped_20Apr26.md). Verification pending E4 activation. Future expansion: bigger model (`bge-reranker-v2-m3`) once `RERANK_MODEL` env-var swap is benchmarked.
 
 ### B5. Hierarchical chunking (the 400-page manual problem)
 - **What:** Two-level: per-section chunk summaries + rolled-up doc summary, both embedded. Retrieval queries both levels.
@@ -130,6 +120,8 @@ Conventions:
 - **Why not yet:** Plumbing a whole front-end when the backend is still in motion is premature optimization.
 - **Revisit trigger:** Backend API surface has stabilized (no search-layer changes in 30 days) and we have at least one happy Phase-1 user asking "where's the app?"
 
+### ~~C7. Default ignore patterns for asset / decorative content~~ — ✅ Shipped 2026-04-21. See [IO/IO - shipped_20Apr26.md §A7](../IO/IO%20-%20shipped_20Apr26.md). Re-ingest pending; unblocks E4.
+
 ---
 
 ## D. Trust / positioning / measurement
@@ -183,6 +175,39 @@ Conventions:
 - **Effort:** S.
 - **Why:** User explicitly asked "did we use 0.8 for colpali" — we're on `>=0.3`. Version drift is a quiet risk.
 - **Revisit trigger:** Next dep-refresh pass.
+
+### E4. Qdrant standalone binary upgrade — reclaim fast_tier storage (✅ wiring shipped 2026-04-24)
+- **What:** Move from `QdrantClient(path=...)` embedded mode to the **Qdrant Rust binary** spawned as a subprocess on `localhost:6333`. Same binary as Qdrant Cloud, supports int8/fp16/binary quantization. Deliberately NOT Docker — chosen so the same subprocess pattern carries forward to end-user shipping (see E5).
+- **Status:** Wiring shipped 2026-04-24:
+  - `just qdrant-install` / `qdrant-up` / `qdrant-down` / `qdrant-status` targets in [justfile](../justfile). Binary + data live on `/mnt/hardisk/qdrant/` by default (env-overridable) so the root drive doesn't fill up.
+  - [src/stage2/db.py:get_qdrant_client](../src/stage2/db.py) loosened: `QDRANT_API_KEY` is now optional when `QDRANT_CLUSTER_ENDPOINT` is on localhost (loopback-host detection via `_is_localhost_url`). Cloud auth still required for non-localhost URLs.
+  - 143 tests still pass.
+- **Activation requires (user-side, not yet done):**
+  1. `just qdrant-install` — pulls the Qdrant binary one time.
+  2. `just qdrant-up` — starts it as a background process.
+  3. `.env`: switch to `QDRANT_PROVIDER=cloud` + `QDRANT_CLUSTER_ENDPOINT=http://localhost:6333` (no API key needed).
+  4. Re-ingest one root to populate the new server.
+- **Why this matters:** Local/embedded Qdrant is a **Python reimplementation**, not the Rust server. It silently drops every advanced feature — confirmed via `just fast-tier-config`:
+  ```
+  VECTOR PARAMS:           scalar int8 requested
+  COLLECTION ACTIVE QC:    None  ← Python shim ignored it
+  ```
+  Standalone Rust binary honors the request → fast_tier drops from ~1 MB/page to ~130 KB/page (8×).
+- **Revisit trigger after activation:** (a) fast_tier passes 2 GB; (b) need binary or fp16 quantization; (c) shipping mode (E5) is being built.
+- **Related:** E1 (Qdrant local-Docker docs) is now superseded by these `just` targets. E5 (the shipping path) reuses the same subprocess pattern.
+
+### E5. Bundle Qdrant binary for end-user distribution (future)
+- **What:** When packaging the app for non-developer users (pipx wheel / Tauri shell), embed the Qdrant binary inside the distribution and spawn it on app launch via the same subprocess pattern E4 introduced. End user installs the app like any other (`pipx install notspotlight` or download a `.dmg`/`.exe`); the app spawns Qdrant transparently in the background. No Docker, no separate Qdrant install step, user sees nothing beyond a one-time "setting up your local index..." spinner.
+- **Effort:** M. The startup logic exists in `just qdrant-up`; it needs to move into Python (so the wheel can launch it) and gain platform-aware binary selection (Linux/macOS/Windows).
+- **Why:** Docker is a non-starter for the small-business / student persona. Bundling is how every tool with a native dep ships (Ollama, LanceDB-Rust core, VS Code's Electron). Single-install user experience is non-negotiable for launch.
+- **Implementation sketch:**
+  1. Per-platform binary selection at install: download once into `~/.local/share/notspotlight/qdrant/<arch>/` (or bundle inside the wheel for the smaller ones).
+  2. Python helper `notspotlight.qdrant_proc.start()` wraps the same subprocess + pidfile logic as `just qdrant-up`.
+  3. App startup calls `start()`, app shutdown sends SIGTERM. Crash detection + auto-restart optional v1.
+  4. Wheel/`.dmg` payload size tradeoff: ~30 MB binary per platform — bundle if total stays <100 MB, otherwise auto-download.
+- **Why not yet:** No public users yet; CLI dev-flow (E4 `just qdrant-up`) is sufficient until shipping. Activates with **C5** (pipx packaging) and/or **C6** (Tauri shell).
+- **Revisit trigger:** Right before C5 or C6 ship.
+- **Related:** Builds directly on E4's subprocess pattern. The Python `start()` helper IS the same code that `just qdrant-up` runs today, just relocated from the justfile into a module.
 
 ---
 
@@ -261,6 +286,32 @@ Conventions:
   the original flag-gated proposal. This item *narrowed* that proposal from
   "opt-in per user" to "auto-applied per ext whitelist."
 
+### G5. Vector DB choice — stay on Qdrant, do NOT migrate to LanceDB (decision record 2026-04-21)
+- **Status:** Decided. Not an open item. Keeping here so we don't re-debate it in 3 months when LanceDB marketing surfaces again.
+- **Context:** Investigated LanceDB as a replacement for Qdrant local after discovering local mode silently drops quantization (see **E4**). Surface reason: LanceDB advertises fp16 and PQ natively in a serverless library — which is exactly the hole in Qdrant local.
+- **Two concrete findings that killed the migration:**
+  1. **LanceDB fp16 is broken in their own tracker.** GitHub issue [lancedb/lance#2120](https://github.com/lancedb/lance/issues/2120) — "db query error when creating GPU index with FP16 vectors". Opened Feb 2025, **still open** April 2026, filed by this repo's author. Workaround documented there is "don't specify fp16 in schema, let it silently convert to fp32" — which defeats the reason to migrate. The feature we'd be migrating *for* doesn't reliably work in their library either.
+  2. **LanceDB's ColPali story is O(N) linear scan, not an indexed MaxSim.** Per their own Sep 2024 engineering blog ("Late Interaction & Efficient Multi-modal Retrievers"), the recommended pattern is:
+     ```python
+     r = table.search().limit(None).to_list()    # fetch ALL docs
+     scores = CustomEvaluator(is_multi_vector=True).evaluate_colbert(...)
+     ```
+     They reported **34 seconds for 556 documents** — MaxSim done in Python, not a vector index. Their proposed optimization is "use FTS or single-vector dense as a pre-filter to top-100, then MaxSim rerank on the 100" — a workaround that compromises recall and is not native late-interaction indexing. As the corpus grows, query time grows linearly. Our [src/stage2/fast_db.py ensure_fast_collection](../src/stage2/fast_db.py) uses Qdrant's `MultiVectorConfig(comparator=MAX_SIM)`, which is a **real HNSW-indexed MaxSim** — O(log N) queries regardless of corpus size. That is the single most important property of the fast tier at scale.
+- **Scaling math, one-shot:**
+
+  | Corpus size | Qdrant HNSW MaxSim | LanceDB linear MaxSim |
+  |---|---|---|
+  | 1,000 pages  | <100 ms / query  | ~60 s / query |
+  | 10,000 pages | <200 ms / query  | ~10 min / query |
+  | 100,000 pages | <500 ms / query | effectively unusable |
+
+  (LanceDB's pre-filter workaround rescues the small end at the cost of recall; it doesn't rescue the large end.)
+- **Decision:** Qdrant is the right DB. Storage gap is solved by **E4** (Docker server → real quantization), not by DB migration.
+- **Revisit trigger:** One of the following would reopen the debate:
+  (a) Qdrant drops / deprecates `MultiVectorConfig(MAX_SIM)` or removes HNSW-indexed multi-vector support.
+  (b) LanceDB's fp16 bug closes AND they ship indexed multi-vector (not linear-scan).
+  (c) We add a columnar-analytics use case that needs Lance's format natively (e.g. dataset versioning for ML training). At that point LanceDB may pay for itself elsewhere; it still wouldn't replace the fast tier.
+
 ---
 
 ## H. Test infrastructure
@@ -303,3 +354,4 @@ Kept here so we don't re-debate them. See also [Plans/Future Plans.md](Future%20
 - **VSCode extension** — MCP (C4) solves it better.
 - **Windows-only OS dependencies** — rememex trapped themselves; don't.
 - **Pooling ColPali patches** — destroys the late-interaction signal exactly where it matters (financial docs).
+- **LanceDB migration** (rejected 2026-04-21) — fp16 bug unresolved in their tracker, ColPali story is O(N) linear-scan not indexed. See **G5** for the full decision record.

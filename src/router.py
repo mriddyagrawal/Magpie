@@ -67,9 +67,15 @@ CSV_ROWS_T2_MAX = 100_000
 
 PDF_SHORT_PAGE_THRESHOLD = 5                 # ≤5 pages → typically discriminator-heavy
 
-# Image thumbnail skip thresholds — very small files are UI assets, not docs.
+# Image thumbnail skip thresholds — small files are UI assets, not docs. The
+# size+dim rule uses AND (both must be below the threshold to skip), so real
+# document scans (large bytes even if low-res, or full-res but aggressively
+# compressed) pass through. Raised from 200→600 px on 2026-04-21 after finding
+# that ColPali was encoding 500+ full-res stock photos as "documents" because
+# they passed the old 200 px floor. Normal document scans are ≥1200 px in at
+# least one dim; decorative clip-art is typically ≤500 px.
 IMAGE_THUMBNAIL_SIZE_BYTES = 50 * 1024
-IMAGE_THUMBNAIL_MIN_DIM = 200                # px
+IMAGE_THUMBNAIL_MIN_DIM = 600                # px
 
 # T4 cost estimates (per page)
 T4_STORAGE_MB_PER_PAGE = 0.2                 # int8-quantized multi-vector
@@ -1213,8 +1219,10 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
     from src.ingest.ignore import IgnoreRules
     from src.ingest.walker import find_candidates
 
-    files, ignored = find_candidates(root, ignore_rules=IgnoreRules.from_root(root))
-    if not files and ignored == 0:
+    files, ignored, asset_lib_skipped = find_candidates(
+        root, ignore_rules=IgnoreRules.from_root(root)
+    )
+    if not files and ignored == 0 and asset_lib_skipped == 0:
         print(f"no indexable files under {root}")
         return 0
 
@@ -1261,7 +1269,8 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
         f"summary: {len(files)} candidates — "
         f"T0={tally['T0']} T1={tally['T1']} T2={tally['T2']} "
         f"T3={tally['T3']} T4={tally['T4']} SKIP={tally['SKIP']} "
-        f"(multi-tier={multi_tier}, ignored={ignored}, gpu={'yes' if gpu else 'no'})"
+        f"(multi-tier={multi_tier}, ignored={ignored}, "
+        f"asset_lib_skipped={asset_lib_skipped}, gpu={'yes' if gpu else 'no'})"
     )
     return 0
 

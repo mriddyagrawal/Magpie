@@ -25,7 +25,18 @@ or opt-outs.
 
 ## The three operational modes
 
-### Mode A — One-shot ingest (most common)
+The walker has **three modes** of operation, mutually exclusive. Pick by
+intent:
+
+| Mode | Flag | What it does | When to use |
+|---|---|---|---|
+| **Append** (default) | none | Skip files whose size matches the manifest. Push only new/changed to Qdrant. | Daily incremental sync — what you run every time |
+| **Force re-encode** | `--force` | Re-encode every file under this root, **including T4 ColPali pages** (which have their own size-skip). Other roots' data is untouched. | After a router-policy change — e.g. you flipped pool_factor, raised the thumbnail threshold, or added a new sensitivity detector and want this corpus refreshed |
+| **Rebuild** | `--rebuild` | DROP both Qdrant collections (`summaries` and `fast_tier`) + clear all manifest entries under this root, then re-ingest from scratch. | Wholesale reset; recovery from a corrupted index; biggest-stick "make the index reflect current code" button |
+
+`--force` and `--rebuild` are mutually exclusive (argparse rejects both at once).
+
+### Mode A — Append (default)
 
 ```bash
 uv run python -m src.ingest <DIR>
@@ -34,31 +45,68 @@ uv run python -m src.ingest <DIR>
 **What happens, in order:**
 
 1. Walks `<DIR>` recursively.
-2. Skips files that match `.gitignore` + `.nasignore` + built-in defaults
+2. Skips files matching `.gitignore` + `.nasignore` + built-in defaults
    (`node_modules/`, `.git/`, `__pycache__/`, `venv/`, `build/`, IDE caches,
    lock files, etc.).
-3. Peeks each remaining file cheaply, computes `visual_score` + `sensitivity_score` + `t4_cost`.
-4. Dispatches to the right tier worker (T0/T1/T2/T3/T4) — see
+3. Drops folders that look like asset libraries (≥15 images + 0 documents).
+4. Peeks each remaining file cheaply, computes `visual_score` +
+   `sensitivity_score` + `t4_cost`.
+5. Dispatches to the right tier worker (T0/T1/T2/T3/T4) — see
    [Plans/Indexing Tiers.md](../Plans/Indexing%20Tiers.md).
-5. Writes summary markdowns to `Test Summaries/<hash>_<tier>.md`.
-6. Records the full router verdict in the manifest audit trail.
-7. **Auto-pushes new/changed entries to Qdrant** via the folded-in Stage 2.
+6. Writes summary markdowns to `Test Summaries/<hash>_<tier>.md`.
+7. Records the full router verdict in the manifest audit trail.
+8. **Auto-pushes new/changed entries to Qdrant** via the folded-in Stage 2.
+9. **Cleans fast-tier orphans** — drops ColPali points for any source path
+   no longer in the manifest (asset-library skips, deleted files, etc.).
 
-**Final output:**
-```
-done: 473 considered — T0=0 T1=28 T2=83 T3=203 T4=159 unchanged=0 skipped=2
-  errors=0 pruned=0 ignored=7061 gpu=yes t4_used_mb=81.0
+### Mode B — Force re-encode
 
-pushing new summaries to Qdrant...
-qdrant: upserted 314 points, 0 orphans cleaned, 473 total manifest rows
+```bash
+uv run python -m src.ingest <DIR> --force
 ```
+
+Same flow as Append, but every per-tier skip-if-unchanged check is
+bypassed. T4 in particular has its own size-skip in
+`src/stage1_fast/index.py:index_file`; `--force` now correctly threads
+through so existing ColPali pages get re-encoded with the current
+`pool_factor` policy. Other corpora are untouched.
+
+### Mode C — Rebuild
+
+```bash
+uv run python -m src.ingest <DIR> --rebuild
+```
+
+Before walking, the walker:
+
+1. Drops the `summaries` Qdrant collection.
+2. Drops + recreates the `fast_tier` Qdrant collection.
+3. Clears every manifest entry under `<DIR>` and removes the corresponding
+   summary markdowns from disk.
+
+Then runs as if the corpus is brand new. Output looks like:
+```
+=== REBUILD mode: clearing all state for /home/astavak/sem6 ===
+  dropped Qdrant collection: summaries
+  dropped + recreated Qdrant collection: fast_tier
+  cleared 473 manifest entries under /home/astavak/sem6
+=== rebuild done; starting fresh ingest ===
+indexing: ...
+done: 473 considered — T0=0 T1=28 T2=83 T3=203 T4=159 ...
+qdrant summaries: upserted 314 points, ...
+qdrant fast_tier: dropped 0 orphaned source paths
+```
+
+Use this when you've changed multiple router policies at once and want
+disk size to actually drop, not just stop growing.
+
+### Universal flags (apply in all three modes)
 
 | Flag | Effect |
 |---|---|
-| `-v` / `--verbose` | Print per-file routing decision as each file completes: `[T3] path (visual=2 sens=7 crit=critical)` |
-| `--force` | Re-ingest every file regardless of manifest state |
+| `-v` / `--verbose` | Print per-file routing decision: `[T3] path (visual=2 sens=7 crit=critical)` |
 | `--concurrency N` | Max concurrent files (default: 4). Bump to 8-10 if your LLM provider tolerates it |
-| `--no-push` | Skip the Stage 2 Qdrant push — useful when Qdrant is down or you're testing locally without creds |
+| `--no-push` | Skip the Stage 2 Qdrant push at the end. Leaves new summaries in `Test Summaries/` with `ingested_at=None`; run `python -m src.stage2 ingest` later to push them manually |
 
 ### Mode B — Dry-run routing inspection (no ingest)
 

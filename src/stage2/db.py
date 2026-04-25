@@ -36,13 +36,19 @@ def get_qdrant_client() -> QdrantClient:
 
     Selected by `QDRANT_PROVIDER` env var (default: ``cloud``):
 
-    - ``cloud``   — remote Qdrant Cloud cluster via HTTPS + API key. Requires
-                    ``QDRANT_CLUSTER_ENDPOINT`` and ``QDRANT_API_KEY``.
-    - ``local``   — embedded Qdrant persisted to a local directory. No server,
-                    no network. Directory path is taken from
-                    ``QDRANT_LOCAL_PATH`` (default: ``./qdrant_data`` at the
-                    repo root). Data persists across runs; delete the folder
-                    to wipe the index.
+    - ``cloud``   — Qdrant server reachable over HTTP(S) — either Qdrant Cloud
+                    (paid, remote) or a self-hosted server you spawned locally
+                    (e.g. via `just qdrant-up`, Docker, or systemd).
+                    Required: ``QDRANT_CLUSTER_ENDPOINT``.
+                    Optional: ``QDRANT_API_KEY`` — required for Cloud, ignored
+                    for self-hosted-localhost (auth is off by default there).
+    - ``local``   — embedded Python Qdrant shim persisted to a SQLite DB. No
+                    server, no network. Directory from ``QDRANT_LOCAL_PATH``
+                    (default: ``./qdrant_data``). NOTE: this Python library
+                    silently drops every advanced feature — quantization, fp16,
+                    binary, snapshots — because it is not the real Rust server.
+                    Use ``cloud`` mode pointing at ``http://localhost:6333``
+                    when storage compression matters. See backlog E4.
     """
     global _client
     if _client is not None:
@@ -65,15 +71,37 @@ def get_qdrant_client() -> QdrantClient:
         )
 
     url = os.environ.get("QDRANT_CLUSTER_ENDPOINT")
-    api_key = os.environ.get("QDRANT_API_KEY")
-    if not url or not api_key:
+    if not url:
         sys.exit(
-            "error: QDRANT_CLUSTER_ENDPOINT and QDRANT_API_KEY must be set in .env "
-            "(or set QDRANT_PROVIDER=local to use embedded Qdrant)."
+            "error: QDRANT_CLUSTER_ENDPOINT must be set in .env "
+            "(or set QDRANT_PROVIDER=local to use the embedded Python shim)."
+        )
+
+    # API key is required for Qdrant Cloud (anything not on a private host) but
+    # optional for a self-hosted server reachable on localhost — those default
+    # to no auth. Treat empty/whitespace as "no auth" for the localhost case.
+    api_key = os.environ.get("QDRANT_API_KEY", "").strip() or None
+    if api_key is None and not _is_localhost_url(url):
+        sys.exit(
+            f"error: QDRANT_API_KEY must be set for non-local QDRANT_CLUSTER_ENDPOINT "
+            f"(got {url!r}). Set the key, or point at http://localhost:6333."
         )
 
     _client = QdrantClient(url=url, api_key=api_key)
     return _client
+
+
+_LOCALHOST_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+
+
+def _is_localhost_url(url: str) -> bool:
+    """True if `url`'s host resolves to the loopback (auth optional there)."""
+    from urllib.parse import urlparse
+    try:
+        host = (urlparse(url).hostname or "").lower()
+    except ValueError:
+        return False
+    return host in _LOCALHOST_HOSTS
 
 
 def create_collection(*, recreate: bool = False) -> None:

@@ -62,7 +62,7 @@ async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> Pipeli
         sq: SearchQuery = await asyncio.to_thread(rewrite_query, question)
     else:
         sq = raw_query(question)
-    retrieved = await asyncio.to_thread(run_search, sq, top_k)
+    retrieved = await asyncio.to_thread(run_search, sq, top_k, question=question)
     if not retrieved:
         return PipelineResult(
             question=question,

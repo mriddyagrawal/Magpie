@@ -142,3 +142,77 @@ def test_search_output_exposes_expected_fields(
 
     fields = {f.name for f in r.__dataclass_fields__.values()}
     assert fields == {"summary", "path", "score", "tier"}
+
+
+# ---------------------------------------------------------------------------
+# Adaptive rerank gating: rerank is suppressed for LIST_ALL queries because
+# the cross-encoder regresses proper-noun / receipt-style retrieval. Empirical
+# evidence captured in src/stage2/search.py:run_search comments.
+# ---------------------------------------------------------------------------
+
+@patch("src.stage2.search._search_fast_tier", return_value=[])
+@patch("src.stage2.search.embed_dense_query")
+@patch("src.stage2.search.embed_sparse_query")
+@patch("src.stage2.search.get_qdrant_client")
+def test_rerank_suppressed_for_list_all_queries(
+    mock_client, mock_sparse, mock_dense, _mock_fast
+):
+    """A LIST_ALL question with rerank=True must NOT invoke the cross-encoder."""
+    from src.stage2.search import run_search
+
+    mock_dense.return_value = [0.1] * 384
+    mock_sparse.return_value = ([1], [0.1])
+    mock_client.return_value.collection_exists.return_value = True
+    mock_response = MagicMock()
+    mock_response.points = [
+        _make_mock_point(f"s{i}", f"p{i}", 0.9 - i * 0.05) for i in range(10)
+    ]
+    mock_client.return_value.query_points.return_value = mock_response
+
+    sq = SearchQuery(query="receipts", keywords=["receipts"])
+
+    with patch("src.stage2.rerank.rerank") as mock_rerank:
+        run_search(
+            sq,
+            top_k=5,
+            question="find me all my uber receipts",  # LIST_ALL — "find me all"
+            rerank=True,
+        )
+
+    mock_rerank.assert_not_called()
+
+
+@patch("src.stage2.search._search_fast_tier", return_value=[])
+@patch("src.stage2.search.embed_dense_query")
+@patch("src.stage2.search.embed_sparse_query")
+@patch("src.stage2.search.get_qdrant_client")
+def test_rerank_fires_for_general_queries(
+    mock_client, mock_sparse, mock_dense, _mock_fast
+):
+    """A GENERAL question with rerank=True still invokes the cross-encoder."""
+    from src.stage2.search import run_search
+
+    mock_dense.return_value = [0.1] * 384
+    mock_sparse.return_value = ([1], [0.1])
+    mock_client.return_value.collection_exists.return_value = True
+    mock_response = MagicMock()
+    mock_response.points = [
+        _make_mock_point(f"s{i}", f"p{i}", 0.9 - i * 0.05) for i in range(10)
+    ]
+    mock_client.return_value.query_points.return_value = mock_response
+
+    sq = SearchQuery(query="hamiltonian", keywords=["hamiltonian"])
+
+    with patch("src.stage2.rerank.rerank") as mock_rerank:
+        # Reranker returns a non-empty list so run_search returns its output
+        mock_rerank.return_value = [
+            SearchResult(summary="s0", path="p0", score=0.9, tier="summary")
+        ]
+        run_search(
+            sq,
+            top_k=5,
+            question="what is hamiltonian mechanics",  # GENERAL — single concept
+            rerank=True,
+        )
+
+    mock_rerank.assert_called_once()

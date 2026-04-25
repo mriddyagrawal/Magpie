@@ -73,6 +73,34 @@ DEFAULT_IGNORE_PATTERNS: tuple[str, ...] = (
     ".DS_Store",
     "Thumbs.db",
     "desktop.ini",
+    # System temp + cache directories — these contain transient state from
+    # other tools (compiler intermediates, browser caches, pytest fixtures,
+    # OS metadata) that should never be indexed as documents. Real instance
+    # observed 2026-04-25: a pytest-fixture path leaked into the user's
+    # production manifest because the test root happened to be `/tmp/...`
+    # and the manifest persisted across runs. The patterns are gitignore
+    # syntax, so they catch these directories at any depth under the walk
+    # root — `tmp/` matches both `/tmp/...` (when walking `/`) and
+    # `<corpus>/tmp/...` (when walking a corpus that contains a tmp folder).
+    "tmp/",
+    "var/tmp/",
+    ".cache/",                       # XDG / Linux user cache
+    "**/Library/Caches/**",          # macOS user caches (multi-segment → needs **/)
+    "**/AppData/Local/Temp/**",      # Windows user temp
+    "**/AppData/Local/Cache/**",     # Windows user cache
+    # Pytest fixture roots — `pytest-of-<user>/` is created by pytest's
+    # tmp_path fixture and lives under /tmp on Linux; explicit pattern
+    # catches it when /tmp/ itself isn't filtered (e.g. during dev runs).
+    "pytest-of-*/",
+    # macOS metadata sidecars + zip-extraction noise
+    "__MACOSX/",
+    ".fseventsd/",
+    ".Spotlight-V100/",
+    ".TemporaryItems/",
+    ".Trashes/",
+    # Trash bins (Linux + macOS)
+    ".Trash/",
+    ".Trash-*/",
     # NotAnotherSpotlight's own state (never ingest our own summaries!)
     "Test Summaries/",
     # Jupyter checkpoints
@@ -86,6 +114,24 @@ DEFAULT_IGNORE_PATTERNS: tuple[str, ...] = (
     "Cargo.lock",
     "Gemfile.lock",
     "go.sum",
+    # Office-archive decomposition: when someone unzips a .pptx / .docx / .xlsx
+    # into a folder, the `*_extracted/<type>/media/` path holds the raw image
+    # assets (slide clipart, icons, chart pics). These are NOT documents — they
+    # get indexed as single-page images by T4/ColPali, each eating ~1 MB of
+    # vector storage for content the user never actually searches for. These
+    # patterns are safe as universal defaults because the `ppt/media/`,
+    # `word/media/`, `xl/media/` structure is mandated by Microsoft's OOXML
+    # spec — not a user naming choice — so the path IS the boundary.
+    "**/*_extracted/ppt/media/**",
+    "**/*_extracted/word/media/**",
+    "**/*_extracted/xl/media/**",
+    # NOTE on scattered decorative files (logos, favicons, stock photos):
+    # we deliberately do NOT pattern-match filenames like `*logo.png` or
+    # `favicon.*` at the default level. Filename patterns are too brittle
+    # (users name things `crest.png`, `school_symbol.png`, etc.). Instead,
+    # the walker applies a sibling-density rule: folders where images
+    # dominate and no documents live are treated as asset libraries and
+    # their images are skipped — see src/ingest/walker.py.
 )
 
 

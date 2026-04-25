@@ -67,6 +67,8 @@ async def _run_tier(
     source_rel: str,
     agent,
     manifest: Manifest,
+    *,
+    force: bool = False,
 ):
     """Dispatch to the matching worker. Each returns (outcome, optional_note)."""
     if tier == "T1":
@@ -81,7 +83,11 @@ async def _run_tier(
         outcome = await tier3.run_async(path, source_rel, agent)
         return outcome, None
     if tier == "T4":
-        outcome = await asyncio.to_thread(tier4.run, path, source_rel, manifest)
+        # T4 has its own size-skip check inside index_file; thread `force`
+        # through so --force / --rebuild actually re-encode existing pages.
+        outcome = await asyncio.to_thread(
+            tier4.run, path, source_rel, manifest, force=force
+        )
         return outcome, None
     raise ValueError(f"unknown tier: {tier}")
 
@@ -104,19 +110,81 @@ _CONSIDERED_EXTS = {
 }
 
 
+# Extensions of files we consider "documents" (as opposed to images). Used by
+# the asset-library-folder heuristic: a folder with many images and zero docs
+# is treated as an asset library and its images are skipped wholesale.
+_DOCUMENT_EXTS = {
+    ".txt", ".md", ".markdown", ".log",
+    ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
+    ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
+    ".sh", ".sql",
+    ".json", ".yaml", ".yml", ".toml",
+    ".csv",
+    ".pdf", ".docx", ".xlsx", ".xlsm",
+    ".pptx", ".html", ".htm", ".ipynb",
+}
+_IMAGE_EXTS_FOR_FILTER = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+
+# Threshold for the sibling-density rule. A folder is treated as an asset
+# library if it has at least this many images AND zero document files. Chosen
+# by observation: real working folders with "a few reference pics next to
+# notes" have <5 images; dedicated asset libraries (course media, stock photo
+# folders, scraped galleries) commonly have 20–500+. 15 is comfortably above
+# the "a few reference pics" ceiling and below the "real asset library" floor.
+_ASSET_LIBRARY_MIN_IMAGES = 15
+
+
+def _asset_library_folders(paths: list[Path]) -> set[Path]:
+    """Return the set of folders that look like asset libraries.
+
+    A folder qualifies if, among its own immediate children, there are at
+    least `_ASSET_LIBRARY_MIN_IMAGES` image files AND zero document files.
+    Subfolder contents are NOT counted — the check is strictly per-folder, so
+    `sem6/` won't be flagged just because it contains `sem6/assets/`.
+
+    This is a structural replacement for naming-based path patterns (like
+    `mediasources-4ed/`): instead of encoding every possible asset-folder
+    name into `.nasignore`, we detect the *shape* — image-dominated folders
+    with no documents — regardless of what the user named them.
+    """
+    # Group files by their immediate parent directory.
+    from collections import defaultdict
+    by_folder_images: dict[Path, int] = defaultdict(int)
+    by_folder_docs: dict[Path, int] = defaultdict(int)
+    for p in paths:
+        ext = p.suffix.lower()
+        parent = p.parent
+        if ext in _IMAGE_EXTS_FOR_FILTER:
+            by_folder_images[parent] += 1
+        elif ext in _DOCUMENT_EXTS:
+            by_folder_docs[parent] += 1
+
+    return {
+        folder
+        for folder, n_images in by_folder_images.items()
+        if n_images >= _ASSET_LIBRARY_MIN_IMAGES and by_folder_docs.get(folder, 0) == 0
+    }
+
+
 def find_candidates(
     root: Path,
     *,
     ignore_rules: IgnoreRules | None = None,
-) -> tuple[list[Path], int]:
-    """Walk `root` and return (accepted, ignored_count).
+) -> tuple[list[Path], int, int]:
+    """Walk `root` and return (accepted, ignored_count, asset_library_skipped).
 
     `ignore_rules` applies cascading `.gitignore` / `.nasignore` + built-in
     defaults (`node_modules/`, `__pycache__/`, `.git/`, etc.). If omitted,
     rules are built from `root` on the fly.
+
+    On top of explicit ignore rules, a **structural** filter runs: folders
+    dominated by images with no documents are treated as asset libraries
+    and their images are dropped from the candidate set. This catches the
+    common "stock photos next to no documents" case without needing a
+    naming-based pattern — see `_asset_library_folders()`.
     """
     rules = ignore_rules if ignore_rules is not None else IgnoreRules.from_root(root)
-    accepted: list[Path] = []
+    pre_accepted: list[Path] = []
     ignored = 0
     for p in root.rglob("*"):
         if not p.is_file() or p.name.startswith("."):
@@ -126,8 +194,18 @@ def find_candidates(
         if rules.is_ignored(p):
             ignored += 1
             continue
+        pre_accepted.append(p)
+
+    asset_folders = _asset_library_folders(pre_accepted)
+    accepted: list[Path] = []
+    asset_skipped = 0
+    for p in pre_accepted:
+        if p.parent in asset_folders and p.suffix.lower() in _IMAGE_EXTS_FOR_FILTER:
+            asset_skipped += 1
+            continue
         accepted.append(p)
-    return sorted(accepted), ignored
+
+    return sorted(accepted), ignored, asset_skipped
 
 
 # ---------------------------------------------------------------------------
@@ -168,7 +246,18 @@ async def ingest_one(
     size = path.stat().st_size
 
     existing = manifest.get(source_rel)
-    if not force and existing is not None and existing.size == size and existing.summary_file:
+    # File is "done" if it's been processed by SOME tier — either the
+    # summary tier (T0-T3 → summary_file set) OR the fast tier
+    # (T4 → fast_indexed_at set). Image files routed to T4-only have
+    # no summary_file, so the original `existing.summary_file` check
+    # was always False for them, causing them to be re-routed every
+    # ingest run (the inner index_file would short-circuit but the
+    # walker's stats line would misleadingly report T4=N for files
+    # that did zero work).
+    already_done = existing is not None and (
+        bool(existing.summary_file) or existing.fast_indexed_at is not None
+    )
+    if not force and existing is not None and existing.size == size and already_done:
         return (
             RouteDecision(
                 routes=list(existing.routes) or [],
@@ -223,7 +312,9 @@ async def ingest_one(
         return decision, 0.0
 
     old_summary_rel = existing.summary_file if existing else None
-    outcome, note = await _run_tier(primary, path, source_rel, agent, manifest)
+    outcome, note = await _run_tier(
+        primary, path, source_rel, agent, manifest, force=force,
+    )
     if note:
         decision = RouteDecision(
             routes=decision.routes,
@@ -296,16 +387,21 @@ async def run_batch(
     manifest = Manifest()
 
     ignore_rules = IgnoreRules.from_root(root)
-    files, ignored_count = find_candidates(root, ignore_rules=ignore_rules)
-    if not files and ignored_count == 0:
+    files, ignored_count, asset_lib_skipped = find_candidates(root, ignore_rules=ignore_rules)
+    if not files and ignored_count == 0 and asset_lib_skipped == 0:
         print(f"no indexable files found under {root}")
         return
     if not files:
         print(
-            f"no indexable files under {root} after ignore rules "
-            f"({ignored_count} filtered out)"
+            f"no indexable files under {root} after filters "
+            f"({ignored_count} ignored, {asset_lib_skipped} in asset-library folders)"
         )
         return
+    if asset_lib_skipped:
+        print(
+            f"skipped {asset_lib_skipped} images in {root} "
+            f"(asset-library folders: ≥{_ASSET_LIBRARY_MIN_IMAGES} images + 0 docs)"
+        )
 
     # Manifest prune for files that vanished under this root. When the walked
     # root lives under REPO_ROOT we scope the prune to repo-relative prefixes;
@@ -410,6 +506,83 @@ async def run_batch(
     )
 
 
+def _rebuild_clean_slate(root: Path) -> None:
+    """Drop both Qdrant collections + clear manifest entries under `root`.
+
+    Used by `--rebuild`. After this returns, the subsequent `run_batch` call
+    will see an empty slate for files under this root and re-encode everything
+    fresh — no zombies from earlier policy versions.
+    """
+    # 1. Drop summaries collection (Stage 2 will recreate on next push).
+    try:
+        from src.stage2.db import COLLECTION_NAME, get_qdrant_client
+        client = get_qdrant_client()
+        if client.collection_exists(COLLECTION_NAME):
+            client.delete_collection(COLLECTION_NAME)
+            print(f"  dropped Qdrant collection: {COLLECTION_NAME}")
+    except SystemExit:
+        # Missing creds — log and continue; user may be running --no-push.
+        print("  warn: could not connect to Qdrant — skipping summary-collection drop",
+              file=sys.stderr)
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"  warn: drop summaries collection failed: {e}", file=sys.stderr)
+
+    # 2. Drop fast_tier (multivector ColPali) collection.
+    try:
+        from src.stage2.fast_db import ensure_fast_collection
+        ensure_fast_collection(recreate=True)
+        print("  dropped + recreated Qdrant collection: fast_tier")
+    except SystemExit:
+        pass
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"  warn: drop fast_tier collection failed: {e}", file=sys.stderr)
+
+    # 3. Clear manifest entries under `root` and remove their summary files.
+    try:
+        root_rel_under_repo = str(root.resolve().relative_to(REPO_ROOT)) + os.sep
+    except ValueError:
+        root_rel_under_repo = str(root.resolve()) + os.sep
+    manifest = Manifest()
+    dropped = 0
+    for rel in list(manifest.paths()):
+        if rel.startswith(root_rel_under_repo):
+            entry = manifest.drop(rel)
+            if entry and entry.summary_file:
+                _delete_if_exists(entry.summary_file)
+            dropped += 1
+    manifest.save()
+    print(f"  cleared {dropped} manifest entries under {root}")
+
+
+def _fast_tier_orphan_cleanup(manifest: Manifest) -> int:
+    """Drop fast_tier points whose source path no longer exists in the manifest.
+
+    Mirrors Stage 2's summary-collection orphan cleanup. Necessary so that
+    files dropped by the asset-library rule (or any other manifest removal)
+    don't leave zombie ColPali patches on disk forever.
+    """
+    try:
+        from src.stage2.fast_db import delete_path, get_indexed_paths
+    except ImportError:
+        return 0
+    try:
+        manifest_paths = set(manifest.paths())
+        indexed = get_indexed_paths()
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"  warn: fast_tier orphan check failed: {e}", file=sys.stderr)
+        return 0
+
+    orphans = indexed - manifest_paths
+    deleted = 0
+    for p in orphans:
+        try:
+            delete_path(p)
+            deleted += 1
+        except Exception as e:  # pylint: disable=broad-except
+            print(f"  warn: fast_tier delete {p} failed: {e}", file=sys.stderr)
+    return deleted
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="nas-ingest",
@@ -420,8 +593,27 @@ def main() -> None:
         ),
     )
     parser.add_argument("path", help="Directory to walk.")
-    parser.add_argument("--force", action="store_true",
-                        help="Re-ingest every file regardless of manifest state.")
+
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--force",
+        action="store_true",
+        help=(
+            "Re-encode every file under this root, including T4 ColPali pages. "
+            "Use after a router-policy change to refresh existing entries. "
+            "Other roots' data is untouched."
+        ),
+    )
+    mode.add_argument(
+        "--rebuild",
+        action="store_true",
+        help=(
+            "DROP both Qdrant collections + clear all manifest entries under "
+            "this root, then re-ingest from scratch. Use for a wholesale reset "
+            "or recovery from a corrupted index."
+        ),
+    )
+
     parser.add_argument("--concurrency", type=int, default=4,
                         help="Max concurrent files (default: 4).")
     parser.add_argument("-v", "--verbose", action="store_true",
@@ -442,9 +634,20 @@ def main() -> None:
         sys.exit(f"error: no such path: {root}")
     if not root.is_dir():
         sys.exit(f"error: ingest walker expects a directory, got: {root}")
+
+    # --rebuild: nuke everything under this root, then proceed with --force.
+    if args.rebuild:
+        print(f"=== REBUILD mode: clearing all state for {root} ===")
+        _rebuild_clean_slate(root)
+        print("=== rebuild done; starting fresh ingest ===\n")
+
+    # `--force` and `--rebuild` both re-encode every file. After a rebuild
+    # there's nothing to skip anyway, but force=True ensures the per-tier
+    # skip checks (T4 in particular) honor the intent.
+    force = args.force or args.rebuild
     asyncio.run(run_batch(
         root,
-        force=args.force,
+        force=force,
         concurrency=args.concurrency,
         verbose=args.verbose,
     ))
@@ -463,7 +666,7 @@ def main() -> None:
         from src.stage2.__main__ import ingest_from_manifest
         stats = ingest_from_manifest(force=False)
         print(
-            f"qdrant: upserted {stats['upserted']} points, "
+            f"qdrant summaries: upserted {stats['upserted']} points, "
             f"{stats['orphans_deleted']} orphans cleaned, "
             f"{stats['total_points']} total manifest rows"
         )
@@ -477,6 +680,17 @@ def main() -> None:
             f"run `python -m src.stage2 ingest` manually to retry.",
             file=sys.stderr,
         )
+
+    # Fast-tier orphan cleanup: drop ColPali points for files that no longer
+    # exist in the manifest. Without this, asset-library skips and `--rebuild`
+    # leave zombie multi-vectors on disk indefinitely. Mirrors the
+    # summary-collection orphan cleanup in `ingest_from_manifest`.
+    try:
+        deleted = _fast_tier_orphan_cleanup(Manifest())
+        if deleted:
+            print(f"qdrant fast_tier: dropped {deleted} orphaned source paths")
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"fast_tier orphan cleanup failed: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":

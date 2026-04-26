@@ -206,6 +206,28 @@ clean-stale-manifest:
     print('run \\'python -m src.stage2 ingest\\' to also clean orphan Qdrant points (or do it on next ingest)');\
     "
 
+# Inverse of clean-stale-manifest: clear `summary_file` pointers when the
+# on-disk markdown is gone but the source file is still present. Symptom:
+# Stage 2 ingest spams `warn: summary missing, skipping: ...` for files
+# whose Test Summaries/<hash>_t1.md disappeared (manual cleanup, partial
+# --rebuild, backup software treating Test Summaries/ as cache, etc.).
+# Cleared rows are re-summarized on the next `python -m src.ingest <root>`.
+# If the source ALSO vanished, the row is dropped entirely.
+clean-stale-summaries:
+    @uv run python -c "\
+    from src.manifest import Manifest;\
+    m = Manifest();\
+    stats = m.clean_missing_summaries();\
+    m.save();\
+    print(f'manifest cleaned: {stats[\"resummarize\"]} rows marked for re-summarization, {stats[\"dropped\"]} rows dropped (source also missing)');\
+    print('run \\'python -m src.ingest <your-corpus-root>\\' to re-summarize the marked files');\
+    "
+
+# Both directions in one shot: drop rows for missing sources AND clear
+# pointers for missing summaries. Use when you're not sure which kind of
+# drift you have or want a clean slate before a big re-ingest.
+clean-stale: clean-stale-manifest clean-stale-summaries
+
 # Show disk usage of pipeline artifacts (summaries, Qdrant, model cache, venv)
 disk-usage:
     @echo "=== Summaries (T0-T3 markdown outputs) ==="

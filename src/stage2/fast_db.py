@@ -172,7 +172,10 @@ def upsert_pages_batch(
         )
         for src, pg, vecs in pages
     ]
-    client.upsert(collection_name=FAST_COLLECTION_NAME, points=points)
+    # Multi-vector batches are MB-size; use the same retry helper as the
+    # summary-tier upsert so a single transient timeout doesn't kill the run.
+    from src.stage2.db import _upsert_with_retry
+    _upsert_with_retry(client, FAST_COLLECTION_NAME, points)
     return len(points)
 
 

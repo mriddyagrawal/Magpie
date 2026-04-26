@@ -256,6 +256,7 @@ uv run python -m src.ingest /your/corpus
 | `OLLAMA_MODEL` | If `LLM_PROVIDER=ollama` | `qwen2.5:3b` (default) |
 | `QDRANT_CLUSTER_ENDPOINT` | Qdrant URL | Cloud: `https://<cluster>.qdrant.tech` / local: `http://localhost:6333` |
 | `QDRANT_API_KEY` | For Qdrant Cloud (omit for local Docker) | `...` |
+| `QDRANT_TIMEOUT_S` | HTTP request timeout for the Qdrant client. Default 60s. Bump higher if you're pushing massive batches over a slow link (e.g. Cloud over a flaky connection). | `60` (default) / `120` / `300` |
 
 See [Plans/Port.md](../Plans/Port.md) for the cloud → local migration path.
 

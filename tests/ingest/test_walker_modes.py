@@ -97,7 +97,7 @@ def test_walker_passes_force_through_to_tier4(isolated, tmp_path: Path):
     with patch("src.ingest.tier4.run") as mock_t4_run:
         mock_t4_run.return_value = MagicMock(summary_file_rel=None, body_chars=0)
         m = Manifest()
-        asyncio.run(_run_tier("T4", p, "x.png", agent=None, manifest=m, force=True))
+        asyncio.run(_run_tier("T4", p, "x.png", get_agent=None, manifest=m, force=True))
         # tier4.run was called with force=True
         assert mock_t4_run.call_args.kwargs.get("force") is True
 

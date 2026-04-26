@@ -87,11 +87,56 @@ def get_qdrant_client() -> QdrantClient:
             f"(got {url!r}). Set the key, or point at http://localhost:6333."
         )
 
-    _client = QdrantClient(url=url, api_key=api_key)
+    # The qdrant-client default timeout (5s) is too tight for large
+    # multi-vector batches — ColPali pages are ~200 KB each int8-quantized,
+    # so a 32-page batch is ~6 MB plus indexing time. On a busy local server
+    # mid-ingest this can occasionally spike past 5s. 60s is generous but
+    # only blocks when Qdrant is genuinely slow. Override via env var if
+    # your server / network needs more.
+    timeout_s = int(os.environ.get("QDRANT_TIMEOUT_S", "60"))
+    _client = QdrantClient(url=url, api_key=api_key, timeout=timeout_s)
     return _client
 
 
 _LOCALHOST_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+
+
+def _upsert_with_retry(
+    client: QdrantClient,
+    collection_name: str,
+    points: list,
+    *,
+    max_attempts: int = 3,
+) -> None:
+    """Upsert with retry on transient timeouts.
+
+    A single timeout shouldn't kill a 99k-file ingest. We retry up to
+    `max_attempts` times with exponential backoff (1s, 2s, 4s) on the
+    qdrant-client's `ResponseHandlingException` (which wraps `TimeoutError`,
+    connection errors, etc.). Other exceptions propagate immediately —
+    those usually mean a real problem (validation, dim mismatch, etc.).
+    """
+    import time
+    from qdrant_client.http.exceptions import ResponseHandlingException
+
+    last_err: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            client.upsert(collection_name=collection_name, points=points)
+            return
+        except ResponseHandlingException as e:
+            last_err = e
+            if attempt == max_attempts:
+                raise
+            wait = 2 ** (attempt - 1)
+            from tqdm import tqdm
+            tqdm.write(
+                f"  qdrant {type(e.source).__name__ if hasattr(e, 'source') else 'timeout'} "
+                f"on upsert (attempt {attempt}/{max_attempts}); retrying in {wait}s"
+            )
+            time.sleep(wait)
+    if last_err is not None:
+        raise last_err
 
 
 def _is_localhost_url(url: str) -> bool:
@@ -240,10 +285,21 @@ def _build_embedding_text(s: ParsedSummary) -> str:
 BATCH_SIZE = 32
 
 
-def upsert_summaries(summaries: list[ParsedSummary]) -> int:
+def upsert_summaries(
+    summaries: list[ParsedSummary],
+    *,
+    on_batch_complete=None,
+) -> int:
     """Embed and upsert parsed summaries into Qdrant in batches with progress.
 
     Returns the number of points upserted.
+
+    `on_batch_complete(indices: list[int])` is called after each successful
+    batch upsert with the indices into `summaries` that were just persisted
+    to Qdrant. Used by callers to mark per-row progress (e.g.
+    `manifest.mark_ingested`) so a Ctrl-C mid-ingest doesn't lose every
+    batch's work — points are already in Qdrant; the next run just needs
+    to know they're done. See `src/stage2/__main__.py:ingest_from_manifest`.
     """
     from tqdm import tqdm
 
@@ -277,8 +333,10 @@ def upsert_summaries(summaries: list[ParsedSummary]) -> int:
                 )
             )
 
-        client.upsert(collection_name=COLLECTION_NAME, points=points)
+        _upsert_with_retry(client, COLLECTION_NAME, points)
         total += len(points)
+        if on_batch_complete is not None:
+            on_batch_complete(list(range(i, min(i + BATCH_SIZE, len(summaries)))))
 
     return total
 

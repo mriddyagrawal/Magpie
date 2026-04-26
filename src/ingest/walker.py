@@ -66,12 +66,17 @@ async def _run_tier(
     tier: Tier,
     path: Path,
     source_rel: str,
-    agent,
+    get_agent,
     manifest: Manifest,
     *,
     force: bool = False,
 ):
-    """Dispatch to the matching worker. Each returns (outcome, optional_note)."""
+    """Dispatch to the matching worker. Each returns (outcome, optional_note).
+
+    `get_agent` is a zero-arg callable that lazily builds the LLM agent — only
+    called from the T3 branch so non-LLM tiers don't pay the construction cost.
+    Pass `None` if T3 is impossible (test fixtures, T4-only paths).
+    """
     if tier == "T1":
         return await asyncio.to_thread(tier1.run, path, source_rel), None
     if tier == "T2":
@@ -79,8 +84,9 @@ async def _run_tier(
     if tier == "T0":
         return await asyncio.to_thread(tier0.run, path, source_rel), None
     if tier == "T3":
-        if agent is None:
-            raise RuntimeError("T3 requested but no LLM agent was provided")
+        if get_agent is None:
+            raise RuntimeError("T3 requested but no LLM agent thunk was provided")
+        agent = get_agent()
         outcome = await tier3.run_async(path, source_rel, agent)
         return outcome, None
     if tier == "T4":
@@ -109,6 +115,17 @@ _CONSIDERED_EXTS = {
     ".pptx", ".html", ".htm", ".ipynb",
     ".png", ".jpg", ".jpeg", ".webp", ".gif",
 }
+
+# Data-flavored extensions that default to SKIPPED. Real-world corpora often
+# carry hundreds-to-thousands of these (config dumps, dataset exports, schema
+# files, old .dat blobs) that bloat the index without typically being what
+# the user actually queries. Re-enable per-run with `--include-data`.
+#
+# `.dat` isn't in `_CONSIDERED_EXTS` — opting in via `--include-data` adds
+# it to the considered set so the router peeks it as text (most `.dat` files
+# in user corpora are CSV-ish or fixed-width text dumps; binary `.dat` will
+# fail the peek's UTF-8 check and route to skip).
+_DATA_EXTS_DEFAULT_OFF = {".json", ".csv", ".dat"}
 
 
 # `_USEFUL_DOTFILE_NAMES` is imported from src.router so the router's `peek`
@@ -205,6 +222,7 @@ def find_candidates(
     root: Path,
     *,
     ignore_rules: IgnoreRules | None = None,
+    include_data: bool = False,
 ) -> tuple[list[Path], int, int]:
     """Walk `root` and return (accepted, ignored_count, asset_library_skipped).
 
@@ -239,6 +257,13 @@ def find_candidates(
     ignored = 0
     nasconfig_cache: dict[Path, bool] = {}
 
+    # Build the active extension whitelist for this run. `--include-data`
+    # adds `.dat` (which the router will peek as text), and stops the
+    # data-skip filter from dropping `.json` / `.csv` later.
+    considered_exts = set(_CONSIDERED_EXTS)
+    if include_data:
+        considered_exts |= _DATA_EXTS_DEFAULT_OFF
+
     for dirpath, dirnames, filenames in os.walk(root):
         dirpath_p = Path(dirpath)
         include_dot = _include_dotfiles_for(
@@ -251,6 +276,16 @@ def find_candidates(
         if not include_dot:
             dirnames[:] = [d for d in dirnames if not d.startswith(".")]
 
+        # Prune directories matching built-in default-ignore patterns
+        # (node_modules, Program Files, target, etc.). Without this, we'd
+        # descend into a 50k-file npm package just to filter every file
+        # individually — minutes-to-hours of pointless `os.stat` calls on
+        # large corpora.
+        dirnames[:] = [
+            d for d in dirnames
+            if not rules.is_default_ignored_dir(dirpath_p / d)
+        ]
+
         for fname in filenames:
             # Leaf dotfile filter — allowlisted ones survive (.bashrc et al.),
             # and `include_dotfiles: true` lets all of them through.
@@ -260,13 +295,19 @@ def find_candidates(
             p = dirpath_p / fname
             if not p.is_file():
                 continue
-            if p.suffix.lower() not in _CONSIDERED_EXTS:
+            ext = p.suffix.lower()
+            if ext not in considered_exts:
                 # Useful dotfiles (and any dotfile under `include_dotfiles: true`
                 # that has no extension) bypass the considered-ext check.
                 if fname not in _USEFUL_DOTFILE_NAMES and not (
                     include_dot and fname.startswith(".")
                 ):
                     continue
+            # Data-extension default-skip: `--include-data` re-adds .json/.csv/.dat
+            # to `considered_exts` above, so this block only fires when the user
+            # has NOT opted in.
+            if not include_data and ext in _DATA_EXTS_DEFAULT_OFF:
+                continue
             if rules.is_ignored(p):
                 ignored += 1
                 continue
@@ -311,7 +352,7 @@ def _gpu_available() -> bool:
 async def ingest_one(
     path: Path,
     manifest: Manifest,
-    agent,
+    get_agent,
     *,
     gpu_available: bool,
     t4_budget_used_mb: float,
@@ -389,7 +430,7 @@ async def ingest_one(
 
     old_summary_rel = existing.summary_file if existing else None
     outcome, note = await _run_tier(
-        primary, path, source_rel, agent, manifest, force=force,
+        primary, path, source_rel, get_agent, manifest, force=force,
     )
     if note:
         decision = RouteDecision(
@@ -456,14 +497,34 @@ async def run_batch(
     force: bool = False,
     concurrency: int = 4,
     verbose: bool = False,
+    include_data: bool = False,
 ) -> None:
     from tqdm import tqdm
 
     load_dotenv()
     manifest = Manifest()
 
+    # Pre-walk phase: scan for .gitignore/.nasignore + enumerate candidate
+    # files. On large corpora (~10 GB+) this can take a minute or two before
+    # the indexing bar appears — print progress so the user knows it isn't
+    # hung. Both walks now prune default-ignored directories (node_modules/,
+    # Program Files/, etc.) so this scales much better than it used to.
+    import time
+    print(f"scanning {root} for ignore rules and candidate files...", flush=True)
+    t0 = time.monotonic()
     ignore_rules = IgnoreRules.from_root(root)
-    files, ignored_count, asset_lib_skipped = find_candidates(root, ignore_rules=ignore_rules)
+    t_ignore = time.monotonic() - t0
+    files, ignored_count, asset_lib_skipped = find_candidates(
+        root, ignore_rules=ignore_rules, include_data=include_data,
+    )
+    t_total = time.monotonic() - t0
+    print(
+        f"  scan done in {t_total:.1f}s "
+        f"(ignore-rules: {t_ignore:.1f}s, candidates: {t_total - t_ignore:.1f}s)\n"
+        f"  found {len(files)} files to consider, {ignored_count} ignored, "
+        f"{asset_lib_skipped} dropped by asset-library rule",
+        flush=True,
+    )
     if not files and ignored_count == 0 and asset_lib_skipped == 0:
         print(f"no indexable files found under {root}")
         return
@@ -515,35 +576,39 @@ async def run_batch(
         "skipped": 0, "unchanged": 0, "errors": 0,
     }
 
+    # Periodic-save baseline so a Ctrl-C never loses more than ~30s of
+    # already-completed work. Without this, manifest is written only when
+    # asyncio.gather() returns — interruption mid-walker discards every
+    # mark_summarized / mark_routed / mark_fast_indexed update from the
+    # in-flight run, even though the on-disk artifacts (summary markdowns,
+    # fast_tier vectors) are already there.
+    last_save_t = time.monotonic()
+    SAVE_INTERVAL_S = 30.0
+
     bar = tqdm(total=len(files), desc="indexing", unit="file")
 
     async def worker(path: Path):
-        nonlocal t4_used_mb
+        nonlocal t4_used_mb, last_save_t
         rel = source_rel_path(path)
         try:
             async with sem:
                 bar.set_postfix_str(path.name[:40])
-                # Acquire LLM agent lazily per decision.
-                decision_for_agent_check = decide(
-                    peek(path),
-                    nasconfig=load_nasconfig(path),
-                    gpu_available=gpu,
-                    t4_budget_used_mb=t4_used_mb,
-                )
-                chosen = _choose_primary_tier(decision_for_agent_check)
-                need_agent = chosen in ("T3", "T4")
-                a = get_agent() if need_agent else None
-
                 async with manifest_lock:
                     current_budget = t4_used_mb
                 decision, added = await ingest_one(
-                    path, manifest, a,
+                    path, manifest, get_agent,
                     gpu_available=gpu,
                     t4_budget_used_mb=current_budget,
                     force=force,
                 )
                 async with manifest_lock:
                     t4_used_mb += added
+                    # Persist progress at most every SAVE_INTERVAL_S seconds.
+                    # Lock held to avoid two workers racing the file write.
+                    now = time.monotonic()
+                    if now - last_save_t >= SAVE_INTERVAL_S:
+                        manifest.save()
+                        last_save_t = now
 
                 if decision.skipped:
                     if decision.skip_reason == "unchanged":
@@ -570,7 +635,7 @@ async def run_batch(
         await asyncio.gather(*(worker(p) for p in files))
     finally:
         bar.close()
-        manifest.save()
+        manifest.save()  # final unconditional save
 
     total = len(files)
     print(
@@ -703,6 +768,37 @@ def main() -> None:
             "ingest` later to push them manually."
         ),
     )
+    parser.add_argument(
+        "--include-data",
+        action="store_true",
+        help=(
+            "Index data-flavored files (.json, .csv, .dat) that are skipped "
+            "by default. Real-world corpora often have hundreds of these "
+            "(config dumps, dataset exports) that bloat the index without "
+            "being what users typically query. Use this when you do want "
+            "them — e.g. you're searching across structured datasets."
+        ),
+    )
+    parser.add_argument(
+        "--per-child",
+        action="store_true",
+        help=(
+            "Iterate immediate subdirectories of <path> and ingest each "
+            "sequentially as its own batch. Useful for huge roots (multi-TB) "
+            "where a single walk feels stuck — you see per-subdir progress "
+            "lines, can Ctrl-C cleanly between chunks, and each scan is "
+            "smaller. Stage 2 push still runs once at the end."
+        ),
+    )
+    parser.add_argument(
+        "--list-children",
+        action="store_true",
+        help=(
+            "Print one ingest command per immediate subdirectory of <path> "
+            "and exit. Use this to preview / cherry-pick before running "
+            "(e.g. `... --list-children | head -20`). No filesystem walk."
+        ),
+    )
     args = parser.parse_args()
 
     root = Path(args.path)
@@ -710,6 +806,37 @@ def main() -> None:
         sys.exit(f"error: no such path: {root}")
     if not root.is_dir():
         sys.exit(f"error: ingest walker expects a directory, got: {root}")
+
+    # --list-children: just print would-be commands and exit. Cheap preview.
+    if args.list_children:
+        # Apply parent's ignore rules so the preview matches what `--per-child`
+        # would actually run. Without this, $RECYCLE.BIN/, movies/, etc. show
+        # up in the list even though they'd be filtered out at run time.
+        parent_rules = IgnoreRules.from_root(root)
+        all_children = sorted(p for p in root.iterdir() if p.is_dir())
+        children = [
+            c for c in all_children
+            if not c.name.startswith(".") and not parent_rules.is_ignored(c)
+        ]
+        if not children:
+            print(f"# {root} has no subdirectories (or all are ignored)")
+            return
+        flag_str = ""
+        if args.force:
+            flag_str += " --force"
+        if args.rebuild:
+            flag_str += " --rebuild"
+        if args.verbose:
+            flag_str += " -v"
+        if args.no_push:
+            flag_str += " --no-push"
+        if args.include_data:
+            flag_str += " --include-data"
+        if args.concurrency != 4:
+            flag_str += f" --concurrency {args.concurrency}"
+        for c in children:
+            print(f"uv run python -m src.ingest {c}{flag_str}")
+        return
 
     # --rebuild: nuke everything under this root, then proceed with --force.
     if args.rebuild:
@@ -721,12 +848,68 @@ def main() -> None:
     # there's nothing to skip anyway, but force=True ensures the per-tier
     # skip checks (T4 in particular) honor the intent.
     force = args.force or args.rebuild
-    asyncio.run(run_batch(
-        root,
-        force=force,
-        concurrency=args.concurrency,
-        verbose=args.verbose,
-    ))
+
+    if args.per_child:
+        import time
+        # Apply parent's ignore rules ($RECYCLE.BIN/, movies/, etc. from
+        # DEFAULT_IGNORE_PATTERNS + /mnt/hardisk/.nasignore) BEFORE iterating
+        # — otherwise we'd recurse into ignored subdirs because run_batch's
+        # own IgnoreRules is rooted at that subdir and can't see rules from
+        # the parent. Hidden dotfile dirs are also skipped to mirror the
+        # walker's normal prune behavior.
+        parent_rules = IgnoreRules.from_root(root)
+        all_children = sorted(p for p in root.iterdir() if p.is_dir())
+        top_files = sorted(p for p in root.iterdir() if p.is_file())
+        children: list[Path] = []
+        filtered: list[tuple[str, str]] = []
+        for c in all_children:
+            if c.name.startswith("."):
+                filtered.append((c.name, "hidden"))
+                continue
+            if parent_rules.is_ignored(c):
+                filtered.append((c.name, "ignore-rule"))
+                continue
+            children.append(c)
+        if filtered:
+            print(
+                f"=== per-child filter: {len(filtered)} subdir(s) skipped at {root} ==="
+            )
+            for name, reason in filtered:
+                print(f"  [skip-{reason}] {name}")
+        if not children:
+            print(f"warn: {root} has no eligible subdirectories — falling back to single-pass ingest")
+            asyncio.run(run_batch(
+                root, force=force, concurrency=args.concurrency,
+                verbose=args.verbose, include_data=args.include_data,
+            ))
+        else:
+            print(f"=== per-child mode: {len(children)} subdirectories under {root} ===")
+            if top_files:
+                print(
+                    f"note: {len(top_files)} top-level file(s) in {root} will NOT "
+                    "be ingested in --per-child mode (only subdirectories are "
+                    "iterated). Run a single-pass ingest on the parent to pick "
+                    "those up, or move them into a subdirectory."
+                )
+            t_start = time.monotonic()
+            for i, c in enumerate(children, 1):
+                print(f"\n=== [{i}/{len(children)}] {c} ===")
+                asyncio.run(run_batch(
+                    c, force=force, concurrency=args.concurrency,
+                    verbose=args.verbose, include_data=args.include_data,
+                ))
+            print(
+                f"\n=== per-child done: {len(children)} subdirectories in "
+                f"{time.monotonic() - t_start:.1f}s ==="
+            )
+    else:
+        asyncio.run(run_batch(
+            root,
+            force=force,
+            concurrency=args.concurrency,
+            verbose=args.verbose,
+            include_data=args.include_data,
+        ))
 
     # Stage 2 push: read the manifest, embed new/changed rows, upsert into
     # Qdrant. This is the step users most often forgot to run — folding it in

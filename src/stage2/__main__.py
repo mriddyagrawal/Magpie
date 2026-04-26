@@ -69,6 +69,7 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
         # lived in this branch and could spend 13+ hours on a single CSV).
         regular_paths: list[str] = []
         skip_only_rels: list[str] = []
+        pending_resummarize: list[str] = []
         for rel in todo_paths:
             entry = manifest.get(rel)
             assert entry is not None
@@ -85,13 +86,32 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
                     # collection (handled by `src.stage1_fast.index`).
                     skip_only_rels.append(rel)
                     continue
-                raise RuntimeError(
-                    f"manifest row {rel!r} has no summary_file and is not fast-tier-only — "
-                    f"the router did not produce a summary for it. "
-                    f"Re-run `python -m src.ingest <path>` to route it through a tier."
-                )
+                # Row is in "needs re-summarization" intermediate state —
+                # produced by `just clean-stale-summaries` after the on-disk
+                # markdown went missing. Skip it here; the walker
+                # (`python -m src.ingest <root>`) will pick it up and
+                # re-summarize. We log a single rollup at the end rather
+                # than per-row spam — could be hundreds.
+                pending_resummarize.append(rel)
+                continue
 
             regular_paths.append(rel)
+
+        if pending_resummarize:
+            sample = ", ".join(pending_resummarize[:3])
+            more = (
+                f" (plus {len(pending_resummarize) - 3} more)"
+                if len(pending_resummarize) > 3 else ""
+            )
+            print(
+                f"  warn: {len(pending_resummarize)} manifest row(s) pending "
+                f"re-summarization — these were cleared by "
+                f"`just clean-stale-summaries` and need the walker to "
+                f"re-summarize them. Run "
+                f"`python -m src.ingest <your-corpus-root>` to fix.\n"
+                f"        first few: {sample}{more}",
+                file=sys.stderr,
+            )
 
         if regular_paths:
             parsed = []
@@ -106,13 +126,27 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
                 parsed.append(parse_summary_file(summary_path))
                 parsed_rels.append(rel)
 
-            upserted += upsert_summaries(parsed)
-            # Mark every rel we successfully parsed. Duplicates (multiple rels
-            # pointing at the same .md, e.g. identical PDFs in different
-            # folders) all get marked even though they collapse to one Qdrant
-            # point — without this they'd re-upsert on every sync.
-            for rel in parsed_rels:
-                manifest.mark_ingested(rel)
+            # Per-batch progress: mark each batch's rows as ingested IMMEDIATELY
+            # after Qdrant acks the upsert, and persist the manifest at most
+            # once every 30 seconds. Without this, a Ctrl-C mid-push loses every
+            # batch's manifest update — even though the points are already in
+            # Qdrant — forcing the user to re-do the entire push from scratch.
+            # 30s save interval bounds lost-progress to ~30s of work; manifest
+            # save itself is ~100-500ms for big manifests so we don't want to
+            # do it per batch.
+            import time
+            last_save_t = [time.monotonic()]
+            SAVE_INTERVAL_S = 30.0
+
+            def _on_batch_complete(batch_indices: list[int]) -> None:
+                for idx in batch_indices:
+                    if idx < len(parsed_rels):
+                        manifest.mark_ingested(parsed_rels[idx])
+                if time.monotonic() - last_save_t[0] >= SAVE_INTERVAL_S:
+                    manifest.save()
+                    last_save_t[0] = time.monotonic()
+
+            upserted += upsert_summaries(parsed, on_batch_complete=_on_batch_complete)
 
         for rel in skip_only_rels:
             manifest.mark_ingested(rel)

@@ -185,6 +185,105 @@ def test_clean_stale_handles_repo_relative_paths(tmp_path: Path) -> None:
     assert "vanished/doc.txt" not in m.paths()
 
 
+def test_clean_missing_summaries_marks_for_resummarization(tmp_path: Path) -> None:
+    """Source still exists, summary markdown is gone — clear the pointer so
+    the next ingest re-summarizes."""
+    import src.manifest as manifest_mod
+
+    manifest_path = tmp_path / "_manifest.json"
+    src = tmp_path / "src.txt"
+    src.write_text("source still here", encoding="utf-8")
+
+    original_root = manifest_mod.REPO_ROOT
+    manifest_mod.REPO_ROOT = tmp_path
+    try:
+        m = Manifest(path=manifest_path)
+        # Reference a summary markdown that doesn't exist on disk
+        m.mark_summarized(str(src), size=10, summary_file="Test Summaries/gone.md")
+        m.mark_ingested(str(src))  # also has an ingested_at
+        stats = m.clean_missing_summaries()
+    finally:
+        manifest_mod.REPO_ROOT = original_root
+
+    assert stats == {"resummarize": 1, "dropped": 0}
+    e = m.get(str(src))
+    assert e is not None
+    assert e.summary_file is None  # cleared
+    assert e.summarized_at == ""    # cleared
+    assert e.ingested_at is None    # cleared
+    assert e.size == 10             # other state intact
+
+
+def test_clean_missing_summaries_drops_when_source_also_gone(tmp_path: Path) -> None:
+    """Both source AND summary missing — drop the row entirely."""
+    import src.manifest as manifest_mod
+
+    manifest_path = tmp_path / "_manifest.json"
+    original_root = manifest_mod.REPO_ROOT
+    manifest_mod.REPO_ROOT = tmp_path
+    try:
+        m = Manifest(path=manifest_path)
+        # Neither file exists
+        m.mark_summarized(
+            "/nonexistent/source.pdf",
+            size=100,
+            summary_file="Test Summaries/also-gone.md",
+        )
+        stats = m.clean_missing_summaries()
+    finally:
+        manifest_mod.REPO_ROOT = original_root
+
+    assert stats == {"resummarize": 0, "dropped": 1}
+    assert "/nonexistent/source.pdf" not in m.paths()
+
+
+def test_clean_missing_summaries_noop_when_all_intact(tmp_path: Path) -> None:
+    """No-op when every entry has both source AND summary on disk."""
+    import src.manifest as manifest_mod
+
+    manifest_path = tmp_path / "_manifest.json"
+    src = tmp_path / "src.txt"
+    src.write_text("x", encoding="utf-8")
+    smry = tmp_path / "Test Summaries" / "abc.md"
+    smry.parent.mkdir()
+    smry.write_text("# summary", encoding="utf-8")
+
+    original_root = manifest_mod.REPO_ROOT
+    manifest_mod.REPO_ROOT = tmp_path
+    try:
+        m = Manifest(path=manifest_path)
+        m.mark_summarized(str(src), size=1, summary_file="Test Summaries/abc.md")
+        stats = m.clean_missing_summaries()
+    finally:
+        manifest_mod.REPO_ROOT = original_root
+
+    assert stats == {"resummarize": 0, "dropped": 0}
+    e = m.get(str(src))
+    assert e is not None and e.summary_file == "Test Summaries/abc.md"
+
+
+def test_clean_missing_summaries_skips_rows_without_summary_file(tmp_path: Path) -> None:
+    """Rows that never had a summary_file (e.g. pure T4 rows, skipped rows)
+    aren't touched even if they're new."""
+    import src.manifest as manifest_mod
+
+    manifest_path = tmp_path / "_manifest.json"
+    src = tmp_path / "src.txt"
+    src.write_text("x", encoding="utf-8")
+
+    original_root = manifest_mod.REPO_ROOT
+    manifest_mod.REPO_ROOT = tmp_path
+    try:
+        m = Manifest(path=manifest_path)
+        m.mark_summarized(str(src), size=1, summary_file=None)  # T4-style row
+        stats = m.clean_missing_summaries()
+    finally:
+        manifest_mod.REPO_ROOT = original_root
+
+    assert stats == {"resummarize": 0, "dropped": 0}
+    assert str(src) in m.paths()
+
+
 def test_clean_stale_noop_when_all_files_present(tmp_path: Path) -> None:
     """No-op when every manifest entry's source still exists."""
     manifest_path = tmp_path / "_manifest.json"

@@ -160,6 +160,54 @@ class Manifest:
         """Remove a row and return the dropped Entry (or None if it wasn't there)."""
         return self.entries.pop(rel_path, None)
 
+    def clean_missing_summaries(self) -> dict[str, int]:
+        """Inverse of `clean_stale`: clear stale `summary_file` pointers when
+        the on-disk markdown is gone but the source file is still present.
+
+        This handles the case where summary markdowns disappear independently
+        of the source — typical causes:
+          * User manually deleted `Test Summaries/` to free disk
+          * `--rebuild` interrupted partway, leaving manifest references to
+            now-missing files
+          * Backup / sync software cleared `Test Summaries/` as "cache"
+          * Disk corruption or filesystem rollback
+
+        Symptom in the field: Stage 2 ingest spams `warn: summary missing,
+        skipping: Test Summaries/<hash>_t1.md` because the manifest says the
+        file is summarized but the markdown is gone.
+
+        Behavior: for each row whose `summary_file` doesn't exist on disk:
+          * Source still exists → clear `summary_file`/`summarized_at`/
+            `ingested_at` so the next walker run re-summarizes it.
+          * Source ALSO gone → drop the row entirely (covered by
+            `clean_stale` too; we re-do that work here so the user only
+            needs one cleanup call).
+
+        Returns `{"resummarize": N, "dropped": M}`. Caller must `save()` after.
+        """
+        resummarize = 0
+        dropped = 0
+        for rel in list(self.paths()):
+            entry = self.get(rel)
+            if entry is None or not entry.summary_file:
+                continue
+            summary_abs = REPO_ROOT / entry.summary_file
+            if summary_abs.is_file():
+                continue  # summary intact, nothing to do
+            # Summary missing. Decide based on source presence.
+            source_abs = REPO_ROOT / rel if not rel.startswith("/") else Path(rel)
+            if source_abs.is_file():
+                # Re-summarize on next ingest run.
+                entry.summary_file = None
+                entry.summarized_at = ""
+                entry.ingested_at = None
+                resummarize += 1
+            else:
+                # Source AND summary both gone — drop the whole row.
+                self.drop(rel)
+                dropped += 1
+        return {"resummarize": resummarize, "dropped": dropped}
+
     def clean_stale(self) -> dict[str, int]:
         """Drop manifest rows whose source file no longer exists on disk, and
         delete the orphaned summary markdown for each.

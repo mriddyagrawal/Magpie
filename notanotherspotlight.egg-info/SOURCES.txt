@@ -8,6 +8,7 @@ notanotherspotlight.egg-info/top_level.txt
 src/__init__.py
 src/answer.py
 src/content.py
+src/enrich_offerings.py
 src/llm.py
 src/manifest.py
 src/pipeline.py

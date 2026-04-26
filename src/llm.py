@@ -25,6 +25,7 @@ import platform
 import re
 import sys
 from dataclasses import dataclass
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar
 
 from pydantic import BaseModel
@@ -127,6 +128,21 @@ def build_chat_model() -> OpenAIChatModel:
 T = TypeVar("T", bound=BaseModel)
 
 
+def _timestamp_prefix() -> str:
+    """Short 'Current date and time: ...' line prepended to every LLM call.
+
+    Local time with timezone so the model can reason about 'today', 'this
+    semester', 'is this receipt recent', etc. Evaluated per-call, not baked
+    into the system prompt.
+    """
+    now = datetime.now().astimezone()
+    return f"Current date and time: {now.strftime('%A, %Y-%m-%d %H:%M %Z')}"
+
+
+def _prepend_timestamp(message: list) -> list:
+    return [_timestamp_prefix(), *message]
+
+
 class ChatAgent(Protocol, Generic[T]):
     """Minimal agent surface used by call sites (summarize / rewrite / answer)."""
 
@@ -153,11 +169,11 @@ class _CloudAgent(Generic[T]):
         )
 
     async def run(self, message: list) -> T:
-        result = await self._agent.run(message)
+        result = await self._agent.run(_prepend_timestamp(message))
         return result.output
 
     def run_sync(self, message: list) -> T:
-        result = self._agent.run_sync(message)
+        result = self._agent.run_sync(_prepend_timestamp(message))
         return result.output
 
 
@@ -308,13 +324,13 @@ class LocalAgent(Generic[T]):
         self._fallback = fallback
 
     async def run(self, message: list) -> T:
-        return await asyncio.to_thread(self._run_sync_impl, message)
+        return await asyncio.to_thread(self._run_sync_impl, _prepend_timestamp(message))
 
     def run_sync(self, message: list) -> T:
         # If an event loop is already running (async context), delegate via
         # asyncio.run_coroutine_threadsafe pattern isn't needed here because
         # all sync callers (search.rewrite_query) come from non-async code.
-        return self._run_sync_impl(message)
+        return self._run_sync_impl(_prepend_timestamp(message))
 
     def _run_sync_impl(self, message: list) -> T:
         prompt_text, images = self._serialize_message(message)

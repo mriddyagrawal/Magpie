@@ -184,66 +184,6 @@ def upsert_summaries(summaries: list[ParsedSummary]) -> int:
     return total
 
 
-def upsert_csv_rows(csv_path: Path, source_rel: str) -> int:
-    """Read a CSV, embed each row, and upsert one Qdrant point per row.
-
-    Point IDs use the scheme ``_point_id(f"{source_rel}::row:{i}")``.
-    The ``source_path`` payload field points to the parent CSV file so the
-    answer stage reads the full file.
-
-    Returns the number of data rows upserted.
-    """
-    import csv as csv_mod
-
-    from tqdm import tqdm
-
-    with csv_path.open(encoding="utf-8") as f:
-        reader = csv_mod.DictReader(f)
-        headers = reader.fieldnames or []
-        rows = list(reader)
-
-    if not rows:
-        return 0
-
-    # Build "header: value, header: value, ..." text per row.
-    texts = [
-        ", ".join(f"{h}: {row.get(h, '')}" for h in headers)
-        for row in rows
-    ]
-
-    client = get_qdrant_client()
-    total = 0
-
-    for i in tqdm(range(0, len(texts), BATCH_SIZE), desc=f"ingesting {csv_path.name}", unit="batch"):
-        batch_texts = texts[i : i + BATCH_SIZE]
-        batch_offset = i
-        dense_vectors = embed_dense(batch_texts)
-        sparse_vectors = embed_sparse(batch_texts)
-
-        points = []
-        for j, (text, dense_vec, (sparse_idx, sparse_val)) in enumerate(
-            zip(batch_texts, dense_vectors, sparse_vectors)
-        ):
-            points.append(
-                PointStruct(
-                    id=_point_id(f"{source_rel}::row:{batch_offset + j}"),
-                    vector={
-                        "dense": dense_vec,
-                        "sparse": SparseVector(indices=sparse_idx, values=sparse_val),
-                    },
-                    payload={
-                        "summary": text,
-                        "source_path": source_rel,
-                    },
-                )
-            )
-
-        client.upsert(collection_name=COLLECTION_NAME, points=points)
-        total += len(points)
-
-    return total
-
-
 def get_all_point_ids() -> set[str]:
     """Return the set of all point IDs currently in the collection.
 

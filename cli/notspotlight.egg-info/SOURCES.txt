@@ -2,6 +2,7 @@ pyproject.toml
 notspotlight/__init__.py
 notspotlight/display.py
 notspotlight/repl.py
+notspotlight/suggestions.py
 notspotlight.egg-info/PKG-INFO
 notspotlight.egg-info/SOURCES.txt
 notspotlight.egg-info/dependency_links.txt

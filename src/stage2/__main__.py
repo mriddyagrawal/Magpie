@@ -1,9 +1,18 @@
 """CLI entrypoint: python -m src.stage2 <command>.
 
 `ingest` walks the manifest (not the Test Summaries/ directory) and upserts
-only rows where `ingested_at` is absent — i.e. new summaries plus any that
-Stage 1 re-summarized (which clears ingested_at). After upserting, orphan
-Qdrant points (IDs not in the manifest) are hard-deleted.
+only rows where `ingested_at` is absent — i.e. new summaries the router
+just wrote (or rows the router re-summarized, which clears ingested_at).
+After upserting, orphan Qdrant points (IDs not in the manifest) are
+hard-deleted.
+
+This module never opens source files. The router (`src.router` →
+`src.ingest.walker`) is the single sanctioned entry point: it inspects each
+file, picks a tier, and writes a summary markdown. Stage 2 only embeds
+those markdowns. If a manifest row reaches stage 2 without a `summary_file`
+and isn't fast-tier-only, that's a bug in upstream routing — we raise
+loudly instead of silently falling back to a per-row CSV embedder (which
+this module used to do, and which could spend hours on a 100k-row CSV).
 
 `--force` drops the collection, clears all `ingested_at` values in the
 manifest, then ingests from scratch.
@@ -13,7 +22,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -30,7 +38,6 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
         create_collection,
         delete_points,
         get_all_point_ids,
-        upsert_csv_rows,
         upsert_summaries,
     )
     from src.stage2.parser import parse_summary_file
@@ -38,7 +45,7 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
     manifest = Manifest()
     if not manifest.entries:
         raise RuntimeError(
-            "manifest is empty — run `python -m src.stage1.summarize \"Test Content\"` first."
+            "manifest is empty — run `python -m src.ingest <path>` first."
         )
 
     if force:
@@ -53,18 +60,39 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
 
     upserted = 0
     if todo_paths:
-        # Split into CSV entries (summary_file is None) and regular entries.
-        csv_paths = []
-        regular_paths = []
+        # Single contract: every todo row is one of three things —
+        #   (a) router-skipped         → mark ingested, no Qdrant work
+        #   (b) fast-tier-only         → lives in fast_tier collection, skip here
+        #   (c) has a summary markdown → embed + upsert into the summary collection
+        # Anything else means upstream routing is broken; we raise instead of
+        # silently invoking a per-row fallback (the old `upsert_csv_rows` path
+        # lived in this branch and could spend 13+ hours on a single CSV).
+        regular_paths: list[str] = []
+        skip_only_rels: list[str] = []
         for rel in todo_paths:
             entry = manifest.get(rel)
             assert entry is not None
-            if entry.summary_file is None:
-                csv_paths.append(rel)
-            else:
-                regular_paths.append(rel)
 
-        # Regular files: parse summary markdown → embed → upsert.
+            if entry.skip_reason is not None:
+                # Router decided to skip this file. Record the no-op so we
+                # don't re-evaluate it on every ingest run.
+                skip_only_rels.append(rel)
+                continue
+
+            if entry.summary_file is None:
+                if entry.fast_indexed_at is not None:
+                    # Fast-tier-only file — its vectors live in the fast_tier
+                    # collection (handled by `src.stage1_fast.index`).
+                    skip_only_rels.append(rel)
+                    continue
+                raise RuntimeError(
+                    f"manifest row {rel!r} has no summary_file and is not fast-tier-only — "
+                    f"the router did not produce a summary for it. "
+                    f"Re-run `python -m src.ingest <path>` to route it through a tier."
+                )
+
+            regular_paths.append(rel)
+
         if regular_paths:
             parsed = []
             parsed_rels: list[str] = []
@@ -86,18 +114,8 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
             for rel in parsed_rels:
                 manifest.mark_ingested(rel)
 
-        # CSV files: embed each row directly → upsert.
-        for rel in csv_paths:
-            entry = manifest.get(rel)
-            assert entry is not None
-            csv_path = REPO_ROOT / rel
-            if not csv_path.exists():
-                print(f"  warn: CSV missing, skipping: {rel}", file=sys.stderr)
-                continue
-            row_count = upsert_csv_rows(csv_path, rel)
-            entry.row_count = row_count
+        for rel in skip_only_rels:
             manifest.mark_ingested(rel)
-            upserted += row_count
 
         manifest.save()
         print(f"upserted {upserted} points into Qdrant")
@@ -105,16 +123,7 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
         print("manifest says nothing needs ingestion.")
 
     # Orphan cleanup: points in Qdrant whose source is no longer in the manifest.
-    expected_ids: set[str] = set()
-    for rel in manifest.paths():
-        entry = manifest.get(rel)
-        assert entry is not None
-        if entry.row_count is not None and entry.row_count > 0:
-            expected_ids.update(
-                _point_id(f"{rel}::row:{i}") for i in range(entry.row_count)
-            )
-        else:
-            expected_ids.add(_point_id(rel))
+    expected_ids: set[str] = {_point_id(rel) for rel in manifest.paths()}
 
     actual_ids = get_all_point_ids()
     orphans = actual_ids - expected_ids

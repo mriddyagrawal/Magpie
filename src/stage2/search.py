@@ -108,51 +108,159 @@ async def rewrite_query_async(
 
 @dataclass
 class SearchResult:
-    """Three-column output: summary, path, score."""
+    """One retrieval hit. `tier` indicates which collection contributed:
+    "summary", "fast", or "both" (after RRF merge across both tiers).
+    """
 
     summary: str
     path: str
     score: float
+    tier: str = "summary"
 
 
-def run_search(sq: SearchQuery, top_k: int = 5) -> list[SearchResult]:
-    """Run hybrid search for an already-rewritten SearchQuery.
+def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
+    """Hybrid (dense + BM25) search of the summaries collection.
 
-    Split out from `search_summaries` so callers (e.g. `pipeline.ask`) can log
-    the rewritten query alongside the retrieval results.
+    Returns an empty list if the collection doesn't exist yet (e.g. fresh
+    setup, or the user has only run --fast-only syncs).
     """
-    # Combine the rewritten query with keywords for a richer embedding input.
+    client = get_qdrant_client()
+    if not client.collection_exists(COLLECTION_NAME):
+        return []
+
     dense_text = sq.query + " " + " ".join(sq.keywords)
     dense_vec = embed_dense_query(dense_text)
-
-    # Same text feeds BM25 for exact-match boosting.
     sparse_idx, sparse_val = embed_sparse_query(dense_text)
-
-    client = get_qdrant_client()
 
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         prefetch=[
-            Prefetch(query=dense_vec, using="dense", limit=top_k * 2),
+            Prefetch(query=dense_vec, using="dense", limit=limit),
             Prefetch(
                 query=SparseVector(indices=sparse_idx, values=sparse_val),
                 using="sparse",
-                limit=top_k * 2,
+                limit=limit,
             ),
         ],
         query=FusionQuery(fusion="rrf"),
-        limit=top_k,
+        limit=limit,
         with_payload=["summary", "source_path"],
     )
+    return [
+        SearchResult(
+            summary=(p.payload or {}).get("summary", ""),
+            path=(p.payload or {}).get("source_path", ""),
+            score=p.score,
+            tier="summary",
+        )
+        for p in results.points
+    ]
+
+
+def _search_fast_tier(query_text: str, limit: int) -> list[SearchResult]:
+    """ColPali MaxSim search of the fast_tier collection, deduped to one
+    result per file (best-matching page wins).
+
+    Returns an empty list if the collection doesn't exist or the fast-tier
+    model can't be loaded (e.g. in CI or on a machine without colpali-engine).
+    """
+    from src.stage2.fast_db import FAST_COLLECTION_NAME
+
+    client = get_qdrant_client()
+    if not client.collection_exists(FAST_COLLECTION_NAME):
+        return []
+
+    try:
+        from src.stage1_fast.model import encode_queries
+        from src.stage2.fast_db import search as fast_search
+    except ImportError:
+        return []
+
+    try:
+        q_tensor = encode_queries([query_text])
+        q_vecs = q_tensor[0].float().cpu().tolist()
+    except Exception:  # pylint: disable=broad-except
+        # Model load failure (no GPU, missing weights, etc.) — fall through.
+        return []
+
+    hits = fast_search(q_vecs, limit=limit)
+
+    # A single file can have multiple matching pages. Collapse to best page.
+    best_by_path: dict[str, tuple[int, float]] = {}
+    for path, page, score in hits:
+        prev = best_by_path.get(path)
+        if prev is None or score > prev[1]:
+            best_by_path[path] = (page, score)
 
     return [
         SearchResult(
-            summary=(point.payload or {}).get("summary", ""),
-            path=(point.payload or {}).get("source_path", ""),
-            score=point.score,
+            summary=f"(visual match — page {page})",
+            path=path,
+            score=score,
+            tier="fast",
         )
-        for point in results.points
+        for path, (page, score) in sorted(
+            best_by_path.items(), key=lambda kv: kv[1][1], reverse=True
+        )
     ]
+
+
+RRF_K = 60  # standard RRF constant; higher = flatter fusion curve
+
+
+def _rrf_merge(
+    summary_hits: list[SearchResult],
+    fast_hits: list[SearchResult],
+    top_k: int,
+) -> list[SearchResult]:
+    """Reciprocal Rank Fusion of two result lists, keyed by source_path.
+
+    Each path's RRF score is sum over each list of `1 / (RRF_K + rank)`,
+    where rank is 1-indexed. Missing from a list contributes 0. The kept
+    SearchResult prefers the summary-tier entry (it has a real summary)
+    when a path appears in both lists.
+    """
+    scores: dict[str, float] = {}
+    chosen: dict[str, SearchResult] = {}
+    seen_in: dict[str, set[str]] = {}
+
+    for rank, r in enumerate(summary_hits, start=1):
+        if not r.path:
+            continue
+        scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
+        chosen[r.path] = r  # summary-tier entries have human-readable summaries
+        seen_in.setdefault(r.path, set()).add("summary")
+
+    for rank, r in enumerate(fast_hits, start=1):
+        if not r.path:
+            continue
+        scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
+        chosen.setdefault(r.path, r)  # only fill if summary didn't already
+        seen_in.setdefault(r.path, set()).add("fast")
+
+    ordered = sorted(chosen.values(), key=lambda r: scores[r.path], reverse=True)
+    # Overwrite each result's score with its RRF score so callers see fused ranking.
+    for r in ordered:
+        r.score = scores[r.path]
+        tiers = seen_in.get(r.path, set())
+        r.tier = "both" if len(tiers) == 2 else next(iter(tiers), r.tier)
+    return ordered[:top_k]
+
+
+def run_search(sq: SearchQuery, top_k: int = 5) -> list[SearchResult]:
+    """Run hybrid search across both the summary and fast-tier collections.
+
+    Each tier returns its top `top_k * 2` candidates; results are merged via
+    Reciprocal Rank Fusion keyed on `source_path`. Either tier being empty
+    (missing collection, disabled, etc.) is tolerated — the other tier's
+    results pass through unchanged.
+    """
+    summary_hits = _search_summary_tier(sq, top_k * 2)
+    # Feed the raw dense-query text (same as summary tier) to ColPali; it
+    # handles multi-token query encoding internally.
+    query_text = (sq.query + " " + " ".join(sq.keywords)).strip()
+    fast_hits = _search_fast_tier(query_text, top_k * 2)
+    return _rrf_merge(summary_hits, fast_hits, top_k)
 
 
 def raw_query(question: str) -> SearchQuery:

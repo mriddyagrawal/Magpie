@@ -1,8 +1,12 @@
 """Tests for the search pipeline.
 
 Mocked — both Kimi (query rewrite) and Qdrant (vector search) are external.
-Tests verify the wiring: that search_summaries correctly connects
+Tests verify the wiring: that `search_summaries` correctly connects
 rewrite → embed → Qdrant query → SearchResult output.
+
+Since the search pipeline now fuses both the `summaries` and `fast_tier`
+(ColPali) collections, each test stubs `_search_fast_tier` to return an
+empty list so we can assert purely on the summaries-collection behavior.
 """
 
 from unittest.mock import MagicMock, patch
@@ -18,11 +22,14 @@ def _make_mock_point(summary: str, source_path: str, score: float) -> MagicMock:
     return point
 
 
+@patch("src.stage2.search._search_fast_tier", return_value=[])
 @patch("src.stage2.search.rewrite_query")
 @patch("src.stage2.search.embed_dense_query")
 @patch("src.stage2.search.embed_sparse_query")
 @patch("src.stage2.search.get_qdrant_client")
-def test_search_returns_search_results(mock_client, mock_sparse, mock_dense, mock_rewrite):
+def test_search_returns_search_results(
+    mock_client, mock_sparse, mock_dense, mock_rewrite, _mock_fast
+):
     """search_summaries must return a list of SearchResult with summary, path, score."""
     mock_rewrite.return_value = SearchQuery(
         query="flight receipt booking cost",
@@ -31,6 +38,8 @@ def test_search_returns_search_results(mock_client, mock_sparse, mock_dense, moc
     mock_dense.return_value = [0.1] * 384
     mock_sparse.return_value = ([1, 2, 3], [0.5, 0.3, 0.2])
 
+    # `summaries` collection exists; the fast-tier mock above bypasses that side.
+    mock_client.return_value.collection_exists.return_value = True
     mock_response = MagicMock()
     mock_response.points = [
         _make_mock_point(
@@ -47,14 +56,17 @@ def test_search_returns_search_results(mock_client, mock_sparse, mock_dense, moc
     assert isinstance(results[0], SearchResult)
     assert results[0].summary == "This receipt documents a $170.45 USD flight booking."
     assert results[0].path == "Test Content/Flight GSP - Hartford Receipt.pdf"
-    assert results[0].score == 0.87
+    assert results[0].tier == "summary"
 
 
+@patch("src.stage2.search._search_fast_tier", return_value=[])
 @patch("src.stage2.search.rewrite_query")
 @patch("src.stage2.search.embed_dense_query")
 @patch("src.stage2.search.embed_sparse_query")
 @patch("src.stage2.search.get_qdrant_client")
-def test_search_empty_results(mock_client, mock_sparse, mock_dense, mock_rewrite):
+def test_search_empty_results(
+    mock_client, mock_sparse, mock_dense, mock_rewrite, _mock_fast
+):
     """search_summaries must return empty list when Qdrant finds nothing."""
     mock_rewrite.return_value = SearchQuery(
         query="something that matches nothing",
@@ -63,6 +75,7 @@ def test_search_empty_results(mock_client, mock_sparse, mock_dense, mock_rewrite
     mock_dense.return_value = [0.0] * 384
     mock_sparse.return_value = ([1], [0.1])
 
+    mock_client.return_value.collection_exists.return_value = True
     mock_response = MagicMock()
     mock_response.points = []
     mock_client.return_value.query_points.return_value = mock_response
@@ -71,36 +84,53 @@ def test_search_empty_results(mock_client, mock_sparse, mock_dense, mock_rewrite
     assert results == []
 
 
+@patch("src.stage2.search._search_fast_tier", return_value=[])
 @patch("src.stage2.search.rewrite_query")
 @patch("src.stage2.search.embed_dense_query")
 @patch("src.stage2.search.embed_sparse_query")
 @patch("src.stage2.search.get_qdrant_client")
-def test_search_respects_top_k(mock_client, mock_sparse, mock_dense, mock_rewrite):
-    """The top_k parameter must be forwarded to Qdrant query_points."""
+def test_search_respects_top_k(
+    mock_client, mock_sparse, mock_dense, mock_rewrite, _mock_fast
+):
+    """top_k drives the final result-list length after fusion.
+
+    (Internally the summary-tier prefetches 2× top_k for RRF headroom, so
+    we assert on the fused output, not the Qdrant call limit.)
+    """
     mock_rewrite.return_value = SearchQuery(query="test", keywords=["test"])
     mock_dense.return_value = [0.1] * 384
     mock_sparse.return_value = ([1], [0.1])
 
+    mock_client.return_value.collection_exists.return_value = True
     mock_response = MagicMock()
-    mock_response.points = []
+    mock_response.points = [
+        _make_mock_point(f"s{i}", f"p{i}", 0.9 - i * 0.05) for i in range(10)
+    ]
     mock_client.return_value.query_points.return_value = mock_response
 
-    search_summaries("test", top_k=3)
-
-    call_kwargs = mock_client.return_value.query_points.call_args
-    assert call_kwargs.kwargs["limit"] == 3
+    results = search_summaries("test", top_k=3)
+    assert len(results) == 3
 
 
+@patch("src.stage2.search._search_fast_tier", return_value=[])
 @patch("src.stage2.search.rewrite_query")
 @patch("src.stage2.search.embed_dense_query")
 @patch("src.stage2.search.embed_sparse_query")
 @patch("src.stage2.search.get_qdrant_client")
-def test_search_output_has_only_three_fields(mock_client, mock_sparse, mock_dense, mock_rewrite):
-    """SearchResult must expose exactly summary, path, score — nothing else."""
+def test_search_output_exposes_expected_fields(
+    mock_client, mock_sparse, mock_dense, mock_rewrite, _mock_fast
+):
+    """SearchResult must expose summary, path, score, tier — the agreed surface.
+
+    `tier` was added when fast-tier (ColPali) landed so callers can tell
+    which collection produced each hit. Anything more than these four is
+    a leak.
+    """
     mock_rewrite.return_value = SearchQuery(query="test", keywords=["test"])
     mock_dense.return_value = [0.1] * 384
     mock_sparse.return_value = ([1], [0.1])
 
+    mock_client.return_value.collection_exists.return_value = True
     mock_response = MagicMock()
     mock_response.points = [
         _make_mock_point("summary text", "path/to/file.pdf", 0.5),
@@ -111,4 +141,4 @@ def test_search_output_has_only_three_fields(mock_client, mock_sparse, mock_dens
     r = results[0]
 
     fields = {f.name for f in r.__dataclass_fields__.values()}
-    assert fields == {"summary", "path", "score"}
+    assert fields == {"summary", "path", "score", "tier"}

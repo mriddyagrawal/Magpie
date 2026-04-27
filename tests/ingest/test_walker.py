@@ -76,10 +76,64 @@ def test_find_candidates_picks_supported_extensions(isolated, tmp_path: Path):
     (corpus / "c.bin").write_bytes(b"\x00\x01")   # unsupported
     (corpus / ".hidden.txt").write_text("h", encoding="utf-8")
 
-    found, ignored = find_candidates(corpus)
+    found, ignored, asset_skipped = find_candidates(corpus)
     names = {p.name for p in found}
     assert names == {"a.py", "b.md"}
     assert ignored == 0
+    assert asset_skipped == 0
+
+
+def test_find_candidates_skips_asset_library_folder(isolated, tmp_path: Path):
+    """Sibling-density rule: a folder with ≥15 images and 0 docs is an asset library."""
+    corpus = tmp_path / "corpus"
+    corpus.mkdir()
+
+    # Real working folder: a few images alongside a document. NOT an asset lib.
+    notes_dir = corpus / "notes"
+    notes_dir.mkdir()
+    (notes_dir / "chapter.md").write_text("notes", encoding="utf-8")
+    for i in range(5):
+        (notes_dir / f"fig{i}.png").write_bytes(b"\x89PNG")
+
+    # Asset library: 20 images, zero documents.
+    assets_dir = corpus / "weird_name_assets"
+    assets_dir.mkdir()
+    for i in range(20):
+        (assets_dir / f"stock{i}.jpg").write_bytes(b"\xff\xd8\xff")
+
+    found, ignored, asset_skipped = find_candidates(corpus)
+    names = {p.name for p in found}
+
+    # Notes folder images survive because chapter.md is a sibling doc.
+    assert "chapter.md" in names
+    assert "fig0.png" in names
+    # Asset-library images are all dropped, regardless of the folder's name.
+    assert not any(n.startswith("stock") for n in names)
+    assert asset_skipped == 20
+    assert ignored == 0
+
+
+def test_find_candidates_asset_rule_ignores_subfolder_docs(isolated, tmp_path: Path):
+    """The check is strictly per-folder — docs in subfolders don't save the parent."""
+    corpus = tmp_path / "corpus"
+    corpus.mkdir()
+
+    assets_dir = corpus / "images"
+    assets_dir.mkdir()
+    for i in range(20):
+        (assets_dir / f"img{i}.png").write_bytes(b"\x89PNG")
+
+    # Doc is in a SUBFOLDER of images/, not a sibling of the images themselves.
+    sub = assets_dir / "writeup"
+    sub.mkdir()
+    (sub / "notes.md").write_text("writeup", encoding="utf-8")
+
+    found, ignored, asset_skipped = find_candidates(corpus)
+    # Images in assets_dir are dropped (0 docs immediately alongside them).
+    assert not any(p.name.startswith("img") for p in found)
+    # The subfolder's notes.md survives.
+    assert any(p.name == "notes.md" for p in found)
+    assert asset_skipped == 20
 
 
 def test_walker_end_to_end_t1_only(isolated, tmp_path: Path):

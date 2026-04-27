@@ -289,6 +289,7 @@ def upsert_summaries(
     summaries: list[ParsedSummary],
     *,
     on_batch_complete=None,
+    verbose: bool = False,
 ) -> int:
     """Embed and upsert parsed summaries into Qdrant in batches with progress.
 
@@ -300,6 +301,10 @@ def upsert_summaries(
     `manifest.mark_ingested`) so a Ctrl-C mid-ingest doesn't lose every
     batch's work — points are already in Qdrant; the next run just needs
     to know they're done. See `src/stage2/__main__.py:ingest_from_manifest`.
+
+    `verbose` prints the source path of each successfully upserted summary
+    via `tqdm.write` so the bar isn't garbled. Use for debugging slow runs
+    or to confirm specific files made it in.
     """
     from tqdm import tqdm
 
@@ -309,7 +314,8 @@ def upsert_summaries(
     client = get_qdrant_client()
     total = 0
 
-    for i in tqdm(range(0, len(summaries), BATCH_SIZE), desc="ingesting", unit="batch"):
+    bar = tqdm(range(0, len(summaries), BATCH_SIZE), desc="ingesting", unit="batch")
+    for i in bar:
         batch = summaries[i : i + BATCH_SIZE]
         texts = [_build_embedding_text(s) for s in batch]
         dense_vectors = embed_dense(texts)
@@ -333,8 +339,13 @@ def upsert_summaries(
                 )
             )
 
-        client.upsert(collection_name=COLLECTION_NAME, points=points)
+        _upsert_with_retry(client, COLLECTION_NAME, points)
         total += len(points)
+        if verbose:
+            for s in batch:
+                tqdm.write(f"  upserted {s.source_path}")
+        if on_batch_complete is not None:
+            on_batch_complete(list(range(i, min(i + BATCH_SIZE, len(summaries)))))
 
     return total
 

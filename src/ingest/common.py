@@ -18,6 +18,10 @@ class TierOutcome:
     """What a tier worker returns after running. Consumed by the walker."""
     summary_file_rel: str | None          # repo-relative path to the generated md (or None)
     body_chars: int                        # length of embedded body (audit / debug)
+    deduped: bool = False                  # True if work was skipped because
+                                           # another path with identical content
+                                           # already produced this tier's summary
+    content_hash: str | None = None        # 16-char sha256 prefix (when computed)
 
 
 def hash_file(path: Path) -> str:

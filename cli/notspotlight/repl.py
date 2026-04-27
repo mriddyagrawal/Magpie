@@ -71,11 +71,12 @@ _rewrite = False
 _top_k = 5
 _history_enabled = False
 _history: list[tuple[str, str]] = []  # (question, answer) pairs from this session
+_rerank = False  # Cross-encoder reranker; opt-in (see backlog B4 / src/stage2/rerank.py)
 
 
 def _handle_dot_command(cmd: str) -> bool:
     """Handle dot-commands. Returns True if the input was a command."""
-    global _rewrite, _top_k, _history_enabled, _history
+    global _rewrite, _top_k, _history_enabled, _history, _rerank
 
     parts = cmd.strip().split()
     if not parts or not parts[0].startswith("."):
@@ -119,6 +120,20 @@ def _handle_dot_command(cmd: str) -> bool:
                     print_setting("top-k", str(_top_k))
                 except ValueError:
                     print_error("usage: .top-k N (integer)")
+        case ".rerank":
+            if len(parts) < 2:
+                print_setting("rerank", "on" if _rerank else "off")
+            elif parts[1] in ("on", "true", "1"):
+                _rerank = True
+                print_setting(
+                    "rerank",
+                    "on (cross-encoder; first query downloads ~80MB model)",
+                )
+            elif parts[1] in ("off", "false", "0"):
+                _rerank = False
+                print_setting("rerank", "off")
+            else:
+                print_error("usage: .rerank on/off")
         case ".clear":
             console.clear()
         case ".suggest":
@@ -201,10 +216,16 @@ async def _run_query_async(question: str) -> None:
     _detail("dense vector", f"{len(dense_vec)} dims")
     _detail("sparse terms", f"{len(sparse_idx)} active terms")
 
-    # Step 3: Qdrant search
+    # Step 3: Qdrant search. Passing the raw question lets the adaptive
+    # classifier widen top_k for enumeration queries (see B1 in backlog).
+    # If `.rerank on`, fan out to top_k*10 candidates and rerank with a
+    # cross-encoder (see B4).
     t0 = time.monotonic()
-    with console.status("[bold blue]  ◦ Searching Qdrant (dense + BM25 hybrid)...", spinner="dots"):
-        retrieved = await asyncio.to_thread(run_search, sq, _top_k)
+    search_label = "Searching Qdrant + cross-encoder rerank" if _rerank else "Searching Qdrant (dense + BM25 hybrid)"
+    with console.status(f"[bold blue]  ◦ {search_label}...", spinner="dots"):
+        retrieved = await asyncio.to_thread(
+            run_search, sq, _top_k, question=question, rerank=_rerank
+        )
     _step("Qdrant searched", t0)
     tier_counts: dict[str, int] = {}
     for r in retrieved:

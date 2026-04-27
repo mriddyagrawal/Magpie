@@ -31,9 +31,11 @@ REWRITE_SYSTEM_PROMPT = (
     "You are a search-query optimizer. Given a user's natural-language question "
     "about their personal documents (invoices, receipts, notes, contracts, etc.), "
     "rewrite it into a SearchQuery: a dense `query` string that captures the full "
-    "intent in keyword-rich language, and a `keywords` list of 3-8 specific terms "
-    "(names, amounts, dates, document types) that should match exactly. "
-    "Do not answer the question — only produce the search query. "
+    "intent in keyword-rich language, and a `keywords` list of 5-12 terms — "
+    "include the user's specific values verbatim (names, amounts, dates, course "
+    "codes, document types) AND the likely synonyms, abbreviations, alternate "
+    "vocabulary, and paraphrases the documents themselves may use for the same "
+    "concept. Do not answer the question — only produce the search query. "
     "If prior conversation turns are provided, use them to resolve pronouns and "
     "references in the current question (e.g. 'what about its prerequisites?' → "
     "the subject from the previous turn). The rewrite should be self-contained: "
@@ -297,6 +299,9 @@ def search_summaries(
 
     Returns up to top_k results ranked by Reciprocal Rank Fusion of dense
     (semantic) and sparse (BM25) scores.
+
+    Passes the raw `question` through to `run_search` so the adaptive
+    classifier can widen top_k for enumeration-shaped queries.
     """
     sq = rewrite_query(question) if rewrite else raw_query(question)
-    return run_search(sq, top_k)
+    return run_search(sq, top_k, question=question)

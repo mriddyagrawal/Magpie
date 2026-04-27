@@ -9,6 +9,7 @@ Responsibilities:
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from pydantic_ai import BinaryContent
@@ -282,12 +283,20 @@ def build_content_blocks(
     *,
     max_chars: int,
     max_pdf_pages: int,
+    search_keywords: list[str] | None = None,
 ) -> list:
     """Return content blocks for a single file.
 
     The returned list contains `str` blocks (carrying textual content, with a
     'Content type: ...' header) and `BinaryContent` blocks (for images or for PDF
     pages rendered via the scanned-PDF vision fallback).
+
+    `search_keywords` (optional): if provided AND the PDF has more text than
+    `max_chars` would fit, the lazy-chunking primitive
+    `extract_pdf_relevant_pages` picks the matching pages first and falls
+    back to the front-of-file extract if no page matches. For short PDFs
+    that fit entirely in `max_chars`, the keywords are ignored — the whole
+    file goes to the LLM regardless.
 
     Raises SummarizeError for unsupported extensions, encrypted PDFs, corrupt
     Office files, non-UTF-8 text files, or empty content.
@@ -298,9 +307,27 @@ def build_content_blocks(
         return [BinaryContent(data=path.read_bytes(), media_type=IMAGE_EXTS[ext])]
 
     if ext in PDF_EXTS:
-        text = extract_pdf_text(path, max_chars).strip()
-        if text:
-            return [f"Content type: pdf\n\n---\n{text[:max_chars]}"]
+        # Always extract first to know the file's full size.
+        full_text = extract_pdf_text(path, max_chars * 4).strip()
+
+        if full_text:
+            # Lazy-chunking trigger: file is bigger than the LLM budget AND
+            # caller gave us keywords. Otherwise the cheap front-of-file
+            # extract is fine — short PDFs fit entirely already.
+            if search_keywords and len(full_text) > max_chars:
+                relevant = extract_pdf_relevant_pages(
+                    path, keywords=search_keywords, max_chars=max_chars
+                )
+                if relevant:
+                    return [
+                        "Content type: pdf (long file — pages selected by query "
+                        "keywords; see ## Page N anchors below)\n\n---\n"
+                        f"{relevant[:max_chars]}"
+                    ]
+                # No keyword matched — fall through to front-of-file.
+            return [f"Content type: pdf\n\n---\n{full_text[:max_chars]}"]
+
+        # Empty extract → scanned/image-only PDF: render pages as images.
         pages = render_pdf_pages_as_png(path, max_pdf_pages)
         if not pages:
             raise SummarizeError(f"PDF has no pages: {path}")

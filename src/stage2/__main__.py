@@ -111,13 +111,17 @@ def ingest_from_manifest(*, force: bool = False, skip_orphan_cleanup: bool = Fal
                 parsed.append(parse_summary_file(summary_path))
                 parsed_rels.append(rel)
 
-            upserted += upsert_summaries(parsed)
-            # Mark every rel we successfully parsed. Duplicates (multiple rels
-            # pointing at the same .md, e.g. identical PDFs in different
-            # folders) all get marked even though they collapse to one Qdrant
-            # point — without this they'd re-upsert on every sync.
-            for rel in parsed_rels:
-                manifest.mark_ingested(rel)
+            # Per-batch progress: mark each batch's rows as ingested IMMEDIATELY
+            # after Qdrant acks the upsert, and persist the manifest at most
+            # once every 30 seconds. Without this, a Ctrl-C mid-push loses every
+            # batch's manifest update — even though the points are already in
+            # Qdrant — forcing the user to re-do the entire push from scratch.
+            # 30s save interval bounds lost-progress to ~30s of work; manifest
+            # save itself is ~100-500ms for big manifests so we don't want to
+            # do it per batch.
+            import time
+            last_save_t = [time.monotonic()]
+            SAVE_INTERVAL_S = 30.0
 
         for rel in skip_only_rels:
             manifest.mark_ingested(rel)

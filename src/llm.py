@@ -107,17 +107,31 @@ def active_model_name() -> str:
     return os.environ.get(cfg.model_env, cfg.default_model)
 
 
-def build_chat_model() -> OpenAIChatModel:
-    """Build an OpenAI-compatible chat model for the active cloud provider.
+def build_chat_model(*, provider_override: str | None = None) -> OpenAIChatModel:
+    """Build an OpenAI-compatible chat model.
 
-    Raises for `LLM_PROVIDER=local` — the local branch of `build_agent` does
-    not go through this path.
+    Without `provider_override`, builds against `LLM_PROVIDER` (the active
+    provider). With `provider_override`, builds against that named provider
+    instead — used by the fallback path in `src/stage1/summarize.py` to spin
+    up a parallel local-or-different-cloud agent without mutating the env.
+
+    Raises for `local` — the MLX path does not go through this builder
+    (see `LocalAgent`).
     """
     from openai import AsyncOpenAI
     from pydantic_ai.models.openai import OpenAIChatModel
     from pydantic_ai.providers.openai import OpenAIProvider
 
-    cfg = active_provider()
+    if provider_override is not None:
+        if provider_override not in PROVIDERS:
+            sys.exit(
+                f"error: provider_override={provider_override!r} is unknown. "
+                f"Valid values: {sorted(PROVIDERS)}."
+            )
+        cfg = PROVIDERS[provider_override]
+    else:
+        cfg = active_provider()
+
     if cfg.name == "local":
         raise RuntimeError(
             "build_chat_model() is for cloud providers; "
@@ -177,11 +191,17 @@ class _CloudAgent(Generic[T]):
     `result.output`), matching what `LocalAgent` returns.
     """
 
-    def __init__(self, system_prompt: str, output_type: type[T]) -> None:
+    def __init__(
+        self,
+        system_prompt: str,
+        output_type: type[T],
+        *,
+        provider_override: str | None = None,
+    ) -> None:
         from pydantic_ai import Agent, NativeOutput
 
         self._agent: Agent[None, T] = Agent(
-            build_chat_model(),
+            build_chat_model(provider_override=provider_override),
             output_type=NativeOutput(output_type),
             system_prompt=system_prompt,
             retries=3,
@@ -200,8 +220,10 @@ def build_agent(
     system_prompt: str,
     output_type: type[T],
     fallback: T | None,
+    *,
+    provider_override: str | None = None,
 ) -> ChatAgent[T]:
-    """Construct a ChatAgent for the active provider.
+    """Construct a ChatAgent for the active provider (or an override).
 
     - `system_prompt` — instructions (identical across providers).
     - `output_type` — Pydantic BaseModel subclass for the structured output.
@@ -211,11 +233,17 @@ def build_agent(
       where a file is skipped rather than indexed with a placeholder).
       Ignored by cloud providers (PydanticAI's native validation either
       succeeds or raises).
+    - `provider_override` — build against a specific provider name instead
+      of `LLM_PROVIDER`. Used by the fallback path so we can spin up a
+      backup agent (e.g. Ollama) without mutating env vars.
     """
-    cfg = active_provider()
+    cfg = (
+        PROVIDERS[provider_override] if provider_override is not None
+        else active_provider()
+    )
     if cfg.name == "local":
         return LocalAgent(system_prompt, output_type, fallback)
-    return _CloudAgent(system_prompt, output_type)
+    return _CloudAgent(system_prompt, output_type, provider_override=provider_override)
 
 
 # ---------------------------------------------------------------------------

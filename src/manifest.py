@@ -127,13 +127,28 @@ class Manifest:
     # ---- mutations ------------------------------------------------------
 
     def mark_summarized(self, rel_path: str, size: int, summary_file: str | None) -> None:
-        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests."""
-        self.entries[rel_path] = Entry(
-            size=size,
-            summary_file=summary_file,
-            summarized_at=_now_iso(),
-            ingested_at=None,
-        )
+        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests.
+
+        Mutates the existing entry rather than replacing it. Other fields owned
+        by **other indexing paths** — fast-tier state (`fast_indexed_at`,
+        `fast_pages`) and the router audit trail (`routes`, scores,
+        `criticality`, etc.) — must NOT be wiped when this tier completes its
+        own work. A real bug existed before 2026-04-25 where this method
+        replaced the entry wholesale, silently zeroing out `fast_indexed_at`
+        on any file that was first ColPali-indexed and then re-summarized;
+        the fast-tier vectors still lived in Qdrant but the manifest forgot
+        about them, so subsequent ingests would re-encode unnecessarily.
+        Symmetric to `mark_fast_indexed` (which correctly mutates) and
+        `mark_routed` (also mutates).
+        """
+        entry = self.entries.get(rel_path)
+        if entry is None:
+            entry = Entry(size=size)
+            self.entries[rel_path] = entry
+        entry.size = size
+        entry.summary_file = summary_file
+        entry.summarized_at = _now_iso()
+        entry.ingested_at = None  # re-ingest needed since the summary changed
 
     def mark_ingested(self, rel_path: str) -> None:
         entry = self.entries.get(rel_path)

@@ -13,13 +13,48 @@ test:
 test-stage2:
     uv run pytest tests/stage2/ -v
 
-# Ingest summaries into Qdrant
-ingest:
-    uv run python -m src.stage2 ingest
+# Walk a folder end-to-end: discover -> route -> summarize -> upsert.
+walk path:
+    uv run python -m src.ingest "{{path}}"
 
-# Force re-ingest (drop + recreate collection)
-ingest-force:
-    uv run python -m src.stage2 ingest --force
+# Walk including .json/.csv/.dat (default-skipped data files).
+walk-data path:
+    uv run python -m src.ingest "{{path}}" --include-data
+
+# Re-encode every file under this root, including T4 ColPali pages.
+walk-force path:
+    uv run python -m src.ingest "{{path}}" --force
+
+# Drop Qdrant collections + clear manifest under this root, then re-ingest.
+walk-rebuild path:
+    uv run python -m src.ingest "{{path}}" --rebuild
+
+# Per-child mode: ingest each immediate subdirectory of <path> sequentially.
+# Useful for huge multi-TB roots where a single walk feels stuck.
+walk-each path:
+    uv run python -m src.ingest "{{path}}" --per-child
+
+# Dry-run: print the ingest command for each immediate subdirectory and exit.
+walk-preview path:
+    uv run python -m src.ingest "{{path}}" --list-children
+
+# Router-only inspection: show what tier each file under <path> would route to.
+# No writes, no LLM calls. Use to estimate cost before a big walk.
+walk-explain path:
+    uv run python -m src.router "{{path}}"
+
+# Walk with per-file routing decisions printed (tier + scores + criticality).
+walk-verbose path:
+    uv run python -m src.ingest "{{path}}" -v
+
+# Push existing summaries into Qdrant (Stage 2 only — no walk, no summarize).
+# Pass extra flags through, e.g. `just ingest -v` for per-file verbose output.
+ingest *args:
+    uv run python -m src.stage2 ingest {{args}}
+
+# Force re-ingest (drop + recreate Qdrant collection from existing summaries).
+ingest-force *args:
+    uv run python -m src.stage2 ingest --force {{args}}
 
 # Search documents
 search q:
@@ -227,6 +262,49 @@ clean-stale-summaries:
 # pointers for missing summaries. Use when you're not sure which kind of
 # drift you have or want a clean slate before a big re-ingest.
 clean-stale: clean-stale-manifest clean-stale-summaries
+
+# Show how many manifest entries live under each top-level directory.
+# `depth` controls grouping: 2 = /home/astavak (mount-level), 3 = /home/astavak/sem6
+# (where actual content lives, default), 4 = one deeper.
+# Useful for confirming which corpus roots are indexed and spotting accidental
+# inclusions (test fixtures, cache dirs, etc.).
+manifest-roots depth='3':
+    @uv run python -c "\
+    from collections import Counter;\
+    from src.manifest import REPO_ROOT, Manifest;\
+    m = Manifest();\
+    n = {{depth}} + 1;\
+    c = Counter();\
+    [c.update(['/'.join(p.split('/', n + 1)[:n + 1]) if len(p.split('/')) >= n + 1 else p]) for p in m.paths()];\
+    print(f'manifest: {len(m.entries)} total entries, grouped at depth {{depth}}');\
+    print('-' * 80);\
+    [print(f'{v:>6}  {k}') for k, v in c.most_common()];\
+    "
+
+# Manifest summary: total entries, by tier-of-routing, by ingestion status.
+# Use to quickly check what state the manifest is in (how many pending push,
+# how many fast-tier-only, how many router-skipped, etc.).
+manifest-stats:
+    @uv run python -c "\
+    from collections import Counter;\
+    from src.manifest import Manifest;\
+    m = Manifest();\
+    total = len(m.entries);\
+    pending_push = sum(1 for p in m.paths() if m.needs_ingestion(p));\
+    fast_only = sum(1 for e in m.entries.values() if not e.summary_file and e.fast_indexed_at);\
+    skipped = sum(1 for e in m.entries.values() if e.skip_reason);\
+    has_summary = sum(1 for e in m.entries.values() if e.summary_file);\
+    tiers = Counter();\
+    [tiers.update(e.routes) for e in m.entries.values() if e.routes];\
+    print(f'manifest entries:          {total}');\
+    print(f'  pending stage-2 push:     {pending_push}');\
+    print(f'  has summary file:         {has_summary}');\
+    print(f'  fast-tier-only (T4):      {fast_only}');\
+    print(f'  router-skipped:           {skipped}');\
+    print();\
+    print('routes (multi-tier counts each separately):');\
+    [print(f'  {t}: {n}') for t, n in tiers.most_common()];\
+    "
 
 # Show disk usage of pipeline artifacts (summaries, Qdrant, model cache, venv)
 disk-usage:

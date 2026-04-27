@@ -40,6 +40,12 @@ uv run python -m src.ingest /path --force
 # Nuke + restart — drop both Qdrant collections, clear manifest under root, re-ingest from scratch
 uv run python -m src.ingest /path --rebuild
 
+# How to ingest?
+just --list
+
+# adds on top of exisiting, skipping unchanged files
+just walk-verbose /path/
+
 # How to ns?
 just qdrant-up
 uv run ns

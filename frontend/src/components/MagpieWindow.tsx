@@ -10,6 +10,13 @@ import { extractHighlightTokens } from "./Highlighted";
 
 import "./MagpieWindow.css";
 
+// Spotlight semantics: width is constant, only height grows downward when a
+// query is in flight. Width matches the tauri.conf.json initial size so the
+// shrink-on-hide doesn't visually jump horizontally.
+const COMPACT_WIDTH = 800;
+const COMPACT_HEIGHT = 96;
+const EXPANDED_HEIGHT = 680;
+
 export function MagpieWindow() {
   const [query, setQuery] = useState("");
   const [submitted, setSubmitted] = useState<string | null>(null); // the question currently answered
@@ -50,8 +57,29 @@ export function MagpieWindow() {
     setError(null);
   }, []);
 
-  // Spotlight behavior: Esc always hides. State reset happens on next summon,
-  // so the user sees a clean input when they re-invoke the window.
+  // Resize the window itself when a query is active vs idle. Tauri's set_size
+  // keeps the top-left fixed, so the bar stays anchored and the cards grow
+  // downward — no jump, no re-anchoring needed mid-session.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
+        if (cancelled) return;
+        const target = result !== null || loading || error !== null
+          ? new LogicalSize(COMPACT_WIDTH, EXPANDED_HEIGHT)
+          : new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT);
+        await getCurrentWindow().setSize(target);
+      } catch {
+        // Not under Tauri (browser dev) — ignore.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [result, loading, error]);
+
+  // Spotlight behavior: Esc always hides. Shrink the window *before* hide so
+  // the next summon opens already-compact — avoids a flash of the expanded
+  // layout being visible for a frame.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -63,17 +91,19 @@ export function MagpieWindow() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // Wire Tauri window events: blur → hide, focus → reset + focus input.
+  // Wire Tauri window events: blur → hide (shrunk), focus → reset + focus input.
   // Spotlight semantics: always hide on blur, regardless of dev/prod.
   useEffect(() => {
     let cleanups: Array<() => void> = [];
     (async () => {
       try {
-        const { getCurrentWindow } = await import("@tauri-apps/api/window");
+        const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
         const appWindow = getCurrentWindow();
 
-        const unBlur = await appWindow.listen("tauri://blur", () => {
-          appWindow.hide();
+        const unBlur = await appWindow.listen("tauri://blur", async () => {
+          // Shrink before hide so re-summon opens already-compact, no flash.
+          await appWindow.setSize(new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT));
+          await appWindow.hide();
         });
         cleanups.push(unBlur);
 
@@ -136,8 +166,13 @@ export function MagpieWindow() {
 
 async function hideWindow() {
   try {
-    const { getCurrentWindow } = await import("@tauri-apps/api/window");
-    await getCurrentWindow().hide();
+    const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
+    const win = getCurrentWindow();
+    // Shrink while still hidden-on-next-summon so the user never sees the
+    // expanded layout briefly when re-summoning. Vibrancy redraw on macOS
+    // can ghost stale pixels otherwise.
+    await win.setSize(new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT));
+    await win.hide();
   } catch {
     /* not under Tauri */
   }

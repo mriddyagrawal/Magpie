@@ -15,7 +15,7 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -24,6 +24,9 @@ from src.content import SummarizeError, build_content_blocks
 from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
 from src.llm import ChatAgent, build_agent
 from src.manifest import Manifest
+
+if TYPE_CHECKING:
+    from src.stage2.search import SearchQuery
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -123,6 +126,7 @@ async def answer_question(
     question: str,
     file_paths: Sequence[str | Path],
     history: list[tuple[str, str]] | None = None,
+    search_query: "SearchQuery | None" = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -203,13 +207,23 @@ async def answer_question(
             f"{body}"
         )
 
+    # If the caller did a Kimi rewrite, its `keywords` list is already the
+    # discriminator-grade tokenization we want for ripgrep — names, dates
+    # (in multiple formats, per the rewriter prompt), amounts, IDs. The raw
+    # question's tokenizer would emit noise like "much" / "spend". Fall back
+    # to the question when no rewrite was done (rewrite is off by default).
+    if search_query is not None and search_query.keywords:
+        rg_query = search_query.query + " " + " ".join(search_query.keywords)
+    else:
+        rg_query = question
+
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
         try:
             if _is_t0(display):
                 # T0 files: skip the whole-file read and lean on ripgrep.
-                hits = await asyncio.to_thread(ripgrep_search, abs_path, question)
+                hits = await asyncio.to_thread(ripgrep_search, abs_path, rg_query)
                 hits_text = format_hits_block(abs_path, hits)
                 if hits_text:
                     blocks = [

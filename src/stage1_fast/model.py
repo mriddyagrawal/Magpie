@@ -47,7 +47,7 @@ def _load_model(cfg: DeviceConfig) -> tuple[Any, Any]:
     # colpali_engine's own processor adds `process_images` / `process_queries`
     # that return model-ready batches with the right prefix tokens for
     # late-interaction retrieval. The generic transformers AutoProcessor
-    # doesn't — that was my bug in the first pass.
+    # didn't.
     processor = proc_cls.from_pretrained(cfg.model_id)
     return model, processor
 

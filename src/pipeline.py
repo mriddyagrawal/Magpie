@@ -74,7 +74,7 @@ async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> Pipeli
 
     agent = build_answer_agent()
     paths = list(dict.fromkeys(r.path for r in retrieved if r.path))
-    ans: Answer = await answer_question(agent, question, paths)
+    ans: Answer = await answer_question(agent, question, paths, search_query=sq)
 
     return PipelineResult(
         question=question,

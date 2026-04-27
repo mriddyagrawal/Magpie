@@ -283,12 +283,22 @@ def _format_decision_line(path: Path, decision: RouteDecision, source_rel: str) 
     return f"  {badge:<10}  {source_rel:<60}  ({detail})"
 
 
+# How many files to ingest before checkpointing (manifest save + intermediate
+# Qdrant flush). Aligned so summarization-on-disk and Qdrant index never drift
+# more than CHUNK_SIZE files apart. If the run dies mid-walk, you lose at most
+# CHUNK_SIZE files of Qdrant indexing — the manifest auto-recovers from disk
+# via `bootstrap_manifest_from_existing`, so summarization work is preserved.
+CHUNK_SIZE = 100
+
+
 async def run_batch(
     root: Path,
     *,
     force: bool = False,
     concurrency: int = 4,
     verbose: bool = False,
+    push_to_qdrant: bool = False,
+    chunk_size: int = CHUNK_SIZE,
 ) -> None:
     from tqdm import tqdm
 
@@ -394,8 +404,34 @@ async def run_batch(
         finally:
             bar.update(1)
 
+    def _flush_chunk(chunk_idx: int) -> None:
+        """Save the manifest, then push new entries to Qdrant (no orphan sweep).
+
+        Runs between chunks, when no workers are active — no lock needed.
+        Wraps the Qdrant push in a broad except so a transient cluster
+        failure doesn't kill the walk; the next flush (or the end-of-walk
+        push in `__main__.py`) will catch up.
+        """
+        manifest.save()
+        if not push_to_qdrant:
+            return
+        try:
+            from src.stage2.__main__ import ingest_from_manifest
+            ingest_from_manifest(skip_orphan_cleanup=True)
+        except RuntimeError:
+            # "manifest is empty" or similar — nothing to push yet, fine.
+            pass
+        except Exception as e:  # pylint: disable=broad-except
+            tqdm.write(
+                f"  warn: chunk {chunk_idx} qdrant flush failed "
+                f"({type(e).__name__}: {e}); will retry at end of walk"
+            )
+
     try:
-        await asyncio.gather(*(worker(p) for p in files))
+        for i in range(0, len(files), chunk_size):
+            chunk = files[i : i + chunk_size]
+            await asyncio.gather(*(worker(p) for p in chunk))
+            _flush_chunk(i // chunk_size)
     finally:
         bar.close()
         manifest.save()
@@ -447,6 +483,7 @@ def main() -> None:
         force=args.force,
         concurrency=args.concurrency,
         verbose=args.verbose,
+        push_to_qdrant=not args.no_push,
     ))
 
     # Stage 2 push: read the manifest, embed new/changed rows, upsert into

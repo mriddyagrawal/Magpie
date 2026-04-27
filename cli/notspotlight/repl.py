@@ -231,7 +231,7 @@ async def _run_query_async(question: str) -> None:
     t0 = time.monotonic()
     with console.status("[bold blue]  ◦ Reading source files and asking Kimi...", spinner="dots"):
         agent = build_answer_agent()
-        ans: Answer = await answer_question(agent, question, paths, history=answer_history)
+        ans: Answer = await answer_question(agent, question, paths, history=answer_history, search_query=sq)
     _step("Answer generated", t0)
     _detail("sources cited", f"{len(ans.sources_used)} files")
     if answer_history:

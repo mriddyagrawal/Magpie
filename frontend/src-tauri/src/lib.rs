@@ -3,8 +3,29 @@ use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 use std::thread;
 
-use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{Manager, PhysicalPosition, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+
+/// Spotlight-style: window appears at the same anchor every summon, regardless
+/// of where it was previously dragged. ~22% from the top, horizontally centered
+/// on the monitor that contains the window (or the primary monitor).
+fn anchor_spotlight(window: &WebviewWindow) {
+    let monitor = match window.current_monitor() {
+        Ok(Some(m)) => m,
+        _ => match window.primary_monitor() {
+            Ok(Some(m)) => m,
+            _ => return,
+        },
+    };
+    let screen = monitor.size();
+    let win_size = match window.outer_size() {
+        Ok(s) => s,
+        Err(_) => return,
+    };
+    let x = ((screen.width as i32) - (win_size.width as i32)) / 2;
+    let y = ((screen.height as f64) * 0.22) as i32;
+    let _ = window.set_position(PhysicalPosition::new(x.max(0), y.max(0)));
+}
 
 /// Child process handle for the Python sidecar. Held in app state so we can
 /// shut it down cleanly on app exit.
@@ -25,14 +46,17 @@ pub fn run() {
             }
 
             // Apply macOS vibrancy (full-window blur) to make the transparent
-            // window feel native.
+            // window feel native. FullScreenUI (not HudWindow) is what
+            // Spotlight / Raycast / Alfred use — HudWindow renders with
+            // square bottom corners on macOS regardless of the radius arg
+            // (legacy HUD-panel behavior). FullScreenUI honors all 4 corners.
             #[cfg(target_os = "macos")]
             {
                 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
                 if let Some(window) = app.get_webview_window("main") {
                     let _ = apply_vibrancy(
                         &window,
-                        NSVisualEffectMaterial::HudWindow,
+                        NSVisualEffectMaterial::FullScreenUI,
                         Some(NSVisualEffectState::Active),
                         Some(18.0),
                     );
@@ -56,14 +80,21 @@ pub fn run() {
                 let init_script = format!("window.__MAGPIE_PORT__ = {};", port);
                 let _ = WebviewWindowBuilder::new(&handle, "main", WebviewUrl::default())
                     .title("Magpie")
-                    .inner_size(960.0, 720.0)
-                    .min_inner_size(900.0, 180.0)
-                    .center()
+                    .inner_size(800.0, 96.0)
+                    .min_inner_size(800.0, 96.0)
+                    .resizable(false)
                     .decorations(false)
                     .transparent(true)
                     .always_on_top(true)
                     .initialization_script(&init_script)
                     .build()?;
+            }
+
+            // Position the window Spotlight-style on first launch. The ⌥Space
+            // handler re-anchors on every subsequent summon so user-drag never
+            // sticks across hides — matches Spotlight / Raycast / Alfred.
+            if let Some(window) = app.get_webview_window("main") {
+                anchor_spotlight(&window);
             }
 
             // Register the global shortcut: ⌥Space. Toggles the window on each
@@ -78,6 +109,10 @@ pub fn run() {
                         if is_visible {
                             let _ = window.hide();
                         } else {
+                            // Re-anchor before showing so the window always
+                            // appears in the same Spotlight spot, even if the
+                            // user dragged it around in a previous session.
+                            anchor_spotlight(&window);
                             let _ = window.show();
                             let _ = window.set_focus();
                         }

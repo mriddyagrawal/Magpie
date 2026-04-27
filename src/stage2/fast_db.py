@@ -18,7 +18,6 @@ cleans up every page of a file at once when the source is deleted.
 from __future__ import annotations
 
 import hashlib
-import os
 import sys
 from pathlib import Path
 from typing import Sequence
@@ -65,11 +64,6 @@ _QUANT_CONFIG = ScalarQuantization(
 _HNSW_CONFIG = HnswConfigDiff(on_disk=True)
 
 
-# Process-cached: tier4.run() calls ensure_fast_collection per file, which
-# would otherwise round-trip Qdrant once per file for the whole batch.
-_collection_ensured = False
-
-
 def _page_point_id(source_path: str, page_num: int) -> str:
     """Deterministic UUID for a (path, page) pair.
 
@@ -84,19 +78,10 @@ def ensure_fast_collection(*, recreate: bool = False) -> None:
     """Create the fast_tier collection if it doesn't exist.
 
     Also ensures a payload index on `source_path` — required for the
-    `delete_path` filter-based delete to work efficiently on the server.
-    Process-cached: subsequent calls in the same process return immediately
-    (tier4.run invokes this per file).
-
-    On `QDRANT_PROVIDER=local`, the payload-index step is skipped: the
-    embedded Python shim doesn't support payload indexes (it emits a
-    UserWarning and does nothing), and filter-based deletes still work via
-    full scan.
+    `delete_path` filter-based delete to work (Qdrant rejects filters on
+    non-indexed fields). Idempotent: re-running on an existing collection
+    adds the index if it's missing.
     """
-    global _collection_ensured
-    if _collection_ensured and not recreate:
-        return
-
     client = get_qdrant_client()
 
     if recreate and client.collection_exists(FAST_COLLECTION_NAME):
@@ -116,20 +101,17 @@ def ensure_fast_collection(*, recreate: bool = False) -> None:
             ),
         )
 
-    is_local = os.environ.get("QDRANT_PROVIDER", "cloud").strip().lower() == "local"
-    if not is_local:
-        try:
-            client.create_payload_index(
-                collection_name=FAST_COLLECTION_NAME,
-                field_name="source_path",
-                field_schema=PayloadSchemaType.KEYWORD,
-            )
-        except Exception:  # pylint: disable=broad-except
-            # Some Qdrant versions/clouds raise on "already exists" rather
-            # than returning a no-op — ignoring is safe here.
-            pass
-
-    _collection_ensured = True
+    # Always ensure the payload index exists (cheap no-op if already present).
+    try:
+        client.create_payload_index(
+            collection_name=FAST_COLLECTION_NAME,
+            field_name="source_path",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+    except Exception:  # pylint: disable=broad-except
+        # Some Qdrant versions/clouds raise on "already exists" rather than
+        # returning a no-op — ignoring is safe here.
+        pass
 
 
 def upsert_page(
@@ -172,10 +154,7 @@ def upsert_pages_batch(
         )
         for src, pg, vecs in pages
     ]
-    # Multi-vector batches are MB-size; use the same retry helper as the
-    # summary-tier upsert so a single transient timeout doesn't kill the run.
-    from src.stage2.db import _upsert_with_retry
-    _upsert_with_retry(client, FAST_COLLECTION_NAME, points)
+    client.upsert(collection_name=FAST_COLLECTION_NAME, points=points)
     return len(points)
 
 

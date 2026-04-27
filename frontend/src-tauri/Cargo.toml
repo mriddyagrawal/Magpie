@@ -1,0 +1,27 @@
+[package]
+name = "magpie"
+version = "0.1.0"
+description = "Magpie — Spotlight-style UI for NotAnotherSpotlight"
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "magpie_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["macos-private-api"] }
+tauri-plugin-global-shortcut = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+window-vibrancy = "0.5"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

@@ -197,3 +197,46 @@ If `char_range` or `page_range` is set, Stage 4 reads only that slice instead of
 - Premature: we haven't yet measured whether range queries ("between X and Y", "last month", "first half of 2022") are common in real use.
 
 **When to revisit:** when retrieval eval starts including range / categorical queries (e.g. "all receipts from Breadfast in 2022", "anything I spent over EGP 500 last summer") and verbatim BM25 matching fails on them. First implement extraction + filter for one field (probably `transaction_date`); measure; expand to merchant / total / currency only if needed.
+
+---
+
+## 8. Smarter T0 / large-CSV retrieval (the ripgrep-at-answer-time approach is leaving signal on the floor)
+
+**What:** Today T0 files (huge CSVs, logs, multi-MB JSON, big textbooks) embed only a 2 KB preview, and the answer step bridges the gap with `ripgrep_file(path, question_tokens)` (see `src/ingest/ripgrep.py` + `src/answer.py`). The approach works for the easy cases — exact dates, exact merchant names, exact dollar amounts — but it has several known weak points worth thinking about together:
+
+1. **Naive token extraction.** `_tokens_for_pattern` uses `re.findall(r"[\w$/.-]+", question)` minus a narrow stopword list. "How much did I spend at Walmart" yields `["much", "spend", "Walmart"]` — two of those are noise content words that aren't in the stopword set. Ripgrep wastes effort and noise dilutes signal.
+2. **Purely lexical — no synonym handling.** "Coffee purchases" never matches "Starbucks." "Rent" never matches "landlord deposit." The semantic gap is exactly why we use dense embeddings everywhere else; ripgrep doesn't have that.
+3. **No date / number format normalization.** Question says "May 2022", CSV row says `05/14/22`. No match. Same for currency formats, abbreviations, etc.
+4. **No relevance ranking of hits.** `rg --max-count=30` returns the *first 30* matches in file order. If the answer line is row 50,000 of an 80,000-row CSV and the question's tokens collide with row 1-30 noise, the answer line is never returned.
+5. **The retrieval step might never surface the file at all.** T0's 2 KB preview is the only thing in Qdrant. If the question is about content deep in the file, the file isn't retrieved → ripgrep never gets a chance.
+6. **Per-file latency stacks.** Top-5 retrieval with all T0 hits = 5 sequential ripgreps (15s timeout each). User waits.
+7. **Date / range queries are filter-shaped, not lexical-shaped.** "Anything from May" works for one verbatim string but breaks across formats.
+
+**Why we might want to revisit:**
+- The current approach optimizes for "find a needle in the file the user already named" — anything where the question contains a literal token that appears in the matching row.
+- Real-world question/file mismatches (synonyms, intent paraphrase, range constraints) silently return empty hits, and the LLM gets a degenerate prompt ("file not embedded, no matches"), so it correctly says "I don't see this in your files" — even though the file does contain the answer.
+- Stage 4 has no way to know the difference between "we genuinely searched and the answer isn't there" and "we used the wrong tokens."
+
+**Approaches to consider (probably not all of them — these are options, not a roadmap):**
+
+a. **LLM-rewritten ripgrep patterns.** Cheapest improvement. Hand the question to a small LLM with a system prompt: "produce a ripgrep regex that would find lines answering this question over a CSV with these column headers." The LLM can synthesize date-format alternations (`(May|/05/|2022-05)`), pick the discriminating tokens (`Walmart` not `much`), and emit a sane pattern. ~1 LLM call per T0 file at answer time, ~$0.0001 each.
+
+b. **Local relevance-ranking of ripgrep hits.** Pull `--max-count=200` instead of 30, then BM25-rank the matching lines locally against the question, send top-30 to the LLM. Catches cases where the answer is row 5,000 but matches the same token as row 5.
+
+c. **Hybrid CSV indexing — header + first N rows as per-row points, ripgrep for the tail.** For CSVs in the 1k-100k row range, embed the first 1,000 rows as proper Qdrant points (so semantic retrieval works), and treat rows 1,001+ as ripgrep-only. Argument: the first rows are usually representative; if the file is structured (catalog, products, courses), those rows give Qdrant enough vocabulary to retrieve the file confidently. Tail rows still need ripgrep but the file is now findable for semantic queries.
+
+d. **Two-step: classify the CSV at ingest, then route by class** (the user's earlier suggestion, written up in the corresponding ponder note). Catalogs → per-row T1 indexing regardless of size. Datasets/logs → T0 + ripgrep. This kills the worst case of "we treated a 5k-row catalog as a dataset because it happened to be over 1k rows." Cheap heuristics first (avg chars/cell, column-name patterns, row uniqueness signature); LLM classification only as tiebreaker.
+
+e. **Date / number range filters as Qdrant payload** (overlaps with item #7 above). Extract a normalized `transaction_date` per row at index time, support `>=` / `<=` filters at query time. Ripgrep doesn't disappear — it complements filter-narrowed candidate sets.
+
+f. **Page-anchored slicing for huge text-native files.** For 500-page textbooks (which currently route to T0), use the bookmark TOC + per-chapter chunking. Retrieval returns "chapter 7 of textbook X"; answer step reads only chapter 7. Backlog item B5 (hierarchical chunking) covers part of this.
+
+**Why we did NOT do it now:**
+- The current ripgrep path covers the *common* case for huge CSVs/logs cheaply. We haven't yet measured how often it silently returns no relevant hits on a real corpus — without that number, it's hard to know which of the above options buys the most.
+- The CSV classification problem (item d) is upstream of all of this — fixing the routing first is probably cheaper than fixing the ripgrep behavior. A 5k-row course catalog routed correctly to per-row T1 doesn't need ripgrep at all.
+- Most of these (a, b, e) add per-query latency or LLM cost at exactly the moment the user is waiting for an answer.
+
+**When to revisit:**
+- After a real-data corpus is in use long enough to log: how many queries hit T0 files? How many of those returned 0 ripgrep hits? Of the 0-hit cases, were the questions answerable from the file in principle?
+- Specifically: build a small "T0 questions" eval set (ground-truth question + huge CSV/log + expected row) and run the current pipeline against it. The recall@5 number on that set is the trigger.
+- Cheapest first move when triggered: option (a) — LLM-rewritten patterns. Smallest blast radius, biggest plausible lift on the synonym/format-mismatch failure modes. If that doesn't move the number, escalate to (b) and (c).

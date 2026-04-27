@@ -15,7 +15,7 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -24,6 +24,9 @@ from src.content import SummarizeError, build_content_blocks
 from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
 from src.llm import ChatAgent, build_agent
 from src.manifest import Manifest
+
+if TYPE_CHECKING:
+    from src.stage2.search import SearchQuery
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -52,31 +55,6 @@ SYSTEM_PROMPT = (
     "Answer the user's question using ONLY the files provided in the message. "
     "If the files do not contain the information needed to answer, say so explicitly — "
     "do not invent facts. "
-    "\n\n"
-    "STRICT GROUNDING RULES — these are inviolable:\n"
-    "1. EVERY substantive claim in your answer must be directly supported by "
-    "text actually visible in the file content blocks. Do NOT add information "
-    "from your training data that isn't explicitly present in the files — even "
-    "if you know it to be true and even if it would round out the answer. "
-    "Helpful expansion is harmful here; the user is checking what THEIR FILES "
-    "say, not what the world knows.\n"
-    "2. If the files cover a topic narrowly (e.g., Dirac delta in an "
-    "electrodynamics text), do NOT expand the answer to cover adjacent areas "
-    "(applications in other fields, historical context, modern variants, "
-    "related concepts) unless those areas are also explicitly discussed in "
-    "the files. Stay in the lane the files cover.\n"
-    "3. EVERY page citation must point to a page whose content you actually "
-    "used. Do not attach a citation to a claim you generated from general "
-    "knowledge. Do not include 'decorative' citations (pages that happen to "
-    "be in the file content but didn't contribute the cited fact).\n"
-    "4. EVERY file used in your answer must appear in `sources_used`. If "
-    "different bullets / sentences pull content from different files, list "
-    "ALL contributing files. Do not attribute content from file A to file B. "
-    "If you can't tell which file a piece of information came from, omit it.\n"
-    "5. When in doubt between completeness and faithfulness, choose "
-    "faithfulness. A short, accurate answer that cites the right files beats "
-    "a comprehensive-looking answer that mixes sources or extrapolates.\n"
-    "\n"
     "IMPORTANT — terminology and unit mapping. The absence of the user's exact "
     "phrase does NOT mean the file lacks the information. Before concluding that "
     "a file does not cover a topic, check whether the file discusses the same "
@@ -176,7 +154,7 @@ async def answer_question(
     question: str,
     file_paths: Sequence[str | Path],
     history: list[tuple[str, str]] | None = None,
-    search_keywords: list[str] | None = None,
+    search_query: "SearchQuery | None" = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -262,13 +240,23 @@ async def answer_question(
             f"{body}"
         )
 
+    # If the caller did a Kimi rewrite, its `keywords` list is already the
+    # discriminator-grade tokenization we want for ripgrep — names, dates
+    # (in multiple formats, per the rewriter prompt), amounts, IDs. The raw
+    # question's tokenizer would emit noise like "much" / "spend". Fall back
+    # to the question when no rewrite was done (rewrite is off by default).
+    if search_query is not None and search_query.keywords:
+        rg_query = search_query.query + " " + " ".join(search_query.keywords)
+    else:
+        rg_query = question
+
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
         try:
             if _is_t0(display):
                 # T0 files: skip the whole-file read and lean on ripgrep.
-                hits = await asyncio.to_thread(ripgrep_search, abs_path, question)
+                hits = await asyncio.to_thread(ripgrep_search, abs_path, rg_query)
                 hits_text = format_hits_block(abs_path, hits)
                 if hits_text:
                     blocks = [
@@ -286,7 +274,6 @@ async def answer_question(
                     abs_path,
                     max_chars=ANSWER_MAX_CHARS_PER_FILE,
                     max_pdf_pages=ANSWER_MAX_PDF_PAGES,
-                    search_keywords=search_keywords,
                 )
         except SummarizeError as e:
             print(f"  warn: skipping {display}: {e}", file=sys.stderr)
@@ -365,41 +352,20 @@ async def answer_question(
     # Match is whitespace-tolerant — the model sometimes collapses double-spaces
     # or normalizes separators when echoing paths with spaces (e.g. "101 mus"),
     # which would cause a valid citation to be filtered out as a hallucination.
-    # We ALSO accept an optional trailing `[book pp. N-M / PDF pp. X-Y]` page
-    # suffix on each path: the bare path is verified against input_paths, but
-    # the suffix is preserved in the output so the user sees both numbers.
     input_paths = {display for display, _ in per_file_blocks}
     normalized_input = {_normalize_path_for_match(p): p for p in input_paths}
-
-    import re as _re
-    _SUFFIX_RE = _re.compile(r"\s*(\[[^\]]*\])\s*$")
 
     filtered: list[str] = []
     dropped: list[str] = []
     for s in ans.sources_used:
-        # Split off the page-citation suffix (if present) so we verify the
-        # bare path against input_paths but keep the suffix for display.
-        m = _SUFFIX_RE.search(s)
-        if m:
-            page_suffix = m.group(1)
-            bare = s[: m.start()].rstrip()
-        else:
-            page_suffix = ""
-            bare = s
-
-        if bare in input_paths:
-            canonical = bare
-        else:
-            canonical = normalized_input.get(_normalize_path_for_match(bare))
-
-        if canonical is None:
-            dropped.append(s)
+        if s in input_paths:
+            filtered.append(s)
             continue
-
-        filtered.append(
-            f"{canonical}  {page_suffix}" if page_suffix else canonical
-        )
-
+        canonical = normalized_input.get(_normalize_path_for_match(s))
+        if canonical is not None:
+            filtered.append(canonical)
+        else:
+            dropped.append(s)
     if dropped:
         print(f"  warn: dropped hallucinated source paths: {dropped}", file=sys.stderr)
     ans.sources_used = filtered
@@ -413,20 +379,9 @@ def _normalize_path_for_match(p: str) -> str:
     spaces even when instructed to copy verbatim. Without normalization those
     echoes get filtered out as hallucinations and the user sees "Sources used:
     (none)" for an answer that did come from a real file.
-
-    Also strips a trailing page-citation suffix like
-    `  [book pp. 254-258 / PDF pp. 269-273]` or
-    `  [PDF p. 7]` — added per system-prompt instruction so the user sees
-    page info in the sources_used line. The canonical comparison is against
-    the raw path; the suffix is recovered separately if we want to display it.
     """
     import urllib.parse as _up
-    import re as _re
     decoded = _up.unquote(p)
-    # Strip a trailing bracketed page-info suffix. The LLM is told to format
-    # it as `<path>  [book pp. N-M / PDF pp. X-Y]` — we accept any [...]
-    # block at the end of the string for forgiveness.
-    decoded = _re.sub(r"\s*\[[^\]]*\]\s*$", "", decoded)
     return " ".join(decoded.split()).strip()
 
 

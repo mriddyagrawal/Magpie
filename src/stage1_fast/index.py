@@ -80,7 +80,6 @@ def index_file(
     manifest: Manifest,
     *,
     pool_factor: int = 1,
-    force: bool = False,
 ) -> tuple[int, bool]:
     """Index one file into fast_tier. Returns (pages_upserted, was_skipped).
 
@@ -92,11 +91,6 @@ def index_file(
     the whole point. `pool_factor=2` halves patch count per page at ~100% recall
     retention for general-content (see Clavié et al. 2024). The router decides
     when pooling is safe; this function trusts it.
-
-    `force=True` re-encodes regardless of whether the manifest says the file's
-    size is unchanged. Used by the walker's `--force` and `--rebuild` modes so
-    a policy change (e.g. pool_factor flip, asset-library rule) actually
-    rewrites the existing fast_tier points instead of leaving zombies.
     """
     from src.stage1_fast.model import encode_images, get_model
     from src.stage2.fast_db import upsert_pages_batch
@@ -104,7 +98,7 @@ def index_file(
     rel = _source_rel(path)
     size = path.stat().st_size
 
-    if not force and not manifest.needs_fast_indexing(rel, size):
+    if not manifest.needs_fast_indexing(rel, size):
         return 0, True
 
     images = _render_pages(path)

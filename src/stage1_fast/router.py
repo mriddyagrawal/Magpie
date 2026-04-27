@@ -22,11 +22,7 @@ from pathlib import Path
 from typing import Literal
 
 FAST_TIER_PDF_MAX_PAGES = 50
-FAST_IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
-# `.gif` is included so the router's IMAGE_EXTS routing to T4 doesn't crash
-# in `_render_pages` with "unsupported file for fast tier". PIL opens GIFs
-# fine — `Image.open(path).convert("RGB")` takes the first frame, which is
-# the correct behavior for embedding (a single static representation per file).
+FAST_IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 
 # Avg chars of extractable text per sampled page below which we consider
 # the PDF "text-sparse" (scan, photo, or diagram-heavy) and route to fast

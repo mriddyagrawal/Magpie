@@ -12,3 +12,10 @@ test_label/
 Test Summaries 2 Deprecated/
 Test Content 2 Deprecated/
 qdrant_data/
+
+# Magpie UI artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.turbo/
+frontend/src-tauri/target/
+frontend/src-tauri/gen/

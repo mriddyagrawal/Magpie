@@ -333,10 +333,8 @@ def upsert_summaries(
                 )
             )
 
-        _upsert_with_retry(client, COLLECTION_NAME, points)
+        client.upsert(collection_name=COLLECTION_NAME, points=points)
         total += len(points)
-        if on_batch_complete is not None:
-            on_batch_complete(list(range(i, min(i + BATCH_SIZE, len(summaries)))))
 
     return total
 

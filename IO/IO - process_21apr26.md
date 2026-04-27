@@ -25,18 +25,7 @@ or opt-outs.
 
 ## The three operational modes
 
-The walker has **three modes** of operation, mutually exclusive. Pick by
-intent:
-
-| Mode | Flag | What it does | When to use |
-|---|---|---|---|
-| **Append** (default) | none | Skip files whose size matches the manifest. Push only new/changed to Qdrant. | Daily incremental sync — what you run every time |
-| **Force re-encode** | `--force` | Re-encode every file under this root, **including T4 ColPali pages** (which have their own size-skip). Other roots' data is untouched. | After a router-policy change — e.g. you flipped pool_factor, raised the thumbnail threshold, or added a new sensitivity detector and want this corpus refreshed |
-| **Rebuild** | `--rebuild` | DROP both Qdrant collections (`summaries` and `fast_tier`) + clear all manifest entries under this root, then re-ingest from scratch. | Wholesale reset; recovery from a corrupted index; biggest-stick "make the index reflect current code" button |
-
-`--force` and `--rebuild` are mutually exclusive (argparse rejects both at once).
-
-### Mode A — Append (default)
+### Mode A — One-shot ingest (most common)
 
 ```bash
 uv run python -m src.ingest <DIR>
@@ -45,68 +34,31 @@ uv run python -m src.ingest <DIR>
 **What happens, in order:**
 
 1. Walks `<DIR>` recursively.
-2. Skips files matching `.gitignore` + `.nasignore` + built-in defaults
+2. Skips files that match `.gitignore` + `.nasignore` + built-in defaults
    (`node_modules/`, `.git/`, `__pycache__/`, `venv/`, `build/`, IDE caches,
    lock files, etc.).
-3. Drops folders that look like asset libraries (≥15 images + 0 documents).
-4. Peeks each remaining file cheaply, computes `visual_score` +
-   `sensitivity_score` + `t4_cost`.
-5. Dispatches to the right tier worker (T0/T1/T2/T3/T4) — see
+3. Peeks each remaining file cheaply, computes `visual_score` + `sensitivity_score` + `t4_cost`.
+4. Dispatches to the right tier worker (T0/T1/T2/T3/T4) — see
    [Plans/Indexing Tiers.md](../Plans/Indexing%20Tiers.md).
-6. Writes summary markdowns to `Test Summaries/<hash>_<tier>.md`.
-7. Records the full router verdict in the manifest audit trail.
-8. **Auto-pushes new/changed entries to Qdrant** via the folded-in Stage 2.
-9. **Cleans fast-tier orphans** — drops ColPali points for any source path
-   no longer in the manifest (asset-library skips, deleted files, etc.).
+5. Writes summary markdowns to `Test Summaries/<hash>_<tier>.md`.
+6. Records the full router verdict in the manifest audit trail.
+7. **Auto-pushes new/changed entries to Qdrant** via the folded-in Stage 2.
 
-### Mode B — Force re-encode
-
-```bash
-uv run python -m src.ingest <DIR> --force
+**Final output:**
 ```
+done: 473 considered — T0=0 T1=28 T2=83 T3=203 T4=159 unchanged=0 skipped=2
+  errors=0 pruned=0 ignored=7061 gpu=yes t4_used_mb=81.0
 
-Same flow as Append, but every per-tier skip-if-unchanged check is
-bypassed. T4 in particular has its own size-skip in
-`src/stage1_fast/index.py:index_file`; `--force` now correctly threads
-through so existing ColPali pages get re-encoded with the current
-`pool_factor` policy. Other corpora are untouched.
-
-### Mode C — Rebuild
-
-```bash
-uv run python -m src.ingest <DIR> --rebuild
+pushing new summaries to Qdrant...
+qdrant: upserted 314 points, 0 orphans cleaned, 473 total manifest rows
 ```
-
-Before walking, the walker:
-
-1. Drops the `summaries` Qdrant collection.
-2. Drops + recreates the `fast_tier` Qdrant collection.
-3. Clears every manifest entry under `<DIR>` and removes the corresponding
-   summary markdowns from disk.
-
-Then runs as if the corpus is brand new. Output looks like:
-```
-=== REBUILD mode: clearing all state for /home/astavak/sem6 ===
-  dropped Qdrant collection: summaries
-  dropped + recreated Qdrant collection: fast_tier
-  cleared 473 manifest entries under /home/astavak/sem6
-=== rebuild done; starting fresh ingest ===
-indexing: ...
-done: 473 considered — T0=0 T1=28 T2=83 T3=203 T4=159 ...
-qdrant summaries: upserted 314 points, ...
-qdrant fast_tier: dropped 0 orphaned source paths
-```
-
-Use this when you've changed multiple router policies at once and want
-disk size to actually drop, not just stop growing.
-
-### Universal flags (apply in all three modes)
 
 | Flag | Effect |
 |---|---|
-| `-v` / `--verbose` | Print per-file routing decision: `[T3] path (visual=2 sens=7 crit=critical)` |
+| `-v` / `--verbose` | Print per-file routing decision as each file completes: `[T3] path (visual=2 sens=7 crit=critical)` |
+| `--force` | Re-ingest every file regardless of manifest state |
 | `--concurrency N` | Max concurrent files (default: 4). Bump to 8-10 if your LLM provider tolerates it |
-| `--no-push` | Skip the Stage 2 Qdrant push at the end. Leaves new summaries in `Test Summaries/` with `ingested_at=None`; run `python -m src.stage2 ingest` later to push them manually |
+| `--no-push` | Skip the Stage 2 Qdrant push — useful when Qdrant is down or you're testing locally without creds |
 
 ### Mode B — Dry-run routing inspection (no ingest)
 
@@ -256,7 +208,6 @@ uv run python -m src.ingest /your/corpus
 | `OLLAMA_MODEL` | If `LLM_PROVIDER=ollama` | `qwen2.5:3b` (default) |
 | `QDRANT_CLUSTER_ENDPOINT` | Qdrant URL | Cloud: `https://<cluster>.qdrant.tech` / local: `http://localhost:6333` |
 | `QDRANT_API_KEY` | For Qdrant Cloud (omit for local Docker) | `...` |
-| `QDRANT_TIMEOUT_S` | HTTP request timeout for the Qdrant client. Default 60s. Bump higher if you're pushing massive batches over a slow link (e.g. Cloud over a flaky connection). | `60` (default) / `120` / `300` |
 
 See [Plans/Port.md](../Plans/Port.md) for the cloud → local migration path.
 
@@ -307,52 +258,7 @@ Test Summaries/
 .ipynb_checkpoints/
 package-lock.json  yarn.lock  pnpm-lock.yaml  poetry.lock  uv.lock
 Cargo.lock  Gemfile.lock  go.sum
-
-# Common-secret filenames (never indexed even with --force):
-.env  .env.*  .npmrc  .netrc  .pgpass  .git-credentials
-id_rsa  id_rsa.*  id_ed25519  id_ed25519.*  id_ecdsa  id_ecdsa.*  id_dsa  id_dsa.*
-*.pfx  *.p12
 ```
-
-## Hidden paths (dot-folders + dotfiles)
-
-Walking from a home directory routinely encounters `.config/`, `.codex/`,
-`.antigravity/`, `.cache/`, `.claude/`, `.vscode/`, etc. — at home-dir
-scale these dominate the candidate list with files the user has zero
-interest in searching.
-
-**Three-level policy:**
-
-1. **Dot-folders are pruned during traversal.** The walker uses `os.walk`
-   and removes any directory whose name starts with `.` from the
-   children list before descending. This means `.config/` and friends
-   are never even *listed*, let alone peeked. The walk root itself can
-   still be a dot-folder if you point us at one explicitly
-   (`python -m src.ingest /home/you/.codex` works).
-2. **Loose dotfiles default to skipped.** A leaf-name `.foo` in any
-   walked folder is skipped by default — no peek, no router call.
-3. **A small allowlist of useful dotfiles is indexed anyway.** Shell
-   rcs and editor configs carry real user content and are surfaced:
-
-   ```
-   .bashrc .bash_profile .bash_aliases .bash_logout
-   .zshrc .zprofile .zshenv .zlogin .zlogout
-   .profile .kshrc .cshrc .tcshrc .inputrc .dircolors
-   .vimrc .nvimrc .gvimrc
-   .tmux.conf .screenrc
-   .gitconfig .gitattributes .editorconfig
-   .condarc
-   ```
-
-   See `_USEFUL_DOTFILE_NAMES` in [src/ingest/walker.py](../src/ingest/walker.py).
-   Add to it if you want to opt in more by default; we keep the list
-   conservative so config secrets (`.env`, `.netrc`, `.pgpass`,
-   `.git-credentials`) stay out.
-
-**Edge case:** a `.bashrc` *inside* a dot-folder
-(e.g. `~/.config/.bashrc`) is still skipped — the parent-folder prune
-outranks the leaf allowlist. The walker's intent is "we don't traverse
-dot-folders," not "we look for allowlisted leaves anywhere."
 
 ---
 

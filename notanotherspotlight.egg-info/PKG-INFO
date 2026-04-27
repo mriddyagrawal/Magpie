@@ -24,6 +24,8 @@ Requires-Dist: mlx-vlm>=0.1.0; sys_platform == "darwin" and platform_machine == 
 Requires-Dist: ipykernel
 Requires-Dist: jupyter
 Requires-Dist: notebook
+Requires-Dist: fastapi>=0.110
+Requires-Dist: uvicorn[standard]>=0.30
 
 # NotAnotherSpotlight
 
@@ -136,6 +138,73 @@ Same pattern as the LLM: pick cloud or local via `QDRANT_PROVIDER`.
 Combined with `LLM_PROVIDER=local`, the entire pipeline runs offline once the LLM weights and Qdrant directory are in place. Storage footprint is modest — the current corpus (~2,500 row-level points) uses under 10 MB on disk.
 
 Switching between providers does not migrate data. After flipping `QDRANT_PROVIDER`, the new backend is empty; re-run `ns --sync` (or `--reset -y` if the manifest is stale) to rebuild the index in the new location.
+
+## Magpie UI
+
+A Spotlight-style floating window sits on top of the RAG backend. Same index, same answer pipeline — just a native-feeling macOS surface instead of a terminal REPL. Hit ⌘K from anywhere, type a question, get a grounded answer with clickable sources and an inline file preview on the right.
+
+Multi-card layout, dark-vibrancy glass, single gold accent (`#ffe97a`), Roboto / Roboto Mono / Roboto Slab typography. Answer mentions and document contents are highlighted in gold so the grounding is visually obvious.
+
+### One-time setup
+
+The backend stays the same as the CLI workflow. The UI needs two extra tools:
+
+1. **Rust toolchain** (for Tauri). Installs into `~/.cargo`, doesn't touch system paths:
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+   source ~/.cargo/env
+   ```
+2. **Node package manager**. `pnpm` is recommended; `npm` works too. If you have neither:
+   ```bash
+   brew install pnpm
+   ```
+
+Then install frontend deps once:
+
+```bash
+cd frontend && pnpm install
+```
+
+### Dev loop
+
+Two processes. The Python sidecar on a known port (so Vite can hit it) and Tauri driving the window.
+
+```bash
+# Terminal 1 — Python sidecar (auto-reloads on source change)
+uv run uvicorn src.server:app --port 8765 --reload
+
+# Terminal 2 — Tauri window (launches Vite + Rust shell)
+cd frontend && pnpm tauri dev
+```
+
+Switch providers the same way as the CLI — edit `.env` (`LLM_PROVIDER=local`, `QDRANT_PROVIDER=local`, etc.). The status pill at the bottom of the window shows which backend you're running against.
+
+### Production build
+
+```bash
+cd frontend && pnpm tauri build
+# output: src-tauri/target/release/bundle/macos/Magpie.app
+```
+
+In a production build, Tauri spawns the Python sidecar itself (`uv run python3 -m src.server`) and reads the chosen port from its first stdout line, so the running app is self-contained — no separate terminal required.
+
+### Shortcuts
+
+| Key | Action |
+|---|---|
+| `⌥ Space` (global) | Summon the window from any app |
+| `Enter` in the question bar | Submit |
+| `Esc` (first press) | Collapse back to resting state + clear input |
+| `Esc` (again, empty) | Hide the window |
+| `↑` / `↓` | Move through source list, preview follows |
+| `Enter` on a source | Open in the OS default app |
+| `⌘ + Enter` on a source | Reveal in Finder |
+
+Spotlight-style behavior: Magpie **hides whenever the window loses focus** — click another app, hit Spotlight, switch to a browser, whatever. Summon it back with `⌥ Space`. This includes dev mode, so editing code in VS Code while developing *will* hide the window; `⌥ Space` brings it back instantly.
+
+If the global `⌥ Space` registration fails at startup (you'll see it in the terminal log: `⌥Space register failed: ...`), something else on your machine has already claimed that combo. The window still works; you just won't be able to summon it globally. Change the shortcut in [src-tauri/src/lib.rs](frontend/src-tauri/src/lib.rs) (look for `Modifiers::ALT` + `Code::Space`) and rebuild.
+
+The CLI (`ns`) keeps working as a parallel entry point — same index, same answers, no UI dependency.
 
 ## Provenance and test corpus
 

@@ -1,0 +1,49 @@
+.magpie-window {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--gap-card);
+  padding: var(--gap-card);
+  color: var(--text-primary);
+}
+
+.magpie-window.is-resting {
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.magpie-window.is-active {
+  padding-bottom: 48px; /* room for status pill */
+}
+
+.magpie-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: var(--gap-card);
+  flex: 1;
+  min-height: 0; /* allow children to scroll */
+}
+
+.magpie-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-card);
+  min-height: 0;
+}
+
+.magpie-col-right {
+  display: flex;
+  min-height: 0;
+}
+
+/* Fade-in when active cards first mount */
+.magpie-grid,
+.magpie-window.is-active .status-pill {
+  animation: magpie-fade 220ms ease-out;
+}
+
+@keyframes magpie-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

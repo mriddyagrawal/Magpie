@@ -42,7 +42,6 @@ DOT_COMMANDS: list[tuple[str, str]] = [
     (".rewrite", "Toggle Kimi query rewriting (on/off)"),
     (".history", "Toggle conversation history (on/off/clear)"),
     (".top-k", "Set number of results to retrieve"),
-    (".rerank", "Toggle cross-encoder reranker (on/off)"),
     (".suggest", "Show question hints (add 'refresh' to regenerate)"),
     (".clear", "Clear the screen"),
 ]
@@ -253,13 +252,7 @@ async def _run_query_async(question: str) -> None:
     t0 = time.monotonic()
     with console.status("[bold blue]  ◦ Reading source files and asking Kimi...", spinner="dots"):
         agent = build_answer_agent()
-        # Pass the rewritten query's keywords so long PDFs get lazy-chunked
-        # to the matching pages instead of the dumb first-N-chars cut.
-        ans: Answer = await answer_question(
-            agent, question, paths,
-            history=answer_history,
-            search_keywords=sq.keywords,
-        )
+        ans: Answer = await answer_question(agent, question, paths, history=answer_history, search_query=sq)
     _step("Answer generated", t0)
     _detail("sources cited", f"{len(ans.sources_used)} files")
     if answer_history:

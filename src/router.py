@@ -38,27 +38,6 @@ CriticalitySource = Literal["user", "auto", "default"]
 # ---------------------------------------------------------------------------
 
 TEXT_EXTS = {".txt", ".md", ".markdown", ".log"}
-
-# Extensionless dotfiles we recognize as text content. Mirrors the walker's
-# `_USEFUL_DOTFILE_NAMES` allowlist — kept here too so `peek()` and `decide()`
-# can route these files as text without having to import from walker (which
-# would create a circular dependency since walker already imports from us).
-# When the walker eventually imports its allowlist from this module, the
-# two will be in sync.
-USEFUL_DOTFILE_NAMES = {
-    # Shell / login
-    ".bashrc", ".bash_profile", ".bash_aliases", ".bash_logout",
-    ".zshrc", ".zprofile", ".zshenv", ".zlogin", ".zlogout",
-    ".profile", ".kshrc", ".cshrc", ".tcshrc",
-    ".inputrc", ".dircolors",
-    # Editors
-    ".vimrc", ".nvimrc", ".gvimrc",
-    # Terminal multiplexers / pagers
-    ".tmux.conf", ".screenrc",
-    # Tool config
-    ".gitconfig", ".gitattributes", ".editorconfig",
-    ".condarc",
-}
 CODE_EXTS = {
     ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
     ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
@@ -88,15 +67,9 @@ CSV_ROWS_T2_MAX = 100_000
 
 PDF_SHORT_PAGE_THRESHOLD = 5                 # ≤5 pages → typically discriminator-heavy
 
-# Image thumbnail skip thresholds — small files are UI assets, not docs. The
-# size+dim rule uses AND (both must be below the threshold to skip), so real
-# document scans (large bytes even if low-res, or full-res but aggressively
-# compressed) pass through. Raised from 200→600 px on 2026-04-21 after finding
-# that ColPali was encoding 500+ full-res stock photos as "documents" because
-# they passed the old 200 px floor. Normal document scans are ≥1200 px in at
-# least one dim; decorative clip-art is typically ≤500 px.
+# Image thumbnail skip thresholds — very small files are UI assets, not docs.
 IMAGE_THUMBNAIL_SIZE_BYTES = 50 * 1024
-IMAGE_THUMBNAIL_MIN_DIM = 600                # px
+IMAGE_THUMBNAIL_MIN_DIM = 200                # px
 
 # T4 cost estimates (per page)
 T4_STORAGE_MB_PER_PAGE = 0.2                 # int8-quantized multi-vector
@@ -614,13 +587,6 @@ def peek(path: Path) -> PeekResult:
     """Dispatch to the right peeker based on extension. Pure-ish: does read I/O only."""
     ext = path.suffix.lower()
 
-    # Extensionless dotfiles like `.bashrc`, `.zshrc`, `.gitconfig` are plain
-    # text — peek them as such even though `path.suffix` is empty. The walker
-    # has already gated which dotfiles reach this point (allowlist or
-    # `include_dotfiles: true`), so we don't re-check the allowlist here.
-    if path.name in USEFUL_DOTFILE_NAMES:
-        return _peek_text_file(path)
-
     if ext in TEXT_EXTS or ext in CODE_EXTS or ext in CONFIG_EXTS:
         return _peek_text_file(path)
     if ext in CSV_EXTS:
@@ -859,20 +825,6 @@ def decide(
     colpali_forced = colpali_pref == "always"
 
     ext = p.ext
-
-    # --- Useful extensionless dotfiles (.bashrc, .zshrc, .vimrc, etc.) ------
-    # Routed by FILENAME, not extension. Treated as text-tier content because
-    # they're shell / editor configs the user typed by hand. T0/T1 split by
-    # size matches the .txt path.
-    if p.path.name in USEFUL_DOTFILE_NAMES:
-        tier: Tier = "T0" if p.size_bytes >= TEXT_SIZE_T0_THRESHOLD else "T1"
-        return RouteDecision(
-            routes=[tier], visual_score=vs, sensitivity_score=ss,
-            t4_cost_mb=0.0, t4_cost_s=0.0,
-            criticality=criticality, criticality_source=crit_source,
-            skip_reason=None,
-            notes=notes + [f"useful dotfile {p.path.name}, size={p.size_bytes}"],
-        )
 
     # --- Skip cases ---------------------------------------------------------
 
@@ -1261,10 +1213,8 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
     from src.ingest.ignore import IgnoreRules
     from src.ingest.walker import find_candidates
 
-    files, ignored, asset_lib_skipped = find_candidates(
-        root, ignore_rules=IgnoreRules.from_root(root)
-    )
-    if not files and ignored == 0 and asset_lib_skipped == 0:
+    files, ignored = find_candidates(root, ignore_rules=IgnoreRules.from_root(root))
+    if not files and ignored == 0:
         print(f"no indexable files under {root}")
         return 0
 
@@ -1311,8 +1261,7 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
         f"summary: {len(files)} candidates — "
         f"T0={tally['T0']} T1={tally['T1']} T2={tally['T2']} "
         f"T3={tally['T3']} T4={tally['T4']} SKIP={tally['SKIP']} "
-        f"(multi-tier={multi_tier}, ignored={ignored}, "
-        f"asset_lib_skipped={asset_lib_skipped}, gpu={'yes' if gpu else 'no'})"
+        f"(multi-tier={multi_tier}, ignored={ignored}, gpu={'yes' if gpu else 'no'})"
     )
     return 0
 

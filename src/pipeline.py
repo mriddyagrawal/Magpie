@@ -74,8 +74,7 @@ async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> Pipeli
 
     agent = build_answer_agent()
     paths = list(dict.fromkeys(r.path for r in retrieved if r.path))
-    # Lazy-chunking on long PDFs uses the rewriter's keywords to pick pages.
-    ans: Answer = await answer_question(agent, question, paths, search_keywords=sq.keywords)
+    ans: Answer = await answer_question(agent, question, paths, search_query=sq)
 
     return PipelineResult(
         question=question,

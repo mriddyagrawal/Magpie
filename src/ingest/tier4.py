@@ -51,19 +51,9 @@ def _pool_factor_for(path: Path) -> int:
     return 1
 
 
-def run(
-    path: Path,
-    source_rel: str,
-    manifest: Manifest,
-    *,
-    force: bool = False,
-) -> TierOutcome:
+def run(path: Path, source_rel: str, manifest: Manifest) -> TierOutcome:
     """Run the ColPali pipeline for a single file. Returns an outcome whose
     `summary_file_rel` is None — the T4 artifacts live in Qdrant, not on disk.
-
-    `force=True` re-encodes even if the manifest says the file's size is
-    unchanged. Necessary so the walker's `--force` / `--rebuild` modes
-    actually refresh existing fast_tier points after a policy change.
     """
     # Local import keeps the rest of the walker snappy — pulls in torch+colpali.
     from src.stage1_fast.index import index_file
@@ -71,7 +61,5 @@ def run(
 
     ensure_fast_collection()
     pool_factor = _pool_factor_for(path)
-    pages, _was_skipped = index_file(
-        path, manifest, pool_factor=pool_factor, force=force
-    )
+    pages, _was_skipped = index_file(path, manifest, pool_factor=pool_factor)
     return TierOutcome(summary_file_rel=None, body_chars=pages)

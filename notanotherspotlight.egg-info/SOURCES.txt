@@ -13,6 +13,7 @@ src/llm.py
 src/manifest.py
 src/pipeline.py
 src/router.py
+src/server.py
 src/split_courses.py
 src/ingest/__init__.py
 src/ingest/__main__.py

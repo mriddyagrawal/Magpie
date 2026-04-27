@@ -17,6 +17,8 @@ trafilatura>=1.12
 ipykernel
 jupyter
 notebook
+fastapi>=0.110
+uvicorn[standard]>=0.30
 
 [:sys_platform == "darwin" and platform_machine == "arm64"]
 mlx-vlm>=0.1.0

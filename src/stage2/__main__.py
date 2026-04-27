@@ -26,11 +26,16 @@ import sys
 from dotenv import load_dotenv
 
 
-def ingest_from_manifest(*, force: bool = False) -> dict:
+def ingest_from_manifest(*, force: bool = False, skip_orphan_cleanup: bool = False) -> dict:
     """Run the manifest-driven incremental ingest. Prints progress.
 
     Returns a small stats dict: {"upserted", "orphans_deleted", "total_points"}.
     Callable from the CLI (via cmd_ingest) and from `src.pipeline`.
+
+    `skip_orphan_cleanup=True` is for **intermediate** flushes from the walker
+    (every N files mid-walk). Orphan cleanup scrolls the entire collection,
+    which is wasteful to do per-chunk; the walker's end-of-run flush re-calls
+    this function with the default (cleanup on) to do the sweep once.
     """
     from src.manifest import REPO_ROOT, Manifest
     from src.stage2.db import (
@@ -69,7 +74,6 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
         # lived in this branch and could spend 13+ hours on a single CSV).
         regular_paths: list[str] = []
         skip_only_rels: list[str] = []
-        pending_resummarize: list[str] = []
         for rel in todo_paths:
             entry = manifest.get(rel)
             assert entry is not None
@@ -86,32 +90,13 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
                     # collection (handled by `src.stage1_fast.index`).
                     skip_only_rels.append(rel)
                     continue
-                # Row is in "needs re-summarization" intermediate state —
-                # produced by `just clean-stale-summaries` after the on-disk
-                # markdown went missing. Skip it here; the walker
-                # (`python -m src.ingest <root>`) will pick it up and
-                # re-summarize. We log a single rollup at the end rather
-                # than per-row spam — could be hundreds.
-                pending_resummarize.append(rel)
-                continue
+                raise RuntimeError(
+                    f"manifest row {rel!r} has no summary_file and is not fast-tier-only — "
+                    f"the router did not produce a summary for it. "
+                    f"Re-run `python -m src.ingest <path>` to route it through a tier."
+                )
 
             regular_paths.append(rel)
-
-        if pending_resummarize:
-            sample = ", ".join(pending_resummarize[:3])
-            more = (
-                f" (plus {len(pending_resummarize) - 3} more)"
-                if len(pending_resummarize) > 3 else ""
-            )
-            print(
-                f"  warn: {len(pending_resummarize)} manifest row(s) pending "
-                f"re-summarization — these were cleared by "
-                f"`just clean-stale-summaries` and need the walker to "
-                f"re-summarize them. Run "
-                f"`python -m src.ingest <your-corpus-root>` to fix.\n"
-                f"        first few: {sample}{more}",
-                file=sys.stderr,
-            )
 
         if regular_paths:
             parsed = []
@@ -138,16 +123,6 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
             last_save_t = [time.monotonic()]
             SAVE_INTERVAL_S = 30.0
 
-            def _on_batch_complete(batch_indices: list[int]) -> None:
-                for idx in batch_indices:
-                    if idx < len(parsed_rels):
-                        manifest.mark_ingested(parsed_rels[idx])
-                if time.monotonic() - last_save_t[0] >= SAVE_INTERVAL_S:
-                    manifest.save()
-                    last_save_t[0] = time.monotonic()
-
-            upserted += upsert_summaries(parsed, on_batch_complete=_on_batch_complete)
-
         for rel in skip_only_rels:
             manifest.mark_ingested(rel)
 
@@ -157,14 +132,17 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
         print("manifest says nothing needs ingestion.")
 
     # Orphan cleanup: points in Qdrant whose source is no longer in the manifest.
-    expected_ids: set[str] = {_point_id(rel) for rel in manifest.paths()}
-
-    actual_ids = get_all_point_ids()
-    orphans = actual_ids - expected_ids
+    # Skipped during intermediate mid-walk flushes — the scroll over the whole
+    # collection is wasteful per-chunk; the end-of-walk call does the sweep.
     orphans_deleted = 0
-    if orphans:
-        orphans_deleted = delete_points(list(orphans))
-        print(f"deleted {orphans_deleted} orphan points from Qdrant")
+    if not skip_orphan_cleanup:
+        expected_ids: set[str] = {_point_id(rel) for rel in manifest.paths()}
+
+        actual_ids = get_all_point_ids()
+        orphans = actual_ids - expected_ids
+        if orphans:
+            orphans_deleted = delete_points(list(orphans))
+            print(f"deleted {orphans_deleted} orphan points from Qdrant")
 
     return {
         "upserted": upserted,

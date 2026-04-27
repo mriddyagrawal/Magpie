@@ -47,7 +47,7 @@ def _load_model(cfg: DeviceConfig) -> tuple[Any, Any]:
     # colpali_engine's own processor adds `process_images` / `process_queries`
     # that return model-ready batches with the right prefix tokens for
     # late-interaction retrieval. The generic transformers AutoProcessor
-    # doesn't — that was my bug in the first pass.
+    # didn't.
     processor = proc_cls.from_pretrained(cfg.model_id)
     return model, processor
 
@@ -63,34 +63,6 @@ def get_model() -> tuple[Any, Any, DeviceConfig]:
     return _cache
 
 
-def _cast_batch_floats(batch: Any, target_dtype: Any) -> Any:
-    """In-place cast every float tensor in `batch` to `target_dtype`.
-
-    Why this exists: `processor.process_images` (and `process_queries`) return
-    pixel-value tensors as float32 regardless of how the model was loaded.
-    When the model is loaded with `torch_dtype=bfloat16` / `float16` (default
-    on CUDA / MPS), the forward pass blows up with::
-
-        RuntimeError: expected mat1 and mat2 to have the same dtype,
-                      got: float != c10::Half
-
-    The fix is to align the input dtype with the model's. We only touch
-    floating-point tensors — int tensors (`input_ids`, `attention_mask`,
-    `pixel_attention_mask`) MUST stay int, otherwise the model breaks
-    elsewhere.
-    """
-    import torch
-
-    for key, value in list(batch.items()):
-        if (
-            isinstance(value, torch.Tensor)
-            and value.is_floating_point()
-            and value.dtype != target_dtype
-        ):
-            batch[key] = value.to(target_dtype)
-    return batch
-
-
 def encode_images(images: list["Image.Image"]) -> Any:
     """Encode a batch of PIL page images into per-page multi-vectors.
 
@@ -100,9 +72,7 @@ def encode_images(images: list["Image.Image"]) -> Any:
     import torch
 
     model, processor, cfg = get_model()
-    target_dtype = _torch_dtype(cfg.dtype)
     batch = processor.process_images(images).to(cfg.device)
-    batch = _cast_batch_floats(batch, target_dtype)
     with torch.no_grad():
         embeddings = model(**batch)
     return embeddings
@@ -113,9 +83,7 @@ def encode_queries(queries: list[str]) -> Any:
     import torch
 
     model, processor, cfg = get_model()
-    target_dtype = _torch_dtype(cfg.dtype)
     batch = processor.process_queries(queries).to(cfg.device)
-    batch = _cast_batch_floats(batch, target_dtype)
     with torch.no_grad():
         embeddings = model(**batch)
     return embeddings

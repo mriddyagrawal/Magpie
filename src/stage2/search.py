@@ -38,6 +38,14 @@ REWRITE_SYSTEM_PROMPT = (
     "references in the current question (e.g. 'what about its prerequisites?' → "
     "the subject from the previous turn). The rewrite should be self-contained: "
     "a search engine seeing only the rewritten query must have enough context. "
+    "DATE NORMALIZATION: if the user mentions a date or month, include all "
+    "common formats in `keywords` so exact-match retrieval (BM25 + ripgrep at "
+    "answer time) hits regardless of how the file represents it. "
+    "Examples: 'May 25 2022' → also include `25 May 2022`, `2022-05-25`, "
+    "`05/25/22`, `05/25/2022`, `05-25-22`. "
+    "'last May' → include the month name AND `05/`, `2024-05`, etc. given the "
+    "current-date hint at the top of the message. Be liberal — extra date "
+    "variants are cheap; missing the format the file uses is expensive. "
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
 )
@@ -216,9 +224,10 @@ def _rrf_merge(
     """Reciprocal Rank Fusion of two result lists, keyed by source_path.
 
     Each path's RRF score is sum over each list of `1 / (RRF_K + rank)`,
-    where rank is 1-indexed. Missing from a list contributes 0. The kept
-    SearchResult prefers the summary-tier entry (it has a real summary)
-    when a path appears in both lists.
+    where rank is 1-indexed. Missing from a list contributes 0. When a
+    path appears in both lists we keep the summary-tier entry — it
+    surfaces the file as a whole rather than as a per-page anchor, which
+    is what the UI source row wants to display.
     """
     scores: dict[str, float] = {}
     chosen: dict[str, SearchResult] = {}
@@ -228,7 +237,7 @@ def _rrf_merge(
         if not r.path:
             continue
         scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
-        chosen[r.path] = r  # summary-tier entries have human-readable summaries
+        chosen[r.path] = r  # show the file, not a specific page
         seen_in.setdefault(r.path, set()).add("summary")
 
     for rank, r in enumerate(fast_hits, start=1):

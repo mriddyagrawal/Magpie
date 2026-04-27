@@ -26,11 +26,16 @@ import sys
 from dotenv import load_dotenv
 
 
-def ingest_from_manifest(*, force: bool = False) -> dict:
+def ingest_from_manifest(*, force: bool = False, skip_orphan_cleanup: bool = False) -> dict:
     """Run the manifest-driven incremental ingest. Prints progress.
 
     Returns a small stats dict: {"upserted", "orphans_deleted", "total_points"}.
     Callable from the CLI (via cmd_ingest) and from `src.pipeline`.
+
+    `skip_orphan_cleanup=True` is for **intermediate** flushes from the walker
+    (every N files mid-walk). Orphan cleanup scrolls the entire collection,
+    which is wasteful to do per-chunk; the walker's end-of-run flush re-calls
+    this function with the default (cleanup on) to do the sweep once.
     """
     from src.manifest import REPO_ROOT, Manifest
     from src.stage2.db import (
@@ -123,14 +128,17 @@ def ingest_from_manifest(*, force: bool = False) -> dict:
         print("manifest says nothing needs ingestion.")
 
     # Orphan cleanup: points in Qdrant whose source is no longer in the manifest.
-    expected_ids: set[str] = {_point_id(rel) for rel in manifest.paths()}
-
-    actual_ids = get_all_point_ids()
-    orphans = actual_ids - expected_ids
+    # Skipped during intermediate mid-walk flushes — the scroll over the whole
+    # collection is wasteful per-chunk; the end-of-walk call does the sweep.
     orphans_deleted = 0
-    if orphans:
-        orphans_deleted = delete_points(list(orphans))
-        print(f"deleted {orphans_deleted} orphan points from Qdrant")
+    if not skip_orphan_cleanup:
+        expected_ids: set[str] = {_point_id(rel) for rel in manifest.paths()}
+
+        actual_ids = get_all_point_ids()
+        orphans = actual_ids - expected_ids
+        if orphans:
+            orphans_deleted = delete_points(list(orphans))
+            print(f"deleted {orphans_deleted} orphan points from Qdrant")
 
     return {
         "upserted": upserted,

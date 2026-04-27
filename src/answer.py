@@ -269,11 +269,19 @@ async def answer_question(
                         f"(no matching lines in {abs_path.name}; file not embedded at ingest)"
                     ]
             else:
+                # Pass the rewriter's keywords through so build_content_blocks
+                # can lazy-chunk long PDFs into the most relevant pages instead
+                # of always returning the first N chars (preface for a 700-page
+                # textbook). Without this, page-anchor headers (`## PDF page N
+                # (book p. X)`) never get emitted, the LLM has nothing to cite,
+                # and `sources_used` shows up without `[book pp. X / PDF pp. Y]`.
+                keywords = list(search_query.keywords) if search_query else None
                 blocks = await asyncio.to_thread(
                     build_content_blocks,
                     abs_path,
                     max_chars=ANSWER_MAX_CHARS_PER_FILE,
                     max_pdf_pages=ANSWER_MAX_PDF_PAGES,
+                    search_keywords=keywords,
                 )
         except SummarizeError as e:
             print(f"  warn: skipping {display}: {e}", file=sys.stderr)
@@ -373,15 +381,25 @@ async def answer_question(
 
 
 def _normalize_path_for_match(p: str) -> str:
-    """Collapse whitespace and URL-decode so LLM-echoed paths match our originals.
+    """Collapse whitespace, URL-decode, and strip page-citation suffix so
+    LLM-echoed paths match our originals.
 
     The model occasionally renders paths with collapsed spaces or %20-encoded
     spaces even when instructed to copy verbatim. Without normalization those
     echoes get filtered out as hallucinations and the user sees "Sources used:
     (none)" for an answer that did come from a real file.
+
+    Also strips any trailing `[...]` page-citation suffix the LLM may have
+    appended per the dual-page citation rule (`<path>  [book pp. 254-258 /
+    PDF pp. 269-273]`). The suffix is for display, not for path matching —
+    it must be removed before comparing against the canonical file path.
     """
+    import re
     import urllib.parse as _up
     decoded = _up.unquote(p)
+    # Strip trailing `[...]` (page-citation suffix or any other bracketed
+    # annotation the LLM appended after the path).
+    decoded = re.sub(r"\s*\[[^\]]*\]\s*$", "", decoded)
     return " ".join(decoded.split()).strip()
 
 

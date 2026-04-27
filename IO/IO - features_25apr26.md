@@ -20,7 +20,7 @@
 | `walker` | Recursively discovers files under a path, dispatches each to a tier, writes summaries + manifest rows. Entry: `python -m src.ingest <path>`. |
 | `peek` | Cheap pre-routing inspection of each file (page count, text density, image dims, content sample) — costs ~10–50 ms per file, never opens the LLM. |
 | `router` | Pure-function decision: given peek + folder-config + budgets, chooses tiers `T0..T4` per file. |
-| `tiers` | Five processing lanes — `T0` register-only (huge files, ripgrep at answer time), `T1` direct embed, `T2` extract-then-embed, `T3` LLM summary, `T4` ColPali visual. |
+| `tiers` | Five processing lanes — `T0` register-only (huge files, ripgrep at answer time), `T1` direct embed, `T2` extract-then-embed, `T3` LLM summary, `T4` ColPali visual. End-to-end walkthrough with a real corpus file in [IO - Tiers.md](IO%20-%20Tiers.md). |
 | `criticality` | Auto-upgrades sensitive files (currency / legal / ID patterns in peek text) from `normal` to `critical` so they pick up `T3+T2`. |
 | `nasconfig` | Folder-level overrides via `.nasconfig.yaml` (accuracy tier, T4 budget, colpali on/off). |
 | `nasignore` | Cascading gitignore-style rules from `.gitignore` / `.nasignore` files plus a hardcoded defaults list. |

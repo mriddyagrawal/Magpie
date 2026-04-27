@@ -19,3 +19,4 @@ frontend/dist/
 frontend/.turbo/
 frontend/src-tauri/target/
 frontend/src-tauri/gen/
+notanotherspotlight.egg-info/

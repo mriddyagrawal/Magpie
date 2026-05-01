@@ -60,6 +60,32 @@ ingest-force *args:
 search q:
     uv run python -m src.stage2 search "{{q}}"
 
+# ----------------------------------------------------------------------------
+# Daemon — keeps search models hot across CLI invocations so subsequent
+# queries are sub-second instead of paying ~3-5s of model load each time.
+# Auto-spawns on first use; auto-shuts down after 15 min idle (override with
+# NS_DAEMON_IDLE_MINUTES; 0 disables idle shutdown).
+# ----------------------------------------------------------------------------
+
+# Start the daemon (no-op if already running). Idempotent.
+daemon-start:
+    uv run python -m src.daemon --detach
+
+# Show whether the daemon is running, plus uptime / idle countdown.
+# `-` prefix suppresses just's complaint when the daemon isn't running
+# (exit code 1 is the intentional "not running" signal for shell scripts).
+[no-exit-message]
+daemon-status:
+    uv run python -m src.daemon --status
+
+# Ask the running daemon to shut down cleanly. Releases ~250 MB - 3 GB of RAM.
+daemon-stop:
+    uv run python -m src.daemon --stop
+
+# Tail the daemon's log (errors, dispatch crashes, model-load failures).
+daemon-log:
+    @tail -f "$(uv run python -c 'from src.daemon.paths import daemon_log_path; print(daemon_log_path())')"
+
 # Summarize a file or directory (Stage 1)
 summarize path:
     uv run python src/stage1/summarize.py "{{path}}"

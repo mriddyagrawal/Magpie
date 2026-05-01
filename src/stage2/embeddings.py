@@ -1,12 +1,17 @@
-"""Embedding utilities: dense vectors via sentence-transformers, sparse via fastembed BM25."""
+"""Embedding utilities: dense + sparse vectors, both via fastembed (ONNX runtime).
+
+Switched from sentence-transformers to fastembed on 2026-04-27 to cut per-process
+model load time from ~5s to ~1.5s. Same MiniLM-L6-v2 weights (ONNX export of the
+original PyTorch model), same 384 output dim, same retrieval results — just a
+faster deserialization path. The sparse BM25 path was already on fastembed.
+"""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from fastembed import SparseTextEmbedding
-    from sentence_transformers import SentenceTransformer
+    from fastembed import SparseTextEmbedding, TextEmbedding
 
 DENSE_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 DENSE_VECTOR_SIZE = 384
@@ -14,16 +19,16 @@ DENSE_VECTOR_SIZE = 384
 SPARSE_MODEL_NAME = "Qdrant/bm25"
 
 # Cached model instances — loaded once on first use.
-_dense_model: SentenceTransformer | None = None
+_dense_model: TextEmbedding | None = None
 _sparse_model: SparseTextEmbedding | None = None
 
 
-def get_dense_model() -> SentenceTransformer:
-    """Return a cached sentence-transformers model for dense embeddings."""
+def get_dense_model() -> TextEmbedding:
+    """Return a cached fastembed TextEmbedding for dense MiniLM vectors."""
     global _dense_model
     if _dense_model is None:
-        from sentence_transformers import SentenceTransformer
-        _dense_model = SentenceTransformer(DENSE_MODEL_NAME)
+        from fastembed import TextEmbedding
+        _dense_model = TextEmbedding(model_name=DENSE_MODEL_NAME)
     return _dense_model
 
 
@@ -37,9 +42,15 @@ def get_sparse_model() -> SparseTextEmbedding:
 
 
 def embed_dense(texts: list[str]) -> list[list[float]]:
-    """Encode texts into dense 384-dim vectors using all-MiniLM-L6-v2."""
+    """Encode texts into dense 384-dim vectors using all-MiniLM-L6-v2.
+
+    fastembed's TextEmbedding emits L2-normalized vectors by default for the
+    sentence-transformers/* models — same default as `SentenceTransformer.encode(
+    normalize_embeddings=True)` we used to call. So existing Qdrant points
+    embedded with the old path remain comparable to fresh queries.
+    """
     model = get_dense_model()
-    return model.encode(texts, normalize_embeddings=True).tolist()
+    return [vec.tolist() for vec in model.embed(texts)]
 
 
 def embed_dense_query(query: str) -> list[float]:

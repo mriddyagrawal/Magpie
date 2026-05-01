@@ -53,6 +53,34 @@ from src.stage2.query_classify import (
         # "everything about"
         "everything about Lagrangian mechanics",
         "all about quantum mechanics",
+        # Receipt-shaped enumerable nouns (added 2026-04-27)
+        "what receipts do I have",
+        "which invoices are unpaid",
+        "what bills came in last month",
+        "what flights did I take",
+        "which hotels did I book",
+        "what trips did I take",
+        "what statements are in the folder",
+        "what expenses do I have",
+        "what transactions are pending",
+        "what contracts do I have",
+        "what orders did I place",
+        # "do I have" pattern with arbitrary noun
+        "what files do I have on Maxwell",
+        "which notes do I keep about tempo",
+        # Conversational phrasings from real REPL transcripts (2026-04-27)
+        # — these slipped through the original patterns
+        "what kind of receipts do i have list all of the possible ones",
+        "what kind of receipts do i have",
+        "what types of bills do I owe",
+        "what sort of contracts do I have on file",
+        "list all of the possible categories",
+        "tell me all the receipts",
+        "show me every receipt",
+        "give me all the bills",
+        # "what kind of X do I have" — multi-word between what and do
+        "what kind of bills do I have",
+        "which type of contracts do I keep",
     ],
 )
 def test_classify_list_all(question: str):
@@ -102,7 +130,7 @@ def test_classify_general(question: str):
 
 def test_list_all_widens_top_k():
     cfg = config_for(QueryClass.LIST_ALL)
-    assert cfg.top_k == 20
+    assert cfg.top_k == 30
     assert "list" in cfg.notes.lower() or "enumeration" in cfg.notes.lower()
 
 
@@ -114,7 +142,7 @@ def test_general_keeps_default_top_k():
 def test_classify_and_config_roundtrip():
     klass, cfg = classify_and_config("what topics did I learn in AI class")
     assert klass is QueryClass.LIST_ALL
-    assert cfg.top_k == 20
+    assert cfg.top_k == 30
 
     klass, cfg = classify_and_config("how much was the receipt")
     assert klass is QueryClass.GENERAL

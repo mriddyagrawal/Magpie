@@ -272,6 +272,7 @@ def run_search(
     *,
     question: str | None = None,
     rerank: bool = False,
+    skip_fast: bool = False,
 ) -> list[SearchResult]:
     """Run hybrid search across both the summary and fast-tier collections.
 
@@ -334,8 +335,14 @@ def run_search(
     summary_hits = _search_summary_tier(sq, fetch_k * 2)
     # Feed the raw dense-query text (same as summary tier) to ColPali; it
     # handles multi-token query encoding internally.
-    query_text = (sq.query + " " + " ".join(sq.keywords)).strip()
-    fast_hits = _search_fast_tier(query_text, fetch_k * 2)
+    # When `skip_fast=True`, bypass ColPali entirely — saves the ~30s first-
+    # query model load and ~1s/query encode for sessions that only need text
+    # retrieval. The REPL exposes this via `.fast on/off`.
+    if skip_fast:
+        fast_hits: list[SearchResult] = []
+    else:
+        query_text = (sq.query + " " + " ".join(sq.keywords)).strip()
+        fast_hits = _search_fast_tier(query_text, fetch_k * 2)
     fused = _rrf_merge(summary_hits, fast_hits, fetch_k)
 
     if rerank and len(fused) > 1:

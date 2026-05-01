@@ -34,8 +34,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response
 from pydantic import BaseModel, Field
 
+from src.manifest import APP_DATA_DIR
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+
+# `REPO_ROOT` here is the data root used to resolve manifest-relative paths.
+# Portable across Linux / Windows / macOS via `platformdirs`.
+REPO_ROOT = APP_DATA_DIR
 
 load_dotenv()
 

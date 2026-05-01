@@ -23,13 +23,16 @@ from pydantic import BaseModel, Field
 from src.content import SummarizeError, build_content_blocks
 from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
 from src.llm import ChatAgent, build_agent
-from src.manifest import Manifest
+from src.manifest import APP_DATA_DIR, Manifest
 
 if TYPE_CHECKING:
     from src.stage2.search import SearchQuery
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+# `REPO_ROOT` here is a legacy alias used to resolve manifest-relative paths
+# (e.g. `summaries/<hash>_t1.md`). The app's data root is `APP_DATA_DIR`,
+# which is portable across Linux / Windows / macOS via `platformdirs`.
+REPO_ROOT = APP_DATA_DIR
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
 

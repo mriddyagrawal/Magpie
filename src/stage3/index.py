@@ -86,7 +86,7 @@ def index_single_alt(
 
     Returns a stats dict: {"emitted", "skipped"}.
     """
-    SUMMARIES_DIR.mkdir(exist_ok=True)
+    SUMMARIES_DIR.mkdir(parents=True, exist_ok=True)
 
     size = alt_path.stat().st_size
     alt_rel = _alt_source_rel(alt_path)

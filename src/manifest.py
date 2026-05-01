@@ -29,12 +29,55 @@ and delete the corresponding Qdrant point.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MANIFEST_PATH = REPO_ROOT / "Test Summaries" / "_manifest.json"
+from platformdirs import user_data_dir
+
+
+# ---------------------------------------------------------------------------
+# Paths — portable across Linux / Windows / macOS via `platformdirs`.
+#
+#   Linux   : ~/.local/share/Magpie/
+#   Windows : %LOCALAPPDATA%\magpie\Magpie\
+#   macOS   : ~/Library/Application Support/Magpie/
+#
+# Override for dev/CI by setting `MAGPIE_DATA_DIR` — useful for tests that
+# want isolated, throwaway data dirs without touching the user's real one.
+# ---------------------------------------------------------------------------
+
+_APP_NAME = "Magpie"
+_APP_AUTHOR = "magpie"
+
+
+def _resolve_app_data_dir() -> Path:
+    """Where Magpie keeps its runtime state (manifest, summaries, qdrant).
+
+    Honors `MAGPIE_DATA_DIR` env override (absolute or ~-expandable), else
+    falls back to the OS-appropriate user data dir from `platformdirs`.
+    """
+    override = os.environ.get("MAGPIE_DATA_DIR", "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+    return Path(user_data_dir(_APP_NAME, _APP_AUTHOR, roaming=False))
+
+
+APP_DATA_DIR = _resolve_app_data_dir()
+"""User data root: manifest, summaries, qdrant collections all live under
+this. Use this for any path the app writes to at runtime."""
+
+SUMMARIES_DIR = APP_DATA_DIR / "summaries"
+"""Tier-output markdown files live here, one per indexed source file."""
+
+DEFAULT_MANIFEST_PATH = APP_DATA_DIR / "manifest.json"
+"""Per-file metadata index — the source of truth for what's been ingested."""
+
+# Backward-compat alias. Existing imports of `REPO_ROOT` for data-path
+# resolution (manifest entries store summary paths relative to this) keep
+# working unchanged. New code should reference `APP_DATA_DIR` directly.
+REPO_ROOT = APP_DATA_DIR
 
 
 def _now_iso() -> str:
@@ -47,6 +90,7 @@ class Entry:
     summary_file: str | None = None
     summarized_at: str = ""
     ingested_at: str | None = None
+    row_count: int | None = None
     fast_indexed_at: str | None = None  # set when the file lands in fast_tier
     fast_pages: int | None = None        # page count indexed into fast_tier
     # Router audit trail (src/router.py + Plans/Indexing Tiers.md). Defaults
@@ -59,12 +103,6 @@ class Entry:
     criticality: str = "normal"            # "critical" | "normal" | "casual"
     criticality_source: str = "default"    # "user" | "auto" | "default"
     skip_reason: str | None = None
-    # Content hash (16-char sha256 prefix of file bytes). Lazy-filled on the
-    # next walk for pre-existing manifest rows. Used by Phase A dedup: when
-    # two paths have the same hash, the second one short-circuits the
-    # expensive tier work (LLM call, ColPali encode) and re-uses the
-    # already-written `<hash>_<tier>.md` summary.
-    content_hash: str | None = None
 
 
 class Manifest:
@@ -96,7 +134,7 @@ class Manifest:
 
     def save(self) -> None:
         """Atomic write: stage to <path>.tmp, then rename."""
-        self.path.parent.mkdir(exist_ok=True)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
         tmp = self.path.with_suffix(self.path.suffix + ".tmp")
         with tmp.open("w", encoding="utf-8") as f:
             json.dump(
@@ -133,28 +171,13 @@ class Manifest:
     # ---- mutations ------------------------------------------------------
 
     def mark_summarized(self, rel_path: str, size: int, summary_file: str | None) -> None:
-        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests.
-
-        Mutates the existing entry rather than replacing it. Other fields owned
-        by **other indexing paths** — fast-tier state (`fast_indexed_at`,
-        `fast_pages`) and the router audit trail (`routes`, scores,
-        `criticality`, etc.) — must NOT be wiped when this tier completes its
-        own work. A real bug existed before 2026-04-25 where this method
-        replaced the entry wholesale, silently zeroing out `fast_indexed_at`
-        on any file that was first ColPali-indexed and then re-summarized;
-        the fast-tier vectors still lived in Qdrant but the manifest forgot
-        about them, so subsequent ingests would re-encode unnecessarily.
-        Symmetric to `mark_fast_indexed` (which correctly mutates) and
-        `mark_routed` (also mutates).
-        """
-        entry = self.entries.get(rel_path)
-        if entry is None:
-            entry = Entry(size=size)
-            self.entries[rel_path] = entry
-        entry.size = size
-        entry.summary_file = summary_file
-        entry.summarized_at = _now_iso()
-        entry.ingested_at = None  # re-ingest needed since the summary changed
+        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests."""
+        self.entries[rel_path] = Entry(
+            size=size,
+            summary_file=summary_file,
+            summarized_at=_now_iso(),
+            ingested_at=None,
+        )
 
     def mark_ingested(self, rel_path: str) -> None:
         entry = self.entries.get(rel_path)
@@ -162,116 +185,9 @@ class Manifest:
             raise KeyError(f"cannot mark ingested: {rel_path!r} not in manifest")
         entry.ingested_at = _now_iso()
 
-    def mark_content_hash(self, rel_path: str, content_hash: str) -> None:
-        """Record the content hash. Idempotent — re-recording the same hash
-        is a no-op. Called by tier workers right after they compute the hash.
-        """
-        entry = self.entries.get(rel_path)
-        if entry is None:
-            raise KeyError(f"cannot mark content_hash: {rel_path!r} not in manifest")
-        entry.content_hash = content_hash
-
-    def find_by_hash(self, content_hash: str) -> list[str]:
-        """Return all rel_paths whose `content_hash` matches.
-
-        Used for stats / debugging. The runtime dedup path uses the
-        existing summary-markdown file on disk (`<digest>_<tier>.md`) as
-        the source of truth, not this lookup — so the manifest can lag
-        without breaking dedup correctness.
-        """
-        return [rel for rel, e in self.entries.items() if e.content_hash == content_hash]
-
     def drop(self, rel_path: str) -> Entry | None:
         """Remove a row and return the dropped Entry (or None if it wasn't there)."""
         return self.entries.pop(rel_path, None)
-
-    def clean_missing_summaries(self) -> dict[str, int]:
-        """Inverse of `clean_stale`: clear stale `summary_file` pointers when
-        the on-disk markdown is gone but the source file is still present.
-
-        This handles the case where summary markdowns disappear independently
-        of the source — typical causes:
-          * User manually deleted `Test Summaries/` to free disk
-          * `--rebuild` interrupted partway, leaving manifest references to
-            now-missing files
-          * Backup / sync software cleared `Test Summaries/` as "cache"
-          * Disk corruption or filesystem rollback
-
-        Symptom in the field: Stage 2 ingest spams `warn: summary missing,
-        skipping: Test Summaries/<hash>_t1.md` because the manifest says the
-        file is summarized but the markdown is gone.
-
-        Behavior: for each row whose `summary_file` doesn't exist on disk:
-          * Source still exists → clear `summary_file`/`summarized_at`/
-            `ingested_at` so the next walker run re-summarizes it.
-          * Source ALSO gone → drop the row entirely (covered by
-            `clean_stale` too; we re-do that work here so the user only
-            needs one cleanup call).
-
-        Returns `{"resummarize": N, "dropped": M}`. Caller must `save()` after.
-        """
-        resummarize = 0
-        dropped = 0
-        for rel in list(self.paths()):
-            entry = self.get(rel)
-            if entry is None or not entry.summary_file:
-                continue
-            summary_abs = REPO_ROOT / entry.summary_file
-            if summary_abs.is_file():
-                continue  # summary intact, nothing to do
-            # Summary missing. Decide based on source presence.
-            source_abs = REPO_ROOT / rel if not rel.startswith("/") else Path(rel)
-            if source_abs.is_file():
-                # Re-summarize on next ingest run.
-                entry.summary_file = None
-                entry.summarized_at = ""
-                entry.ingested_at = None
-                resummarize += 1
-            else:
-                # Source AND summary both gone — drop the whole row.
-                self.drop(rel)
-                dropped += 1
-        return {"resummarize": resummarize, "dropped": dropped}
-
-    def clean_stale(self) -> dict[str, int]:
-        """Drop manifest rows whose source file no longer exists on disk, and
-        delete the orphaned summary markdown for each.
-
-        Used to clean up manifest pollution from earlier ingest runs whose
-        sources have since been deleted (the typical case: pytest fixture
-        directories under `/tmp/...` that vanished after the test ran).
-
-        The walker's per-run prune at `walker.py:run_batch` only touches
-        entries under the walked root — `/tmp/...` entries linger if the
-        user ingests `/home/me/sem6` instead. This method does an
-        unconditional sweep across the whole manifest.
-
-        Qdrant orphan cleanup happens automatically on the next stage 2
-        ingest run (it diffs `manifest.paths()` against `get_all_point_ids()`
-        and deletes the difference). Caller is responsible for triggering
-        that — either by re-ingesting or by running `python -m src.stage2 ingest`.
-
-        Returns `{"dropped": N, "summaries_removed": M}`. Caller must call
-        `save()` afterward to persist.
-        """
-        dropped = 0
-        summaries_removed = 0
-        for rel in list(self.paths()):
-            # Manifest keys may be repo-relative or absolute. Resolve to abs.
-            abs_path = REPO_ROOT / rel if not rel.startswith("/") else Path(rel)
-            if abs_path.is_file():
-                continue
-            entry = self.drop(rel)
-            dropped += 1
-            if entry and entry.summary_file:
-                summary_abs = REPO_ROOT / entry.summary_file
-                if summary_abs.is_file():
-                    try:
-                        summary_abs.unlink()
-                        summaries_removed += 1
-                    except OSError:
-                        pass  # best-effort; manifest still cleaned
-        return {"dropped": dropped, "summaries_removed": summaries_removed}
 
     def mark_routed(
         self,
@@ -326,60 +242,3 @@ class Manifest:
             entry.size = size
             entry.fast_indexed_at = _now_iso()
             entry.fast_pages = pages
-
-    def reconcile_from_fast_tier(self) -> dict[str, int]:
-        """Rebuild lost `fast_indexed_at` / `fast_pages` from Qdrant fast_tier.
-
-        Recovery method for the pre-2026-04-25 `mark_summarized` bug that
-        wiped fast-tier fields when a previously-T4-indexed file got
-        re-summarized. The Qdrant fast_tier collection still holds the
-        vectors — this scrolls it, counts pages per source path, and
-        re-stamps the manifest with the recovered state. Caller must
-        `save()` afterward.
-
-        Returns `{"recovered": N, "missing_in_manifest": M}` where the
-        second count tracks paths that have fast_tier vectors but no
-        manifest row at all (rare; would require manual investigation).
-        """
-        # Local import — avoids a load-time cycle and keeps this method
-        # callable in tests without spinning up Qdrant unless invoked.
-        from collections import Counter
-        from src.stage2.db import get_qdrant_client
-        from src.stage2.fast_db import FAST_COLLECTION_NAME
-
-        client = get_qdrant_client()
-        if not client.collection_exists(FAST_COLLECTION_NAME):
-            return {"recovered": 0, "missing_in_manifest": 0}
-
-        # Scroll the entire fast_tier collection, counting pages per source.
-        page_counts: Counter[str] = Counter()
-        offset = None
-        while True:
-            points, offset = client.scroll(
-                collection_name=FAST_COLLECTION_NAME,
-                limit=512,
-                offset=offset,
-                with_payload=True,
-                with_vectors=False,
-            )
-            for p in points:
-                src = (p.payload or {}).get("source_path")
-                if src:
-                    page_counts[src] += 1
-            if offset is None:
-                break
-
-        recovered = 0
-        missing = 0
-        for src_path, n_pages in page_counts.items():
-            entry = self.entries.get(src_path)
-            if entry is None:
-                missing += 1
-                continue
-            # Only restore if the field is currently empty — don't blow away
-            # a freshly-set timestamp.
-            if entry.fast_indexed_at is None:
-                entry.fast_indexed_at = _now_iso()
-                entry.fast_pages = n_pages
-                recovered += 1
-        return {"recovered": recovered, "missing_in_manifest": missing}

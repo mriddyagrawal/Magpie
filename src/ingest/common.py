@@ -6,9 +6,15 @@ import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
-from src.manifest import REPO_ROOT
+from src.manifest import APP_DATA_DIR, SUMMARIES_DIR
 
-SUMMARIES_DIR = REPO_ROOT / "Test Summaries"
+# Re-export the canonical SUMMARIES_DIR from manifest so existing imports
+# (`from src.ingest.common import SUMMARIES_DIR`) still work.
+__all__ = ["SUMMARIES_DIR", "APP_DATA_DIR"]
+
+# Path used to render manifest entries relative to the data root.
+REPO_ROOT = APP_DATA_DIR
+
 HASH_CHUNK = 1 << 20                      # 1 MiB
 DEFAULT_BODY_MAX_CHARS = 8_000            # cap embedded text per file
 
@@ -69,7 +75,7 @@ def render_summary_markdown(
 
 
 def summary_output_path(path: Path, tier: str) -> Path:
-    """Deterministic output path: Test Summaries/<16-char hash>_<tier>.md."""
+    """Deterministic output path: <APP_DATA_DIR>/summaries/<16-char hash>_<tier>.md."""
     digest = hash_file(path)
     return SUMMARIES_DIR / f"{digest}_{tier.lower()}.md"
 
@@ -83,7 +89,7 @@ def summary_rel_path(out_path: Path) -> str:
 
 
 def write_summary(out_path: Path, content: str) -> None:
-    SUMMARIES_DIR.mkdir(exist_ok=True)
+    SUMMARIES_DIR.mkdir(parents=True, exist_ok=True)
     out_path.write_text(content, encoding="utf-8")
 
 

@@ -34,15 +34,16 @@ from src.content import (
     build_content_blocks,
 )
 from src.llm import ChatAgent, active_provider, build_agent as _build_chat_agent
-from src.manifest import Manifest
+from src.manifest import APP_DATA_DIR, SUMMARIES_DIR, Manifest
 
 
 MAX_TEXT_CHARS = 120_000
 PDF_VISION_MAX_PAGES = 20
 HASH_CHUNK = 1 << 20  # 1 MiB
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-SUMMARIES_DIR = REPO_ROOT / "Test Summaries"
+# Legacy alias — historical code resolves manifest paths relative to this.
+# Now points to the portable per-OS app data dir (see src/manifest.py).
+REPO_ROOT = APP_DATA_DIR
 
 ContentType = Literal["image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other"]
 
@@ -237,7 +238,7 @@ def source_rel_path(path: Path) -> str:
 
 
 def write_summary_at(out_path: Path, summary: FileSummary, source_rel: str) -> None:
-    SUMMARIES_DIR.mkdir(exist_ok=True)
+    SUMMARIES_DIR.mkdir(parents=True, exist_ok=True)
     out_path.write_text(render_markdown(summary, source_rel), encoding="utf-8")
 
 

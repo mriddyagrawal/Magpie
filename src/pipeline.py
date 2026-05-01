@@ -206,10 +206,10 @@ def reset() -> dict:
     abort the local cleanup (so a reset still works offline or when the
     cluster is unreachable).
     """
-    from src.manifest import DEFAULT_MANIFEST_PATH, REPO_ROOT
+    from src.manifest import DEFAULT_MANIFEST_PATH, SUMMARIES_DIR
     from src.stage2.db import COLLECTION_NAME, get_qdrant_client
 
-    summaries_dir = REPO_ROOT / "Test Summaries"
+    summaries_dir = SUMMARIES_DIR
 
     # Delete every summary .md file (keep the directory itself).
     deleted_summaries = 0

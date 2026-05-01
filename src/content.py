@@ -119,6 +119,144 @@ def _extract_pdf_toc(path: Path) -> str:
     return "\n".join(lines)
 
 
+_TOC_LINE_RE = re.compile(
+    # Matches lines like:
+    #   "1.2 Conservation of Momentum 47"
+    #   "CHAPTER 3 Momentum and Angular Momentum 83"
+    #   "Appendix A: Diagonalizing Real Symmetric Matrices 615"
+    # The defining trait: ALL-CAPS or numeric prefix → title text → page number,
+    # ending the line. A real content page rarely has 5+ lines of this shape.
+    r"(?:^|\n)\s*(?:CHAPTER\s+|APPENDIX\s+|\d+(?:\.\d+)?)\s+"
+    r"[A-Za-z][^\n]{2,80}?\s+\d+\s*(?=\n|$)",
+    re.MULTILINE | re.IGNORECASE,
+)
+
+_BOOK_PAGE_LABEL_RE = re.compile(
+    r"^\s*(\d{1,4}|[IVXLCDM]+|[ivxlcdm]+)\s*$",
+    re.MULTILINE,
+)
+
+
+def _extract_book_page_label(text: str) -> str | None:
+    """Recover the book's PRINTED page number from a PDF page's text.
+
+    PDFs often carry the printed page number in the running header or footer.
+    The PDF page index (1, 2, 3…) almost never matches the book's printed
+    page (which restarts at 1 after front matter and may use roman numerals
+    before that). Heuristic: look at the first 3 lines of the page (top-of-
+    page page numbers — Taylor's textbook is one of these), then the last 3
+    lines (footer style). A line is a page-label if it contains only a
+    1-4 digit number or a Roman numeral, surrounded by whitespace.
+    """
+    if not text or not text.strip():
+        return None
+    lines = text.split("\n")
+    for line in lines[:3]:
+        m = _BOOK_PAGE_LABEL_RE.match(line)
+        if m:
+            return m.group(1)
+    for line in reversed(lines[-3:]):
+        m = _BOOK_PAGE_LABEL_RE.match(line)
+        if m:
+            return m.group(1)
+    return None
+
+
+def _looks_like_toc_page(text: str) -> bool:
+    """True when the page is dominated by table-of-contents-shaped lines.
+
+    TOC pages list every chapter and section by name → they outscore real
+    content pages on any "what's in this textbook" query. The bookmark TOC
+    is already in the summary tier; we don't want it doubled up here.
+    """
+    matches = _TOC_LINE_RE.findall(text)
+    return len(matches) >= 5
+
+
+def extract_pdf_relevant_pages(
+    path: Path,
+    keywords: list[str],
+    *,
+    max_pages: int = 10,
+    max_chars: int = 25_000,
+    context_pages: int = 1,
+) -> str:
+    """Pick the PDF pages most relevant to `keywords`; return their text.
+
+    The lazy-chunking primitive used at answer time for long PDFs that would
+    otherwise have their first ~25K chars (cover + preface) cut and sent to
+    the LLM. Algorithm: score each page by case-insensitive keyword hits,
+    take top `max_pages`, expand by `context_pages` neighbors, emit in
+    document order with `## PDF page N (book p. X)` anchors capped at
+    `max_chars`. Returns "" when keywords empty, no page matches, or PDF
+    can't be opened — caller falls back to first-N-chars extract.
+    """
+    if not keywords:
+        return ""
+    try:
+        import pymupdf
+    except ImportError:
+        return ""
+    try:
+        doc = pymupdf.open(str(path))
+    except Exception:  # pylint: disable=broad-except
+        return ""
+
+    try:
+        n_pages = len(doc)
+        if n_pages == 0:
+            return ""
+        kws = [k.lower() for k in keywords if k.strip()]
+        if not kws:
+            return ""
+
+        page_scores: list[tuple[int, int]] = []
+        for i in range(n_pages):
+            try:
+                raw_text = doc[i].get_text() or ""
+            except Exception:  # pylint: disable=broad-except
+                continue
+            if _looks_like_toc_page(raw_text):
+                continue
+            text = raw_text.lower()
+            score = sum(text.count(kw) for kw in kws)
+            if score > 0:
+                page_scores.append((i, score))
+
+        if not page_scores:
+            return ""
+
+        page_scores.sort(key=lambda kv: -kv[1])
+        seeds = {p for p, _ in page_scores[:max_pages]}
+        with_context: set[int] = set()
+        for p in seeds:
+            for delta in range(-context_pages, context_pages + 1):
+                if 0 <= p + delta < n_pages:
+                    with_context.add(p + delta)
+
+        chunks: list[str] = []
+        total = 0
+        for i in sorted(with_context):
+            try:
+                page_text = doc[i].get_text() or ""
+            except Exception:  # pylint: disable=broad-except
+                continue
+            book_label = _extract_book_page_label(page_text)
+            if book_label:
+                anchor = f"## PDF page {i + 1} (book p. {book_label})"
+            else:
+                anchor = f"## PDF page {i + 1}"
+            block = f"{anchor}\n{page_text}"
+            chunks.append(block)
+            total += len(block)
+            if total >= max_chars:
+                break
+
+        return "\n\n".join(chunks)
+    finally:
+        doc.close()
+
+
 def render_pdf_pages_as_png(path: Path, max_pages: int) -> list[bytes]:
     import pymupdf
 

@@ -61,10 +61,12 @@ class RetrievalConfig:
 
 # Default per-class configs. Numbers chosen empirically:
 #   - 5 was the original product default; matches what the REPL shipped.
-#   - 20 is roughly "show me the front page of a folder" — typical course
-#     folders have 10-30 files, so 20 covers most enumeration cases without
-#     drowning the answer LLM in tokens.
-_LIST_ALL_TOP_K = 20
+#   - 30 covers most enumeration cases including category-spanning queries
+#     ("what kind of receipts do I have") where the user expects the full
+#     surface area: small purchase receipts AND flight itineraries AND
+#     hotel bookings AND bank statements all need to fit. 20 was missing
+#     the long tail in real-corpus testing.
+_LIST_ALL_TOP_K = 30
 _GENERAL_TOP_K = 5
 
 
@@ -100,6 +102,12 @@ _LIST_ALL_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
         r"^\s*give\s+me\b",
         r"^\s*show\s+me\b",
 
+        # Same imperative verbs ANYWHERE in the query — catches conversational
+        # phrasings like "what receipts do i have list all of the possible ones"
+        # where the list verb shows up after a question stem.
+        r"\b(list|show|give|tell)\s+(me\s+)?(all|every|the\s+(?:full|complete|whole))\b",
+        r"\blist\s+all\s+of\s+the\b",
+
         # "what are all X" / "what were every Y"
         r"\bwhat\s+(are|were)\s+(all|every|the)\b",
 
@@ -117,9 +125,26 @@ _LIST_ALL_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
         r"\b(every|all\s+(?:my|the))\s+\w+\b",
 
         # "what / which" + plural enumerable noun
-        # ("what courses", "which classes", "what files")
+        # ("what courses", "which classes", "what files",
+        #  "what receipts", "which invoices", "what flights")
         r"\b(what|which)\s+(courses?|classes?|files?|documents?|chapters?|"
-        r"sections?|topics?|subjects?|assignments?|lectures?|notes)\b",
+        r"sections?|topics?|subjects?|assignments?|lectures?|notes|"
+        r"receipts?|bills?|invoices?|statements?|expenses?|transactions?|"
+        r"purchases?|orders?|flights?|hotels?|trips?|bookings?|"
+        r"contracts?|leases?|payments?|charges?|refunds?)\b",
+
+        # "what / which X do I have / own / keep" — common phrasing for
+        # "tell me my X." Covers receipts, files, courses, docs, etc. that
+        # fall outside the noun whitelist above. Up to 4 words between
+        # the question stem and the verb, so "what kind of receipts do i
+        # have" and "which sort of bills do i keep" both match.
+        r"\b(what|which)\s+(?:\w+\s+){1,4}do\s+i\s+(have|own|keep)\b",
+
+        # "what kind / type / sort of X" — "what kind of receipts" is a
+        # very common conversational way of asking for an enumeration of
+        # categories. Standalone trigger; captures the pattern even when
+        # the rest of the query doesn't include a do/have stem.
+        r"\bwhat\s+(kind|kinds|type|types|sort|sorts|category|categories)\s+of\b",
 
         # "contents of" — TOC-style enumeration
         r"\bcontents?\s+of\b",

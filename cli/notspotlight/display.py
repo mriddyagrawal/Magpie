@@ -119,6 +119,7 @@ def print_help() -> None:
     table.add_column()
     table.add_row(".help", "Show this help")
     table.add_row(".rewrite on/off", "Toggle Kimi query rewriting (default: off)")
+    table.add_row(".fast on/off", "Toggle ColPali visual tier (default: off — saves ~30s startup)")
     table.add_row(".history on/off/clear", "Send prior Q&A to the rewriter (needs .rewrite on)")
     table.add_row(".top-k N", "Set number of results to retrieve")
     table.add_row(".suggest [refresh]", "Show question hints (add 'refresh' to regenerate)")

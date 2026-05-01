@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+magpie_server/__init__.py
+magpie_server/auth.py
+magpie_server/llm_client.py
+magpie_server/llm_routes.py
+magpie_server/main.py
+magpie_server/prompts.py
+magpie_server/schemas.py
+magpie_server/settings.py
+magpie_server.egg-info/PKG-INFO
+magpie_server.egg-info/SOURCES.txt
+magpie_server.egg-info/dependency_links.txt
+magpie_server.egg-info/requires.txt
+magpie_server.egg-info/top_level.txt
+tests/test_prompts_parity.py

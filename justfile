@@ -94,6 +94,23 @@ summarize path:
 chat:
     uv run notspotlight
 
+# Start the FastAPI sidecar (the backend that the Tauri GUI talks to).
+# Data goes to APP_DATA_DIR (~/.local/share/Magpie on Linux). Override
+# with MAGPIE_DATA_DIR=/some/path if you want a different location.
+serve:
+    uv run uvicorn src.server:app --port 8765
+
+# Same as `serve`, but auto-reloads on src/ changes — use during dev.
+serve-dev:
+    uv run uvicorn src.server:app --port 8765 --reload
+
+# Start Magpie Cloud (the LLM-orchestration backend that holds prompts
+# and proxies LLM calls). Different process from `just serve` — that
+# one is the LOCAL desktop sidecar; this one is the REMOTE server the
+# desktop app talks to. See server/README.md for what each is for.
+cloud-serve:
+    cd server && uv run uvicorn magpie_server.main:app --port 8000 --reload
+
 # Install global aliases (notspotlight, ns, nas) via uv tool
 install:
     uv tool install -e cli --force
@@ -117,7 +134,7 @@ QDRANT_BIN       := QDRANT_HOME / "qdrant"
 QDRANT_DATA      := env_var_or_default("QDRANT_DATA", QDRANT_HOME / "storage")
 QDRANT_LOGS      := QDRANT_HOME / "qdrant.log"
 QDRANT_PIDFILE   := QDRANT_HOME / "qdrant.pid"
-QDRANT_VERSION   := "v1.12.4"
+QDRANT_VERSION   := "v1.17.1"
 QDRANT_PORT      := "6333"
 
 # Download the Qdrant standalone binary onto QDRANT_HOME (one-time, ~30 MB).

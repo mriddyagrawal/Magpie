@@ -74,6 +74,18 @@ SUMMARIES_DIR = APP_DATA_DIR / "summaries"
 DEFAULT_MANIFEST_PATH = APP_DATA_DIR / "manifest.json"
 """Per-file metadata index — the source of truth for what's been ingested."""
 
+# Redirect HuggingFace's model cache into APP_DATA_DIR/cache/ so embedding
+# and visual-tier model files don't leak into the user's shared cache
+# (~/.cache/huggingface/hub/) where directory names like
+# `models--vidore--colSmol-500M` directly identify our stack to anyone
+# browsing. This must be set BEFORE any transformers / sentence-transformers
+# / colpali-engine import — putting it here guarantees that, since
+# APP_DATA_DIR is required by every code path that loads a model.
+_MODEL_CACHE_DIR = APP_DATA_DIR / "cache"
+os.environ.setdefault("HF_HOME", str(_MODEL_CACHE_DIR))
+os.environ.setdefault("HF_HUB_CACHE", str(_MODEL_CACHE_DIR / "hub"))
+os.environ.setdefault("TRANSFORMERS_CACHE", str(_MODEL_CACHE_DIR))
+
 # Backward-compat alias. Existing imports of `REPO_ROOT` for data-path
 # resolution (manifest entries store summary paths relative to this) keep
 # working unchanged. New code should reference `APP_DATA_DIR` directly.

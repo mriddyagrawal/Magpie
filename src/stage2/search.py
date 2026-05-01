@@ -27,6 +27,9 @@ class SearchQuery(BaseModel):
     )
 
 
+# NOTE: Until Phase 2.5 step 5 lands, this prompt is duplicated in
+# `server/magpie_server/prompts.py:REWRITE_PROMPT`. Edit there, not here.
+# After step 5: deleted; desktop calls /llm/rewrite on cloud.
 REWRITE_SYSTEM_PROMPT = (
     "You are a search-query optimizer. Given a user's natural-language question "
     "about their personal documents (invoices, receipts, notes, contracts, etc.), "

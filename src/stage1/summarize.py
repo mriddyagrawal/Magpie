@@ -78,6 +78,9 @@ class FileSummary(BaseModel):
     )
 
 
+# NOTE: Until Phase 2.5 step 5 lands, this prompt is duplicated in
+# `server/magpie_server/prompts.py:SUMMARIZE_PROMPT`. Edit there, not here.
+# After step 5: deleted; desktop calls /llm/summarize on cloud.
 SYSTEM_PROMPT = (
     "You are a file-summarization assistant. Given a single file's content, produce a "
     "FileSummary with: `title`, `summary`, `content_type`, `keywords`, `key_entities`, "
@@ -111,6 +114,9 @@ SYSTEM_PROMPT = (
 )
 
 
+# NOTE: see SUMMARIZE_PROMPT_LOCAL in server/magpie_server/prompts.py.
+# This local-mode prompt may stay client-side post-step-5 (since local
+# mode doesn't go through the cloud), TBD when v1.1 local-LLM ships.
 LOCAL_SYSTEM_PROMPT = """You are a file analyzer. Given a file's content, output a JSON object describing what the file is and the details someone might use to find it later via keyword search.
 
 The JSON MUST have exactly these keys (and only these keys):

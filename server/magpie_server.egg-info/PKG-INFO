@@ -1,0 +1,103 @@
+Metadata-Version: 2.4
+Name: magpie-server
+Version: 0.1.0
+Summary: Magpie Cloud — LLM orchestration backend for the Magpie desktop app.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.115
+Requires-Dist: uvicorn[standard]>=0.30
+Requires-Dist: pydantic>=2.8
+Requires-Dist: pydantic-settings>=2.4
+Requires-Dist: httpx>=0.27
+Requires-Dist: python-dotenv>=1.0
+Requires-Dist: pydantic-ai>=0.0.14
+
+# Magpie Cloud
+
+LLM orchestration backend for the Magpie desktop app. Holds the system
+prompts and proxies LLM calls so the desktop app never ships them.
+
+## What lives here
+
+```
+server/
+├── magpie_server/
+│   ├── main.py            FastAPI app + /health + /whoami
+│   ├── auth.py            Invite-code bearer-token middleware
+│   ├── settings.py        Env-var-driven config (pydantic-settings)
+│   ├── prompts.py         (Phase 2.5 step 3) system prompts — the IP
+│   └── llm_routes.py      (Phase 2.5 step 4) /llm/rewrite, /llm/answer, /llm/summarize
+├── tests/
+├── pyproject.toml         Server-only deps (no torch / qdrant / colpali)
+├── .env.example           Copy to .env, fill in INVITE_CODES + OPENROUTER_API_KEY
+├── Dockerfile             (Phase 2.5 step 7) for fly.io / Render / Railway
+└── README.md              You are here.
+```
+
+## Run locally (dev)
+
+```bash
+# One-time: install server-only deps in a separate venv
+cd server
+uv sync                       # installs from server/pyproject.toml
+
+# Configure
+cp .env.example .env
+# Edit .env: set INVITE_CODES (or leave empty for unauth localhost)
+#            set OPENROUTER_API_KEY (later — empty for skeleton testing)
+
+# Run
+uv run uvicorn magpie_server.main:app --reload
+# → server now on http://127.0.0.1:8000
+```
+
+Or from the repo root:
+
+```bash
+just cloud-serve
+```
+
+## Smoke test
+
+```bash
+# Health (no auth needed)
+curl http://127.0.0.1:8000/health
+
+# Auth path (needs an invite code in INVITE_CODES env)
+curl http://127.0.0.1:8000/whoami \
+  -H "Authorization: Bearer your-invite-code"
+```
+
+## Auth model (beta)
+
+Single shared-secret per beta tester. Generate codes with:
+
+```bash
+python -c "import secrets; print('alice-' + secrets.token_urlsafe(16))"
+```
+
+Add to `INVITE_CODES` (comma-separated). Hand the code to the tester; their
+desktop app pastes it once at first launch.
+
+To revoke a tester: drop their code from the env var, restart the server.
+
+When Beta graduates to public launch, swap `auth.py` for JWT/OAuth — the
+endpoint signatures don't change, only the dependency.
+
+## Deploy
+
+(Phase 2.5 step 7 — not built yet.) Will use fly.io's free tier:
+
+```bash
+fly launch                          # one-time
+fly secrets set INVITE_CODES=...    # set per-tester codes
+fly secrets set OPENROUTER_API_KEY=...
+fly deploy                          # ship it
+```
+
+## Why this is in the same repo as the desktop app
+
+See [../IO/IO - Repo Structure.md](../IO/IO%20-%20Repo%20Structure.md). Short
+version: solo-dev coordination wins; we'll split this out only when we
+hit one of the four legitimate triggers (people / product / license /
+compliance).

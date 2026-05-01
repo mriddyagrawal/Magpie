@@ -87,6 +87,19 @@ PROVIDERS: dict[str, ProviderConfig] = {
         default_model="mlx-community/gemma-3n-E2B-it-4bit",
         default_base_url="",
     ),
+    # Magpie Cloud — your hosted backend that holds the prompts and proxies
+    # LLM calls (server/magpie_server). The desktop sends questions +
+    # snippets; the cloud server returns structured answers. No
+    # OpenAI-compatible base URL — communication uses our own /llm/* JSON
+    # endpoints, dispatched by `src/cloud_provider.py`.
+    "magpie-cloud": ProviderConfig(
+        name="magpie-cloud",
+        api_key_env="MAGPIE_INVITE_CODE",
+        model_env="",                          # model is chosen server-side
+        base_url_env="MAGPIE_CLOUD_URL",
+        default_model="(server-decided)",
+        default_base_url="http://127.0.0.1:8000",
+    ),
 }
 
 
@@ -243,6 +256,13 @@ def build_agent(
     )
     if cfg.name == "local":
         return LocalAgent(system_prompt, output_type, fallback)
+    if cfg.name == "magpie-cloud":
+        # Cloud-managed path: prompts live server-side, the desktop just
+        # POSTs questions/snippets to /llm/* endpoints. system_prompt and
+        # fallback are both ignored — the server controls them. See
+        # `src/cloud_provider.py` for the dispatch logic.
+        from src.cloud_provider import build_cloud_agent
+        return build_cloud_agent(output_type)  # type: ignore[return-value]
     return _CloudAgent(system_prompt, output_type, provider_override=provider_override)
 
 

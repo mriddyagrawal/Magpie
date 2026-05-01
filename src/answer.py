@@ -53,6 +53,10 @@ class Answer(BaseModel):
     )
 
 
+# NOTE: Until Phase 2.5 step 5 (cloud-provider wiring) lands, this prompt is
+# duplicated in `server/magpie_server/prompts.py:ANSWER_PROMPT`. Edit there,
+# not here — copy back to keep parity. After step 5 lands, this constant is
+# deleted and the desktop calls /llm/answer on the cloud server instead.
 SYSTEM_PROMPT = (
     "You are a file-grounded question-answering assistant. "
     "Answer the user's question using ONLY the files provided in the message. "

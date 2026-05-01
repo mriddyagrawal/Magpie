@@ -81,6 +81,49 @@ from src.stage2.query_classify import (
         # "what kind of X do I have" — multi-word between what and do
         "what kind of bills do I have",
         "which type of contracts do I keep",
+        # Receipt-shaped enumerable nouns (added 2026-04-27)
+        "what receipts do I have",
+        "which invoices are unpaid",
+        "what bills came in last month",
+        "what flights did I take",
+        "which hotels did I book",
+        "what trips did I take",
+        "what statements are in the folder",
+        "what expenses do I have",
+        "what transactions are pending",
+        "what contracts do I have",
+        "what orders did I place",
+        # "do I have" pattern with arbitrary noun
+        "what files do I have on Maxwell",
+        "which notes do I keep about tempo",
+        # Conversational phrasings from real REPL transcripts (2026-04-27)
+        # — these slipped through the original patterns
+        "what kind of receipts do i have list all of the possible ones",
+        "what kind of receipts do i have",
+        "what types of bills do I owe",
+        "what sort of contracts do I have on file",
+        "list all of the possible categories",
+        "tell me all the receipts",
+        "show me every receipt",
+        "give me all the bills",
+        # "what kind of X do I have" — multi-word between what and do
+        "what kind of bills do I have",
+        "which type of contracts do I keep",
+        # Aggregation / universal queries (added 2026-05-01)
+        # — real REPL transcript: "how much has been my total expenses
+        #    altogether include all of it"
+        "how much has been my total expenses altogether include all of it",
+        "how much have I spent in total",
+        "how much overall did I spend on groceries",
+        "sum up all the transactions",
+        "include all of it",
+        "include every one",
+        "every single transaction this month",
+        "each and every receipt",
+        "total spending on travel",
+        "total transactions in March",
+        "total expenses for the year",
+        "total of all my receipts",
     ],
 )
 def test_classify_list_all(question: str):

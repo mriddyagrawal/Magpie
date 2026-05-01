@@ -151,6 +151,49 @@ _LIST_ALL_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
 
         # "everything about X" / "all about X"
         r"\b(everything|all)\s+(about|on|regarding)\b",
+
+        # ----------------------------------------------------------------
+        # Aggregation / universal-quantifier queries (added 2026-05-01).
+        # Trigger transcript: "how much has been my total expenses
+        # altogether include all of it" — the user wanted every expense
+        # doc summed, not the single closest match. None of the
+        # enumeration-noun patterns above caught it because the question
+        # stem is "how much", not "what" / "which" / "list".
+        # ----------------------------------------------------------------
+
+        # Aggregation adverbs — "altogether", "in total", "in all",
+        # "combined", "overall". The query wants every matching doc
+        # rolled up, not the single best match.
+        r"\b(altogether|in\s+total|in\s+all|combined|overall)\b",
+
+        # "all of it" / "all of them" / "every one of them" / "all of
+        # these" — universal quantification without a list verb.
+        # Excludes "all of the" deliberately to avoid factoid noise.
+        r"\b(all|every(?:\s+one)?)\s+of\s+(it|them|these|those)\b",
+
+        # "every single X" — emphatic universal.
+        r"\bevery\s+single\b",
+
+        # "include all / every / everything" — explicit directive to be
+        # exhaustive. Common as a tail clause: "...include all of it".
+        r"\binclude\s+(all|every|everything)\b",
+
+        # "total <enumerable>" — aggregation across every matching doc.
+        # Restricted to enumerable nouns; even occasional false positives
+        # are cheap (top_k 5→30 is harmless when the answer LLM grounds).
+        r"\btotal\s+(?:my\s+)?"
+        r"(expenses?|transactions?|spending|spend|receipts?|invoices?|"
+        r"bills?|charges?|payments?|purchases?|costs?|deposits?|"
+        r"withdrawals?|orders?|trips?|hours?|miles?)\b",
+
+        # "total of all/my/the/every <X>" — explicit aggregation phrasing.
+        r"\btotal\s+of\s+(all|my|the|every)\b",
+
+        # "sum of" / "sum up" — explicit aggregation language.
+        r"\bsum\s+(of|up)\b",
+
+        # "each and every" — emphatic universal quantifier.
+        r"\beach\s+and\s+every\b",
     )
 )
 

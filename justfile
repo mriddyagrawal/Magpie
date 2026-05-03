@@ -111,6 +111,16 @@ serve-dev:
 cloud-serve:
     cd server && uv run uvicorn magpie_server.main:app --port 8000 --reload
 
+# Run the desktop CLI through the local Magpie Cloud (instead of
+# direct-to-OpenRouter). Pair with `just cloud-serve` running in
+# another terminal. Useful for verifying the full cloud-mode flow
+# end-to-end on a single laptop.
+chat-cloud:
+    LLM_PROVIDER=magpie-cloud \
+    MAGPIE_CLOUD_URL=http://127.0.0.1:8000 \
+    MAGPIE_INVITE_CODE="${MAGPIE_INVITE_CODE:-dev-anonymous}" \
+    uv run notspotlight
+
 # Install global aliases (notspotlight, ns, nas) via uv tool
 install:
     uv tool install -e cli --force

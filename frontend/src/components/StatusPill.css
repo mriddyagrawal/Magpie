@@ -25,6 +25,11 @@
   box-shadow: 0 0 6px rgba(127, 191, 142, 0.6);
 }
 
+.status-pill__dot--off {
+  background: var(--text-dim);
+  box-shadow: none;
+}
+
 .status-pill__text {
   font-family: var(--font-mono);
   font-size: var(--size-xs);

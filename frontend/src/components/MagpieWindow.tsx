@@ -91,6 +91,21 @@ export function MagpieWindow() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
+  // Clicking the transparent window background (outside any card) should dismiss,
+  // matching Spotlight / Alfred behaviour. tauri://blur only fires when another
+  // *app* steals focus, so we also need this document-level handler for clicks
+  // that land on the webview's transparent layer without leaving the window.
+  useEffect(() => {
+    const handler = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest(".magpie-card")) {
+        hideWindow();
+      }
+    };
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
+  }, []);
+
   // Wire Tauri window events: blur → hide (shrunk), focus → reset + focus input.
   // Spotlight semantics: always hide on blur, regardless of dev/prod.
   useEffect(() => {

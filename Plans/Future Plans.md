@@ -240,3 +240,45 @@ f. **Page-anchored slicing for huge text-native files.** For 500-page textbooks 
 - After a real-data corpus is in use long enough to log: how many queries hit T0 files? How many of those returned 0 ripgrep hits? Of the 0-hit cases, were the questions answerable from the file in principle?
 - Specifically: build a small "T0 questions" eval set (ground-truth question + huge CSV/log + expected row) and run the current pipeline against it. The recall@5 number on that set is the trigger.
 - Cheapest first move when triggered: option (a) — LLM-rewritten patterns. Smallest blast radius, biggest plausible lift on the synonym/format-mismatch failure modes. If that doesn't move the number, escalate to (b) and (c).
+
+---
+
+## 9. Liquid AI LFM2 Model Family Evaluation
+
+**Context:** Magpie's pipeline currently calls cloud LLMs for two tasks: query rewriting (pydantic-ai `SearchQuery` generation) and cited answer synthesis. Stage 1 vision summaries are exploring Gemma 3n E4B via mlx-vlm on Apple Silicon. With Liquid AI's LFM2 family (late 2025) and Google's Gemma 4 family (April 2026) both now available, there are stronger local candidates worth benchmarking against our actual corpora (ReceiptQA, 1,724-course catalog, 236-club directory). All LFM2 models ship with day-one MLX support and an Apache 2.0-derivative license (free commercial use under $10M ARR).
+
+**Binding hardware constraint:** ColQwen2.5 in `fast_tier` consumes ~6 GB VRAM, leaving ~2 GB headroom on 8 GB Apple Silicon. This — not benchmark scores — is the primary filter.
+
+### LFM2.5-1.2B-Instruct — query rewriter (highest priority)
+
+**Why test:** The query rewriter is a pydantic-ai call producing a structured `SearchQuery` — almost certainly a cloud roundtrip today. LFM2 was post-trained specifically on RAG and function-calling. At 4-bit MLX it's ~600–800 MB resident, runs in tens of milliseconds, and pydantic-ai works against any OpenAI-compatible endpoint (mlx-lm serves one natively). Killing the network roundtrip on every keypress is the most direct UX improvement possible. IFEval 74.89% suggests solid schema adherence.
+
+**Where it may fail:** Sub-2B models can produce schema-valid but semantically wrong `SearchQuery` objects — worse than an obvious failure. Multilingual queries outside its 8 trained languages (EN, AR, ZH, JA, KO, ES, FR, DE) may degrade. No thinking mode, so complex multi-clause queries may decompose poorly compared to a cloud model.
+
+**Test plan:** Replay 100 representative queries (synthesize if no logs exist) through cloud and LFM2.5-1.2B; manually grade intent fidelity, schema correctness, and decomposition quality. Measure end-to-end latency. **Lowest-risk swap — implement first.**
+
+### LFM2.5-VL-1.6B — Stage 1 vision summaries
+
+**Why test:** Direct A/B candidate against Gemma 3n E4B (and Gemma 4 E4B) for structured per-file summary generation. Same mlx-vlm tooling. At 8-bit it's ~1.6–1.8 GB resident vs. ~3.5–4 GB for Gemma 3n E4B at 4-bit — better fit alongside ColQwen2.5. Tunable image token budget (96 tokens at 256×384 up to ~1,020 at 1000×3000) lets us trade accuracy/latency per file type. Liquid explicitly markets LFM2 for "data extraction" tasks, which matches our structured summary schema (title / description / entities / identifiers).
+
+**Where it may fail:** 1.6B is small; likely weaker than Gemma 4 E4B on dense visual reasoning (MMMU-Pro 52.6% is a high bar). May struggle with multi-page club directory entries. Native 512×512 patch tiling could lose detail on dense receipts with small fonts. No thinking mode.
+
+**Test plan:** A/B against Gemma 3n E4B and Gemma 4 E4B on ReceiptQA + 50 sampled course entries + 50 sampled club entries. Measure: schema adherence rate, entity extraction F1, peak memory during indexing, time per file.
+
+### LFM2-2.6B / LFM2-8B-A1B — cited answer synthesis (test, do not commit)
+
+**Why test:** The final pipeline stage is the only remaining cloud dependency. Eliminating it completes the "no cloud, filesystem as source of truth" story. LFM2-2.6B at ~2 GB (4-bit) fits alongside the retriever on 8 GB hardware. Strong instruction-following (IFEval 79.56%) matters for citation format adherence. LFM2-8B-A1B (8.3B total / 1.5B active MoE) is worth trying if it fits at ~4–5 GB — it gains +11 MMLU-Pro points over the 2.6B.
+
+**Where it may fail (significant concerns):** Liquid AI explicitly advises against LFM2 for knowledge-intensive tasks. Cited multi-document synthesis is exactly that. MMLU-Pro ~26% for the 2.6B is 30–40 points behind Gemma 4 E4B (69.4%). Expected failure modes: (a) correct format, wrong substance; (b) citation hallucination — claiming a chunk supports a claim it doesn't; (c) failure to reconcile contradictions across 3+ sources.
+
+**Test plan:** Build a held-out eval set of ~30 queries with ground-truth cited answers from the cloud baseline. Score on: citation faithfulness, answer completeness, hallucination rate. **Hard cutoff: if citation faithfulness falls below 90% of cloud baseline, do not ship.** Keep cloud for synthesis and accept the hybrid architecture.
+
+### Suggested order of evaluation
+
+1. LFM2.5-1.2B-Instruct as query rewriter — half a day, immediate latency win, near-zero output risk.
+2. LFM2.5-VL-1.6B vs. Gemma 3n E4B vs. Gemma 4 E4B for Stage 1 — let our corpora decide, not public benchmarks.
+3. LFM2-2.6B / LFM2-8B-A1B for synthesis — only commit if quality holds within tolerance; otherwise keep hybrid (local rewriter, cloud synthesizer).
+
+### Out of scope
+
+LFM2-ColBERT-350M is text-only late-interaction and cannot replace ColQwen2.5 (visual late-interaction over page patches). Retrieval architecture is unchanged. No `fast_tier` or `summaries` collection changes are part of this evaluation.

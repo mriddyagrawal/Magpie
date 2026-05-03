@@ -295,3 +295,29 @@ LFM2-ColBERT-350M is text-only late-interaction and cannot replace ColQwen2.5 (v
 - **Security & Sandboxing.** A self-contained bundle is a prerequisite for proper macOS code signing and notarization, which removes the "damaged / unidentified developer" warnings that currently plague non-developer users.
 
 **When to revisit:** As soon as we want to share the app with non-technical users or move beyond a "developer-preview" state.
+
+---
+
+## 11. Unify orphan-cleanup pattern across `summaries` and `fast_tier`
+
+**What:** The codebase currently has two different orphan-cleanup styles in two collections, and a fix-time decision was made to add a third (count-based for CSV/PDF chunks). Pick one canonical approach and migrate the other.
+
+| Collection | Style today | How it works |
+|---|---|---|
+| `summaries` | **count-based** (after the 2026-05-03 fix in [src/stage2/__main__.py](../src/stage2/__main__.py)) | Manifest stores `entry.row_count` (and future `entry.chunk_count`). Orphan cleanup generates expected point IDs from those counts and deletes anything in Qdrant not in the expected set. |
+| `fast_tier` | **path-based** ([src/ingest/walker.py:776](../src/ingest/walker.py#L776), [src/stage2/fast_db.py:201,224](../src/stage2/fast_db.py#L201)) | Asks Qdrant "what source paths are indexed?" via payload scroll. Diff against `manifest.paths()`. For each orphan path, call `delete_path(path)` which removes ALL pages of that file in one filter-based delete. |
+
+**Why we might want this:**
+- **Latent in-file-shrinkage bug in fast_tier.** If a PDF is re-rendered with fewer pages (compression change, edited PDF, renderer behavior change), pages `N..oldN-1` stay in Qdrant forever — search returns them, click jumps to "page doesn't exist." Path-based cleanup looks at the *path* (still in manifest) and skips it, never touching the stale pages. Count-based would catch it.
+- **Future-proofing chunked formats.** When PDF semantic chunking lands (Plan #?), audio segment indexing lands, video frame indexing lands, etc. — a new engineer copies one of the two patterns. If they pick path-based ("simpler, mirror fast_tier"), they inherit the same in-file-shrinkage blind spot. One canonical pattern removes that fork in the road.
+- **Schema clarity.** `fast_tier` already has `entry.fast_pages` populated — the count is *already there*, it's just not used by the cleanup. The migration is genuinely small.
+- **Consider an even cleaner alternative.** Instead of per-tier count fields (`row_count`, `chunk_count`, `fast_pages`, ...), store the actual point IDs in the manifest entry: `point_ids: list[str]`. Orphan cleanup becomes pure set subtraction with no per-tier dispatch. Cost: ~125 KB of extra manifest weight per 1700-file corpus (negligible). Benefit: zero new schema fields per new tier. Worth evaluating during this work.
+
+**Why we did NOT do it now:**
+- Both styles work for their current callers. The fast_tier bug is *latent* — users who don't shrink their PDFs never hit it. Migrating proactively risks introducing regressions in the working path-based code.
+- ~15 lines of code for the migration, but needs careful testing on a real fast_tier corpus to confirm the point-ID derivation matches what `_page_point_id()` writes (it should — both use MD5 of `f"{source_path}::page:{page_num}"` — but worth verifying with a scroll diff before flipping).
+- No user-facing symptom right now; not worth pre-empting Mridul's CSV unblock.
+
+**When to revisit:** Before adding any third tier that produces multi-point-per-file output (PDF chunking, audio segments, video frames). At that point a) we'll have a third writer and choosing must be deliberate, b) the migration test infrastructure is freshest, c) we'll want every cleanup style aligned for the future engineer.
+
+**Risk if deferred indefinitely:** Each new tier doubles the cognitive surface. By tier 4 (audio/video/pdf-chunks/whatever) the codebase will have grown three semi-orphaned conventions and a new contributor will spend a day reverse-engineering which to use.

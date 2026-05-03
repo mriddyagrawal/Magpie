@@ -10,7 +10,7 @@ Requires-Dist: pydantic>=2.8
 Requires-Dist: pydantic-settings>=2.4
 Requires-Dist: httpx>=0.27
 Requires-Dist: python-dotenv>=1.0
-Requires-Dist: pydantic-ai>=0.0.14
+Requires-Dist: pydantic-ai-slim[openai]>=0.0.14
 
 # Magpie Cloud
 

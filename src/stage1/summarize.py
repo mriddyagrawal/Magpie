@@ -34,15 +34,16 @@ from src.content import (
     build_content_blocks,
 )
 from src.llm import ChatAgent, active_provider, build_agent as _build_chat_agent
-from src.manifest import Manifest
+from src.manifest import APP_DATA_DIR, SUMMARIES_DIR, Manifest
 
 
 MAX_TEXT_CHARS = 120_000
 PDF_VISION_MAX_PAGES = 20
 HASH_CHUNK = 1 << 20  # 1 MiB
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-SUMMARIES_DIR = REPO_ROOT / "Test Summaries"
+# Legacy alias — historical code resolves manifest paths relative to this.
+# Now points to the portable per-OS app data dir (see src/manifest.py).
+REPO_ROOT = APP_DATA_DIR
 
 ContentType = Literal["image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other"]
 
@@ -77,6 +78,9 @@ class FileSummary(BaseModel):
     )
 
 
+# NOTE: Until Phase 2.5 step 5 lands, this prompt is duplicated in
+# `server/magpie_server/prompts.py:SUMMARIZE_PROMPT`. Edit there, not here.
+# After step 5: deleted; desktop calls /llm/summarize on cloud.
 SYSTEM_PROMPT = (
     "You are a file-summarization assistant. Given a single file's content, produce a "
     "FileSummary with: `title`, `summary`, `content_type`, `keywords`, `key_entities`, "
@@ -93,6 +97,15 @@ SYSTEM_PROMPT = (
     "- Totals, subtotals, exact prices and currency symbols\n"
     "- For non-receipt files: file paths, function/class names, version strings, "
     "error codes, URLs\n\n"
+    "CATEGORY tagging in keywords. If the file represents a recognizable "
+    "category, include the category name in `keywords` EVEN IF the file does "
+    "not use that exact word. Examples: a flight itinerary, trip confirmation, "
+    "or e-ticket → add `receipt` (it's a travel receipt); a hotel booking "
+    "→ add `receipt`; a bank statement → add `statement` and `receipt`; a "
+    "lease agreement → add `contract`; a course syllabus → add `syllabus`; "
+    "an order confirmation → add `receipt` and `order`. The user searches "
+    "by category words, not file-internal jargon — so the category MUST "
+    "appear in keywords for retrieval to work.\n\n"
     "Be specific and factual. Do not invent content that is not present. If a field "
     "would be empty (e.g. `identifiers` for a code file), return an empty list — do "
     "not pad with guesses.\n\n"
@@ -101,6 +114,9 @@ SYSTEM_PROMPT = (
 )
 
 
+# NOTE: see SUMMARIZE_PROMPT_LOCAL in server/magpie_server/prompts.py.
+# This local-mode prompt may stay client-side post-step-5 (since local
+# mode doesn't go through the cloud), TBD when v1.1 local-LLM ships.
 LOCAL_SYSTEM_PROMPT = """You are a file analyzer. Given a file's content, output a JSON object describing what the file is and the details someone might use to find it later via keyword search.
 
 The JSON MUST have exactly these keys (and only these keys):
@@ -134,6 +150,56 @@ def build_agent() -> ChatAgent[FileSummary]:
     # natively; local Gemma 3n needs a few-shot example to stay in JSON mode.
     prompt = LOCAL_SYSTEM_PROMPT if active_provider().name == "local" else SYSTEM_PROMPT
     return _build_chat_agent(prompt, FileSummary, None)
+
+
+# Fallback agent: built lazily on first cloud failure, cached for the rest of
+# the process. Keyed on FALLBACK_LLM_PROVIDER (e.g. "ollama" / "moonshot").
+# When unset OR set to the same value as LLM_PROVIDER, no fallback exists and
+# `_run_with_retry` raises after primary failure — matching pre-fallback
+# behavior.
+_fallback_agent_cache: ChatAgent[FileSummary] | None = None
+_fallback_checked: bool = False
+
+
+def get_fallback_agent() -> ChatAgent[FileSummary] | None:
+    """Return the cached fallback summarization agent, or None if not configured.
+
+    Reads `FALLBACK_LLM_PROVIDER` once per process. Returns None if:
+      - the env var is unset / empty
+      - the env var equals `LLM_PROVIDER` (no point falling back to itself)
+      - the env var names an unknown provider (warned once)
+
+    The agent is built lazily so users not opting into a fallback don't
+    pay the construction cost (model load, network warmup).
+    """
+    global _fallback_agent_cache, _fallback_checked
+    if _fallback_checked:
+        return _fallback_agent_cache
+    _fallback_checked = True
+
+    name = os.environ.get("FALLBACK_LLM_PROVIDER", "").strip().lower()
+    if not name:
+        return None
+
+    from src.llm import PROVIDERS  # deferred import to avoid load-time cycle
+    if name not in PROVIDERS:
+        sys.stderr.write(
+            f"  warn: FALLBACK_LLM_PROVIDER={name!r} unknown; "
+            f"valid: {sorted(PROVIDERS)}\n"
+        )
+        return None
+    if name == active_provider().name:
+        # Falling back to the same provider doesn't help — skip silently.
+        return None
+
+    prompt = LOCAL_SYSTEM_PROMPT if name == "local" else SYSTEM_PROMPT
+    _fallback_agent_cache = _build_chat_agent(
+        prompt, FileSummary, None, provider_override=name
+    )
+    sys.stderr.write(
+        f"  fallback summarization agent armed: provider={name!r}\n"
+    )
+    return _fallback_agent_cache
 
 
 def build_user_message(path: Path) -> list:
@@ -178,7 +244,7 @@ def source_rel_path(path: Path) -> str:
 
 
 def write_summary_at(out_path: Path, summary: FileSummary, source_rel: str) -> None:
-    SUMMARIES_DIR.mkdir(exist_ok=True)
+    SUMMARIES_DIR.mkdir(parents=True, exist_ok=True)
     out_path.write_text(render_markdown(summary, source_rel), encoding="utf-8")
 
 
@@ -258,28 +324,55 @@ MAX_429_RETRIES = 6
 
 
 async def _run_with_retry(agent: ChatAgent[FileSummary], message: list, label: str) -> FileSummary:
-    """Call agent.run() with automatic retry + backoff on 429 rate-limit errors.
+    """Call agent.run() with retry on 429 + optional provider fallback.
 
-    Only meaningful for cloud providers (ModelHTTPError never raised by local).
-    For local, the loop runs once and returns successfully.
+    Two-stage failure handling:
+
+      1. **429 backoff loop** on the primary agent — up to MAX_429_RETRIES
+         attempts with exponential-or-server-suggested wait. Only `ModelHTTPError`
+         with `status_code == 429` triggers retries; other HTTP / parse errors
+         break out immediately.
+
+      2. **Provider fallback** (if `FALLBACK_LLM_PROVIDER` is set): on ANY
+         primary failure that isn't a 429 worth retrying — including
+         `UnexpectedModelBehavior` (the SDK couldn't parse the response,
+         which is what OpenRouter free-tier returns on quota exhaustion),
+         non-429 HTTP errors, network errors — make ONE attempt against the
+         fallback agent. If it succeeds, the file is rescued. If it also
+         fails, raise the fallback's exception (chained from the primary's).
+
+    Without `FALLBACK_LLM_PROVIDER`, behavior is identical to before this
+    change — the primary failure propagates as a SummarizeError to the
+    walker, and the file lands in the `errors` bucket of the run summary.
     """
     try:
         from pydantic_ai.exceptions import ModelHTTPError
     except ImportError:  # pragma: no cover — pydantic_ai is always installed
         ModelHTTPError = None  # type: ignore[assignment]
 
+    last_error: Exception | None = None
+
     for attempt in range(1, MAX_429_RETRIES + 1):
         try:
             return await agent.run(message)
         except Exception as e:
-            if ModelHTTPError is None or not isinstance(e, ModelHTTPError):
-                raise
-            if e.status_code != 429 or attempt == MAX_429_RETRIES:
-                raise
-            # Try to parse retryDelay from the response body; fall back to exponential backoff.
+            last_error = e
+
+            is_retryable_429 = (
+                ModelHTTPError is not None
+                and isinstance(e, ModelHTTPError)
+                and getattr(e, "status_code", None) == 429
+                and attempt < MAX_429_RETRIES
+            )
+            if not is_retryable_429:
+                # Either non-429, or the final 429 attempt — break out and try
+                # the fallback (if configured), then re-raise.
+                break
+
+            # Parse retryDelay from the response body; fall back to exponential.
             wait = 2 ** attempt
-            if isinstance(e.body, dict):
-                meta = e.body.get("metadata", {})
+            if isinstance(getattr(e, "body", None), dict):
+                meta = e.body.get("metadata", {})  # type: ignore[union-attr]
                 raw = meta.get("raw", "")
                 if isinstance(raw, str):
                     import re
@@ -289,6 +382,24 @@ async def _run_with_retry(agent: ChatAgent[FileSummary], message: list, label: s
             from tqdm import tqdm
             tqdm.write(f"  429 on {label}, retry {attempt}/{MAX_429_RETRIES} in {wait}s")
             await asyncio.sleep(wait)
+
+    # Primary failed. Last-ditch attempt on the fallback agent if configured.
+    fallback = get_fallback_agent()
+    if fallback is not None and last_error is not None:
+        from tqdm import tqdm
+        primary_kind = type(last_error).__name__
+        tqdm.write(f"  fallback firing on {label} (primary raised {primary_kind})")
+        try:
+            return await fallback.run(message)
+        except Exception as fallback_err:
+            tqdm.write(
+                f"  fallback also failed on {label}: "
+                f"{type(fallback_err).__name__}: {fallback_err}"
+            )
+            raise fallback_err from last_error
+
+    if last_error is not None:
+        raise last_error
     raise RuntimeError("unreachable")
 
 

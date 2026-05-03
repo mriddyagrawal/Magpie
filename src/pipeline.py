@@ -42,7 +42,13 @@ class PipelineResult:
     sources_used: list[str]             # Subset of retrieved paths Kimi cited
 
 
-async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> PipelineResult:
+async def ask(
+    question: str,
+    *,
+    top_k: int = 5,
+    rewrite: bool = False,
+    fast: bool = False,
+) -> PipelineResult:
     """Run the full retrieve -> answer pipeline for one question.
 
     1. **Query construction.** If `rewrite=True`, Kimi expands the question
@@ -51,7 +57,9 @@ async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> Pipeli
        embedders — faster, and usually fine for question sets that already
        contain good entity names / document terms.
     2. `run_search(sq, top_k)` — Qdrant hybrid search (dense + BM25 via RRF)
-       over the summary index.
+       over the summary index. When `fast=False` (default), the ColPali
+       visual tier is skipped — saves the ~25s first-query model load and
+       ~1s/query encode. Visual search is opt-in.
     3. `answer_question(agent, question, paths)` — read the retrieved files,
        send them with the question to Kimi, get a grounded answer + citations.
 
@@ -62,7 +70,9 @@ async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> Pipeli
         sq: SearchQuery = await asyncio.to_thread(rewrite_query, question)
     else:
         sq = raw_query(question)
-    retrieved = await asyncio.to_thread(run_search, sq, top_k)
+    retrieved = await asyncio.to_thread(
+        run_search, sq, top_k, question=question, skip_fast=not fast
+    )
     if not retrieved:
         return PipelineResult(
             question=question,
@@ -85,8 +95,14 @@ async def ask(question: str, *, top_k: int = 5, rewrite: bool = False) -> Pipeli
     )
 
 
-def ask_sync(question: str, *, top_k: int = 5, rewrite: bool = False) -> PipelineResult:
-    return asyncio.run(ask(question, top_k=top_k, rewrite=rewrite))
+def ask_sync(
+    question: str,
+    *,
+    top_k: int = 5,
+    rewrite: bool = False,
+    fast: bool = False,
+) -> PipelineResult:
+    return asyncio.run(ask(question, top_k=top_k, rewrite=rewrite, fast=fast))
 
 
 DEFAULT_SOURCE_DIR = "Test Content"
@@ -206,10 +222,10 @@ def reset() -> dict:
     abort the local cleanup (so a reset still works offline or when the
     cluster is unreachable).
     """
-    from src.manifest import DEFAULT_MANIFEST_PATH, REPO_ROOT
+    from src.manifest import DEFAULT_MANIFEST_PATH, SUMMARIES_DIR
     from src.stage2.db import COLLECTION_NAME, get_qdrant_client
 
-    summaries_dir = REPO_ROOT / "Test Summaries"
+    summaries_dir = SUMMARIES_DIR
 
     # Delete every summary .md file (keep the directory itself).
     deleted_summaries = 0

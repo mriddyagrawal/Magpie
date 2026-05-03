@@ -20,10 +20,9 @@ export interface QueryResponse {
 }
 
 export interface StatusResponse {
-  llm_provider: string;
-  llm_model: string;
-  qdrant_provider: string;
+  ready: boolean;
   indexed_count: number;
+  version: string;
 }
 
 export interface CsvPreview {

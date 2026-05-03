@@ -40,6 +40,7 @@ HISTORY_FILE = Path.home() / ".notspotlight_history"
 DOT_COMMANDS: list[tuple[str, str]] = [
     (".help", "Show help"),
     (".rewrite", "Toggle Kimi query rewriting (on/off)"),
+    (".fast", "Toggle ColPali visual tier (on/off) — off saves ~30s startup"),
     (".history", "Toggle conversation history (on/off/clear)"),
     (".top-k", "Set number of results to retrieve"),
     (".suggest", "Show question hints (add 'refresh' to regenerate)"),
@@ -71,11 +72,15 @@ _rewrite = False
 _top_k = 5
 _history_enabled = False
 _history: list[tuple[str, str]] = []  # (question, answer) pairs from this session
+_rerank = False  # Cross-encoder reranker; opt-in (see backlog B4 / src/stage2/rerank.py)
+_fast = False    # ColPali visual tier; opt-in. Off saves the ~30s first-query
+                 # weight load + ~1s/query encode. Visual-document searches
+                 # (scanned PDFs, image-heavy decks) need this on.
 
 
 def _handle_dot_command(cmd: str) -> bool:
     """Handle dot-commands. Returns True if the input was a command."""
-    global _rewrite, _top_k, _history_enabled, _history
+    global _rewrite, _top_k, _history_enabled, _history, _rerank, _fast
 
     parts = cmd.strip().split()
     if not parts or not parts[0].startswith("."):
@@ -119,6 +124,34 @@ def _handle_dot_command(cmd: str) -> bool:
                     print_setting("top-k", str(_top_k))
                 except ValueError:
                     print_error("usage: .top-k N (integer)")
+        case ".rerank":
+            if len(parts) < 2:
+                print_setting("rerank", "on" if _rerank else "off")
+            elif parts[1] in ("on", "true", "1"):
+                _rerank = True
+                print_setting(
+                    "rerank",
+                    "on (cross-encoder; first query downloads ~80MB model)",
+                )
+            elif parts[1] in ("off", "false", "0"):
+                _rerank = False
+                print_setting("rerank", "off")
+            else:
+                print_error("usage: .rerank on/off")
+        case ".fast":
+            if len(parts) < 2:
+                print_setting("fast", "on" if _fast else "off")
+            elif parts[1] in ("on", "true", "1"):
+                _fast = True
+                print_setting(
+                    "fast",
+                    "on (ColPali visual tier; first query loads ~500MB model)",
+                )
+            elif parts[1] in ("off", "false", "0"):
+                _fast = False
+                print_setting("fast", "off")
+            else:
+                print_error("usage: .fast on/off")
         case ".clear":
             console.clear()
         case ".suggest":
@@ -201,10 +234,26 @@ async def _run_query_async(question: str) -> None:
     _detail("dense vector", f"{len(dense_vec)} dims")
     _detail("sparse terms", f"{len(sparse_idx)} active terms")
 
-    # Step 3: Qdrant search
+    # Step 3: Qdrant search. Passing the raw question lets the adaptive
+    # classifier widen top_k for enumeration queries (see B1 in backlog).
+    # If `.rerank on`, fan out to top_k*10 candidates and rerank with a
+    # cross-encoder (see B4).
     t0 = time.monotonic()
-    with console.status("[bold blue]  ◦ Searching Qdrant (dense + BM25 hybrid)...", spinner="dots"):
-        retrieved = await asyncio.to_thread(run_search, sq, _top_k)
+    if _rerank:
+        search_label = "Searching Qdrant + cross-encoder rerank"
+    elif _fast:
+        search_label = "Searching Qdrant (text + ColPali visual)"
+    else:
+        search_label = "Searching Qdrant (text only — fast)"
+    with console.status(f"[bold blue]  ◦ {search_label}...", spinner="dots"):
+        retrieved = await asyncio.to_thread(
+            run_search,
+            sq,
+            _top_k,
+            question=question,
+            rerank=_rerank,
+            skip_fast=not _fast,
+        )
     _step("Qdrant searched", t0)
     tier_counts: dict[str, int] = {}
     for r in retrieved:
@@ -376,6 +425,64 @@ def _cmd_reset(assume_yes: bool) -> int:
 
 def _run_repl() -> None:
     print_banner()
+
+    # Background-prewarm everything the first query is likely to need.
+    # The user reads the banner and types — call it ~3 sec of natural
+    # latency we can hide work behind. We load:
+    #
+    #   - FastEmbed dense + sparse encoders   (~1-2 sec total, always needed)
+    #   - Qdrant client + TLS handshake       (~100-300 ms, always needed)
+    #   - Kimi answer agent                   (~100 ms module setup)
+    #   - Kimi rewrite agent  (only if `_rewrite` is on at startup)
+    #   - Cross-encoder       (only if `_rerank` is on at startup; ~3 sec)
+    #
+    # Each step is independent and skipped on failure — the actual code
+    # paths revalidate when called, so a failed prewarm just means the
+    # query takes a hair longer.
+    import threading
+
+    def _prewarm() -> None:
+        # Catch SystemExit too — get_qdrant_client() calls sys.exit() if env
+        # is missing, and BaseException is the only superclass that covers
+        # both Exception and SystemExit. The prewarm is best-effort; we
+        # never want a failure here to crash anything visible.
+        try:
+            from src.stage2.embeddings import get_dense_model, get_sparse_model
+            get_dense_model()
+            get_sparse_model()
+        except BaseException:  # pylint: disable=broad-except
+            pass
+        try:
+            from src.stage2.db import get_qdrant_client
+            client = get_qdrant_client()
+            try:
+                client.get_collections()  # force TLS/auth round-trip now
+            except BaseException:  # pylint: disable=broad-except
+                pass
+        except BaseException:  # pylint: disable=broad-except
+            pass
+        try:
+            from src.answer import build_answer_agent
+            build_answer_agent()
+        except BaseException:  # pylint: disable=broad-except
+            pass
+
+        # Opt-in components. Only prewarm if the user already has them
+        # toggled on at startup — otherwise they pay no startup cost.
+        if _rewrite:
+            try:
+                from src.stage2.search import _build_rewrite_agent
+                _build_rewrite_agent()
+            except BaseException:  # pylint: disable=broad-except
+                pass
+        if _rerank:
+            try:
+                from src.stage2.rerank import _load_model
+                _load_model()  # ~3 sec — worth hiding behind typing
+            except BaseException:  # pylint: disable=broad-except
+                pass
+
+    threading.Thread(target=_prewarm, daemon=True).start()
 
     session: PromptSession = PromptSession(
         history=FileHistory(str(HISTORY_FILE)),

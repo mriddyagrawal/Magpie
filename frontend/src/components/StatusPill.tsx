@@ -22,7 +22,7 @@ export function StatusPill() {
 
   return (
     <div className="status-pill">
-      <span className={`status-pill__dot ${status.ready ? "" : "status-pill__dot--off"}`} />
+      <span className={`status-pill__dot${status.ready ? "" : " status-pill__dot--off"}`} />
       <span className="status-pill__text">
         {status.indexed_count.toLocaleString()} {docsLabel} indexed
       </span>

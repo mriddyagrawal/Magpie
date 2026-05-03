@@ -25,7 +25,7 @@ export function SourcesCard({ sources, selectedPath, onSelect, highlights }: Pro
       // Don't hijack arrow keys when the user is typing in the question input.
       if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA") return;
 
-      const curr = Math.max(0, selectedIdx);
+      const curr = selectedIdx; // -1 when nothing selected; ArrowDown from -1 correctly lands on index 0
       if (e.key === "ArrowDown") {
         e.preventDefault();
         onSelect(sources[Math.min(sources.length - 1, curr + 1)].path);

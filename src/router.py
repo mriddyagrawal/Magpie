@@ -40,7 +40,7 @@ CriticalitySource = Literal["user", "auto", "default"]
 TEXT_EXTS = {".txt", ".md", ".markdown", ".log"}
 
 # Extensionless dotfiles we recognize as text content. Mirrors the walker's
-# `_USEFUL_DOTFILE_NAMES` allowlist — kept here too so `peek()` and `decide()`
+# \`_USEFUL_DOTFILE_NAMES\` allowlist — kept here too so \`peek()\` and \`decide()\`
 # can route these files as text without having to import from walker (which
 # would create a circular dependency since walker already imports from us).
 # When the walker eventually imports its allowlist from this module, the
@@ -84,6 +84,7 @@ CODE_SIZE_T0_THRESHOLD = 500 * 1024          # 500 KB
 CONFIG_SIZE_T0_THRESHOLD = 50 * 1024         # 50 KB
 
 CSV_ROWS_T1_MAX = 1_000
+CSV_SIZE_T1_MAX = 20 * 1024 * 1024       # 20 MB
 CSV_ROWS_T2_MAX = 100_000
 
 PDF_SHORT_PAGE_THRESHOLD = 5                 # ≤5 pages → typically discriminator-heavy
@@ -121,7 +122,7 @@ PEEK_TEXT_MAX_CHARS = 5000
 
 @dataclass(frozen=True)
 class PeekResult:
-    """Deterministic inspection result for one file. All fields populated by `peek()`."""
+    """Deterministic inspection result for one file. All fields populated by \`peek()\`."""
 
     path: Path
     ext: str                          # lowercased suffix including leading dot
@@ -147,7 +148,7 @@ class PeekResult:
 
 @dataclass(frozen=True)
 class RouteDecision:
-    """One file's dispatch verdict. `routes` is the list of tier workers to run."""
+    """One file's dispatch verdict. \`routes\` is the list of tier workers to run."""
 
     routes: list[Tier]
     visual_score: int
@@ -497,8 +498,7 @@ def _peek_pptx(path: Path) -> PeekResult:
         path=path, ext=path.suffix.lower(), size_bytes=size,
         page_count=n_slides,
         text_density=len(peek_text) // max(n_slides, 1),
-        extractable=extractable,
-        image_ratio=image_ratio,
+        extractable=extractable, image_ratio=image_ratio,
         row_count=None, image_dims=None,
         peek_text=peek_text, peek_error=err,
     )
@@ -614,10 +614,10 @@ def peek(path: Path) -> PeekResult:
     """Dispatch to the right peeker based on extension. Pure-ish: does read I/O only."""
     ext = path.suffix.lower()
 
-    # Extensionless dotfiles like `.bashrc`, `.zshrc`, `.gitconfig` are plain
-    # text — peek them as such even though `path.suffix` is empty. The walker
+    # Extensionless dotfiles like \`.bashrc\`, \`.zshrc\`, \`.gitconfig\` are plain
+    # text — peek them as such even though \`path.suffix\` is empty. The walker
     # has already gated which dotfiles reach this point (allowlist or
-    # `include_dotfiles: true`), so we don't re-check the allowlist here.
+    # \`include_dotfiles: true\`), so we don't re-check the allowlist here.
     if path.name in USEFUL_DOTFILE_NAMES:
         return _peek_text_file(path)
 
@@ -751,7 +751,7 @@ _NASCONFIG_FILENAME = ".nasconfig.yaml"
 
 
 def load_nasconfig(path: Path, *, stop_at: Path | None = None) -> dict:
-    """Walk parent folders looking for `.nasconfig.yaml`. First match wins (nearest folder).
+    """Walk parent folders looking for \`.nasconfig.yaml\`. First match wins (nearest folder).
 
     Returns a dict with any of: {"accuracy": "critical"|"normal"|"casual",
     "t4_budget_gb_override": float, "colpali": "always"|"never"}.
@@ -928,16 +928,18 @@ def decide(
     # --- CSV ---------------------------------------------------------------
 
     if ext in CSV_EXTS:
-        rc = p.row_count or 0
-        if rc <= CSV_ROWS_T1_MAX:
+        # User directive: Anything below 20 MB should be done row-by-row (T1).
+        if p.size_bytes < CSV_SIZE_T1_MAX:
             tier = "T1"
-            notes.append(f"csv {rc} rows → T1 (row-level embed)")
-        elif rc <= CSV_ROWS_T2_MAX:
-            tier = "T2"
-            notes.append(f"csv {rc} rows → T2 (sample summary + rows)")
+            notes.append(f"csv size {p.size_bytes / 1024 / 1024:.1f} MB < 20 MB → T1 (row-level embed)")
         else:
-            tier = "T0"
-            notes.append(f"csv {rc} rows → T0 (sample summary only)")
+            rc = p.row_count or 0
+            if rc <= CSV_ROWS_T2_MAX:
+                tier = "T2"
+                notes.append(f"csv {rc} rows → T2 (sample summary + rows)")
+            else:
+                tier = "T0"
+                notes.append(f"csv {rc} rows → T0 (sample summary only)")
         return RouteDecision(
             routes=[tier], visual_score=vs, sensitivity_score=ss,
             t4_cost_mb=0.0, t4_cost_s=0.0,
@@ -1191,7 +1193,7 @@ def decide(
 
 
 # ---------------------------------------------------------------------------
-# CLI: `python -m src.router <file>` — inspect a single file's routing decision
+# CLI: \`python -m src.router <file>\` — inspect a single file's routing decision
 # ---------------------------------------------------------------------------
 
 def _detect_gpu() -> bool:
@@ -1252,9 +1254,9 @@ def _cli_explain_file(path: Path, gpu: bool) -> int:
 
 
 def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
-    """Walk `root`, print one compact line per candidate, tally by tier.
+    """Walk \`root\`, print one compact line per candidate, tally by tier.
 
-    Respects `.gitignore` / `.nasignore` + built-in defaults (same rules the
+    Respects \`.gitignore\` / \`.nasignore\` + built-in defaults (same rules the
     ingest walker uses). No side effects — nothing is written, no LLM.
     """
     # Deferred imports: only hit the walker/ignore modules in directory mode.

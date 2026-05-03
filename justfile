@@ -138,8 +138,14 @@ uninstall:
 # distribution later (see backlog E5).
 # ----------------------------------------------------------------------------
 
-# Where to keep the Qdrant binary, data, and pidfile. Override with env vars.
-QDRANT_HOME      := env_var_or_default("QDRANT_HOME", "/mnt/hardisk/qdrant")
+# Resolve the app's data directory once.
+DATA_DIR         := `uv run python -c 'from src.manifest import APP_DATA_DIR; print(APP_DATA_DIR)'`
+SUMMARIES_DIR    := `uv run python -c 'from src.manifest import SUMMARIES_DIR; print(SUMMARIES_DIR)'`
+MANIFEST_PATH    := `uv run python -c 'from src.manifest import DEFAULT_MANIFEST_PATH; print(DEFAULT_MANIFEST_PATH)'`
+
+# Where to keep the Qdrant binary, data, and pidfile. Defaults to a subfolder 
+# in the app's data directory. Override with QDRANT_HOME env var.
+QDRANT_HOME      := env_var_or_default("QDRANT_HOME", DATA_DIR / "qdrant")
 QDRANT_BIN       := QDRANT_HOME / "qdrant"
 QDRANT_DATA      := env_var_or_default("QDRANT_DATA", QDRANT_HOME / "storage")
 QDRANT_LOGS      := QDRANT_HOME / "qdrant.log"
@@ -155,19 +161,25 @@ qdrant-install:
         "{{QDRANT_BIN}}" --version; \
     else \
         echo "Downloading Qdrant {{QDRANT_VERSION}} into {{QDRANT_HOME}}..."; \
+        OS=`uname -s | tr '[:upper:]' '[:lower:]'`; \
+        ARCH=`uname -m`; \
+        if [ "$ARCH" = "arm64" ]; then ARCH="aarch64"; elif [ "$ARCH" = "x86_64" ]; then ARCH="x86_64"; fi; \
+        FILE="qdrant-$ARCH-apple-darwin.tar.gz"; \
+        if [ "$OS" = "linux" ]; then FILE="qdrant-$ARCH-unknown-linux-gnu.tar.gz"; fi; \
         curl -L -o "{{QDRANT_HOME}}/qdrant.tar.gz" \
-            "https://github.com/qdrant/qdrant/releases/download/{{QDRANT_VERSION}}/qdrant-x86_64-unknown-linux-gnu.tar.gz"; \
+            "https://github.com/qdrant/qdrant/releases/download/{{QDRANT_VERSION}}/$FILE"; \
         tar -xzf "{{QDRANT_HOME}}/qdrant.tar.gz" -C "{{QDRANT_HOME}}"; \
         rm "{{QDRANT_HOME}}/qdrant.tar.gz"; \
         chmod +x "{{QDRANT_BIN}}"; \
-        echo "Installed: $({{QDRANT_BIN}} --version)"; \
+        echo "Installed: \"{{QDRANT_BIN}}\" --version"; \
+        "{{QDRANT_BIN}}" --version; \
     fi
 
 # Start Qdrant as a background process. Data + logs go to QDRANT_DATA/QDRANT_LOGS.
 qdrant-up:
     @mkdir -p "{{QDRANT_DATA}}"
     @if [ -f "{{QDRANT_PIDFILE}}" ] && kill -0 $(cat "{{QDRANT_PIDFILE}}") 2>/dev/null; then \
-        echo "Qdrant already running (pid $(cat {{QDRANT_PIDFILE}})). Use 'just qdrant-status' to inspect."; \
+        echo "Qdrant already running (pid $(cat "{{QDRANT_PIDFILE}}")). Use 'just qdrant-status' to inspect."; \
     elif [ ! -x "{{QDRANT_BIN}}" ]; then \
         echo "Qdrant binary missing at {{QDRANT_BIN}}. Run 'just qdrant-install' first."; \
         exit 1; \
@@ -179,7 +191,7 @@ qdrant-up:
             echo $! > "{{QDRANT_PIDFILE}}"; \
         sleep 2; \
         if kill -0 $(cat "{{QDRANT_PIDFILE}}") 2>/dev/null; then \
-            echo "Started (pid $(cat {{QDRANT_PIDFILE}})). Logs: {{QDRANT_LOGS}}"; \
+            echo "Started (pid $(cat "{{QDRANT_PIDFILE}}")). Logs: {{QDRANT_LOGS}}"; \
             echo "Set in .env: QDRANT_PROVIDER=cloud  QDRANT_CLUSTER_ENDPOINT=http://localhost:{{QDRANT_PORT}}"; \
         else \
             echo "Qdrant failed to start. Last 30 lines of {{QDRANT_LOGS}}:"; \
@@ -213,7 +225,7 @@ qdrant-down:
 # Show current Qdrant status (running? collections? recent log lines?).
 qdrant-status:
     @if [ -f "{{QDRANT_PIDFILE}}" ] && kill -0 $(cat "{{QDRANT_PIDFILE}}") 2>/dev/null; then \
-        echo "Qdrant: RUNNING (pid $(cat {{QDRANT_PIDFILE}}), port {{QDRANT_PORT}})"; \
+        echo "Qdrant: RUNNING (pid $(cat "{{QDRANT_PIDFILE}}"), port {{QDRANT_PORT}})"; \
         echo; \
         echo "=== Collections ==="; \
         curl -sS "http://localhost:{{QDRANT_PORT}}/collections" | python3 -m json.tool 2>/dev/null || echo "(server not responding yet)"; \
@@ -231,8 +243,8 @@ qdrant-status:
 # List fast-tier files ranked by pages indexed (biggest consumers first)
 fast-tier-files:
     @uv run python -c "\
-    import json;\
-    m = json.load(open('Test Summaries/_manifest.json'));\
+    import json; from pathlib import Path;\
+    m = json.load(open('{{MANIFEST_PATH}}'));\
     files = [(e.get('fast_pages') or 0, p, e.get('size', 0)) for p, e in m.items() if e.get('fast_pages')];\
     files.sort(reverse=True);\
     print(f'{\"pages\":>6}  {\"est_mb\":>7}  {\"src_mb\":>7}  path');\
@@ -291,7 +303,7 @@ clean-stale-manifest:
     stats = m.clean_stale();\
     m.save();\
     print(f'cleaned manifest: dropped {stats[\"dropped\"]} stale entries, removed {stats[\"summaries_removed\"]} orphan summary markdowns');\
-    print('run \\'python -m src.stage2 ingest\\' to also clean orphan Qdrant points (or do it on next ingest)');\
+    print('run \'python -m src.stage2 ingest\' to also clean orphan Qdrant points (or do it on next ingest)');\
     "
 
 # Inverse of clean-stale-manifest: clear `summary_file` pointers when the
@@ -308,7 +320,7 @@ clean-stale-summaries:
     stats = m.clean_missing_summaries();\
     m.save();\
     print(f'manifest cleaned: {stats[\"resummarize\"]} rows marked for re-summarization, {stats[\"dropped\"]} rows dropped (source also missing)');\
-    print('run \\'python -m src.ingest <your-corpus-root>\\' to re-summarize the marked files');\
+    print('run \'python -m src.ingest <your-corpus-root>\' to re-summarize the marked files');\
     "
 
 # Both directions in one shot: drop rows for missing sources AND clear
@@ -362,13 +374,13 @@ manifest-stats:
 # Show disk usage of pipeline artifacts (summaries, Qdrant, model cache, venv)
 disk-usage:
     @echo "=== Summaries (T0-T3 markdown outputs) ==="
-    @du -sh "Test Summaries" 2>/dev/null || echo "  (none)"
+    @du -sh "{{SUMMARIES_DIR}}" 2>/dev/null || echo "  (none)"
     @echo
     @echo "=== Qdrant local DB (summary + fast tier) ==="
-    @du -sh qdrant_data/collection/* 2>/dev/null || echo "  (no collections)"
+    @du -sh "{{DATA_DIR}}/qdrant_data/collection/"* 2>/dev/null || echo "  (no collections)"
     @echo
     @echo "=== HF model cache (one-time, shared) ==="
-    @du -sh ~/.cache/huggingface/hub/* 2>/dev/null | sort -h || echo "  (none)"
+    @du -sh "{{DATA_DIR}}/cache/hub/"* 2>/dev/null | sort -h || echo "  (none)"
     @echo
     @echo "=== Project venv ==="
     @du -sh .venv 2>/dev/null || echo "  (no venv)"
@@ -376,14 +388,15 @@ disk-usage:
     @echo "=== Manifest stats ==="
     @uv run python -c "\
     import json; from pathlib import Path;\
-    m = json.load(open('Test Summaries/_manifest.json'));\
+    m = json.load(open('{{MANIFEST_PATH}}'));\
     src_bytes = sum(e.get('size', 0) for e in m.values());\
     fast_pages = sum(e.get('fast_pages') or 0 for e in m.values());\
     summarized = sum(1 for e in m.values() if e.get('summary_file'));\
     in_fast = sum(1 for e in m.values() if e.get('fast_indexed_at'));\
     skipped = sum(1 for e in m.values() if e.get('skip_reason'));\
-    summaries_mb = sum(p.stat().st_size for p in Path('Test Summaries').glob('*.md')) / 1024**2;\
-    ft_dir = Path('qdrant_data/collection/fast_tier');\
+    summaries_dir = Path('{{SUMMARIES_DIR}}');\
+    summaries_mb = sum(p.stat().st_size for p in summaries_dir.glob('*.md')) / 1024**2 if summaries_dir.exists() else 0;\
+    ft_dir = Path('{{DATA_DIR}}/qdrant_data/collection/fast_tier');\
     ft_bytes = sum(p.stat().st_size for p in ft_dir.rglob('*') if p.is_file()) if ft_dir.exists() else 0;\
     print(f'  Files in manifest:   {len(m):,}');\
     print(f'  Source corpus size:  {src_bytes / 1024**3:.2f} GB');\
@@ -393,3 +406,14 @@ disk-usage:
     print(f'  Avg summary:         {summaries_mb*1024 / max(summarized,1):.0f} KB/file');\
     print(f'  Avg fast-tier page:  {ft_bytes / 1024 / max(fast_pages,1):.0f} KB')\
     "
+
+# Show point counts for all Qdrant collections
+qdrant-counts:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "=== Qdrant Collection Counts ==="
+    for coll in summaries fast_tier; do
+        count=$(curl -s "http://localhost:{{QDRANT_PORT}}/collections/$coll" | \
+               python3 -c "import sys, json; data=json.load(sys.stdin); print(data.get('result', {}).get('points_count', 'not found'))" 2>/dev/null)
+        echo "$coll: $count"
+    done

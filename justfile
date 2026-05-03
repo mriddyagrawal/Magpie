@@ -1,9 +1,48 @@
 # NotAnotherSpotlight — command runner
 
-# Install all dependencies
-sync:
+# Install all dependencies (Python venv + CLI tool). Renamed from `sync`
+# in 2026-05 — `sync` now means "ingest everything in indexing_rules.json".
+# See Plans/Ingestion Rules/Implementation Plan.md.
+sync-environment:
     uv sync
     uv pip install -e cli
+
+# Walk every enabled include_paths entry in indexing_rules.json. This is
+# the "do everything" command — replaces running `just walk <path>` once
+# per directory. Reads from $MAGPIE_DATA_DIR/indexing_rules.json (default
+# ~/.local/share/Magpie on Linux, ~/Library/Application Support/Magpie on
+# macOS). If no include_paths are configured, prints a hint and exits 0.
+sync:
+    @uv run python -c "\
+    from src.config import load_user_rules; \
+    rules = load_user_rules(); \
+    enabled = [ip for ip in rules.include_paths if ip.enabled]; \
+    print('No included folders configured. Add one with: just walk <folder>') if not enabled else \
+    [print(f'== walking {ip.path} ==') for ip in enabled]; \
+    " && \
+    uv run python -c "\
+    from src.config import load_user_rules; \
+    import subprocess, sys; \
+    rules = load_user_rules(); \
+    [subprocess.run(['uv','run','python','-m','src.ingest', ip.path], check=False) \
+     for ip in rules.include_paths if ip.enabled]"
+
+# Check whether a single file or folder will be indexed under the current
+# rules. Prints the (allowed/skipped) decision and the reason that fired
+# (which rule layer rejected/accepted it). Useful for debugging "why isn't
+# this file showing up in search?" without running a real walk.
+#
+# Example: just check ~/Documents/secret.pdf
+check path:
+    @uv run python -m scripts.check_indexing "{{path}}"
+
+# Walk a directory and print the (allow/skip + reason) decision for every
+# file inside, without running any LLM/embedding/Qdrant work. The dry-run
+# explainer — answers "if I ran sync now, exactly what would happen?"
+#
+# Example: just check-dir ~/Documents
+check-dir path:
+    @uv run python -m scripts.check_indexing --recursive "{{path}}"
 
 # Run all tests
 test:

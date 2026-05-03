@@ -1,19 +1,77 @@
-"""Tests for src/ingest/ignore.py — cascading .gitignore + .nasignore + defaults.
+"""Tests for the safety-rail behavior previously owned by src/ingest/ignore.py.
 
-Covers:
-  * Built-in defaults (node_modules/, .git/, __pycache__/, etc.) always fire
-  * `.gitignore` at root is honored
-  * `.nasignore` is honored and composes with `.gitignore`
-  * Deeper `.gitignore` files apply below their own directory
-  * Negation patterns ("!foo") unignore a subset
-  * Rules don't bleed outside the walk root
+This file's tests are BEHAVIOR tests (does node_modules get blocked? does
+.gitignore cascade? does .nasignore compose?) — not API tests of any
+specific class. The IgnoreRules class itself was removed in the 2026-05
+ingestion-rules refactor; the same behavior now lives in
+`src.config.IndexingRules.should_index()`.
+
+Rather than rewrite 23 test bodies, we expose a thin compat shim below
+that re-implements the OLD `IgnoreRules.from_root(root).is_ignored(path)`
+surface on top of the new `IndexingRules` machinery. The shim lets these
+tests continue to validate the OS-junk safety rails (Windows mount cruft,
+Unix recovery, macOS resource forks, JVM artifacts, etc.) end-to-end —
+those patterns are exactly what `magpie_defaults.json` exists to catch.
+
+If you're writing NEW tests, prefer `tests/test_indexing_rules_should_index.py`
+which directly exercises the new precedence chain.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from src.ingest.ignore import DEFAULT_IGNORE_PATTERNS, IgnoreRules
+# DEFAULT_IGNORE_PATTERNS is preserved as a deprecated re-export — used by
+# the existence-of-known-patterns smoke tests below.
+from src.ingest.ignore import DEFAULT_IGNORE_PATTERNS
+from src.config import (
+    IncludePath,
+    IndexingRules as _NewIndexingRules,
+    UserRules,
+    load_magpie_defaults,
+)
+
+
+class IgnoreRules:
+    """Compat shim: emulates the old `IgnoreRules` API on top of the new
+    `IndexingRules`. Exists ONLY for these legacy tests; production code
+    no longer references it.
+
+    Mapping:
+      - `IgnoreRules.from_root(root)` → IndexingRules with one include_path
+        rooted there + the real shipped magpie_defaults.
+      - `is_ignored(path)` → True if `should_index` rejects (with the
+        outside-of-root special case preserved as `False`, matching the
+        old contract).
+    """
+
+    def __init__(self, root: Path, inner: _NewIndexingRules) -> None:
+        self._root = root.resolve()
+        self._inner = inner
+
+    @classmethod
+    def from_root(cls, root: Path) -> "IgnoreRules":
+        defaults = load_magpie_defaults()
+        user = UserRules(
+            include_paths=[IncludePath(path=str(root), enabled=True)],
+        )
+        inner = _NewIndexingRules(
+            defaults=defaults,
+            user=user,
+            user_path=root / "_test_compat_fake.json",
+        )
+        return cls(root, inner)
+
+    def is_ignored(self, path: Path) -> bool:
+        # Old contract: paths outside the walk root return False (we don't
+        # have an opinion). Walker never called this with outside-root
+        # paths in practice, but the test suite asserts it.
+        try:
+            path.resolve().relative_to(self._root)
+        except (ValueError, OSError):
+            return False
+        ok, _ = self._inner.should_index(path)
+        return not ok
 
 
 def _touch(p: Path, contents: str = "") -> Path:

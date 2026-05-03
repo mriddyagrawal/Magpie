@@ -1,0 +1,41 @@
+# Anything not needed inside the image. Keeps the build context small
+# (faster docker builds, faster fly deploys) and avoids accidentally
+# baking secrets into the image.
+
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtualenvs — we install fresh inside the image
+.venv/
+venv/
+env/
+
+# Tests don't run in production
+tests/
+
+# Local dev files
+.env
+.env.local
+*.log
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Documentation that doesn't need to ship
+README.md
+*.md

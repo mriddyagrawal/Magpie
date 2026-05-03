@@ -282,3 +282,16 @@ f. **Page-anchored slicing for huge text-native files.** For 500-page textbooks 
 ### Out of scope
 
 LFM2-ColBERT-350M is text-only late-interaction and cannot replace ColQwen2.5 (visual late-interaction over page patches). Retrieval architecture is unchanged. No `fast_tier` or `summaries` collection changes are part of this evaluation.
+
+---
+
+## 10. Self-contained Packaging (Bundled Python & Sidecar)
+
+**What:** Package the application so that the `.app` and `.dmg` bundles are entirely self-contained, including the Python interpreter and all necessary dependencies. This likely involves using `PyInstaller`, `Nuitka`, or Tauri's built-in sidecar support with a pre-bundled Python environment (like a `conda` or `uv` export).
+
+**Why:**
+- **Zero-dependency install.** Currently, the app expects `uv` and `python3` to be in the user's `$PATH` and the source code to be present in a specific location. A real desktop app should work with a simple "drag to Applications" flow on any Mac, regardless of the user's developer tools.
+- **Sidecar reliability.** By bundling the Python sidecar as a compiled binary (or a private internal environment), we eliminate "it works on my machine" issues caused by version mismatches in Python libraries or missing system dependencies.
+- **Security & Sandboxing.** A self-contained bundle is a prerequisite for proper macOS code signing and notarization, which removes the "damaged / unidentified developer" warnings that currently plague non-developer users.
+
+**When to revisit:** As soon as we want to share the app with non-technical users or move beyond a "developer-preview" state.

@@ -234,7 +234,7 @@ def preview(
                     rows.append(row)
         except (UnicodeDecodeError, csv.Error) as e:
             raise HTTPException(status_code=415, detail=f"csv parse error: {e}") from e
-        return JSONResponse({"columns": header, "rows": rows, "truncated": i + 1 >= max_rows if rows else False})
+        return JSONResponse({"columns": header, "rows": rows, "truncated": len(rows) >= max_rows})
 
     if ext in TEXT_EXTS:
         try:

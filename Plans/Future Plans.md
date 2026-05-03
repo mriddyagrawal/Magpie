@@ -296,6 +296,17 @@ LFM2-ColBERT-350M is text-only late-interaction and cannot replace ColQwen2.5 (v
 
 **When to revisit:** As soon as we want to share the app with non-technical users or move beyond a "developer-preview" state.
 
+## Addendum to Plan #10 (Self-contained packaging) — `magpie_defaults.json`
+
+The 2026-05 ingestion-rules refactor introduced [src/config/magpie_defaults.json](../src/config/magpie_defaults.json). Today it lives in the source tree; `load_magpie_defaults()` resolves it via `Path(__file__).parent`. That works in dev mode and inside an editable install, but breaks for a packaged binary (PyInstaller / Nuitka / Tauri-bundled-Python) where the file may live alongside the executable in a different layout per OS.
+
+When implementing Plan #10, also handle:
+- Bundle `magpie_defaults.json` as a Python package resource (ship via `[tool.uv.sources]` or `package_data` so `importlib.resources` can find it).
+- OR pass an env var (`MAGPIE_DEFAULTS_PATH`) from the Tauri Rust shell when spawning the sidecar, pointing at the bundled resource location.
+- OR accept the dev-mode `Path(__file__).parent` fallback as the "if everything else fails" path.
+
+The fallback in `load_magpie_defaults()` already prints a warning and runs with empty defaults rather than crashing — so if packaging gets this wrong, users see "running with no built-in exclusion patterns" in stderr rather than a hard failure. That's intentional. Don't relax this safety net during the packaging migration.
+
 ---
 
 ## 11. Unify orphan-cleanup pattern across `summaries` and `fast_tier`
@@ -321,3 +332,77 @@ LFM2-ColBERT-350M is text-only late-interaction and cannot replace ColQwen2.5 (v
 **When to revisit:** Before adding any third tier that produces multi-point-per-file output (PDF chunking, audio segments, video frames). At that point a) we'll have a third writer and choosing must be deliberate, b) the migration test infrastructure is freshest, c) we'll want every cleanup style aligned for the future engineer.
 
 **Risk if deferred indefinitely:** Each new tier doubles the cognitive surface. By tier 4 (audio/video/pdf-chunks/whatever) the codebase will have grown three semi-orphaned conventions and a new contributor will spend a day reverse-engineering which to use.
+
+---
+
+## 12. Routing data files (CSV / JSON / XML / Parquet) properly through tiers
+
+**What:** Today data files are processed by either (a) the row-level CSV ingester (one Qdrant point per row, no LLM summary) or (b) the standard text summarizer (one summary per file). The router decides via extension + size, but the decision logic is shallow — large CSVs go to row-mode, small JSONs go to summary-mode, and there's no real "what's IN this file" awareness. The `data` category in `categories_enabled` lumps them all together and defaults ON purely to keep Mridul's just-fixed CSV ingestion working.
+
+**Why we might want this:**
+- **Different data shapes need different handling.** A 50-row contacts CSV is a useful row-level index ("find Sarah's email"). A 5000-row sales-by-day CSV is better summarized as "daily sales 2024-01 to 2024-12, columns: date, sku, units, revenue" with sparse rows for outliers. A `package.json` doesn't want either — it wants metadata extraction. Today, all three go through the same paths.
+- **Sensitivity & dedup.** Bank statement CSVs and project config JSONs need different sensitivity scoring. Today both get the same router treatment.
+- **The `data: true` default is currently a hack.** It's TRUE only because `data: false` would silently break Mridul's CSV indexing — not because indexing every JSON file in the world is good.
+
+**Why we did NOT do it now:**
+- Mridul's CSV path works as of the 2026-05 fix (`Plans/Ingestion Rules/Implementation Plan.md` cross-ref). Users searching course CSVs get correct results.
+- Real product evidence needed: what kinds of data files do users actually have? Without that, any tier scheme we design is speculation.
+
+**When to revisit:** Once users complain about results from data files (either too many irrelevant hits from JSON dumps, OR missed hits because a CSV got summarized at file-level when row-level would've helped). At that point we can build a `data_shape_classifier()` that distinguishes "tabular row index", "key-value extract", "blob to summarize", "stream to skip". 1–2 weeks of work; expensive to do prematurely.
+
+---
+
+## 13. Daemon as a true OS service (launchctl / systemd)
+
+**What:** Run the indexing daemon as a real OS-managed service. macOS: a `launchctl` agent under `~/Library/LaunchAgents/`. Linux: a `systemd --user` unit. Windows: a Task Scheduler entry or a real Windows service. The user installs Magpie, the OS handles starting/stopping/respawning the daemon, and Magpie keeps indexing in the background whether or not Tauri is open.
+
+**Why we might want this:**
+- **Spotlight-parity.** Spotlight indexes whether you're using it or not. Real users expect "I added a folder to Magpie, new files in it get indexed within minutes" — not "I have to open the GUI for indexing to happen."
+- **Decouples indexing lifecycle from GUI lifecycle.** Today's MVP plan (PR2 of `Plans/Ingestion Rules/Implementation Plan.md`) merges the daemon into the Tauri sidecar — file watching dies when the user closes the app. That's a known trade-off for MVP simplicity, but it's not the right end state.
+- **Sidecar can stay lean.** Sidecar handles GUI requests; daemon handles background indexing. Different processes, different concerns, easier to reason about each.
+
+**Why we did NOT do it now:**
+- Three OS-specific implementations (launchctl + systemd + Task Scheduler) is a meaningful chunk of work — each needs install/uninstall/upgrade scripts and signed plist/unit files for permissions to work cleanly.
+- macOS `launchctl` requires entitlements / notarization for full background privilege; ties into Plan #10 (self-contained packaging). Doesn't make sense to do separately.
+- Until users actually complain about "I closed Magpie and now indexing doesn't happen," the sidecar-absorbs-daemon path covers the 90% case.
+
+**When to revisit:** After (a) the app ships to non-developers and we get real feedback about background indexing, OR (b) we're already implementing Plan #10 (self-contained packaging) — at that point we have the signing/notarization infrastructure required to register a launchctl agent without permission popups.
+
+---
+
+## 14. Promote `MAGPIE_DEV_USE_MTIME` to a user-facing setting
+
+**What:** Today, the manifest's `needs_summarization()` check uses size-only. A `MAGPIE_DEV_USE_MTIME=1` env var enables a size-AND-mtime check (re-summarize if the file was touched, even if bytes are identical). It exists for dev workflows where you want to force re-ingest by `touch`-ing a file. Promote it to a real user-facing setting in `indexing_rules.json` (`reindex_on_mtime_change: bool`).
+
+**Why we might want this:**
+- **Some users want strict re-index on any modification.** Power users editing files in-place (think notes, journals, ongoing project docs) want to be sure search reflects the latest content even if size happens to match.
+- **Some users want loose re-index for performance.** Read-heavy corpora (downloaded papers, archived statements) shouldn't get re-summarized every time the OS touches them for backup or sync purposes.
+- **Today's env-var approach is dev-only.** Production users have no way to tune this without editing source code.
+
+**Why we did NOT do it now:**
+- We don't yet know which users want which behavior. Shipping a setting without real demand creates a "what does this do?" question in the GUI that adds complexity for negligible benefit.
+- The dev toggle covers the immediate need (Astavak's debugging workflow). Adding a JSON flag later is a 10-line change once we know the right default.
+
+**When to revisit:** Once a user files a "Magpie didn't pick up my edit" issue, OR once we have telemetry showing how often files change in real-world corpora. Default proposal at that time: `reindex_on_mtime_change: false` (keep current performance behavior), but allow users to flip it ON via the Advanced settings panel.
+
+---
+
+## 15. Auto-promotion of nested exclude paths into sub-roots
+
+**What:** Today (per `Plans/Ingestion Rules/Implementation Plan.md`), if a user's per-root rules include nested paths like `exclude_globs: ["src/secrets/*"]`, those rules stay attached to the parent root. An alternative design ("rule normalization") would auto-create a sub-root for each nested path on save: the parent's rule moves into a new `magpie/src/secrets` sub-root with `exclude_globs: ["*"]`. The JSON ends up "denormalized" — every rule is scoped to the immediate directory it lives in.
+
+**Why we might want this:**
+- **Cleaner mental model:** every config scope = one directory.
+- **Better GUI rendering:** each root becomes a tree node with its own rule panel; nested rules don't sprawl into long path strings.
+- **Forces a normalized data model** that's easier to index, search, and validate.
+- **The future "Include/Exclude inside folder" UI buttons** (per the locked design) write to per-folder `.magpieinclude` / `.magpieexclude` files — that already produces a quasi-normalized state. Auto-promotion would be the JSON-side equivalent.
+
+**Why we did NOT do it now:**
+- **Round-trip surprise risk:** users who edit the JSON by hand see their rules rewritten on save. Loses trust unless the UI explains what's happening.
+- **Bidirectional consistency complexity:** if user later removes the auto-generated sub-root, what happens to the original parent rule? Re-promote? Orphan?
+- **No GUI yet to render the promoted shape.** Building auto-promotion before the GUI exists means designing for an interface we can't yet test.
+- **The current pass-through design works** — `pathspec.PathSpec` handles nested patterns natively. No matching capability is lost.
+
+**When to revisit:** When the Tauri GUI ships (PR3 + GUI work) and we know exactly what shape the rule editor needs. At that point auto-promotion is either an obvious next step (because the GUI demands it) or genuinely unneeded (because the GUI renders parent-relative paths just fine).
+
+---

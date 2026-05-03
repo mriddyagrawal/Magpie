@@ -26,6 +26,37 @@ import sys
 from dotenv import load_dotenv
 
 
+def _expected_point_ids(manifest) -> set[str]:
+    """Compute every Qdrant point ID we expect to find in the `summaries`
+    collection, given the current manifest.
+
+    Different tiers write different shapes:
+      - Regular T0-T3 (one summary markdown per file): a single file-level
+        point at `_point_id(rel)`.
+      - CSV row tier: N row-level points at `_row_point_id(rel, i)` for
+        i in 0..row_count-1. The writer records `entry.row_count` so we
+        know how many to expect.
+
+    Future chunked formats (PDF sections, audio segments, long-doc windows)
+    plug in here — add a count field to the Entry, write the chunk-id helper
+    in its tier module, then add another branch below. The orphan cleanup is
+    the one place that needs to know the full set.
+    """
+    from src.stage2.csv_ingest import _row_point_id
+    from src.stage2.db import _point_id
+
+    expected: set[str] = set()
+    for rel in manifest.paths():
+        entry = manifest.get(rel)
+        if entry is None:
+            continue
+        if entry.row_count and entry.row_count > 0:
+            expected.update(_row_point_id(rel, i) for i in range(entry.row_count))
+        else:
+            expected.add(_point_id(rel))
+    return expected
+
+
 def ingest_from_manifest(
     *, force: bool = False, skip_orphan_cleanup: bool = False, verbose: bool = False,
 ) -> dict:
@@ -164,6 +195,13 @@ def ingest_from_manifest(
                         print(f"  indexing csv rows: {rel}")
                     rows_indexed = ingest_csv_rows(source_path, rel)
                     upserted += rows_indexed
+                    # Record how many row-points we wrote so orphan cleanup
+                    # knows to expect them. Without this, every row point
+                    # gets deleted on the next sweep (1-point-per-file
+                    # assumption, see _expected_point_ids_for below).
+                    entry = manifest.get(rel)
+                    if entry is not None:
+                        entry.row_count = rows_indexed
                     manifest.mark_ingested(rel)
                     if time.monotonic() - last_save_t[0] >= SAVE_INTERVAL_S:
                         manifest.save()
@@ -182,8 +220,7 @@ def ingest_from_manifest(
     # collection is wasteful per-chunk; the end-of-walk call does the sweep.
     orphans_deleted = 0
     if not skip_orphan_cleanup:
-        expected_ids: set[str] = {_point_id(rel) for rel in manifest.paths()}
-
+        expected_ids = _expected_point_ids(manifest)
         actual_ids = get_all_point_ids()
         orphans = actual_ids - expected_ids
         if orphans:

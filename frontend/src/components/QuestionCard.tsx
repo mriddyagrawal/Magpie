@@ -1,5 +1,10 @@
 import { forwardRef, useCallback, useEffect } from "react";
-import magpieLogo from "../assets/magpie-logo.png";
+// Two transparent variants. Dark-mode is the default — the Magpie window
+// renders with dark vibrancy (see styles/tokens.css `--bg-card`). The
+// light-mode asset swaps in via the <picture> media query below if the
+// user's system is in light mode (vibrancy lightens slightly there).
+import magpieLogoDark from "../assets/magpie-logo-dark.png";
+import magpieLogoLight from "../assets/magpie-logo-light.png";
 
 import "./QuestionCard.css";
 
@@ -43,12 +48,15 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
         data-tauri-drag-region
         onMouseDown={onMouseDown}
       >
-        <img
-          src={magpieLogo}
-          alt="Magpie"
-          className={`question-card__logo ${value || isActive ? "is-active" : ""}`}
-          data-tauri-drag-region
-        />
+        <picture>
+          <source srcSet={magpieLogoLight} media="(prefers-color-scheme: light)" />
+          <img
+            src={magpieLogoDark}
+            alt="Magpie"
+            className={`question-card__logo ${value || isActive ? "is-active" : ""}`}
+            data-tauri-drag-region
+          />
+        </picture>
         {isActive ? (
           <div className="question-card__title" data-tauri-drag-region>
             {display}

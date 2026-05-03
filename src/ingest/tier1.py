@@ -3,7 +3,8 @@
 Used for: small `.txt .md .json .yaml .toml`, code files, small CSVs.
 
 No LLM call. We write a summary markdown whose body is the raw file content
-(capped at DEFAULT_BODY_MAX_CHARS). Filename is included in the title so
+(capped at DEFAULT_BODY_MAX_CHARS, except for CSVs which use a larger limit
+to support row-level indexing). Filename is included in the title so
 BM25 hits filename-like queries. Stage 2's parser then embeds that body
 verbatim — which is the whole point: exact-token matches survive.
 """
@@ -21,6 +22,7 @@ from src.ingest.common import (
     title_from_path,
     write_summary,
 )
+from src.router import CSV_SIZE_T1_MAX
 
 
 def run(path: Path, source_rel: str) -> TierOutcome:
@@ -30,11 +32,16 @@ def run(path: Path, source_rel: str) -> TierOutcome:
     except UnicodeDecodeError:
         raw = path.read_text(encoding="utf-8", errors="ignore")
 
-    body = raw[:DEFAULT_BODY_MAX_CHARS].strip()
+    ext = path.suffix.lower()
+    is_csv = ext == ".csv"
+
+    # CSVs get a much larger cap to support row-by-row indexing in Stage 2.
+    # Non-CSVs stay at the default 8k cap to avoid drowning retrieval in noise.
+    cap = CSV_SIZE_T1_MAX if is_csv else DEFAULT_BODY_MAX_CHARS
+    body = raw[:cap].strip()
     if not body:
         body = "(empty file)"
 
-    ext = path.suffix.lower()
     content_type = (
         "markdown" if ext in {".md", ".markdown"}
         else "code" if ext in {
@@ -43,6 +50,7 @@ def run(path: Path, source_rel: str) -> TierOutcome:
             ".sh", ".sql",
         }
         else "config" if ext in {".json", ".yaml", ".yml", ".toml"}
+        else "csv" if is_csv
         else "text"
     )
 

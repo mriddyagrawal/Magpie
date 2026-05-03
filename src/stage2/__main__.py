@@ -75,6 +75,7 @@ def ingest_from_manifest(
         # silently invoking a per-row fallback (the old `upsert_csv_rows` path
         # lived in this branch and could spend 13+ hours on a single CSV).
         regular_paths: list[str] = []
+        csv_row_paths: list[str] = []
         skip_only_rels: list[str] = []
         pending_resummarize: list[str] = []
         for rel in todo_paths:
@@ -82,9 +83,12 @@ def ingest_from_manifest(
             assert entry is not None
 
             if entry.skip_reason is not None:
-                # Router decided to skip this file. Record the no-op so we
-                # don't re-evaluate it on every ingest run.
                 skip_only_rels.append(rel)
+                continue
+
+            # NEW: If it's a CSV and routed to T1, it needs row-level indexing.
+            if rel.lower().endswith(".csv") and entry.routes and "T1" in entry.routes:
+                csv_row_paths.append(rel)
                 continue
 
             if entry.summary_file is None:
@@ -120,42 +124,50 @@ def ingest_from_manifest(
                 file=sys.stderr,
             )
 
-        if regular_paths:
-            parsed = []
-            parsed_rels: list[str] = []
-            for rel in regular_paths:
-                entry = manifest.get(rel)
-                assert entry is not None
-                summary_path = REPO_ROOT / entry.summary_file
-                if not summary_path.exists():
-                    print(f"  warn: summary missing, skipping: {entry.summary_file}", file=sys.stderr)
-                    continue
-                parsed.append(parse_summary_file(summary_path))
-                parsed_rels.append(rel)
-
-            # Per-batch progress: mark each batch's rows as ingested IMMEDIATELY
-            # after Qdrant acks the upsert, and persist the manifest at most
-            # once every 30 seconds. Without this, a Ctrl-C mid-push loses every
-            # batch's manifest update — even though the points are already in
-            # Qdrant — forcing the user to re-do the entire push from scratch.
-            # 30s save interval bounds lost-progress to ~30s of work; manifest
-            # save itself is ~100-500ms for big manifests so we don't want to
-            # do it per batch.
+        if regular_paths or csv_row_paths:
             import time
             last_save_t = [time.monotonic()]
             SAVE_INTERVAL_S = 30.0
 
-            def _on_batch_complete(batch_indices: list[int]) -> None:
+            def _on_batch_complete(batch_indices: list[int], rels: list[str]) -> None:
                 for idx in batch_indices:
-                    if idx < len(parsed_rels):
-                        manifest.mark_ingested(parsed_rels[idx])
+                    if idx < len(rels):
+                        manifest.mark_ingested(rels[idx])
                 if time.monotonic() - last_save_t[0] >= SAVE_INTERVAL_S:
                     manifest.save()
                     last_save_t[0] = time.monotonic()
 
-            upserted += upsert_summaries(
-                parsed, on_batch_complete=_on_batch_complete, verbose=verbose,
-            )
+            if regular_paths:
+                parsed = []
+                parsed_rels: list[str] = []
+                for rel in regular_paths:
+                    entry = manifest.get(rel)
+                    assert entry is not None
+                    summary_path = REPO_ROOT / entry.summary_file
+                    if not summary_path.exists():
+                        print(f"  warn: summary missing, skipping: {entry.summary_file}", file=sys.stderr)
+                        continue
+                    parsed.append(parse_summary_file(summary_path))
+                    parsed_rels.append(rel)
+
+                upserted += upsert_summaries(
+                    parsed, 
+                    on_batch_complete=lambda idxs: _on_batch_complete(idxs, parsed_rels), 
+                    verbose=verbose,
+                )
+
+            if csv_row_paths:
+                from src.stage2.csv_ingest import ingest_csv_rows
+                for rel in csv_row_paths:
+                    source_path = REPO_ROOT / rel
+                    if verbose:
+                        print(f"  indexing csv rows: {rel}")
+                    rows_indexed = ingest_csv_rows(source_path, rel)
+                    upserted += rows_indexed
+                    manifest.mark_ingested(rel)
+                    if time.monotonic() - last_save_t[0] >= SAVE_INTERVAL_S:
+                        manifest.save()
+                        last_save_t[0] = time.monotonic()
 
         for rel in skip_only_rels:
             manifest.mark_ingested(rel)

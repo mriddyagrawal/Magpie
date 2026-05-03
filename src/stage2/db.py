@@ -20,13 +20,13 @@ from qdrant_client.models import (
     VectorParams,
 )
 
+from src.manifest import APP_DATA_DIR
 from src.stage2.embeddings import DENSE_VECTOR_SIZE, embed_dense, embed_sparse
 from src.stage2.parser import ParsedSummary
 
 COLLECTION_NAME = "summaries"
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-_DEFAULT_LOCAL_PATH = _REPO_ROOT / "qdrant_data"
+_DEFAULT_LOCAL_PATH = APP_DATA_DIR / "qdrant_data"
 
 _client: QdrantClient | None = None
 

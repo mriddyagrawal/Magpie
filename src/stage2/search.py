@@ -27,25 +27,22 @@ class SearchQuery(BaseModel):
     )
 
 
+# NOTE: Until Phase 2.5 step 5 lands, this prompt is duplicated in
+# `server/magpie_server/prompts.py:REWRITE_PROMPT`. Edit there, not here.
+# After step 5: deleted; desktop calls /llm/rewrite on cloud.
 REWRITE_SYSTEM_PROMPT = (
     "You are a search-query optimizer. Given a user's natural-language question "
     "about their personal documents (invoices, receipts, notes, contracts, etc.), "
     "rewrite it into a SearchQuery: a dense `query` string that captures the full "
-    "intent in keyword-rich language, and a `keywords` list of 3-8 specific terms "
-    "(names, amounts, dates, document types) that should match exactly. "
-    "Do not answer the question — only produce the search query. "
+    "intent in keyword-rich language, and a `keywords` list of 5-12 terms — "
+    "include the user's specific values verbatim (names, amounts, dates, course "
+    "codes, document types) AND the likely synonyms, abbreviations, alternate "
+    "vocabulary, and paraphrases the documents themselves may use for the same "
+    "concept. Do not answer the question — only produce the search query. "
     "If prior conversation turns are provided, use them to resolve pronouns and "
     "references in the current question (e.g. 'what about its prerequisites?' → "
     "the subject from the previous turn). The rewrite should be self-contained: "
     "a search engine seeing only the rewritten query must have enough context. "
-    "DATE NORMALIZATION: if the user mentions a date or month, include all "
-    "common formats in `keywords` so exact-match retrieval (BM25 + ripgrep at "
-    "answer time) hits regardless of how the file represents it. "
-    "Examples: 'May 25 2022' → also include `25 May 2022`, `2022-05-25`, "
-    "`05/25/22`, `05/25/2022`, `05-25-22`. "
-    "'last May' → include the month name AND `05/`, `2024-05`, etc. given the "
-    "current-date hint at the top of the message. Be liberal — extra date "
-    "variants are cheap; missing the format the file uses is expensive. "
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
 )
@@ -131,10 +128,19 @@ def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
 
     Returns an empty list if the collection doesn't exist yet (e.g. fresh
     setup, or the user has only run --fast-only syncs).
+
+    Asserts the configured embedding model's dim matches the collection's
+    stored dim before issuing the query — if you swap the dense model
+    (e.g. MiniLM-384 → E5-base-768) the index becomes incompatible, and
+    silently sending a 768-d vector at a 384-d collection either errors
+    cryptically or returns garbage. Fail loudly with re-index instructions.
     """
+    from src.stage2.db import assert_dense_dim_match
+
     client = get_qdrant_client()
     if not client.collection_exists(COLLECTION_NAME):
         return []
+    assert_dense_dim_match(client, COLLECTION_NAME)
 
     dense_text = sq.query + " " + " ".join(sq.keywords)
     dense_vec = embed_dense_query(dense_text)
@@ -224,10 +230,9 @@ def _rrf_merge(
     """Reciprocal Rank Fusion of two result lists, keyed by source_path.
 
     Each path's RRF score is sum over each list of `1 / (RRF_K + rank)`,
-    where rank is 1-indexed. Missing from a list contributes 0. When a
-    path appears in both lists we keep the summary-tier entry — it
-    surfaces the file as a whole rather than as a per-page anchor, which
-    is what the UI source row wants to display.
+    where rank is 1-indexed. Missing from a list contributes 0. The kept
+    SearchResult prefers the summary-tier entry (it has a real summary)
+    when a path appears in both lists.
     """
     scores: dict[str, float] = {}
     chosen: dict[str, SearchResult] = {}
@@ -237,7 +242,7 @@ def _rrf_merge(
         if not r.path:
             continue
         scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
-        chosen[r.path] = r  # show the file, not a specific page
+        chosen[r.path] = r  # summary-tier entries have human-readable summaries
         seen_in.setdefault(r.path, set()).add("summary")
 
     for rank, r in enumerate(fast_hits, start=1):
@@ -256,20 +261,103 @@ def _rrf_merge(
     return ordered[:top_k]
 
 
-def run_search(sq: SearchQuery, top_k: int = 5) -> list[SearchResult]:
+RERANK_OVERSAMPLE = 10
+"""When reranking, how many RRF-fused candidates to feed the cross-encoder.
+
+A factor of 10 means top_k=5 fetches 50 candidates from RRF before reranking
+down to 5. Standard practice in RAG papers; balances recall headroom against
+the cross-encoder's per-pair cost."""
+
+
+def run_search(
+    sq: SearchQuery,
+    top_k: int = 5,
+    *,
+    question: str | None = None,
+    rerank: bool = False,
+    skip_fast: bool = False,
+) -> list[SearchResult]:
     """Run hybrid search across both the summary and fast-tier collections.
 
     Each tier returns its top `top_k * 2` candidates; results are merged via
     Reciprocal Rank Fusion keyed on `source_path`. Either tier being empty
     (missing collection, disabled, etc.) is tolerated — the other tier's
     results pass through unchanged.
+
+    Adaptive routing: if `question` is provided, the raw user text is
+    classified (list/enumeration vs general) and the per-class top_k can
+    override the caller's default. The caller's `top_k` still wins if it's
+    larger — explicit user override (e.g. `.top-k 50` in the REPL) is
+    respected. See `src.stage2.query_classify`.
+
+    Optional cross-encoder rerank (`rerank=True`): pulls `top_k *
+    RERANK_OVERSAMPLE` RRF-fused candidates, scores each `(question, doc)`
+    pair with a small cross-encoder model, then returns the top-k by that
+    score. Default off because cross-encoders occasionally regress factoid
+    queries (rememex postmortem). Enable in the REPL with `.rerank on`.
+    See `src.stage2.rerank`.
     """
-    summary_hits = _search_summary_tier(sq, top_k * 2)
+    from src.stage2.query_classify import QueryClass, classify_and_config
+
+    if question is not None:
+        klass, cfg = classify_and_config(question)
+        # Adaptive routing only **widens** top_k, never narrows. We bump the
+        # caller's value only when (a) the class is one with a real
+        # widening preference and (b) the class wants more than the caller
+        # asked for. Explicit small caller values (e.g. tests passing
+        # top_k=3) and explicit large caller values (e.g. `.top-k 50` in the
+        # REPL) are both respected — the classifier just helps the default
+        # case where caller didn't customize.
+        if klass is QueryClass.LIST_ALL and cfg.top_k > top_k:
+            print(
+                f"  query_class={klass.value}  top_k {top_k}→{cfg.top_k}  "
+                f"({cfg.notes})"
+            )
+            top_k = cfg.top_k
+
+        # Cross-encoder rerank regresses LIST_ALL queries — proper-noun /
+        # receipt / enumeration lookups. The cross-encoder over-weights
+        # rich semantic prose (e.g. project context docs) against terse
+        # receipt-style summaries, pushing the actually-relevant files out
+        # of the top-K. Auto-disable rerank for this class even when the
+        # caller toggled it on. Empirically validated 2026-04-25:
+        # "find me all my uber/lodging receipts" with rerank=on → 0 receipts
+        # in top-20; same query with rerank=off → 11 receipts in top-20.
+        # GENERAL queries (Hamiltonian, music 101, Romantic era) keep rerank.
+        if rerank and klass is QueryClass.LIST_ALL:
+            print(
+                f"  query_class={klass.value}  rerank suppressed "
+                f"(cross-encoder regresses list/enumeration queries)"
+            )
+            rerank = False
+
+    # If reranking, fetch a wider RRF-fused candidate pool so the cross-encoder
+    # has real options to reorder. Otherwise stick with the original top_k.
+    fetch_k = top_k * RERANK_OVERSAMPLE if rerank else top_k
+
+    summary_hits = _search_summary_tier(sq, fetch_k * 2)
     # Feed the raw dense-query text (same as summary tier) to ColPali; it
     # handles multi-token query encoding internally.
-    query_text = (sq.query + " " + " ".join(sq.keywords)).strip()
-    fast_hits = _search_fast_tier(query_text, top_k * 2)
-    return _rrf_merge(summary_hits, fast_hits, top_k)
+    # When `skip_fast=True`, bypass ColPali entirely — saves the ~30s first-
+    # query model load and ~1s/query encode for sessions that only need text
+    # retrieval. The REPL exposes this via `.fast on/off`.
+    if skip_fast:
+        fast_hits: list[SearchResult] = []
+    else:
+        query_text = (sq.query + " " + " ".join(sq.keywords)).strip()
+        fast_hits = _search_fast_tier(query_text, fetch_k * 2)
+    fused = _rrf_merge(summary_hits, fast_hits, fetch_k)
+
+    if rerank and len(fused) > 1:
+        from src.stage2.rerank import rerank as cross_encoder_rerank
+        # Use the raw user question for reranking when available — it
+        # carries the user's actual intent, where the LLM rewrite is
+        # paraphrased. Fall back to the rewritten query for non-question
+        # callers (programmatic use without `question=`).
+        rerank_text = question if question is not None else sq.query
+        return cross_encoder_rerank(rerank_text, fused, top_k)
+
+    return fused[:top_k]
 
 
 def raw_query(question: str) -> SearchQuery:
@@ -297,6 +385,9 @@ def search_summaries(
 
     Returns up to top_k results ranked by Reciprocal Rank Fusion of dense
     (semantic) and sparse (BM25) scores.
+
+    Passes the raw `question` through to `run_search` so the adaptive
+    classifier can widen top_k for enumeration-shaped queries.
     """
     sq = rewrite_query(question) if rewrite else raw_query(question)
-    return run_search(sq, top_k)
+    return run_search(sq, top_k, question=question)

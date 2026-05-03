@@ -29,12 +29,67 @@ and delete the corresponding Qdrant point.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MANIFEST_PATH = REPO_ROOT / "Test Summaries" / "_manifest.json"
+from platformdirs import user_data_dir
+
+
+# ---------------------------------------------------------------------------
+# Paths — portable across Linux / Windows / macOS via `platformdirs`.
+#
+#   Linux   : ~/.local/share/Magpie/
+#   Windows : %LOCALAPPDATA%\magpie\Magpie\
+#   macOS   : ~/Library/Application Support/Magpie/
+#
+# Override for dev/CI by setting `MAGPIE_DATA_DIR` — useful for tests that
+# want isolated, throwaway data dirs without touching the user's real one.
+# ---------------------------------------------------------------------------
+
+_APP_NAME = "Magpie"
+_APP_AUTHOR = "magpie"
+
+
+def _resolve_app_data_dir() -> Path:
+    """Where Magpie keeps its runtime state (manifest, summaries, qdrant).
+
+    Honors `MAGPIE_DATA_DIR` env override (absolute or ~-expandable), else
+    falls back to the OS-appropriate user data dir from `platformdirs`.
+    """
+    override = os.environ.get("MAGPIE_DATA_DIR", "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+    return Path(user_data_dir(_APP_NAME, _APP_AUTHOR, roaming=False))
+
+
+APP_DATA_DIR = _resolve_app_data_dir()
+"""User data root: manifest, summaries, qdrant collections all live under
+this. Use this for any path the app writes to at runtime."""
+
+SUMMARIES_DIR = APP_DATA_DIR / "summaries"
+"""Tier-output markdown files live here, one per indexed source file."""
+
+DEFAULT_MANIFEST_PATH = APP_DATA_DIR / "manifest.json"
+"""Per-file metadata index — the source of truth for what's been ingested."""
+
+# Redirect HuggingFace's model cache into APP_DATA_DIR/cache/ so embedding
+# and visual-tier model files don't leak into the user's shared cache
+# (~/.cache/huggingface/hub/) where directory names like
+# `models--vidore--colSmol-500M` directly identify our stack to anyone
+# browsing. This must be set BEFORE any transformers / sentence-transformers
+# / colpali-engine import — putting it here guarantees that, since
+# APP_DATA_DIR is required by every code path that loads a model.
+_MODEL_CACHE_DIR = APP_DATA_DIR / "cache"
+os.environ.setdefault("HF_HOME", str(_MODEL_CACHE_DIR))
+os.environ.setdefault("HF_HUB_CACHE", str(_MODEL_CACHE_DIR / "hub"))
+os.environ.setdefault("TRANSFORMERS_CACHE", str(_MODEL_CACHE_DIR))
+
+# Backward-compat alias. Existing imports of `REPO_ROOT` for data-path
+# resolution (manifest entries store summary paths relative to this) keep
+# working unchanged. New code should reference `APP_DATA_DIR` directly.
+REPO_ROOT = APP_DATA_DIR
 
 
 def _now_iso() -> str:
@@ -47,6 +102,7 @@ class Entry:
     summary_file: str | None = None
     summarized_at: str = ""
     ingested_at: str | None = None
+    row_count: int | None = None
     fast_indexed_at: str | None = None  # set when the file lands in fast_tier
     fast_pages: int | None = None        # page count indexed into fast_tier
     # Router audit trail (src/router.py + Plans/Indexing Tiers.md). Defaults
@@ -90,7 +146,7 @@ class Manifest:
 
     def save(self) -> None:
         """Atomic write: stage to <path>.tmp, then rename."""
-        self.path.parent.mkdir(exist_ok=True)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
         tmp = self.path.with_suffix(self.path.suffix + ".tmp")
         with tmp.open("w", encoding="utf-8") as f:
             json.dump(

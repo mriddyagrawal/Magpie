@@ -15,14 +15,16 @@ export function StatusPill() {
 
   if (!status) return null;
 
-  // Shorten long model strings so the pill stays compact.
-  const shortModel = status.llm_model.split("/").pop() ?? status.llm_model;
+  // Single user-facing fact: how much of their library is indexed.
+  // Never expose model name, LLM provider, or storage backend — see
+  // IO - Repo Structure.md for the no-tech-leak principle.
+  const docsLabel = status.indexed_count === 1 ? "document" : "documents";
 
   return (
     <div className="status-pill">
-      <span className="status-pill__dot" />
+      <span className={`status-pill__dot ${status.ready ? "" : "status-pill__dot--off"}`} />
       <span className="status-pill__text">
-        {shortModel} · {status.indexed_count.toLocaleString()} indexed · {status.llm_provider} ▸ qdrant {status.qdrant_provider}
+        {status.indexed_count.toLocaleString()} {docsLabel} indexed
       </span>
     </div>
   );

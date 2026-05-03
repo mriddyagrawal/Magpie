@@ -27,6 +27,7 @@ dependencies = [
     "notebook",
     "fastapi>=0.110",
     "uvicorn[standard]>=0.30",
+    "platformdirs>=4.0",
 ]
 
 [build-system]

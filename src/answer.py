@@ -23,13 +23,16 @@ from pydantic import BaseModel, Field
 from src.content import SummarizeError, build_content_blocks
 from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
 from src.llm import ChatAgent, build_agent
-from src.manifest import Manifest
+from src.manifest import APP_DATA_DIR, Manifest
 
 if TYPE_CHECKING:
     from src.stage2.search import SearchQuery
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+# `REPO_ROOT` here is a legacy alias used to resolve manifest-relative paths
+# (e.g. `summaries/<hash>_t1.md`). The app's data root is `APP_DATA_DIR`,
+# which is portable across Linux / Windows / macOS via `platformdirs`.
+REPO_ROOT = APP_DATA_DIR
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
 
@@ -50,6 +53,10 @@ class Answer(BaseModel):
     )
 
 
+# NOTE: Until Phase 2.5 step 5 (cloud-provider wiring) lands, this prompt is
+# duplicated in `server/magpie_server/prompts.py:ANSWER_PROMPT`. Edit there,
+# not here — copy back to keep parity. After step 5 lands, this constant is
+# deleted and the desktop calls /llm/answer on the cloud server instead.
 SYSTEM_PROMPT = (
     "You are a file-grounded question-answering assistant. "
     "Answer the user's question using ONLY the files provided in the message. "
@@ -75,14 +82,48 @@ SYSTEM_PROMPT = (
     "the question, add background context, or enumerate details the user didn't "
     "ask for. If the user wants more detail, they will ask a follow-up. "
     "Exception: if the question is explicitly comparative, aggregative, or asks "
-    "for a list ('which courses...', 'what are all...'), return the full list. "
+    "for a list ('which courses...', 'what are all...', 'what receipts do I have'), "
+    "return the full list AND include every retrieved file that qualifies — even "
+    "if the file uses a different word for the category. A 'flight itinerary' or "
+    "'trip confirmation' IS a travel receipt; a 'lease agreement' IS a contract; "
+    "a 'bank statement' IS a financial record / receipt of transactions. Map the "
+    "user's category to its equivalents in the files. Do NOT silently drop files "
+    "from the answer because their internal label differs from the user's word. "
     "If prior conversation turns are included, use them to interpret the user's "
     "current question (resolve references like 'that', 'it', 'the same course'), "
     "but still ground your answer in the files — do not recycle a prior answer "
     "without checking the current files. "
-    "In `sources_used`, include only the exact file paths (copied verbatim from the "
-    "'--- File N: <path> ---' headers) that your answer actually depends on. "
-    "Do not list files you consulted but did not actually use. "
+    "In `sources_used`, include only the file paths your answer actually "
+    "depends on. The path itself must be copied verbatim from the "
+    "'--- File N: <path> ---' headers — but you MAY append page references "
+    "after the path using this exact format: "
+    "`<path>  [book pp. 254-258 / PDF pp. 269-273]`. Use this format only "
+    "when the file has page anchors (you'll see '## PDF page N (book p. X)' "
+    "headers in the file content). Do NOT invent page numbers; cite only the "
+    "anchors that actually appear in what you read. "
+    "\n\n"
+    "Mathematical notation: PREFER Unicode math symbols — they render "
+    "cleanly in plain-text terminals (which is what most users see). "
+    "Use ∂ ∫ ∑ ∏ √ ⇒ ⇔ ≈ ≠ ≤ ≥ ∇ × · ± ∞ α β γ θ φ ψ ω π Δ where they "
+    "express the equation. Use Unicode subscripts/superscripts where useful "
+    "(x², q̇, m₁). Only fall back to LaTeX `$...$` (inline) or `$$...$$` "
+    "(display) for structures Unicode can't express clearly: fractions like "
+    "$\\frac{a}{b}$, multi-line sums, integrals with limits. "
+    "Source PDFs often have OCR-garbled math (e.g. 'd/dt' shown as 'dldt', "
+    "'∂' shown as 'a', subscripts split across spaces, em-dashes for minus "
+    "signs). Use your knowledge of standard physics/math notation to "
+    "reconstruct the correct expression — never copy garbled OCR verbatim. "
+    "If you can't reliably reconstruct, describe the equation in plain "
+    "language instead. "
+    "\n\n"
+    "Page numbers belong in `sources_used` ONLY. Do NOT pepper the answer "
+    "prose with `[book p. N / PDF p. M]` annotations — they clutter the "
+    "reading experience and the user already sees the consolidated page "
+    "list at the bottom. The only exception: if the user explicitly asked "
+    "'where' or 'on what page', you may give a single short citation in "
+    "the prose using the form 'page N' (book page; the PDF page is in "
+    "sources_used). Otherwise keep the prose clean. "
+    "\n\n"
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
 )
@@ -137,6 +178,11 @@ async def answer_question(
     turns), it's prepended to the message so the model can resolve references
     like 'it' or 'the same course'. The model is still instructed to ground
     its answer in the current files, not recycle prior answers.
+
+    If `search_keywords` is provided (the SearchQuery's keywords list from
+    the rewriter), long PDFs are lazy-chunked: rather than send the LLM the
+    first N chars (cover + preface for a 700-page book), we pick the pages
+    matching those keywords. Without keywords, behavior is unchanged.
     """
     if not question.strip():
         raise ValueError("question is empty")
@@ -236,11 +282,19 @@ async def answer_question(
                         f"(no matching lines in {abs_path.name}; file not embedded at ingest)"
                     ]
             else:
+                # Pass the rewriter's keywords through so build_content_blocks
+                # can lazy-chunk long PDFs into the most relevant pages instead
+                # of always returning the first N chars (preface for a 700-page
+                # textbook). Without this, page-anchor headers (`## PDF page N
+                # (book p. X)`) never get emitted, the LLM has nothing to cite,
+                # and `sources_used` shows up without `[book pp. X / PDF pp. Y]`.
+                keywords = list(search_query.keywords) if search_query else None
                 blocks = await asyncio.to_thread(
                     build_content_blocks,
                     abs_path,
                     max_chars=ANSWER_MAX_CHARS_PER_FILE,
                     max_pdf_pages=ANSWER_MAX_PDF_PAGES,
+                    search_keywords=keywords,
                 )
         except SummarizeError as e:
             print(f"  warn: skipping {display}: {e}", file=sys.stderr)
@@ -278,6 +332,36 @@ async def answer_question(
         "the information absent. Cite the exact file paths (from the "
         "'--- File N: <path> ---' headers) in `sources_used`."
     )
+
+    # If the user is asking an enumeration ("all my receipts" / "list every
+    # X" / "what stuff did I do in Y") query, the strict-grounding rules
+    # alone cause the LLM to cherry-pick a few "safe" representative items
+    # and drop borderline matches. Enumeration questions need the opposite
+    # stance: be exhaustive, include every file that plausibly fits, and
+    # let borderline cases in with a short hedge rather than dropping them.
+    # B1's classifier is the existing mechanism — re-run it here so the
+    # answer stage sees the same class the search layer used. Pure regex,
+    # no LLM call, cheap to run.
+    from src.stage2.query_classify import QueryClass, classify as _classify_q
+    if _classify_q(question) is QueryClass.LIST_ALL:
+        intro_parts.append(
+            ""
+        )
+        intro_parts.append(
+            "ENUMERATION MODE: this is a 'list all' / 'give me every X' "
+            "question. Be EXHAUSTIVE — include every file in the input "
+            "that plausibly fits the user's category. Do NOT cherry-pick "
+            "a few representative examples and drop the rest. If a file's "
+            "membership in the category is uncertain, include it with a "
+            "short hedge (e.g. '(possibly also a receipt)' / 'related: ...') "
+            "rather than omitting. The strict grounding rules still apply "
+            "— every line you write must be supported by visible file "
+            "text — but for enumeration queries, err on the side of "
+            "INCLUDING borderline matches rather than excluding them. "
+            "List every contributing file in `sources_used`, not just the "
+            "headline few."
+        )
+
     message: list = ["\n".join(intro_parts)]
     for i, (display, blocks) in enumerate(per_file_blocks, 1):
         message.append(f"\n--- File {i}: {display} ---")
@@ -310,15 +394,25 @@ async def answer_question(
 
 
 def _normalize_path_for_match(p: str) -> str:
-    """Collapse whitespace and URL-decode so LLM-echoed paths match our originals.
+    """Collapse whitespace, URL-decode, and strip page-citation suffix so
+    LLM-echoed paths match our originals.
 
     The model occasionally renders paths with collapsed spaces or %20-encoded
     spaces even when instructed to copy verbatim. Without normalization those
     echoes get filtered out as hallucinations and the user sees "Sources used:
     (none)" for an answer that did come from a real file.
+
+    Also strips any trailing `[...]` page-citation suffix the LLM may have
+    appended per the dual-page citation rule (`<path>  [book pp. 254-258 /
+    PDF pp. 269-273]`). The suffix is for display, not for path matching —
+    it must be removed before comparing against the canonical file path.
     """
+    import re
     import urllib.parse as _up
     decoded = _up.unquote(p)
+    # Strip trailing `[...]` (page-citation suffix or any other bracketed
+    # annotation the LLM appended after the path).
+    decoded = re.sub(r"\s*\[[^\]]*\]\s*$", "", decoded)
     return " ".join(decoded.split()).strip()
 
 

@@ -25,8 +25,19 @@ import socket
 import subprocess
 import sys
 import time
+import warnings
 from pathlib import Path
 from typing import Any
+
+# Suppress library noise BEFORE importing torch / transformers / qdrant_client.
+# These show up as scary-looking warnings and progress bars in dev terminals,
+# but say nothing useful to the user. Set defaults so .env / env can override
+# (e.g. TRANSFORMERS_VERBOSITY=info during model debugging).
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+warnings.filterwarnings("ignore", category=UserWarning, module="qdrant_client")
+warnings.filterwarnings("ignore", category=UserWarning, module="torch.cuda")
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
@@ -34,8 +45,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response
 from pydantic import BaseModel, Field
 
+from src.manifest import APP_DATA_DIR
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+
+# `REPO_ROOT` here is the data root used to resolve manifest-relative paths.
+# Portable across Linux / Windows / macOS via `platformdirs`.
+REPO_ROOT = APP_DATA_DIR
 
 load_dotenv()
 
@@ -88,6 +103,10 @@ class QueryRequest(BaseModel):
     question: str = Field(min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)
     rewrite: bool = Field(default=False)
+    # `fast` toggles ColPali visual-tier search. Default off — the cold-load
+    # is ~25s for a model that's only useful for a small fraction of queries
+    # (visual / scanned-PDF questions). Same default as the CLI's `.fast off`.
+    fast: bool = Field(default=False)
 
 
 class SourceOut(BaseModel):
@@ -104,14 +123,52 @@ class QueryResponse(BaseModel):
     search_query: dict[str, Any]
 
 
+def _user_facing_error(exc: Exception) -> tuple[int, str]:
+    """Map an internal exception to (HTTP status, user-safe message).
+
+    Real exception details are logged server-side (stderr) so we can debug,
+    but the client only ever sees a generic friendly message — no model
+    names, no provider names, no implementation jargon. See
+    IO/IO - Repo Structure.md for the no-tech-leak principle.
+    """
+    name = type(exc).__name__
+    text = str(exc)
+
+    print(f"[server] internal error {name}: {text}", file=sys.stderr)
+
+    # 429 rate-limit / quota-exhausted from any LLM provider
+    if "429" in text or "rate" in text.lower() or "quota" in text.lower():
+        return 503, "Service is busy right now. Try again in a few seconds."
+    # Auth / API-key issues (cloud provider rejected our request)
+    if "401" in text or "403" in text or "unauthor" in text.lower() or "api key" in text.lower():
+        return 401, "Account isn't set up yet. Check your settings."
+    # Network / DNS / connection errors
+    if name in ("ConnectionError", "TimeoutError") or "connection" in text.lower():
+        return 503, "Can't reach the network. Check your connection."
+    # Local file disappeared between retrieval and read
+    if name == "FileNotFoundError" or "no such file" in text.lower():
+        return 404, "Couldn't find that file anymore."
+    # Qdrant unavailable
+    if "qdrant" in text.lower() or "collection" in text.lower():
+        return 503, "Search is starting up. Try again in a moment."
+    # Default fallback
+    return 500, "Something went wrong. Please try again."
+
+
 @app.post("/query", response_model=QueryResponse)
 async def query(req: QueryRequest) -> QueryResponse:
     from src.pipeline import ask
 
     try:
-        result = await ask(req.question, top_k=req.top_k, rewrite=req.rewrite)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"pipeline error: {type(e).__name__}: {e}") from e
+        result = await ask(
+            req.question,
+            top_k=req.top_k,
+            rewrite=req.rewrite,
+            fast=req.fast,
+        )
+    except Exception as e:  # pylint: disable=broad-except
+        status_code, detail = _user_facing_error(e)
+        raise HTTPException(status_code=status_code, detail=detail) from e
 
     cited = set(result.sources_used)
     sources = [
@@ -217,10 +274,13 @@ _STATUS_TTL = 5.0
 
 
 class StatusResponse(BaseModel):
-    llm_provider: str
-    llm_model: str
-    qdrant_provider: str
+    """User-facing status. Deliberately omits LLM provider, model name,
+    Qdrant provider, GPU info, etc. — those are implementation details
+    that should never be visible in the GUI. See IO/IO - Repo Structure.md
+    for the no-tech-leak product principle."""
+    ready: bool
     indexed_count: int
+    version: str
 
 
 @app.get("/status", response_model=StatusResponse)
@@ -229,22 +289,19 @@ def status() -> StatusResponse:
     if _status_cache["payload"] is not None and now - _status_cache["ts"] < _STATUS_TTL:
         return _status_cache["payload"]
 
-    from src.llm import active_provider, active_model_name
     from src.stage2.db import get_all_point_ids
 
-    llm_prov = active_provider().name
-    llm_model = active_model_name()
-    qdrant_prov = os.environ.get("QDRANT_PROVIDER", "cloud").strip().lower()
     try:
         indexed_count = len(get_all_point_ids())
-    except Exception:
+        ready = True
+    except Exception:  # pylint: disable=broad-except
         indexed_count = 0
+        ready = False
 
     payload = StatusResponse(
-        llm_provider=llm_prov,
-        llm_model=llm_model,
-        qdrant_provider=qdrant_prov,
+        ready=ready,
         indexed_count=indexed_count,
+        version=app.version,
     )
     _status_cache["payload"] = payload
     _status_cache["ts"] = now

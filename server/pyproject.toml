@@ -1,0 +1,36 @@
+[project]
+name = "magpie-server"
+version = "0.1.0"
+description = "Magpie Cloud — LLM orchestration backend for the Magpie desktop app."
+readme = "README.md"
+requires-python = ">=3.11"
+
+# Deliberately minimal. The cloud server holds prompts and proxies LLM
+# calls — it does NOT need torch, qdrant_client, sentence-transformers,
+# colpali-engine, or any of the heavy local-engine dependencies. Keeping
+# this small means a small Docker image and fast cold-starts on serverless
+# hosts (fly.io, Render, Railway).
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "httpx>=0.27",                 # to call OpenRouter
+    "python-dotenv>=1.0",
+    # `pydantic-ai-slim[openai]` instead of full `pydantic-ai` — the full
+    # package pulls in Anthropic / Google / Mistral / AWS / Temporal SDKs
+    # we never use (OpenRouter speaks the OpenAI-compatible API for every
+    # underlying model, so the OpenAI client covers them all). Slim trims
+    # the Docker image from ~620 MB → ~250 MB.
+    "pydantic-ai-slim[openai]>=0.0.14",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["magpie_server*"]
+
+[dependency-groups]
+dev = ["pytest>=8.0", "httpx>=0.27"]

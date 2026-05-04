@@ -20,3 +20,11 @@ frontend/.turbo/
 frontend/src-tauri/target/
 frontend/src-tauri/gen/
 notanotherspotlight.egg-info/
+
+# Compiled sidecar binaries — built locally via `just build-sidecar`, never committed
+frontend/src-tauri/binaries/
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec

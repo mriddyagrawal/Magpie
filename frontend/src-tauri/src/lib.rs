@@ -67,7 +67,7 @@ pub fn run() {
             // then inject it into the webview as window.__MAGPIE_PORT__.
             let handle = app.handle().clone();
             let sidecar_state = app.state::<SidecarState>();
-            let port = spawn_sidecar(sidecar_state)?;
+            let port = spawn_sidecar(&handle, sidecar_state)?;
             // Rebuild the webview window *after* we know the port, so the init
             // script can inject it deterministically.
             if let Some(_existing) = app.get_webview_window("main") {
@@ -139,14 +139,24 @@ pub fn run() {
         .expect("error while running magpie");
 }
 
-fn spawn_sidecar(state: tauri::State<'_, SidecarState>) -> Result<u16, Box<dyn std::error::Error>> {
-    // `uv run python3 -m src.server` picks a free port and prints MAGPIE_PORT=<n>
-    // on the first line of stdout. We block on that line then return.
-    let mut child = Command::new("uv")
-        .args(["run", "python3", "-m", "src.server"])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
-        .spawn()?;
+fn spawn_sidecar(app: &tauri::AppHandle, state: tauri::State<'_, SidecarState>) -> Result<u16, Box<dyn std::error::Error>> {
+    let mut child = if cfg!(debug_assertions) {
+        // Dev: delegate to uv so changes to the Python server don't need a Tauri rebuild.
+        // `python` (not `python3`) works on both Windows and Unix with uv.
+        Command::new("uv")
+            .args(["run", "python", "-m", "src.server"])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::inherit())
+            .spawn()?
+    } else {
+        // Release: run the PyInstaller-compiled sidecar that ships inside the bundle.
+        let resource_dir = app.path().resource_dir()?;
+        let bin = resource_dir.join(if cfg!(windows) { "magpie-sidecar.exe" } else { "magpie-sidecar" });
+        Command::new(&bin)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::inherit())
+            .spawn()?
+    };
 
     let stdout = child.stdout.take().ok_or("sidecar has no stdout")?;
     let mut reader = BufReader::new(stdout);

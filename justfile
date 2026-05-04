@@ -94,6 +94,29 @@ summarize path:
 chat:
     uv run notspotlight
 
+# ----------------------------------------------------------------------------
+# Desktop app build
+# ----------------------------------------------------------------------------
+
+# Step 1: compile the Python backend into a self-contained binary (run on the
+# target OS — PyInstaller cannot cross-compile).
+build-sidecar:
+    uv run python scripts/build_sidecar.py
+
+# Step 2: build the Tauri installer for the current platform.
+# Must run build-sidecar first so binaries/magpie-sidecar-<triple>[.exe] exists.
+build-app:
+    cd frontend && pnpm tauri build
+
+# Full release build in one shot (sidecar + Tauri installer).
+build: build-sidecar build-app
+
+# Dev mode: hot-reload frontend + Tauri shell. Python server is spawned via
+# `uv run python -m src.server` automatically — no build-sidecar needed.
+dev:
+    cd frontend && pnpm tauri dev
+
+# ----------------------------------------------------------------------------
 # Start the FastAPI sidecar (the backend that the Tauri GUI talks to).
 # Data goes to APP_DATA_DIR (~/.local/share/Magpie on Linux). Override
 # with MAGPIE_DATA_DIR=/some/path if you want a different location.

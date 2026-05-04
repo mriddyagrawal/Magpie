@@ -316,8 +316,13 @@ def status() -> StatusResponse:
 def open_file(path: str = Query(...)) -> JSONResponse:
     abs_path = _resolve(path)
     try:
-        subprocess.run(["open", str(abs_path)], check=True)
-    except subprocess.CalledProcessError as e:
+        if sys.platform == "win32":
+            os.startfile(str(abs_path))
+        elif sys.platform == "darwin":
+            subprocess.run(["open", str(abs_path)], check=True)
+        else:
+            subprocess.run(["xdg-open", str(abs_path)], check=True)
+    except (OSError, subprocess.CalledProcessError) as e:
         raise HTTPException(status_code=500, detail=f"open failed: {e}") from e
     return JSONResponse({"ok": True})
 
@@ -326,8 +331,15 @@ def open_file(path: str = Query(...)) -> JSONResponse:
 def reveal_file(path: str = Query(...)) -> JSONResponse:
     abs_path = _resolve(path)
     try:
-        subprocess.run(["open", "-R", str(abs_path)], check=True)
-    except subprocess.CalledProcessError as e:
+        if sys.platform == "win32":
+            # explorer /select highlights the file in its parent folder.
+            # check=False: explorer.exe returns non-zero even on success.
+            subprocess.run(["explorer", f"/select,{abs_path}"], check=False)
+        elif sys.platform == "darwin":
+            subprocess.run(["open", "-R", str(abs_path)], check=True)
+        else:
+            subprocess.run(["xdg-open", str(abs_path.parent)], check=True)
+    except (OSError, subprocess.CalledProcessError) as e:
         raise HTTPException(status_code=500, detail=f"reveal failed: {e}") from e
     return JSONResponse({"ok": True})
 

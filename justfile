@@ -98,21 +98,26 @@ chat:
 # Desktop app build
 # ----------------------------------------------------------------------------
 
-# Step 1: compile the Python backend into a self-contained binary (run on the
-# target OS — PyInstaller cannot cross-compile).
+# Download the Qdrant binary for the current platform into binaries/.
+# Safe to re-run — skips if already present. Pass --force to re-download.
+download-qdrant:
+    uv run python scripts/download_qdrant.py
+
+# Compile the Python backend into a self-contained binary.
+# Must run on the target OS — PyInstaller cannot cross-compile.
 build-sidecar:
     uv run python scripts/build_sidecar.py
 
-# Step 2: build the Tauri installer for the current platform.
-# Must run build-sidecar first so binaries/magpie-sidecar-<triple>[.exe] exists.
+# Build the Tauri installer for the current platform.
+# Requires both download-qdrant and build-sidecar to have run first.
 build-app:
     cd frontend && pnpm tauri build
 
-# Full release build in one shot (sidecar + Tauri installer).
-build: build-sidecar build-app
+# Full release build: download Qdrant + compile sidecar + build installer.
+build: download-qdrant build-sidecar build-app
 
-# Dev mode: hot-reload frontend + Tauri shell. Python server is spawned via
-# `uv run python -m src.server` automatically — no build-sidecar needed.
+# Dev mode: hot-reload frontend + Tauri shell. Python server spawns via uv.
+# Qdrant is NOT spawned automatically — run `just qdrant-up` in another terminal.
 dev:
     cd frontend && pnpm tauri dev
 

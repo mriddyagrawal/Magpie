@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
-uv.lock
 CLAUDE.md
 Test Content/
 Test Content Deprecated/

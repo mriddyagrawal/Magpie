@@ -36,6 +36,20 @@ from typing import Any
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+# logfire (pulled in by pydantic-ai) registers a Pydantic plugin that calls
+# inspect.getsource() at import time — that crashes in PyInstaller bundles.
+# LOGFIRE_PYDANTIC_PLUGIN_RECORD only controls logging; logfire still patches
+# the SchemaValidator unconditionally. Swallow the OSError in frozen builds.
+os.environ.setdefault("LOGFIRE_PYDANTIC_PLUGIN_RECORD", "off")
+if getattr(sys, "frozen", False):
+    import inspect as _inspect
+    _real_getsource = _inspect.getsource
+    def _safe_getsource(obj):  # noqa: E306
+        try:
+            return _real_getsource(obj)
+        except OSError:
+            return ""
+    _inspect.getsource = _safe_getsource
 warnings.filterwarnings("ignore", category=UserWarning, module="qdrant_client")
 warnings.filterwarnings("ignore", category=UserWarning, module="torch.cuda")
 

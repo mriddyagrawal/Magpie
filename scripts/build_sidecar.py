@@ -77,6 +77,10 @@ def main() -> None:
         "--hidden-import", "src.manifest",
         # Bundle the src package so relative imports resolve at runtime
         "--add-data", f"src{sep}src",
+        # Packages that call importlib.metadata.version() on themselves at import
+        # time — PyInstaller strips .dist-info by default, so the lookup crashes.
+        "--copy-metadata", "genai_prices",
+        "--copy-metadata", "pydantic_ai",
     ]
 
     subprocess.run(cmd, cwd=ROOT, check=True)

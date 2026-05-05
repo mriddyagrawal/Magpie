@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { postQuery } from "../api";
+import { postQuery, getStatus, pickFolder, startIngest, getIngestStatus } from "../api";
 import type { QueryResponse } from "../types";
 import { AnswerCard } from "./AnswerCard";
 import { PreviewCard } from "./PreviewCard";
@@ -15,6 +15,7 @@ import "./MagpieWindow.css";
 // shrink-on-hide doesn't visually jump horizontally.
 const COMPACT_WIDTH = 800;
 const COMPACT_HEIGHT = 96;
+const ONBOARD_HEIGHT = 210;
 const EXPANDED_HEIGHT = 680;
 
 export function MagpieWindow() {
@@ -24,7 +25,66 @@ export function MagpieWindow() {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [booting, setBooting] = useState(true);
+  const [needsIndex, setNeedsIndex] = useState(false);
+  const [indexing, setIndexing] = useState(false);
+  const [indexError, setIndexError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Poll /healthz every 500ms until the sidecar is up, then check if anything
+  // is indexed. If the corpus is empty, show the onboarding card.
+  useEffect(() => {
+    let cancelled = false;
+    const poll = async () => {
+      const base = `http://127.0.0.1:${(window as Window & { __MAGPIE_PORT__?: number }).__MAGPIE_PORT__ ?? 8765}`;
+      while (!cancelled) {
+        try {
+          const res = await fetch(`${base}/healthz`);
+          if (res.ok) {
+            if (!cancelled) {
+              setBooting(false);
+              const status = await getStatus();
+              if (!cancelled && status.indexed_count === 0) setNeedsIndex(true);
+            }
+            return;
+          }
+        } catch {
+          // sidecar not ready yet
+        }
+        await new Promise<void>((r) => setTimeout(r, 500));
+      }
+    };
+    poll();
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleSelectFolder = useCallback(async () => {
+    const folder = await pickFolder();
+    if (!folder) return;
+    setIndexing(true);
+    setIndexError(null);
+    try {
+      await startIngest(folder);
+      // Poll until indexing finishes
+      while (true) {
+        await new Promise<void>((r) => setTimeout(r, 1000));
+        const s = await getIngestStatus();
+        if (!s.running) {
+          if (s.error) {
+            setIndexError(s.error);
+          } else {
+            setNeedsIndex(false);
+          }
+          break;
+        }
+      }
+    } catch (e) {
+      setIndexError((e as Error).message);
+    } finally {
+      setIndexing(false);
+    }
+  }, []);
 
   const highlights = useMemo(
     () => (result ? extractHighlightTokens(result.answer) : []),
@@ -39,11 +99,13 @@ export function MagpieWindow() {
     try {
       const res = await postQuery(q);
       setResult(res);
+      setNeedsIndex(false);
       // Select the top-scoring source by default so the preview pane is populated.
       setSelectedPath(res.sources[0]?.path ?? null);
     } catch (e) {
       setError((e as Error).message);
       setResult(null);
+      setSubmitted(null); // restore input so user can edit and retry immediately
     } finally {
       setLoading(false);
     }
@@ -68,6 +130,8 @@ export function MagpieWindow() {
         if (cancelled) return;
         const target = result !== null || loading || error !== null
           ? new LogicalSize(COMPACT_WIDTH, EXPANDED_HEIGHT)
+          : needsIndex
+          ? new LogicalSize(COMPACT_WIDTH, ONBOARD_HEIGHT)
           : new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT);
         await getCurrentWindow().setSize(target);
       } catch {
@@ -75,7 +139,7 @@ export function MagpieWindow() {
       }
     })();
     return () => { cancelled = true; };
-  }, [result, loading, error]);
+  }, [result, loading, error, needsIndex]);
 
   // Spotlight behavior: Esc always hides. Shrink the window *before* hide so
   // the next summon opens already-compact — avoids a flash of the expanded
@@ -115,16 +179,23 @@ export function MagpieWindow() {
         const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
         const appWindow = getCurrentWindow();
 
-        const unBlur = await appWindow.listen("tauri://blur", async () => {
-          // Shrink before hide so re-summon opens already-compact, no flash.
-          await appWindow.setSize(new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT));
-          await appWindow.hide();
+        const unBlur = await appWindow.listen("tauri://blur", () => {
+          // Debounce: on Windows the Alt key causes a spurious blur immediately
+          // after the window appears. Cancel the hide if focus returns quickly.
+          blurTimer.current = setTimeout(async () => {
+            blurTimer.current = null;
+            await appWindow.setSize(new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT));
+            await appWindow.hide();
+          }, 150);
         });
         cleanups.push(unBlur);
 
         const unFocus = await appWindow.listen("tauri://focus", () => {
+          if (blurTimer.current !== null) {
+            clearTimeout(blurTimer.current);
+            blurTimer.current = null;
+          }
           reset();
-          // Defer to next tick so the reset has rendered the input.
           requestAnimationFrame(() => inputRef.current?.focus());
         });
         cleanups.push(unFocus);
@@ -145,8 +216,29 @@ export function MagpieWindow() {
         onChange={setQuery}
         onSubmit={() => onSubmit(query)}
         loading={loading}
+        booting={booting}
         submittedQuestion={submitted}
       />
+
+      {needsIndex && !active && (
+        <div className="onboard-card magpie-card">
+          <p className="onboard-card__message">
+            {indexing
+              ? "Indexing your files…"
+              : indexError
+              ? `Indexing failed: ${indexError}`
+              : "Nothing indexed yet. Select a folder to get started."}
+          </p>
+          {!indexing && (
+            <button
+              className="onboard-card__btn"
+              onClick={handleSelectFolder}
+            >
+              {indexError ? "Try again" : "Select folder to index"}
+            </button>
+          )}
+        </div>
+      )}
 
       {active && (
         <div className="magpie-grid">

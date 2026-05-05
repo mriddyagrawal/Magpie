@@ -56,6 +56,7 @@ def main() -> None:
         "src/server.py",
         "--name", "magpie-sidecar",
         "--onefile",
+        "--noconsole",
         "--noconfirm",
         # Heavy packages that use dynamic imports or include non-Python assets
         "--collect-all", "sentence_transformers",
@@ -73,8 +74,14 @@ def main() -> None:
         "--hidden-import", "src.content",
         "--hidden-import", "src.stage2.db",
         "--hidden-import", "src.stage2",
+        "--hidden-import", "src.stage2.__main__",
         "--hidden-import", "src.stage1",
         "--hidden-import", "src.manifest",
+        "--hidden-import", "src.ingest",
+        "--hidden-import", "src.ingest.walker",
+        "--hidden-import", "src.ingest.common",
+        "--hidden-import", "src.ingest.ignore",
+        "--hidden-import", "src.router",
         # Bundle the src package so relative imports resolve at runtime
         "--add-data", f"src{sep}src",
         # Packages that call importlib.metadata.version() on themselves at import

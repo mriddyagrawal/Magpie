@@ -13,6 +13,7 @@ interface Props {
   onChange: (v: string) => void;
   onSubmit: () => void;
   loading: boolean;
+  booting: boolean;
   submittedQuestion: string | null;
 }
 
@@ -33,7 +34,7 @@ function startDragOnMouseDown(e: React.MouseEvent) {
 }
 
 export const QuestionCard = forwardRef<HTMLInputElement, Props>(
-  function QuestionCard({ value, onChange, onSubmit, loading, submittedQuestion }, ref) {
+  function QuestionCard({ value, onChange, onSubmit, loading, booting, submittedQuestion }, ref) {
     useEffect(() => {
       if (typeof ref === "object" && ref?.current) ref.current.focus();
     }, [ref]);
@@ -66,7 +67,7 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
             ref={ref}
             className="question-card__input"
             value={value}
-            placeholder="Ask magpie"
+            placeholder={booting ? "Starting Magpie…" : "Ask magpie"}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -74,7 +75,7 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
                 onSubmit();
               }
             }}
-            disabled={loading}
+            disabled={loading || booting}
             spellCheck={false}
             autoComplete="off"
           />

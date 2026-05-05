@@ -364,6 +364,64 @@ def healthz() -> dict[str, str]:
 
 
 # ---------------------------------------------------------------------------
+# /ingest  — trigger folder indexing from the GUI
+# ---------------------------------------------------------------------------
+
+_ingest_state: dict[str, Any] = {
+    "running": False,
+    "done": False,
+    "error": None,
+    "path": None,
+}
+
+
+class IngestRequest(BaseModel):
+    path: str
+
+
+@app.post("/ingest")
+async def start_ingest(req: IngestRequest) -> dict[str, Any]:
+    if _ingest_state["running"]:
+        raise HTTPException(status_code=409, detail="Indexing already in progress")
+    folder = Path(req.path)
+    if not folder.exists():
+        raise HTTPException(status_code=400, detail=f"Path does not exist: {req.path}")
+    if not folder.is_dir():
+        raise HTTPException(status_code=400, detail=f"Not a directory: {req.path}")
+
+    _ingest_state.update(running=True, done=False, error=None, path=req.path)
+
+    import threading
+    threading.Thread(target=_do_ingest, args=(folder,), daemon=True).start()
+    return {"status": "started", "path": req.path}
+
+
+def _do_ingest(folder: Path) -> None:
+    try:
+        from src.ingest.walker import run_batch
+        from src.stage2.__main__ import ingest_from_manifest
+        import asyncio
+        asyncio.run(run_batch(folder, push_to_qdrant=True, concurrency=4))
+        ingest_from_manifest(force=False, verbose=False)
+        _ingest_state["done"] = True
+    except Exception as exc:
+        _ingest_state["error"] = str(exc)
+        print(f"[server] ingest error: {exc}", file=sys.stderr)
+    finally:
+        _ingest_state["running"] = False
+
+
+@app.get("/ingest/status")
+def ingest_status() -> dict[str, Any]:
+    return {
+        "running": _ingest_state["running"],
+        "done": _ingest_state["done"],
+        "error": _ingest_state["error"],
+        "path": _ingest_state["path"],
+    }
+
+
+# ---------------------------------------------------------------------------
 # Sidecar entrypoint: pick a free port, print it, serve.
 # ---------------------------------------------------------------------------
 

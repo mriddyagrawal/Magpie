@@ -1,4 +1,5 @@
 import type { QueryResponse, StatusResponse, CsvPreview } from "./types";
+import { invoke } from "@tauri-apps/api/core";
 
 // Tauri's shell injects `window.__MAGPIE_PORT__` at startup, reading it from
 // the Python sidecar's first stdout line. 8765 is the dev fallback when the
@@ -62,6 +63,36 @@ export async function openInOs(path: string): Promise<void> {
 export async function revealInFinder(path: string): Promise<void> {
   const res = await fetch(`${baseUrl()}/reveal?path=${encodeURIComponent(path)}`);
   if (!res.ok) throw new Error(`reveal failed: ${res.status}`);
+}
+
+export async function pickFolder(): Promise<string | null> {
+  try {
+    return await invoke<string | null>("pick_folder");
+  } catch {
+    return null;
+  }
+}
+
+export interface IngestStatus {
+  running: boolean;
+  done: boolean;
+  error: string | null;
+  path: string | null;
+}
+
+export async function startIngest(path: string): Promise<void> {
+  const res = await fetch(`${baseUrl()}/ingest`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ path }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+}
+
+export async function getIngestStatus(): Promise<IngestStatus> {
+  const res = await fetch(`${baseUrl()}/ingest/status`);
+  if (!res.ok) throw new Error(`ingest/status failed: ${res.status}`);
+  return res.json();
 }
 
 /** File-extension router — drives which preview component is rendered. */

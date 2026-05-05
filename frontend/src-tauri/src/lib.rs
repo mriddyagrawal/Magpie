@@ -1,4 +1,3 @@
-use std::io::{BufRead, BufReader};
 use std::net::{SocketAddr, TcpStream};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
@@ -61,67 +60,26 @@ pub fn run() {
 
             let handle = app.handle().clone();
 
-            // Release only: spawn the bundled Qdrant binary and wait for it.
-            // Dev mode: run `just qdrant-up` separately — no bundled binary present.
-            let qdrant_port: Option<u16> = if cfg!(not(debug_assertions)) {
-                match spawn_qdrant(&handle, app.state::<QdrantState>()) {
-                    Err(e) => {
-                        eprintln!("[magpie] fatal: qdrant failed to start: {e}");
-                        handle
-                            .dialog()
-                            .message(format!(
-                                "Magpie could not start its search database.\n\n\
-                                 Error: {e}\n\nPlease reinstall the app."
-                            ))
-                            .kind(MessageDialogKind::Error)
-                            .title("Magpie failed to start")
-                            .blocking_show();
-                        return Err(e.into());
-                    }
-                    Ok(port) => {
-                        if !wait_for_port(port, 30) {
-                            eprintln!("[magpie] fatal: qdrant port {port} not ready after 15s");
-                            handle
-                                .dialog()
-                                .message(
-                                    "Magpie's search database took too long to start.\n\n\
-                                     Please try relaunching the app.",
-                                )
-                                .kind(MessageDialogKind::Error)
-                                .title("Magpie failed to start")
-                                .blocking_show();
-                            return Err("qdrant not ready".into());
-                        }
-                        Some(port)
-                    }
-                }
+            // Pre-pick ports instantly (just binds + releases a socket) so the
+            // window can appear immediately with the port already known — no
+            // blocking on qdrant/sidecar startup inside setup().
+            let sidecar_port = pick_free_port().unwrap_or(8765);
+            let qdrant_port_pre: Option<u16> = if cfg!(not(debug_assertions)) {
+                pick_free_port().ok()
             } else {
                 None
             };
 
-            // Spawn Python sidecar (dev: uv run; release: PyInstaller bundle).
-            let port = match spawn_sidecar(&handle, app.state::<SidecarState>(), qdrant_port) {
-                Err(e) => {
-                    eprintln!("[magpie] fatal: sidecar failed to start: {e}");
-                    handle
-                        .dialog()
-                        .message(format!(
-                            "Magpie could not start its search backend.\n\n\
-                             Error: {e}\n\nPlease reinstall the app."
-                        ))
-                        .kind(MessageDialogKind::Error)
-                        .title("Magpie failed to start")
-                        .blocking_show();
-                    return Err(e.into());
-                }
-                Ok(p) => p,
-            };
-
-            let init_script = format!("window.__MAGPIE_PORT__ = {};", port);
+            // Inject the port and show the window immediately.
+            let init_script = format!(
+                "window.__MAGPIE_PORT__ = {}; window.__MAGPIE_BOOTING__ = true;",
+                sidecar_port
+            );
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.eval(&init_script);
+                anchor_spotlight(&window);
             } else {
-                let _ = WebviewWindowBuilder::new(&handle, "main", WebviewUrl::default())
+                let window = WebviewWindowBuilder::new(&handle, "main", WebviewUrl::default())
                     .title("Magpie")
                     .inner_size(800.0, 96.0)
                     .min_inner_size(800.0, 96.0)
@@ -131,9 +89,6 @@ pub fn run() {
                     .always_on_top(true)
                     .initialization_script(&init_script)
                     .build()?;
-            }
-
-            if let Some(window) = app.get_webview_window("main") {
                 anchor_spotlight(&window);
             }
 
@@ -195,6 +150,74 @@ pub fn run() {
             }
             tray_builder.build(app)?;
 
+            // Background thread: slow startup (qdrant + sidecar). The window is
+            // already visible; the frontend polls /healthz and shows a booting
+            // state until the sidecar responds.
+            let bg = handle.clone();
+            thread::spawn(move || {
+                // Release only: start qdrant and wait for it to accept connections.
+                let qdrant_port: Option<u16> = if cfg!(not(debug_assertions)) {
+                    let port = match qdrant_port_pre {
+                        Some(p) => p,
+                        None => {
+                            eprintln!("[magpie] fatal: could not pre-pick qdrant port");
+                            return;
+                        }
+                    };
+                    match spawn_qdrant(&bg, port) {
+                        Err(e) => {
+                            eprintln!("[magpie] fatal: qdrant failed to start: {e}");
+                            bg.dialog()
+                                .message(format!(
+                                    "Magpie could not start its search database.\n\n\
+                                     Error: {e}\n\nPlease reinstall the app."
+                                ))
+                                .kind(MessageDialogKind::Error)
+                                .title("Magpie failed to start")
+                                .blocking_show();
+                            return;
+                        }
+                        Ok(child) => {
+                            *bg.state::<QdrantState>().0.lock().unwrap() = Some(child);
+                            if !wait_for_port(port, 30) {
+                                eprintln!("[magpie] fatal: qdrant not ready after 15s");
+                                bg.dialog()
+                                    .message(
+                                        "Magpie's search database took too long to start.\n\n\
+                                         Please try relaunching the app.",
+                                    )
+                                    .kind(MessageDialogKind::Error)
+                                    .title("Magpie failed to start")
+                                    .blocking_show();
+                                return;
+                            }
+                            Some(port)
+                        }
+                    }
+                } else {
+                    None
+                };
+
+                // Start the Python sidecar on the pre-picked port.
+                match spawn_sidecar(&bg, sidecar_port, qdrant_port) {
+                    Err(e) => {
+                        eprintln!("[magpie] fatal: sidecar failed to start: {e}");
+                        bg.dialog()
+                            .message(format!(
+                                "Magpie could not start its search backend.\n\n\
+                                 Error: {e}\n\nPlease reinstall the app."
+                            ))
+                            .kind(MessageDialogKind::Error)
+                            .title("Magpie failed to start")
+                            .blocking_show();
+                    }
+                    Ok(child) => {
+                        *bg.state::<SidecarState>().0.lock().unwrap() = Some(child);
+                        eprintln!("[magpie] sidecar started on port {sidecar_port}");
+                    }
+                }
+            });
+
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -203,7 +226,7 @@ pub fn run() {
                 let _ = window.hide();
             }
         })
-        .invoke_handler(tauri::generate_handler![hide_window, show_window])
+        .invoke_handler(tauri::generate_handler![hide_window, show_window, pick_folder])
         .build(tauri::generate_context!())
         .expect("error building magpie");
 
@@ -269,76 +292,56 @@ fn wait_for_port(port: u16, max_attempts: u32) -> bool {
     false
 }
 
-fn spawn_qdrant(
-    app: &tauri::AppHandle,
-    state: tauri::State<'_, QdrantState>,
-) -> Result<u16, Box<dyn std::error::Error>> {
-    let port = pick_free_port()?;
+// Spawn qdrant on a pre-picked port; caller is responsible for storing the child.
+fn spawn_qdrant(app: &tauri::AppHandle, port: u16) -> Result<Child, String> {
     let storage = app_data_dir().join("qdrant_storage");
-    std::fs::create_dir_all(&storage)?;
+    std::fs::create_dir_all(&storage).map_err(|e| e.to_string())?;
 
-    let resource_dir = app.path().resource_dir()?;
+    let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
     let bin = resource_dir.join(if cfg!(windows) { "qdrant.exe" } else { "qdrant" });
 
-    let child = Command::new(&bin)
-        .env("QDRANT__STORAGE__STORAGE_PATH", &storage)
+    let mut cmd = Command::new(&bin);
+    cmd.env("QDRANT__STORAGE__STORAGE_PATH", &storage)
         .env("QDRANT__SERVICE__HTTP_PORT", port.to_string())
         .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()?;
-
-    *state.0.lock().unwrap() = Some(child);
-    Ok(port)
+        .stderr(Stdio::null());
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+    }
+    cmd.spawn()
+        .map_err(|e| format!("failed to spawn qdrant: {e}"))
 }
 
+// Spawn the Python sidecar on a pre-picked port; no stdout blocking.
 fn spawn_sidecar(
     app: &tauri::AppHandle,
-    state: tauri::State<'_, SidecarState>,
+    port: u16,
     qdrant_port: Option<u16>,
-) -> Result<u16, Box<dyn std::error::Error>> {
+) -> Result<Child, String> {
     let mut cmd = if cfg!(debug_assertions) {
-        // Dev: uv manages the Python env — no sidecar binary needed.
         let mut c = Command::new("uv");
-        c.args(["run", "python", "-m", "src.server"]);
+        c.args(["run", "python", "-m", "src.server", "--port", &port.to_string()]);
         c
     } else {
-        // Release: run the PyInstaller-compiled binary from the app bundle.
-        let resource_dir = app.path().resource_dir()?;
+        let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
         let bin =
             resource_dir.join(if cfg!(windows) { "magpie-sidecar.exe" } else { "magpie-sidecar" });
         let mut c = Command::new(&bin);
-        // Pin the data dir so Python and Qdrant use the same location.
+        c.arg("--port").arg(port.to_string());
         c.env("MAGPIE_DATA_DIR", app_data_dir());
-        if let Some(port) = qdrant_port {
+        if let Some(qport) = qdrant_port {
             c.env("QDRANT_PROVIDER", "cloud")
-                .env("QDRANT_CLUSTER_ENDPOINT", format!("http://127.0.0.1:{port}"));
+                .env("QDRANT_CLUSTER_ENDPOINT", format!("http://127.0.0.1:{qport}"));
         }
         c
     };
 
-    let mut child = cmd.stdout(Stdio::piped()).stderr(Stdio::inherit()).spawn()?;
-
-    let stdout = child.stdout.take().ok_or("sidecar has no stdout")?;
-    let mut reader = BufReader::new(stdout);
-    let mut first_line = String::new();
-    reader.read_line(&mut first_line)?;
-
-    let port: u16 = first_line
-        .trim()
-        .strip_prefix("MAGPIE_PORT=")
-        .ok_or_else(|| format!("unexpected sidecar greeting: {:?}", first_line))?
-        .parse()?;
-
-    thread::spawn(move || {
-        let mut line = String::new();
-        while reader.read_line(&mut line).unwrap_or(0) > 0 {
-            eprint!("[magpie sidecar] {}", line);
-            line.clear();
-        }
-    });
-
-    *state.0.lock().unwrap() = Some(child);
-    Ok(port)
+    cmd.stdout(Stdio::null())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .map_err(|e| format!("failed to spawn sidecar: {e}"))
 }
 
 #[tauri::command]
@@ -350,4 +353,26 @@ fn hide_window(window: tauri::Window) {
 fn show_window(window: tauri::Window) {
     let _ = window.show();
     let _ = window.set_focus();
+}
+
+#[tauri::command]
+async fn pick_folder(app: tauri::AppHandle) -> Option<String> {
+    use tauri_plugin_dialog::DialogExt;
+    let (tx, rx) = std::sync::mpsc::channel::<Option<tauri_plugin_dialog::FilePath>>();
+    app.dialog()
+        .file()
+        .set_title("Select folder to index")
+        .pick_folder(move |folder| {
+            let _ = tx.send(folder);
+        });
+    tauri::async_runtime::spawn_blocking(move || {
+        rx.recv().ok().flatten().and_then(|p| match p {
+            tauri_plugin_dialog::FilePath::Path(path) => {
+                Some(path.to_string_lossy().into_owned())
+            }
+            _ => None,
+        })
+    })
+    .await
+    .unwrap_or(None)
 }

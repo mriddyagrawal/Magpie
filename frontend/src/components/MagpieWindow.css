@@ -37,6 +37,39 @@
   min-height: 0;
 }
 
+.onboard-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px 32px;
+  animation: magpie-fade 220ms ease-out;
+}
+
+.onboard-card__message {
+  margin: 0;
+  font-size: var(--size-sm);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.onboard-card__btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-primary);
+  font-size: var(--size-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 120ms;
+}
+
+.onboard-card__btn:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
 /* Fade-in when active cards first mount */
 .magpie-grid,
 .magpie-window.is-active .status-pill {

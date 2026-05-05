@@ -243,6 +243,35 @@ def get_indexed_paths() -> set[str]:
     return paths
 
 
+def get_indexed_path_counts() -> dict[str, int]:
+    """Map each source_path in the fast tier to its page count.
+
+    Used by `Manifest.reconcile_from_fast_tier()` to re-stamp
+    `fast_indexed_at` + `fast_pages` after a manifest wipe. One Qdrant
+    point per page, so counting points per source_path equals page count.
+    Empty dict when the collection doesn't exist (fresh setup, post-reset)."""
+    client = get_qdrant_client()
+    if not client.collection_exists(FAST_COLLECTION_NAME):
+        return {}
+    counts: dict[str, int] = {}
+    offset = None
+    while True:
+        points, offset = client.scroll(
+            collection_name=FAST_COLLECTION_NAME,
+            limit=512,
+            offset=offset,
+            with_payload=True,
+            with_vectors=False,
+        )
+        for p in points:
+            src = p.payload.get("source_path") if p.payload else None
+            if src:
+                counts[src] = counts.get(src, 0) + 1
+        if offset is None:
+            break
+    return counts
+
+
 # ---------------------------------------------------------------------------
 # Smoke test: `uv run python -m src.stage2.fast_db <pdf-or-image>`
 # Renders, encodes, upserts, queries. Prints the round-trip result.

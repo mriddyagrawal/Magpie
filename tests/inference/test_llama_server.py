@@ -249,6 +249,36 @@ def test_complete_marks_pool_dead_on_connection_error():
 
 
 # ---------------------------------------------------------------------------
+# Pool stderr-mirror filter (quiet by default)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "line, is_signal",
+    [
+        # high-signal lines — always surface in quiet mode
+        ("ERROR: failed to load model", True),
+        ("warning: out of memory", True),
+        ("model loaded", True),
+        ("main: server is listening on http://127.0.0.1:9100", True),
+        ("common_init_result: failed to load model", True),
+        # low-signal per-inference noise — only shown with VERBOSE=1
+        ("slot update_slots: id  3 | task 0 | prompt processing", False),
+        ("ggml_metal_init: allocating", False),
+        ("sched_reserve: reserving ...", False),
+        ("srv  process_chun: image processed in 1572 ms", False),
+        ("[llama-server] llama_model_loader: - kv  17:                         gemma4.block_count", False),
+    ],
+)
+def test_drain_filter_keeps_errors_drops_per_inference_noise(line, is_signal):
+    """Pool's stderr drain hides ~30 noisy lines per inference but always
+    surfaces errors / warnings / model-loaded / server-listening lines.
+    Keeps `just sync` walker tqdm readable while preserving the lines
+    that matter when something breaks."""
+    from src.inference.llama_server_pool import _is_high_signal
+    assert _is_high_signal(line) is is_signal
+
+
+# ---------------------------------------------------------------------------
 # Singleton
 # ---------------------------------------------------------------------------
 

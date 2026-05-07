@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { postQuery, getStatus, pickFolder, startIngest, getIngestStatus } from "../api";
+import { postQuery, getStatus, pickFolder, pickFile, startIngest, getIngestStatus, stopIngest } from "../api";
 import type { QueryResponse } from "../types";
 import { AnswerCard } from "./AnswerCard";
 import { PreviewCard } from "./PreviewCard";
@@ -10,12 +10,18 @@ import { extractHighlightTokens } from "./Highlighted";
 
 import "./MagpieWindow.css";
 
+function formatElapsed(s: number): string {
+  if (s < 60) return `${Math.round(s)}s`;
+  return `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`;
+}
+
 // Spotlight semantics: width is constant, only height grows downward when a
 // query is in flight. Width matches the tauri.conf.json initial size so the
 // shrink-on-hide doesn't visually jump horizontally.
 const COMPACT_WIDTH = 800;
 const COMPACT_HEIGHT = 96;
-const ONBOARD_HEIGHT = 210;
+const MANAGE_HEIGHT = 160;
+const ONBOARD_HEIGHT = 310;
 const EXPANDED_HEIGHT = 680;
 
 export function MagpieWindow() {
@@ -29,8 +35,13 @@ export function MagpieWindow() {
   const [needsIndex, setNeedsIndex] = useState(false);
   const [indexing, setIndexing] = useState(false);
   const [indexError, setIndexError] = useState<string | null>(null);
+  const [indexDone, setIndexDone] = useState(false);
+  const [indexStopped, setIndexStopped] = useState(false);
+  const [ingestProgress, setIngestProgress] = useState<{
+    done: number; total: number; current: string | null; elapsed: number | null;
+  } | null>(null);
+  const [lastFolder, setLastFolder] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Poll /healthz every 500ms until the sidecar is up, then check if anything
   // is indexed. If the corpus is empty, show the onboarding card.
@@ -59,23 +70,34 @@ export function MagpieWindow() {
     return () => { cancelled = true; };
   }, []);
 
-  const handleSelectFolder = useCallback(async () => {
-    const folder = await pickFolder();
-    if (!folder) return;
+  const runIngest = useCallback(async (folder: string) => {
     setIndexing(true);
     setIndexError(null);
+    setIndexDone(false);
+    setIndexStopped(false);
+    setIngestProgress(null);
     try {
       await startIngest(folder);
-      // Poll until indexing finishes
       while (true) {
         await new Promise<void>((r) => setTimeout(r, 1000));
         const s = await getIngestStatus();
+        setIngestProgress({
+          done: s.files_done,
+          total: s.files_total,
+          current: s.current_file,
+          elapsed: s.elapsed_s,
+        });
         if (!s.running) {
           if (s.error) {
             setIndexError(s.error);
           } else {
             setNeedsIndex(false);
+            setIndexStopped(s.stopped);
+            setIndexDone(true);
+            setTimeout(() => setIndexDone(false), 3000);
+            requestAnimationFrame(() => inputRef.current?.focus());
           }
+          setIngestProgress(null);
           break;
         }
       }
@@ -84,6 +106,51 @@ export function MagpieWindow() {
     } finally {
       setIndexing(false);
     }
+  }, []);
+
+  const handleSelectFolder = useCallback(async () => {
+    const folder = await pickFolder();
+    if (!folder) return;
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      await getCurrentWindow().setFocus();
+    } catch { /* not under Tauri */ }
+    requestAnimationFrame(() => inputRef.current?.focus());
+    setLastFolder(folder);
+    await runIngest(folder);
+  }, [runIngest]);
+
+  const handleSelectFile = useCallback(async () => {
+    const file = await pickFile();
+    if (!file) return;
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      await getCurrentWindow().setFocus();
+    } catch { /* not under Tauri */ }
+    requestAnimationFrame(() => inputRef.current?.focus());
+    setLastFolder(file);
+    await runIngest(file);
+  }, [runIngest]);
+
+  const handleReindex = useCallback(async () => {
+    if (lastFolder) {
+      await runIngest(lastFolder);
+      return;
+    }
+    // No folder indexed yet — open the picker as a fallback.
+    const folder = await pickFolder();
+    if (!folder) return;
+    try {
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
+      await getCurrentWindow().setFocus();
+    } catch { /* not under Tauri */ }
+    requestAnimationFrame(() => inputRef.current?.focus());
+    setLastFolder(folder);
+    await runIngest(folder);
+  }, [lastFolder, runIngest]);
+
+  const handleStop = useCallback(async () => {
+    await stopIngest();
   }, []);
 
   const highlights = useMemo(
@@ -111,13 +178,17 @@ export function MagpieWindow() {
     }
   }, []);
 
-  const reset = useCallback(() => {
-    setResult(null);
-    setSubmitted(null);
-    setSelectedPath(null);
-    setQuery("");
-    setError(null);
-  }, []);
+  // Backspace-to-dismiss: clearing the input collapses the answer card.
+  // The answer stays visible while the user types a new query; only
+  // backspacing all the way to empty counts as an intentional dismiss.
+  useEffect(() => {
+    if (query === "") {
+      setResult(null);
+      setSubmitted(null);
+      setSelectedPath(null);
+      setError(null);
+    }
+  }, [query]);
 
   // Resize the window itself when a query is active vs idle. Tauri's set_size
   // keeps the top-left fixed, so the bar stays anchored and the cards grow
@@ -130,16 +201,16 @@ export function MagpieWindow() {
         if (cancelled) return;
         const target = result !== null || loading || error !== null
           ? new LogicalSize(COMPACT_WIDTH, EXPANDED_HEIGHT)
-          : needsIndex
+          : indexing || indexError !== null || needsIndex || indexDone
           ? new LogicalSize(COMPACT_WIDTH, ONBOARD_HEIGHT)
-          : new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT);
+          : new LogicalSize(COMPACT_WIDTH, MANAGE_HEIGHT);
         await getCurrentWindow().setSize(target);
       } catch {
         // Not under Tauri (browser dev) — ignore.
       }
     })();
     return () => { cancelled = true; };
-  }, [result, loading, error, needsIndex]);
+  }, [result, loading, error, needsIndex, indexDone, indexing, indexError]);
 
   // Spotlight behavior: Esc always hides. Shrink the window *before* hide so
   // the next summon opens already-compact — avoids a flash of the expanded
@@ -155,47 +226,24 @@ export function MagpieWindow() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  // Clicking the transparent window background (outside any card) should dismiss,
-  // matching Spotlight / Alfred behaviour. tauri://blur only fires when another
-  // *app* steals focus, so we also need this document-level handler for clicks
-  // that land on the webview's transparent layer without leaving the window.
-  useEffect(() => {
-    const handler = (e: PointerEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target?.closest(".magpie-card")) {
-        hideWindow();
-      }
-    };
-    document.addEventListener("pointerdown", handler);
-    return () => document.removeEventListener("pointerdown", handler);
-  }, []);
 
-  // Wire Tauri window events: blur → hide (shrunk), focus → reset + focus input.
-  // Spotlight semantics: always hide on blur, regardless of dev/prod.
+  // Auto-focus the input once the backend finishes booting (it was disabled until now).
+  useEffect(() => {
+    if (!booting) {
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+  }, [booting]);
+
+  // Re-focus the input whenever the window gains focus (e.g. user clicks back on Magpie
+  // or Alt+Space re-summons it). Does not reset state so in-progress queries are preserved.
   useEffect(() => {
     let cleanups: Array<() => void> = [];
     (async () => {
       try {
-        const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
+        const { getCurrentWindow } = await import("@tauri-apps/api/window");
         const appWindow = getCurrentWindow();
 
-        const unBlur = await appWindow.listen("tauri://blur", () => {
-          // Debounce: on Windows the Alt key causes a spurious blur immediately
-          // after the window appears. Cancel the hide if focus returns quickly.
-          blurTimer.current = setTimeout(async () => {
-            blurTimer.current = null;
-            await appWindow.setSize(new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT));
-            await appWindow.hide();
-          }, 150);
-        });
-        cleanups.push(unBlur);
-
         const unFocus = await appWindow.listen("tauri://focus", () => {
-          if (blurTimer.current !== null) {
-            clearTimeout(blurTimer.current);
-            blurTimer.current = null;
-          }
-          reset();
           requestAnimationFrame(() => inputRef.current?.focus());
         });
         cleanups.push(unFocus);
@@ -204,7 +252,7 @@ export function MagpieWindow() {
       }
     })();
     return () => cleanups.forEach((fn) => fn());
-  }, [reset]);
+  }, []);
 
   const active = result !== null || loading || error !== null;
 
@@ -220,22 +268,61 @@ export function MagpieWindow() {
         submittedQuestion={submitted}
       />
 
-      {needsIndex && !active && (
+      {!active && (
         <div className="onboard-card magpie-card">
-          <p className="onboard-card__message">
-            {indexing
-              ? "Indexing your files…"
-              : indexError
-              ? `Indexing failed: ${indexError}`
-              : "Nothing indexed yet. Select a folder to get started."}
-          </p>
-          {!indexing && (
-            <button
-              className="onboard-card__btn"
-              onClick={handleSelectFolder}
-            >
-              {indexError ? "Try again" : "Select folder to index"}
-            </button>
+          {indexing ? (
+            <>
+              <p className="onboard-card__message">
+                {ingestProgress?.total
+                  ? `Indexing ${ingestProgress.done} / ${ingestProgress.total} files…`
+                  : "Scanning files…"}
+              </p>
+              {ingestProgress?.total ? (
+                <div className="onboard-card__progress-bar">
+                  <div
+                    className="onboard-card__progress-fill"
+                    style={{ width: `${Math.round((ingestProgress.done / ingestProgress.total) * 100)}%` }}
+                  />
+                </div>
+              ) : null}
+              {ingestProgress?.current && (
+                <p className="onboard-card__detail">
+                  {ingestProgress.current.length > 44
+                    ? `…${ingestProgress.current.slice(-42)}`
+                    : ingestProgress.current}
+                </p>
+              )}
+              {ingestProgress?.elapsed != null && (
+                <p className="onboard-card__detail">{formatElapsed(ingestProgress.elapsed)}</p>
+              )}
+              <button className="onboard-card__btn onboard-card__btn--stop" onClick={handleStop}>
+                Stop indexing
+              </button>
+            </>
+          ) : indexError ? (
+            <>
+              <p className="onboard-card__message">Indexing failed: {indexError}</p>
+              <button className="onboard-card__btn" onClick={handleSelectFolder}>Try again</button>
+            </>
+          ) : indexDone ? (
+            <>
+              <p className="onboard-card__message">
+                {indexStopped
+                  ? "Indexing stopped — files processed so far are searchable."
+                  : "All done! Go ahead and ask something."}
+              </p>
+              <button className="onboard-card__btn" onClick={handleReindex}>Re-index</button>
+            </>
+          ) : needsIndex ? (
+            <>
+              <p className="onboard-card__message">Nothing indexed yet. Select a folder or file to get started.</p>
+              <div className="onboard-card__actions">
+                <button className="onboard-card__btn" onClick={handleSelectFolder}>Select folder</button>
+                <button className="onboard-card__btn onboard-card__btn--secondary" onClick={handleSelectFile}>Select file</button>
+              </div>
+            </>
+          ) : (
+            <button className="onboard-card__btn" onClick={handleReindex}>Re-index</button>
           )}
         </div>
       )}
@@ -275,10 +362,9 @@ async function hideWindow() {
   try {
     const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
-    // Shrink while still hidden-on-next-summon so the user never sees the
-    // expanded layout briefly when re-summoning. Vibrancy redraw on macOS
-    // can ghost stale pixels otherwise.
-    await win.setSize(new LogicalSize(COMPACT_WIDTH, COMPACT_HEIGHT));
+    // Shrink to MANAGE_HEIGHT (not COMPACT_HEIGHT) — the management card is
+    // always rendered below the search bar, so the window is never truly 96px.
+    await win.setSize(new LogicalSize(COMPACT_WIDTH, MANAGE_HEIGHT));
     await win.hide();
   } catch {
     /* not under Tauri */

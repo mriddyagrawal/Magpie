@@ -538,6 +538,8 @@ async def run_batch(
     include_data: bool = False,
     push_to_qdrant: bool = False,
     chunk_size: int = CHUNK_SIZE,
+    progress_callback=None,
+    stop_event=None,
 ) -> None:
     from tqdm import tqdm
 
@@ -574,6 +576,9 @@ async def run_batch(
             f"({ignored_count} ignored, {asset_lib_skipped} in asset-library folders)"
         )
         return
+
+    if progress_callback:
+        progress_callback(0, len(files), None)
     if asset_lib_skipped:
         print(
             f"skipped {asset_lib_skipped} images in {root} "
@@ -636,7 +641,15 @@ async def run_batch(
 
     async def worker(path: Path):
         nonlocal t4_used_mb, last_save_t
+        if stop_event is not None and stop_event.is_set():
+            bar.update(1)
+            stats["skipped"] += 1
+            if progress_callback:
+                progress_callback(bar.n, len(files), None)
+            return
         rel = source_rel_path(path)
+        if progress_callback:
+            progress_callback(bar.n, len(files), path.name)
         try:
             async with sem:
                 bar.set_postfix_str(path.name[:40])
@@ -681,6 +694,8 @@ async def run_batch(
             tqdm.write(f"  error: {rel}: {type(e).__name__}: {e}")
         finally:
             bar.update(1)
+            if progress_callback:
+                progress_callback(bar.n, len(files), None)
 
     def _flush_chunk(chunk_idx: int) -> None:
         """Save the manifest, then push new entries to Qdrant (no orphan sweep).

@@ -24,6 +24,7 @@ import os
 import socket
 import subprocess
 import sys
+import threading
 import time
 import warnings
 from pathlib import Path
@@ -372,7 +373,14 @@ _ingest_state: dict[str, Any] = {
     "done": False,
     "error": None,
     "path": None,
+    "files_total": 0,
+    "files_done": 0,
+    "current_file": None,
+    "started_at": None,
+    "stopped": False,
 }
+
+_stop_event = threading.Event()
 
 
 class IngestRequest(BaseModel):
@@ -386,22 +394,41 @@ async def start_ingest(req: IngestRequest) -> dict[str, Any]:
     folder = Path(req.path)
     if not folder.exists():
         raise HTTPException(status_code=400, detail=f"Path does not exist: {req.path}")
-    if not folder.is_dir():
-        raise HTTPException(status_code=400, detail=f"Not a directory: {req.path}")
+    if not folder.is_file() and not folder.is_dir():
+        raise HTTPException(status_code=400, detail=f"Not a file or directory: {req.path}")
 
-    _ingest_state.update(running=True, done=False, error=None, path=req.path)
-
-    import threading
-    threading.Thread(target=_do_ingest, args=(folder,), daemon=True).start()
+    _stop_event.clear()
+    _ingest_state.update(
+        running=True, done=False, error=None, path=req.path,
+        files_total=0, files_done=0, current_file=None,
+        started_at=time.time(), stopped=False,
+    )
+    if folder.is_file():
+        threading.Thread(target=_do_ingest_file, args=(folder,), daemon=True).start()
+    else:
+        threading.Thread(target=_do_ingest, args=(folder,), daemon=True).start()
     return {"status": "started", "path": req.path}
 
 
 def _do_ingest(folder: Path) -> None:
+    def _on_progress(done: int, total: int, current: str | None = None) -> None:
+        _ingest_state["files_done"] = done
+        _ingest_state["files_total"] = total
+        if current is not None:
+            _ingest_state["current_file"] = current
+
     try:
         from src.ingest.walker import run_batch
         from src.stage2.__main__ import ingest_from_manifest
-        import asyncio
-        asyncio.run(run_batch(folder, push_to_qdrant=True, concurrency=4))
+        asyncio.run(run_batch(
+            folder,
+            push_to_qdrant=True,
+            concurrency=4,
+            progress_callback=_on_progress,
+            stop_event=_stop_event,
+        ))
+        if _stop_event.is_set():
+            _ingest_state["stopped"] = True
         ingest_from_manifest(force=False, verbose=False)
         _ingest_state["done"] = True
     except Exception as exc:
@@ -411,13 +438,69 @@ def _do_ingest(folder: Path) -> None:
         _ingest_state["running"] = False
 
 
+def _do_ingest_file(file_path: Path) -> None:
+    def _on_progress(done: int, total: int, current: str | None = None) -> None:
+        _ingest_state["files_done"] = done
+        _ingest_state["files_total"] = total
+        if current is not None:
+            _ingest_state["current_file"] = current
+
+    _on_progress(0, 1, file_path.name)
+    try:
+        from src.ingest.walker import ingest_one, _gpu_available
+        from src.manifest import Manifest
+        from src.stage2.__main__ import ingest_from_manifest
+
+        manifest = Manifest()
+        agent = None
+
+        def get_agent():
+            nonlocal agent
+            if agent is None:
+                from src.stage1.summarize import build_agent as _build
+                agent = _build()
+            return agent
+
+        async def _run():
+            return await ingest_one(
+                file_path, manifest, get_agent,
+                gpu_available=_gpu_available(),
+                t4_budget_used_mb=0.0,
+            )
+
+        asyncio.run(_run())
+        manifest.save()
+        _on_progress(1, 1, None)
+        ingest_from_manifest(force=False, verbose=False)
+        _ingest_state["done"] = True
+    except Exception as exc:
+        _ingest_state["error"] = str(exc)
+        print(f"[server] ingest_file error: {exc}", file=sys.stderr)
+    finally:
+        _ingest_state["running"] = False
+
+
+@app.post("/ingest/stop")
+def stop_ingest() -> dict[str, str]:
+    _stop_event.set()
+    return {"status": "stopping"}
+
+
 @app.get("/ingest/status")
 def ingest_status() -> dict[str, Any]:
+    elapsed: float | None = None
+    if _ingest_state["started_at"] is not None:
+        elapsed = round(time.time() - _ingest_state["started_at"], 1)
     return {
         "running": _ingest_state["running"],
         "done": _ingest_state["done"],
         "error": _ingest_state["error"],
         "path": _ingest_state["path"],
+        "files_total": _ingest_state["files_total"],
+        "files_done": _ingest_state["files_done"],
+        "current_file": _ingest_state["current_file"],
+        "elapsed_s": elapsed,
+        "stopped": _ingest_state["stopped"],
     }
 
 

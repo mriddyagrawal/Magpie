@@ -60,8 +60,17 @@ class LaunchArgs:
     quant: str = DEFAULT_QUANT
 
     # `--mmproj` — path to a multimodal projector .gguf. None for
-    # text-only profiles. PR 2 sets this for vision profiles.
+    # text-only profiles. Two ways to specify it on a vision profile:
+    #   - `mmproj` set to an absolute path → spawn passes it verbatim
+    #     (test-friendly: lets a pinned local file override discovery).
+    #   - `mmproj_repo_id` set → pool calls
+    #     `ensure_mmproj(repo_id, variant)` at spawn time, downloading
+    #     once and caching to <APP_DATA_DIR>/cache/hub/.
+    # The variant ("BF16" / "F16" / "Q8_0" etc.) selects which projector
+    # quant Unsloth's repo ships.
     mmproj: Optional[str] = None
+    mmproj_repo_id: Optional[str] = None
+    mmproj_variant: str = "BF16"
 
     # `-ngl` — layers offloaded to GPU. 999 = all (recommended on
     # Metal/CUDA), 0 = pure CPU.
@@ -168,6 +177,34 @@ register(
 )
 
 
+# `gemma-4-e4b-vision` — same GGUF as the text profile + the BF16 mmproj
+# projector. Registered at import; the projector itself is only
+# downloaded when this profile is first spawned (via ensure_mmproj in
+# the pool's argv builder), or pre-downloaded by `just install-llama-server`
+# so first-inference latency stays low.
+register(
+    ModelProfile(
+        name="gemma-4-e4b-vision",
+        description=(
+            "Gemma 4 E4B + mmproj-BF16 projector for vision. Pairs the "
+            "same GGUF as the text profile with the multi-modal "
+            "projector Unsloth ships in the same repo (~946 MB BF16)."
+        ),
+        has_vision=True,
+        args=LaunchArgs(
+            repo_id=os.environ.get("LOCAL_MODEL", DEFAULT_REPO),
+            quant=os.environ.get("LOCAL_QUANT", DEFAULT_QUANT),
+            mmproj_repo_id=os.environ.get("LOCAL_MMPROJ_REPO", DEFAULT_REPO),
+            mmproj_variant=os.environ.get("LOCAL_MMPROJ_VARIANT", "BF16"),
+            ngl=DEFAULT_NGL,
+            ctx_size=int(os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)),
+            temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
+            jinja=True,
+        ),
+    )
+)
+
+
 # ---------------------------------------------------------------------------
 # Default-name resolution
 # ---------------------------------------------------------------------------
@@ -181,10 +218,11 @@ def default_text_profile() -> str:
 
 
 def default_vision_profile() -> Optional[str]:
-    """Profile name for vision inference. PR 1 has no vision profile;
-    returns None when none is registered yet. PR 2 changes the default
-    to `gemma-4-e4b-vision`."""
-    name = os.environ.get("LLAMA_SERVER_VISION_MODEL", "")
+    """Profile name for vision inference. Defaults to `gemma-4-e4b-vision`
+    when registered; env-overridable via `LLAMA_SERVER_VISION_MODEL`.
+    Returns None if neither the env override nor the default is in the
+    registry, so callers can fall back gracefully (text-only summary)."""
+    name = os.environ.get("LLAMA_SERVER_VISION_MODEL", "gemma-4-e4b-vision")
     if name and name in _PROFILES:
         return name
     return None

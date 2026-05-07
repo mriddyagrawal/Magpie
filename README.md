@@ -100,7 +100,7 @@ After `just sync-environment`, run:
 just install-llama-server
 ```
 
-This downloads the right `llama-server` binary for your platform from llama.cpp's GitHub releases (~30 MB), stages it under `<APP_DATA_DIR>/bin/`, strips macOS quarantine, and verifies the version. Override the version with `LLAMA_SERVER_VERSION=b5500 just install-llama-server`.
+This downloads the right `llama-server` binary for your platform from llama.cpp's GitHub releases (~30 MB), stages it under `<APP_DATA_DIR>/bin/`, strips macOS quarantine, and verifies the version. It ALSO pre-downloads the Gemma 4 E4B vision projector (`mmproj-BF16.gguf`, ~946 MB) so the first vision-bearing summary doesn't pause for several minutes on a slow connection. Skip the projector with `SKIP_MMPROJ_DOWNLOAD=1 just install-llama-server` if you don't need local vision. Override the version pin with `LLAMA_SERVER_VERSION=b5500 just install-llama-server`.
 
 Supported platforms (auto-detected):
 
@@ -131,6 +131,9 @@ LLAMA_SERVER_BASE_PORT=9100               # NOT 8765 (FastAPI sidecar)
 LLAMA_SERVER_MAX_LOADED_MODELS=1          # 1 = sequential, LRU eviction
 LLAMA_SERVER_IDLE_TIMEOUT_S=600           # unload after 10 min idle
 LLAMA_SERVER_STARTUP_TIMEOUT_S=60         # wait for /health on spawn
+LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text  # profile for text inference
+LLAMA_SERVER_VISION_MODEL=gemma-4-e4b-vision  # profile for image-bearing calls
+LOCAL_MMPROJ_VARIANT=BF16                 # mmproj quant (BF16 / F16 / Q8_0 / …)
 ```
 
 Available Gemma 4 E4B quants (all UD = Unsloth Dynamic-2.0, on the Pareto frontier):
@@ -146,7 +149,7 @@ Available Gemma 4 E4B quants (all UD = Unsloth Dynamic-2.0, on the Pareto fronti
 
 - **Latency**: ~1-3s per text call on Metal/CUDA (Apple Silicon M-series, modern NVIDIA), plus ~5 ms HTTP localhost overhead. CPU fallback is bounded but noticeably slower.
 - **Concurrency**: HTTP-safe — multiple Python coroutines can submit concurrent requests; llama-server's internal scheduler handles them. Throughput is bounded by the single subprocess.
-- **Vision**: PR 2 of the llama-server migration adds Gemma 4 E4B native vision via the mmproj projector (~946 MB additional file, eager-downloaded by `install-llama-server`). T3 image-bearing calls then route image bytes through `LocalLLM.complete(images=...)`. See [Specs/llama_server_migration.md](Specs/llama_server_migration.md). Cloud providers keep full vision support regardless.
+- **Vision**: Gemma 4 E4B native vision via the `mmproj-BF16.gguf` projector. The `gemma-4-e4b-vision` profile is registered automatically; T3 image-bearing summaries (raw images, scanned PDFs) route image bytes through `LocalLLM.complete(images=...)` and the pool transparently swaps to the vision model when needed. With `LLAMA_SERVER_MAX_LOADED_MODELS=1` (default), back-and-forth between text and vision incurs a model-reload — bump to 2 on RAM-rich machines to keep both warm. Set `LLAMA_SERVER_VISION_MODEL=` (empty) to disable local vision; image bytes then silently fall through to a text-only summary.
 - **Quality caveat**: Gemma 4 E4B is small. Summaries may be less detailed than what `gemma-4-31B-it` or Claude Sonnet produce. The JSON-repair layer keeps the pipeline running on imperfect output.
 
 #### Thinking mode

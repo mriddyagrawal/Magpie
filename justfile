@@ -86,7 +86,19 @@ install-llama-server:
     fi
     echo "==> Verifying version"
     "$DEST/llama-server" --version 2>&1 | head -3
-    echo "==> done. Installed to: $DEST/llama-server"
+    echo "==> Installed to: $DEST/llama-server"
+    echo
+    echo "==> Pre-downloading the Gemma 4 E4B vision projector (~946 MB)"
+    echo "    First-time only; cached under \$APP_DATA_DIR/cache/hub/."
+    echo "    Streams progress below. Skip with SKIP_MMPROJ_DOWNLOAD=1."
+    if [ "${SKIP_MMPROJ_DOWNLOAD:-}" != "1" ]; then
+        uv run python -c "from src.inference.model_downloader import ensure_mmproj; \
+            p = ensure_mmproj('unsloth/gemma-4-E4B-it-GGUF'); \
+            print(f'    cached at {p}')"
+    else
+        echo "    skipped (SKIP_MMPROJ_DOWNLOAD=1)"
+    fi
+    echo "==> done."
 
 # Walk every enabled include_paths entry in indexing_rules.json. This is
 # the "do everything" command — replaces running `just walk <path>` once

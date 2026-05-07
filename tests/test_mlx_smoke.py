@@ -1,13 +1,17 @@
-"""Smoke test for the local llama-cpp-python backend.
+"""Smoke test for the local llama-server backend.
 
 Skipped unless `LLM_PROVIDER=local` is set in the environment. Cross-platform
 since 2026-05 (was Apple-Silicon-only when this used mlx-vlm; see
 Plans/Local LLM Plan.md). The filename is kept for git-history continuity
-even though MLX is no longer the underlying engine.
+even though neither MLX nor llama-cpp-python is the underlying engine —
+the actual backend is `llama-server` (HTTP) plus the Gemma 4 E4B GGUF
+and BF16 mmproj projector for vision.
 
 Exercises the full path: load the model, summarize a text file and (if
-available) an image, assert the outputs parse into valid Pydantic objects.
-Real inference — no mocks. Expect ~30s first run (model load) + a few seconds
+available) an image, ask a question that requires reading an image —
+assert the outputs parse into valid Pydantic objects AND (for image
+tests) contain non-trivial image-derived content. Real inference,
+no mocks. Expect ~30s first run (model + mmproj load) + a few seconds
 per file.
 """
 
@@ -41,10 +45,30 @@ def _pick_text_file() -> Path | None:
 
 
 def _pick_image_file() -> Path | None:
+    """Prefer the committed fixture (deterministic content for assertions);
+    fall back to any image under Test Content/ for users who run the smoke
+    test without that fixture available."""
+    fixture = REPO_ROOT / "tests" / "inference" / "image.png"
+    if fixture.is_file():
+        return fixture
     for candidate in TEST_CONTENT.rglob("*"):
         if candidate.is_file() and candidate.suffix.lower() in IMAGE_EXTS:
             return candidate
     return None
+
+
+# Visible text labels in `tests/inference/image.png` (an LLM-evaluation
+# diagram). The image-bearing tests assert the model recovers at least
+# one — the non-trivial image-derived content gate.
+_FIXTURE_IMAGE_LABELS = (
+    "llm", "evaluation", "knowledge", "cognition", "hallucination",
+    "creativity", "coding", "bias", "context", "lightbulb",
+)
+
+
+def _matches_fixture_labels(text: str) -> list[str]:
+    lower = text.lower()
+    return [w for w in _FIXTURE_IMAGE_LABELS if w in lower]
 
 
 @pytest.mark.asyncio
@@ -73,7 +97,15 @@ async def test_mlx_summarize_text():
 
 @pytest.mark.asyncio
 async def test_mlx_summarize_image():
-    """Summarize an image file (if any exist under Test Content/)."""
+    """Summarize an image file end-to-end through the vision profile.
+
+    When the committed fixture is present, this is the load-bearing test
+    that PR 3's wiring actually delivers vision to T3 ingest: the
+    FileSummary's title or summary must mention something the image
+    visibly contains. A non-trivial assertion (vs. just "title is
+    non-empty") catches regressions where the image gets dropped to
+    text-only path silently.
+    """
     from src.stage1.summarize import (
         FileSummary,
         build_agent,
@@ -82,7 +114,7 @@ async def test_mlx_summarize_image():
 
     path = _pick_image_file()
     if path is None:
-        pytest.skip("no image files under Test Content/ to summarize")
+        pytest.skip("no image files (no fixture, no Test Content/ images)")
 
     agent = build_agent()
     message = build_user_message(path)
@@ -90,6 +122,19 @@ async def test_mlx_summarize_image():
 
     assert isinstance(result, FileSummary)
     assert result.title, "FileSummary.title must be non-empty for image"
+
+    # If the user pointed us at the committed fixture, demand image-derived
+    # content. Other images skip the strong assertion (we don't know what
+    # they contain) but still validate the structural path above.
+    is_fixture = path == REPO_ROOT / "tests" / "inference" / "image.png"
+    if is_fixture:
+        haystack = " ".join([result.title, result.summary or ""])
+        matched = _matches_fixture_labels(haystack)
+        assert matched, (
+            "vision profile produced no image-derived content for the "
+            f"committed fixture. FileSummary was:\ntitle={result.title!r}\n"
+            f"summary={result.summary!r}"
+        )
 
 
 @pytest.mark.asyncio
@@ -110,3 +155,32 @@ async def test_mlx_answer_from_file():
 
     assert isinstance(ans, Answer)
     assert ans.answer, "Answer.answer must be non-empty"
+
+
+@pytest.mark.asyncio
+async def test_mlx_answer_from_image():
+    """The PR 3 gate: an image-bearing answer-step call must route bytes
+    to the vision profile and return image-derived content.
+
+    Skipped if the committed fixture isn't present — without a known
+    image we can't make a non-trivial assertion about the answer."""
+    from src.answer import Answer, answer_question, build_answer_agent
+
+    fixture = REPO_ROOT / "tests" / "inference" / "image.png"
+    if not fixture.is_file():
+        pytest.skip("committed image fixture missing; can't verify content")
+
+    agent = build_answer_agent()
+    ans = await answer_question(
+        agent,
+        "What text is visible in this image?",
+        [str(fixture.relative_to(REPO_ROOT))],
+    )
+
+    assert isinstance(ans, Answer)
+    assert ans.answer, "Answer.answer must be non-empty"
+    matched = _matches_fixture_labels(ans.answer)
+    assert matched, (
+        "answer-step vision is not delivering image content to the model. "
+        f"Answer was:\n{ans.answer[:500]}"
+    )

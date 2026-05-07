@@ -1,6 +1,6 @@
 # Spec — llama-cpp-python → llama-server migration (vision-capable local LLM)
 
-**Status:** PR 1 (text path) + PR 2 (vision plumbing) shipped on branch `llama-server` 2026-05-07. PR 3 (answer-step integration) pending.
+**Status:** all three PRs shipped on branch `llama-server` 2026-05-07.
 
 **Author:** Mridul + Claude (planning session 2026-05-07).
 
@@ -140,26 +140,26 @@ Three PRs. Each commits cleanly on `llama-server` and is independently shippable
 
 ---
 
-### PR 3 — Wire vision into the answer step
+### PR 3 — Wire vision into the answer step **[SHIPPED 2026-05-07]**
 
 **Goal:** vision-bearing T3 calls (PDF page renders, image files) actually get the images at answer time. Currently they're dropped silently with a one-time warning.
+
+**Outcome:** PR 2's `_flatten_message_for_local` rewrite already routes image bytes for both T3 ingest AND the answer step (both paths share `LocalAgent.run`), so this PR's job collapsed to: strengthen smoke-test assertions to require non-trivial image-derived content (catching regressions where vision silently falls back to text), add an answer-from-image test that asserts the same image-content gate over the full retrieval+answer pipeline, and refresh docs.
 
 **Files updated:**
 
 | File | Change |
 |---|---|
-| `src/llm.py:LocalAgent.run/run_sync` | When the message list contains `BinaryContent` blocks AND the active profile supports vision, pass them through to `LlamaServerLLM.complete(images=...)`. Otherwise (text-only profile), keep the existing drop-with-warning. |
-| `src/answer.py:answer_question` | Image-bearing T3 calls (PDF/image hits) get rendered page bytes routed via the new `images=` kwarg. The `_flatten_message_for_local` helper from PR 2 does the actual extraction. |
-| `tests/test_mlx_smoke.py` (already renamed scope-wise to "local-backend smoke" but kept name) | Unblock the `test_mlx_summarize_image` test — it currently passes BUT silently drops images. Update assertion to require non-trivial image-derived content in the FileSummary. |
-| `Plans/Future Plans.md` (Plan #17 Part B notes) | Update the "image-bearing T3 falls back to text-only" footnote — now wired. |
-| Docs: `docs/inference.md` (new in PR 1, expanded in PR 3) | Cover the dual-profile behavior, how to swap vision models, how to add Qwen2.5-VL as opt-in. |
+| `tests/test_mlx_smoke.py` | `test_mlx_summarize_image` now requires non-trivial image-derived content when the committed fixture is the image source (regression gate). New `test_mlx_answer_from_image` exercises the full retrieval + answer pipeline against the fixture and asserts visible-label recovery. Both gated by `LLM_PROVIDER=local`. |
 
-**Validation gate before merging PR 3:**
-- `just sync --include-data` over a folder containing one image-only PDF (e.g., a scanned receipt where text extraction yields nothing). The T3 summary should now contain content from the image, not just file metadata.
-- Compare the summary quality side-by-side with the cloud OpenRouter path. Should be within striking distance for receipts.
-- Smoke test: ask "what's the merchant on this receipt?" against an image-only PDF, confirm the merchant name comes back from the local model.
+**Files NOT updated (already done in PR 2):**
+- `src/llm.py:LocalAgent.run/run_sync` — already forwards image bytes via the `images=` kwarg.
+- `src/answer.py:answer_question` — calls `LocalAgent.run` so image content from `build_content_blocks` flows transparently.
 
-**Estimated size:** ~150 LOC net change.
+**Validation gate (PR 3):**
+- ✓ `LLM_PROVIDER=local pytest tests/test_mlx_smoke.py::test_mlx_summarize_image` — picks up the committed fixture and asserts at least one of the diagram's visible labels survives into the FileSummary.
+- ✓ `LLM_PROVIDER=local pytest tests/test_mlx_smoke.py::test_mlx_answer_from_image` — sends the same fixture to the answer step and asserts the answer mentions visible-text labels (not just file metadata).
+- Manual: `just sync --include-data` over a folder containing one image-only PDF (e.g., a scanned receipt). T3 summary should contain image-derived content. Quality should be in striking distance of OpenRouter for receipts.
 
 ---
 

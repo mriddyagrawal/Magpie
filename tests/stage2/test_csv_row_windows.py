@@ -1,7 +1,8 @@
-"""Tests for `build_csv_row_window_block` (Plan #17 Part B).
+"""Tests for `build_csv_row_window_block` + `build_csv_sample_block`
+(Plan #17 Part B + the 2026-05 file-level summary follow-up).
 
-Validates the row-window construction + merging logic without any Qdrant /
-LLM dependencies.
+Validates the row-window construction + merging logic, and the case-A
+sample block, without any Qdrant / LLM dependencies.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from src.stage2.search import (
     CSV_NEIGHBOR_WINDOW,
     _csv_rows_cache,
     build_csv_row_window_block,
+    build_csv_sample_block,
 )
 
 
@@ -41,48 +43,124 @@ def _csv_with_n_data_rows(tmp_path: Path, n: int) -> Path:
     return _write_csv(tmp_path, rows)
 
 
+# Marker text expected on matched rows. Pinned here so a typo elsewhere
+# can't drift the format.
+MATCH_MARKER = "(this row matched the question)"
+
+
 # ---------------------------------------------------------------------------
-# single-hit window
+# Format basics
+# ---------------------------------------------------------------------------
+
+def test_block_has_header_at_top(tmp_path):
+    """Each window block leads with a CSV header line."""
+    p = _csv_with_n_data_rows(tmp_path, 50)
+    block = build_csv_row_window_block(str(p), [10])
+    assert block is not None
+    assert block.splitlines()[0] == "id,name"
+
+
+def test_data_rows_are_raw_csv_not_key_value(tmp_path):
+    """Rows in the prompt block are raw CSV. The key-value `k: v | k: v`
+    format is for INDEX-time embedding only, not query-time prompts."""
+    p = _csv_with_n_data_rows(tmp_path, 50)
+    block = build_csv_row_window_block(str(p), [10])
+    assert block is not None
+    # Find the matched row's line.
+    for line in block.splitlines():
+        if "r10" in line:
+            # Raw CSV: starts with the integer id, comma, name.
+            assert line.startswith("10,r10")
+            # Should NOT use the key-value index-time format.
+            assert "id:" not in line
+            assert " | " not in line
+            break
+    else:
+        pytest.fail("matched row not found in block output")
+
+
+def test_no_row_n_prefix(tmp_path):
+    """Old format had `[row N]` at the start of every line. New format drops it."""
+    p = _csv_with_n_data_rows(tmp_path, 50)
+    block = build_csv_row_window_block(str(p), [5])
+    assert block is not None
+    assert "[row " not in block
+
+
+def test_match_marker_is_ascii_parenthetical(tmp_path):
+    """Matched rows tagged with `(this row matched the question)` —
+    plain ASCII, no unicode arrows that small models might tokenize poorly."""
+    p = _csv_with_n_data_rows(tmp_path, 50)
+    block = build_csv_row_window_block(str(p), [10])
+    assert block is not None
+    assert MATCH_MARKER in block
+    # No unicode arrow.
+    assert "→" not in block
+    assert "←" not in block
+
+
+def test_only_matched_rows_get_marker(tmp_path):
+    """Neighbors should NOT carry the matched marker — only the row
+    actually retrieved."""
+    p = _csv_with_n_data_rows(tmp_path, 50)
+    block = build_csv_row_window_block(str(p), [10])
+    assert block is not None
+    # Only one match in this test → marker appears exactly once.
+    assert block.count(MATCH_MARKER) == 1
+    # The line carrying the marker is the row 10 line specifically.
+    matched_line = next(
+        line for line in block.splitlines() if MATCH_MARKER in line
+    )
+    assert matched_line.startswith("10,r10")
+
+
+# ---------------------------------------------------------------------------
+# Single-hit window
 # ---------------------------------------------------------------------------
 
 def test_single_hit_includes_neighbors(tmp_path):
     p = _csv_with_n_data_rows(tmp_path, 50)
     block = build_csv_row_window_block(str(p), [10])
     assert block is not None
-    assert "[row 10 (match)]" in block
-    # ±2 neighbors = rows 8, 9, 11, 12
-    assert "[row 8]" in block
-    assert "[row 9]" in block
-    assert "[row 11]" in block
-    assert "[row 12]" in block
+    # Header + 5 rows = 6 lines (rows 8, 9, 10, 11, 12).
+    lines = block.splitlines()
+    assert lines[0] == "id,name"  # header
+    assert lines[1].startswith("8,r8")
+    assert lines[2].startswith("9,r9")
+    assert lines[3].startswith("10,r10")
+    assert MATCH_MARKER in lines[3]
+    assert lines[4].startswith("11,r11")
+    assert lines[5].startswith("12,r12")
     # No row outside the window.
-    assert "[row 7]" not in block
-    assert "[row 13]" not in block
+    assert "r7" not in block
+    assert "r13" not in block
 
 
 def test_single_hit_at_start_of_file_clamps_to_zero(tmp_path):
     p = _csv_with_n_data_rows(tmp_path, 10)
     block = build_csv_row_window_block(str(p), [0])
     assert block is not None
-    assert "[row 0 (match)]" in block
-    assert "[row 1]" in block
-    assert "[row 2]" in block
-    # No "row -1" leaks
-    assert "[row -" not in block
+    # Window can't go below 0; first data row is r0.
+    lines = block.splitlines()
+    assert lines[0] == "id,name"
+    assert lines[1].startswith("0,r0")
+    assert MATCH_MARKER in lines[1]
 
 
 def test_single_hit_at_end_of_file_clamps_to_len(tmp_path):
     p = _csv_with_n_data_rows(tmp_path, 10)
-    # Last data row index in the parsed dict is 9 (zero-indexed, 10 rows total).
+    # Last data row index in DictReader output is 9 (zero-indexed).
     block = build_csv_row_window_block(str(p), [9])
     assert block is not None
-    assert "[row 9 (match)]" in block
-    # Should clamp at the end — no row 10/11.
-    assert "[row 10]" not in block
+    # Should clamp at end — no row 10/11.
+    assert "r10" not in block
+    # The matched row is r9.
+    assert any(MATCH_MARKER in line and line.startswith("9,r9")
+               for line in block.splitlines())
 
 
 # ---------------------------------------------------------------------------
-# multi-hit merging
+# Multi-hit merging
 # ---------------------------------------------------------------------------
 
 def test_overlapping_windows_merge(tmp_path):
@@ -91,29 +169,31 @@ def test_overlapping_windows_merge(tmp_path):
     block = build_csv_row_window_block(str(p), [5, 6])
     assert block is not None
     # Both matches present.
-    assert "[row 5 (match)]" in block
-    assert "[row 6 (match)]" in block
-    # Single merged window should include 3..8 inclusive.
-    for i in range(3, 9):
-        assert f"[row {i}" in block
-    # Should NOT have a section divider since it's one window.
+    assert block.count(MATCH_MARKER) == 2
+    # Single merged window: header + 6 rows (3..8 inclusive).
+    sections = block.split("\n\n---\n\n")
+    assert len(sections) == 1
+    # No `---` divider in single window.
     assert "\n\n---\n\n" not in block
 
 
 def test_disjoint_windows_stay_separate(tmp_path):
     """Hits at rows 5 and 47: ranges 3..7 and 45..49 stay as two windows
-    separated by a divider."""
+    separated by a divider, each with its own header line at the top."""
     p = _csv_with_n_data_rows(tmp_path, 100)
     block = build_csv_row_window_block(str(p), [5, 47])
     assert block is not None
-    # Both matches.
-    assert "[row 5 (match)]" in block
-    assert "[row 47 (match)]" in block
-    # Divider between disjoint windows.
-    assert "\n\n---\n\n" in block
-    # Rows in between should NOT be present.
-    assert "[row 20]" not in block
-    assert "[row 30]" not in block
+    sections = block.split("\n\n---\n\n")
+    assert len(sections) == 2
+    # Each section has its own header.
+    assert sections[0].splitlines()[0] == "id,name"
+    assert sections[1].splitlines()[0] == "id,name"
+    # Each section has exactly one match marker.
+    assert sections[0].count(MATCH_MARKER) == 1
+    assert sections[1].count(MATCH_MARKER) == 1
+    # Rows in between (e.g. r20, r30) should NOT appear.
+    assert "r20" not in block
+    assert "r30" not in block
 
 
 def test_three_hits_with_two_overlapping(tmp_path):
@@ -123,15 +203,9 @@ def test_three_hits_with_two_overlapping(tmp_path):
     assert block is not None
     sections = block.split("\n\n---\n\n")
     assert len(sections) == 2
-    # First section spans rows 3..8.
-    assert "[row 3]" in sections[0]
-    assert "[row 8]" in sections[0]
-    assert "[row 5 (match)]" in sections[0]
-    assert "[row 6 (match)]" in sections[0]
-    # Second section spans rows 45..49.
-    assert "[row 45]" in sections[1]
-    assert "[row 47 (match)]" in sections[1]
-    assert "[row 49]" in sections[1]
+    # First section has 2 matches, second has 1.
+    assert sections[0].count(MATCH_MARKER) == 2
+    assert sections[1].count(MATCH_MARKER) == 1
 
 
 def test_adjacent_windows_merge(tmp_path):
@@ -143,19 +217,39 @@ def test_adjacent_windows_merge(tmp_path):
     # No divider.
     assert "\n\n---\n\n" not in block
     # Row 7 appears once (no duplicate from the merge).
-    assert block.count("[row 7]") == 1
+    # Count occurrences of the row-7 line. Header is "id,name" so
+    # we look for "7,r7" prefix.
+    row7_lines = [l for l in block.splitlines() if l.startswith("7,r7")]
+    assert len(row7_lines) == 1
 
 
 def test_duplicate_indexes_dedup(tmp_path):
-    """Same row hit twice should not double-print."""
+    """Same row hit twice should not double-print or duplicate marker."""
     p = _csv_with_n_data_rows(tmp_path, 50)
     block = build_csv_row_window_block(str(p), [10, 10, 10])
     assert block is not None
-    assert block.count("[row 10 (match)]") == 1
+    assert block.count(MATCH_MARKER) == 1
 
 
 # ---------------------------------------------------------------------------
-# error cases
+# CSV quoting / escaping
+# ---------------------------------------------------------------------------
+
+def test_values_with_commas_are_quoted(tmp_path):
+    """A row value containing a comma must be CSV-quoted so the prompt
+    parses unambiguously. Uses Python's csv.writer for proper escaping."""
+    p = _write_csv(tmp_path, [
+        ["id", "description"],
+        ["1", "Hello, world"],
+    ])
+    block = build_csv_row_window_block(str(p), [0])
+    assert block is not None
+    # The comma inside the value forces the field to be quoted.
+    assert '"Hello, world"' in block
+
+
+# ---------------------------------------------------------------------------
+# Error cases
 # ---------------------------------------------------------------------------
 
 def test_unreadable_csv_returns_none(tmp_path):
@@ -177,3 +271,43 @@ def test_default_window_matches_constant(tmp_path):
         str(p), [10], window=CSV_NEIGHBOR_WINDOW
     )
     assert block_default == block_explicit
+
+
+# ---------------------------------------------------------------------------
+# build_csv_sample_block (case A — file-level summary hit, no rows)
+# ---------------------------------------------------------------------------
+
+def test_sample_block_has_header_then_first_n_rows(tmp_path):
+    p = _csv_with_n_data_rows(tmp_path, 50)
+    block = build_csv_sample_block(str(p))
+    assert block is not None
+    lines = block.splitlines()
+    assert lines[0] == "id,name"  # header
+    # Default max_rows=5 → 5 data rows after header.
+    assert len(lines) == 1 + 5
+    assert lines[1].startswith("0,r0")
+    assert lines[5].startswith("4,r4")
+
+
+def test_sample_block_no_match_marker(tmp_path):
+    """case-A rows weren't directly retrieved — no `(this row matched the
+    question)` marker should appear."""
+    p = _csv_with_n_data_rows(tmp_path, 50)
+    block = build_csv_sample_block(str(p))
+    assert block is not None
+    assert MATCH_MARKER not in block
+
+
+def test_sample_block_caps_at_file_length(tmp_path):
+    """If the CSV has fewer rows than `max_rows`, return what's available
+    (don't pad with empty lines)."""
+    p = _csv_with_n_data_rows(tmp_path, 3)
+    block = build_csv_sample_block(str(p), max_rows=10)
+    assert block is not None
+    lines = block.splitlines()
+    assert len(lines) == 1 + 3  # header + 3 actual rows
+
+
+def test_sample_block_unreadable_returns_none(tmp_path):
+    block = build_csv_sample_block(str(tmp_path / "missing.csv"))
+    assert block is None

@@ -33,9 +33,14 @@ def _expected_point_ids(manifest) -> set[str]:
     Different tiers write different shapes:
       - Regular T0-T3 (one summary markdown per file): a single file-level
         point at `_point_id(rel)`.
-      - CSV row tier: N row-level points at `_row_point_id(rel, i)` for
-        i in 0..row_count-1. The writer records `entry.row_count` so we
-        know how many to expect.
+      - T1 CSVs: BOTH N row-level points at `_row_point_id(rel, i)` for
+        i in 0..row_count-1 AND a single file-level summary point at
+        `_point_id(rel)` (since the 2026-05 follow-up). Only the
+        file-level point exists when `summary_file` is set; if for some
+        reason the summary failed to write but rows did, only rows are
+        expected.
+      - Other chunked types (T0/T2 CSVs without a summary, etc.): file-
+        level only, like regular T0-T3.
 
     Future chunked formats (PDF sections, audio segments, long-doc windows)
     plug in here — add a count field to the Entry, write the chunk-id helper
@@ -52,6 +57,13 @@ def _expected_point_ids(manifest) -> set[str]:
             continue
         if entry.row_count and entry.row_count > 0:
             expected.update(_row_point_id(rel, i) for i in range(entry.row_count))
+            # T1 CSVs ALSO have a file-level summary point alongside the
+            # row points (Plan #17 follow-up). Only expect it when the
+            # entry actually has a summary_file pointer — otherwise the
+            # row-level ingest happened standalone (legacy / pre-#17
+            # data, or a summary-write failure).
+            if entry.summary_file:
+                expected.add(_point_id(rel))
         else:
             expected.add(_point_id(rel))
     return expected
@@ -117,9 +129,19 @@ def ingest_from_manifest(
                 skip_only_rels.append(rel)
                 continue
 
-            # NEW: If it's a CSV and routed to T1, it needs row-level indexing.
+            # T1 CSVs get TWO Qdrant representations (Plan #17 follow-up,
+            # 2026-05): row-level points (one per row, for "which row
+            # matches the question") AND a file-level summary point
+            # embedded from the LLM-generated summary markdown (so
+            # "what is this CSV?" semantic queries can find the file by
+            # its identity, not just its rows). The two have distinct
+            # point IDs (`_row_point_id(rel, i)` vs `_point_id(rel)`)
+            # so they don't collide. `_expected_point_ids` knows about
+            # both shapes so orphan cleanup expects all of them.
             if rel.lower().endswith(".csv") and entry.routes and "T1" in entry.routes:
                 csv_row_paths.append(rel)
+                if entry.summary_file:
+                    regular_paths.append(rel)
                 continue
 
             if entry.summary_file is None:

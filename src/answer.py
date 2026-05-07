@@ -294,10 +294,13 @@ async def answer_question(
     for display, abs_path in valid:
         try:
             csv_hits = _csv_row_indexes_for(display, abs_path)
-            if csv_hits is not None and abs_path.suffix.lower() == ".csv":
-                # Plan #17 Part B: focused row-window block, NOT file prefix.
-                # The file's LLM summary still gets prepended as supplement
-                # (which Part A made into a real summary, not raw bytes).
+            is_csv = abs_path.suffix.lower() == ".csv"
+
+            if is_csv and csv_hits:
+                # Plan #17 Part B (case B/C): one or more rows of this CSV
+                # were retrieved → row-window block (matched rows + ±2
+                # neighbors, merged across hits). The LLM summary still
+                # gets prepended as supplement.
                 from src.stage2.search import build_csv_row_window_block
                 block = await asyncio.to_thread(
                     build_csv_row_window_block, display, csv_hits
@@ -310,10 +313,34 @@ async def answer_question(
                 else:
                     blocks = [
                         f"Content type: csv-row-windows (the rows that match "
-                        f"the question, with ±2 neighbors for context — the "
-                        f"full file is intentionally NOT included; rely on "
-                        f"the per-file summary above for cross-row context "
-                        f"or to know what the CSV is about as a whole)\n\n---\n{block}"
+                        f"the question, with ±2 neighbors for context; "
+                        f"matched rows are tagged inline. Full CSV is "
+                        f"intentionally NOT included — rely on the per-file "
+                        f"summary above for cross-row context or to know "
+                        f"what the CSV is about as a whole)\n\n---\n{block}"
+                    ]
+            elif is_csv:
+                # Plan #17 Part B (case A): the CSV's file-level summary
+                # point hit in retrieval but no specific rows did. The
+                # user asked something the summary matched semantically
+                # ("do we have a faculty directory?"), not something a
+                # row matches verbatim. Surface the first 5 rows as a
+                # representative sample so the model has a concrete
+                # picture of row shape alongside the summary supplement.
+                from src.stage2.search import build_csv_sample_block
+                block = await asyncio.to_thread(build_csv_sample_block, display)
+                if block is None:
+                    blocks = [
+                        f"Content type: csv-sample\n\n---\n"
+                        f"(could not read {abs_path.name} from disk)"
+                    ]
+                else:
+                    blocks = [
+                        f"Content type: csv-sample (first 5 rows of this CSV "
+                        f"— no specific row matched your question; the "
+                        f"per-file summary above explains what the CSV is "
+                        f"overall, the rows below are illustrative of its "
+                        f"shape)\n\n---\n{block}"
                     ]
             elif _is_t0(display):
                 # T0 files: skip the whole-file read and lean on ripgrep.

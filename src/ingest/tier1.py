@@ -240,6 +240,17 @@ async def _do_csv_summarize(
         summary = await _run_with_retry(agent, message, path.name)
 
     body_markdown = render_markdown(summary, source_rel)
+    # Append a deterministic stats block (row count, column names, per-column
+    # distribution / numeric range). The LLM prose above is good for semantic
+    # retrieval ("course catalog", "people directory"); the stats block
+    # answers aggregation questions ("how many SUS courses?", "how many 0-credit
+    # courses across all majors?") that small models otherwise undercount because
+    # they're working from a top-k retrieval window, not the full file. See
+    # benchmarks/course_information/REPORT.md for the failure mode that
+    # motivated this. Compute is deterministic + fast (no LLM call) so we
+    # do it unconditionally for every CSV at ingest time.
+    from src.ingest.csv_stats import compute_csv_stats_markdown
+    body_markdown += await asyncio.to_thread(compute_csv_stats_markdown, path)
     await asyncio.to_thread(write_summary, out_path, body_markdown)
     return TierOutcome(
         summary_file_rel=summary_rel,

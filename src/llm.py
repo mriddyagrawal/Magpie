@@ -23,6 +23,7 @@ until per-provider reasoning APIs are wired (see Plans/Future Plans.md #16).
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import sys
@@ -317,6 +318,46 @@ _FENCE_CLOSE = re.compile(r"\n?\s*```\s*$")
 _JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
 
 
+def _coerce_field_name_drift(json_text: str) -> dict | None:
+    """Rescue payloads where the model wrote `{<some-name>: ..., sources_used: [...]}`
+    instead of `{answer: ..., sources_used: [...]}`. Returns a dict with
+    `answer` filled in from the misnamed key, or None if the input doesn't
+    match the rescuable shape.
+
+    Rescue is intentionally narrow — fires only when:
+      - the JSON parses cleanly to a dict
+      - the dict has exactly one key besides `sources_used`
+      - the misnamed key's value is a string OR a list (we join lists into
+        bulleted prose so the schema's `answer: str` validates)
+    Anything more ambiguous (multiple unknown keys, mismatched types) falls
+    through to the existing fallback / JSONParseError path.
+    """
+    try:
+        payload = json.loads(json_text)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(payload, dict) or "sources_used" not in payload:
+        return None
+    other_keys = [k for k in payload if k != "sources_used"]
+    if len(other_keys) != 1:
+        return None
+    answer_value = payload[other_keys[0]]
+    if isinstance(answer_value, str):
+        pass
+    elif isinstance(answer_value, list):
+        # Render as bulleted prose so it validates as `answer: str`. Items
+        # cast to str defensively (model occasionally embeds nested objects).
+        answer_value = "\n".join(f"- {item}" for item in answer_value)
+    elif isinstance(answer_value, (int, float, bool)):
+        # Numeric / boolean answer (e.g. count questions). Coerce to string.
+        answer_value = str(answer_value)
+    else:
+        # Dicts, None, anything else — too ambiguous to flatten safely.
+        # Let the diagnostic path log the raw output.
+        return None
+    return {"answer": answer_value, "sources_used": payload["sources_used"]}
+
+
 class JSONParseError(RuntimeError):
     """Raised when model output can't be coerced into the requested schema
     and the caller did not provide a fallback.
@@ -358,6 +399,21 @@ def parse_json_with_repair(raw: str, schema: type[T], fallback: T | None) -> T:
             return schema.model_validate_json(match.group(0))
         except Exception:
             pass
+
+    # Field-name-drift rescue. Small local models reliably get the structural
+    # field (`sources_used`) right but rename the prose field to something
+    # question-flavored (`courses_mentioned`, `result`, `findings`, etc.).
+    # If the payload has `sources_used` plus exactly one other key, AND the
+    # schema declares an `answer: str` field, coerce the wrong-named key into
+    # `answer`. Only fires when the schema actually expects `answer` — won't
+    # silently corrupt other Pydantic models routed through this helper.
+    if match and "answer" in getattr(schema, "model_fields", {}):
+        coerced = _coerce_field_name_drift(match.group(0))
+        if coerced is not None:
+            try:
+                return schema.model_validate(coerced)
+            except Exception:
+                pass
 
     # Log the raw output on every hard failure — this is the primary
     # diagnostic. Useful whether we raise or fall back.

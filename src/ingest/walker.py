@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 
 from src.content import SummarizeError
 from src.ingest.common import source_rel_path
-from src.ingest.ignore import IgnoreRules
+from src.config import IndexingRules, ensure_path_included, load_indexing_rules
 from src.ingest import tier0, tier1, tier2, tier3, tier4
 from src.manifest import REPO_ROOT, Manifest
 from src.router import (
@@ -84,6 +84,17 @@ async def _run_tier(
     other tiers ignore them. See `tier3.run_async` for the protocol.
     """
     if tier == "T1":
+        # CSVs at T1 use an LLM-generated FileSummary (Plan #17 Part A).
+        # Other small text/code files keep the no-LLM raw-content path.
+        if path.suffix.lower() == ".csv":
+            if get_agent is None:
+                raise RuntimeError("T1 CSV requested but no LLM agent thunk was provided")
+            agent = get_agent()
+            outcome = await tier1.run_csv_async(
+                path, source_rel, agent,
+                inflight=inflight, inflight_lock=inflight_lock,
+            )
+            return outcome, None
         return await asyncio.to_thread(tier1.run, path, source_rel), None
     if tier == "T2":
         return await asyncio.to_thread(tier2.run, path, source_rel), None
@@ -230,14 +241,17 @@ def _include_dotfiles_for(
 def find_candidates(
     root: Path,
     *,
-    ignore_rules: IgnoreRules | None = None,
+    indexing_rules: IndexingRules | None = None,
     include_data: bool = False,
 ) -> tuple[list[Path], int, int]:
     """Walk `root` and return (accepted, ignored_count, asset_library_skipped).
 
-    `ignore_rules` applies cascading `.gitignore` / `.nasignore` + built-in
-    defaults (`node_modules/`, `__pycache__/`, `.git/`, etc.). If omitted,
-    rules are built from `root` on the fly.
+    `indexing_rules` is the composed config (defaults + user JSON + cascade-
+    discovered .gitignore/.nasignore/.magpieinclude/.magpieexclude). If
+    omitted, loaded from disk via `load_indexing_rules()`. The walker
+    auto-adds `root` to user `include_paths` if not already covered (so
+    ad-hoc CLI walks register the path as a managed root for the future
+    daemon to pick up).
 
     Three filter layers run in order:
 
@@ -261,7 +275,19 @@ def find_candidates(
     children list in-place during traversal — `rglob` doesn't expose
     a prune hook.
     """
-    rules = ignore_rules if ignore_rules is not None else IgnoreRules.from_root(root)
+    if indexing_rules is None:
+        # Auto-add the requested walk root to user include_paths if it isn't
+        # already covered. Loud one-liner so users know their config changed.
+        added, resolved = ensure_path_included(root)
+        if added:
+            print(
+                f"  + auto-added '{resolved}' to indexing_rules.json "
+                f"(edit at: {resolved.parent}/.../indexing_rules.json)",
+                flush=True,
+            )
+        rules = load_indexing_rules()
+    else:
+        rules = indexing_rules
     pre_accepted: list[Path] = []
     ignored = 0
     nasconfig_cache: dict[Path, bool] = {}
@@ -286,14 +312,18 @@ def find_candidates(
             dirnames[:] = [d for d in dirnames if not d.startswith(".")]
 
         # Prune directories matching built-in default-ignore patterns
-        # (node_modules, Program Files, target, etc.). Without this, we'd
-        # descend into a 50k-file npm package just to filter every file
-        # individually — minutes-to-hours of pointless `os.stat` calls on
-        # large corpora.
+        # (node_modules, Program Files, target, etc.) AND user-excluded
+        # directories. Without this, we'd descend into a 50k-file npm
+        # package just to filter every file individually — minutes-to-hours
+        # of pointless `os.stat` calls on large corpora.
         dirnames[:] = [
             d for d in dirnames
-            if not rules.is_default_ignored_dir(dirpath_p / d)
+            if not rules.is_pruneable_dir(dirpath_p / d)
         ]
+        # Pre-warm the cascade cache for this directory so per-file
+        # should_index() calls below reuse the parsed .gitignore /
+        # .nasignore / .magpieinclude / .magpieexclude specs.
+        rules.note_directory(dirpath_p)
 
         for fname in filenames:
             # Leaf dotfile filter — allowlisted ones survive (.bashrc et al.),
@@ -317,7 +347,8 @@ def find_candidates(
             # has NOT opted in.
             if not include_data and ext in _DATA_EXTS_DEFAULT_OFF:
                 continue
-            if rules.is_ignored(p):
+            ok, _ = rules.should_index(p)
+            if not ok:
                 ignored += 1
                 continue
             pre_accepted.append(p)
@@ -554,10 +585,14 @@ async def run_batch(
     import time
     print(f"scanning {root} for ignore rules and candidate files...", flush=True)
     t0 = time.monotonic()
-    ignore_rules = IgnoreRules.from_root(root)
+    # Auto-add the walk root to user include_paths if not already covered.
+    added, resolved = ensure_path_included(root)
+    if added:
+        print(f"  + auto-added '{resolved}' to indexing_rules.json", flush=True)
+    indexing_rules = load_indexing_rules()
     t_ignore = time.monotonic() - t0
     files, ignored_count, asset_lib_skipped = find_candidates(
-        root, ignore_rules=ignore_rules, include_data=include_data,
+        root, indexing_rules=indexing_rules, include_data=include_data,
     )
     t_total = time.monotonic() - t0
     print(
@@ -710,7 +745,11 @@ async def run_batch(
             return
         try:
             from src.stage2.__main__ import ingest_from_manifest
-            ingest_from_manifest(skip_orphan_cleanup=True)
+            # Pass the walker's manifest so `ingested_at` marks made by the
+            # ingest land in the walker's in-memory view too. Without this,
+            # the walker's next manifest.save() overwrites the marks with its
+            # stale view, and the end-of-walk push re-uploads everything.
+            ingest_from_manifest(skip_orphan_cleanup=True, manifest=manifest)
         except RuntimeError:
             # "manifest is empty" or similar — nothing to push yet, fine.
             pass
@@ -902,14 +941,15 @@ def main() -> None:
 
     # --list-children: just print would-be commands and exit. Cheap preview.
     if args.list_children:
-        # Apply parent's ignore rules so the preview matches what `--per-child`
+        # Apply parent's indexing rules so the preview matches what `--per-child`
         # would actually run. Without this, $RECYCLE.BIN/, movies/, etc. show
         # up in the list even though they'd be filtered out at run time.
-        parent_rules = IgnoreRules.from_root(root)
+        ensure_path_included(root)
+        parent_rules = load_indexing_rules()
         all_children = sorted(p for p in root.iterdir() if p.is_dir())
         children = [
             c for c in all_children
-            if not c.name.startswith(".") and not parent_rules.is_ignored(c)
+            if not c.name.startswith(".") and not parent_rules.is_pruneable_dir(c)
         ]
         if not children:
             print(f"# {root} has no subdirectories (or all are ignored)")
@@ -944,13 +984,13 @@ def main() -> None:
 
     if args.per_child:
         import time
-        # Apply parent's ignore rules ($RECYCLE.BIN/, movies/, etc. from
-        # DEFAULT_IGNORE_PATTERNS + /mnt/hardisk/.nasignore) BEFORE iterating
-        # — otherwise we'd recurse into ignored subdirs because run_batch's
-        # own IgnoreRules is rooted at that subdir and can't see rules from
-        # the parent. Hidden dotfile dirs are also skipped to mirror the
-        # walker's normal prune behavior.
-        parent_rules = IgnoreRules.from_root(root)
+        # Apply parent's indexing rules ($RECYCLE.BIN/, movies/, default
+        # exclusions, .magpieexclude/.nasignore) BEFORE iterating — otherwise
+        # we'd recurse into ignored subdirs because each run_batch's own
+        # rules-load can't see all the cascade context. Hidden dotfile dirs
+        # are also skipped to mirror the walker's normal prune behavior.
+        ensure_path_included(root)
+        parent_rules = load_indexing_rules()
         all_children = sorted(p for p in root.iterdir() if p.is_dir())
         top_files = sorted(p for p in root.iterdir() if p.is_file())
         children: list[Path] = []
@@ -959,7 +999,7 @@ def main() -> None:
             if c.name.startswith("."):
                 filtered.append((c.name, "hidden"))
                 continue
-            if parent_rules.is_ignored(c):
+            if parent_rules.is_pruneable_dir(c):
                 filtered.append((c.name, "ignore-rule"))
                 continue
             children.append(c)

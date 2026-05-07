@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import csv
+import os
 from dataclasses import dataclass
 
 from pydantic import BaseModel, Field
 from qdrant_client.models import FusionQuery, Prefetch, SparseVector
 
 from src.llm import ChatAgent, build_agent
+from src.manifest import REPO_ROOT
 from src.stage2.db import COLLECTION_NAME, get_qdrant_client
 from src.stage2.embeddings import embed_dense_query, embed_sparse_query
 
@@ -115,12 +118,223 @@ async def rewrite_query_async(
 class SearchResult:
     """One retrieval hit. `tier` indicates which collection contributed:
     "summary", "fast", or "both" (after RRF merge across both tiers).
+
+    `chunk_index` is the 0-based index of a within-file chunk: the row
+    number for CSV row-tier hits (set during `csv_ingest.ingest_csv_rows`);
+    None for hits where the whole file is a single Qdrant point. Generic
+    name so future tier types (PDF section chunks, audio segments) can
+    reuse the same answer-step neighbor-lookup logic — see Plans/Future
+    Plans.md and the industry convention for RAG payload metadata.
     """
 
     summary: str
     path: str
     score: float
     tier: str = "summary"
+    chunk_index: int | None = None
+
+
+CSV_NEIGHBOR_WINDOW = 2
+"""How many rows above and below a CSV row hit to splice into `summary`.
+
+A CSV hit alone is a single row stripped of context — neighbors often carry
+the column headers' meaning, the running total, or the next/prev event in a
+log. ±2 rows is a 5-row window: enough context for the LLM to disambiguate
+without ballooning the prompt or polluting the cross-encoder rerank score."""
+
+
+def _format_csv_row(row: dict[str, str]) -> str:
+    """Format a row the same way `csv_ingest.stream_csv_rows` does so the
+    spliced neighbors look identical to what the embedder originally saw."""
+    return " | ".join(f"{k}: {v}" for k, v in row.items() if v)
+
+
+_csv_rows_cache: dict[str, list[dict[str, str]] | None] = {}
+
+
+def _load_csv_rows(source_rel: str) -> list[dict[str, str]] | None:
+    """Read all rows of a CSV (cached). Returns None if the file is missing
+    or unreadable so callers can fall back to the bare row summary."""
+    if source_rel in _csv_rows_cache:
+        return _csv_rows_cache[source_rel]
+    path = REPO_ROOT / source_rel
+    try:
+        with path.open(encoding="utf-8", errors="ignore") as f:
+            rows = list(csv.DictReader(f))
+    except (OSError, csv.Error):
+        rows = None
+    _csv_rows_cache[source_rel] = rows
+    return rows
+
+
+def _expand_csv_hit(source_rel: str, row_idx: int, focal_summary: str) -> str:
+    """Replace a single-row hit with a ±CSV_NEIGHBOR_WINDOW snippet.
+
+    Falls back to the focal row alone if the source CSV can't be read (file
+    moved, deleted, or permissions changed since ingestion)."""
+    rows = _load_csv_rows(source_rel)
+    if rows is None:
+        return focal_summary
+    start = max(0, row_idx - CSV_NEIGHBOR_WINDOW)
+    end = min(len(rows), row_idx + CSV_NEIGHBOR_WINDOW + 1)
+    lines: list[str] = []
+    for i in range(start, end):
+        marker = " (match)" if i == row_idx else ""
+        text = _format_csv_row(rows[i]) if i != row_idx else focal_summary
+        lines.append(f"[row {i}{marker}] {text}")
+    return "\n".join(lines)
+
+
+_MATCH_MARKER = "   (this row matched the question)"
+
+
+def _ordered_headers(rows: list[dict[str, str]]) -> list[str]:
+    """Return column headers in the order they appear in the first row.
+    `csv.DictReader` preserves order on Python 3.7+ — we just take row 0."""
+    if not rows:
+        return []
+    return list(rows[0].keys())
+
+
+def _csv_row_to_csv_line(
+    row: dict[str, str], headers: list[str], *, matched: bool
+) -> str:
+    """Render one row as a properly-quoted CSV line, optionally with the
+    match-marker parenthetical appended. Uses `csv.writer` so values
+    containing commas / quotes / newlines round-trip correctly."""
+    import io
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="")
+    writer.writerow([row.get(h, "") for h in headers])
+    line = buf.getvalue()
+    return line + _MATCH_MARKER if matched else line
+
+
+def _csv_header_line(headers: list[str]) -> str:
+    """Render the CSV header line. Same quoting semantics as data rows
+    so a header containing a comma (rare) is still parseable."""
+    import io
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="")
+    writer.writerow(headers)
+    return buf.getvalue()
+
+
+def build_csv_row_window_block(
+    source_rel: str,
+    row_indexes: list[int],
+    *,
+    window: int = CSV_NEIGHBOR_WINDOW,
+) -> str | None:
+    """Build a multi-window CSV text block for the answer step (Plan #17 Part B).
+
+    For each row index in `row_indexes`, expand to a ±`window` neighbor
+    range. Overlapping or adjacent ranges merge into a single window so
+    rows aren't duplicated in the prompt. Each window is a self-contained
+    CSV snippet: header line at the top, comma-separated rows below.
+    Matched rows get a trailing `(this row matched the question)` marker
+    so the LLM can tell signal from context. Returns the block text or
+    None if the CSV can't be read.
+
+    Result for one CSV with 3 hits at rows [5, 6, 47] (window=2):
+
+        coid,code,title,prerequisites
+        67000,PHY-101,Introduction to Physics,
+        67050,PHY-102,Physics II,PHY-101
+        67053,PHY-113,General Physics III,PHY-111   (this row matched the question)
+        67100,PHY-201,Mechanics,PHY-113   (this row matched the question)
+        67200,PHY-301,Quantum,PHY-201
+        67250,PHY-302,Relativity,PHY-201
+
+        ---
+
+        coid,code,title,prerequisites
+        68045,ENG-244,Romantic Literature,ENG-101
+        68099,ENG-254,Prison Literature,   (this row matched the question)
+        68110,ENG-275,Postcolonial Voices,
+
+    The first two hits' windows merged (3-7 ∪ 4-8 → 3-8); the third stayed
+    separate. Headers repeat at the top of each window — for weak local
+    models this is much easier to parse than relying on cross-block memory.
+
+    Indexing-time row format (`csv_ingest.stream_csv_rows`) stays as
+    `key: value | key: value | ...` because that's what the dense + BM25
+    embedders need for column-aware semantic search. The two formats live
+    on opposite sides of the wall: vector store indexing vs. answer-time
+    prompt readability for weak LLMs.
+    """
+
+    rows = _load_csv_rows(source_rel)
+    if rows is None or not row_indexes:
+        return None
+    headers = _ordered_headers(rows)
+    if not headers:
+        return None
+
+    # Build per-hit windows, then merge overlapping/adjacent.
+    sorted_idxs = sorted(set(row_indexes))
+    raw_windows: list[tuple[int, int]] = []
+    for ri in sorted_idxs:
+        start = max(0, ri - window)
+        end = min(len(rows), ri + window + 1)  # half-open [start, end)
+        raw_windows.append((start, end))
+
+    merged: list[tuple[int, int]] = []
+    for start, end in raw_windows:
+        if merged and start <= merged[-1][1]:
+            # overlap or touch — extend the last window
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+
+    match_set = set(sorted_idxs)
+    header_line = _csv_header_line(headers)
+    sections: list[str] = []
+    for start, end in merged:
+        lines: list[str] = [header_line]
+        for i in range(start, end):
+            lines.append(
+                _csv_row_to_csv_line(rows[i], headers, matched=(i in match_set))
+            )
+        sections.append("\n".join(lines))
+
+    return "\n\n---\n\n".join(sections)
+
+
+def build_csv_sample_block(
+    source_rel: str,
+    *,
+    max_rows: int = 5,
+) -> str | None:
+    """Build a CSV header + first-N-rows sample for the case-A answer path
+    (Plan #17 Part B + 2026-05 file-level summary follow-up).
+
+    Used when a CSV's file-level summary point is in top-k retrieval but
+    none of its row points are. The user asked something the LLM summary
+    matched semantically (e.g. "do we have a faculty directory?") rather
+    than something a specific row matches verbatim. The sample gives the
+    answer model a representative slice of the CSV's rows alongside the
+    summary supplement, so it can answer "what is this file" + "what
+    do its rows look like" together.
+
+    Same raw-CSV format as `build_csv_row_window_block` (header line +
+    comma-separated rows) for prompt-format consistency. No
+    `(this row matched the question)` markers — none of these rows
+    matched directly. Returns None if the CSV can't be read.
+    """
+
+    rows = _load_csv_rows(source_rel)
+    if rows is None or not rows:
+        return None
+    headers = _ordered_headers(rows)
+    if not headers:
+        return None
+
+    sample = rows[:max_rows]
+    lines: list[str] = [_csv_header_line(headers)]
+    for row in sample:
+        lines.append(_csv_row_to_csv_line(row, headers, matched=False))
+    return "\n".join(lines)
 
 
 def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
@@ -158,17 +372,96 @@ def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
         ],
         query=FusionQuery(fusion="rrf"),
         limit=limit,
-        with_payload=["summary", "source_path"],
+        # Payload is path + chunk index only since 2026-05; the display
+        # summary is reconstructed from disk via `_summary_for_result`.
+        with_payload=["source_path", "chunk_index"],
     )
-    return [
-        SearchResult(
-            summary=(p.payload or {}).get("summary", ""),
-            path=(p.payload or {}).get("source_path", ""),
-            score=p.score,
-            tier="summary",
+
+    # Per-call caches: same CSV may produce multiple row hits, same
+    # file-level path could appear once. Load each at most once.
+    _csv_rows_cache.clear()
+    _summary_md_cache.clear()
+
+    out: list[SearchResult] = []
+    for p in results.points:
+        payload = p.payload or {}
+        source_path = payload.get("source_path", "")
+        chunk_index = payload.get("chunk_index")
+        summary = _summary_for_result(source_path, chunk_index)
+        out.append(
+            SearchResult(
+                summary=summary,
+                path=source_path,
+                score=p.score,
+                tier="summary",
+                chunk_index=chunk_index if chunk_index is None else int(chunk_index),
+            )
         )
-        for p in results.points
-    ]
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Display-summary reconstruction (since payload no longer carries text)
+# ---------------------------------------------------------------------------
+
+# Per-query cache for the parsed prose-summary of file-level hits. Keyed
+# by source_path; reset at the top of each search call. Avoids rereading
+# the same markdown when a file shows up in both dense and sparse tiers
+# of the same RRF result set.
+_summary_md_cache: dict[str, str] = {}
+
+
+def _summary_for_result(source_path: str, chunk_index: int | None) -> str:
+    """Reconstruct the search-snippet text for a Qdrant hit.
+
+    Two paths:
+      - chunk_index is set (CSV row hit) → re-read the CSV at chunk_index
+        and expand to ±CSV_NEIGHBOR_WINDOW neighbors via `_expand_csv_hit`.
+      - chunk_index is None (file-level hit) → load the file's summary
+        markdown via the manifest, return its parsed `summary` prose.
+
+    Returns an empty string if reconstruction fails (file moved, manifest
+    out of sync, etc.) — better than raising; the UI just shows an empty
+    snippet rather than crashing on a stale point.
+    """
+
+    if not source_path:
+        return ""
+    if chunk_index is not None:
+        rows = _load_csv_rows(source_path)
+        if rows is None or not (0 <= int(chunk_index) < len(rows)):
+            return ""
+        focal = _format_csv_row(rows[int(chunk_index)])
+        return _expand_csv_hit(source_path, int(chunk_index), focal)
+    return _load_summary_prose(source_path)
+
+
+def _load_summary_prose(source_path: str) -> str:
+    """Look up the summary markdown for a file-level hit and return its
+    parsed prose summary. Cached per query.
+
+    The lookup chain: source_path → manifest entry → summary_file → disk
+    read → parse_summary_file → ParsedSummary.summary. Falls back to an
+    empty string when any link breaks (manifest missing, file moved,
+    parse error)."""
+    if source_path in _summary_md_cache:
+        return _summary_md_cache[source_path]
+    text = ""
+    try:
+        from src.manifest import APP_DATA_DIR, Manifest
+        from src.stage2.parser import parse_summary_file
+
+        manifest = Manifest()
+        entry = manifest.get(source_path)
+        if entry is not None and entry.summary_file:
+            md_path = APP_DATA_DIR / entry.summary_file
+            if md_path.is_file():
+                parsed = parse_summary_file(md_path)
+                text = parsed.summary or parsed.title or ""
+    except Exception:  # pylint: disable=broad-except
+        text = ""
+    _summary_md_cache[source_path] = text
+    return text
 
 
 def _search_fast_tier(query_text: str, limit: int) -> list[SearchResult]:
@@ -222,41 +515,66 @@ def _search_fast_tier(query_text: str, limit: int) -> list[SearchResult]:
 RRF_K = 60  # standard RRF constant; higher = flatter fusion curve
 
 
+def _hit_key(r: SearchResult) -> tuple[str, int | None]:
+    """Dedup key for RRF fusion. Composite to handle within-file chunks.
+
+    For non-chunked points (PDF/DOCX/IMAGE summary points, fast_tier page
+    points) `chunk_index is None`, so the key collapses to `(path, None)`
+    — the legacy file-level dedup behavior survives unchanged.
+
+    For CSV row points (and future PDF/audio chunked points), each chunk
+    of the same file is a distinct key. CRITICAL: without this, a query
+    that matches multiple rows of the same CSV would silently lose all
+    but the last row's `chunk_index` after RRF — see the 2026-05 audit;
+    this was a real correctness bug.
+    """
+    return (r.path, r.chunk_index)
+
+
 def _rrf_merge(
     summary_hits: list[SearchResult],
     fast_hits: list[SearchResult],
     top_k: int,
 ) -> list[SearchResult]:
-    """Reciprocal Rank Fusion of two result lists, keyed by source_path.
+    """Reciprocal Rank Fusion of two result lists, keyed by
+    `(source_path, chunk_index)`.
 
-    Each path's RRF score is sum over each list of `1 / (RRF_K + rank)`,
+    Each key's RRF score is the sum over each list of `1 / (RRF_K + rank)`
     where rank is 1-indexed. Missing from a list contributes 0. The kept
     SearchResult prefers the summary-tier entry (it has a real summary)
-    when a path appears in both lists.
+    when a key appears in both lists.
+
+    The composite key matters for CSV row points and future chunked
+    types: a 5-row hit on `tax_2025.csv` produces 5 distinct keys
+    `(tax_2025.csv, 0..4)` instead of one collapsed key `(tax_2025.csv,)`,
+    so all matched rows reach the answer step.
     """
-    scores: dict[str, float] = {}
-    chosen: dict[str, SearchResult] = {}
-    seen_in: dict[str, set[str]] = {}
+    scores: dict[tuple[str, int | None], float] = {}
+    chosen: dict[tuple[str, int | None], SearchResult] = {}
+    seen_in: dict[tuple[str, int | None], set[str]] = {}
 
     for rank, r in enumerate(summary_hits, start=1):
         if not r.path:
             continue
-        scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
-        chosen[r.path] = r  # summary-tier entries have human-readable summaries
-        seen_in.setdefault(r.path, set()).add("summary")
+        key = _hit_key(r)
+        scores[key] = scores.get(key, 0.0) + 1.0 / (RRF_K + rank)
+        chosen[key] = r  # summary-tier entries have human-readable summaries
+        seen_in.setdefault(key, set()).add("summary")
 
     for rank, r in enumerate(fast_hits, start=1):
         if not r.path:
             continue
-        scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
-        chosen.setdefault(r.path, r)  # only fill if summary didn't already
-        seen_in.setdefault(r.path, set()).add("fast")
+        key = _hit_key(r)
+        scores[key] = scores.get(key, 0.0) + 1.0 / (RRF_K + rank)
+        chosen.setdefault(key, r)  # only fill if summary didn't already
+        seen_in.setdefault(key, set()).add("fast")
 
-    ordered = sorted(chosen.values(), key=lambda r: scores[r.path], reverse=True)
+    ordered = sorted(chosen.values(), key=lambda r: scores[_hit_key(r)], reverse=True)
     # Overwrite each result's score with its RRF score so callers see fused ranking.
     for r in ordered:
-        r.score = scores[r.path]
-        tiers = seen_in.get(r.path, set())
+        key = _hit_key(r)
+        r.score = scores[key]
+        tiers = seen_in.get(key, set())
         r.tier = "both" if len(tiers) == 2 else next(iter(tiers), r.tier)
     return ordered[:top_k]
 
@@ -309,11 +627,35 @@ def run_search(
         # REPL) are both respected — the classifier just helps the default
         # case where caller didn't customize.
         if klass is QueryClass.LIST_ALL and cfg.top_k > top_k:
-            print(
-                f"  query_class={klass.value}  top_k {top_k}→{cfg.top_k}  "
-                f"({cfg.notes})"
-            )
-            top_k = cfg.top_k
+            widened = cfg.top_k
+            # Local backend has a much smaller context window than cloud
+            # (Gemma 4 E4B: 32-131K vs Claude/GPT: 200K+). The adaptive
+            # widening's default of 30 paths × ~29 KB/file = ~870 KB easily
+            # blows past any local model's context. Cap at 8 for local —
+            # still gives a meaningful breadth bump over the default 5
+            # without overflowing the answer-step prompt. See
+            # Plans/Local LLM Plan.md / Plans/Future Plans.md #17.
+            from src.llm import active_provider
+            if active_provider().name == "local":
+                local_cap = int(os.environ.get("LOCAL_MAX_TOP_K", "8"))
+                if widened > local_cap:
+                    print(
+                        f"  query_class={klass.value}  top_k {top_k}→{local_cap}  "
+                        f"(local backend cap; cfg wanted {widened})"
+                    )
+                    top_k = local_cap
+                else:
+                    print(
+                        f"  query_class={klass.value}  top_k {top_k}→{widened}  "
+                        f"({cfg.notes})"
+                    )
+                    top_k = widened
+            else:
+                print(
+                    f"  query_class={klass.value}  top_k {top_k}→{widened}  "
+                    f"({cfg.notes})"
+                )
+                top_k = widened
 
         # Cross-encoder rerank regresses LIST_ALL queries — proper-noun /
         # receipt / enumeration lookups. The cross-encoder over-weights

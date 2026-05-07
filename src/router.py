@@ -76,6 +76,36 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
 
 # ---------------------------------------------------------------------------
+# CATEGORY_MAP — user-facing categorization (consumed by IndexingRules).
+#
+# Why a separate map from the EXT constants above:
+#   - The EXT constants drive *tier routing* (T0..T4 dispatch). They reflect
+#     "what does the router know how to summarize?"
+#   - CATEGORY_MAP drives *user opt-in/opt-out* via `categories_enabled` in
+#     `indexing_rules.json`. It's a broader, friendlier classification that
+#     users toggle in the future Settings panel ("show me documents but not
+#     code", etc.).
+#   - Some categories are supersets (e.g. `text` adds .rst, .rtf — accepted
+#     as text by the user even if the router still summarizes them with the
+#     same handler that processes .txt).
+#   - `archive` has no router handler today; it's listed so the GUI toggle
+#     is meaningful (default OFF; flipping ON would be a future tier).
+#
+# Single source of truth for category↔extension mapping. If you add a new
+# router handler for an extension, also add it here. If you add a new
+# category, you must add it to GlobalRules.categories_enabled defaults too.
+# ---------------------------------------------------------------------------
+CATEGORY_MAP: dict[str, set[str]] = {
+    "text": TEXT_EXTS | {".rst", ".rtf"},
+    "code": CODE_EXTS,
+    "data": CONFIG_EXTS | CSV_EXTS | {".xml", ".tsv", ".parquet", ".dat", ".jsonl", ".ndjson"},
+    "document": PDF_EXTS | DOCX_EXTS | XLSX_EXTS | PPTX_EXTS | HTML_EXTS | IPYNB_EXTS | {".odt", ".odp", ".ods", ".epub"},
+    "image": IMAGE_EXTS | {".heic", ".heif", ".tiff", ".tif", ".bmp", ".svg"},
+    "archive": {".zip", ".tar", ".gz", ".bz2", ".xz", ".7z", ".rar", ".tgz"},
+}
+
+
+# ---------------------------------------------------------------------------
 # Size and count thresholds (documented in Plans/Indexing Tiers.md)
 # ---------------------------------------------------------------------------
 
@@ -1259,12 +1289,13 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
     Respects \`.gitignore\` / \`.nasignore\` + built-in defaults (same rules the
     ingest walker uses). No side effects — nothing is written, no LLM.
     """
-    # Deferred imports: only hit the walker/ignore modules in directory mode.
-    from src.ingest.ignore import IgnoreRules
+    # Deferred imports: only hit the walker/config modules in directory mode.
+    from src.config import ensure_path_included, load_indexing_rules
     from src.ingest.walker import find_candidates
 
+    ensure_path_included(root)
     files, ignored, asset_lib_skipped = find_candidates(
-        root, ignore_rules=IgnoreRules.from_root(root)
+        root, indexing_rules=load_indexing_rules()
     )
     if not files and ignored == 0 and asset_lib_skipped == 0:
         print(f"no indexable files under {root}")

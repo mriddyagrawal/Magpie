@@ -1,0 +1,245 @@
+"""Model launch profiles for the llama-server pool.
+
+Each profile is a recipe for spawning a `llama-server` subprocess with a
+specific GGUF + mmproj + flags combo. Adding a new model = adding a new
+entry here. Spec: `Specs/llama_server_migration.md`.
+
+The profile registry is intentionally small in PR 1:
+
+  - `gemma-4-e4b-text` — text-only Gemma 4 E4B, the path that today's
+    `LlamaCppLLM` already serves. PR 1's parity target.
+
+PR 2 adds `gemma-4-e4b-vision` (same GGUF + mmproj-BF16.gguf projector).
+PR 3 wires the vision profile into the answer step.
+
+Profile field meanings track llama-server's CLI flags closely so the
+mapping is obvious — each `LaunchArgs` field maps to one llama-server
+argument. `extra_args` is the escape hatch for one-off flags.
+"""
+
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
+
+
+# ---------------------------------------------------------------------------
+# Defaults — env-var overridable, mirror existing LOCAL_* knobs
+# ---------------------------------------------------------------------------
+
+DEFAULT_REPO = "unsloth/gemma-4-E4B-it-GGUF"
+DEFAULT_QUANT = "Q5_K_XL"
+DEFAULT_N_CTX = 8192
+DEFAULT_TEMPERATURE = 0.7
+
+# llama-server uses `-ngl` (number of GPU layers). 999 = "offload all,"
+# the standard idiom across llama.cpp documentation. Equivalent to
+# llama-cpp-python's n_gpu_layers=-1.
+DEFAULT_NGL = 999
+
+
+# ---------------------------------------------------------------------------
+# Profile dataclasses
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class LaunchArgs:
+    """The set of llama-server flags a profile needs.
+
+    Maps 1:1 to llama-server's CLI args. The pool manager translates
+    this dataclass into argv when spawning the subprocess. New flags
+    rare enough that we'd add a field here per addition.
+    """
+
+    # `--model` — path to the GGUF file. Resolved by the model_downloader
+    # at spawn time from `repo_id` + `quant`.
+    repo_id: str = DEFAULT_REPO
+    quant: str = DEFAULT_QUANT
+
+    # `--mmproj` — path to a multimodal projector .gguf. None for
+    # text-only profiles. Two ways to specify it on a vision profile:
+    #   - `mmproj` set to an absolute path → spawn passes it verbatim
+    #     (test-friendly: lets a pinned local file override discovery).
+    #   - `mmproj_repo_id` set → pool calls
+    #     `ensure_mmproj(repo_id, variant)` at spawn time, downloading
+    #     once and caching to <APP_DATA_DIR>/cache/hub/.
+    # The variant ("BF16" / "F16" / "Q8_0" etc.) selects which projector
+    # quant Unsloth's repo ships.
+    mmproj: Optional[str] = None
+    mmproj_repo_id: Optional[str] = None
+    mmproj_variant: str = "BF16"
+
+    # `-ngl` — layers offloaded to GPU. 999 = all (recommended on
+    # Metal/CUDA), 0 = pure CPU.
+    ngl: int = DEFAULT_NGL
+
+    # `-c` / `--ctx-size` — context window in tokens.
+    ctx_size: int = DEFAULT_N_CTX
+
+    # `-b` / `--batch-size` — physical batch size for prompt processing.
+    # llama-server defaults to 2048; some vision models (Gemma 4) need
+    # this kept high for the image-token expansion. PR 1 leaves None
+    # (server default); PR 2 overrides for vision.
+    batch_size: Optional[int] = None
+    ubatch_size: Optional[int] = None
+
+    # `-t` / `--threads` — CPU threads. None = server default (auto-detect).
+    threads: Optional[int] = None
+
+    # `--jinja` — apply the GGUF's embedded Jinja chat template
+    # server-side. We need this on for Gemma 4's chat formatting.
+    # Without it, llama-server defaults to a generic template that
+    # doesn't match what Gemma expects.
+    jinja: bool = True
+
+    # Sampling defaults. The HTTP client overrides these per-call when
+    # the caller passes temperature/max_tokens. These set the server's
+    # baseline.
+    temperature: float = DEFAULT_TEMPERATURE
+
+    # Escape hatch for one-off flags we don't want to canonicalize yet.
+    # Items are passed verbatim after the canonical args. Useful for
+    # experimentation; promote to a typed field once stable.
+    extra_args: tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True)
+class ModelProfile:
+    """A named launch recipe. The pool manager looks up profiles by name."""
+
+    name: str
+    args: LaunchArgs
+    # Human-readable description for diagnostics + future settings UI.
+    description: str = ""
+    # True when the profile requires an mmproj projector (vision-capable).
+    # Used by retrieval / answer paths to decide whether to forward
+    # image content blocks.
+    has_vision: bool = False
+
+
+# ---------------------------------------------------------------------------
+# Registry
+# ---------------------------------------------------------------------------
+
+_PROFILES: dict[str, ModelProfile] = {}
+
+
+def register(profile: ModelProfile) -> None:
+    """Add a profile to the registry. Idempotent."""
+    _PROFILES[profile.name] = profile
+
+
+def get_profile(name: str) -> ModelProfile:
+    """Return the registered profile, or raise KeyError with a list of
+    valid names so the message is useful at startup."""
+    if name not in _PROFILES:
+        raise KeyError(
+            f"unknown model profile {name!r}. "
+            f"Registered profiles: {sorted(_PROFILES)}"
+        )
+    return _PROFILES[name]
+
+
+def all_profiles() -> dict[str, ModelProfile]:
+    """For the diagnostics endpoint and tests."""
+    return dict(_PROFILES)
+
+
+# ---------------------------------------------------------------------------
+# Built-in profiles (PR 1 scope)
+# ---------------------------------------------------------------------------
+
+# `gemma-4-e4b-text` — the parity target for PR 1. Same GGUF the
+# existing `LlamaCppLLM` loads. Reads model + quant + ctx + temperature
+# from env so users keep their current `.env` knobs working.
+register(
+    ModelProfile(
+        name="gemma-4-e4b-text",
+        description=(
+            "Gemma 4 E4B (text-only). Parity target for the "
+            "llama-cpp-python → llama-server migration. Matches what "
+            "Magpie shipped 2026-05 via LlamaCppLLM."
+        ),
+        has_vision=False,
+        args=LaunchArgs(
+            repo_id=os.environ.get("LOCAL_MODEL", DEFAULT_REPO),
+            quant=os.environ.get("LOCAL_QUANT", DEFAULT_QUANT),
+            mmproj=None,
+            ngl=DEFAULT_NGL,
+            ctx_size=int(os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)),
+            temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
+            jinja=True,
+        ),
+    )
+)
+
+
+# `gemma-4-e4b-vision` — same GGUF as the text profile + the BF16 mmproj
+# projector. Registered at import; the projector itself is only
+# downloaded when this profile is first spawned (via ensure_mmproj in
+# the pool's argv builder), or pre-downloaded by `just install-llama-server`
+# so first-inference latency stays low.
+register(
+    ModelProfile(
+        name="gemma-4-e4b-vision",
+        description=(
+            "Gemma 4 E4B + mmproj-BF16 projector for vision. Pairs the "
+            "same GGUF as the text profile with the multi-modal "
+            "projector Unsloth ships in the same repo (~946 MB BF16)."
+        ),
+        has_vision=True,
+        args=LaunchArgs(
+            repo_id=os.environ.get("LOCAL_MODEL", DEFAULT_REPO),
+            quant=os.environ.get("LOCAL_QUANT", DEFAULT_QUANT),
+            mmproj_repo_id=os.environ.get("LOCAL_MMPROJ_REPO", DEFAULT_REPO),
+            mmproj_variant=os.environ.get("LOCAL_MMPROJ_VARIANT", "BF16"),
+            ngl=DEFAULT_NGL,
+            ctx_size=int(os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)),
+            temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
+            jinja=True,
+        ),
+    )
+)
+
+
+# ---------------------------------------------------------------------------
+# Default-name resolution
+# ---------------------------------------------------------------------------
+
+
+def default_text_profile() -> str:
+    """Profile name used for **all** inference (text and vision) by default.
+
+    Despite the name, this returns the vision-capable profile. Reasoning:
+    Gemma 4 (and Qwen2.5-VL, LFM2-VL — same llama.cpp `--mmproj` pattern)
+    is one set of weights with an optional image-encoder bolted on. When
+    the projector is loaded but the request has no `image_url` blocks,
+    the projector tensors sit idle — zero inference cost. The only cost
+    is the projector's resident memory (~946 MB for Gemma 4 BF16).
+
+    Avoiding the LRU swap between a text-only and a text+vision profile
+    is worth far more than the 946 MB on a laptop-class machine — a
+    single swap is ~25-30s on cold load, and a mixed walker corpus can
+    swap several times. Empirically verified against Gemma 4 E4B +
+    b9049 (2026-05-07): text-only `complete()` against a vision-loaded
+    subprocess returns identical results at full speed.
+
+    The text-only profile (`gemma-4-e4b-text`) is still registered for
+    users on tight memory budgets — set `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text`
+    in `.env` to opt into the swap-y behavior and save ~946 MB.
+    """
+    return os.environ.get("LLAMA_SERVER_TEXT_MODEL", "gemma-4-e4b-vision")
+
+
+def default_vision_profile() -> Optional[str]:
+    """Profile name for vision inference. Defaults to `gemma-4-e4b-vision`
+    when registered; env-overridable via `LLAMA_SERVER_VISION_MODEL`.
+    Returns None if neither the env override nor the default is in the
+    registry, so callers can fall back gracefully (text-only summary)."""
+    name = os.environ.get("LLAMA_SERVER_VISION_MODEL", "gemma-4-e4b-vision")
+    if name and name in _PROFILES:
+        return name
+    return None

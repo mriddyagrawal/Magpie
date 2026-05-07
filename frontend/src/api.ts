@@ -73,11 +73,24 @@ export async function pickFolder(): Promise<string | null> {
   }
 }
 
+export async function pickFile(): Promise<string | null> {
+  try {
+    return await invoke<string | null>("pick_file");
+  } catch {
+    return null;
+  }
+}
+
 export interface IngestStatus {
   running: boolean;
   done: boolean;
   error: string | null;
   path: string | null;
+  files_total: number;
+  files_done: number;
+  current_file: string | null;
+  elapsed_s: number | null;
+  stopped: boolean;
 }
 
 export async function startIngest(path: string): Promise<void> {
@@ -93,6 +106,10 @@ export async function getIngestStatus(): Promise<IngestStatus> {
   const res = await fetch(`${baseUrl()}/ingest/status`);
   if (!res.ok) throw new Error(`ingest/status failed: ${res.status}`);
   return res.json();
+}
+
+export async function stopIngest(): Promise<void> {
+  await fetch(`${baseUrl()}/ingest/stop`, { method: "POST" });
 }
 
 /** File-extension router — drives which preview component is rendered. */

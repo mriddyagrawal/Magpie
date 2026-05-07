@@ -8,7 +8,7 @@ use std::time::Duration;
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{Manager, PhysicalPosition, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
-use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 fn anchor_spotlight(window: &WebviewWindow) {
@@ -32,9 +32,135 @@ fn anchor_spotlight(window: &WebviewWindow) {
 struct SidecarState(Mutex<Option<Child>>);
 struct QdrantState(Mutex<Option<Child>>);
 
+// ── Global shortcut: picker + persistence ────────────────────────────────────
+
+fn shortcut_config_path() -> PathBuf {
+    app_data_dir().join("shortcut.json")
+}
+
+fn load_saved_shortcut() -> Option<String> {
+    let content = std::fs::read_to_string(shortcut_config_path()).ok()?;
+    let v: serde_json::Value = serde_json::from_str(&content).ok()?;
+    v["shortcut"].as_str().map(|s| s.to_owned())
+}
+
+fn save_shortcut(label: &str) {
+    let path = shortcut_config_path();
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let _ = std::fs::write(&path, format!(r#"{{"shortcut":"{}"}}"#, label));
+}
+
+fn preset_shortcuts() -> Vec<(&'static str, Option<Modifiers>, Code)> {
+    vec![
+        ("Alt+Space", Some(Modifiers::ALT), Code::Space),
+        ("Alt+Q",     Some(Modifiers::ALT), Code::KeyQ),
+        ("Ctrl+Space", Some(Modifiers::CONTROL), Code::Space),
+        ("Ctrl+Alt+Space", Some(Modifiers::ALT | Modifiers::CONTROL), Code::Space),
+    ]
+}
+
+/// Try to register a shortcut that toggles the main window. Returns true on success.
+fn try_register_shortcut(app: &tauri::AppHandle, modifiers: Option<Modifiers>, code: Code) -> bool {
+    let shortcut = Shortcut::new(modifiers, code);
+    let handle = app.clone();
+    let result = app.global_shortcut().on_shortcut(shortcut, move |_app, _sc, event| {
+        if event.state == ShortcutState::Pressed {
+            if let Some(window) = handle.get_webview_window("main") {
+                let is_visible = window.is_visible().unwrap_or(false);
+                if is_visible {
+                    let _ = window.hide();
+                } else {
+                    anchor_spotlight(&window);
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+        }
+    });
+    if result.is_err() { return false; }
+    let _ = app.global_shortcut().register(shortcut);
+    true
+}
+
+/// Runs in a background thread after the event loop is up.
+/// Tries the saved/default shortcut; if it fails, offers a preset picker.
+fn setup_global_shortcut(app: &tauri::AppHandle) {
+    let presets = preset_shortcuts();
+    let saved = load_saved_shortcut();
+
+    // Use saved preference, or fall back to Alt+Space.
+    let first = saved
+        .as_deref()
+        .and_then(|lbl| presets.iter().copied().find(|(l, _, _)| *l == lbl))
+        .unwrap_or(presets[0]);
+
+    if try_register_shortcut(app, first.1, first.2) {
+        if saved.as_deref() != Some(first.0) {
+            save_shortcut(first.0);
+        }
+        return;
+    }
+
+    // First choice failed — ask the user to pick an alternative.
+    let failed = first.0;
+    let alternatives: Vec<_> = presets.iter().copied().filter(|(l, _, _)| *l != failed).collect();
+
+    for (label, modifiers, code) in &alternatives {
+        let chose = app
+            .dialog()
+            .message(format!(
+                "{failed} is already in use by another application.\n\n\
+                 Use {label} to summon Magpie instead?"
+            ))
+            .title("Magpie — pick a shortcut")
+            .buttons(MessageDialogButtons::YesNo)
+            .blocking_show();
+
+        if !chose { continue; }
+
+        if try_register_shortcut(app, *modifiers, *code) {
+            save_shortcut(label);
+            return;
+        }
+
+        // User picked it but it also failed — tell them and try the next.
+        app.dialog()
+            .message(format!("{label} couldn't be registered either. Trying another option…"))
+            .title("Magpie — shortcut unavailable")
+            .blocking_show();
+    }
+
+    // All options exhausted or user declined everything.
+    app.dialog()
+        .message(
+            "No global shortcut could be registered.\n\n\
+             Open Magpie anytime by clicking the system tray icon.",
+        )
+        .title("Magpie — no shortcut")
+        .blocking_show();
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            // A second instance tried to launch — focus the existing window instead.
+            if let Some(window) = app.get_webview_window("main") {
+                anchor_spotlight(&window);
+                let _ = window.show();
+                let _ = window.set_focus();
+                let shortcut = load_saved_shortcut().unwrap_or_else(|| "Alt+Space".to_string());
+                app.dialog()
+                    .message(format!(
+                        "Magpie is already running.\n\nYour existing window has been brought \
+                         to the front. You can also summon it anytime with {shortcut}."
+                    ))
+                    .title("Magpie already running")
+                    .blocking_show();
+            }
+        }))
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .manage(SidecarState(Mutex::new(None)))
@@ -92,26 +218,14 @@ pub fn run() {
                 anchor_spotlight(&window);
             }
 
-            let shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
-            let handle_for_shortcut = app.handle().clone();
-            if let Err(e) = app.global_shortcut().on_shortcut(shortcut, move |_app, _sc, event| {
-                if event.state == ShortcutState::Pressed {
-                    if let Some(window) = handle_for_shortcut.get_webview_window("main") {
-                        let is_visible = window.is_visible().unwrap_or(false);
-                        if is_visible {
-                            let _ = window.hide();
-                        } else {
-                            anchor_spotlight(&window);
-                            let _ = window.show();
-                            let _ = window.set_focus();
-                        }
-                    }
-                }
-            }) {
-                eprintln!("[magpie] ⌥Space handler setup failed: {e}");
-            } else if let Err(e) = app.global_shortcut().register(shortcut) {
-                eprintln!("[magpie] ⌥Space register failed: {e} (global summon disabled)");
-            }
+            // Shortcut registration runs in a background thread so the picker
+            // dialog (if Alt+Space is taken) appears after the event loop starts.
+            let shortcut_handle = app.handle().clone();
+            thread::spawn(move || {
+                // Brief pause so the window is visible before any dialog appears.
+                thread::sleep(Duration::from_millis(400));
+                setup_global_shortcut(&shortcut_handle);
+            });
 
             // System tray icon: left-click toggles window, right-click → Quit.
             // macOS: menu-bar icon (top-right). Windows/Linux: notification-area tray.
@@ -120,7 +234,7 @@ pub fn run() {
             let mut tray_builder = TrayIconBuilder::new()
                 .menu(&tray_menu)
                 .show_menu_on_left_click(false)
-                .tooltip("Magpie — Alt+Space to summon")
+                .tooltip("Magpie")
                 .on_menu_event(|app, event| {
                     if event.id() == "quit" {
                         app.exit(0);
@@ -226,7 +340,7 @@ pub fn run() {
                 let _ = window.hide();
             }
         })
-        .invoke_handler(tauri::generate_handler![hide_window, show_window, pick_folder])
+        .invoke_handler(tauri::generate_handler![hide_window, show_window, pick_folder, pick_file])
         .build(tauri::generate_context!())
         .expect("error building magpie");
 
@@ -364,6 +478,28 @@ async fn pick_folder(app: tauri::AppHandle) -> Option<String> {
         .set_title("Select folder to index")
         .pick_folder(move |folder| {
             let _ = tx.send(folder);
+        });
+    tauri::async_runtime::spawn_blocking(move || {
+        rx.recv().ok().flatten().and_then(|p| match p {
+            tauri_plugin_dialog::FilePath::Path(path) => {
+                Some(path.to_string_lossy().into_owned())
+            }
+            _ => None,
+        })
+    })
+    .await
+    .unwrap_or(None)
+}
+
+#[tauri::command]
+async fn pick_file(app: tauri::AppHandle) -> Option<String> {
+    use tauri_plugin_dialog::DialogExt;
+    let (tx, rx) = std::sync::mpsc::channel::<Option<tauri_plugin_dialog::FilePath>>();
+    app.dialog()
+        .file()
+        .set_title("Select file to index")
+        .pick_file(move |file| {
+            let _ = tx.send(file);
         });
     tauri::async_runtime::spawn_blocking(move || {
         rx.recv().ok().flatten().and_then(|p| match p {

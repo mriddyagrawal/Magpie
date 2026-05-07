@@ -156,3 +156,69 @@ Tauri's NSIS bundler automatically handles:
 - MSVC redistributable (bundled)
 
 No manual action needed.
+
+---
+
+## UX behaviour changes (windows-app branch)
+
+### Window no longer auto-hides on blur
+The `tauri://blur` hide handler and the `pointerdown`-outside handler were removed
+because they caused the window to vanish while the native folder-picker dialog was
+open (the dialog steals focus, firing a blur before the user could pick a folder).
+
+**Current behaviour:** only `Escape` hides the window.
+
+**Correct fix (not yet done):** suppress blur-hide with a flag while the picker is
+in flight, then restore it. Removes the regression without breaking the picker flow.
+
+### Re-summon preserves state
+`tauri://focus` no longer calls `reset()`. Alt+Space brings the window back with the
+previous query and answer still visible. The old `reset()` callback has been deleted.
+
+### Backspace-to-dismiss
+Clearing the input field (backspacing to empty) collapses the answer card and returns
+to the management card. The answer stays visible while the user is composing a new
+query; only a fully empty input counts as a dismiss.
+
+Implemented as a `useEffect` on `query` in `MagpieWindow.tsx`:
+```ts
+useEffect(() => {
+  if (query === "") {
+    setResult(null);
+    setSubmitted(null);
+    setSelectedPath(null);
+    setError(null);
+  }
+}, [query]);
+```
+
+### Global shortcut: dynamic picker + persistence
+`Alt+Space` is the default. If it is already registered by another app, a dialog
+offers `Alt+Q`, `Ctrl+Space`, `Ctrl+Alt+Space` in sequence. The chosen shortcut is
+saved to `<APP_DATA>/shortcut.json` and reused on next launch.
+
+### Single-instance enforcement
+`tauri-plugin-single-instance` intercepts a second launch, focuses the existing
+window (re-anchored to center-top), and shows a dialog that names the actual
+registered shortcut (read from `shortcut.json`, not hardcoded).
+
+### Management card always visible
+The index-management card (`MagpieWindow.tsx`) is shown whenever the query result
+area is not active — not only on first launch. States:
+
+| State | Content |
+|---|---|
+| Indexing | Progress bar + current file + elapsed + Stop button |
+| Error | Error message + Try again |
+| Done / stopped | Confirmation message + Re-index button |
+| Nothing indexed | Onboarding prompt + Select folder button |
+| Idle (has files) | Re-index button |
+
+**Re-index** uses the last indexed folder path if one is known; otherwise opens the
+folder picker (same as first-time flow). `lastFolder` is held in React state and
+resets when the app restarts.
+
+### Qdrant flush on stop
+`ingest_from_manifest` is now always called after `run_batch` completes, even when
+the user hits Stop. Previously stopping skipped the final Qdrant push, leaving up
+to 100 summarised files unsearchable. The `stopped` flag is still set for UI feedback.

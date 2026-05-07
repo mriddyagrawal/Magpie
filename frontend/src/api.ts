@@ -18,14 +18,22 @@ export async function postQuery(
   question: string,
   opts: { topK?: number; rewrite?: boolean } = {}
 ): Promise<QueryResponse> {
+  // Build the body so the `rewrite` field is OMITTED (not sent as false)
+  // when the caller doesn't pass a value. Pydantic on the server side
+  // then defaults to None and falls back to the REWRITE env var. If we
+  // sent `rewrite: false` here it'd be an explicit override that
+  // shadows the .env setting silently. See `src/server.py:QueryRequest`.
+  const body: Record<string, unknown> = {
+    question,
+    top_k: opts.topK ?? 5,
+  };
+  if (opts.rewrite !== undefined) {
+    body.rewrite = opts.rewrite;
+  }
   const res = await fetch(`${baseUrl()}/query`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      question,
-      top_k: opts.topK ?? 5,
-      rewrite: opts.rewrite ?? false,
-    }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`query failed: ${res.status} ${await res.text()}`);
   return res.json();

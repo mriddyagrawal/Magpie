@@ -2,9 +2,74 @@
 
 Ideas we've decided against doing *right now* but want to revisit. Every entry must include **why** we'd make the change — not just the change itself — so future-us can judge whether the reason still applies.
 
+Plan numbers are stable IDs (referenced from code comments and commit messages). Don't renumber. Plans are appended in roughly chronological order; the index below is the recommended way to browse by theme.
+
+---
+
+## Topic index
+
+Each plan is tagged on its own heading with all the topics it touches. A plan can appear under multiple themes — the index below points at it from each. Implemented plans get a ✅; everything else is still open.
+
+### 🔍 Retrieval quality — how search behaves
+What gets returned for a query: ranking, fusion, agentic loops, query rewriting, asymmetric search, reranking.
+
+- **#2** Asymmetric-search-aware query path (HyDE)
+- **#3** Agentic retrieval loop (top-k → fetch more on demand)
+- **#5** Hierarchical chunking — the "400-page manual" problem
+- **#6** Cross-encoder reranker (Stage 3.5)
+- **#7** Structured payload filtering on date / merchant
+- **#8** Smarter T0 / large-CSV retrieval
+- **#9** Liquid AI LFM2 model evaluation *(also: Models)*
+- **#17** ✅ CSV redesign — row-window retrieval *(also: Indexing, CSV)*
+
+### 🗂 Indexing pipeline — what enters the index, how
+File classification into tiers, summarization, manifest lifecycle, ingest robustness.
+
+- **#1** Swap Kimi-vision PDF fallback for Marker (layout-aware OSS OCR) *(also: PDF)*
+- **#4** ✅ Data lifecycle, updates & deletions (the manifest)
+- **#5** Hierarchical chunking *(also: Retrieval, PDF)*
+- **#7** Structured payload filtering *(also: Retrieval)*
+- **#11** Unify orphan-cleanup pattern across `summaries` and `fast_tier` *(also: Qdrant)*
+- **#12** Routing data files (CSV / JSON / XML / Parquet) properly through tiers *(also: CSV)*
+- **#14** Promote `MAGPIE_DEV_USE_MTIME` to a user-facing setting *(also: UI, Config)*
+- **#17** ✅ CSV redesign — proper summaries at ingest *(also: Retrieval, CSV)*
+- **#21** Surface drift events: warn before silently dropping vanished files *(also: UI)*
+
+### 🖥 User experience / UI
+Settings panels, in-app warnings, anything the user sees.
+
+- **#14** Promote `MAGPIE_DEV_USE_MTIME` to a user-facing setting *(also: Indexing, Config)*
+- **#15** Auto-promotion of nested exclude paths into sub-roots *(also: Config)*
+- **#16** LLM / inference settings UI + cross-provider thinking-mode unification *(also: Models, Config)*
+- **#21** Surface drift events: warn before silently dropping vanished files *(also: Indexing)*
+
+### 📦 Packaging, distribution & process lifecycle
+How Magpie ships and runs as an end-user app — from installer through process management.
+
+- **#10** Self-contained packaging (bundled Python & sidecar)
+- **#13** Daemon as a true OS service (launchctl / systemd) *(also: Daemon)*
+- **#19** Post-packaging configuration story — replace `.env` with structured config + OS-keychain secrets *(also: Security, Config)*
+- **#20** Qdrant process lifecycle — who starts, stops, and health-checks the local server *(also: Qdrant, Daemon)*
+
+### 🔒 Security & privacy
+Auth, hardening, secret storage.
+
+- **#18** Lock down Magpie's Qdrant — auth + bind hardening *(also: Qdrant)*
+- **#19** Post-packaging configuration story (keychain secrets) *(also: Packaging, Config)*
+
+### 🤖 Models & providers
+LLM/embedding model swaps, evaluation, cross-provider feature parity.
+
+- **#2** Asymmetric models / HyDE *(also: Retrieval)*
+- **#6** Cross-encoder reranker *(also: Retrieval)*
+- **#9** Liquid AI LFM2 model evaluation
+- **#16** LLM / inference settings UI + thinking-mode unification *(also: UI, Config)*
+
 ---
 
 ## 1. Swap Kimi-vision PDF fallback for Marker (layout-aware OSS OCR)
+
+**Tags:** indexing · pdf
 
 **What:** Replace (or add an option alongside) the current "render PDF pages → Kimi vision" fallback with [Marker](https://github.com/VikParuchuri/marker). Marker runs small specialized models locally and emits clean markdown with tables / math / figures preserved.
 
@@ -25,6 +90,8 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 
 ## 2. Asymmetric-search-aware query path (or HyDE)
 
+**Tags:** retrieval · models
+
 **What:** When we add the retrieval stage, don't just embed the raw user question and ANN-search against the summary embeddings. Either (a) pick an embedding model explicitly trained for question↔document asymmetric retrieval, or (b) do **HyDE**: have a cheap LLM (GPT-4o-mini / Haiku / Kimi-Flash) write a *hypothetical summary* that would answer the question, embed *that*, and search with it.
 
 **Why:**
@@ -43,6 +110,8 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 
 ## 3. Agentic retrieval loop (top-K = 5 → fetch more on demand)
 
+**Tags:** retrieval
+
 **What:** In Stage 3, don't hand the final LLM a fixed top-K of retrieved summaries. Set a default top-K (e.g. 5) but expose a tool — `fetch_next_documents(offset, k)` — that the model can call itself when it decides the current batch doesn't contain the answer. The model loops: read → decide "not enough info" → tool-call for more → read → answer, or exhaust the index.
 
 **Why:**
@@ -59,6 +128,8 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 ---
 
 ## 4. Data lifecycle, updates & deletions — IMPLEMENTED (see `src/manifest.py`)
+
+**Tags:** indexing · ✅ implemented
 
 > **Promoted from Future Plans to shipped.** `Test Summaries/_manifest.json` now
 > tracks every source file's `size`, `summary_file`, `summarized_at`, `ingested_at`.
@@ -117,6 +188,8 @@ Ideas we've decided against doing *right now* but want to revisit. Every entry m
 
 ## 5. Hierarchical chunking (the "400-page manual" problem)
 
+**Tags:** indexing · retrieval · pdf
+
 **What:** For any source file above a size threshold (proposed: ~50k characters or ~50 PDF pages), don't produce a single `FileSummary`. Instead build a two-level hierarchy:
 
 1. **Chunk summaries** — one `FileSummary` per chapter / section / natural unit. Each chunk row in the DB stores: `parent_file_id`, `chunk_index`, `char_start`, `char_end`, `page_start`, `page_end`, and `level="chunk"`. Embed the chunk summary.
@@ -165,6 +238,8 @@ If `char_range` or `page_range` is set, Stage 4 reads only that slice instead of
 
 ## 6. Cross-encoder reranker (Stage 3.5)
 
+**Tags:** retrieval · models
+
 **What:** Insert a reranking step between Qdrant retrieval and Stage 4. Today the pipeline pulls top-k=5 from Qdrant and hands them straight to the answerer. Instead: pull top-k=50 from Qdrant (cheap), then run a **cross-encoder** (e.g. `bge-reranker-v2-m3` or Cohere's Rerank API) over `(query, doc)` pairs to re-score and pick the top 5 to actually feed Stage 4.
 
 **Why:**
@@ -182,6 +257,8 @@ If `char_range` or `page_range` is set, Stage 4 reads only that slice instead of
 ---
 
 ## 7. Structured payload filtering on extracted transaction date / merchant
+
+**Tags:** indexing · retrieval
 
 **What:** When Stage 1 produces a `FileSummary`, extract structured fields — at minimum a normalized `transaction_date` (ISO 8601) and `merchant_name` — and store them as Qdrant **payload** alongside the vector. Then Stage 3 query rewriting can emit *filters* (e.g. `transaction_date >= 2022-05-01 AND transaction_date < 2022-06-01`) that Qdrant applies pre-search. This is fundamentally different from "boost newer documents": boosts blend signals, filters scope the search.
 
@@ -201,6 +278,8 @@ If `char_range` or `page_range` is set, Stage 4 reads only that slice instead of
 ---
 
 ## 8. Smarter T0 / large-CSV retrieval (the ripgrep-at-answer-time approach is leaving signal on the floor)
+
+**Tags:** retrieval · csv
 
 **What:** Today T0 files (huge CSVs, logs, multi-MB JSON, big textbooks) embed only a 2 KB preview, and the answer step bridges the gap with `ripgrep_file(path, question_tokens)` (see `src/ingest/ripgrep.py` + `src/answer.py`). The approach works for the easy cases — exact dates, exact merchant names, exact dollar amounts — but it has several known weak points worth thinking about together:
 
@@ -245,6 +324,8 @@ f. **Page-anchored slicing for huge text-native files.** For 500-page textbooks 
 
 ## 9. Liquid AI LFM2 Model Family Evaluation
 
+**Tags:** models · retrieval
+
 **Context:** Magpie's pipeline currently calls cloud LLMs for two tasks: query rewriting (pydantic-ai `SearchQuery` generation) and cited answer synthesis. Stage 1 vision summaries are exploring Gemma 3n E4B via mlx-vlm on Apple Silicon. With Liquid AI's LFM2 family (late 2025) and Google's Gemma 4 family (April 2026) both now available, there are stronger local candidates worth benchmarking against our actual corpora (ReceiptQA, 1,724-course catalog, 236-club directory). All LFM2 models ship with day-one MLX support and an Apache 2.0-derivative license (free commercial use under $10M ARR).
 
 **Binding hardware constraint:** ColQwen2.5 in `fast_tier` consumes ~6 GB VRAM, leaving ~2 GB headroom on 8 GB Apple Silicon. This — not benchmark scores — is the primary filter.
@@ -287,6 +368,8 @@ LFM2-ColBERT-350M is text-only late-interaction and cannot replace ColQwen2.5 (v
 
 ## 10. Self-contained Packaging (Bundled Python & Sidecar)
 
+**Tags:** packaging
+
 **What:** Package the application so that the `.app` and `.dmg` bundles are entirely self-contained, including the Python interpreter and all necessary dependencies. This likely involves using `PyInstaller`, `Nuitka`, or Tauri's built-in sidecar support with a pre-bundled Python environment (like a `conda` or `uv` export).
 
 **Why:**
@@ -310,6 +393,8 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 ---
 
 ## 11. Unify orphan-cleanup pattern across `summaries` and `fast_tier`
+
+**Tags:** indexing · qdrant
 
 **What:** The codebase currently has two different orphan-cleanup styles in two collections, and a fix-time decision was made to add a third (count-based for CSV/PDF chunks). Pick one canonical approach and migrate the other.
 
@@ -337,6 +422,8 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 
 ## 12. Routing data files (CSV / JSON / XML / Parquet) properly through tiers
 
+**Tags:** indexing · csv
+
 **What:** Today data files are processed by either (a) the row-level CSV ingester (one Qdrant point per row, no LLM summary) or (b) the standard text summarizer (one summary per file). The router decides via extension + size, but the decision logic is shallow — large CSVs go to row-mode, small JSONs go to summary-mode, and there's no real "what's IN this file" awareness. The `data` category in `categories_enabled` lumps them all together and defaults ON purely to keep Mridul's just-fixed CSV ingestion working.
 
 **Why we might want this:**
@@ -353,6 +440,8 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 ---
 
 ## 13. Daemon as a true OS service (launchctl / systemd)
+
+**Tags:** packaging · daemon
 
 **What:** Run the indexing daemon as a real OS-managed service. macOS: a `launchctl` agent under `~/Library/LaunchAgents/`. Linux: a `systemd --user` unit. Windows: a Task Scheduler entry or a real Windows service. The user installs Magpie, the OS handles starting/stopping/respawning the daemon, and Magpie keeps indexing in the background whether or not Tauri is open.
 
@@ -372,6 +461,8 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 
 ## 14. Promote `MAGPIE_DEV_USE_MTIME` to a user-facing setting
 
+**Tags:** indexing · ui · config
+
 **What:** Today, the manifest's `needs_summarization()` check uses size-only. A `MAGPIE_DEV_USE_MTIME=1` env var enables a size-AND-mtime check (re-summarize if the file was touched, even if bytes are identical). It exists for dev workflows where you want to force re-ingest by `touch`-ing a file. Promote it to a real user-facing setting in `indexing_rules.json` (`reindex_on_mtime_change: bool`).
 
 **Why we might want this:**
@@ -388,6 +479,8 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 ---
 
 ## 15. Auto-promotion of nested exclude paths into sub-roots
+
+**Tags:** ui · config
 
 **What:** Today (per `Plans/Ingestion Rules/Implementation Plan.md`), if a user's per-root rules include nested paths like `exclude_globs: ["src/secrets/*"]`, those rules stay attached to the parent root. An alternative design ("rule normalization") would auto-create a sub-root for each nested path on save: the parent's rule moves into a new `magpie/src/secrets` sub-root with `exclude_globs: ["*"]`. The JSON ends up "denormalized" — every rule is scoped to the immediate directory it lives in.
 
@@ -408,6 +501,8 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 ---
 
 ## 16. LLM / inference settings UI + cross-provider thinking-mode unification
+
+**Tags:** ui · models · config
 
 **What:** Two related pieces of work that both belong upstream of the local-LLM migration shipped in `Plans/Local LLM Plan.md`:
 
@@ -441,6 +536,8 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 ---
 
 ## 17. CSV redesign — proper summaries (Part A) + row-window retrieval (Part B) — IMPLEMENTED 2026-05-06
+
+**Tags:** indexing · retrieval · csv · ✅ implemented
 
 > **Promoted from Future Plans to shipped.** Both halves landed together,
 > as the design required. See `src/ingest/tier1.py:run_csv_async`,
@@ -595,6 +692,8 @@ all backends.
 
 ## 18. Lock down Magpie's Qdrant — auth + bind hardening (Layer 2 of the OpenWhispr-collision fix)
 
+**Tags:** security · qdrant
+
 **Context:** The 2026-05-06 audit caught a silent disaster: Magpie's `.env` pointed at `http://localhost:6333`, the Qdrant default, and so did OpenWhispr's bundled Qdrant binary. OpenWhispr was running and Magpie's `just qdrant-up` was not — so every Magpie ingest call landed in OpenWhispr's storage at `~/.cache/openwhispr/qdrant-data/`. Twenty `summaries` points and an empty `fast_tier` collection were created against the wrong instance. The fix shipped (Layer 1): Magpie's standalone Qdrant now runs on **6433/6434** instead of 6333/6334, with `QDRANT__SERVICE__HOST="127.0.0.1"` pinned in `just qdrant-up`. See `justfile` `QDRANT_PORT` / `QDRANT_GRPC_PORT` and the `.env` comment.
 
 That's a port move. It is **not** an isolation guarantee. Anything else on the machine — another app, a stray script, a misconfigured client, a future OpenWhispr update that probes a wider port range — can still talk to `localhost:6433` and read or wipe Magpie's data. The 127.0.0.1 bind keeps the LAN out; it does not keep co-resident apps out.
@@ -635,6 +734,8 @@ That's a port move. It is **not** an isolation guarantee. Anything else on the m
 ---
 
 ## 19. Post-packaging configuration story — replace `.env` with structured config + OS-keychain secrets
+
+**Tags:** packaging · config · security
 
 **Context:** Today's runtime configuration lives in `.env` at the repo root and is loaded by `python-dotenv` from inside CLI entrypoints (`src/ingest/walker.main()`, `src/stage2/__main__.main()`, `src/pipeline.main()`, etc.). The justfile now does `set dotenv-load` (added 2026-05-06 after `just reset-index` failed because its `python -c` snippet bypassed every entrypoint that loads dotenv) so every `just` recipe inherits `.env` too. This works for developers running from a checked-out source tree.
 
@@ -686,6 +787,8 @@ It does **not** survive packaging. After Plan #10 ships (PyInstaller / Nuitka / 
 
 ## 20. Qdrant process lifecycle — who starts, stops, and health-checks the local server
 
+**Tags:** packaging · qdrant · daemon
+
 **Context:** Today `just qdrant-up` is the only path that launches the binary. Everything else — `reset()`, `ingest_from_manifest()`, every search call — *assumes* Qdrant is already running and surfaces a "Connection refused" error otherwise. That's exactly what bit `just reset-index` on 2026-05-07: the recipe ran fine on the filesystem half but blew up on the Qdrant half because the server had been SIGTERM'd at some earlier point. Patched at the recipe layer (`reset-index: qdrant-up` dependency) but the underlying gap stands: there is no Python-side owner of the Qdrant process. The Tauri Settings page that's about to be built (reset / re-index / "what's indexed?" buttons) cannot rely on the user remembering to run a `just` command before clicking.
 
 **What:** Make the Python sidecar own Qdrant's lifecycle end-to-end. A new `QdrantSupervisor` class wraps the binary as a child process; `src/server.py`'s FastAPI `lifespan` hook calls `start()` on app boot and `stop()` on shutdown. New endpoints (`/reset`, `/reindex`, `/qdrant-status`) expose what the Settings page needs. Leaf functions like `pipeline.reset()` stay process-manager-free.
@@ -725,5 +828,141 @@ It does **not** survive packaging. After Plan #10 ships (PyInstaller / Nuitka / 
 - **Together with Plan #18 (Magpie Qdrant API key)** — the supervisor generates the key on first start, persists it, and passes it to both server + in-process client. Doing API auth before the supervisor exists means duplicating the key-read in two places.
 
 **Risk if deferred:** every new `just` recipe that touches Qdrant accretes a `xxx: qdrant-up` dependency edge (today: `reset-index`; next: `ingest`, `search`, `recover-fast-tier`...). The recipe-prereq pattern is a band-aid that doesn't survive into the packaged app. The longer the supervisor is deferred, the more places quietly assume "Qdrant just is running" — and each silent assumption becomes a connection-refused stack trace the user has to translate into "oh, run `just qdrant-up`." Tauri users will hit the same wall with no `just` to run.
+
+---
+
+## 21. Surface drift events: warn before silently dropping vanished files / folders
+
+**Tags:** ui · indexing
+
+**What:** Today, when a sync detects that a file or whole folder the user
+asked Magpie to index is gone from disk, the pipeline silently drops every
+trace of it: the Qdrant points (file-level summary + per-row points for
+CSVs + per-page ColPali patches), the on-disk summary markdown, and the
+manifest entry. The walker's prune counter (`run_batch` in
+[src/ingest/walker.py](../src/ingest/walker.py)) reports a number — "pruned
+3 manifest entries" — but never names them. `just clean-stale-manifest`
+behaves the same.
+
+This plan: **before** dropping anything, enumerate what's about to be
+removed (files, folders, summary markdowns, expected Qdrant point counts)
+and surface that to the user with a clear warning. Two surfaces:
+
+1. **CLI / `just sync` terminal output:** print a red-text block listing
+   each vanished path with what'll be dropped. Default behavior stays
+   "drop after warning" so unattended runs don't stall, but a flag
+   (`--confirm-drops` or `JUST_SYNC_CONFIRM=1`) gates the drop on a
+   `y/N` prompt for cautious users.
+
+2. **Tauri UI (when the Plan #16 settings panel ships):** a notification
+   row or modal listing the drift events the same way, with options
+   "drop them" / "keep them" / "show me what was dropped." If the user
+   says "keep them," the manifest entries stay (with `skip_reason="orphaned: source missing"`)
+   and the user can investigate before re-running.
+
+**Example terminal output:**
+
+```
+== walking /Users/mriddy/Desktop/notes ==
+…
+WARNING: 4 paths in the manifest no longer exist on disk —
+they will be dropped from the index, summaries, and Qdrant
+collections. If you renamed or moved them, restore them
+before dropping (or use --keep-drift to leave the manifest entries
+in place for a manual decision):
+
+  - /Users/mriddy/Desktop/notes/old_paper.pdf  (3 Qdrant points,
+        1 summary markdown, 12 ColPali pages)
+  - /Users/mriddy/Desktop/notes/spring_archive/  (entire folder gone;
+        87 manifest entries, 87 summaries, 2,341 row points)
+  - /Users/mriddy/Desktop/notes/draft_v2.md  (1 Qdrant point,
+        1 summary markdown)
+  - /Users/mriddy/Desktop/notes/data/sales.csv  (1 file-level
+        summary point + 1,200 row points + 1 summary markdown)
+
+Dropping in 5 seconds (Ctrl-C to abort) …
+```
+
+**Why we want this:**
+
+- **The biggest cost in a local-first RAG app is silent data loss the
+  user didn't intend.** A user who renamed a folder won't realize
+  their re-ingest will silently re-summarize 1,000 files (LLM calls,
+  Qdrant churn, ~hour of wall time on local Gemma 4) and drop the old
+  state with no recovery path. A 5-second pause + a clear message is
+  the minimum dignity owed.
+- **The current "manifest entry stat()s as missing → drop" rule
+  doesn't distinguish between intentional deletion vs. mount unavailable
+  vs. rename mid-walk vs. backup software temporarily moving files.**
+  Surfacing the list lets the user judge whether the disappearance is
+  real or a transient.
+- **Folders are a natural unit:** one rename of a parent folder shows up
+  as N orphan entries today, listed individually. Grouping by deepest
+  surviving common prefix ("entire folder gone: spring_archive/")
+  makes the warning legible. "I renamed `spring_archive/` to
+  `spring_2025/`, please don't drop 87 summaries" is a one-glance
+  decision.
+- **Helps debug daemon mode (Plan #13 / pre-#13):** when the future
+  watcher fires off-hours, the user comes back to "I lost
+  87 summaries last night, why?" Today's silent log line gives no
+  trace; a structured drift event ("at 2026-05-07 02:14, watcher
+  observed `spring_archive/` removed → dropped 87 entries") preserves
+  the audit trail.
+
+**Why we did NOT do it now:**
+
+- The packaging story (Plan #10) determines where the warning surfaces
+  best — terminal-only is fine for developers running `just sync`
+  manually but useless for non-developer Tauri users who never see a
+  terminal. Doing the CLI piece without the UI piece means
+  re-implementing once for each surface.
+- The grouping / deepest-common-prefix logic ("entire folder gone")
+  is a small but meaningful UX exercise — not just `os.path.commonpath`,
+  because we want to distinguish "user removed all 87 files
+  individually" (rare but possible — 87 individual messages) from
+  "user removed the parent folder" (one folder-level message).
+- The "skip / keep / re-confirm next time" UX needs design alongside
+  the eventual indexing-rules settings panel (Plan #16) — it's a
+  per-orphan decision that should persist somewhere the user can see
+  later, not a one-shot terminal prompt that disappears.
+
+**When to revisit:**
+
+- Immediately after the daemon watcher (the future "react to file
+  changes" piece, partially in Plan #13) — at that point silent drops
+  start happening on a schedule the user didn't initiate, and lack
+  of audit trail becomes a real complaint surface.
+- Or sooner if any beta user reports "Magpie deleted my summaries
+  when I just renamed a folder, and I had to re-summarize from
+  scratch because there was no way to tell it the folder still
+  existed under the new name."
+
+**Implementation sketch:**
+
+- Refactor the prune logic in `walker.run_batch` and
+  `Manifest.clean_stale` (and `pipeline.reset`'s underlying
+  cleanup helpers) into a single `compute_drift_events(manifest) ->
+  list[DriftEvent]` that returns each vanished entry with: path,
+  kind (file vs folder), Qdrant point count expected (file-level +
+  row + page), summary markdown path, mtime of last successful
+  ingest. **Read-only** — does not delete anything.
+- New `apply_drift_events(events, *, dry_run=False)` actually performs
+  the drops (Qdrant deletes, summary markdown unlinks, manifest row
+  removal). All current call sites switch to `compute → present →
+  apply`.
+- CLI surface: `just sync` calls compute → prints the warning block
+  → 5-second sleep (`Ctrl-C to abort`) → applies. With `--confirm-drops`,
+  prompts y/N. With `--keep-drift`, prints the warning but skips
+  the apply step.
+- UI surface (when Plan #16 settings panel exists): the daemon's
+  watcher posts drift events to a `/events/drift` endpoint; the UI
+  shows them in a "Files no longer in your index" section with
+  per-entry buttons. The same `apply_drift_events` is the action
+  target — reused, not re-implemented.
+- Grouping heuristic: when ≥10 manifest entries share a deepest
+  common ancestor that is also gone from disk, render as one
+  folder-level event instead of N file-level events. Threshold and
+  exact rule (e.g. "≥80% of children gone") tunable; start simple,
+  measure on real data.
 
 ---

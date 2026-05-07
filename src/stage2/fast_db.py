@@ -235,8 +235,16 @@ def delete_path(source_path: str) -> int:
 
 
 def get_indexed_paths() -> set[str]:
-    """Return the set of distinct source_paths currently in the fast tier."""
+    """Return the set of distinct source_paths currently in the fast tier.
+
+    Empty set when the collection doesn't exist yet (corpus has no T4 files,
+    or `ensure_fast_collection` hasn't fired). Prevents the orphan-cleanup
+    callers in the walker from logging a confusing 404 warning every run on
+    text-only corpora.
+    """
     client = get_qdrant_client()
+    if not client.collection_exists(FAST_COLLECTION_NAME):
+        return set()
     paths: set[str] = set()
     offset = None
     while True:

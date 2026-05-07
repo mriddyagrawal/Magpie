@@ -77,6 +77,14 @@ sync *args:
         echo "== walking $path =="
         uv run python -m src.ingest "$path" {{args}} || true
     done <<< "$paths"
+    # Auto-backup the resulting state so the next reset-index can restore in
+    # ~30s instead of forcing a 15-minute re-summarize. Single backup slot
+    # under <APP_DATA_DIR>/backup/, overwritten each run. See src/backup.py.
+    # Wrapped in `|| ...` so a backup failure doesn't make sync exit nonzero;
+    # the warning + manual `just backup` is the recovery path.
+    echo
+    echo "== auto-backup =="
+    just backup || echo "warn: auto-backup failed; run 'just backup' manually once Qdrant is healthy"
 
 # Check whether a single file or folder will be indexed under the current
 # rules. Prints the (allowed/skipped) decision and the reason that fired
@@ -144,6 +152,39 @@ reset-index: qdrant-up
     print(f'qdrant error:                 {s[\"qdrant_error\"]}') if s.get('qdrant_error') else None; \
     print(); \
     print('indexing_rules.json untouched. Next: just sync --include-data')\
+    "
+
+# Snapshot the entire indexed state (manifest + summary markdowns + every
+# Qdrant collection via the native snapshot API) to <APP_DATA_DIR>/backup/.
+# Single backup slot — overwrites the previous one atomically. Auto-fired
+# by `just sync` at the end of every walk so reset-index has something to
+# restore from. Implementation: src/backup.py.
+backup: qdrant-up
+    @uv run python -c "\
+    from src.backup import create_backup; \
+    s = create_backup(); \
+    print(f'manifest backed up:           {s[\"manifest_present\"]}'); \
+    print(f'summary markdowns backed up:  {s[\"summary_count\"]}'); \
+    print(f'qdrant collections backed up: {len(s[\"qdrant_collections\"])}'); \
+    [print(f'  - {c[\"name\"]:20s} {c[\"points\"]:>8} points  {c[\"size_bytes\"]/1024/1024:>7.1f} MB') for c in s['qdrant_collections']]; \
+    print(f'backup dir:                   {s[\"backup_dir\"]}')\
+    "
+
+# Restore the entire indexed state from <APP_DATA_DIR>/backup/. DESTRUCTIVE:
+# drops current Qdrant collections, replaces manifest + summary markdowns on
+# disk. Use after a `reset-index` you regret, after a corrupted index, or
+# when porting state to a fresh machine. Fast — no LLM, no embedding,
+# no network — restores in seconds for our scale because Qdrant snapshots
+# preserve segment binaries directly. Pair with the auto-backup that
+# `just sync` writes at the end of every walk.
+restore: qdrant-up
+    @uv run python -c "\
+    from src.backup import restore_backup; \
+    s = restore_backup(); \
+    print(f'collections restored:  {s[\"restored_collections\"]}'); \
+    print(f'manifest restored:     {s[\"manifest_restored\"]}'); \
+    print(f'summary markdowns:     {s[\"summary_count\"]}'); \
+    print(f'from backup created:   {s[\"from_backup_created_at\"]}')\
     "
 
 # Per-child mode: ingest each immediate subdirectory of <path> sequentially.

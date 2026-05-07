@@ -195,8 +195,17 @@ def restore_backup() -> dict[str, Any]:
 
     client = get_qdrant_client()
 
-    # ---- 1. Qdrant: drop existing then recover from snapshot files ------
+    # ---- 1. Qdrant: drop existing then upload-and-recover each snapshot --
+    # We use the multipart-upload endpoint rather than `client.recover_snapshot`
+    # with a `file://` URL because Qdrant 1.17 enforces that any file:// path
+    # must live inside the server's own snapshots dir (a security check
+    # against arbitrary local-disk reads). The upload endpoint takes the
+    # bytes over HTTP, side-stepping the path restriction without needing
+    # us to know or write into Qdrant's snapshots dir.
+    import requests
+
     qdrant_dir = BACKUP_DIR / "qdrant"
+    base_url = _qdrant_base_url()
     restored: list[str] = []
     for col_info in meta.get("qdrant_collections", []):
         name = col_info["name"]
@@ -210,11 +219,20 @@ def restore_backup() -> dict[str, Any]:
         if client.collection_exists(name):
             client.delete_collection(name)
 
-        # `file://` URL works because Qdrant runs on the same machine and can
-        # read this path. Anything else (e.g. http upload) would round-trip
-        # the bytes pointlessly.
-        location = f"file://{snap_path.resolve()}"
-        client.recover_snapshot(collection_name=name, location=location)
+        upload_url = f"{base_url}/collections/{name}/snapshots/upload?priority=snapshot"
+        with snap_path.open("rb") as fh:
+            resp = requests.post(
+                upload_url,
+                files={"snapshot": (snap_path.name, fh, "application/octet-stream")},
+                # Long timeout: large snapshots (multi-GB ColPali tiers) take
+                # real wall-clock to upload + recover even on loopback.
+                timeout=600,
+            )
+        if not resp.ok:
+            raise RuntimeError(
+                f"snapshot upload failed for collection {name!r}: "
+                f"{resp.status_code} {resp.text}"
+            )
         restored.append(name)
 
     # ---- 2. Manifest ----------------------------------------------------

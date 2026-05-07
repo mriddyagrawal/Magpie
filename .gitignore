@@ -13,6 +13,9 @@ test_label/
 Test Summaries 2 Deprecated/
 Test Content 2 Deprecated/
 qdrant_data/
+# Qdrant's per-collection working snapshot dir, created in cwd whenever the
+# server runs. Re-populated transiently every `just backup` run.
+snapshots/
 
 # Magpie UI artifacts
 frontend/node_modules/

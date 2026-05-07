@@ -47,7 +47,7 @@ def get_qdrant_client() -> QdrantClient:
                     (default: ``./qdrant_data``). NOTE: this Python library
                     silently drops every advanced feature — quantization, fp16,
                     binary, snapshots — because it is not the real Rust server.
-                    Use ``cloud`` mode pointing at ``http://localhost:6333``
+                    Use ``cloud`` mode pointing at ``http://localhost:6433``
                     when storage compression matters. See backlog E4.
     """
     global _client
@@ -84,7 +84,7 @@ def get_qdrant_client() -> QdrantClient:
     if api_key is None and not _is_localhost_url(url):
         sys.exit(
             f"error: QDRANT_API_KEY must be set for non-local QDRANT_CLUSTER_ENDPOINT "
-            f"(got {url!r}). Set the key, or point at http://localhost:6333."
+            f"(got {url!r}). Set the key, or point at http://localhost:6433."
         )
 
     # The qdrant-client default timeout (5s) is too tight for large

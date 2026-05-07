@@ -1,5 +1,16 @@
 # NotAnotherSpotlight — command runner
 
+# Auto-load .env into every recipe's environment. Without this, recipes
+# that shell out to `python -c "..."` snippets (reset-index, qdrant-counts,
+# recover-fast-tier, disk-usage, manifest-stats, fast-tier-files, etc.)
+# never see QDRANT_CLUSTER_ENDPOINT / QDRANT_API_KEY / LLM keys, because
+# they bypass the CLI entrypoints that call `load_dotenv()` themselves.
+# `just sync` etc. work without this because they invoke `python -m
+# src.ingest`, which loads dotenv from inside main(). Once the app is
+# packaged (Plan #10), `.env` goes away — see Plans/Future Plans.md #19
+# for the JSON-config + keychain-secrets replacement.
+set dotenv-load
+
 # Install all dependencies (Python venv + CLI tool). Renamed from `sync`
 # in 2026-05 — `sync` now means "ingest everything in indexing_rules.json".
 # See Plans/Ingestion Rules/Implementation Plan.md.
@@ -257,7 +268,13 @@ QDRANT_DATA      := env_var_or_default("QDRANT_DATA", QDRANT_HOME / "storage")
 QDRANT_LOGS      := QDRANT_HOME / "qdrant.log"
 QDRANT_PIDFILE   := QDRANT_HOME / "qdrant.pid"
 QDRANT_VERSION   := "v1.17.1"
-QDRANT_PORT      := "6333"
+# 6433/6434 instead of Qdrant's default 6333/6334. OpenWhispr ships its own
+# bundled Qdrant on the default ports; co-existing on the same machine on
+# defaults caused Magpie to silently write into OpenWhispr's storage tree.
+# These ports are Magpie-only. See Plans/Future Plans.md #18 for the
+# layer-2 auth follow-up.
+QDRANT_PORT      := "6433"
+QDRANT_GRPC_PORT := "6434"
 
 # Download the Qdrant standalone binary onto QDRANT_HOME (one-time, ~30 MB).
 qdrant-install:
@@ -290,9 +307,11 @@ qdrant-up:
         echo "Qdrant binary missing at {{QDRANT_BIN}}. Run 'just qdrant-install' first."; \
         exit 1; \
     else \
-        echo "Starting Qdrant on port {{QDRANT_PORT}}, data at {{QDRANT_DATA}}..."; \
+        echo "Starting Qdrant on port {{QDRANT_PORT}} (gRPC {{QDRANT_GRPC_PORT}}), data at {{QDRANT_DATA}}..."; \
         QDRANT__STORAGE__STORAGE_PATH="{{QDRANT_DATA}}" \
+        QDRANT__SERVICE__HOST="127.0.0.1" \
         QDRANT__SERVICE__HTTP_PORT="{{QDRANT_PORT}}" \
+        QDRANT__SERVICE__GRPC_PORT="{{QDRANT_GRPC_PORT}}" \
             nohup "{{QDRANT_BIN}}" > "{{QDRANT_LOGS}}" 2>&1 & \
             echo $! > "{{QDRANT_PIDFILE}}"; \
         sleep 2; \

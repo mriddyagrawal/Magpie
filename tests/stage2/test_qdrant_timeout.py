@@ -27,10 +27,8 @@ def _reset_client_cache():
 def test_default_timeout_is_60_seconds(monkeypatch):
     """No QDRANT_TIMEOUT_S env var → 60-second default."""
     _reset_client_cache()
-    monkeypatch.setenv("QDRANT_PROVIDER", "cloud")
     monkeypatch.setenv("QDRANT_CLUSTER_ENDPOINT", "http://localhost:6333")
     monkeypatch.delenv("QDRANT_TIMEOUT_S", raising=False)
-    monkeypatch.delenv("QDRANT_API_KEY", raising=False)
 
     with patch.object(db_mod, "QdrantClient") as MockClient:
         db_mod.get_qdrant_client()
@@ -40,7 +38,6 @@ def test_default_timeout_is_60_seconds(monkeypatch):
 
 def test_env_var_overrides_timeout(monkeypatch):
     _reset_client_cache()
-    monkeypatch.setenv("QDRANT_PROVIDER", "cloud")
     monkeypatch.setenv("QDRANT_CLUSTER_ENDPOINT", "http://localhost:6333")
     monkeypatch.setenv("QDRANT_TIMEOUT_S", "300")
 
@@ -49,19 +46,26 @@ def test_env_var_overrides_timeout(monkeypatch):
         assert MockClient.call_args.kwargs.get("timeout") == 300
 
 
-def test_local_provider_does_not_pass_timeout(monkeypatch, tmp_path):
-    """`QDRANT_PROVIDER=local` uses the in-process shim — no HTTP timeout
-    applies. Verify we don't pass `timeout=` (would be wasted/confusing)."""
+def test_default_endpoint_is_localhost_6433(monkeypatch):
+    """Magpie defaults to its non-default port to avoid OpenWhispr / other
+    apps that ship Qdrant on the canonical 6333."""
     _reset_client_cache()
-    monkeypatch.setenv("QDRANT_PROVIDER", "local")
-    monkeypatch.setenv("QDRANT_LOCAL_PATH", str(tmp_path / "qdrant_local"))
+    monkeypatch.delenv("QDRANT_CLUSTER_ENDPOINT", raising=False)
 
     with patch.object(db_mod, "QdrantClient") as MockClient:
         db_mod.get_qdrant_client()
-        kwargs = MockClient.call_args.kwargs
-        # Local mode constructs with `path=...`, no timeout kwarg.
-        assert "timeout" not in kwargs
-        assert "path" in kwargs
+        assert MockClient.call_args.kwargs.get("url") == "http://localhost:6433"
+
+
+def test_non_localhost_endpoint_hard_errors(monkeypatch):
+    """Magpie is local-first by design — remote Qdrant clusters would
+    silently leak the user's index off-machine. Reject at startup."""
+    _reset_client_cache()
+    monkeypatch.setenv("QDRANT_CLUSTER_ENDPOINT", "https://my-cluster.qdrant.io")
+
+    with pytest.raises(SystemExit) as exc_info:
+        db_mod.get_qdrant_client()
+    assert "not a localhost URL" in str(exc_info.value)
 
 
 # ---------------------------------------------------------------------------

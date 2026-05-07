@@ -22,15 +22,21 @@ def _make_mock_point(summary: str, source_path: str, score: float) -> MagicMock:
     return point
 
 
+@patch("src.stage2.search._summary_for_result",
+       return_value="This receipt documents a $170.45 USD flight booking.")
 @patch("src.stage2.search._search_fast_tier", return_value=[])
 @patch("src.stage2.search.rewrite_query")
 @patch("src.stage2.search.embed_dense_query")
 @patch("src.stage2.search.embed_sparse_query")
 @patch("src.stage2.search.get_qdrant_client")
 def test_search_returns_search_results(
-    mock_client, mock_sparse, mock_dense, mock_rewrite, _mock_fast
+    mock_client, mock_sparse, mock_dense, mock_rewrite, _mock_fast, _mock_summary
 ):
-    """search_summaries must return a list of SearchResult with summary, path, score."""
+    """search_summaries must return a list of SearchResult with summary, path, score.
+
+    The summary text is reconstructed from disk in `_summary_for_result`
+    (since 2026-05 — payload-only Qdrant points). Mocked here so the test
+    doesn't depend on a live manifest / summary markdown on disk."""
     mock_rewrite.return_value = SearchQuery(
         query="flight receipt booking cost",
         keywords=["flight", "receipt", "cost"],
@@ -43,7 +49,7 @@ def test_search_returns_search_results(
     mock_response = MagicMock()
     mock_response.points = [
         _make_mock_point(
-            summary="This receipt documents a $170.45 USD flight booking.",
+            summary="(unused — summary now reconstructed from disk)",
             source_path="Test Content/Flight GSP - Hartford Receipt.pdf",
             score=0.87,
         ),
@@ -141,4 +147,6 @@ def test_search_output_exposes_expected_fields(
     r = results[0]
 
     fields = {f.name for f in r.__dataclass_fields__.values()}
-    assert fields == {"summary", "path", "score", "tier"}
+    # `chunk_index` added 2026-05 alongside CSV row-level points (Plan #17).
+    # Optional field — None for non-chunked file-level points.
+    assert fields == {"summary", "path", "score", "tier", "chunk_index"}

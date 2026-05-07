@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
-import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Sequence
@@ -36,31 +35,12 @@ if TYPE_CHECKING:
 REPO_ROOT = APP_DATA_DIR
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
-# Local-backend per-file content cap. Smaller than the cloud default
-# because llama-cpp-python's prompt-eval throughput on consumer hardware
-# (~200-300 tok/s on M-series Metal) makes long prompts the dominant
-# latency. With LOCAL_MAX_TOP_K=8 and 10K chars/file, total prompt is
-# ~80 KB ≈ 20K tokens — sub-30s prompt eval instead of 1-2 minutes.
-# Override via env: `LOCAL_ANSWER_MAX_CHARS=8000`.
-LOCAL_ANSWER_MAX_CHARS_DEFAULT = 10_000
-
-
-def _answer_max_chars_per_file() -> int:
-    """Return the per-file content cap, swapping in the local-backend
-    value when `LLM_PROVIDER=local`. Cloud paths keep the larger cap so
-    high-context models (Claude Sonnet, GPT-5, etc.) get full file content."""
-    from src.llm import active_provider
-    if active_provider().name == "local":
-        return int(os.environ.get(
-            "LOCAL_ANSWER_MAX_CHARS", LOCAL_ANSWER_MAX_CHARS_DEFAULT
-        ))
-    return ANSWER_MAX_CHARS_PER_FILE
 # `_summary_supplement` was designed for T3 LLM summaries (~200-500 words,
-# typically <2 KB). T1's raw-content "summaries" can be huge — the CSV tier
-# stuffs up to 20 MB of CSV content into the summary markdown. Without a cap,
-# the supplement can blow past every model's context window. 4 KB keeps real
-# T3 summaries intact while truncating accidental T1/T2 dumps.
-ANSWER_SUPPLEMENT_MAX_CHARS = 4_000
+# typically <2 KB). Plan #17 Part A made T1 CSV summaries also LLM-generated
+# (no more raw-content dumps), so the cap can be much higher than the
+# emergency 4 KB band-aid we used to need. 10 KB comfortably fits any real
+# FileSummary while still truncating accidental misuse.
+ANSWER_SUPPLEMENT_MAX_CHARS = 10_000
 
 
 class Answer(BaseModel):
@@ -194,6 +174,7 @@ async def answer_question(
     file_paths: Sequence[str | Path],
     history: list[tuple[str, str]] | None = None,
     search_query: "SearchQuery | None" = None,
+    csv_row_hits: dict[str, list[int]] | None = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -293,11 +274,48 @@ async def answer_question(
     else:
         rg_query = question
 
+    def _csv_row_indexes_for(display: str, abs_path: Path) -> list[int] | None:
+        """Look up the row indexes for this path in `csv_row_hits`.
+
+        Search by display path (the value `pipeline.ask` passes) first, then
+        absolute path as a fallback. Returns None if no row hits — the path
+        will fall through to the standard file-content path."""
+        if csv_row_hits is None:
+            return None
+        if display in csv_row_hits:
+            return csv_row_hits[display]
+        abs_str = str(abs_path)
+        if abs_str in csv_row_hits:
+            return csv_row_hits[abs_str]
+        return None
+
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
         try:
-            if _is_t0(display):
+            csv_hits = _csv_row_indexes_for(display, abs_path)
+            if csv_hits is not None and abs_path.suffix.lower() == ".csv":
+                # Plan #17 Part B: focused row-window block, NOT file prefix.
+                # The file's LLM summary still gets prepended as supplement
+                # (which Part A made into a real summary, not raw bytes).
+                from src.stage2.search import build_csv_row_window_block
+                block = await asyncio.to_thread(
+                    build_csv_row_window_block, display, csv_hits
+                )
+                if block is None:
+                    blocks = [
+                        f"Content type: csv-row-windows\n\n---\n"
+                        f"(could not read {abs_path.name} from disk)"
+                    ]
+                else:
+                    blocks = [
+                        f"Content type: csv-row-windows (the rows that match "
+                        f"the question, with ±2 neighbors for context — the "
+                        f"full file is intentionally NOT included; rely on "
+                        f"the per-file summary above for cross-row context "
+                        f"or to know what the CSV is about as a whole)\n\n---\n{block}"
+                    ]
+            elif _is_t0(display):
                 # T0 files: skip the whole-file read and lean on ripgrep.
                 hits = await asyncio.to_thread(ripgrep_search, abs_path, rg_query)
                 hits_text = format_hits_block(abs_path, hits)
@@ -322,7 +340,7 @@ async def answer_question(
                 blocks = await asyncio.to_thread(
                     build_content_blocks,
                     abs_path,
-                    max_chars=_answer_max_chars_per_file(),
+                    max_chars=ANSWER_MAX_CHARS_PER_FILE,
                     max_pdf_pages=ANSWER_MAX_PDF_PAGES,
                     search_keywords=keywords,
                 )

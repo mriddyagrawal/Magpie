@@ -19,7 +19,7 @@ list of tier workers to run`. The walker picks ONE primary tier (priority
 | Tier | What it does | LLM? | Output |
 |---|---|---|---|
 | **T0** | Register large file with 2 KB head preview (or header + 100 CSV rows). Ripgrep at query time. | No | summary md |
-| **T1** | Direct embed: full file body in markdown (8 KB cap; CSV cap = 20 MB). | No | summary md |
+| **T1** | Non-CSV: direct embed of full file body in markdown (8 KB cap). **CSV: LLM-summarized via `tier1.run_csv_async` (header + ~20 sample rows → `FileSummary`).** | **Yes for CSV**, no otherwise | summary md |
 | **T2** | Extract-then-embed via [src/content.py](../src/content.py) extractors (PDF/DOCX/XLSX/PPTX/HTML/IPYNB/CSV). 8 KB cap. | No | summary md |
 | **T3** | LLM structured summary (vision-capable). Content-hash deduped. | **Yes** | summary md |
 | **T4** | ColPali multi-vector visual embedding. Pool factor 2 only for `.pptx`. | No (encoder) | Qdrant patches in `fast_tier` |
@@ -28,6 +28,13 @@ T0/T1/T2/T3 all write a summary markdown to `SUMMARIES_DIR/<sha256[:16]>_<tier>.
 which Stage 2 then parses, embeds (dense + sparse), and upserts into the
 `summaries` Qdrant collection (1 point per file). T4 doesn't produce a
 markdown — its output is multi-vector patches in the `fast_tier` collection.
+
+**CSVs (T1) are the exception**: they write the LLM summary to disk (used
+as answer-time supplement) AND have their rows embedded one-per-point in
+the `summaries` collection by `csv_ingest.ingest_csv_rows`. The CSV's LLM
+summary itself is NOT yet embedded as a file-level Qdrant point — known
+follow-up to Plan #17. See [CSV_routing.md](CSV_routing.md) for the full
+end-to-end including answer-time row-window retrieval.
 
 ---
 
@@ -78,11 +85,11 @@ extension token in the file's name.
 | `.yml` | [YML_routing.md](YML_routing.md) | |
 | `.toml` | [TOML_routing.md](TOML_routing.md) | |
 
-### CSV (special — row-level indexing for small files)
+### CSV (special — LLM summary + row-level Qdrant points + answer-time row windows)
 
 | Ext | File | Notes |
 |---|---|---|
-| `.csv` | [CSV_routing.md](CSV_routing.md) | **default-skipped** unless `--include-data`. Small csv → T1 → row-level Qdrant points (1 per row) |
+| `.csv` | [CSV_routing.md](CSV_routing.md) | **default-skipped** unless `--include-data`. Small csv → T1 → LLM summary md + 1 Qdrant point per row. Answer step substitutes ±2 row windows for the file-prefix dump (Plan #17). |
 
 ### Office documents
 
@@ -182,12 +189,44 @@ Two end states for the Stage 2 push ([src/stage2/__main__.py:29](../src/stage2/_
    `id = md5(source_rel)`.
 2. **CSV row-level path** — `.csv` extension AND `T1` in routes.
    `csv_ingest.ingest_csv_rows` produces **one Qdrant point per row** in the
-   same `summaries` collection. `id = md5("source_rel::row:N")`.
+   same `summaries` collection. `id = md5("source_rel::row:N")`. The row
+   point's payload includes `chunk_index: N` so the answer step can recover
+   the row's neighbors at query time. **The CSV's LLM-generated summary
+   markdown** (produced by `tier1.run_csv_async` and written to disk) is
+   NOT also embedded as a file-level Qdrant point today — it serves as
+   answer-time supplement only. Wiring it as a searchable file-level
+   point is a Plan #17 follow-up.
 
 T4 files (PDFs / images via ColPali) don't go through Stage 2's summary upsert
 — their patches are already in the `fast_tier` collection. Stage 2 sees
 `summary_file=None` + `fast_indexed_at=set` and just calls `mark_ingested`
 without writing new vectors.
+
+## Qdrant collection schemas
+
+| Collection | Qdrant-managed | Payload fields | Notes |
+|---|---|---|---|
+| `summaries` | `id`, `vector.dense` (384-d MiniLM-L6-v2), `vector.sparse` (BM25 indices+values) | `source_path`, `chunk_index` | **Path-only payload since 2026-05.** No summary text in payload — search-snippet text is reconstructed at query time by re-reading the CSV at `chunk_index` (row hits) or the summary markdown via the manifest (file-level hits). Saves ~30% of Qdrant size at 1M+ scale. `chunk_index` is the generic within-file index (RAG industry convention) — row number for CSVs; future PDF/audio chunks reuse the same field. File-level summary points omit it. |
+| `fast_tier` | `id`, `vector` (multi-vector ColPali patch embeddings) | `source_path`, `page_num` | One point per page (PDFs) or per image. |
+
+## Answer-time post-processing (CSV-only, since Plan #17)
+
+For non-CSV hits the answer step still calls
+`build_content_blocks(path, max_chars=...)` — file prefix or
+keyword-anchored chunk for PDFs.
+
+For CSV row hits ([src/answer.py:answer_question](../src/answer.py)):
+
+1. `pipeline.ask` groups hits by path, keeping `chunk_index` from the
+   payload: `csv_row_hits[path] = [chunk_indexes]`. (CSV-specific dict
+   name; the field itself is generic — `SearchResult.chunk_index`.)
+2. For each CSV path, `build_csv_row_window_block(path, indexes, window=2)`
+   produces a multi-window text block (matched rows + ±2 neighbors,
+   overlapping windows merged).
+3. The CSV's LLM summary markdown is prepended via `_summary_supplement`
+   (cap 10 KB).
+4. `build_content_blocks` is **skipped** for the CSV path — no
+   file-prefix dump.
 
 ## Reading the diagrams
 

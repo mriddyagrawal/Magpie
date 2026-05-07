@@ -3,12 +3,12 @@
 # Auto-load .env into every recipe's environment. Without this, recipes
 # that shell out to `python -c "..."` snippets (reset-index, qdrant-counts,
 # recover-fast-tier, disk-usage, manifest-stats, fast-tier-files, etc.)
-# never see QDRANT_CLUSTER_ENDPOINT / QDRANT_API_KEY / LLM keys, because
-# they bypass the CLI entrypoints that call `load_dotenv()` themselves.
-# `just sync` etc. work without this because they invoke `python -m
-# src.ingest`, which loads dotenv from inside main(). Once the app is
-# packaged (Plan #10), `.env` goes away — see Plans/Future Plans.md #19
-# for the JSON-config + keychain-secrets replacement.
+# never see HF_TOKEN / OPENROUTER_API_KEY / other LLM keys, because they
+# bypass the CLI entrypoints that call `load_dotenv()` themselves. `just
+# sync` etc. work without this because they invoke `python -m src.ingest`,
+# which loads dotenv from inside main(). Once the app is packaged
+# (Plan #10), `.env` goes away — see Plans/Future Plans.md #19 for the
+# JSON-config + keychain-secrets replacement.
 set dotenv-load
 
 # Install all dependencies (Python venv + CLI tool). Renamed from `sync`
@@ -133,7 +133,7 @@ walk-rebuild path:
 # but doesn't drop collections, clear the manifest, or delete markdowns.
 #
 # After running, your next `just sync --include-data` rebuilds everything.
-reset-index:
+reset-index: qdrant-up
     @uv run python -c "\
     from src.pipeline import reset; \
     s = reset(); \
@@ -220,6 +220,18 @@ serve:
 # Same as `serve`, but auto-reloads on src/ changes — use during dev.
 serve-dev:
     uv run uvicorn src.server:app --port 8765 --reload
+
+# One-shot: launch the Magpie window. Tauri auto-spawns its own Python
+# sidecar internally (see frontend/src-tauri/src/lib.rs), so this is a
+# single process / single terminal. Logs from both Tauri and the
+# sidecar interleave in this same window. ⌥Space summons the window
+# (or hides it). Ctrl-C kills everything cleanly.
+#
+# Want hot-reload of Python code? That needs `just serve-dev` in a
+# separate terminal AND a small lib.rs change to make Tauri skip its
+# auto-spawn. See the note in the recipe — ask if you want it.
+run-magpie:
+    cd frontend && pnpm tauri dev
 
 # Start Magpie Cloud (the LLM-orchestration backend that holds prompts
 # and proxies LLM calls). Different process from `just serve` — that
@@ -317,7 +329,7 @@ qdrant-up:
         sleep 2; \
         if kill -0 $(cat "{{QDRANT_PIDFILE}}") 2>/dev/null; then \
             echo "Started (pid $(cat "{{QDRANT_PIDFILE}}")). Logs: {{QDRANT_LOGS}}"; \
-            echo "Set in .env: QDRANT_PROVIDER=cloud  QDRANT_CLUSTER_ENDPOINT=http://localhost:{{QDRANT_PORT}}"; \
+            echo "Magpie reaches Qdrant on http://localhost:{{QDRANT_PORT}} by default. Override only if needed: QDRANT_CLUSTER_ENDPOINT=http://localhost:<port>"; \
         else \
             echo "Qdrant failed to start. Last 30 lines of {{QDRANT_LOGS}}:"; \
             tail -30 "{{QDRANT_LOGS}}"; \
@@ -382,10 +394,10 @@ fast-tier-files:
     print(f'Top 50: {sum(pg for pg,_,_ in files[:50])*100/max(total,1):.0f}% of pages')\
     "
 
-# Inspect the live Qdrant fast_tier config — shows what's actually applied
-# vs what the code requested (exposes silent local-mode quantization gaps).
+# Inspect the live Qdrant fast_tier config — shows the vector / quantization
+# settings the running server actually has applied.
 fast-tier-config:
-    @QDRANT_PROVIDER=local uv run python -c "\
+    @uv run python -c "\
     from src.stage2.db import get_qdrant_client;\
     import json;\
     c = get_qdrant_client();\
@@ -399,7 +411,7 @@ fast-tier-config:
     print();\
     print('COLLECTION-LEVEL QUANTIZATION (what is actually applied):');\
     qc = info.config.quantization_config;\
-    print('  ', qc.model_dump() if qc else 'None  <-- LOCAL MODE DOES NOT APPLY QUANTIZATION; vectors are raw fp32');\
+    print('  ', qc.model_dump() if qc else 'None');\
     "
 
 # Rebuild manifest fast_indexed_at + fast_pages from Qdrant fast_tier — recovers
@@ -407,7 +419,7 @@ fast-tier-config:
 # fields when a file was re-summarized. Vectors stayed in Qdrant; only the
 # manifest forgot. This re-stamps the manifest from the surviving Qdrant data.
 recover-fast-tier:
-    @QDRANT_PROVIDER=local uv run python -c "\
+    @uv run python -c "\
     from src.manifest import Manifest;\
     m = Manifest();\
     stats = m.reconcile_from_fast_tier();\

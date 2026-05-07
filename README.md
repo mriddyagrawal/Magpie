@@ -72,7 +72,7 @@ A few decisions shape the whole system:
 - Self-contained — you run it against the folder you care about.
 
 **It isn't:**
-- A cloud-sync service. Files don't leave your machine. If you run both `LLM_PROVIDER=local` and `QDRANT_PROVIDER=local`, nothing leaves at all. Cloud providers see only the small structured summaries sent for embedding / answering.
+- A cloud-sync service. Files don't leave your machine. With `LLM_PROVIDER=local`, nothing leaves at all — Qdrant is always local. Cloud LLM providers see only the small structured summaries sent for embedding / answering.
 - An always-on background daemon. You run sync when you want the index refreshed.
 - A replacement for full-text search over every file on your disk. It's scoped to the folders you point it at.
 
@@ -140,14 +140,18 @@ Run `ns` the same way regardless of provider. Only `.env` changes.
 
 ## Vector database
 
-Same pattern as the LLM: pick cloud or local via `QDRANT_PROVIDER`.
+Magpie targets exactly one Qdrant deployment shape: **the real Qdrant Rust binary running on localhost.** No remote clusters, no Python embedded shim, no Docker. Both alternatives existed in earlier versions and were dropped in 2026-05 — the remote-cluster mode broke the privacy promise, and the embedded Python shim silently disabled quantization, payload indexes, and other server features that the at-scale tests relied on.
 
-- **`cloud`** *(default)* — Qdrant Cloud cluster. Requires `QDRANT_API_KEY` and `QDRANT_CLUSTER_ENDPOINT`. Data lives in their infrastructure.
-- **`local`** — Embedded Qdrant that persists to a directory on disk (defaults to `./qdrant_data/`, override with `QDRANT_LOCAL_PATH`). No server, no Docker, no network. The index lives in RAM during use and is flushed to disk on shutdown.
+Set up once with:
 
-Combined with `LLM_PROVIDER=local`, the entire pipeline runs offline once the LLM weights and Qdrant directory are in place. Storage footprint is modest — the current corpus (~2,500 row-level points) uses under 10 MB on disk.
+```bash
+just qdrant-install   # one-time download (~30 MB)
+just qdrant-up        # start the binary on port 6433
+```
 
-Switching between providers does not migrate data. After flipping `QDRANT_PROVIDER`, the new backend is empty; re-run `ns --sync` (or `--reset -y` if the manifest is stale) to rebuild the index in the new location.
+Port 6433 (deliberately NOT Qdrant's default 6333) avoids colliding with OpenWhispr and other apps that ship their own bundled Qdrant. Override the port via `QDRANT_CLUSTER_ENDPOINT=http://localhost:<port>` if you need to; the host must resolve to loopback or Magpie hard-errors at startup.
+
+Combined with `LLM_PROVIDER=local`, the entire pipeline runs offline once the LLM weights and Qdrant binary are in place. Storage footprint is modest — the current corpus (~2,500 row-level points) uses under 10 MB on disk.
 
 ## Magpie UI
 
@@ -187,7 +191,7 @@ uv run uvicorn src.server:app --port 8765 --reload
 cd frontend && pnpm tauri dev
 ```
 
-Switch providers the same way as the CLI — edit `.env` (`LLM_PROVIDER=local`, `QDRANT_PROVIDER=local`, etc.). The status pill at the bottom of the window shows which backend you're running against.
+Switch the LLM backend the same way as the CLI — edit `.env` (`LLM_PROVIDER=local`, `LLM_PROVIDER=openrouter`, etc.). The status pill at the bottom of the window shows which backend you're running against. Qdrant is always local.
 
 ### Production build
 

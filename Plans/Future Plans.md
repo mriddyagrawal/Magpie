@@ -64,6 +64,7 @@ LLM/embedding model swaps, evaluation, cross-provider feature parity.
 - **#6** Cross-encoder reranker *(also: Retrieval)*
 - **#9** Liquid AI LFM2 model evaluation
 - **#16** LLM / inference settings UI + thinking-mode unification *(also: UI, Config)*
+- **#22** Adding a new local LLM — playbook (Qwen2.5-VL, LFM2-VL, MiniCPM-V, …)
 
 ---
 
@@ -964,5 +965,54 @@ Dropping in 5 seconds (Ctrl-C to abort) …
   folder-level event instead of N file-level events. Threshold and
   exact rule (e.g. "≥80% of children gone") tunable; start simple,
   measure on real data.
+
+---
+
+## 22. Adding a new local LLM — playbook (Qwen2.5-VL, LFM2-VL, MiniCPM-V, …)
+
+**Tags:** models · indexing
+
+**What:** Concrete checklist for swapping or adding a new local model on top of the `llama-server` backend (PRs 1–4 of the migration; full design lives in [`Specs/llama_server_migration.md`](../Specs/llama_server_migration.md)). Today, only Gemma 4 E4B is wired — `LOCAL_MODEL=<some other repo>` in `.env` fails immediately because the model-downloader's filename dispatch and the launch-profile registry are both hardcoded to that one repo. This plan documents the seven concrete steps and the four common failure modes so the next person doesn't relearn them by hitting each one in production.
+
+**Why this isn't already a feature:** every multi-modal family has small but real shape differences in (a) the GGUF / mmproj filename convention, (b) the chat template's thinking-mode flag (Gemma 4 reads `chat_template_kwargs.enable_thinking`; Qwen / LFM2 may use a different name), and (c) memory headroom. Hardcoding Gemma 4 was the right call for the first ship — it kept the migration tight and validated the architecture. Generalizing the dispatch is straightforward but has to be backed by per-model verification, not just config plumbing.
+
+**Why we did NOT do it now:** no concrete second model to support yet. The infrastructure is ready (the spec calls out Qwen as opt-in for PR 2; the architecture is universal in llama.cpp's `--mmproj` system). Worth implementing the moment we have a real second model picked, not before — the abstraction is cleaner when it has a second concrete data point to abstract over rather than being designed in the abstract.
+
+**When to revisit:** when any of these triggers fire — (a) a user reports OOM on Gemma 4 E4B and we need a smaller default (LFM2-VL-1.6B); (b) we measure receipt-summary quality on Gemma 4 and find it lacking vs. Qwen2.5-VL-7B on a RAM-rich machine; (c) we want Apache-2.0 licensing parity with LFM (Gemma's license has commercial-use restrictions); (d) Plan #9's LFM2 eval concludes one is worth shipping by default.
+
+### The seven-step pipeline
+
+For each new model, in order:
+
+1. **Filename patterns** — `src/inference/model_downloader.py`. Add the new repo to `_filename_for(repo_id, quant)` and (if vision) `_mmproj_filename_for(repo_id, variant)`. Both currently dispatch on equality against `"unsloth/gemma-4-E4B-it-GGUF"`. Add an `elif repo_id == "<new-repo>": return "<pattern>"`. Verify the filename pattern against the repo's HuggingFace file listing — Unsloth's GGUF naming, Bartowski's, ggml-org's, and the model author's repos all differ.
+
+2. **Profile registration** — `src/inference/profiles.py`. Add a `register(ModelProfile(...))` call with a clear name (e.g. `qwen-2.5-vl-7b-vision`, `lfm2-vl-1.6b-vision`). Reuse `LaunchArgs` defaults where they fit; override `ctx_size`, `temperature`, `mmproj_variant` per the model's needs. Keep `jinja=True` — every model in this class ships its chat template inside the GGUF.
+
+3. **Default-profile decision** — leave `default_text_profile()` pointed at Gemma 4 unless this model is meant to replace it. Adding a profile doesn't change defaults; users opt in via `LLAMA_SERVER_TEXT_MODEL=<new-profile-name>` in `.env`. (See spec post-validation deviations log: the default is the *vision-capable* profile so one subprocess serves text and image. New default candidates must support that pattern.)
+
+4. **Min-version pin** — confirm the new model's architecture is supported by the current `LLAMA_SERVER_MIN_VERSION` pin (today `b9049`). Check llama.cpp's release notes for `<arch> support added` — the spec's pin-bump deviation (b5400 → b9049 because `gemma4` arch wasn't in b5400) is the cautionary tale here. If the new model needs a newer pin, update `DEFAULT_MIN_VERSION` in `src/inference/llama_server_binary.py` AND `LLAMA_SERVER_VERSION` in `src/tools/install_llama_server.py`.
+
+5. **Thinking-mode flag** — verify (or override) `chat_template_kwargs.enable_thinking`. Currently the request body always sends this flag (see spec deviations log re: Gemma 4's silent thinking-mode footgun). If the new model's chat template uses a different kwarg name (some templates use `thinking`, some `enable_reasoning`), either the model template will silently ignore ours and emit reasoning content into `content` (fine for us — `_extract_content`'s `reasoning_content` fallback covers the inverse case), or thinking still leaks. Test with `max_tokens=512` against a known-answer prompt; if the response is shorter than expected, check `reasoning_content` in the raw JSON to confirm.
+
+6. **Validation tests** — extend `tests/inference/test_vision.py::test_vision_recovers_visible_text_from_fixture_image` (gated by `LLAMA_SERVER_VISION_INTEGRATION=1`) to optionally run against the new profile. Add a profile-specific parametrization or a new `test_<profile>_recovers_visible_text` so the gate catches model-specific regressions. Same for `tests/test_mlx_smoke.py` — its image / answer tests already use the profile resolved by `LLM_PROVIDER=local`, but the assertion list (`_FIXTURE_IMAGE_LABELS`) may need expanding if the new model paraphrases differently than Gemma 4 does. Don't loosen the assertion to "any non-empty string" — that re-opens the empty-content footgun.
+
+7. **Real-corpus smoke** — `LLM_PROVIDER=local LLAMA_SERVER_TEXT_MODEL=<new-profile> just sync` against a small known folder before claiming the profile works. Inspect the resulting summary markdowns for image-derived content (not just file metadata) and reasonable JSON-repair success rate (parse failures = `(model output could not be parsed into Answer)` lines in the per-file logs). The vision integration test catches the obvious failure modes; the smoke catches the schema-mismatch + JSON-repair-too-aggressive failure modes that only show up on real prompts.
+
+### The four common failure modes
+
+Each one has bitten us at least once during the Gemma 4 work. Pre-empt by checking up-front:
+
+- **Filename dispatch hardcoded → `ValueError: unknown GGUF repo`.** Step 1 above. Failure mode is loud and easy.
+- **Min-version pin too old → `unknown model architecture: '<arch>'`.** Step 4. Caught only at first inference call (after model download), so cycle time to discover is ~5 min instead of seconds.
+- **Thinking mode silently eats the token budget → `content: ''` even though `usage.completion_tokens` says full budget consumed.** Step 5. Reproducibly empty-output, integration test catches it if the assertion is "≥1 fixture label" rather than "non-empty."
+- **`max_tokens` too low for thinking + content together.** Even with thinking suppressed, some prompts produce long answers. If a regression bumps thinking back on AND `max_tokens` is at LOCAL_MAX_TOKENS=2048, the content may still be truncated. Symptom: complete sentences cut off mid-word. Fix in caller, not here.
+
+### Notes for the future implementer
+
+- The pipeline order above is the minimum-cycle order. Steps 1–3 are mechanical; step 4 needs a llama.cpp release notes lookup; step 5 is the empirical-test step that's easy to skip and expensive to skip.
+- Don't generalize `_filename_for` into a config table until there are ≥3 concrete entries. With one (Gemma 4 today) it'd be over-engineered; with three the pattern shape is clear.
+- The architectural assumption — mmproj idle for text-only — is verified for Gemma 4 (spec post-validation deviations log) and *expected* for Qwen / LFM2 / MiniCPM-V from llama.cpp's [multimodal docs](https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md), not separately verified. Step 7's real-corpus smoke is what closes that gap when adding a new family.
+- If the new model is text-only (no vision), skip step 1's mmproj dispatch and the profile's `mmproj_repo_id` field. The pool's `_build_argv` already handles the "no mmproj" case for the legacy `gemma-4-e4b-text` profile.
+- License check before defaulting: Gemma's license has commercial restrictions; LFM2 is Apache-2.0-derivative; Qwen is Tongyi Qianwen LICENSE (research-friendly, commercial restrictions over $10M ARR). Any profile we promote to the default needs license sign-off, not just technical sign-off.
 
 ---

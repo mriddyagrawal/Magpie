@@ -432,41 +432,66 @@ def _search_fast_tier(query_text: str, limit: int) -> list[SearchResult]:
 RRF_K = 60  # standard RRF constant; higher = flatter fusion curve
 
 
+def _hit_key(r: SearchResult) -> tuple[str, int | None]:
+    """Dedup key for RRF fusion. Composite to handle within-file chunks.
+
+    For non-chunked points (PDF/DOCX/IMAGE summary points, fast_tier page
+    points) `chunk_index is None`, so the key collapses to `(path, None)`
+    — the legacy file-level dedup behavior survives unchanged.
+
+    For CSV row points (and future PDF/audio chunked points), each chunk
+    of the same file is a distinct key. CRITICAL: without this, a query
+    that matches multiple rows of the same CSV would silently lose all
+    but the last row's `chunk_index` after RRF — see the 2026-05 audit;
+    this was a real correctness bug.
+    """
+    return (r.path, r.chunk_index)
+
+
 def _rrf_merge(
     summary_hits: list[SearchResult],
     fast_hits: list[SearchResult],
     top_k: int,
 ) -> list[SearchResult]:
-    """Reciprocal Rank Fusion of two result lists, keyed by source_path.
+    """Reciprocal Rank Fusion of two result lists, keyed by
+    `(source_path, chunk_index)`.
 
-    Each path's RRF score is sum over each list of `1 / (RRF_K + rank)`,
+    Each key's RRF score is the sum over each list of `1 / (RRF_K + rank)`
     where rank is 1-indexed. Missing from a list contributes 0. The kept
     SearchResult prefers the summary-tier entry (it has a real summary)
-    when a path appears in both lists.
+    when a key appears in both lists.
+
+    The composite key matters for CSV row points and future chunked
+    types: a 5-row hit on `tax_2025.csv` produces 5 distinct keys
+    `(tax_2025.csv, 0..4)` instead of one collapsed key `(tax_2025.csv,)`,
+    so all matched rows reach the answer step.
     """
-    scores: dict[str, float] = {}
-    chosen: dict[str, SearchResult] = {}
-    seen_in: dict[str, set[str]] = {}
+    scores: dict[tuple[str, int | None], float] = {}
+    chosen: dict[tuple[str, int | None], SearchResult] = {}
+    seen_in: dict[tuple[str, int | None], set[str]] = {}
 
     for rank, r in enumerate(summary_hits, start=1):
         if not r.path:
             continue
-        scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
-        chosen[r.path] = r  # summary-tier entries have human-readable summaries
-        seen_in.setdefault(r.path, set()).add("summary")
+        key = _hit_key(r)
+        scores[key] = scores.get(key, 0.0) + 1.0 / (RRF_K + rank)
+        chosen[key] = r  # summary-tier entries have human-readable summaries
+        seen_in.setdefault(key, set()).add("summary")
 
     for rank, r in enumerate(fast_hits, start=1):
         if not r.path:
             continue
-        scores[r.path] = scores.get(r.path, 0.0) + 1.0 / (RRF_K + rank)
-        chosen.setdefault(r.path, r)  # only fill if summary didn't already
-        seen_in.setdefault(r.path, set()).add("fast")
+        key = _hit_key(r)
+        scores[key] = scores.get(key, 0.0) + 1.0 / (RRF_K + rank)
+        chosen.setdefault(key, r)  # only fill if summary didn't already
+        seen_in.setdefault(key, set()).add("fast")
 
-    ordered = sorted(chosen.values(), key=lambda r: scores[r.path], reverse=True)
+    ordered = sorted(chosen.values(), key=lambda r: scores[_hit_key(r)], reverse=True)
     # Overwrite each result's score with its RRF score so callers see fused ranking.
     for r in ordered:
-        r.score = scores[r.path]
-        tiers = seen_in.get(r.path, set())
+        key = _hit_key(r)
+        r.score = scores[key]
+        tiers = seen_in.get(key, set())
         r.tier = "both" if len(tiers) == 2 else next(iter(tiers), r.tier)
     return ordered[:top_k]
 

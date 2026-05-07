@@ -452,11 +452,13 @@ async def run_batch(
 ) -> None:
     from tqdm import tqdm
 
-    # Pre-load the local model before the tqdm bar starts so the 20-30s
-    # Gemma load doesn't look like "stuck on first file."
+    # Pre-load the local model before the tqdm bar starts so the 10-20s
+    # GGUF load doesn't look like "stuck on first file." Triggers the
+    # weight download + load via the LocalLLM singleton; subsequent calls
+    # in this process are free.
     if active_provider().name == "local":
-        from src.llm import get_model
-        get_model()
+        from src.inference import get_local_llm
+        get_local_llm()._ensure_loaded()
 
     manifest = Manifest()
     bootstrapped = bootstrap_manifest_from_existing(manifest)

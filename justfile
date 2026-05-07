@@ -7,25 +7,65 @@ sync-environment:
     uv sync
     uv pip install -e cli
 
+# Reinstall llama-cpp-python with the right hardware-acceleration flag for
+# the current platform. Run this AFTER `just sync-environment` if you want
+# Metal/CUDA acceleration — otherwise pip installs a CPU-only build that
+# works but is much slower for local LLM inference.
+#
+#   macOS Apple Silicon → Metal
+#   Linux + nvidia-smi  → CUDA
+#   anything else       → CPU (no-op, the wheel is fine)
+#
+# See Plans/Local LLM Plan.md.
+install-llama:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    OS="$(uname -s)"
+    ARCH="$(uname -m)"
+    if [ "$OS" = "Darwin" ] && [ "$ARCH" = "arm64" ]; then
+        echo "==> macOS Apple Silicon: building llama-cpp-python with Metal"
+        CMAKE_ARGS="-DGGML_METAL=on" \
+            uv pip install --force-reinstall --no-cache-dir llama-cpp-python
+    elif [ "$OS" = "Linux" ] && command -v nvidia-smi >/dev/null 2>&1; then
+        echo "==> Linux + CUDA detected: building llama-cpp-python with CUDA"
+        CMAKE_ARGS="-DGGML_CUDA=on" \
+            uv pip install --force-reinstall --no-cache-dir llama-cpp-python
+    else
+        echo "==> CPU build (no GPU acceleration detected)"
+        uv pip install --force-reinstall --no-cache-dir llama-cpp-python
+    fi
+    echo "==> done. Verify with: uv run python -c 'from llama_cpp import Llama; print(Llama.__module__)'"
+
 # Walk every enabled include_paths entry in indexing_rules.json. This is
 # the "do everything" command — replaces running `just walk <path>` once
 # per directory. Reads from $MAGPIE_DATA_DIR/indexing_rules.json (default
 # ~/.local/share/Magpie on Linux, ~/Library/Application Support/Magpie on
 # macOS). If no include_paths are configured, prints a hint and exits 0.
-sync:
-    @uv run python -c "\
-    from src.config import load_user_rules; \
-    rules = load_user_rules(); \
-    enabled = [ip for ip in rules.include_paths if ip.enabled]; \
-    print('No included folders configured. Add one with: just walk <folder>') if not enabled else \
-    [print(f'== walking {ip.path} ==') for ip in enabled]; \
-    " && \
-    uv run python -c "\
-    from src.config import load_user_rules; \
-    import subprocess, sys; \
-    rules = load_user_rules(); \
-    [subprocess.run(['uv','run','python','-m','src.ingest', ip.path], check=False) \
-     for ip in rules.include_paths if ip.enabled]"
+#
+# Any extra args pass through to `python -m src.ingest`. So:
+#   just sync                  → default walk
+#   just sync --include-data   → also index .json/.csv/.dat (data category)
+#   just sync --force          → re-summarize even unchanged files
+#   just sync -v               → verbose per-file routing decisions
+# A single failed walk doesn't abort the rest — each include_path runs
+# independently, mirroring the prior `subprocess.run(check=False)` behavior.
+sync *args:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    paths=$(uv run python -c "
+    from src.config import load_user_rules
+    for ip in load_user_rules().include_paths:
+        if ip.enabled:
+            print(ip.path)
+    ") || exit 1
+    if [ -z "$paths" ]; then
+        echo "No included folders configured. Add one with: just walk <folder>"
+        exit 0
+    fi
+    while IFS= read -r path; do
+        echo "== walking $path =="
+        uv run python -m src.ingest "$path" {{args}} || true
+    done <<< "$paths"
 
 # Check whether a single file or folder will be indexed under the current
 # rules. Prints the (allowed/skipped) decision and the reason that fired

@@ -1,8 +1,9 @@
-"""Smoke test for the local MLX Gemma 3n backend.
+"""Smoke test for the local llama-cpp-python backend.
 
-Skipped unless:
-- Running on Apple Silicon macOS, AND
-- `LLM_PROVIDER=local` is set in the environment.
+Skipped unless `LLM_PROVIDER=local` is set in the environment. Cross-platform
+since 2026-05 (was Apple-Silicon-only when this used mlx-vlm; see
+Plans/Local LLM Plan.md). The filename is kept for git-history continuity
+even though MLX is no longer the underlying engine.
 
 Exercises the full path: load the model, summarize a text file and (if
 available) an image, assert the outputs parse into valid Pydantic objects.
@@ -13,8 +14,6 @@ per file.
 from __future__ import annotations
 
 import os
-import platform
-import sys
 from pathlib import Path
 
 import pytest
@@ -22,10 +21,8 @@ import pytest
 from src.content import IMAGE_EXTS
 
 pytestmark = pytest.mark.skipif(
-    sys.platform != "darwin"
-    or platform.machine() != "arm64"
-    or os.environ.get("LLM_PROVIDER", "").lower() != "local",
-    reason="MLX smoke test requires Apple Silicon + LLM_PROVIDER=local.",
+    os.environ.get("LLM_PROVIDER", "").lower() != "local",
+    reason="local-backend smoke test requires LLM_PROVIDER=local.",
 )
 
 

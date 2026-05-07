@@ -1,32 +1,35 @@
 """Shared LLM client construction for all agents (summarize / rewrite / answer).
 
 Which provider is used is selected by the `LLM_PROVIDER` env var (default:
-`moonshot`). Three providers are supported:
+`openrouter`). Supported providers:
 
 - `moonshot` — Moonshot Kimi via OpenAI-compatible API
 - `openrouter` — OpenRouter (Gemma, Claude, GPT, etc.) via OpenAI-compatible API
-- `local` — Local Apple-Silicon inference via `mlx-vlm` (Gemma 3n E4B 4-bit by default)
+- `ollama` — Local Ollama OpenAI-compatible server (Linux/Win/Intel-Mac)
+- `local` — In-process local inference via llama-cpp-python + GGUF
+- `magpie-cloud` — Magpie's hosted backend (`server/magpie_server`)
 
 Call sites use `build_agent(system_prompt, output_type, fallback)` which
 returns a `ChatAgent` with `.run(message)` / `.run_sync(message)`. The factory
 dispatches on the active provider: cloud providers wrap PydanticAI's `Agent`
 against an OpenAI-compatible `OpenAIChatModel`; `local` returns a `LocalAgent`
-that drives `mlx-vlm` directly and parses structured output with a JSON-repair
-fallback.
+that drives `llama-cpp-python` directly and parses structured output via
+JSON-repair (no native structured-output support in raw chat completion).
+
+`thinking` is a per-call kwarg on `run`/`run_sync`. Local honors it (Gemma 4
+`<|think|>` token); cloud agents accept it but no-op with a one-time warning
+until per-provider reasoning APIs are wired (see Plans/Future Plans.md #16).
 """
 
 from __future__ import annotations
 
-import asyncio
-import io
-import json
 import os
-import platform
 import re
 import sys
+import warnings
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar
+from typing import TYPE_CHECKING, Generic, Protocol, TypeVar
 
 from pydantic import BaseModel
 
@@ -67,8 +70,8 @@ PROVIDERS: dict[str, ProviderConfig] = {
         default_model="google/gemini-2.0-flash-exp:free",
         default_base_url="https://openrouter.ai/api/v1",
     ),
-    # Local Ollama daemon on Linux / Windows / Intel-Mac (anything with
-    # an OpenAI-compatible local server). No API key needed — the daemon
+    # Ollama daemon on Linux / Windows / Intel-Mac (anything with an
+    # OpenAI-compatible local server). No API key needed — the daemon
     # ignores auth. Default model is a 3B vision-capable Qwen that fits
     # alongside ColPali on a 6 GB GPU.
     "ollama": ProviderConfig(
@@ -79,15 +82,21 @@ PROVIDERS: dict[str, ProviderConfig] = {
         default_model="qwen2.5vl:3b",
         default_base_url="http://localhost:11434/v1",
     ),
+    # In-process llama-cpp-python (cross-platform: Metal on macOS, CUDA on
+    # Linux/Windows, CPU fallback). See Plans/Local LLM Plan.md. The
+    # `model_env`/`default_model` here is the HF GGUF *repo*; the specific
+    # quant is selected by `LOCAL_QUANT` (default Q5_K_XL). Runtime knobs
+    # (`LOCAL_N_CTX`, `LOCAL_N_GPU_LAYERS`, `LOCAL_TEMPERATURE`) are read
+    # by `src.inference.local_llm`.
     "local": ProviderConfig(
         name="local",
         api_key_env="",
         model_env="LOCAL_MODEL",
         base_url_env="",
-        default_model="mlx-community/gemma-3n-E2B-it-4bit",
+        default_model="unsloth/gemma-4-E4B-it-GGUF",
         default_base_url="",
     ),
-    # Magpie Cloud — your hosted backend that holds the prompts and proxies
+    # Magpie Cloud — hosted backend that holds the prompts and proxies
     # LLM calls (server/magpie_server). The desktop sends questions +
     # snippets; the cloud server returns structured answers. No
     # OpenAI-compatible base URL — communication uses our own /llm/* JSON
@@ -128,7 +137,7 @@ def build_chat_model(*, provider_override: str | None = None) -> OpenAIChatModel
     instead — used by the fallback path in `src/stage1/summarize.py` to spin
     up a parallel local-or-different-cloud agent without mutating the env.
 
-    Raises for `local` — the MLX path does not go through this builder
+    Raises for `local` — the llama-cpp path does not go through this builder
     (see `LocalAgent`).
     """
     from openai import AsyncOpenAI
@@ -190,11 +199,35 @@ def _prepend_timestamp(message: list) -> list:
 
 
 class ChatAgent(Protocol, Generic[T]):
-    """Minimal agent surface used by call sites (summarize / rewrite / answer)."""
+    """Minimal agent surface used by call sites (summarize / rewrite / answer).
 
-    async def run(self, message: list) -> T: ...
+    `thinking=True` requests model-internal reasoning before the final
+    response. Local agents (Gemma 4) honor it; cloud agents currently
+    no-op + warn (see Plans/Future Plans.md #16 for the cross-provider
+    unification work).
+    """
 
-    def run_sync(self, message: list) -> T: ...
+    async def run(self, message: list, *, thinking: bool = False) -> T: ...
+
+    def run_sync(self, message: list, *, thinking: bool = False) -> T: ...
+
+
+# Track that we've already warned about cloud thinking-mode this process,
+# so a hot loop doesn't drown stderr in the same warning.
+_cloud_thinking_warned = False
+
+
+def _warn_cloud_thinking_unsupported(provider_name: str) -> None:
+    global _cloud_thinking_warned
+    if _cloud_thinking_warned:
+        return
+    _cloud_thinking_warned = True
+    warnings.warn(
+        f"thinking=True was requested but the active provider {provider_name!r} "
+        f"doesn't yet expose a unified reasoning toggle. Continuing without it. "
+        f"See Plans/Future Plans.md #16 for the cross-provider thinking-mode plan.",
+        stacklevel=3,
+    )
 
 
 class _CloudAgent(Generic[T]):
@@ -219,12 +252,21 @@ class _CloudAgent(Generic[T]):
             system_prompt=system_prompt,
             retries=3,
         )
+        self._provider_name = (
+            provider_override
+            if provider_override is not None
+            else active_provider().name
+        )
 
-    async def run(self, message: list) -> T:
+    async def run(self, message: list, *, thinking: bool = False) -> T:
+        if thinking:
+            _warn_cloud_thinking_unsupported(self._provider_name)
         result = await self._agent.run(_prepend_timestamp(message))
         return result.output
 
-    def run_sync(self, message: list) -> T:
+    def run_sync(self, message: list, *, thinking: bool = False) -> T:
+        if thinking:
+            _warn_cloud_thinking_unsupported(self._provider_name)
         result = self._agent.run_sync(_prepend_timestamp(message))
         return result.output
 
@@ -264,45 +306,6 @@ def build_agent(
         from src.cloud_provider import build_cloud_agent
         return build_cloud_agent(output_type)  # type: ignore[return-value]
     return _CloudAgent(system_prompt, output_type, provider_override=provider_override)
-
-
-# ---------------------------------------------------------------------------
-# Local MLX backend
-# ---------------------------------------------------------------------------
-
-_model_cache: tuple[Any, Any, Any] | None = None
-
-
-def _require_apple_silicon() -> None:
-    if sys.platform != "darwin" or platform.machine() != "arm64":
-        sys.exit(
-            "error: LLM_PROVIDER=local requires an Apple Silicon Mac "
-            f"(got platform={sys.platform!r}, machine={platform.machine()!r}). "
-            "Set LLM_PROVIDER=moonshot or LLM_PROVIDER=openrouter instead."
-        )
-
-
-def get_model() -> tuple[Any, Any, Any]:
-    """Load (on first call) and return the cached (model, processor, config).
-
-    The load is several seconds on a warm machine, several minutes on first
-    run (while the weights download from Hugging Face). Cached for the
-    lifetime of the process — all subsequent calls are free.
-    """
-    global _model_cache
-    if _model_cache is not None:
-        return _model_cache
-    _require_apple_silicon()
-    from mlx_vlm import load
-    from mlx_vlm.utils import load_config
-
-    model_name = active_model_name()
-    print(f"  loading local model: {model_name} (first run may take a few minutes)", file=sys.stderr)
-    model, processor = load(model_name)
-    config = load_config(model_name)
-    _model_cache = (model, processor, config)
-    print(f"  model loaded", file=sys.stderr)
-    return _model_cache
 
 
 # ---------------------------------------------------------------------------
@@ -374,11 +377,75 @@ def parse_json_with_repair(raw: str, schema: type[T], fallback: T | None) -> T:
 
 
 # ---------------------------------------------------------------------------
-# LocalAgent
+# LocalAgent — llama-cpp-python (cross-platform)
 # ---------------------------------------------------------------------------
 
+# Tracked once-per-process: the local backend currently doesn't support
+# multimodal input (Gemma 4 vision via mmproj is a follow-up; see
+# Plans/Local LLM Plan.md "Migration & risks"). When a caller passes
+# image-bearing content, we drop it and warn once. T3 image-only files
+# end up with a thin summary; cloud providers (LLM_PROVIDER=openrouter
+# etc.) keep full vision support.
+_local_image_drop_warned = False
+
+
+def _flatten_message_for_local(message: list, system_prompt: str) -> list[dict]:
+    """Convert the desktop-side message list into chat-completion format.
+
+    The desktop builds messages as a heterogeneous list — strings interleaved
+    with `BinaryContent` for image-bearing T3 calls. llama-cpp-python's text
+    chat surface wants `[{"role": "system", "content": str}, {"role": "user",
+    "content": str}]`. We:
+
+      - Pull the system prompt out as its own message
+      - Concatenate all string parts into one user message
+      - Drop any non-string blocks (BinaryContent, etc.) with a one-time
+        warning. Vision support for Gemma 4 + llama-cpp-python is a
+        separate plan item (mmproj projector + Gemma4ChatHandler).
+    """
+
+    global _local_image_drop_warned
+
+    text_parts: list[str] = []
+    n_dropped = 0
+    for block in message:
+        if isinstance(block, str):
+            text_parts.append(block)
+        else:
+            n_dropped += 1
+
+    if n_dropped > 0 and not _local_image_drop_warned:
+        _local_image_drop_warned = True
+        warnings.warn(
+            f"local LLM backend dropped {n_dropped} non-text content block(s) "
+            f"(image/binary). Vision support for the local backend is a follow-up "
+            f"(see Plans/Local LLM Plan.md). For full vision summarization use "
+            f"LLM_PROVIDER=openrouter or moonshot.",
+            stacklevel=4,
+        )
+
+    # Add a hint that the model should output JSON only — small models often
+    # don't otherwise. parse_json_with_repair handles failures, but a clean
+    # JSON-only response is faster + less noisy.
+    user_text = "\n\n".join(text_parts).strip() + (
+        "\n\nRespond with a single valid JSON object that matches the "
+        "requested schema. Do not include any prose before or after."
+    )
+    return [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_text},
+    ]
+
+
 class LocalAgent(Generic[T]):
-    """MLX-backed agent. Same .run()/.run_sync() shape as _CloudAgent."""
+    """llama-cpp-python-backed agent. Same .run()/.run_sync() shape as _CloudAgent.
+
+    Uses the singleton `LocalLLM` (one engine, two surfaces — also serves
+    the `/generate` endpoint). Structured-output is achieved by
+    JSON-repair after-the-fact; small models don't reliably honor
+    schema instructions, so the repair pipeline (strip fences → extract
+    object → validate) is required.
+    """
 
     def __init__(
         self,
@@ -390,66 +457,26 @@ class LocalAgent(Generic[T]):
         self._output_type = output_type
         self._fallback = fallback
 
-    async def run(self, message: list) -> T:
-        return await asyncio.to_thread(self._run_sync_impl, _prepend_timestamp(message))
+    async def run(self, message: list, *, thinking: bool = False) -> T:
+        from src.inference import get_local_llm
 
-    def run_sync(self, message: list) -> T:
-        # If an event loop is already running (async context), delegate via
-        # asyncio.run_coroutine_threadsafe pattern isn't needed here because
-        # all sync callers (search.rewrite_query) come from non-async code.
-        return self._run_sync_impl(_prepend_timestamp(message))
-
-    def _run_sync_impl(self, message: list) -> T:
-        prompt_text, images = self._serialize_message(message)
-        model, processor, config = get_model()
-
-        from mlx_vlm import generate
-        from mlx_vlm.prompt_utils import apply_chat_template
-
-        formatted = apply_chat_template(
-            processor, config, prompt_text, num_images=len(images)
+        msgs = _flatten_message_for_local(
+            _prepend_timestamp(message), self._system_prompt
         )
-        # Prefill the opening brace so the model's first generated token is
-        # already inside a JSON object. Small models ignore "output JSON" as
-        # an instruction but reliably continue a pattern once started.
-        formatted = formatted + "{"
-        output = generate(
-            model,
-            processor,
-            formatted,
-            images if images else None,
-            max_tokens=LOCAL_MAX_TOKENS,
-            verbose=False,
+        llm = get_local_llm()
+        raw = await llm.complete(
+            msgs, thinking=thinking, max_tokens=LOCAL_MAX_TOKENS
         )
-        # `generate` historically returns a string in newer versions of mlx-vlm
-        # but may return a GenerateResult object. Normalise to the text.
-        raw = getattr(output, "text", output)
-        if not isinstance(raw, str):
-            raw = str(raw)
-        # Re-attach the prefilled `{` so the parser sees a full JSON object.
-        raw = "{" + raw
         return parse_json_with_repair(raw, self._output_type, self._fallback)
 
-    def _serialize_message(self, message: list) -> tuple[str, list]:
-        """Split the incoming message list into (prompt_text, [PIL images]).
+    def run_sync(self, message: list, *, thinking: bool = False) -> T:
+        from src.inference import get_local_llm
 
-        Duck-types `BinaryContent` by checking for `.data` and `.media_type`.
-        Keeps system prompt as a prefix.
-        """
-        from PIL import Image
-
-        text_parts: list[str] = [self._system_prompt]
-        images: list = []
-        for block in message:
-            if isinstance(block, str):
-                text_parts.append(block)
-            elif hasattr(block, "data") and hasattr(block, "media_type"):
-                try:
-                    img = Image.open(io.BytesIO(block.data))
-                    img.load()  # force decode before BytesIO goes out of scope
-                    images.append(img)
-                except Exception as e:
-                    text_parts.append(f"[image could not be decoded: {e}]")
-            else:
-                text_parts.append(str(block))
-        return "\n\n".join(text_parts), images
+        msgs = _flatten_message_for_local(
+            _prepend_timestamp(message), self._system_prompt
+        )
+        llm = get_local_llm()
+        raw = llm.complete_sync(
+            msgs, thinking=thinking, max_tokens=LOCAL_MAX_TOKENS
+        )
+        return parse_json_with_repair(raw, self._output_type, self._fallback)

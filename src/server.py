@@ -2,6 +2,7 @@
 
 Endpoints:
     POST /query     - natural-language question → answer + sources
+    POST /generate  - raw chat completion against the local LLM (text or SSE)
     GET  /preview   - return a file's content/rendering for the preview pane
     GET  /status    - model name + indexed file count (for the status pill)
     GET  /open      - open a file in the OS default app
@@ -42,7 +43,13 @@ warnings.filterwarnings("ignore", category=UserWarning, module="torch.cuda")
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response
+from fastapi.responses import (
+    FileResponse,
+    JSONResponse,
+    PlainTextResponse,
+    Response,
+    StreamingResponse,
+)
 from pydantic import BaseModel, Field
 
 from src.manifest import APP_DATA_DIR
@@ -99,10 +106,28 @@ TEXT_EXTS = {".md", ".markdown", ".txt", ".py", ".js", ".ts", ".tsx", ".jsx",
 # /query
 # ---------------------------------------------------------------------------
 
+def _env_bool(name: str, default: bool) -> bool:
+    """Parse a boolean env var. Accepts true/yes/on/1 (case-insensitive) as
+    True, false/no/off/0/empty as False; anything else falls back to default."""
+    raw = os.environ.get(name, "").strip().lower()
+    if raw in ("true", "yes", "on", "1"):
+        return True
+    if raw in ("false", "no", "off", "0", ""):
+        return False
+    return default
+
+
 class QueryRequest(BaseModel):
     question: str = Field(min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)
-    rewrite: bool = Field(default=False)
+    # `rewrite` enables Kimi-style query expansion before retrieval (~20s
+    # extra LLM round-trip; produces a keyword-rich SearchQuery). When the
+    # client omits the field, the server falls back to the `REWRITE` env
+    # var (default: false). Explicit per-request value still wins. So:
+    #   .env REWRITE=true  + body omits rewrite → True
+    #   .env REWRITE=true  + body rewrite=False → False (explicit override)
+    #   .env unset         + body omits rewrite → False (current default)
+    rewrite: bool | None = Field(default=None)
     # `fast` toggles ColPali visual-tier search. Default off — the cold-load
     # is ~25s for a model that's only useful for a small fraction of queries
     # (visual / scanned-PDF questions). Same default as the CLI's `.fast off`.
@@ -159,11 +184,14 @@ def _user_facing_error(exc: Exception) -> tuple[int, str]:
 async def query(req: QueryRequest) -> QueryResponse:
     from src.pipeline import ask
 
+    # Resolve `rewrite`: explicit body value wins; otherwise REWRITE env.
+    rewrite = req.rewrite if req.rewrite is not None else _env_bool("REWRITE", default=False)
+
     try:
         result = await ask(
             req.question,
             top_k=req.top_k,
-            rewrite=req.rewrite,
+            rewrite=rewrite,
             fast=req.fast,
         )
     except Exception as e:  # pylint: disable=broad-except
@@ -181,6 +209,87 @@ async def query(req: QueryRequest) -> QueryResponse:
         sources=sources,
         search_query={"query": result.search_query.query, "keywords": result.search_query.keywords},
     )
+
+
+# ---------------------------------------------------------------------------
+# /generate — raw chat completion against the local LLM
+# ---------------------------------------------------------------------------
+#
+# `/query` is the high-level RAG endpoint (retrieve → answer with citations).
+# `/generate` is one level lower: it talks to the local LLM directly with the
+# caller's chat-completion message list. Used for ad-hoc generation, future
+# agentic loops, and any UI surface that wants conversational completion
+# without going through retrieval. Local-only by design — cloud paths use
+# `/query` (or, eventually, the magpie-cloud sidecar's own routes).
+
+class GenerateMessage(BaseModel):
+    role: str = Field(pattern="^(system|user|assistant)$")
+    content: str
+
+
+class GenerateRequest(BaseModel):
+    messages: list[GenerateMessage]
+    stream: bool = Field(default=False)
+    thinking: bool = Field(default=False)
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    max_tokens: int | None = Field(default=None, ge=1, le=8192)
+
+
+class GenerateResponse(BaseModel):
+    text: str
+
+
+@app.post("/generate")
+async def generate(req: GenerateRequest):
+    """Run a chat completion against the local LLM.
+
+    Returns JSON `{text}` for `stream=false`. Returns an
+    `text/event-stream` of `data: <chunk>\\n\\n` lines for `stream=true`,
+    terminated by `data: [DONE]\\n\\n` — the standard SSE shape that
+    OpenAI-style streaming clients expect.
+    """
+    from src.inference import get_local_llm
+
+    msgs = [{"role": m.role, "content": m.content} for m in req.messages]
+    llm = get_local_llm()
+
+    if not req.stream:
+        try:
+            text = await llm.complete(
+                msgs,
+                thinking=req.thinking,
+                temperature=req.temperature,
+                max_tokens=req.max_tokens,
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            status_code, detail = _user_facing_error(e)
+            raise HTTPException(status_code=status_code, detail=detail) from e
+        return GenerateResponse(text=text)
+
+    async def sse_iter():
+        try:
+            stream = await llm.stream(
+                msgs,
+                thinking=req.thinking,
+                temperature=req.temperature,
+                max_tokens=req.max_tokens,
+            )
+            async for chunk in stream:
+                # SSE wire format: each event is `data: <payload>\n\n`.
+                # Newlines inside the chunk would break the framing, so
+                # encode them — clients reverse this on the other side.
+                safe = chunk.replace("\n", "\\n")
+                yield f"data: {safe}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as e:  # pylint: disable=broad-except
+            # Errors mid-stream: emit a final SSE event with the user-safe
+            # message and end the stream. Client-side error UI then has
+            # something to show without a TCP reset.
+            _, detail = _user_facing_error(e)
+            yield f"event: error\ndata: {detail}\n\n"
+            yield "data: [DONE]\n\n"
+
+    return StreamingResponse(sse_iter(), media_type="text/event-stream")
 
 
 # ---------------------------------------------------------------------------

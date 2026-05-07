@@ -1,58 +1,72 @@
-"""LocalLLM — llama-cpp-python wrapper.
+"""LocalLLM — HTTP client for llama-server subprocess(es).
 
 Two surfaces, one engine:
 
   - `complete(messages, ...)` → full-response string (await-able).
   - `stream(messages, ...)` → async iterator of token-string chunks.
 
-Both wrap `llama_cpp.Llama.create_chat_completion`. The synchronous
-llama-cpp call is offloaded via `asyncio.to_thread` for `complete`. For
-`stream`, an `asyncio.Queue` + a producer thread bridges the sync
-generator into an async iterator — `to_thread` alone can't do that.
+Both make HTTP POST calls against `/v1/chat/completions` on a
+llama-server instance managed by `LlamaServerPool`. The pool spawns
+the subprocess on demand, health-checks it, and hands back the base
+URL — this class is a thin OpenAI-compatible client on top.
 
 Construction is lazy through `get_local_llm()` (singleton). The first
-call resolves the GGUF path via `model_downloader.ensure_model` (downloads
-on cache miss), then loads the model into memory (~10–20s for a 5–7 GB
-GGUF on Apple Silicon). All subsequent calls reuse the loaded model —
-that's the whole point of the singleton.
+call that triggers `pool.get_url_for(profile)` causes the subprocess
+to spawn and the model to load (~10–20s for a 5–7 GB GGUF on Apple
+Silicon). All subsequent calls reuse the running instance — that's
+the whole point of the pool.
 
 Configuration via env vars (also documented in `.env.example`):
-  LOCAL_MODEL          HF repo id           default unsloth/gemma-4-E4B-it-GGUF
-  LOCAL_QUANT          GGUF quant name      default Q5_K_XL
-  LOCAL_N_CTX          context window       default 8192
-  LOCAL_N_GPU_LAYERS   layers on GPU        default -1 (all)
-  LOCAL_TEMPERATURE    sampling temp        default 0.7
+  LOCAL_MODEL                  HF repo id (e.g. unsloth/gemma-4-E4B-it-GGUF)
+  LOCAL_QUANT                  GGUF quant name (e.g. Q5_K_XL)
+  LOCAL_N_CTX                  context window
+  LOCAL_TEMPERATURE            sampling temp
+  LLAMA_SERVER_PATH            override binary path
+  LLAMA_SERVER_MIN_VERSION     refuse to start older binaries
+  LLAMA_SERVER_BASE_PORT       first port to allocate (default 9100)
+  LLAMA_SERVER_MAX_LOADED_MODELS  LRU cap; default 1 on local
+  LLAMA_SERVER_IDLE_TIMEOUT_S  unload-after-idle in seconds
+  LLAMA_SERVER_STARTUP_TIMEOUT_S  health-check timeout
+
+Migration note (2026-05): replaces the previous `LlamaCppLLM`
+in-process backend. Same Protocol surface, same call sites, same
+chat-template helper — only the underlying engine changed. See
+`Specs/llama_server_migration.md`.
 """
 
 from __future__ import annotations
 
-import asyncio
-import os
-import sys
+import json
 import threading
 from typing import Any, AsyncIterator, Optional, Protocol
 
+import httpx
+
 from src.inference.chat_template import apply_thinking_to_messages
-from src.inference.model_downloader import ensure_model
+from src.inference.llama_server_pool import LlamaServerSpawnError, get_pool
+from src.inference.profiles import default_text_profile, get_profile
 
 
-# ---------------------------------------------------------------------------
-# Defaults — overridden per-instance via env at construction time
-# ---------------------------------------------------------------------------
-
-DEFAULT_REPO = "unsloth/gemma-4-E4B-it-GGUF"
-DEFAULT_QUANT = "Q5_K_XL"
-DEFAULT_N_CTX = 8192
-DEFAULT_N_GPU_LAYERS = -1   # -1 = offload everything (Metal/CUDA), 0 = pure CPU
-DEFAULT_TEMPERATURE = 0.7
+# Per-call HTTP timeout. Long enough to cover prompt eval + generation
+# on slow CPU paths; bounded so a stuck server doesn't hang the sidecar
+# forever. Override via `LLAMA_SERVER_REQUEST_TIMEOUT_S` if a user has
+# unusually large prompts at low ngl.
+_DEFAULT_REQUEST_TIMEOUT_S = 600.0
 
 
 # ---------------------------------------------------------------------------
 # Protocol — the public surface (used by callers + tests via duck typing)
 # ---------------------------------------------------------------------------
 
+
 class LocalLLM(Protocol):
-    """Async chat completion over a local LLM. Implementations: LlamaCppLLM."""
+    """Async chat completion over a local LLM. Implementations: LlamaServerLLM.
+
+    Kept as a Protocol (not an ABC) so test fakes don't have to inherit.
+    The two surfaces (`complete`/`complete_sync` for full responses,
+    `stream` for incremental output) are independent — implementations
+    may serialize them under a single connection or fan out per-call.
+    """
 
     model_id: str  # for logging / chat-template dispatch
 
@@ -85,88 +99,56 @@ class LocalLLM(Protocol):
 
 
 # ---------------------------------------------------------------------------
-# LlamaCppLLM
+# LlamaServerLLM — HTTP client against the pool
 # ---------------------------------------------------------------------------
 
-class LlamaCppLLM:
-    """The default LocalLLM impl. Wraps a single `llama_cpp.Llama` instance.
 
-    Thread-unsafety: `Llama.create_chat_completion` is not safe to call
-    concurrently. We serialize calls under `_llm_lock` so two coroutines
-    can't trample each other's KV cache. The lock is held only while
-    the C++ call runs; queueing latency under load is fine for a desktop
-    RAG app — typical concurrency here is "search yields to ingest,"
-    not "100 simultaneous queries."
+class LlamaServerLLM:
+    """The default `LocalLLM` impl. Routes all calls through the
+    subprocess pool to a `llama-server` HTTP endpoint.
+
+    Concurrency: HTTP calls are inherently safe to make concurrently
+    against llama-server (its own internal scheduling handles
+    serialization). We don't lock here.
+
+    Profile dispatch: each instance is bound to a single profile name
+    (default: text profile from env). Swapping profiles per-call is
+    a future feature — today, the singleton pattern means there's
+    one LlamaServerLLM per process bound to the text profile, and
+    PR 2 adds a separate vision-bound instance.
     """
 
     def __init__(
         self,
         *,
-        repo_id: Optional[str] = None,
-        quant: Optional[str] = None,
-        n_ctx: Optional[int] = None,
-        n_gpu_layers: Optional[int] = None,
-        temperature: Optional[float] = None,
+        profile_name: Optional[str] = None,
+        request_timeout_s: float = _DEFAULT_REQUEST_TIMEOUT_S,
     ) -> None:
-        self.repo_id = repo_id or os.environ.get("LOCAL_MODEL", DEFAULT_REPO)
-        self.quant = quant or os.environ.get("LOCAL_QUANT", DEFAULT_QUANT)
-        self.n_ctx = int(
-            n_ctx if n_ctx is not None
-            else os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)
-        )
-        self.n_gpu_layers = int(
-            n_gpu_layers if n_gpu_layers is not None
-            else os.environ.get("LOCAL_N_GPU_LAYERS", DEFAULT_N_GPU_LAYERS)
-        )
-        self.default_temperature = float(
-            temperature if temperature is not None
-            else os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)
-        )
+        self.profile_name = profile_name or default_text_profile()
+        profile = get_profile(self.profile_name)
         # `model_id` is the public identifier callers (and the chat-template
-        # helper) use to know which model is loaded — repo + quant uniquely
-        # identifies a specific GGUF.
-        self.model_id = f"{self.repo_id}::{self.quant}"
-        self._llm: Any = None  # llama_cpp.Llama; loaded lazily
-        self._llm_lock = threading.Lock()  # serialize C++ calls (KV cache)
-        self._load_lock = threading.Lock()  # only one thread loads weights
+        # helper) use to know which model is loaded. Same shape as the
+        # previous LlamaCppLLM so chat_template.is_gemma4(model_id) still works.
+        self.model_id = f"{profile.args.repo_id}::{profile.args.quant}"
+        self.default_temperature = profile.args.temperature
+        self.request_timeout_s = request_timeout_s
 
-    # ----- loading -----------------------------------------------------------
+    # ----- pool-resolved URL -------------------------------------------------
+
+    def _base_url(self) -> str:
+        """Resolve the running llama-server's base URL, spawning it
+        on first call. Per-call so LRU eviction across profiles
+        respawns transparently."""
+        return get_pool().get_url_for(self.profile_name)
 
     def _ensure_loaded(self) -> None:
-        """Load the GGUF on first use. Idempotent + thread-safe."""
-        if self._llm is not None:
-            return
-        with self._load_lock:
-            if self._llm is not None:
-                return
-            try:
-                from llama_cpp import Llama  # deferred — slow import
-            except ImportError as e:
-                raise RuntimeError(
-                    "llama-cpp-python is not installed. Run "
-                    "`just sync-environment && just install-llama` first."
-                ) from e
-            gguf_path = ensure_model(self.repo_id, self.quant)
-            print(
-                f"  loading local LLM: {self.model_id} "
-                f"(n_ctx={self.n_ctx}, n_gpu_layers={self.n_gpu_layers})",
-                file=sys.stderr,
-            )
-            self._llm = Llama(
-                model_path=str(gguf_path),
-                n_ctx=self.n_ctx,
-                n_gpu_layers=self.n_gpu_layers,
-                # Flash-attention dramatically speeds up prompt eval on Metal
-                # and CUDA — at 65K context we'd otherwise spend 30-60s just
-                # ingesting an 8-file answer prompt. `True` is safe across
-                # supported backends; on the rare CPU build that doesn't
-                # implement it the kernel falls back transparently.
-                flash_attn=True,
-                # `verbose=False` silences the wall of llama.cpp init logs
-                # on every load. Errors still propagate as exceptions.
-                verbose=False,
-            )
-            print("  local LLM loaded", file=sys.stderr)
+        """Force the subprocess to spawn + model to load now (without
+        making an inference request). Used by the walker's pre-load
+        before the tqdm bar starts so the cold-load is visible.
+
+        Same name as the old in-process method so `src/stage1/summarize.py`
+        keeps working unchanged."""
+        self._base_url()  # side-effect: pool.get_url_for spawns if needed
 
     # ----- complete ----------------------------------------------------------
 
@@ -178,20 +160,22 @@ class LlamaCppLLM:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
     ) -> str:
-        """Run a non-streaming chat completion. Returns the full response text.
+        """Run a non-streaming chat completion. Returns the response text.
 
         `thinking=True` injects the Gemma 4 `<|think|>` token via
-        `apply_thinking_to_messages`. For non-Gemma-4 models, that helper
-        is a no-op — the kwarg is preserved across model swaps without
-        special-casing in callers.
+        `apply_thinking_to_messages`. For non-Gemma-4 models, that
+        helper is a no-op — the kwarg is preserved across model swaps
+        without special-casing in callers.
         """
 
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
-        return await asyncio.to_thread(
-            self._raw_complete, prepared, temperature, max_tokens
-        )
+        body = self._build_request_body(prepared, temperature, max_tokens, stream=False)
+        url = self._base_url() + "/v1/chat/completions"
+        async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
+            resp = await self._post_with_pool_recovery(client, url, body)
+        return self._extract_content(resp.json())
 
     def complete_sync(
         self,
@@ -201,37 +185,21 @@ class LlamaCppLLM:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
     ) -> str:
-        """Synchronous variant of `complete()`. Same arguments, no event loop.
+        """Synchronous variant. Used by `LocalAgent.run_sync` from
+        non-async paths (`src.stage2.search.rewrite_query`).
 
-        Used by `LocalAgent.run_sync` (called from non-async paths like
-        `src.stage2.search.rewrite_query`). Avoids the `asyncio.run` /
-        nested-loop awkwardness of wrapping `complete()` in a sync caller.
+        Avoids the asyncio.run / nested-loop awkwardness of wrapping
+        `complete()` in a sync caller.
         """
 
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
-        return self._raw_complete(prepared, temperature, max_tokens)
-
-    def _raw_complete(
-        self,
-        messages: list[dict],
-        temperature: Optional[float],
-        max_tokens: Optional[int],
-    ) -> str:
-        self._ensure_loaded()
-        with self._llm_lock:
-            resp = self._llm.create_chat_completion(
-                messages=messages,
-                temperature=(
-                    temperature if temperature is not None
-                    else self.default_temperature
-                ),
-                max_tokens=max_tokens,  # None = no cap (model decides)
-                stream=False,
-            )
-        # The OpenAI-shaped response: choices[0].message.content
-        return resp["choices"][0]["message"]["content"] or ""
+        body = self._build_request_body(prepared, temperature, max_tokens, stream=False)
+        url = self._base_url() + "/v1/chat/completions"
+        with httpx.Client(timeout=self.request_timeout_s) as client:
+            resp = self._post_with_pool_recovery_sync(client, url, body)
+        return self._extract_content(resp.json())
 
     # ----- stream ------------------------------------------------------------
 
@@ -245,78 +213,175 @@ class LlamaCppLLM:
     ) -> AsyncIterator[str]:
         """Yield response chunks as they're generated.
 
-        The producer runs `create_chat_completion(stream=True)` on a
-        background thread and pushes each chunk's text delta into an
-        asyncio.Queue. The async iterator drains the queue. Sentinel
-        `None` marks end-of-stream; an exception in the producer is
-        re-raised to the consumer.
+        Uses llama-server's native SSE response on `/v1/chat/completions`
+        with `stream=true`. Each `data: { ... }\\n\\n` event carries an
+        OpenAI-shaped delta; we extract `choices[0].delta.content` and
+        yield. The server's terminal `data: [DONE]\\n\\n` ends the
+        iterator cleanly.
+
+        On HTTP error mid-stream we propagate the exception to the
+        consumer; the caller's `except` block decides what to surface
+        to the user.
         """
 
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
-        loop = asyncio.get_running_loop()
-        queue: asyncio.Queue[Any] = asyncio.Queue(maxsize=64)
-
-        def producer() -> None:
-            try:
-                self._ensure_loaded()
-                with self._llm_lock:
-                    iterator = self._llm.create_chat_completion(
-                        messages=prepared,
-                        temperature=(
-                            temperature if temperature is not None
-                            else self.default_temperature
-                        ),
-                        max_tokens=max_tokens,
-                        stream=True,
-                    )
-                    for chunk in iterator:
-                        delta = chunk["choices"][0].get("delta", {})
-                        text = delta.get("content")
-                        if text:
-                            asyncio.run_coroutine_threadsafe(
-                                queue.put(text), loop
-                            ).result()
-            except BaseException as e:  # pylint: disable=broad-except
-                asyncio.run_coroutine_threadsafe(queue.put(e), loop).result()
-                return
-            asyncio.run_coroutine_threadsafe(queue.put(None), loop).result()
-
-        threading.Thread(target=producer, daemon=True).start()
+        body = self._build_request_body(prepared, temperature, max_tokens, stream=True)
+        url = self._base_url() + "/v1/chat/completions"
 
         async def _gen() -> AsyncIterator[str]:
-            while True:
-                item = await queue.get()
-                if item is None:
-                    return
-                if isinstance(item, BaseException):
-                    raise item
-                yield item
+            try:
+                async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
+                    async with client.stream("POST", url, json=body) as resp:
+                        resp.raise_for_status()
+                        async for line in resp.aiter_lines():
+                            text = _parse_sse_chunk(line)
+                            if text == _SSE_DONE:
+                                return
+                            if text:
+                                yield text
+            except httpx.ConnectError as e:
+                # Subprocess vanished mid-stream — drop registry entry
+                # so the next call respawns cleanly.
+                get_pool().mark_dead(self.profile_name)
+                raise RuntimeError(
+                    f"llama-server connection failed mid-stream: {e}"
+                ) from e
 
         return _gen()
+
+    # ----- internals ---------------------------------------------------------
+
+    def _build_request_body(
+        self,
+        messages: list[dict],
+        temperature: Optional[float],
+        max_tokens: Optional[int],
+        *,
+        stream: bool,
+    ) -> dict[str, Any]:
+        """OpenAI-compatible chat-completions request body. We omit
+        fields with None values so llama-server's defaults stay in
+        play (especially `max_tokens`, where None = no client-side cap)."""
+        body: dict[str, Any] = {
+            "messages": messages,
+            "stream": stream,
+            "temperature": (
+                temperature if temperature is not None else self.default_temperature
+            ),
+        }
+        if max_tokens is not None:
+            body["max_tokens"] = max_tokens
+        return body
+
+    @staticmethod
+    def _extract_content(payload: dict[str, Any]) -> str:
+        """Pull the assistant message content out of an OpenAI-shaped
+        response. Defensive against null fields (some models emit
+        `content: null` when the response is purely a tool call —
+        not relevant today, but harmless to handle)."""
+        try:
+            return payload["choices"][0]["message"]["content"] or ""
+        except (KeyError, IndexError, TypeError):
+            return ""
+
+    async def _post_with_pool_recovery(
+        self,
+        client: httpx.AsyncClient,
+        url: str,
+        body: dict[str, Any],
+    ) -> httpx.Response:
+        """POST that converts llama-server connection failures into a
+        pool 'mark dead' so the next call respawns the subprocess."""
+        try:
+            resp = await client.post(url, json=body)
+            resp.raise_for_status()
+            return resp
+        except httpx.ConnectError as e:
+            get_pool().mark_dead(self.profile_name)
+            raise LlamaServerSpawnError(
+                f"llama-server connection failed: {e}. "
+                f"The subprocess may have crashed; the pool has cleared "
+                f"its registry, so the next request will respawn it."
+            ) from e
+
+    def _post_with_pool_recovery_sync(
+        self,
+        client: httpx.Client,
+        url: str,
+        body: dict[str, Any],
+    ) -> httpx.Response:
+        """Sync mirror of `_post_with_pool_recovery`."""
+        try:
+            resp = client.post(url, json=body)
+            resp.raise_for_status()
+            return resp
+        except httpx.ConnectError as e:
+            get_pool().mark_dead(self.profile_name)
+            raise LlamaServerSpawnError(
+                f"llama-server connection failed: {e}. "
+                f"The subprocess may have crashed; the pool has cleared "
+                f"its registry, so the next request will respawn it."
+            ) from e
+
+
+# ---------------------------------------------------------------------------
+# SSE parsing helpers (module-level for unit-test mockability)
+# ---------------------------------------------------------------------------
+
+
+_SSE_DONE = "<<DONE>>"  # internal sentinel — never appears in real chunks
+
+
+def _parse_sse_chunk(line: str) -> str:
+    """Extract the assistant content delta from one SSE line.
+
+    Returns:
+      - empty string for non-data lines (heartbeats, blank separators)
+      - `_SSE_DONE` sentinel for the terminal `[DONE]` line
+      - the actual delta content otherwise
+
+    llama-server's SSE shape:
+        data: {"choices": [{"delta": {"content": "Hello"}, ...}], ...}
+        data: [DONE]
+    """
+    if not line.startswith("data: "):
+        return ""
+    payload = line[len("data: "):].strip()
+    if payload == "[DONE]":
+        return _SSE_DONE
+    try:
+        chunk = json.loads(payload)
+        return chunk["choices"][0].get("delta", {}).get("content") or ""
+    except (json.JSONDecodeError, KeyError, IndexError, TypeError):
+        return ""
 
 
 # ---------------------------------------------------------------------------
 # Singleton accessor
 # ---------------------------------------------------------------------------
 
-_singleton: Optional[LlamaCppLLM] = None
+
+_singleton: Optional[LlamaServerLLM] = None
 _singleton_lock = threading.Lock()
 
 
-def get_local_llm() -> LlamaCppLLM:
+def get_local_llm() -> LlamaServerLLM:
     """Return the process-wide LocalLLM singleton.
 
-    Idempotent — first call constructs (no weight load yet, that's lazy
-    in `_ensure_loaded`); subsequent calls return the same instance.
-    Use this anywhere inference happens in-process so we don't end up
-    with two copies of the GGUF in RAM.
+    Idempotent — first call constructs (no subprocess spawn yet, that's
+    lazy in `_base_url()`); subsequent calls return the same instance.
+    Use this anywhere inference happens so we don't end up with two
+    HTTP clients pointing at separate subprocesses.
+
+    Future (PR 2): a separate `get_vision_llm()` will return a second
+    LlamaServerLLM bound to the vision profile, sharing the same pool.
     """
     global _singleton
     if _singleton is not None:
         return _singleton
     with _singleton_lock:
         if _singleton is None:
-            _singleton = LlamaCppLLM()
+            _singleton = LlamaServerLLM()
         return _singleton

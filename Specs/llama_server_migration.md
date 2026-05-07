@@ -52,7 +52,7 @@ Conclusion: no architectural surprises. Backend swap is a localized change to `s
 | Default vision model | **Gemma 4 E4B + mmproj-BF16.gguf** (~6.7 GB GGUF + 946 MB mmproj). NOT Qwen2.5-VL-7B. | We already ship Gemma 4 E4B for text. Adding the mmproj projector is one extra file. Qwen2.5-VL-7B is too heavy for the 8 GB Apple-Silicon target. Add Qwen as an opt-in profile in PR 2 if there's RAM. |
 | `LFM2.5-350M` text-only profile | **Out of scope.** Defer to Workstream 3 (entity extraction). | This spec is about the llama-server swap, not adding new models. |
 | Streaming | SSE proxy from llama-server's native stream | Lower latency, less code than the asyncio queue+thread pattern. |
-| Test image | User provides a real test image; placed at `tests/inference/fixtures/test_image.{png,jpg}` | Spec note: real fixture committed to the repo. |
+| Test image | User provides a real test image; placed at `tests/inference/image.png` | Spec note: real fixture committed to the repo. |
 | Auto-restart on subprocess crash | **Drop.** Log loudly + fail the request. | Auto-restart hides real failures (OOM, bad model, version mismatch). Add later as a flag if telemetry justifies it. |
 | Tests | Pool manager unit, HTTP client unit, integration smoke (gated by env). User provides the image fixture; chat-test prompts I write. | Standard structure mirroring existing `tests/inference/`. |
 
@@ -113,7 +113,7 @@ Three PRs. Each commits cleanly on `llama-server` and is independently shippable
 
 | File | Purpose |
 |---|---|
-| `tests/inference/fixtures/test_image.{png,jpg}` | **User-provided real image.** Committed to the repo. The test will assert visible-text recovery + a description match. |
+| `tests/inference/image.png` | **User-provided real image.** Committed to the repo. The test will assert visible-text recovery + a description match. |
 | `tests/inference/test_vision.py` | Unit + integration tests for the vision path. |
 
 **Files updated:**
@@ -134,6 +134,7 @@ Three PRs. Each commits cleanly on `llama-server` and is independently shippable
 - Submit a receipt-PDF page-image. Assert the merchant name comes back. (User supplies the receipt image too.)
 - Confirm subprocess for the vision profile launches with both `--model` and `--mmproj` flags (peek at the launch command via `LlamaServerPool.spawn_command()` test helper).
 - Confirm LRU eviction works: with `MAX_LOADED_MODELS=1`, querying vision after a text query unloads text and loads vision; querying text again unloads vision and reloads text.
+- **End-to-end summarize check:** `just walk` over a folder containing one image file (the user's fixture) AND one receipt-PDF. The resulting T3 summary markdowns must contain image-derived content (visible text from the image, not just filename metadata). This validates the `_flatten_message_for_local` wiring works at INGEST time, not just `/generate`. Both T3 summarize and the answer step share `LocalAgent.run`, so this also pre-validates the answer-side path that PR 3 fully wires.
 
 **Estimated size:** ~250 LOC net change.
 
@@ -198,13 +199,15 @@ After PR 3 merges, T3 image-bearing calls use vision automatically. Users see be
 
 ## Risks
 
-1. **`<|think|>` token survives `--jinja` rendering — unverified.** PR 1's smoke test must confirm. If it doesn't (e.g., the GGUF's chat template strips unknown tokens), the workaround is to construct the message via the `/v1/completions` endpoint (raw, no chat template) instead of `/v1/chat/completions`. Add this as a fallback path in `LlamaServerLLM`.
+1. **`<|think|>` token survives `--jinja` rendering — unverified.** PR 1's smoke test must confirm. **Likely outcome:** works fine — `--jinja` renders the GGUF's embedded chat template over the message list, and `<|think|>` inside system-message content is just text that passes through. **If it doesn't:** the fix is NOT switching to `/v1/completions` (raw, no chat template) — that's a much bigger rewrite because every call site assumes chat format with system/user/assistant roles. The right fallback is to inject the thinking token **after** the chat template is applied, by intercepting the rendered prompt and prepending the token before sending. llama-server exposes this via the `prefill` parameter on `/v1/chat/completions` in newer builds; if not available on b5400, we add a string-rewrite step on the rendered template. Either way, message construction stays in chat-format. Document the chosen path in PR 1 if the smoke test forces the fallback.
 2. **Streaming + structured output don't compose.** Current code already handles this — `stream()` is `/generate`-only; `LocalAgent.run` is non-streaming. PR 1 keeps that boundary.
 3. **Subprocess port collisions.** If a previous run left an orphan process on port 9100, the next spawn fails. Pool manager picks the next available port automatically (port + 1, retry). The atexit handler should prevent this in practice.
 4. **Binary version skew at startup.** Hard-fail at startup with a clear message if `llama-server --version` is below `LLAMA_SERVER_MIN_VERSION`. User runs `just install-llama-server` to upgrade.
 5. **Vision quality on Gemma 4 E4B (the load-bearing claim of PR 2).** If receipts come back garbled, falling back to OpenRouter / Moonshot for image-heavy T3 is the escape hatch. We don't lose it — `LLM_PROVIDER` still lets users flip to cloud.
 6. **mmproj download fails behind a firewall.** The model_downloader reuses `huggingface_hub` which already handles this. Surface the error clearly; don't silently fall back to text-only.
-7. **macOS Gatekeeper on the downloaded llama-server binary.** First run may show "cannot verify developer." Document the `xattr -d com.apple.quarantine` workaround in README. For Plan #10, the eventual notarized .app handles this.
+7. **macOS Gatekeeper on the downloaded llama-server binary.** First run may show "cannot verify developer." The `just install-llama-server` recipe runs `xattr -d com.apple.quarantine <bin>` automatically on macOS so users never see the dialog. README documents this happens for transparency. For Plan #10, the eventual notarized .app removes the issue entirely.
+
+8. **mmproj's 946 MB download is a long pause on slow connections.** PR 2's `install-llama-server` recipe must print a clear "downloading mmproj-BF16.gguf (~946 MB) — this may take several minutes on slow connections" message before kicking off the download, and stream `huggingface_hub`'s progress bar. Don't let this look like the install hung.
 
 ---
 

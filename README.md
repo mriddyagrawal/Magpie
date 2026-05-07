@@ -83,37 +83,54 @@ Five interchangeable providers, selected via the `LLM_PROVIDER` environment vari
 - **`moonshot`** — Moonshot Kimi via their OpenAI-compatible API. Vision-capable, structured output via native JSON mode.
 - **`openrouter`** *(default)* — OpenRouter gateway. Any model they front (Gemma, Claude, GPT, Llama, etc.) works; same OpenAI-compatible protocol.
 - **`ollama`** — Local Ollama daemon (Linux / Windows / Intel-Mac). OpenAI-compatible.
-- **`local`** — In-process inference via `llama-cpp-python` + GGUF weights. Cross-platform: Metal on macOS, CUDA on Linux / Windows, CPU fallback. No API key, no network calls for inference. Files never leave the machine.
+- **`local`** — Subprocess inference via `llama-server` (HTTP) + GGUF weights. Cross-platform: Metal on macOS, CUDA on Linux / Windows, CPU fallback. Vision support via mmproj projector (Gemma 4 E4B native). No API key, no network calls for inference. Files never leave the machine.
 - **`magpie-cloud`** — Magpie's hosted backend. Auth via invite code; prompts live server-side.
 
 The cloud providers rely on native structured output (the model is constrained to emit valid JSON matching the schema). The local provider has no equivalent mechanism, so structured output goes through a repair pipeline — direct parse, strip markdown fences, extract a JSON object by brace match, fall back to a minimal valid structure on hard failures. The pipeline never crashes on a malformed response.
 
 ### Local inference
 
-When `LLM_PROVIDER=local`, Magpie loads a GGUF model into the Python process via `llama-cpp-python` and serves all LLM calls (T3 summarize, query rewrite, answer synthesis, the new `POST /generate` endpoint) from the same in-memory engine.
+When `LLM_PROVIDER=local`, Magpie spawns one or more `llama-server` subprocesses (Metal / CUDA / CPU built-in to the binary) and routes all LLM calls — T3 summarize, query rewrite, answer synthesis, the `POST /generate` endpoint — through their HTTP `/v1/chat/completions` endpoint. The Python sidecar manages the subprocess pool: spawn on demand, health-check, idle-evict, kill at exit.
 
 #### One-time install
 
-After `just sync-environment`, run `just install-llama` to rebuild `llama-cpp-python` with hardware acceleration for your platform:
+After `just sync-environment`, run:
 
-| Platform | What `just install-llama` does |
+```
+just install-llama-server
+```
+
+This downloads the right `llama-server` binary for your platform from llama.cpp's GitHub releases (~30 MB), stages it under `<APP_DATA_DIR>/bin/`, strips macOS quarantine, and verifies the version. Override the version with `LLAMA_SERVER_VERSION=b5500 just install-llama-server`.
+
+Supported platforms (auto-detected):
+
+| Platform | Asset |
 |---|---|
-| macOS (Apple Silicon) | `CMAKE_ARGS="-DGGML_METAL=on"` — Metal acceleration |
-| Linux + nvidia-smi | `CMAKE_ARGS="-DGGML_CUDA=on"` — CUDA acceleration |
-| Other (CPU only) | Plain pip install — works, just slower |
-
-Without this rebuild step, you get the prebuilt CPU wheel — works correctly but ~5-10× slower than Metal/CUDA for inference.
+| macOS Apple Silicon | `macos-arm64.zip` (Metal) |
+| macOS Intel | `macos-x64.zip` (Accelerate) |
+| Linux x86_64 | `ubuntu-x64.zip` (CPU; CUDA build = manual override) |
+| Windows | manual download (documented in the recipe) |
 
 #### Default model
 
-`unsloth/gemma-4-E4B-it-GGUF` at the `Q5_K_XL` quant (~6.7 GB) downloads automatically from Hugging Face into `<APP_DATA_DIR>/cache/hub/` on first call. Subsequent runs load from local cache in ~10-20s. Override via `.env`:
+`unsloth/gemma-4-E4B-it-GGUF` at the `Q5_K_XL` quant (~6.7 GB) downloads automatically from Hugging Face into `<APP_DATA_DIR>/cache/hub/` on first inference. Subsequent runs load from local cache in ~10-20s. Override via `.env`:
 
 ```
 LOCAL_MODEL=unsloth/gemma-4-E4B-it-GGUF   # HF GGUF repo
 LOCAL_QUANT=Q5_K_XL                       # quant inside that repo
 LOCAL_N_CTX=8192                          # context window
-LOCAL_N_GPU_LAYERS=-1                     # -1 = all on GPU; 0 = pure CPU
 LOCAL_TEMPERATURE=0.7                     # sampling temperature
+```
+
+Subprocess pool tunables (also in `.env`):
+
+```
+LLAMA_SERVER_PATH=                        # empty = auto-discover
+LLAMA_SERVER_MIN_VERSION=b5400            # hard-fail if older
+LLAMA_SERVER_BASE_PORT=9100               # NOT 8765 (FastAPI sidecar)
+LLAMA_SERVER_MAX_LOADED_MODELS=1          # 1 = sequential, LRU eviction
+LLAMA_SERVER_IDLE_TIMEOUT_S=600           # unload after 10 min idle
+LLAMA_SERVER_STARTUP_TIMEOUT_S=60         # wait for /health on spawn
 ```
 
 Available Gemma 4 E4B quants (all UD = Unsloth Dynamic-2.0, on the Pareto frontier):
@@ -127,9 +144,9 @@ Available Gemma 4 E4B quants (all UD = Unsloth Dynamic-2.0, on the Pareto fronti
 
 #### Runtime characteristics
 
-- **Latency**: ~1-3s per text call on Metal/CUDA (Apple Silicon M-series, modern NVIDIA). CPU fallback is bounded but noticeably slower.
-- **Concurrency**: in-process serial — `LlamaCppLLM` holds a `threading.Lock` around the C++ call to keep the KV cache consistent. Multiple coroutines queue cleanly; throughput is limited by the single backing engine.
-- **Vision**: not yet supported on the local backend. Image-bearing T3 calls (receipt PDFs, scans) drop the binary content with a one-time warning and produce thin text-only summaries. Cloud providers (`openrouter`, `moonshot`) keep full vision support. Adding Gemma 4 vision via the `Gemma4ChatHandler` + mmproj projector is a follow-up — see `Plans/Local LLM Plan.md`.
+- **Latency**: ~1-3s per text call on Metal/CUDA (Apple Silicon M-series, modern NVIDIA), plus ~5 ms HTTP localhost overhead. CPU fallback is bounded but noticeably slower.
+- **Concurrency**: HTTP-safe — multiple Python coroutines can submit concurrent requests; llama-server's internal scheduler handles them. Throughput is bounded by the single subprocess.
+- **Vision**: PR 2 of the llama-server migration adds Gemma 4 E4B native vision via the mmproj projector (~946 MB additional file, eager-downloaded by `install-llama-server`). T3 image-bearing calls then route image bytes through `LocalLLM.complete(images=...)`. See [Specs/llama_server_migration.md](Specs/llama_server_migration.md). Cloud providers keep full vision support regardless.
 - **Quality caveat**: Gemma 4 E4B is small. Summaries may be less detailed than what `gemma-4-31B-it` or Claude Sonnet produce. The JSON-repair layer keeps the pipeline running on imperfect output.
 
 #### Thinking mode

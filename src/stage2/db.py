@@ -7,9 +7,9 @@ Both alternatives were dropped 2026-05:
   - The remote-cluster mode broke Magpie's "files never leave your machine"
     privacy promise. If you want a hosted setup, use Qdrant Cloud directly
     in your own service — Magpie does not.
-  - The Python embedded shim (formerly `QDRANT_PROVIDER=local`) silently
-    dropped quantization, payload indexes, snapshots, and other features
-    of the real Rust server. The fallback always misled at-scale tests.
+  - The Python embedded shim silently dropped quantization, payload
+    indexes, snapshots, and other features of the real Rust server. It
+    always misled at-scale tests, so we removed the option entirely.
 
 Run Qdrant locally via `just qdrant-install && just qdrant-up`. Default
 endpoint is `http://localhost:6433`. Override with `QDRANT_CLUSTER_ENDPOINT`

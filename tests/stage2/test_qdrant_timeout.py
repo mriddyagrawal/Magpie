@@ -27,7 +27,7 @@ def _reset_client_cache():
 def test_default_timeout_is_60_seconds(monkeypatch):
     """No QDRANT_TIMEOUT_S env var → 60-second default."""
     _reset_client_cache()
-    monkeypatch.setenv("QDRANT_CLUSTER_ENDPOINT", "http://localhost:6333")
+    monkeypatch.setenv("QDRANT_CLUSTER_ENDPOINT", "http://localhost:6433")
     monkeypatch.delenv("QDRANT_TIMEOUT_S", raising=False)
 
     with patch.object(db_mod, "QdrantClient") as MockClient:
@@ -38,7 +38,7 @@ def test_default_timeout_is_60_seconds(monkeypatch):
 
 def test_env_var_overrides_timeout(monkeypatch):
     _reset_client_cache()
-    monkeypatch.setenv("QDRANT_CLUSTER_ENDPOINT", "http://localhost:6333")
+    monkeypatch.setenv("QDRANT_CLUSTER_ENDPOINT", "http://localhost:6433")
     monkeypatch.setenv("QDRANT_TIMEOUT_S", "300")
 
     with patch.object(db_mod, "QdrantClient") as MockClient:

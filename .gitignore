@@ -5,6 +5,7 @@ __pycache__/
 .DS_Store
 uv.lock
 CLAUDE.md
+.claude/scheduled_tasks.lock
 Test Content/
 Test Content Deprecated/
 Test Summaries/

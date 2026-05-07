@@ -39,13 +39,20 @@ sync-environment:
 install-llama-server:
     #!/usr/bin/env bash
     set -euo pipefail
-    VERSION="${LLAMA_SERVER_VERSION:-b5400}"
+    # Pin: must support the `gemma4` model architecture in llama.cpp,
+    # added 2026-04 well after b5400. b9049 (2026-05-06) is the most
+    # recent confirmed-good build at spec authoring time.
+    VERSION="${LLAMA_SERVER_VERSION:-b9049}"
     OS="$(uname -s)"
     ARCH="$(uname -m)"
+    # Modern llama.cpp releases (b8xxx+) ship .tar.gz on Linux/macOS
+    # and renamed macOS assets (no `bin-` infix). Older releases used
+    # .zip; we follow current convention.
     case "$OS-$ARCH" in
-        Darwin-arm64)   ASSET="llama-${VERSION}-bin-macos-arm64.zip" ;;
-        Darwin-x86_64)  ASSET="llama-${VERSION}-bin-macos-x64.zip" ;;
-        Linux-x86_64)   ASSET="llama-${VERSION}-bin-ubuntu-x64.zip" ;;
+        Darwin-arm64)   ASSET="llama-${VERSION}-bin-macos-arm64.tar.gz" ;;
+        Darwin-x86_64)  ASSET="llama-${VERSION}-bin-macos-x64.tar.gz" ;;
+        Linux-x86_64)   ASSET="llama-${VERSION}-bin-ubuntu-x64.tar.gz" ;;
+        Linux-aarch64)  ASSET="llama-${VERSION}-bin-ubuntu-arm64.tar.gz" ;;
         *)
             echo "==> Unsupported OS/ARCH ($OS-$ARCH). For Windows or other"
             echo "    platforms, download manually from"
@@ -57,12 +64,13 @@ install-llama-server:
     DEST="$(uv run python -c 'from src.manifest import APP_DATA_DIR; print(APP_DATA_DIR / "bin")')"
     mkdir -p "$DEST"
     URL="https://github.com/ggml-org/llama.cpp/releases/download/${VERSION}/${ASSET}"
-    echo "==> Downloading $ASSET (~30 MB) from $URL"
+    echo "==> Downloading $ASSET (~10-30 MB) from $URL"
     TMPDIR="$(mktemp -d)"
     trap 'rm -rf "$TMPDIR"' EXIT
-    curl -fL --progress-bar -o "$TMPDIR/llama.zip" "$URL"
+    curl -fL --progress-bar -o "$TMPDIR/llama.tar.gz" "$URL"
     echo "==> Extracting to $DEST"
-    unzip -q "$TMPDIR/llama.zip" -d "$TMPDIR/llama"
+    mkdir -p "$TMPDIR/llama"
+    tar -xzf "$TMPDIR/llama.tar.gz" -C "$TMPDIR/llama"
     # Find the llama-server binary inside the extracted tree (release
     # archives nest under `build/bin/` or similar; flatten here).
     BIN_PATH="$(find "$TMPDIR/llama" -name 'llama-server' -type f | head -1)"
@@ -84,8 +92,8 @@ install-llama-server:
         xattr -d com.apple.quarantine "$DEST/llama-server" 2>/dev/null || true
         find "$DEST" \( -name '*.dylib' \) -exec xattr -d com.apple.quarantine {} \; 2>/dev/null || true
     fi
-    echo "==> Verifying version"
-    "$DEST/llama-server" --version 2>&1 | head -3
+    echo "==> Verifying version (Metal device probe takes ~12s on first run)"
+    "$DEST/llama-server" --version 2>&1 | grep -E '^(version:|build|built)' || true
     echo "==> Installed to: $DEST/llama-server"
     echo
     echo "==> Pre-downloading the Gemma 4 E4B vision projector (~946 MB)"

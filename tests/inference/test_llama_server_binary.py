@@ -28,6 +28,16 @@ from src.inference.llama_server_binary import (
         ("llama-server build b5400-12-gabc123", 5400),
         ("b5400", 5400),
         ("version: b9999 (release)", 9999),
+        # Regression: the actual macOS-arm64 build of b5400 reports
+        # `version: 5400 (sha)` with no `b` prefix — observed against
+        # llama-b5400-bin-macos-arm64.zip, 2026-05. If the regex stops
+        # accepting this shape, the min-version check silently no-ops
+        # because get_binary_version returns build_number=None.
+        ("version: 5400 (c6a2c9e7)", 5400),
+        (
+            "version: 5400 (c6a2c9e7)\nbuilt with Apple clang version 15.0.0",
+            5400,
+        ),
         ("commit abc123 (no tag)", None),
         ("", None),
         ("just some text", None),
@@ -52,9 +62,13 @@ def test_env_var_takes_priority(monkeypatch, tmp_path):
 
 
 def test_missing_binary_lists_paths_tried(monkeypatch, tmp_path):
-    """Error message must enumerate every checked path so users can fix."""
+    """Error message must enumerate every checked path so users can fix.
+    Redirects APP_DATA_DIR to a clean tmp tree so a real install on the
+    dev machine doesn't satisfy discovery and skip the failure path."""
     monkeypatch.setenv("LLAMA_SERVER_PATH", str(tmp_path / "does-not-exist"))
-    with patch("shutil.which", return_value=None):
+    with patch(
+        "src.inference.llama_server_binary.APP_DATA_DIR", tmp_path
+    ), patch("shutil.which", return_value=None):
         with pytest.raises(LlamaServerBinaryError) as exc:
             find_llama_server()
     msg = str(exc.value)
@@ -63,12 +77,15 @@ def test_missing_binary_lists_paths_tried(monkeypatch, tmp_path):
     assert "LLAMA_SERVER_PATH" in msg
 
 
-def test_app_data_dir_path_is_checked(monkeypatch):
+def test_app_data_dir_path_is_checked(monkeypatch, tmp_path):
     """When the env override is unset, APP_DATA_DIR/bin/llama-server is
     one of the paths we look at — that's where install-llama-server
-    stages the binary, AND where the .app bundle would put it."""
+    stages the binary, AND where the .app bundle would put it.
+    Redirects APP_DATA_DIR to a clean tmp tree (see test above)."""
     monkeypatch.delenv("LLAMA_SERVER_PATH", raising=False)
-    with patch("shutil.which", return_value=None):
+    with patch(
+        "src.inference.llama_server_binary.APP_DATA_DIR", tmp_path
+    ), patch("shutil.which", return_value=None):
         with pytest.raises(LlamaServerBinaryError) as exc:
             find_llama_server()
     msg = str(exc.value)
@@ -124,8 +141,16 @@ def test_version_check_warns_when_pin_format_unknown(tmp_path, capsys):
     assert "custom-tag-xyz" in captured.err
 
 
-def test_default_min_version_is_recent_release_tag():
+def test_default_min_version_supports_gemma4():
     """Document the default pin in code so a regression catches it.
-    bNNNN with NNNN >= 5000 is the May-2026+ range — our spec target."""
+    Must be a build that knows the `gemma4` model architecture (added
+    upstream after Gemma 4's 2026-04 release). b5400 (mid-2024) DOES
+    NOT — model load bails with `unknown model architecture: gemma4`.
+    Verified empirically against the macOS-arm64 build of b9049, which
+    loads the unsloth/gemma-4-E4B-it-GGUF model successfully."""
     parsed = parse_build_number(DEFAULT_MIN_VERSION)
-    assert parsed is not None and parsed >= 5000
+    assert parsed is not None and parsed >= 9049, (
+        f"DEFAULT_MIN_VERSION pin {DEFAULT_MIN_VERSION!r} is too old to "
+        f"load Gemma 4 GGUFs. Bump to a release that supports the gemma4 "
+        f"architecture."
+    )

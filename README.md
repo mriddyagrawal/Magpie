@@ -126,7 +126,7 @@ Subprocess pool tunables (also in `.env`):
 
 ```
 LLAMA_SERVER_PATH=                        # empty = auto-discover
-LLAMA_SERVER_MIN_VERSION=b5400            # hard-fail if older
+LLAMA_SERVER_MIN_VERSION=b9049            # hard-fail if older — must support gemma4 arch
 LLAMA_SERVER_BASE_PORT=9100               # NOT 8765 (FastAPI sidecar)
 LLAMA_SERVER_MAX_LOADED_MODELS=1          # 1 = sequential, LRU eviction
 LLAMA_SERVER_IDLE_TIMEOUT_S=600           # unload after 10 min idle

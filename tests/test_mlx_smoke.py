@@ -59,10 +59,12 @@ def _pick_image_file() -> Path | None:
 
 # Visible text labels in `tests/inference/image.png` (an LLM-evaluation
 # diagram). The image-bearing tests assert the model recovers at least
-# one — the non-trivial image-derived content gate.
+# one — the non-trivial image-derived content gate. "fake" is an inner
+# quadrant label the BF16 mmproj reliably identifies (verified against
+# b9049 + Gemma 4 E4B, 2026-05-07).
 _FIXTURE_IMAGE_LABELS = (
     "llm", "evaluation", "knowledge", "cognition", "hallucination",
-    "creativity", "coding", "bias", "context", "lightbulb",
+    "creativity", "coding", "bias", "context", "lightbulb", "fake",
 )
 
 

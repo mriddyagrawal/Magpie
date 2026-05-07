@@ -70,6 +70,37 @@ def test_build_request_body_preserves_max_tokens():
     assert body["stream"] is True
 
 
+def test_build_request_body_disables_thinking_by_default():
+    """Regression gate: Gemma 4's chat template auto-enables thinking
+    via --jinja, which routes 90%+ of the token budget into
+    `reasoning_content` and leaves `content` mostly empty. The body
+    must explicitly pass `chat_template_kwargs.enable_thinking=False`
+    to suppress this. Validated against b9049 + Gemma 4 E4B
+    (vision integration test was empty-content without this fix)."""
+    llm = LlamaServerLLM()
+    body = llm._build_request_body(
+        messages=[{"role": "user", "content": "hi"}],
+        temperature=None,
+        max_tokens=None,
+        stream=False,
+    )
+    assert body["chat_template_kwargs"] == {"enable_thinking": False}
+
+
+def test_build_request_body_thinking_true_propagates():
+    """When the caller asks for thinking, propagate it to llama-server's
+    chat template. Mirrors the `thinking=True` kwarg on complete()."""
+    llm = LlamaServerLLM()
+    body = llm._build_request_body(
+        messages=[],
+        temperature=None,
+        max_tokens=None,
+        stream=False,
+        thinking=True,
+    )
+    assert body["chat_template_kwargs"] == {"enable_thinking": True}
+
+
 # ---------------------------------------------------------------------------
 # Content extraction
 # ---------------------------------------------------------------------------
@@ -96,6 +127,40 @@ def test_extract_content_handles_normal_response():
 def test_extract_content_returns_empty_on_malformed(payload):
     """Defensive: no IndexError / KeyError surfacing to the caller."""
     assert LlamaServerLLM._extract_content(payload) == ""
+
+
+def test_extract_content_falls_back_to_reasoning_when_content_empty():
+    """Belt-and-suspenders: if a future llama-server build renames
+    `enable_thinking` and our suppression silently breaks, callers
+    should still see *something* (the reasoning) rather than an
+    empty string + a degraded JSON-repair fallback."""
+    payload = {
+        "choices": [{
+            "message": {
+                "content": "",
+                "reasoning_content": "[the reasoning trace happens here]",
+            }
+        }]
+    }
+    assert (
+        LlamaServerLLM._extract_content(payload)
+        == "[the reasoning trace happens here]"
+    )
+
+
+def test_extract_content_prefers_content_over_reasoning():
+    """When both are present (normal case), `content` is the answer
+    and `reasoning_content` is the model's scratchpad — never surface
+    the scratchpad if real content is available."""
+    payload = {
+        "choices": [{
+            "message": {
+                "content": "the answer",
+                "reasoning_content": "scratchpad",
+            }
+        }]
+    }
+    assert LlamaServerLLM._extract_content(payload) == "the answer"
 
 
 # ---------------------------------------------------------------------------

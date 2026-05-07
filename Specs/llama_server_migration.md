@@ -1,12 +1,12 @@
 # Spec — llama-cpp-python → llama-server migration (vision-capable local LLM)
 
-**Status:** all three PRs shipped on branch `llama-server` 2026-05-07.
+**Status:** PRs 1 / 2 / 3 shipped on branch `llama-server` 2026-05-07; PR 4 (cross-platform installer) added 2026-05-07 after a real-install validation surfaced cross-platform gaps.
 
 **Author:** Mridul + Claude (planning session 2026-05-07).
 
 **Branch:** `llama-server` (off `ingestion-rules`).
 
-**Ship strategy:** three sequential PRs in this session. Each PR is independently testable; failure in any later phase does not roll back earlier phases.
+**Ship strategy:** four sequential PRs in this session. Each PR is independently testable; failure in any later phase does not roll back earlier phases.
 
 ---
 
@@ -45,7 +45,8 @@ Conclusion: no architectural surprises. Backend swap is a localized change to `s
 |---|---|---|
 | Coexist or replace | **Replace.** Remove llama-cpp-python entirely in PR 1. | We just shipped llama-cpp-python, but vision is the immediate need and llama-cpp-python has no path to it. Maintaining two backends adds churn. |
 | `LOCAL_BACKEND` env selector | **Remove.** Only one backend now. | Less moving parts. |
-| `LLAMA_SERVER_MIN_VERSION` pin | `b5400` (May 2026) | Spring 2026 is post-Gemma-4 stable + Qwen2.5-VL support. b5400 is the current month's tip; safe and well-tested. |
+| `LLAMA_SERVER_MIN_VERSION` pin | ~~`b5400`~~ → **`b9049`** (corrected 2026-05-07 post-validation). | b5400 turned out to be a mid-2024 build that predates the `gemma4` model architecture in llama.cpp — model load fails with "unknown model architecture: 'gemma4'". I had no calibrated sense of how many builds llama.cpp ships per day (turns out ~10/day, so b5400 was ~12 months stale). Rule going forward: pin a recent **release**, not an arbitrary "looks recent" tag. |
+| Binary install: shell script vs. Python | ~~bash recipe in justfile~~ → **Python module** (`src/tools/install_llama_server.py`), called from a 1-line justfile recipe. PR 4 deviation. | Bash recipe was broken on native Windows shells (no bash, no curl, no unzip on PowerShell), missed Linux-arm64, and broke when llama.cpp switched zip→tar.gz. Python uses stdlib (`urllib`, `tarfile`, `zipfile`) — works on every platform that runs Magpie. |
 | Binary install path | Auto-download from llama.cpp GitHub releases via a justfile recipe. NOT brew. | Same download mechanism dev + prod (eventual `.app` bundle). One source of truth. |
 | Bundling story (Plan #10 future) | The `.app` build pipeline calls the same downloader to vendor the binary into `<App.app>/Contents/Resources/bin/llama-server`. Discovery order: env var → bundled path → `PATH`. | Dev workflow (brew or PATH) and prod workflow (bundled) share code. |
 | mmproj download | Eager — at `just install-llama-server` time, not lazy on first vision query. | Predictable. Avoids a 946 MB pause on the user's first PDF query. |
@@ -160,6 +161,75 @@ Three PRs. Each commits cleanly on `llama-server` and is independently shippable
 - ✓ `LLM_PROVIDER=local pytest tests/test_mlx_smoke.py::test_mlx_summarize_image` — picks up the committed fixture and asserts at least one of the diagram's visible labels survives into the FileSummary.
 - ✓ `LLM_PROVIDER=local pytest tests/test_mlx_smoke.py::test_mlx_answer_from_image` — sends the same fixture to the answer step and asserts the answer mentions visible-text labels (not just file metadata).
 - Manual: `just sync --include-data` over a folder containing one image-only PDF (e.g., a scanned receipt). T3 summary should contain image-derived content. Quality should be in striking distance of OpenRouter for receipts.
+
+---
+
+### PR 4 — Cross-platform installer (Python) **[in flight 2026-05-07]**
+
+**Goal:** make `just install-llama-server` work on every platform Magpie runs on, without depending on bash, curl, unzip, find, or xattr being available — only on a working Python 3.11 (which Magpie already requires for the sidecar).
+
+**Why this PR exists.** PR 1 shipped a bash-based installer. Real-install validation on macOS surfaced four bugs (asset format, version regex, version-pin staleness, `head -3` SIGPIPE) — each one a separate first-run failure mode that would have hit Rahul on Linux/Windows the same way. The bash recipe also can't run on native Windows shells (PowerShell / cmd) and silently dies on Linux-arm64 (no case in the platform switch). The deviation here is about **install reliability**, not feature scope: PR 4 doesn't add new user-visible behavior, it makes PR 1's installer actually work for Rahul.
+
+**Deviations from PR 1's plan, justified:**
+- ~~`just install-llama-server` is a bash recipe~~ → **Python module called from a 1-line just recipe.** Bash ergonomics on Windows are bad enough (Git Bash users have varying tool availability; PowerShell has neither) that platform-specific recipes would have multiplied. Python stdlib gives us the same logic across every platform with `urllib` / `tarfile` / `zipfile` / `pathlib` / `shutil`.
+- ~~`xattr -d com.apple.quarantine`~~ → **shelled out via `subprocess.run([...], check=False)` only on macOS.** No portable Python equivalent and we can't avoid it (Gatekeeper blocks downloaded binaries otherwise). 5 LOC inside an `if sys.platform == 'darwin':` block.
+- ~~Implicit "find binary anywhere in extracted tree"~~ → **explicit per-platform expected location** (`build/bin/llama-server[.exe]`) with a fallback rglob. Faster, less error-prone, behaves the same on every OS.
+
+**Files added:**
+| File | Purpose |
+|---|---|
+| `src/tools/__init__.py` | New top-level package for build / install helpers (currently empty; future scripts land here). |
+| `src/tools/install_llama_server.py` | Cross-platform installer. Public entrypoints: `download_and_install(version=...)`, `select_asset(os_name, arch, gpu_hint)`, `extract_to(archive_path, dest)`. Module is `python -m`-runnable and importable for tests. |
+| `tests/inference/test_install_llama_server.py` | Asset-name selection table-driven tests; archive-extraction round-trip with synthetic tarballs/zips; macOS-only xattr branch test (skipped elsewhere). No real network. |
+
+**Files updated:**
+| File | Change |
+|---|---|
+| `justfile:install-llama-server` | Single line: `uv run python -m src.tools.install_llama_server`. Env vars (`LLAMA_SERVER_VERSION`, `LLAMA_SERVER_GPU`, `SKIP_MMPROJ_DOWNLOAD`) read directly by the Python module. |
+| `src/inference/llama_server_binary.py:_BIN_NAME` | `_BIN_NAME` becomes platform-aware (`llama-server.exe` on Windows). Discovery loop unchanged otherwise. |
+| `README.md` | Cross-platform install section: per-platform asset table, GPU-variant notes for Linux x86_64 + Windows, troubleshooting one-liners. |
+
+**Asset-selection logic** (the load-bearing decision PR 4 owns):
+| OS / arch | GPU hint | Asset name (b9049+) |
+|---|---|---|
+| Darwin / arm64 | (Metal, baked in) | `llama-bXXXX-bin-macos-arm64.tar.gz` |
+| Darwin / x86_64 | (Accelerate, baked in) | `llama-bXXXX-bin-macos-x64.tar.gz` |
+| Linux / x86_64 | `cpu` (default) | `llama-bXXXX-bin-ubuntu-x64.tar.gz` |
+| Linux / x86_64 | `vulkan` | `llama-bXXXX-bin-ubuntu-vulkan-x64.tar.gz` |
+| Linux / x86_64 | `cuda-12.4` / `cuda-13.1` | (build from source — release tarballs are CPU-only on Ubuntu) |
+| Linux / aarch64 | `cpu` | `llama-bXXXX-bin-ubuntu-arm64.tar.gz` |
+| Linux / aarch64 | `vulkan` | `llama-bXXXX-bin-ubuntu-vulkan-arm64.tar.gz` |
+| Windows / x86_64 | `cpu` (default) | `llama-bXXXX-bin-win-cpu-x64.zip` |
+| Windows / x86_64 | `cuda-12.4` | `llama-bXXXX-bin-win-cuda-12.4-x64.zip` (+ `cudart-llama-bin-win-cuda-12.4-x64.zip` if user lacks CUDA runtime) |
+| Windows / x86_64 | `cuda-13.1` | `llama-bXXXX-bin-win-cuda-13.1-x64.zip` (+ cudart) |
+| Windows / x86_64 | `vulkan` | `llama-bXXXX-bin-win-vulkan-x64.zip` |
+| Windows / arm64 | `cpu` | `llama-bXXXX-bin-win-cpu-arm64.zip` |
+
+GPU hint set via `LLAMA_SERVER_GPU=cuda-12.4` (etc.). Default per platform is `cpu` for max compatibility. CUDA runtime DLL bundle is fetched alongside on Windows-CUDA paths.
+
+**Validation gate (PR 4):**
+- ✓ macOS-arm64: re-run `just install-llama-server`, confirm same outcome as the bash recipe (binary installed + verified, mmproj cached).
+- Unit: asset-selection table for every (OS, arch, gpu) combo above.
+- Unit: archive extraction round-trip with a synthetic tar.gz + zip containing a fake `llama-server` binary.
+- Manual (Rahul follow-up): Linux x86_64 install, Windows + PowerShell install. Documented as a "first-run validation" item in README; not gated in CI because we don't have the runners.
+
+**Estimated size:** ~250 LOC installer + ~150 LOC tests.
+
+---
+
+## Post-validation deviations log (2026-05-07, after first real install)
+
+These are the diff between what PR 1's spec said and what actually shipped. Logged here so future readers don't trust the wrong details:
+
+| Original | Reality | Why |
+|---|---|---|
+| Pin `b5400` | `b9049` | b5400 (mid-2024) doesn't have the `gemma4` model arch. Model load fails before inference. |
+| Asset format `.zip` | `.tar.gz` for macOS / Linux, `.zip` for Windows only | llama.cpp switched its release artifacts to tar.gz on unix-y platforms in the b8000+ range. Python installer (PR 4) handles both. |
+| Asset name `llama-bXXXX-bin-macos-arm64.zip` | `llama-bXXXX-bin-macos-arm64.tar.gz` (no schema change, just the extension) | Same release-naming convention; the `bin-` infix is still there. |
+| Version regex matches only `bNNNN` | Also accepts `version: NNNN` (bare digits) | Modern macOS builds emit `version: 9049 (sha)` without the `b` prefix. Original regex returned `None`, making the min-version check a silent no-op. |
+| `--version` subprocess timeout 10s | 30s (binary helper) / 60s (installer verify) | macOS b9000+ initializes Metal on `--version` (cold cache: 12-15s). 10s false-failed every check. |
+| Bash recipe with `find` + `unzip` + `curl` | Python module (`src/tools/install_llama_server.py`) | See PR 4 above. Cross-platform requirement; bash assumed POSIX userland. |
+| `thinking=False` was assumed to mean "no thinking" | Plus `chat_template_kwargs.enable_thinking=false` on every request | b9049 + Gemma 4 E4B with `--jinja` auto-enables thinking via the GGUF's chat template. Our `<\|think\|>`-token injection only suppressed the OLD-style thinking; the new template-driven thinking eats the entire token budget and leaves `content` mostly empty (`reasoning_content` gets it instead). The vision integration test caught this: with max_tokens=512, all 512 went to reasoning and content was a 13-token cliff. Fix: thread `thinking` into the request body as `chat_template_kwargs.enable_thinking`, plus a belt-and-suspenders `_extract_content` fallback that surfaces `reasoning_content` if `content` is empty. Spec risk #1 (`<\|think\|>` token survives `--jinja`) was the right *area* but the wrong *direction* — newer builds DO pass it through, but they ALSO add a separate template flag we now have to manage. |
 
 ---
 

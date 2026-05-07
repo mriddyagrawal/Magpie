@@ -401,25 +401,42 @@ class LlamaServerPool:
             pass
 
     def _drain_stderr(self, name: str, inst: _LoadedInstance) -> None:
-        """Background reader for the subprocess's stderr. Mirrors lines
-        to the sidecar's stderr (so debugging is one log) AND keeps the
-        last 50 lines in the instance's tail buffer for crash reports."""
+        """Background reader for the subprocess's stderr. Always keeps
+        the last 50 lines in the instance's tail buffer for crash
+        reports. Only mirrors lines to the sidecar's stderr when
+        `LLAMA_SERVER_VERBOSE=1` — otherwise the per-token slot/sched
+        chatter (~30 lines per inference) drowns out the walker's
+        progress bar.
+
+        Even in quiet mode we still surface the highest-signal lines
+        (errors, warnings, "model loaded") so you can tell something is
+        happening; the rest goes only to the tail buffer where the
+        spawn-failure / crash paths can dump it on demand.
+        """
         if inst.process.stderr is None:
             return
+        verbose = os.environ.get("LLAMA_SERVER_VERBOSE") == "1"
         for line in iter(inst.process.stderr.readline, ""):
             line = line.rstrip("\n")
             inst.stderr_tail.append(line)
-            print(f"[llama-server:{name}] {line}", file=sys.stderr)
+            if verbose or _is_high_signal(line):
+                print(f"[llama-server:{name}] {line}", file=sys.stderr)
 
     def _drain_stdout(self, name: str, inst: _LoadedInstance) -> None:
         """Same as _drain_stderr but for stdout. llama-server is mostly
         chatty on stderr, but a few lines (e.g. JSON-RPC trace if enabled)
-        come from stdout. Don't let it fill the pipe."""
+        come from stdout. Don't let it fill the pipe.
+
+        Same verbose gating as stderr — silent unless `LLAMA_SERVER_VERBOSE=1`
+        or the line matches a high-signal pattern.
+        """
         if inst.process.stdout is None:
             return
+        verbose = os.environ.get("LLAMA_SERVER_VERBOSE") == "1"
         for line in iter(inst.process.stdout.readline, ""):
             line = line.rstrip("\n")
-            print(f"[llama-server:{name}] {line}", file=sys.stderr)
+            if verbose or _is_high_signal(line):
+                print(f"[llama-server:{name}] {line}", file=sys.stderr)
 
     # --- shutdown / cleanup -------------------------------------------------
 
@@ -480,6 +497,31 @@ class LlamaServerPool:
 # ---------------------------------------------------------------------------
 # Helpers (module-level so unit tests can mock them cleanly)
 # ---------------------------------------------------------------------------
+
+
+# High-signal markers worth surfacing even in quiet mode. The default is
+# silence: per-inference llama-server emits ~30 lines per request (slot
+# selection, sched_reserve, image decode, eval timing, etc.) and that
+# floods walker tqdm output. Errors + lifecycle events (model loaded,
+# warnings) we always show.
+_HIGH_SIGNAL_SUBSTRINGS = (
+    "error",
+    "ERROR",
+    "warning:",
+    "warn:",
+    " WARN ",
+    "failed",
+    "panic",
+    "abort",
+    "model loaded",
+    "server is listening",
+)
+
+
+def _is_high_signal(line: str) -> bool:
+    """Cheap substring match — keeps the helper fast on the hot path
+    (every stderr line from every subprocess passes through it)."""
+    return any(s in line for s in _HIGH_SIGNAL_SUBSTRINGS)
 
 
 def _port_is_free(port: int, host: str = "127.0.0.1") -> bool:

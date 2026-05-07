@@ -406,3 +406,175 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 **When to revisit:** When the Tauri GUI ships (PR3 + GUI work) and we know exactly what shape the rule editor needs. At that point auto-promotion is either an obvious next step (because the GUI demands it) or genuinely unneeded (because the GUI renders parent-relative paths just fine).
 
 ---
+
+## 16. LLM / inference settings UI + cross-provider thinking-mode unification
+
+**What:** Two related pieces of work that both belong upstream of the local-LLM migration shipped in `Plans/Local LLM Plan.md`:
+
+(a) **Settings UI for inference config.** Today the local-backend knobs (`LLM_PROVIDER`, `LOCAL_MODEL`, `LOCAL_QUANT`, `LOCAL_N_CTX`, `LOCAL_N_GPU_LAYERS`, `LOCAL_TEMPERATURE`) live in `.env`. That works for developers but isn't survivable for end-users who can't be asked to edit dotenv files. Promote these to a structured `<APP_DATA_DIR>/llm_config.json` (Pydantic-modeled like `indexing_rules.json`), surface them in the future Tauri settings panel, and let the daemon hot-reload on file change the same way `IndexingRules.maybe_reload` does.
+
+(b) **Unify `thinking` across providers.** The `LocalAgent` honors `thinking=True` (Gemma 4 `<|think|>` token). The cloud agents (`_CloudAgent`, `MagpieCloudAgent`) accept the kwarg for protocol compatibility but currently no-op with a one-time warning. Each cloud provider has its own reasoning surface — OpenAI's `reasoning_effort`, Anthropic's `extra_body.thinking`, Google's `thinking_config`, OpenRouter's pass-through varies by model — and PydanticAI doesn't unify them. Wiring a real implementation means per-provider routing inside `_CloudAgent.run()` and `magpie-cloud`'s `/llm/*` endpoints accepting and forwarding a `thinking` field.
+
+**Why we want both:**
+
+- **Settings UI:** Closes the dotenv-vs-GUI gap that the indexing-rules PR already opened (Plan #10's Addendum lists the `magpie_defaults.json` packaging concern in the same spirit). Once Magpie ships to non-developers, "switch to a smaller quant because my Mac is out of RAM" must be a button, not an editor session.
+
+- **Unified thinking:** A `thinking=True` checkbox in the GUI should produce the same behavioral change regardless of which backend is selected, otherwise users either get a silent no-op (today's cloud behavior) or get confused by toggle-with-no-effect. The right time to design that surface is alongside the settings UI.
+
+**Why we did NOT do it now:**
+
+- The local-LLM PR's primary goal was cross-platform local inference. Settings UI is a separable, larger piece that needs the Tauri settings panel work first (Plans #14 / #15 also block on it).
+- Each cloud provider's reasoning API is a research-and-test exercise — model identifiers + parameter shapes vary, and the "what does each one *actually do* with this flag" answer varies more. Doing it half-correctly is worse than the current explicit no-op + warning.
+- No user has yet asked for cloud thinking-mode. The local Gemma 4 path is the immediate use case.
+
+**When to revisit:**
+
+- Settings UI: as part of the Tauri settings-panel work that also picks up `indexing_rules.json` (per Plan #14 / #15). That's the next major UI milestone after the indexing-rules MVP.
+- Cross-provider thinking: when the GUI exposes the toggle, OR when the answer step shows a meaningful accuracy lift from local thinking-mode and we want the same lift on cloud paths to keep parity. Whichever comes first.
+
+**Notes for the future implementer:**
+
+- `src.llm._warn_cloud_thinking_unsupported` is the single throttle — replace its body when wiring real reasoning support, no need to hunt for callers.
+- The `thinking` kwarg is already plumbed through `ChatAgent`, `_CloudAgent`, `_CloudAgentBase`, `LocalAgent`, and the `/generate` endpoint. The data path exists; only the per-provider terminal logic is missing.
+- For provider-specific implementations: OpenRouter's structured output API supports a `reasoning` field on supported models (currently a small set). Anthropic's `extra_body={"thinking": {"type": "enabled", "budget_tokens": 1024}}` is the cleanest. OpenAI's `reasoning_effort` is on `o1`/`o3`/`gpt-5` only. Each one needs a model-id allowlist.
+
+---
+
+## 17. CSV redesign — proper summaries (Part A) + row-window retrieval (Part B)
+
+This is one feature with **two coupled halves**. Either half alone leaves the
+system in an awkward intermediate state. Implement them together; do not ship
+Part B without Part A landing in the same release.
+
+**The problem today:**
+
+The T1 CSV path conflates "summary" with "embed body." [src/ingest/tier1.py:40](../src/ingest/tier1.py#L40)
+writes the entire CSV — capped at 20 MB — into the summary markdown. At
+retrieval time, `_summary_supplement` then prepends that whole-file dump to
+every answer prompt; `build_content_blocks` separately reads `text[:max_chars]`
+of the same file. So the LLM sees the **start** of the CSV (twice, in two
+framings) regardless of which row was retrieved. Bad in two directions:
+the summary isn't a real summary, and the prompt content has nothing to do
+with the matched row.
+
+### Part A — Indexing side: one real summary per CSV
+
+At ingest, replace the "stuff the whole CSV into a markdown" path with:
+
+1. **Sample the CSV.** Header row + first ~20 rows / first ~1000 chars. For
+   non-uniform CSVs (sales logs, telemetry dumps where the head can be
+   metadata), a future enhancement might add lightweight column-stats
+   sampling before the LLM call — but uniform-rows-from-the-top is the
+   robust default for the catalog/directory shape Magpie currently sees.
+2. **LLM call** producing a `FileSummary(title, summary, keywords,
+   key_entities, identifiers)` — same Pydantic shape T3 produces for
+   PDFs / DOCX. Write it as the summary markdown alongside other tiers'
+   outputs.
+3. **Row-level Qdrant points unchanged.** `csv_ingest.py` continues to
+   embed every row as a separate point. The summary is a *separate
+   artifact*, not the embed source for row points. Stays embedded in the
+   `summaries` collection like any other file-level summary, with a payload
+   field marking it as the CSV's parent summary.
+
+### Part B — Retrieval side: row windows + the summary, nothing else
+
+At answer time, when any row of a CSV is in the top-k:
+
+1. **Build a row-window block** for each hit: matched row + ±2 neighbors
+   (CSV_NEIGHBOR_WINDOW from `src/stage2/search.py`). For multiple hits in
+   the same CSV, merge overlapping or adjacent windows into one block
+   instead of duplicating rows. Result is ~5-15 rows per CSV, ~1-3 KB of
+   text — focused on what the user actually asked about.
+2. **Attach the file's summary** (the new Part-A summary) once per CSV.
+   Gives the model semantic context: "this row is from a 1,724-row Furman
+   course catalog covering N departments and M GERs."
+3. **Skip `build_content_blocks` and `_summary_supplement` for CSV row
+   hits.** They're the wrong primitives — they read the file's
+   beginning, not the matched rows. The row-window block + summary
+   replace both. PDFs / DOCX / etc. continue using the existing path
+   unchanged.
+
+This means the LLM prompt for a CSV-heavy query goes from ~14 KB/file
+(raw prefix dumped twice) to ~3 KB/file (the actual matched rows + a
+real summary). At top_k=8 that's ~24 KB total instead of ~112 KB —
+~5× faster prompt eval on the local backend, sharper answers across
+all backends.
+
+### Why both halves must ship together
+
+- **Part A without Part B:** the retrieval prompt still reads the file's
+  beginning. The new summary lands in `_summary_supplement` (where it now
+  fits in the 4 KB cap) but the per-file content is still wrong-row
+  prefix. Improvement is small.
+- **Part B without Part A:** the row windows are good but the
+  "summary" attached to each is still the raw-content dump that caused
+  the May 2026 token blowup. We'd just be reusing the broken summary in
+  a different framing.
+- **Both together:** consistent semantics across the pipeline — row-level
+  search hits, row-window content, real semantic summary.
+
+**Why we did NOT do it now:**
+
+- The supplement cap and the local per-file cap unblock today's queries.
+  No user-visible regression as of 2026-05-06.
+- Sampling-strategy design needs evidence: 20 rows is fine for catalog
+  CSVs but unclear for sales / log shapes. Worth running a small eval
+  before locking the default in.
+- Need product evidence that the LLM-call-per-CSV cost at ingest is
+  worth the quality lift. ReceiptQA / Furman corpora are the natural
+  eval targets.
+
+**When to revisit:**
+
+- Once we have a real-data corpus running through Magpie long enough to
+  log: how often do queries hit a CSV row? How often does the answer
+  model fail because it sees the wrong rows (or no useful summary)? An
+  eval set targeting catalog/directory questions (Furman directory +
+  course CSVs) would surface the gap concretely.
+- Failure modes today that this fixes: (a) "find me a CSV about X"
+  misses because no row contains X verbatim; (b) "what are the *other*
+  courses by this instructor" — retrieval returns one row; the answer
+  model has no view onto the other rows in the same file; (c) the
+  current band-aid `LOCAL_ANSWER_MAX_CHARS = 10_000` truncates real
+  PDF / DOCX content unnecessarily because it has to be tight enough
+  for the worst-case CSV blowup.
+
+**Implementation sketch (for the future implementer):**
+
+**Part A:**
+- New helper `src/ingest/tier_csv_summary.py` (or a new path inside
+  `tier1.py`'s CSV branch). Reads header + N sample rows, builds a
+  `FileSummary`-shaped LLM prompt via `src.llm.build_agent`, writes a
+  normal T3-style summary markdown.
+- The summary point lands in the `summaries` Qdrant collection with a
+  payload flag like `payload.kind = "csv_parent_summary"` so retrieval
+  can find it without scrolling the manifest.
+- Row points keep their existing `payload.row_index` and `payload.source_path`.
+
+**Part B:**
+- Plumb `SearchResult.row_index` (already populated) into
+  `src.pipeline.ask`'s call to `answer_question`.
+- In `src/answer.py`, add a CSV-row-hit branch: when a path has any
+  retrieved hits with `row_index` set, skip `_summary_supplement` and
+  `build_content_blocks` for that path. Substitute (a) merged row-window
+  block(s) for that CSV's hits and (b) the parent summary fetched via
+  Qdrant payload lookup.
+- Multiple hits in the same CSV: merge overlapping windows by sorting
+  row_indexes and joining when `next_start <= prev_end + 1`.
+- The cap on `ANSWER_SUPPLEMENT_MAX_CHARS = 4_000` in
+  [src/answer.py](../src/answer.py) can be removed (or relaxed back to
+  ~10 KB) once T1 CSV no longer emits raw-content "summaries."
+- The local-only `LOCAL_ANSWER_MAX_CHARS = 10_000` cap can be removed
+  once Part B kicks in for CSV hits — the prompt will be small by
+  construction. Non-CSV files keep the existing `ANSWER_MAX_CHARS_PER_FILE`.
+
+**Tests:**
+- A new fixture under `tests/ingest/` that walks a tiny CSV, asserts
+  the produced summary is a valid `FileSummary` (not raw bytes), and
+  asserts the row-level Qdrant points still appear.
+- An answer-step test: feed a synthetic 100-row CSV with 3 row hits
+  at indexes 5, 6, 47. Assert the prompt contains exactly the merged
+  windows (rows 3-8 and 45-49) plus the file summary, NOT the file's
+  beginning, NOT `text[:max_chars]`.
+
+---

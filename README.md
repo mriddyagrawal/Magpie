@@ -78,24 +78,63 @@ A few decisions shape the whole system:
 
 ## LLM backends
 
-Three interchangeable providers, selected via the `LLM_PROVIDER` environment variable. Flipping the variable is all it takes to swap — no code changes, no re-indexing. Prompts, schemas, and retrieval logic are identical across all three.
+Five interchangeable providers, selected via the `LLM_PROVIDER` environment variable. Flipping the variable is all it takes to swap — no code changes, no re-indexing. Prompts, schemas, and retrieval logic are identical across all of them.
 
-- **`moonshot`** *(default)* — Moonshot Kimi via their OpenAI-compatible API. Vision-capable, structured output via native JSON mode.
-- **`openrouter`** — OpenRouter gateway. Any model they front (Gemma, Claude, GPT, Llama, etc.) works; same OpenAI-compatible protocol.
-- **`local`** — On-device inference via `mlx-vlm` on Apple Silicon. Defaults to `mlx-community/gemma-3n-E2B-it-4bit` (~2GB, fits comfortably on an 8GB machine). No API key, no network calls for inference. Files never leave the machine.
+- **`moonshot`** — Moonshot Kimi via their OpenAI-compatible API. Vision-capable, structured output via native JSON mode.
+- **`openrouter`** *(default)* — OpenRouter gateway. Any model they front (Gemma, Claude, GPT, Llama, etc.) works; same OpenAI-compatible protocol.
+- **`ollama`** — Local Ollama daemon (Linux / Windows / Intel-Mac). OpenAI-compatible.
+- **`local`** — In-process inference via `llama-cpp-python` + GGUF weights. Cross-platform: Metal on macOS, CUDA on Linux / Windows, CPU fallback. No API key, no network calls for inference. Files never leave the machine.
+- **`magpie-cloud`** — Magpie's hosted backend. Auth via invite code; prompts live server-side.
 
 The cloud providers rely on native structured output (the model is constrained to emit valid JSON matching the schema). The local provider has no equivalent mechanism, so structured output goes through a repair pipeline — direct parse, strip markdown fences, extract a JSON object by brace match, fall back to a minimal valid structure on hard failures. The pipeline never crashes on a malformed response.
 
-### Local inference (Apple Silicon)
+### Local inference
 
-When `LLM_PROVIDER=local`:
+When `LLM_PROVIDER=local`, Magpie loads a GGUF model into the Python process via `llama-cpp-python` and serves all LLM calls (T3 summarize, query rewrite, answer synthesis, the new `POST /generate` endpoint) from the same in-memory engine.
 
-- **Requirements**: Apple Silicon Mac, macOS, ~4GB free disk (~2GB model + runtime), 8GB+ RAM.
-- **First run**: the model downloads automatically from Hugging Face on first use (~2GB for E2B, ~4GB for E4B). Subsequent runs load from the local HF cache in ~10-20 seconds.
-- **Latency**: ~2-6s per text call, 4-12s per image-bearing call. Noticeably slower than cloud, but bounded and predictable.
-- **Concurrency**: keep `--concurrency 1` for `ns --sync`. Local inference is single-GPU; parallel workers contend for the same hardware and increase memory pressure without throughput benefit. Cloud providers with generous rate limits can handle more.
-- **More memory available?** On 16GB+ Macs, switch to the larger `mlx-community/gemma-3n-E4B-it-4bit` (~4GB) for better quality: `LOCAL_MODEL=mlx-community/gemma-3n-E4B-it-4bit` in `.env`.
-- **Quality caveat**: Gemma 3n E2B/E4B are small models. Summaries may be less detailed and rewritten queries less precise than what cloud models produce. The repair layer keeps the pipeline running, but expect noisier output until prompts are tuned specifically for local inference. That tuning is deliberately out of scope for the initial port.
+#### One-time install
+
+After `just sync-environment`, run `just install-llama` to rebuild `llama-cpp-python` with hardware acceleration for your platform:
+
+| Platform | What `just install-llama` does |
+|---|---|
+| macOS (Apple Silicon) | `CMAKE_ARGS="-DGGML_METAL=on"` — Metal acceleration |
+| Linux + nvidia-smi | `CMAKE_ARGS="-DGGML_CUDA=on"` — CUDA acceleration |
+| Other (CPU only) | Plain pip install — works, just slower |
+
+Without this rebuild step, you get the prebuilt CPU wheel — works correctly but ~5-10× slower than Metal/CUDA for inference.
+
+#### Default model
+
+`unsloth/gemma-4-E4B-it-GGUF` at the `Q5_K_XL` quant (~6.7 GB) downloads automatically from Hugging Face into `<APP_DATA_DIR>/cache/hub/` on first call. Subsequent runs load from local cache in ~10-20s. Override via `.env`:
+
+```
+LOCAL_MODEL=unsloth/gemma-4-E4B-it-GGUF   # HF GGUF repo
+LOCAL_QUANT=Q5_K_XL                       # quant inside that repo
+LOCAL_N_CTX=8192                          # context window
+LOCAL_N_GPU_LAYERS=-1                     # -1 = all on GPU; 0 = pure CPU
+LOCAL_TEMPERATURE=0.7                     # sampling temperature
+```
+
+Available Gemma 4 E4B quants (all UD = Unsloth Dynamic-2.0, on the Pareto frontier):
+
+| Quant | Size | Notes |
+|---|---|---|
+| `Q4_K_XL` | ~5.1 GB | smaller / faster |
+| `Q5_K_XL` | ~6.7 GB | **default** — balanced |
+| `Q6_K_XL` | ~7.5 GB | higher quality |
+| `Q8_K_XL` | ~8.7 GB | near-original quality, ~2× slower |
+
+#### Runtime characteristics
+
+- **Latency**: ~1-3s per text call on Metal/CUDA (Apple Silicon M-series, modern NVIDIA). CPU fallback is bounded but noticeably slower.
+- **Concurrency**: in-process serial — `LlamaCppLLM` holds a `threading.Lock` around the C++ call to keep the KV cache consistent. Multiple coroutines queue cleanly; throughput is limited by the single backing engine.
+- **Vision**: not yet supported on the local backend. Image-bearing T3 calls (receipt PDFs, scans) drop the binary content with a one-time warning and produce thin text-only summaries. Cloud providers (`openrouter`, `moonshot`) keep full vision support. Adding Gemma 4 vision via the `Gemma4ChatHandler` + mmproj projector is a follow-up — see `Plans/Local LLM Plan.md`.
+- **Quality caveat**: Gemma 4 E4B is small. Summaries may be less detailed than what `gemma-4-31B-it` or Claude Sonnet produce. The JSON-repair layer keeps the pipeline running on imperfect output.
+
+#### Thinking mode
+
+Gemma 4 supports a thinking mode (model emits internal reasoning before the final answer). Toggle per-call via the `thinking=True` kwarg on `ChatAgent.run` / `ChatAgent.run_sync`, or in `POST /generate`'s request body. Default off — Magpie is latency-sensitive. Cloud providers accept the kwarg but currently no-op with a one-time warning until per-provider reasoning APIs are wired (tracked in `Plans/Future Plans.md` #16).
 
 Run `ns` the same way regardless of provider. Only `.env` changes.
 

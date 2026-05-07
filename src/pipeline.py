@@ -65,15 +65,43 @@ async def ask(
 
     `PipelineResult.search_query` always carries the query we actually sent
     to the embedders (rewritten or raw), so eval and debugging see the truth.
+
+    Per-step timings + retrieval results are printed to stderr so the
+    sidecar terminal (`just serve-dev` or under tauri-dev) shows a query
+    trace. Overhead is negligible; turn off by silencing stderr if needed.
     """
+    import time
+    t_start = time.monotonic()
+    print(f"\n[query] question: {question!r} (top_k={top_k}, rewrite={rewrite}, fast={fast})",
+          file=sys.stderr, flush=True)
+
     if rewrite:
+        t = time.monotonic()
         sq: SearchQuery = await asyncio.to_thread(rewrite_query, question)
+        print(f"[query] rewrite ({time.monotonic()-t:.2f}s): "
+              f"query={sq.query!r} keywords={sq.keywords}",
+              file=sys.stderr, flush=True)
     else:
         sq = raw_query(question)
+        print(f"[query] rewrite: skipped (using raw question)",
+              file=sys.stderr, flush=True)
+
+    t = time.monotonic()
     retrieved = await asyncio.to_thread(
         run_search, sq, top_k, question=question, skip_fast=not fast
     )
+    print(f"[query] retrieval ({time.monotonic()-t:.2f}s): {len(retrieved)} hits",
+          file=sys.stderr, flush=True)
+    for i, r in enumerate(retrieved, 1):
+        # `summary` is the snippet text; truncate to avoid wall-of-text spam.
+        snippet = (r.summary or "").replace("\n", " ")[:120]
+        print(f"  [{i}] tier={r.tier} score={r.score:.3f} {r.path}\n      └ {snippet}",
+              file=sys.stderr, flush=True)
+
     if not retrieved:
+        print(f"[query] no hits — returning empty answer "
+              f"(total {time.monotonic()-t_start:.2f}s)",
+              file=sys.stderr, flush=True)
         return PipelineResult(
             question=question,
             search_query=sq,
@@ -82,9 +110,18 @@ async def ask(
             sources_used=[],
         )
 
-    agent = build_answer_agent()
     paths = list(dict.fromkeys(r.path for r in retrieved if r.path))
+    print(f"[query] reading {len(paths)} unique file(s) for answer step",
+          file=sys.stderr, flush=True)
+
+    agent = build_answer_agent()
+    t = time.monotonic()
     ans: Answer = await answer_question(agent, question, paths, search_query=sq)
+    print(f"[query] answer ({time.monotonic()-t:.2f}s): "
+          f"{len(ans.answer)} chars, sources_used={ans.sources_used}",
+          file=sys.stderr, flush=True)
+    print(f"[query] total {time.monotonic()-t_start:.2f}s",
+          file=sys.stderr, flush=True)
 
     return PipelineResult(
         question=question,

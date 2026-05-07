@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import csv
+import os
 from dataclasses import dataclass
 
 from pydantic import BaseModel, Field
 from qdrant_client.models import FusionQuery, Prefetch, SparseVector
 
 from src.llm import ChatAgent, build_agent
+from src.manifest import REPO_ROOT
 from src.stage2.db import COLLECTION_NAME, get_qdrant_client
 from src.stage2.embeddings import embed_dense_query, embed_sparse_query
 
@@ -115,12 +118,68 @@ async def rewrite_query_async(
 class SearchResult:
     """One retrieval hit. `tier` indicates which collection contributed:
     "summary", "fast", or "both" (after RRF merge across both tiers).
+
+    `row_index` is the 0-based row number for CSV row-tier hits (set during
+    `csv_ingest.ingest_csv_rows`); `None` for non-CSV hits where the whole
+    file is a single point.
     """
 
     summary: str
     path: str
     score: float
     tier: str = "summary"
+    row_index: int | None = None
+
+
+CSV_NEIGHBOR_WINDOW = 2
+"""How many rows above and below a CSV row hit to splice into `summary`.
+
+A CSV hit alone is a single row stripped of context — neighbors often carry
+the column headers' meaning, the running total, or the next/prev event in a
+log. ±2 rows is a 5-row window: enough context for the LLM to disambiguate
+without ballooning the prompt or polluting the cross-encoder rerank score."""
+
+
+def _format_csv_row(row: dict[str, str]) -> str:
+    """Format a row the same way `csv_ingest.stream_csv_rows` does so the
+    spliced neighbors look identical to what the embedder originally saw."""
+    return " | ".join(f"{k}: {v}" for k, v in row.items() if v)
+
+
+_csv_rows_cache: dict[str, list[dict[str, str]] | None] = {}
+
+
+def _load_csv_rows(source_rel: str) -> list[dict[str, str]] | None:
+    """Read all rows of a CSV (cached). Returns None if the file is missing
+    or unreadable so callers can fall back to the bare row summary."""
+    if source_rel in _csv_rows_cache:
+        return _csv_rows_cache[source_rel]
+    path = REPO_ROOT / source_rel
+    try:
+        with path.open(encoding="utf-8", errors="ignore") as f:
+            rows = list(csv.DictReader(f))
+    except (OSError, csv.Error):
+        rows = None
+    _csv_rows_cache[source_rel] = rows
+    return rows
+
+
+def _expand_csv_hit(source_rel: str, row_idx: int, focal_summary: str) -> str:
+    """Replace a single-row hit with a ±CSV_NEIGHBOR_WINDOW snippet.
+
+    Falls back to the focal row alone if the source CSV can't be read (file
+    moved, deleted, or permissions changed since ingestion)."""
+    rows = _load_csv_rows(source_rel)
+    if rows is None:
+        return focal_summary
+    start = max(0, row_idx - CSV_NEIGHBOR_WINDOW)
+    end = min(len(rows), row_idx + CSV_NEIGHBOR_WINDOW + 1)
+    lines: list[str] = []
+    for i in range(start, end):
+        marker = " (match)" if i == row_idx else ""
+        text = _format_csv_row(rows[i]) if i != row_idx else focal_summary
+        lines.append(f"[row {i}{marker}] {text}")
+    return "\n".join(lines)
 
 
 def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
@@ -158,17 +217,31 @@ def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
         ],
         query=FusionQuery(fusion="rrf"),
         limit=limit,
-        with_payload=["summary", "source_path"],
+        with_payload=["summary", "source_path", "row_index"],
     )
-    return [
-        SearchResult(
-            summary=(p.payload or {}).get("summary", ""),
-            path=(p.payload or {}).get("source_path", ""),
-            score=p.score,
-            tier="summary",
+
+    # Per-call CSV cache: same source CSV may produce multiple hits in one
+    # query (e.g. several adjacent rows match) — load each file at most once.
+    _csv_rows_cache.clear()
+
+    out: list[SearchResult] = []
+    for p in results.points:
+        payload = p.payload or {}
+        summary = payload.get("summary", "")
+        source_path = payload.get("source_path", "")
+        row_index = payload.get("row_index")
+        if row_index is not None and source_path:
+            summary = _expand_csv_hit(source_path, int(row_index), summary)
+        out.append(
+            SearchResult(
+                summary=summary,
+                path=source_path,
+                score=p.score,
+                tier="summary",
+                row_index=row_index if row_index is None else int(row_index),
+            )
         )
-        for p in results.points
-    ]
+    return out
 
 
 def _search_fast_tier(query_text: str, limit: int) -> list[SearchResult]:
@@ -309,11 +382,35 @@ def run_search(
         # REPL) are both respected — the classifier just helps the default
         # case where caller didn't customize.
         if klass is QueryClass.LIST_ALL and cfg.top_k > top_k:
-            print(
-                f"  query_class={klass.value}  top_k {top_k}→{cfg.top_k}  "
-                f"({cfg.notes})"
-            )
-            top_k = cfg.top_k
+            widened = cfg.top_k
+            # Local backend has a much smaller context window than cloud
+            # (Gemma 4 E4B: 32-131K vs Claude/GPT: 200K+). The adaptive
+            # widening's default of 30 paths × ~29 KB/file = ~870 KB easily
+            # blows past any local model's context. Cap at 8 for local —
+            # still gives a meaningful breadth bump over the default 5
+            # without overflowing the answer-step prompt. See
+            # Plans/Local LLM Plan.md / Plans/Future Plans.md #17.
+            from src.llm import active_provider
+            if active_provider().name == "local":
+                local_cap = int(os.environ.get("LOCAL_MAX_TOP_K", "8"))
+                if widened > local_cap:
+                    print(
+                        f"  query_class={klass.value}  top_k {top_k}→{local_cap}  "
+                        f"(local backend cap; cfg wanted {widened})"
+                    )
+                    top_k = local_cap
+                else:
+                    print(
+                        f"  query_class={klass.value}  top_k {top_k}→{widened}  "
+                        f"({cfg.notes})"
+                    )
+                    top_k = widened
+            else:
+                print(
+                    f"  query_class={klass.value}  top_k {top_k}→{widened}  "
+                    f"({cfg.notes})"
+                )
+                top_k = widened
 
         # Cross-encoder rerank regresses LIST_ALL queries — proper-noun /
         # receipt / enumeration lookups. The cross-encoder over-weights

@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Sequence
@@ -35,6 +36,31 @@ if TYPE_CHECKING:
 REPO_ROOT = APP_DATA_DIR
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
+# Local-backend per-file content cap. Smaller than the cloud default
+# because llama-cpp-python's prompt-eval throughput on consumer hardware
+# (~200-300 tok/s on M-series Metal) makes long prompts the dominant
+# latency. With LOCAL_MAX_TOP_K=8 and 10K chars/file, total prompt is
+# ~80 KB ≈ 20K tokens — sub-30s prompt eval instead of 1-2 minutes.
+# Override via env: `LOCAL_ANSWER_MAX_CHARS=8000`.
+LOCAL_ANSWER_MAX_CHARS_DEFAULT = 10_000
+
+
+def _answer_max_chars_per_file() -> int:
+    """Return the per-file content cap, swapping in the local-backend
+    value when `LLM_PROVIDER=local`. Cloud paths keep the larger cap so
+    high-context models (Claude Sonnet, GPT-5, etc.) get full file content."""
+    from src.llm import active_provider
+    if active_provider().name == "local":
+        return int(os.environ.get(
+            "LOCAL_ANSWER_MAX_CHARS", LOCAL_ANSWER_MAX_CHARS_DEFAULT
+        ))
+    return ANSWER_MAX_CHARS_PER_FILE
+# `_summary_supplement` was designed for T3 LLM summaries (~200-500 words,
+# typically <2 KB). T1's raw-content "summaries" can be huge — the CSV tier
+# stuffs up to 20 MB of CSV content into the summary markdown. Without a cap,
+# the supplement can blow past every model's context window. 4 KB keeps real
+# T3 summaries intact while truncating accidental T1/T2 dumps.
+ANSWER_SUPPLEMENT_MAX_CHARS = 4_000
 
 
 class Answer(BaseModel):
@@ -246,11 +272,15 @@ async def answer_question(
         body = body.strip()
         if not body:
             return None
+        # Defensive cap — see ANSWER_SUPPLEMENT_MAX_CHARS for why.
+        truncated = len(body) > ANSWER_SUPPLEMENT_MAX_CHARS
+        body = body[:ANSWER_SUPPLEMENT_MAX_CHARS]
+        suffix = "\n…(supplement truncated)" if truncated else ""
         return (
             "Content type: llm-summary (distilled overview of the file — use "
             "alongside the raw content below, especially when the raw "
             "extraction is thin or the file is large)\n\n---\n"
-            f"{body}"
+            f"{body}{suffix}"
         )
 
     # If the caller did a Kimi rewrite, its `keywords` list is already the
@@ -292,7 +322,7 @@ async def answer_question(
                 blocks = await asyncio.to_thread(
                     build_content_blocks,
                     abs_path,
-                    max_chars=ANSWER_MAX_CHARS_PER_FILE,
+                    max_chars=_answer_max_chars_per_file(),
                     max_pdf_pages=ANSWER_MAX_PDF_PAGES,
                     search_keywords=keywords,
                 )

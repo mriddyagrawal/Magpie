@@ -18,34 +18,75 @@ sync-environment:
     uv sync
     uv pip install -e cli
 
-# Reinstall llama-cpp-python with the right hardware-acceleration flag for
-# the current platform. Run this AFTER `just sync-environment` if you want
-# Metal/CUDA acceleration — otherwise pip installs a CPU-only build that
-# works but is much slower for local LLM inference.
+# Download the llama-server binary for this platform from llama.cpp's
+# GitHub releases. Run this AFTER `just sync-environment`. Replaces
+# the previous `install-llama` (llama-cpp-python rebuild) — that
+# whole approach went away when we moved to subprocess-based inference
+# (Specs/llama_server_migration.md, 2026-05).
 #
-#   macOS Apple Silicon → Metal
-#   Linux + nvidia-smi  → CUDA
-#   anything else       → CPU (no-op, the wheel is fine)
+#   macOS Apple Silicon  → Metal-enabled binary
+#   macOS Intel          → CPU/Accelerate binary
+#   Linux x86_64         → CPU binary (CUDA build = manual override)
+#   Windows x86_64       → manual; documented in README
 #
-# See Plans/Local LLM Plan.md.
-install-llama:
+# Stages the binary at `<APP_DATA_DIR>/bin/llama-server` (where
+# `llama_server_binary.py` discovers it). Strips the macOS quarantine
+# attribute automatically so users don't see the "cannot verify
+# developer" Gatekeeper dialog on first launch. Verifies version >=
+# LLAMA_SERVER_MIN_VERSION (default b5400).
+#
+# Override the version pin: LLAMA_SERVER_VERSION=b5500 just install-llama-server
+install-llama-server:
     #!/usr/bin/env bash
     set -euo pipefail
+    VERSION="${LLAMA_SERVER_VERSION:-b5400}"
     OS="$(uname -s)"
     ARCH="$(uname -m)"
-    if [ "$OS" = "Darwin" ] && [ "$ARCH" = "arm64" ]; then
-        echo "==> macOS Apple Silicon: building llama-cpp-python with Metal"
-        CMAKE_ARGS="-DGGML_METAL=on" \
-            uv pip install --force-reinstall --no-cache-dir llama-cpp-python
-    elif [ "$OS" = "Linux" ] && command -v nvidia-smi >/dev/null 2>&1; then
-        echo "==> Linux + CUDA detected: building llama-cpp-python with CUDA"
-        CMAKE_ARGS="-DGGML_CUDA=on" \
-            uv pip install --force-reinstall --no-cache-dir llama-cpp-python
-    else
-        echo "==> CPU build (no GPU acceleration detected)"
-        uv pip install --force-reinstall --no-cache-dir llama-cpp-python
+    case "$OS-$ARCH" in
+        Darwin-arm64)   ASSET="llama-${VERSION}-bin-macos-arm64.zip" ;;
+        Darwin-x86_64)  ASSET="llama-${VERSION}-bin-macos-x64.zip" ;;
+        Linux-x86_64)   ASSET="llama-${VERSION}-bin-ubuntu-x64.zip" ;;
+        *)
+            echo "==> Unsupported OS/ARCH ($OS-$ARCH). For Windows or other"
+            echo "    platforms, download manually from"
+            echo "    https://github.com/ggml-org/llama.cpp/releases/tag/${VERSION}"
+            echo "    and set LLAMA_SERVER_PATH=/path/to/llama-server in .env."
+            exit 1
+            ;;
+    esac
+    DEST="$(uv run python -c 'from src.manifest import APP_DATA_DIR; print(APP_DATA_DIR / "bin")')"
+    mkdir -p "$DEST"
+    URL="https://github.com/ggml-org/llama.cpp/releases/download/${VERSION}/${ASSET}"
+    echo "==> Downloading $ASSET (~30 MB) from $URL"
+    TMPDIR="$(mktemp -d)"
+    trap 'rm -rf "$TMPDIR"' EXIT
+    curl -fL --progress-bar -o "$TMPDIR/llama.zip" "$URL"
+    echo "==> Extracting to $DEST"
+    unzip -q "$TMPDIR/llama.zip" -d "$TMPDIR/llama"
+    # Find the llama-server binary inside the extracted tree (release
+    # archives nest under `build/bin/` or similar; flatten here).
+    BIN_PATH="$(find "$TMPDIR/llama" -name 'llama-server' -type f | head -1)"
+    if [ -z "$BIN_PATH" ]; then
+        echo "==> ERROR: no llama-server binary found in archive. Check the release."
+        exit 1
     fi
-    echo "==> done. Verify with: uv run python -c 'from llama_cpp import Llama; print(Llama.__module__)'"
+    cp "$BIN_PATH" "$DEST/llama-server"
+    # Copy any sibling shared libraries the binary needs (libllama.dylib,
+    # libggml-metal.dylib, etc.). Without these the binary fails to launch
+    # on macOS with a dyld library-not-loaded error.
+    BIN_DIR="$(dirname "$BIN_PATH")"
+    find "$BIN_DIR" -maxdepth 1 \( -name '*.dylib' -o -name '*.so' -o -name '*.dll' \) -exec cp {} "$DEST/" \;
+    chmod +x "$DEST/llama-server"
+    if [ "$OS" = "Darwin" ]; then
+        # Strip macOS quarantine — Gatekeeper would otherwise block the
+        # downloaded binary on first execution. Notarized .app builds
+        # (Plan #10) won't need this.
+        xattr -d com.apple.quarantine "$DEST/llama-server" 2>/dev/null || true
+        find "$DEST" \( -name '*.dylib' \) -exec xattr -d com.apple.quarantine {} \; 2>/dev/null || true
+    fi
+    echo "==> Verifying version"
+    "$DEST/llama-server" --version 2>&1 | head -3
+    echo "==> done. Installed to: $DEST/llama-server"
 
 # Walk every enabled include_paths entry in indexing_rules.json. This is
 # the "do everything" command — replaces running `just walk <path>` once

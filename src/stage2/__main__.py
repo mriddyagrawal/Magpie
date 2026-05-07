@@ -70,7 +70,11 @@ def _expected_point_ids(manifest) -> set[str]:
 
 
 def ingest_from_manifest(
-    *, force: bool = False, skip_orphan_cleanup: bool = False, verbose: bool = False,
+    *,
+    force: bool = False,
+    skip_orphan_cleanup: bool = False,
+    verbose: bool = False,
+    manifest=None,
 ) -> dict:
     """Run the manifest-driven incremental ingest. Prints progress.
 
@@ -81,6 +85,14 @@ def ingest_from_manifest(
     (every N files mid-walk). Orphan cleanup scrolls the entire collection,
     which is wasteful to do per-chunk; the walker's end-of-run flush re-calls
     this function with the default (cleanup on) to do the sweep once.
+
+    `manifest` lets the walker thread its own in-memory `Manifest` instance
+    through so the `ingested_at` marks made here stay in the walker's view.
+    Without it, this function constructs its own `Manifest()` and the
+    walker's next save (with its stale view) silently overwrites the marks
+    — which causes every mid-walk flush to be re-pushed at end-of-walk.
+    External callers (CLI, pipeline.reset) leave it unset; the function
+    constructs its own Manifest as before.
     """
     from src.manifest import REPO_ROOT, Manifest
     from src.stage2.db import (
@@ -92,7 +104,8 @@ def ingest_from_manifest(
     )
     from src.stage2.parser import parse_summary_file
 
-    manifest = Manifest()
+    if manifest is None:
+        manifest = Manifest()
     if not manifest.entries:
         raise RuntimeError(
             "manifest is empty — run `python -m src.ingest <path>` first."

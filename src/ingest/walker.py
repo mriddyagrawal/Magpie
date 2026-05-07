@@ -730,7 +730,11 @@ async def run_batch(
             return
         try:
             from src.stage2.__main__ import ingest_from_manifest
-            ingest_from_manifest(skip_orphan_cleanup=True)
+            # Pass the walker's manifest so `ingested_at` marks made by the
+            # ingest land in the walker's in-memory view too. Without this,
+            # the walker's next manifest.save() overwrites the marks with its
+            # stale view, and the end-of-walk push re-uploads everything.
+            ingest_from_manifest(skip_orphan_cleanup=True, manifest=manifest)
         except RuntimeError:
             # "manifest is empty" or similar — nothing to push yet, fine.
             pass

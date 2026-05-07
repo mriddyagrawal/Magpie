@@ -105,6 +105,12 @@ class Entry:
     row_count: int | None = None
     fast_indexed_at: str | None = None  # set when the file lands in fast_tier
     fast_pages: int | None = None        # page count indexed into fast_tier
+    # Optional file mtime (seconds since epoch). Captured at ingest time when
+    # MAGPIE_DEV_USE_MTIME=1 is set; used by `needs_summarization` as a
+    # secondary check (size-only is the production default — see
+    # `Plans/Ingestion Rules/Implementation Plan.md` §6 / Future Plan #14).
+    # Always optional + nullable so old manifests load cleanly.
+    mtime: float | None = None
     # Router audit trail (src/router.py + Plans/Indexing Tiers.md). Defaults
     # are backward-compatible: pre-router manifest rows load cleanly.
     routes: list[str] = field(default_factory=list)
@@ -115,6 +121,10 @@ class Entry:
     criticality: str = "normal"            # "critical" | "normal" | "casual"
     criticality_source: str = "default"    # "user" | "auto" | "default"
     skip_reason: str | None = None
+    # Phase A T3 dedup: 16-char sha256 prefix of the source bytes. Set by the
+    # walker after a T3 summarize lands; lets future walks identify byte-
+    # identical files across paths and reuse the same summary markdown.
+    content_hash: str | None = None
 
 
 class Manifest:
@@ -166,12 +176,35 @@ class Manifest:
     def paths(self) -> list[str]:
         return list(self.entries.keys())
 
-    def needs_summarization(self, rel_path: str, current_size: int) -> bool:
-        """True if rel_path is new to us, or its byte size has changed."""
+    def needs_summarization(
+        self,
+        rel_path: str,
+        current_size: int,
+        current_mtime: float | None = None,
+    ) -> bool:
+        """True if rel_path is new to us, or its byte size has changed.
+
+        With MAGPIE_DEV_USE_MTIME=1 set in the environment AND a non-None
+        `current_mtime` provided, ALSO returns True when the on-disk mtime
+        is newer than the recorded `entry.mtime`. This catches "user
+        re-saved with no byte changes" — useful for dev/debug workflows
+        where you want to force re-summarization on touch. Production
+        default (env unset) ignores mtime entirely. See Future Plan #14
+        for graduating this to a user-facing setting.
+        """
         entry = self.entries.get(rel_path)
         if entry is None:
             return True
-        return entry.size != current_size
+        if entry.size != current_size:
+            return True
+        if (
+            current_mtime is not None
+            and entry.mtime is not None
+            and os.environ.get("MAGPIE_DEV_USE_MTIME") == "1"
+            and current_mtime > entry.mtime
+        ):
+            return True
+        return False
 
     def needs_ingestion(self, rel_path: str) -> bool:
         """True if the row has been summarized but not yet ingested (or re-summarized)."""
@@ -183,13 +216,23 @@ class Manifest:
     # ---- mutations ------------------------------------------------------
 
     def mark_summarized(self, rel_path: str, size: int, summary_file: str | None) -> None:
-        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests."""
-        self.entries[rel_path] = Entry(
-            size=size,
-            summary_file=summary_file,
-            summarized_at=_now_iso(),
-            ingested_at=None,
-        )
+        """Record a successful summarization. Clears ingested_at so stage 2 re-ingests.
+
+        Updates the entry in place — fast-tier state (fast_indexed_at,
+        fast_pages), router audit (routes, scores, criticality), and
+        content_hash all survive a re-summarization. Pre-2026-04-25 this
+        replaced the whole Entry, silently zeroing fast_indexed_at when a
+        T4-indexed file later went through summarization. Vectors stayed in
+        Qdrant; the manifest forgot — and the next ingest re-encoded the
+        file unnecessarily."""
+        entry = self.entries.get(rel_path)
+        if entry is None:
+            entry = Entry(size=size)
+            self.entries[rel_path] = entry
+        entry.size = size
+        entry.summary_file = summary_file
+        entry.summarized_at = _now_iso()
+        entry.ingested_at = None
 
     def mark_ingested(self, rel_path: str) -> None:
         entry = self.entries.get(rel_path)
@@ -254,3 +297,137 @@ class Manifest:
             entry.size = size
             entry.fast_indexed_at = _now_iso()
             entry.fast_pages = pages
+
+    def mark_content_hash(self, rel_path: str, content_hash: str) -> None:
+        """Stamp the source bytes' 16-char sha256 prefix onto the manifest row.
+
+        Called by the walker after a T3 summarize lands so future walks can
+        identify byte-identical files across paths and reuse the same
+        summary markdown without re-firing the LLM. Creates the row if
+        absent (size=0 stub) so an out-of-order call from a tier worker
+        doesn't lose the hash; the next mark_routed / mark_summarized fills
+        in the real fields."""
+        entry = self.entries.get(rel_path)
+        if entry is None:
+            entry = Entry(size=0)
+            self.entries[rel_path] = entry
+        entry.content_hash = content_hash
+
+    # ---- maintenance / recovery ----------------------------------------
+
+    def _source_exists(self, rel_path: str) -> bool:
+        """True if this manifest key resolves to a file on disk.
+
+        Absolute keys are checked directly; relative keys are resolved
+        against REPO_ROOT (the app data dir). Matches the path semantics
+        the walker uses when building manifest keys."""
+        p = Path(rel_path)
+        if not p.is_absolute():
+            p = REPO_ROOT / p
+        return p.is_file()
+
+    def _summary_exists(self, summary_file: str) -> bool:
+        """True if the summary markdown exists at REPO_ROOT/<summary_file>."""
+        return (REPO_ROOT / summary_file).is_file()
+
+    def _delete_summary_file(self, summary_file: str) -> bool:
+        """Best-effort delete of REPO_ROOT/<summary_file>. Returns True on success."""
+        p = REPO_ROOT / summary_file
+        try:
+            if p.is_file():
+                p.unlink()
+                return True
+        except OSError:
+            pass
+        return False
+
+    def clean_stale(self) -> dict[str, int]:
+        """Drop manifest rows whose source files no longer exist on disk.
+
+        For each dropped row, also delete its `summary_file` markdown if
+        present (those are this entry's orphaned tier output — useless
+        without the source they describe).
+
+        Returns `{"dropped": N, "summaries_removed": M}`.
+
+        Use after deleting source files outside a walk (e.g. stale
+        `/tmp/pytest-of-*` entries from earlier test runs leaking into the
+        manifest)."""
+        dropped = 0
+        summaries_removed = 0
+        for rel in list(self.entries.keys()):
+            if self._source_exists(rel):
+                continue
+            entry = self.entries.pop(rel)
+            dropped += 1
+            if entry.summary_file and self._delete_summary_file(entry.summary_file):
+                summaries_removed += 1
+        return {"dropped": dropped, "summaries_removed": summaries_removed}
+
+    def clean_missing_summaries(self) -> dict[str, int]:
+        """Reconcile rows whose summary markdown went missing from disk.
+
+        Two cases per row that has `summary_file` set:
+          - source still exists → clear the summary pointer (summary_file,
+            summarized_at, ingested_at) so the next walk re-summarizes.
+            Other fields (size, routes, fast_indexed_at, etc.) are kept.
+          - source ALSO gone → drop the row entirely.
+
+        Rows without `summary_file` (e.g. T4-only or skipped rows) are
+        left alone.
+
+        Returns `{"resummarize": N, "dropped": M}`."""
+        resummarize = 0
+        dropped = 0
+        for rel in list(self.entries.keys()):
+            entry = self.entries[rel]
+            if not entry.summary_file:
+                continue
+            if self._summary_exists(entry.summary_file):
+                continue
+            # Summary markdown is gone.
+            if self._source_exists(rel):
+                # Mark the row for re-summarization; preserve everything else.
+                entry.summary_file = None
+                entry.summarized_at = ""
+                entry.ingested_at = None
+                resummarize += 1
+            else:
+                # Source also vanished — useless row.
+                self.entries.pop(rel)
+                dropped += 1
+        return {"resummarize": resummarize, "dropped": dropped}
+
+    def reconcile_from_fast_tier(self) -> dict[str, int]:
+        """Re-stamp `fast_indexed_at` + `fast_pages` from the live Qdrant
+        fast_tier collection.
+
+        Recovers from the pre-2026-04-25 mark_summarized regression where
+        re-summarizing a previously T4-indexed file silently wiped its
+        fast-tier audit fields. Vectors survived in Qdrant; only the
+        manifest forgot. This walks the live collection and re-stamps each
+        matching manifest row.
+
+        Returns `{"recovered": N, "missing_in_manifest": M}`. The `missing`
+        counter is informational — Qdrant points whose source path isn't
+        in the manifest are usually leftover orphans (asset-library skips,
+        stale --rebuild) that the regular orphan cleanup will hard-delete
+        on the next ingest run."""
+        # Deferred import: this path only fires from the justfile recovery
+        # command, and importing fast_db pulls in qdrant_client. Keep the
+        # manifest module import-cheap for the hot path.
+        from src.stage2.fast_db import get_indexed_path_counts
+
+        counts = get_indexed_path_counts()
+        now = _now_iso()
+        recovered = 0
+        missing = 0
+        for path, pages in counts.items():
+            entry = self.entries.get(path)
+            if entry is None:
+                missing += 1
+                continue
+            entry.fast_indexed_at = now
+            entry.fast_pages = pages
+            recovered += 1
+        return {"recovered": recovered, "missing_in_manifest": missing}

@@ -35,6 +35,12 @@ if TYPE_CHECKING:
 REPO_ROOT = APP_DATA_DIR
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
+# `_summary_supplement` was designed for T3 LLM summaries (~200-500 words,
+# typically <2 KB). Plan #17 Part A made T1 CSV summaries also LLM-generated
+# (no more raw-content dumps), so the cap can be much higher than the
+# emergency 4 KB band-aid we used to need. 10 KB comfortably fits any real
+# FileSummary while still truncating accidental misuse.
+ANSWER_SUPPLEMENT_MAX_CHARS = 10_000
 
 
 class Answer(BaseModel):
@@ -124,6 +130,22 @@ SYSTEM_PROMPT = (
     "the prose using the form 'page N' (book page; the PDF page is in "
     "sources_used). Otherwise keep the prose clean. "
     "\n\n"
+    "\n\n"
+    "OUTPUT FORMAT — required schema. Respond with a single JSON object that "
+    "has EXACTLY these two keys, named EXACTLY as shown:\n"
+    "  {\"answer\": <string with your full natural-language answer>, "
+    "\"sources_used\": [<file path string>, <file path string>, ...]}\n"
+    "Both keys are required. Do NOT rename `answer` to something descriptive "
+    "like `result` / `summary` / `courses_mentioned` / `findings` — small models "
+    "tend to do this and it breaks downstream parsing. The key is literally "
+    "the four letters `answer` regardless of what the question is about. "
+    "If the answer is naturally a list (e.g. 'list every X'), join the items "
+    "into a single string inside the `answer` value (use bullets `- ` or "
+    "newlines), do NOT make `answer` a JSON array.\n"
+    "Example for a list-shaped question:\n"
+    "  {\"answer\": \"- Item one\\n- Item two\\n- Item three\", "
+    "\"sources_used\": [\"path/to/file.md\"]}\n"
+    "\n"
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
 )
@@ -168,6 +190,7 @@ async def answer_question(
     file_paths: Sequence[str | Path],
     history: list[tuple[str, str]] | None = None,
     search_query: "SearchQuery | None" = None,
+    csv_row_hits: dict[str, list[int]] | None = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -246,11 +269,15 @@ async def answer_question(
         body = body.strip()
         if not body:
             return None
+        # Defensive cap — see ANSWER_SUPPLEMENT_MAX_CHARS for why.
+        truncated = len(body) > ANSWER_SUPPLEMENT_MAX_CHARS
+        body = body[:ANSWER_SUPPLEMENT_MAX_CHARS]
+        suffix = "\n…(supplement truncated)" if truncated else ""
         return (
             "Content type: llm-summary (distilled overview of the file — use "
             "alongside the raw content below, especially when the raw "
             "extraction is thin or the file is large)\n\n---\n"
-            f"{body}"
+            f"{body}{suffix}"
         )
 
     # If the caller did a Kimi rewrite, its `keywords` list is already the
@@ -263,11 +290,75 @@ async def answer_question(
     else:
         rg_query = question
 
+    def _csv_row_indexes_for(display: str, abs_path: Path) -> list[int] | None:
+        """Look up the row indexes for this path in `csv_row_hits`.
+
+        Search by display path (the value `pipeline.ask` passes) first, then
+        absolute path as a fallback. Returns None if no row hits — the path
+        will fall through to the standard file-content path."""
+        if csv_row_hits is None:
+            return None
+        if display in csv_row_hits:
+            return csv_row_hits[display]
+        abs_str = str(abs_path)
+        if abs_str in csv_row_hits:
+            return csv_row_hits[abs_str]
+        return None
+
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
         try:
-            if _is_t0(display):
+            csv_hits = _csv_row_indexes_for(display, abs_path)
+            is_csv = abs_path.suffix.lower() == ".csv"
+
+            if is_csv and csv_hits:
+                # Plan #17 Part B (case B/C): one or more rows of this CSV
+                # were retrieved → row-window block (matched rows + ±2
+                # neighbors, merged across hits). The LLM summary still
+                # gets prepended as supplement.
+                from src.stage2.search import build_csv_row_window_block
+                block = await asyncio.to_thread(
+                    build_csv_row_window_block, display, csv_hits
+                )
+                if block is None:
+                    blocks = [
+                        f"Content type: csv-row-windows\n\n---\n"
+                        f"(could not read {abs_path.name} from disk)"
+                    ]
+                else:
+                    blocks = [
+                        f"Content type: csv-row-windows (the rows that match "
+                        f"the question, with ±2 neighbors for context; "
+                        f"matched rows are tagged inline. Full CSV is "
+                        f"intentionally NOT included — rely on the per-file "
+                        f"summary above for cross-row context or to know "
+                        f"what the CSV is about as a whole)\n\n---\n{block}"
+                    ]
+            elif is_csv:
+                # Plan #17 Part B (case A): the CSV's file-level summary
+                # point hit in retrieval but no specific rows did. The
+                # user asked something the summary matched semantically
+                # ("do we have a faculty directory?"), not something a
+                # row matches verbatim. Surface the first 5 rows as a
+                # representative sample so the model has a concrete
+                # picture of row shape alongside the summary supplement.
+                from src.stage2.search import build_csv_sample_block
+                block = await asyncio.to_thread(build_csv_sample_block, display)
+                if block is None:
+                    blocks = [
+                        f"Content type: csv-sample\n\n---\n"
+                        f"(could not read {abs_path.name} from disk)"
+                    ]
+                else:
+                    blocks = [
+                        f"Content type: csv-sample (first 5 rows of this CSV "
+                        f"— no specific row matched your question; the "
+                        f"per-file summary above explains what the CSV is "
+                        f"overall, the rows below are illustrative of its "
+                        f"shape)\n\n---\n{block}"
+                    ]
+            elif _is_t0(display):
                 # T0 files: skip the whole-file read and lean on ripgrep.
                 hits = await asyncio.to_thread(ripgrep_search, abs_path, rg_query)
                 hits_text = format_hits_block(abs_path, hits)

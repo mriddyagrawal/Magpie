@@ -72,43 +72,106 @@ A few decisions shape the whole system:
 - Self-contained — you run it against the folder you care about.
 
 **It isn't:**
-- A cloud-sync service. Files don't leave your machine. If you run both `LLM_PROVIDER=local` and `QDRANT_PROVIDER=local`, nothing leaves at all. Cloud providers see only the small structured summaries sent for embedding / answering.
+- A cloud-sync service. Files don't leave your machine. With `LLM_PROVIDER=local`, nothing leaves at all — Qdrant is always local. Cloud LLM providers see only the small structured summaries sent for embedding / answering.
 - An always-on background daemon. You run sync when you want the index refreshed.
 - A replacement for full-text search over every file on your disk. It's scoped to the folders you point it at.
 
 ## LLM backends
 
-Three interchangeable providers, selected via the `LLM_PROVIDER` environment variable. Flipping the variable is all it takes to swap — no code changes, no re-indexing. Prompts, schemas, and retrieval logic are identical across all three.
+Five interchangeable providers, selected via the `LLM_PROVIDER` environment variable. Flipping the variable is all it takes to swap — no code changes, no re-indexing. Prompts, schemas, and retrieval logic are identical across all of them.
 
-- **`moonshot`** *(default)* — Moonshot Kimi via their OpenAI-compatible API. Vision-capable, structured output via native JSON mode.
-- **`openrouter`** — OpenRouter gateway. Any model they front (Gemma, Claude, GPT, Llama, etc.) works; same OpenAI-compatible protocol.
-- **`local`** — On-device inference via `mlx-vlm` on Apple Silicon. Defaults to `mlx-community/gemma-3n-E2B-it-4bit` (~2GB, fits comfortably on an 8GB machine). No API key, no network calls for inference. Files never leave the machine.
+- **`moonshot`** — Moonshot Kimi via their OpenAI-compatible API. Vision-capable, structured output via native JSON mode.
+- **`openrouter`** *(default)* — OpenRouter gateway. Any model they front (Gemma, Claude, GPT, Llama, etc.) works; same OpenAI-compatible protocol.
+- **`ollama`** — Local Ollama daemon (Linux / Windows / Intel-Mac). OpenAI-compatible.
+- **`local`** — Subprocess inference via `llama-server` (HTTP) + GGUF weights. Cross-platform: Metal on macOS, CUDA on Linux / Windows, CPU fallback. Vision support via mmproj projector (Gemma 4 E4B native). No API key, no network calls for inference. Files never leave the machine.
+- **`magpie-cloud`** — Magpie's hosted backend. Auth via invite code; prompts live server-side.
 
 The cloud providers rely on native structured output (the model is constrained to emit valid JSON matching the schema). The local provider has no equivalent mechanism, so structured output goes through a repair pipeline — direct parse, strip markdown fences, extract a JSON object by brace match, fall back to a minimal valid structure on hard failures. The pipeline never crashes on a malformed response.
 
-### Local inference (Apple Silicon)
+### Local inference
 
-When `LLM_PROVIDER=local`:
+When `LLM_PROVIDER=local`, Magpie spawns one or more `llama-server` subprocesses (Metal / CUDA / CPU built-in to the binary) and routes all LLM calls — T3 summarize, query rewrite, answer synthesis, the `POST /generate` endpoint — through their HTTP `/v1/chat/completions` endpoint. The Python sidecar manages the subprocess pool: spawn on demand, health-check, idle-evict, kill at exit.
 
-- **Requirements**: Apple Silicon Mac, macOS, ~4GB free disk (~2GB model + runtime), 8GB+ RAM.
-- **First run**: the model downloads automatically from Hugging Face on first use (~2GB for E2B, ~4GB for E4B). Subsequent runs load from the local HF cache in ~10-20 seconds.
-- **Latency**: ~2-6s per text call, 4-12s per image-bearing call. Noticeably slower than cloud, but bounded and predictable.
-- **Concurrency**: keep `--concurrency 1` for `ns --sync`. Local inference is single-GPU; parallel workers contend for the same hardware and increase memory pressure without throughput benefit. Cloud providers with generous rate limits can handle more.
-- **More memory available?** On 16GB+ Macs, switch to the larger `mlx-community/gemma-3n-E4B-it-4bit` (~4GB) for better quality: `LOCAL_MODEL=mlx-community/gemma-3n-E4B-it-4bit` in `.env`.
-- **Quality caveat**: Gemma 3n E2B/E4B are small models. Summaries may be less detailed and rewritten queries less precise than what cloud models produce. The repair layer keeps the pipeline running, but expect noisier output until prompts are tuned specifically for local inference. That tuning is deliberately out of scope for the initial port.
+#### One-time install
+
+After `just sync-environment`, run:
+
+```
+just install-llama-server
+```
+
+This downloads the right `llama-server` binary for your platform from llama.cpp's GitHub releases (~30 MB), stages it under `<APP_DATA_DIR>/bin/`, strips macOS quarantine, and verifies the version. It ALSO pre-downloads the Gemma 4 E4B vision projector (`mmproj-BF16.gguf`, ~946 MB) so the first vision-bearing summary doesn't pause for several minutes on a slow connection. Skip the projector with `SKIP_MMPROJ_DOWNLOAD=1 just install-llama-server` if you don't need local vision. Override the version pin with `LLAMA_SERVER_VERSION=b5500 just install-llama-server`.
+
+Supported platforms (auto-detected):
+
+| Platform | Asset |
+|---|---|
+| macOS Apple Silicon | `macos-arm64.zip` (Metal) |
+| macOS Intel | `macos-x64.zip` (Accelerate) |
+| Linux x86_64 | `ubuntu-x64.zip` (CPU; CUDA build = manual override) |
+| Windows | manual download (documented in the recipe) |
+
+#### Default model
+
+`unsloth/gemma-4-E4B-it-GGUF` at the `Q5_K_XL` quant (~6.7 GB) downloads automatically from Hugging Face into `<APP_DATA_DIR>/cache/hub/` on first inference. Subsequent runs load from local cache in ~10-20s. Override via `.env`:
+
+```
+LOCAL_MODEL=unsloth/gemma-4-E4B-it-GGUF   # HF GGUF repo
+LOCAL_QUANT=Q5_K_XL                       # quant inside that repo
+LOCAL_N_CTX=8192                          # context window
+LOCAL_TEMPERATURE=0.7                     # sampling temperature
+```
+
+Subprocess pool tunables (also in `.env`):
+
+```
+LLAMA_SERVER_PATH=                        # empty = auto-discover
+LLAMA_SERVER_MIN_VERSION=b9049            # hard-fail if older — must support gemma4 arch
+LLAMA_SERVER_BASE_PORT=9100               # NOT 8765 (FastAPI sidecar)
+LLAMA_SERVER_MAX_LOADED_MODELS=1          # 1 = sequential, LRU eviction
+LLAMA_SERVER_IDLE_TIMEOUT_S=600           # unload after 10 min idle
+LLAMA_SERVER_STARTUP_TIMEOUT_S=60         # wait for /health on spawn
+LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-vision  # default profile (handles BOTH text and images)
+LLAMA_SERVER_VISION_MODEL=gemma-4-e4b-vision  # routing target if a text-bound caller hits an image
+LOCAL_MMPROJ_VARIANT=BF16                 # mmproj quant (BF16 / F16 / Q8_0 / …)
+```
+
+Available Gemma 4 E4B quants (all UD = Unsloth Dynamic-2.0, on the Pareto frontier):
+
+| Quant | Size | Notes |
+|---|---|---|
+| `Q4_K_XL` | ~5.1 GB | smaller / faster |
+| `Q5_K_XL` | ~6.7 GB | **default** — balanced |
+| `Q6_K_XL` | ~7.5 GB | higher quality |
+| `Q8_K_XL` | ~8.7 GB | near-original quality, ~2× slower |
+
+#### Runtime characteristics
+
+- **Latency**: ~1-3s per text call on Metal/CUDA (Apple Silicon M-series, modern NVIDIA), plus ~5 ms HTTP localhost overhead. CPU fallback is bounded but noticeably slower.
+- **Concurrency**: HTTP-safe — multiple Python coroutines can submit concurrent requests; llama-server's internal scheduler handles them. Throughput is bounded by the single subprocess.
+- **Vision**: Gemma 4 E4B is natively multi-modal — one set of weights handles text and images, with `mmproj-BF16.gguf` (~946 MB) acting as the image encoder bolted onto the base GGUF. By default both load into the same subprocess and serve every request: text-only calls run at full speed (the projector tensors aren't in the forward pass when no image is attached), image-bearing calls go through the vision path. No LRU swapping. To save the projector's resident memory on tight-RAM machines, opt out with `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text` in `.env` — that splits inference into two profiles and incurs a ~25-30s cold-load when transitioning between text and image workloads. The same `--mmproj` pattern applies to Qwen2.5-VL, LFM2-VL, MiniCPM-V (architectural parity, not yet tested in Magpie).
+- **Quality caveat**: Gemma 4 E4B is small. Summaries may be less detailed than what `gemma-4-31B-it` or Claude Sonnet produce. The JSON-repair layer keeps the pipeline running on imperfect output.
+
+#### Thinking mode
+
+Gemma 4 supports a thinking mode (model emits internal reasoning before the final answer). Toggle per-call via the `thinking=True` kwarg on `ChatAgent.run` / `ChatAgent.run_sync`, or in `POST /generate`'s request body. Default off — Magpie is latency-sensitive. Cloud providers accept the kwarg but currently no-op with a one-time warning until per-provider reasoning APIs are wired (tracked in `Plans/Future Plans.md` #16).
 
 Run `ns` the same way regardless of provider. Only `.env` changes.
 
 ## Vector database
 
-Same pattern as the LLM: pick cloud or local via `QDRANT_PROVIDER`.
+Magpie targets exactly one Qdrant deployment shape: **the real Qdrant Rust binary running on localhost.** No remote clusters, no Python embedded shim, no Docker. Both alternatives existed in earlier versions and were dropped in 2026-05 — the remote-cluster mode broke the privacy promise, and the embedded Python shim silently disabled quantization, payload indexes, and other server features that the at-scale tests relied on.
 
-- **`cloud`** *(default)* — Qdrant Cloud cluster. Requires `QDRANT_API_KEY` and `QDRANT_CLUSTER_ENDPOINT`. Data lives in their infrastructure.
-- **`local`** — Embedded Qdrant that persists to a directory on disk (defaults to `./qdrant_data/`, override with `QDRANT_LOCAL_PATH`). No server, no Docker, no network. The index lives in RAM during use and is flushed to disk on shutdown.
+Set up once with:
 
-Combined with `LLM_PROVIDER=local`, the entire pipeline runs offline once the LLM weights and Qdrant directory are in place. Storage footprint is modest — the current corpus (~2,500 row-level points) uses under 10 MB on disk.
+```bash
+just qdrant-install   # one-time download (~30 MB)
+just qdrant-up        # start the binary on port 6433
+```
 
-Switching between providers does not migrate data. After flipping `QDRANT_PROVIDER`, the new backend is empty; re-run `ns --sync` (or `--reset -y` if the manifest is stale) to rebuild the index in the new location.
+Port 6433 (deliberately NOT Qdrant's default 6333) avoids colliding with OpenWhispr and other apps that ship their own bundled Qdrant. Override the port via `QDRANT_CLUSTER_ENDPOINT=http://localhost:<port>` if you need to; the host must resolve to loopback or Magpie hard-errors at startup.
+
+Combined with `LLM_PROVIDER=local`, the entire pipeline runs offline once the LLM weights and Qdrant binary are in place. Storage footprint is modest — the current corpus (~2,500 row-level points) uses under 10 MB on disk.
 
 ## Magpie UI
 
@@ -148,7 +211,7 @@ uv run uvicorn src.server:app --port 8765 --reload
 cd frontend && pnpm tauri dev
 ```
 
-Switch providers the same way as the CLI — edit `.env` (`LLM_PROVIDER=local`, `QDRANT_PROVIDER=local`, etc.). The status pill at the bottom of the window shows which backend you're running against.
+Switch the LLM backend the same way as the CLI — edit `.env` (`LLM_PROVIDER=local`, `LLM_PROVIDER=openrouter`, etc.). The status pill at the bottom of the window shows which backend you're running against. Qdrant is always local.
 
 ### Production build
 

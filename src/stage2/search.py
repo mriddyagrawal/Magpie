@@ -119,16 +119,19 @@ class SearchResult:
     """One retrieval hit. `tier` indicates which collection contributed:
     "summary", "fast", or "both" (after RRF merge across both tiers).
 
-    `row_index` is the 0-based row number for CSV row-tier hits (set during
-    `csv_ingest.ingest_csv_rows`); `None` for non-CSV hits where the whole
-    file is a single point.
+    `chunk_index` is the 0-based index of a within-file chunk: the row
+    number for CSV row-tier hits (set during `csv_ingest.ingest_csv_rows`);
+    None for hits where the whole file is a single Qdrant point. Generic
+    name so future tier types (PDF section chunks, audio segments) can
+    reuse the same answer-step neighbor-lookup logic — see Plans/Future
+    Plans.md and the industry convention for RAG payload metadata.
     """
 
     summary: str
     path: str
     score: float
     tier: str = "summary"
-    row_index: int | None = None
+    chunk_index: int | None = None
 
 
 CSV_NEIGHBOR_WINDOW = 2
@@ -182,6 +185,75 @@ def _expand_csv_hit(source_rel: str, row_idx: int, focal_summary: str) -> str:
     return "\n".join(lines)
 
 
+def build_csv_row_window_block(
+    source_rel: str,
+    row_indexes: list[int],
+    *,
+    window: int = CSV_NEIGHBOR_WINDOW,
+) -> str | None:
+    """Build a multi-window text block for the answer step (Plan #17 Part B).
+
+    For each row index in `row_indexes`, expand to a ±`window` neighbor
+    range. Overlapping or adjacent ranges merge into a single window so
+    rows aren't duplicated in the prompt. Returns formatted text with
+    `(match)` markers on hit rows; or None if the CSV can't be read.
+
+    This replaces the file-prefix dump (`build_content_blocks` →
+    `text[:max_chars]`) that the answer step would otherwise produce for a
+    CSV path. Result for one CSV with 3 hits at rows [5, 6, 47] (window=2):
+
+        [row 3] coid: 67000 | code: PHY-101 | ...
+        [row 4] coid: 67050 | code: PHY-102 | ...
+        [row 5 (match)] coid: 67053 | code: PHY-113 | ...
+        [row 6 (match)] coid: 67100 | code: PHY-201 | ...
+        [row 7] coid: 67200 | code: PHY-301 | ...
+        [row 8] coid: 67250 | code: PHY-302 | ...
+
+        ---
+
+        [row 45] ...
+        [row 46] ...
+        [row 47 (match)] ...
+        [row 48] ...
+        [row 49] ...
+
+    The first two hits' windows merged (3-7 ∪ 4-8 → 3-8); the third stayed
+    separate.
+    """
+
+    rows = _load_csv_rows(source_rel)
+    if rows is None or not row_indexes:
+        return None
+
+    # Build per-hit windows, then merge overlapping/adjacent.
+    sorted_idxs = sorted(set(row_indexes))
+    raw_windows: list[tuple[int, int]] = []
+    for ri in sorted_idxs:
+        start = max(0, ri - window)
+        end = min(len(rows), ri + window + 1)  # half-open [start, end)
+        raw_windows.append((start, end))
+
+    merged: list[tuple[int, int]] = []
+    for start, end in raw_windows:
+        if merged and start <= merged[-1][1]:
+            # overlap or touch — extend the last window
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+
+    match_set = set(sorted_idxs)
+    sections: list[str] = []
+    for start, end in merged:
+        lines: list[str] = []
+        for i in range(start, end):
+            marker = " (match)" if i in match_set else ""
+            text = _format_csv_row(rows[i])
+            lines.append(f"[row {i}{marker}] {text}")
+        sections.append("\n".join(lines))
+
+    return "\n\n---\n\n".join(sections)
+
+
 def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
     """Hybrid (dense + BM25) search of the summaries collection.
 
@@ -217,31 +289,96 @@ def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
         ],
         query=FusionQuery(fusion="rrf"),
         limit=limit,
-        with_payload=["summary", "source_path", "row_index"],
+        # Payload is path + chunk index only since 2026-05; the display
+        # summary is reconstructed from disk via `_summary_for_result`.
+        with_payload=["source_path", "chunk_index"],
     )
 
-    # Per-call CSV cache: same source CSV may produce multiple hits in one
-    # query (e.g. several adjacent rows match) — load each file at most once.
+    # Per-call caches: same CSV may produce multiple row hits, same
+    # file-level path could appear once. Load each at most once.
     _csv_rows_cache.clear()
+    _summary_md_cache.clear()
 
     out: list[SearchResult] = []
     for p in results.points:
         payload = p.payload or {}
-        summary = payload.get("summary", "")
         source_path = payload.get("source_path", "")
-        row_index = payload.get("row_index")
-        if row_index is not None and source_path:
-            summary = _expand_csv_hit(source_path, int(row_index), summary)
+        chunk_index = payload.get("chunk_index")
+        summary = _summary_for_result(source_path, chunk_index)
         out.append(
             SearchResult(
                 summary=summary,
                 path=source_path,
                 score=p.score,
                 tier="summary",
-                row_index=row_index if row_index is None else int(row_index),
+                chunk_index=chunk_index if chunk_index is None else int(chunk_index),
             )
         )
     return out
+
+
+# ---------------------------------------------------------------------------
+# Display-summary reconstruction (since payload no longer carries text)
+# ---------------------------------------------------------------------------
+
+# Per-query cache for the parsed prose-summary of file-level hits. Keyed
+# by source_path; reset at the top of each search call. Avoids rereading
+# the same markdown when a file shows up in both dense and sparse tiers
+# of the same RRF result set.
+_summary_md_cache: dict[str, str] = {}
+
+
+def _summary_for_result(source_path: str, chunk_index: int | None) -> str:
+    """Reconstruct the search-snippet text for a Qdrant hit.
+
+    Two paths:
+      - chunk_index is set (CSV row hit) → re-read the CSV at chunk_index
+        and expand to ±CSV_NEIGHBOR_WINDOW neighbors via `_expand_csv_hit`.
+      - chunk_index is None (file-level hit) → load the file's summary
+        markdown via the manifest, return its parsed `summary` prose.
+
+    Returns an empty string if reconstruction fails (file moved, manifest
+    out of sync, etc.) — better than raising; the UI just shows an empty
+    snippet rather than crashing on a stale point.
+    """
+
+    if not source_path:
+        return ""
+    if chunk_index is not None:
+        rows = _load_csv_rows(source_path)
+        if rows is None or not (0 <= int(chunk_index) < len(rows)):
+            return ""
+        focal = _format_csv_row(rows[int(chunk_index)])
+        return _expand_csv_hit(source_path, int(chunk_index), focal)
+    return _load_summary_prose(source_path)
+
+
+def _load_summary_prose(source_path: str) -> str:
+    """Look up the summary markdown for a file-level hit and return its
+    parsed prose summary. Cached per query.
+
+    The lookup chain: source_path → manifest entry → summary_file → disk
+    read → parse_summary_file → ParsedSummary.summary. Falls back to an
+    empty string when any link breaks (manifest missing, file moved,
+    parse error)."""
+    if source_path in _summary_md_cache:
+        return _summary_md_cache[source_path]
+    text = ""
+    try:
+        from src.manifest import APP_DATA_DIR, Manifest
+        from src.stage2.parser import parse_summary_file
+
+        manifest = Manifest()
+        entry = manifest.get(source_path)
+        if entry is not None and entry.summary_file:
+            md_path = APP_DATA_DIR / entry.summary_file
+            if md_path.is_file():
+                parsed = parse_summary_file(md_path)
+                text = parsed.summary or parsed.title or ""
+    except Exception:  # pylint: disable=broad-except
+        text = ""
+    _summary_md_cache[source_path] = text
+    return text
 
 
 def _search_fast_tier(query_text: str, limit: int) -> list[SearchResult]:

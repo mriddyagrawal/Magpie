@@ -440,7 +440,21 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 
 ---
 
-## 17. CSV redesign — proper summaries (Part A) + row-window retrieval (Part B)
+## 17. CSV redesign — proper summaries (Part A) + row-window retrieval (Part B) — IMPLEMENTED 2026-05-06
+
+> **Promoted from Future Plans to shipped.** Both halves landed together,
+> as the design required. See `src/ingest/tier1.py:run_csv_async`,
+> `src/stage2/search.py:build_csv_row_window_block`, and the new
+> `csv_row_hits` plumbing through `src/pipeline.py:ask` and
+> `src/answer.py:answer_question`. Tests under
+> `tests/ingest/test_tier1_csv.py` and
+> `tests/stage2/test_csv_row_windows.py`. The `LOCAL_ANSWER_MAX_CHARS`
+> band-aid was removed; `ANSWER_SUPPLEMENT_MAX_CHARS` was relaxed from
+> 4 KB to 10 KB. To pick up the new behavior on existing CSVs, run
+> `just walk --force <root>` once — that re-summarizes the CSVs through
+> the LLM path; PDFs / DOCX get re-summarized too but that's incidental.
+>
+> Original plan kept below for context.
 
 This is one feature with **two coupled halves**. Either half alone leaves the
 system in an awkward intermediate state. Implement them together; do not ship

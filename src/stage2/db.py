@@ -333,7 +333,12 @@ def upsert_summaries(
                         "sparse": SparseVector(indices=sparse_idx, values=sparse_val),
                     },
                     payload={
-                        "summary": s.summary,
+                        # Path-only payload (2026-05). The summary prose
+                        # for display is reconstructed at query time by
+                        # re-reading the markdown at <APP_DATA_DIR>/
+                        # summaries/<hash>_<tier>.md (looked up via
+                        # the manifest entry's `summary_file`). Saves
+                        # significant Qdrant payload bytes at scale.
                         "source_path": s.source_path,
                     },
                 )

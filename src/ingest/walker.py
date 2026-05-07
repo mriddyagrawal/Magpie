@@ -84,6 +84,17 @@ async def _run_tier(
     other tiers ignore them. See `tier3.run_async` for the protocol.
     """
     if tier == "T1":
+        # CSVs at T1 use an LLM-generated FileSummary (Plan #17 Part A).
+        # Other small text/code files keep the no-LLM raw-content path.
+        if path.suffix.lower() == ".csv":
+            if get_agent is None:
+                raise RuntimeError("T1 CSV requested but no LLM agent thunk was provided")
+            agent = get_agent()
+            outcome = await tier1.run_csv_async(
+                path, source_rel, agent,
+                inflight=inflight, inflight_lock=inflight_lock,
+            )
+            return outcome, None
         return await asyncio.to_thread(tier1.run, path, source_rel), None
     if tier == "T2":
         return await asyncio.to_thread(tier2.run, path, source_rel), None

@@ -108,6 +108,33 @@ walk-force path:
 walk-rebuild path:
     uv run python -m src.ingest "{{path}}" --rebuild
 
+# Full reset: drop ALL Qdrant collections (summaries + fast_tier), clear
+# the manifest, delete every summary markdown. Use when the manifest has
+# drifted (test pollution, schema changes like the 2026-05 row_index →
+# chunk_index rename) and you want a clean slate.
+#
+# DOES NOT touch:
+#   - indexing_rules.json (your include_paths / exclude_paths stay)
+#   - the GGUF / HF model cache (no re-download)
+#   - source files on disk
+#
+# Different from `just sync --force`, which re-summarizes existing files
+# but doesn't drop collections, clear the manifest, or delete markdowns.
+#
+# After running, your next `just sync --include-data` rebuilds everything.
+reset-index:
+    @uv run python -c "\
+    from src.pipeline import reset; \
+    s = reset(); \
+    print(f'manifest removed:             {s[\"manifest_removed\"]}'); \
+    print(f'summaries deleted:            {s[\"summaries_deleted\"]}'); \
+    print(f'summaries collection dropped: {s[\"collection_dropped\"]}'); \
+    print(f'fast_tier collection dropped: {s[\"fast_tier_dropped\"]}'); \
+    print(f'qdrant error:                 {s[\"qdrant_error\"]}') if s.get('qdrant_error') else None; \
+    print(); \
+    print('indexing_rules.json untouched. Next: just sync --include-data')\
+    "
+
 # Per-child mode: ingest each immediate subdirectory of <path> sequentially.
 # Useful for huge multi-TB roots where a single walk feels stuck.
 walk-each path:

@@ -111,12 +111,32 @@ async def ask(
         )
 
     paths = list(dict.fromkeys(r.path for r in retrieved if r.path))
+
+    # Group CSV chunk (row) hits per path so the answer step can substitute
+    # row-window blocks for the file-prefix dump (Plan #17 Part B).
+    # Non-chunked hits have chunk_index=None and don't appear here.
+    # Future PDF chunk hits will populate this same structure but with
+    # different downstream handling in the answer step.
+    csv_row_hits: dict[str, list[int]] = {}
+    for r in retrieved:
+        if r.path and r.chunk_index is not None:
+            csv_row_hits.setdefault(r.path, []).append(int(r.chunk_index))
+    if csv_row_hits:
+        rows_summary = ", ".join(
+            f"{p.rsplit('/', 1)[-1]}={sorted(set(idxs))}"
+            for p, idxs in csv_row_hits.items()
+        )
+        print(f"[query] csv row hits: {rows_summary}",
+              file=sys.stderr, flush=True)
     print(f"[query] reading {len(paths)} unique file(s) for answer step",
           file=sys.stderr, flush=True)
 
     agent = build_answer_agent()
     t = time.monotonic()
-    ans: Answer = await answer_question(agent, question, paths, search_query=sq)
+    ans: Answer = await answer_question(
+        agent, question, paths, search_query=sq,
+        csv_row_hits=csv_row_hits or None,
+    )
     print(f"[query] answer ({time.monotonic()-t:.2f}s): "
           f"{len(ans.answer)} chars, sources_used={ans.sources_used}",
           file=sys.stderr, flush=True)
@@ -280,14 +300,22 @@ def reset() -> dict:
     if tmp.exists():
         tmp.unlink()
 
-    # Drop the Qdrant collection. Don't fail the reset if Qdrant is down.
+    # Drop the Qdrant `summaries` collection. Don't fail the reset if
+    # Qdrant is down — local cleanup already happened.
     collection_dropped = False
+    fast_tier_dropped = False
     qdrant_error: str | None = None
     try:
         client = get_qdrant_client()
         if client.collection_exists(COLLECTION_NAME):
             client.delete_collection(COLLECTION_NAME)
             collection_dropped = True
+        # Drop the fast_tier (ColPali multi-vector) collection too.
+        # Hardcoded name since fast_db.py exposes it via a function rather
+        # than a constant; this is the canonical collection name in code.
+        if client.collection_exists("fast_tier"):
+            client.delete_collection("fast_tier")
+            fast_tier_dropped = True
     except Exception as e:
         qdrant_error = f"{type(e).__name__}: {e}"
 
@@ -295,6 +323,7 @@ def reset() -> dict:
         "summaries_deleted": deleted_summaries,
         "manifest_removed": manifest_removed,
         "collection_dropped": collection_dropped,
+        "fast_tier_dropped": fast_tier_dropped,
         "qdrant_error": qdrant_error,
     }
 

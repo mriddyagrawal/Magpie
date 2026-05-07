@@ -185,44 +185,90 @@ def _expand_csv_hit(source_rel: str, row_idx: int, focal_summary: str) -> str:
     return "\n".join(lines)
 
 
+_MATCH_MARKER = "   (this row matched the question)"
+
+
+def _ordered_headers(rows: list[dict[str, str]]) -> list[str]:
+    """Return column headers in the order they appear in the first row.
+    `csv.DictReader` preserves order on Python 3.7+ — we just take row 0."""
+    if not rows:
+        return []
+    return list(rows[0].keys())
+
+
+def _csv_row_to_csv_line(
+    row: dict[str, str], headers: list[str], *, matched: bool
+) -> str:
+    """Render one row as a properly-quoted CSV line, optionally with the
+    match-marker parenthetical appended. Uses `csv.writer` so values
+    containing commas / quotes / newlines round-trip correctly."""
+    import io
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="")
+    writer.writerow([row.get(h, "") for h in headers])
+    line = buf.getvalue()
+    return line + _MATCH_MARKER if matched else line
+
+
+def _csv_header_line(headers: list[str]) -> str:
+    """Render the CSV header line. Same quoting semantics as data rows
+    so a header containing a comma (rare) is still parseable."""
+    import io
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="")
+    writer.writerow(headers)
+    return buf.getvalue()
+
+
 def build_csv_row_window_block(
     source_rel: str,
     row_indexes: list[int],
     *,
     window: int = CSV_NEIGHBOR_WINDOW,
 ) -> str | None:
-    """Build a multi-window text block for the answer step (Plan #17 Part B).
+    """Build a multi-window CSV text block for the answer step (Plan #17 Part B).
 
     For each row index in `row_indexes`, expand to a ±`window` neighbor
     range. Overlapping or adjacent ranges merge into a single window so
-    rows aren't duplicated in the prompt. Returns formatted text with
-    `(match)` markers on hit rows; or None if the CSV can't be read.
+    rows aren't duplicated in the prompt. Each window is a self-contained
+    CSV snippet: header line at the top, comma-separated rows below.
+    Matched rows get a trailing `(this row matched the question)` marker
+    so the LLM can tell signal from context. Returns the block text or
+    None if the CSV can't be read.
 
-    This replaces the file-prefix dump (`build_content_blocks` →
-    `text[:max_chars]`) that the answer step would otherwise produce for a
-    CSV path. Result for one CSV with 3 hits at rows [5, 6, 47] (window=2):
+    Result for one CSV with 3 hits at rows [5, 6, 47] (window=2):
 
-        [row 3] coid: 67000 | code: PHY-101 | ...
-        [row 4] coid: 67050 | code: PHY-102 | ...
-        [row 5 (match)] coid: 67053 | code: PHY-113 | ...
-        [row 6 (match)] coid: 67100 | code: PHY-201 | ...
-        [row 7] coid: 67200 | code: PHY-301 | ...
-        [row 8] coid: 67250 | code: PHY-302 | ...
+        coid,code,title,prerequisites
+        67000,PHY-101,Introduction to Physics,
+        67050,PHY-102,Physics II,PHY-101
+        67053,PHY-113,General Physics III,PHY-111   (this row matched the question)
+        67100,PHY-201,Mechanics,PHY-113   (this row matched the question)
+        67200,PHY-301,Quantum,PHY-201
+        67250,PHY-302,Relativity,PHY-201
 
         ---
 
-        [row 45] ...
-        [row 46] ...
-        [row 47 (match)] ...
-        [row 48] ...
-        [row 49] ...
+        coid,code,title,prerequisites
+        68045,ENG-244,Romantic Literature,ENG-101
+        68099,ENG-254,Prison Literature,   (this row matched the question)
+        68110,ENG-275,Postcolonial Voices,
 
     The first two hits' windows merged (3-7 ∪ 4-8 → 3-8); the third stayed
-    separate.
+    separate. Headers repeat at the top of each window — for weak local
+    models this is much easier to parse than relying on cross-block memory.
+
+    Indexing-time row format (`csv_ingest.stream_csv_rows`) stays as
+    `key: value | key: value | ...` because that's what the dense + BM25
+    embedders need for column-aware semantic search. The two formats live
+    on opposite sides of the wall: vector store indexing vs. answer-time
+    prompt readability for weak LLMs.
     """
 
     rows = _load_csv_rows(source_rel)
     if rows is None or not row_indexes:
+        return None
+    headers = _ordered_headers(rows)
+    if not headers:
         return None
 
     # Build per-hit windows, then merge overlapping/adjacent.
@@ -242,16 +288,53 @@ def build_csv_row_window_block(
             merged.append((start, end))
 
     match_set = set(sorted_idxs)
+    header_line = _csv_header_line(headers)
     sections: list[str] = []
     for start, end in merged:
-        lines: list[str] = []
+        lines: list[str] = [header_line]
         for i in range(start, end):
-            marker = " (match)" if i in match_set else ""
-            text = _format_csv_row(rows[i])
-            lines.append(f"[row {i}{marker}] {text}")
+            lines.append(
+                _csv_row_to_csv_line(rows[i], headers, matched=(i in match_set))
+            )
         sections.append("\n".join(lines))
 
     return "\n\n---\n\n".join(sections)
+
+
+def build_csv_sample_block(
+    source_rel: str,
+    *,
+    max_rows: int = 5,
+) -> str | None:
+    """Build a CSV header + first-N-rows sample for the case-A answer path
+    (Plan #17 Part B + 2026-05 file-level summary follow-up).
+
+    Used when a CSV's file-level summary point is in top-k retrieval but
+    none of its row points are. The user asked something the LLM summary
+    matched semantically (e.g. "do we have a faculty directory?") rather
+    than something a specific row matches verbatim. The sample gives the
+    answer model a representative slice of the CSV's rows alongside the
+    summary supplement, so it can answer "what is this file" + "what
+    do its rows look like" together.
+
+    Same raw-CSV format as `build_csv_row_window_block` (header line +
+    comma-separated rows) for prompt-format consistency. No
+    `(this row matched the question)` markers — none of these rows
+    matched directly. Returns None if the CSV can't be read.
+    """
+
+    rows = _load_csv_rows(source_rel)
+    if rows is None or not rows:
+        return None
+    headers = _ordered_headers(rows)
+    if not headers:
+        return None
+
+    sample = rows[:max_rows]
+    lines: list[str] = [_csv_header_line(headers)]
+    for row in sample:
+        lines.append(_csv_row_to_csv_line(row, headers, matched=False))
+    return "\n".join(lines)
 
 
 def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:

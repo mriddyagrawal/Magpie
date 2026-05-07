@@ -131,8 +131,8 @@ LLAMA_SERVER_BASE_PORT=9100               # NOT 8765 (FastAPI sidecar)
 LLAMA_SERVER_MAX_LOADED_MODELS=1          # 1 = sequential, LRU eviction
 LLAMA_SERVER_IDLE_TIMEOUT_S=600           # unload after 10 min idle
 LLAMA_SERVER_STARTUP_TIMEOUT_S=60         # wait for /health on spawn
-LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text  # profile for text inference
-LLAMA_SERVER_VISION_MODEL=gemma-4-e4b-vision  # profile for image-bearing calls
+LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-vision  # default profile (handles BOTH text and images)
+LLAMA_SERVER_VISION_MODEL=gemma-4-e4b-vision  # routing target if a text-bound caller hits an image
 LOCAL_MMPROJ_VARIANT=BF16                 # mmproj quant (BF16 / F16 / Q8_0 / …)
 ```
 
@@ -149,7 +149,7 @@ Available Gemma 4 E4B quants (all UD = Unsloth Dynamic-2.0, on the Pareto fronti
 
 - **Latency**: ~1-3s per text call on Metal/CUDA (Apple Silicon M-series, modern NVIDIA), plus ~5 ms HTTP localhost overhead. CPU fallback is bounded but noticeably slower.
 - **Concurrency**: HTTP-safe — multiple Python coroutines can submit concurrent requests; llama-server's internal scheduler handles them. Throughput is bounded by the single subprocess.
-- **Vision**: Gemma 4 E4B native vision via the `mmproj-BF16.gguf` projector. The `gemma-4-e4b-vision` profile is registered automatically; T3 image-bearing summaries (raw images, scanned PDFs) route image bytes through `LocalLLM.complete(images=...)` and the pool transparently swaps to the vision model when needed. With `LLAMA_SERVER_MAX_LOADED_MODELS=1` (default), back-and-forth between text and vision incurs a model-reload — bump to 2 on RAM-rich machines to keep both warm. Set `LLAMA_SERVER_VISION_MODEL=` (empty) to disable local vision; image bytes then silently fall through to a text-only summary.
+- **Vision**: Gemma 4 E4B is natively multi-modal — one set of weights handles text and images, with `mmproj-BF16.gguf` (~946 MB) acting as the image encoder bolted onto the base GGUF. By default both load into the same subprocess and serve every request: text-only calls run at full speed (the projector tensors aren't in the forward pass when no image is attached), image-bearing calls go through the vision path. No LRU swapping. To save the projector's resident memory on tight-RAM machines, opt out with `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text` in `.env` — that splits inference into two profiles and incurs a ~25-30s cold-load when transitioning between text and image workloads. The same `--mmproj` pattern applies to Qwen2.5-VL, LFM2-VL, MiniCPM-V (architectural parity, not yet tested in Magpie).
 - **Quality caveat**: Gemma 4 E4B is small. Summaries may be less detailed than what `gemma-4-31B-it` or Claude Sonnet produce. The JSON-repair layer keeps the pipeline running on imperfect output.
 
 #### Thinking mode

@@ -211,10 +211,27 @@ register(
 
 
 def default_text_profile() -> str:
-    """Profile name for text-only inference. Env-overridable so future
-    profiles (LFM2.5, Qwen text-only, etc.) can be made the default
-    without code change."""
-    return os.environ.get("LLAMA_SERVER_TEXT_MODEL", "gemma-4-e4b-text")
+    """Profile name used for **all** inference (text and vision) by default.
+
+    Despite the name, this returns the vision-capable profile. Reasoning:
+    Gemma 4 (and Qwen2.5-VL, LFM2-VL — same llama.cpp `--mmproj` pattern)
+    is one set of weights with an optional image-encoder bolted on. When
+    the projector is loaded but the request has no `image_url` blocks,
+    the projector tensors sit idle — zero inference cost. The only cost
+    is the projector's resident memory (~946 MB for Gemma 4 BF16).
+
+    Avoiding the LRU swap between a text-only and a text+vision profile
+    is worth far more than the 946 MB on a laptop-class machine — a
+    single swap is ~25-30s on cold load, and a mixed walker corpus can
+    swap several times. Empirically verified against Gemma 4 E4B +
+    b9049 (2026-05-07): text-only `complete()` against a vision-loaded
+    subprocess returns identical results at full speed.
+
+    The text-only profile (`gemma-4-e4b-text`) is still registered for
+    users on tight memory budgets — set `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text`
+    in `.env` to opt into the swap-y behavior and save ~946 MB.
+    """
+    return os.environ.get("LLAMA_SERVER_TEXT_MODEL", "gemma-4-e4b-vision")
 
 
 def default_vision_profile() -> Optional[str]:

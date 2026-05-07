@@ -18,23 +18,34 @@ from src.inference.profiles import (
 # Registry
 # ---------------------------------------------------------------------------
 
-def test_default_text_profile_registered_at_import():
-    """The built-in `gemma-4-e4b-text` profile is registered when the module
-    loads. New code adding profiles via `register(...)` extends this set."""
+def test_both_text_and_vision_profiles_registered_at_import():
+    """Both built-in profiles register when the module loads. The
+    text-only profile is kept around as an opt-in memory-saver
+    (`LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text`); the vision profile
+    is the default for everything since 2026-05-07."""
     profiles = all_profiles()
     assert "gemma-4-e4b-text" in profiles
+    assert "gemma-4-e4b-vision" in profiles
 
 
-def test_default_text_profile_is_gemma_4():
+def test_default_text_profile_is_vision_capable():
+    """Default points at the vision profile so the same subprocess serves
+    text and image requests with no LRU swap. The mmproj costs ~946 MB
+    resident but zero inference cost on text-only calls."""
     profile = get_profile(default_text_profile())
     assert profile.args.repo_id.startswith("unsloth/gemma-4")
     assert profile.args.jinja is True  # Gemma 4 chat template requires it
+    assert profile.has_vision is True
+    assert profile.args.mmproj_repo_id is not None  # mmproj is loaded
 
 
-def test_default_text_profile_has_no_mmproj():
-    """PR 1 ships text-only. Vision profile lands in PR 2."""
+def test_text_only_profile_kept_for_opt_in():
+    """Users on tight memory budgets can opt out of the projector by
+    setting LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text in .env. Verifies
+    the text-only profile is still registered and still has no mmproj."""
     profile = get_profile("gemma-4-e4b-text")
     assert profile.args.mmproj is None
+    assert profile.args.mmproj_repo_id is None
     assert profile.has_vision is False
 
 
@@ -90,4 +101,6 @@ def test_env_override_propagates_to_default_text_profile(monkeypatch):
     ))
     assert default_text_profile() == "test-profile"
     monkeypatch.delenv("LLAMA_SERVER_TEXT_MODEL")
-    assert default_text_profile() == "gemma-4-e4b-text"
+    # Default fallback is the vision-capable profile (post-2026-05-07
+    # decision: load mmproj once, idle for text-only).
+    assert default_text_profile() == "gemma-4-e4b-vision"

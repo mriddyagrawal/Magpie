@@ -118,13 +118,31 @@ def test_select_profile_no_images_uses_instance_default():
     assert llm._select_profile([]) == llm.profile_name
 
 
-def test_select_profile_with_images_routes_to_vision():
-    """Images present + instance is text-only → switch to the registered
-    vision profile (default `gemma-4-e4b-vision`)."""
+def test_select_profile_default_is_vision_so_no_swap_needed():
+    """Post-2026-05 default: the singleton LLM is bound to the vision
+    profile (one subprocess serves both text and image requests, mmproj
+    sits idle for text-only). So _select_profile returns the same name
+    whether images are present or not — no swap.
+
+    To exercise the legacy text→vision swap path explicitly, see
+    `test_select_profile_text_instance_switches_to_vision_when_images_present`
+    below."""
     llm = LlamaServerLLM()
+    assert llm.profile_name == "gemma-4-e4b-vision"
+    assert llm._select_profile(None) == llm.profile_name
+    assert llm._select_profile([b"\x89PNG\r\n\x1a\n"]) == llm.profile_name
+
+
+def test_select_profile_text_instance_switches_to_vision_when_images_present():
+    """The legacy / opt-in path: users who explicitly set
+    `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text` to save the projector's
+    ~946 MB. With a text-bound instance, image-bearing calls still
+    route to the vision profile — incurring an LRU swap with
+    MAX_LOADED_MODELS=1, hence why this isn't the default anymore."""
+    llm = LlamaServerLLM(profile_name="gemma-4-e4b-text")
     chosen = llm._select_profile([b"\x89PNG\r\n\x1a\n"])
     assert chosen == "gemma-4-e4b-vision"
-    assert chosen != llm.profile_name  # text vs vision split
+    assert chosen != llm.profile_name  # explicit text → vision switch
 
 
 def test_select_profile_vision_instance_does_not_double_switch():
@@ -141,11 +159,14 @@ def test_select_profile_vision_instance_does_not_double_switch():
 
 
 def test_select_profile_no_vision_registered_raises():
-    """If LLAMA_SERVER_VISION_MODEL points at nothing, callers need a
-    loud error so they can either install the mmproj or fall back."""
+    """If a text-bound instance hits an image-bearing call AND no vision
+    profile is registered, callers need a loud error so they can either
+    install the mmproj or fall back. Constructed via the opt-in
+    text profile because the default instance is now vision-bound and
+    wouldn't take this code path."""
     from src.inference import llama_server_pool
 
-    llm = LlamaServerLLM()
+    llm = LlamaServerLLM(profile_name="gemma-4-e4b-text")
     with patch(
         "src.inference.local_llm.default_vision_profile",
         return_value=None,

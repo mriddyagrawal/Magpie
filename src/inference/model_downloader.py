@@ -1,7 +1,11 @@
-"""GGUF model downloader — wraps `huggingface_hub.hf_hub_download`.
+"""GGUF model + mmproj downloader — wraps `huggingface_hub.hf_hub_download`.
 
 `ensure_model(repo_id, quant)` returns a `Path` to a local GGUF file,
 downloading on first use and reusing the HF cache on subsequent calls.
+`ensure_mmproj(repo_id, variant)` does the same for the multi-modal
+projector that pairs with a vision-capable GGUF (Gemma 4 E4B + BF16
+mmproj is Magpie's default vision stack).
+
 SHA verification is automatic (huggingface_hub re-checks ETag and
 filesize against the remote on every call; corrupted/partial files
 re-download).
@@ -13,6 +17,7 @@ nothing outside `APP_DATA_DIR`; this includes model weights.
 Filename convention is per-repo. Unsloth's Gemma 4 GGUFs follow:
 
     gemma-4-E4B-it-UD-{QUANT}.gguf
+    mmproj-{VARIANT}.gguf            (paired projector, same repo)
 
 The `UD` prefix is Unsloth's Dynamic-2.0 variant — selectively higher
 precision on critical layers, generally on the Pareto frontier vs.
@@ -36,6 +41,12 @@ from src.manifest import APP_DATA_DIR  # noqa: F401  (side-effect import)
 # https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF.
 _UNSLOTH_GEMMA4_E4B_PATTERN = "gemma-4-E4B-it-UD-{quant}.gguf"
 
+# Multi-modal projector pattern (same Unsloth repo as the GGUF). The
+# projector is a single ~946 MB file; BF16 is the highest-fidelity
+# variant Unsloth ships and matches the spec target. F16 / Q8_0 are
+# valid alternatives for tighter RAM budgets.
+_UNSLOTH_GEMMA4_E4B_MMPROJ_PATTERN = "mmproj-{variant}.gguf"
+
 
 def _filename_for(repo_id: str, quant: str) -> str:
     """Resolve the GGUF filename for a (repo_id, quant) pair.
@@ -53,6 +64,25 @@ def _filename_for(repo_id: str, quant: str) -> str:
         "the model_downloader has only been wired for unsloth/gemma-4-E4B-it-GGUF. "
         "Add a filename pattern in src/inference/model_downloader.py:_filename_for "
         "before pointing LOCAL_MODEL at a different repo."
+    )
+
+
+def _mmproj_filename_for(repo_id: str, variant: str) -> str:
+    """Resolve the mmproj filename for a (repo_id, variant) pair.
+
+    Same dispatch shape as `_filename_for`. New vision-capable repos
+    branch here.
+    """
+
+    if repo_id == "unsloth/gemma-4-E4B-it-GGUF":
+        return _UNSLOTH_GEMMA4_E4B_MMPROJ_PATTERN.format(variant=variant)
+    raise ValueError(
+        f"unknown mmproj repo {repo_id!r}; "
+        "the model_downloader has only been wired for "
+        "unsloth/gemma-4-E4B-it-GGUF's projector. "
+        "Add an mmproj pattern in src/inference/model_downloader.py:"
+        "_mmproj_filename_for before pointing a vision profile at a "
+        "different repo."
     )
 
 
@@ -84,5 +114,34 @@ def ensure_model(repo_id: str, quant: str) -> Path:
     # Unsloth ships derivative quants under their own license-compliant
     # repo). If LOCAL_MODEL is later pointed at a gated repo, the user's
     # `HF_TOKEN` env var is read automatically by huggingface_hub.
+    path = hf_hub_download(repo_id=repo_id, filename=filename)
+    return Path(path)
+
+
+def ensure_mmproj(repo_id: str, variant: str = "BF16") -> Path:
+    """Return the local path to a multi-modal projector .gguf, downloading
+    if missing.
+
+    The projector pairs with a base GGUF to enable vision. For Gemma 4 E4B
+    + the BF16 mmproj this is a one-time ~946 MB download. The progress
+    bar streams to stderr — be mindful of slow connections (the
+    install-llama-server recipe pre-downloads this so the first inference
+    call doesn't hang).
+    """
+
+    try:
+        from huggingface_hub import hf_hub_download
+    except ImportError as e:
+        raise RuntimeError(
+            "huggingface_hub is required for mmproj downloads "
+            "but isn't installed. Run `just sync-environment` to install."
+        ) from e
+
+    filename = _mmproj_filename_for(repo_id, variant)
+    print(
+        f"  resolving mmproj projector: {repo_id} :: {filename} "
+        f"(first run downloads ~900 MB to {os.environ.get('HF_HUB_CACHE', '<cache>')})",
+        file=sys.stderr,
+    )
     path = hf_hub_download(repo_id=repo_id, filename=filename)
     return Path(path)

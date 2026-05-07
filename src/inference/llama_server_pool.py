@@ -314,11 +314,14 @@ class LlamaServerPool:
     def _build_argv(self, profile: ModelProfile, port: int) -> list[str]:
         """Translate a ModelProfile into a llama-server command line.
 
-        We resolve the GGUF path via the existing `model_downloader`
-        which caches under `<APP_DATA_DIR>/cache/hub/`. mmproj resolution
-        comes in PR 2.
+        Resolves the GGUF (always) and the mmproj projector (when the
+        profile declares one) via `model_downloader`, both cached under
+        `<APP_DATA_DIR>/cache/hub/`. The mmproj is downloaded lazily on
+        first vision-profile spawn — slow connections see this as a
+        ~900 MB pause, which `just install-llama-server` pre-empts by
+        downloading it eagerly.
         """
-        from src.inference.model_downloader import ensure_model
+        from src.inference.model_downloader import ensure_model, ensure_mmproj
 
         gguf = ensure_model(profile.args.repo_id, profile.args.quant)
         argv: list[str] = [
@@ -330,8 +333,18 @@ class LlamaServerPool:
             "-c", str(profile.args.ctx_size),
             "--temp", str(profile.args.temperature),
         ]
-        if profile.args.mmproj:
-            argv.extend(["--mmproj", profile.args.mmproj])
+        # mmproj resolution: explicit path wins (test fixtures), else
+        # download from the repo when mmproj_repo_id is set.
+        mmproj_path: Optional[str] = profile.args.mmproj
+        if mmproj_path is None and profile.args.mmproj_repo_id:
+            mmproj_path = str(
+                ensure_mmproj(
+                    profile.args.mmproj_repo_id,
+                    profile.args.mmproj_variant,
+                )
+            )
+        if mmproj_path:
+            argv.extend(["--mmproj", mmproj_path])
         if profile.args.batch_size is not None:
             argv.extend(["-b", str(profile.args.batch_size)])
         if profile.args.ubatch_size is not None:

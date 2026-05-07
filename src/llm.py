@@ -380,47 +380,58 @@ def parse_json_with_repair(raw: str, schema: type[T], fallback: T | None) -> T:
 # LocalAgent — llama-cpp-python (cross-platform)
 # ---------------------------------------------------------------------------
 
-# Tracked once-per-process: the local backend currently doesn't support
-# multimodal input (Gemma 4 vision via mmproj is a follow-up; see
-# Plans/Local LLM Plan.md "Migration & risks"). When a caller passes
-# image-bearing content, we drop it and warn once. T3 image-only files
-# end up with a thin summary; cloud providers (LLM_PROVIDER=openrouter
-# etc.) keep full vision support.
+# Tracked once-per-process: when image content arrives on the local
+# backend, we forward the bytes to the vision profile (Gemma 4 + mmproj
+# via llama-server). Non-image binary blocks (audio, etc.) still get
+# dropped with a one-time warning.
 _local_image_drop_warned = False
 
 
-def _flatten_message_for_local(message: list, system_prompt: str) -> list[dict]:
+def _flatten_message_for_local(
+    message: list,
+    system_prompt: str,
+) -> tuple[list[dict], list[bytes]]:
     """Convert the desktop-side message list into chat-completion format.
 
     The desktop builds messages as a heterogeneous list — strings interleaved
-    with `BinaryContent` for image-bearing T3 calls. llama-cpp-python's text
-    chat surface wants `[{"role": "system", "content": str}, {"role": "user",
-    "content": str}]`. We:
+    with `BinaryContent` for image-bearing T3 calls. We:
 
       - Pull the system prompt out as its own message
       - Concatenate all string parts into one user message
-      - Drop any non-string blocks (BinaryContent, etc.) with a one-time
-        warning. Vision support for Gemma 4 + llama-cpp-python is a
-        separate plan item (mmproj projector + Gemma4ChatHandler).
+      - Collect image bytes from `BinaryContent` blocks (via duck-typed
+        `data` + `media_type` attributes) for the LocalLLM `images` kwarg
+      - Drop any non-image binary blocks with a one-time warning
+
+    Returns `(messages, images)`. `images` is `[]` when the file is text-only.
+    The caller decides whether to forward `images` based on whether a
+    vision profile is registered.
     """
 
     global _local_image_drop_warned
 
     text_parts: list[str] = []
+    image_blobs: list[bytes] = []
     n_dropped = 0
     for block in message:
         if isinstance(block, str):
             text_parts.append(block)
+            continue
+        # BinaryContent is duck-typed here so we don't import pydantic_ai —
+        # the local backend keeps that dep optional.
+        data = getattr(block, "data", None)
+        media = getattr(block, "media_type", "") or ""
+        if isinstance(data, (bytes, bytearray)) and media.startswith("image/"):
+            image_blobs.append(bytes(data))
         else:
             n_dropped += 1
 
     if n_dropped > 0 and not _local_image_drop_warned:
         _local_image_drop_warned = True
         warnings.warn(
-            f"local LLM backend dropped {n_dropped} non-text content block(s) "
-            f"(image/binary). Vision support for the local backend is a follow-up "
-            f"(see Plans/Local LLM Plan.md). For full vision summarization use "
-            f"LLM_PROVIDER=openrouter or moonshot.",
+            f"local LLM backend dropped {n_dropped} non-image binary content "
+            f"block(s). Image blocks ARE forwarded to the local vision profile; "
+            f"audio / other binary types are not yet supported. For full "
+            f"multimodal use LLM_PROVIDER=openrouter or moonshot.",
             stacklevel=4,
         )
 
@@ -434,7 +445,7 @@ def _flatten_message_for_local(message: list, system_prompt: str) -> list[dict]:
     return [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_text},
-    ]
+    ], image_blobs
 
 
 class LocalAgent(Generic[T]):
@@ -458,25 +469,38 @@ class LocalAgent(Generic[T]):
         self._fallback = fallback
 
     async def run(self, message: list, *, thinking: bool = False) -> T:
-        from src.inference import get_local_llm
+        from src.inference import default_vision_profile, get_local_llm
 
-        msgs = _flatten_message_for_local(
+        msgs, images = _flatten_message_for_local(
             _prepend_timestamp(message), self._system_prompt
         )
+        # Drop images when no vision profile is registered (rather than
+        # raising), so users without the mmproj installed still get a
+        # text-only summary instead of a hard failure.
+        if images and default_vision_profile() is None:
+            images = []
         llm = get_local_llm()
         raw = await llm.complete(
-            msgs, thinking=thinking, max_tokens=LOCAL_MAX_TOKENS
+            msgs,
+            thinking=thinking,
+            max_tokens=LOCAL_MAX_TOKENS,
+            images=images or None,
         )
         return parse_json_with_repair(raw, self._output_type, self._fallback)
 
     def run_sync(self, message: list, *, thinking: bool = False) -> T:
-        from src.inference import get_local_llm
+        from src.inference import default_vision_profile, get_local_llm
 
-        msgs = _flatten_message_for_local(
+        msgs, images = _flatten_message_for_local(
             _prepend_timestamp(message), self._system_prompt
         )
+        if images and default_vision_profile() is None:
+            images = []
         llm = get_local_llm()
         raw = llm.complete_sync(
-            msgs, thinking=thinking, max_tokens=LOCAL_MAX_TOKENS
+            msgs,
+            thinking=thinking,
+            max_tokens=LOCAL_MAX_TOKENS,
+            images=images or None,
         )
         return parse_json_with_repair(raw, self._output_type, self._fallback)

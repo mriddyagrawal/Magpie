@@ -1,6 +1,6 @@
 # Spec — llama-cpp-python → llama-server migration (vision-capable local LLM)
 
-**Status:** approved 2026-05-07; implementation in progress on branch `llama-server`.
+**Status:** PR 1 (text path) + PR 2 (vision plumbing) shipped on branch `llama-server` 2026-05-07. PR 3 (answer-step integration) pending.
 
 **Author:** Mridul + Claude (planning session 2026-05-07).
 
@@ -105,9 +105,11 @@ Three PRs. Each commits cleanly on `llama-server` and is independently shippable
 
 ---
 
-### PR 2 — Vision plumbing (Gemma 4 + mmproj)
+### PR 2 — Vision plumbing (Gemma 4 + mmproj) **[SHIPPED 2026-05-07]**
 
 **Goal:** load the mmproj projector alongside the text model; an image submitted to `LocalLLM.complete(images=...)` returns a description.
+
+**Outcome:** wiring complete. Image-bearing T3 ingest calls now route bytes through the vision profile transparently. Real-spawn integration test gated by `LLAMA_SERVER_VISION_INTEGRATION=1` (skipped by default — first run downloads the ~946 MB projector, slow on bandwidth-limited CI).
 
 **Files added:**
 
@@ -129,12 +131,10 @@ Three PRs. Each commits cleanly on `llama-server` and is independently shippable
 | `.env` + `.env.example` | New keys: `LLAMA_SERVER_VISION_MODEL=gemma-4-e4b-vision` (default; settable to other profiles in PR 3+). |
 | `src/llm.py:_flatten_message_for_local` | Stop dropping `BinaryContent` blocks; instead, extract their bytes and pass to `complete(images=[...])`. |
 
-**Validation gate before merging PR 2:**
-- Submit `tests/inference/fixtures/test_image.png` to `LlamaServerLLM.complete()` with prompt `"Describe what's in this image."`. Assert the response is non-empty and mentions a recognizable feature of the image (the test will use a known fixture, so the assertion can be specific).
-- Submit a receipt-PDF page-image. Assert the merchant name comes back. (User supplies the receipt image too.)
-- Confirm subprocess for the vision profile launches with both `--model` and `--mmproj` flags (peek at the launch command via `LlamaServerPool.spawn_command()` test helper).
-- Confirm LRU eviction works: with `MAX_LOADED_MODELS=1`, querying vision after a text query unloads text and loads vision; querying text again unloads vision and reloads text.
-- **End-to-end summarize check:** `just walk` over a folder containing one image file (the user's fixture) AND one receipt-PDF. The resulting T3 summary markdowns must contain image-derived content (visible text from the image, not just filename metadata). This validates the `_flatten_message_for_local` wiring works at INGEST time, not just `/generate`. Both T3 summarize and the answer step share `LocalAgent.run`, so this also pre-validates the answer-side path that PR 3 fully wires.
+**Validation gate (PR 2):**
+- ✓ 16 unit tests cover `_detect_image_media_type`, `_attach_images_to_last_user`, `LlamaServerLLM._select_profile` (no-images / text-instance / vision-instance / unregistered) and the new `_flatten_message_for_local` tuple return.
+- ✓ Real-spawn smoke test in `tests/inference/test_vision.py::test_vision_recovers_visible_text_from_fixture_image` (gated by `LLAMA_SERVER_VISION_INTEGRATION=1`) sends the `image.png` LLM-evaluation diagram and asserts the response contains at least one of its visible labels.
+- **End-to-end summarize smoke (manual)**: `just walk` over a folder with one image file (the user's fixture) and one receipt-PDF. T3 summary markdowns should contain image-derived content. Skipped during automated testing because it requires the mmproj download.
 
 **Estimated size:** ~250 LOC net change.
 

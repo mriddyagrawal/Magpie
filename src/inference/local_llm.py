@@ -10,6 +10,14 @@ llama-server instance managed by `LlamaServerPool`. The pool spawns
 the subprocess on demand, health-checks it, and hands back the base
 URL — this class is a thin OpenAI-compatible client on top.
 
+Vision (PR 2): when `complete(...)` is called with `images=[...]`, the
+client transparently switches to the registered vision profile (default
+`gemma-4-e4b-vision`) for that call only — the pool handles spawn /
+LRU eviction. Image bytes are base64-encoded and sent as OpenAI-style
+`image_url` content blocks attached to the last user message. With
+`MAX_LOADED_MODELS=1`, switching between text and vision profiles
+incurs a model-reload cost; raise the cap if both are hot.
+
 Construction is lazy through `get_local_llm()` (singleton). The first
 call that triggers `pool.get_url_for(profile)` causes the subprocess
 to spawn and the model to load (~10–20s for a 5–7 GB GGUF on Apple
@@ -27,6 +35,7 @@ Configuration via env vars (also documented in `.env.example`):
   LLAMA_SERVER_MAX_LOADED_MODELS  LRU cap; default 1 on local
   LLAMA_SERVER_IDLE_TIMEOUT_S  unload-after-idle in seconds
   LLAMA_SERVER_STARTUP_TIMEOUT_S  health-check timeout
+  LLAMA_SERVER_VISION_MODEL    profile name for image-bearing requests
 
 Migration note (2026-05): replaces the previous `LlamaCppLLM`
 in-process backend. Same Protocol surface, same call sites, same
@@ -36,15 +45,20 @@ chat-template helper — only the underlying engine changed. See
 
 from __future__ import annotations
 
+import base64
 import json
 import threading
-from typing import Any, AsyncIterator, Optional, Protocol
+from typing import Any, AsyncIterator, Optional, Protocol, Sequence
 
 import httpx
 
 from src.inference.chat_template import apply_thinking_to_messages
 from src.inference.llama_server_pool import LlamaServerSpawnError, get_pool
-from src.inference.profiles import default_text_profile, get_profile
+from src.inference.profiles import (
+    default_text_profile,
+    default_vision_profile,
+    get_profile,
+)
 
 
 # Per-call HTTP timeout. Long enough to cover prompt eval + generation
@@ -77,6 +91,7 @@ class LocalLLM(Protocol):
         thinking: bool = False,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        images: Optional[Sequence[bytes]] = None,
     ) -> str: ...
 
     def complete_sync(
@@ -86,6 +101,7 @@ class LocalLLM(Protocol):
         thinking: bool = False,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        images: Optional[Sequence[bytes]] = None,
     ) -> str: ...
 
     async def stream(
@@ -135,11 +151,12 @@ class LlamaServerLLM:
 
     # ----- pool-resolved URL -------------------------------------------------
 
-    def _base_url(self) -> str:
+    def _base_url(self, profile_name: Optional[str] = None) -> str:
         """Resolve the running llama-server's base URL, spawning it
         on first call. Per-call so LRU eviction across profiles
-        respawns transparently."""
-        return get_pool().get_url_for(self.profile_name)
+        respawns transparently. `profile_name` overrides the instance
+        default for image-bearing requests that need the vision model."""
+        return get_pool().get_url_for(profile_name or self.profile_name)
 
     def _ensure_loaded(self) -> None:
         """Force the subprocess to spawn + model to load now (without
@@ -150,6 +167,30 @@ class LlamaServerLLM:
         keeps working unchanged."""
         self._base_url()  # side-effect: pool.get_url_for spawns if needed
 
+    def _select_profile(self, images: Optional[Sequence[bytes]]) -> str:
+        """Pick the right profile for this request.
+
+        - No images → instance default.
+        - Images + instance is already vision-capable → reuse it (avoids
+          a model swap when callers explicitly bound to vision).
+        - Images + instance is text → switch to the registered vision
+          profile. Raises if none is registered (fail loudly so callers
+          can fall back, rather than silently dropping image content).
+        """
+        if not images:
+            return self.profile_name
+        instance_profile = get_profile(self.profile_name)
+        if instance_profile.has_vision:
+            return self.profile_name
+        vision = default_vision_profile()
+        if vision is None:
+            raise LlamaServerSpawnError(
+                "complete(images=...) was called but no vision profile "
+                "is registered. Set LLAMA_SERVER_VISION_MODEL or register "
+                "one via src.inference.profiles.register(...)."
+            )
+        return vision
+
     # ----- complete ----------------------------------------------------------
 
     async def complete(
@@ -159,6 +200,7 @@ class LlamaServerLLM:
         thinking: bool = False,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        images: Optional[Sequence[bytes]] = None,
     ) -> str:
         """Run a non-streaming chat completion. Returns the response text.
 
@@ -166,15 +208,23 @@ class LlamaServerLLM:
         `apply_thinking_to_messages`. For non-Gemma-4 models, that
         helper is a no-op — the kwarg is preserved across model swaps
         without special-casing in callers.
+
+        `images=[bytes, ...]` attaches one or more raw image blobs to the
+        last user message. Routes to the vision profile transparently;
+        the pool's LRU may unload the text model on the first vision
+        request when `MAX_LOADED_MODELS=1`.
         """
 
+        profile_name = self._select_profile(images)
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
+        if images:
+            prepared = _attach_images_to_last_user(prepared, images)
         body = self._build_request_body(prepared, temperature, max_tokens, stream=False)
-        url = self._base_url() + "/v1/chat/completions"
+        url = self._base_url(profile_name) + "/v1/chat/completions"
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
-            resp = await self._post_with_pool_recovery(client, url, body)
+            resp = await self._post_with_pool_recovery(client, url, body, profile_name)
         return self._extract_content(resp.json())
 
     def complete_sync(
@@ -184,6 +234,7 @@ class LlamaServerLLM:
         thinking: bool = False,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        images: Optional[Sequence[bytes]] = None,
     ) -> str:
         """Synchronous variant. Used by `LocalAgent.run_sync` from
         non-async paths (`src.stage2.search.rewrite_query`).
@@ -192,13 +243,16 @@ class LlamaServerLLM:
         `complete()` in a sync caller.
         """
 
+        profile_name = self._select_profile(images)
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
+        if images:
+            prepared = _attach_images_to_last_user(prepared, images)
         body = self._build_request_body(prepared, temperature, max_tokens, stream=False)
-        url = self._base_url() + "/v1/chat/completions"
+        url = self._base_url(profile_name) + "/v1/chat/completions"
         with httpx.Client(timeout=self.request_timeout_s) as client:
-            resp = self._post_with_pool_recovery_sync(client, url, body)
+            resp = self._post_with_pool_recovery_sync(client, url, body, profile_name)
         return self._extract_content(resp.json())
 
     # ----- stream ------------------------------------------------------------
@@ -291,15 +345,19 @@ class LlamaServerLLM:
         client: httpx.AsyncClient,
         url: str,
         body: dict[str, Any],
+        profile_name: Optional[str] = None,
     ) -> httpx.Response:
         """POST that converts llama-server connection failures into a
-        pool 'mark dead' so the next call respawns the subprocess."""
+        pool 'mark dead' so the next call respawns the subprocess.
+        `profile_name` defaults to the instance's default — image-bearing
+        calls override it so the right vision profile is cleared."""
+        target = profile_name or self.profile_name
         try:
             resp = await client.post(url, json=body)
             resp.raise_for_status()
             return resp
         except httpx.ConnectError as e:
-            get_pool().mark_dead(self.profile_name)
+            get_pool().mark_dead(target)
             raise LlamaServerSpawnError(
                 f"llama-server connection failed: {e}. "
                 f"The subprocess may have crashed; the pool has cleared "
@@ -311,19 +369,94 @@ class LlamaServerLLM:
         client: httpx.Client,
         url: str,
         body: dict[str, Any],
+        profile_name: Optional[str] = None,
     ) -> httpx.Response:
         """Sync mirror of `_post_with_pool_recovery`."""
+        target = profile_name or self.profile_name
         try:
             resp = client.post(url, json=body)
             resp.raise_for_status()
             return resp
         except httpx.ConnectError as e:
-            get_pool().mark_dead(self.profile_name)
+            get_pool().mark_dead(target)
             raise LlamaServerSpawnError(
                 f"llama-server connection failed: {e}. "
                 f"The subprocess may have crashed; the pool has cleared "
                 f"its registry, so the next request will respawn it."
             ) from e
+
+
+# ---------------------------------------------------------------------------
+# Multi-modal helpers (module-level for unit-test mockability)
+# ---------------------------------------------------------------------------
+
+
+def _detect_image_media_type(data: bytes) -> str:
+    """Sniff a small set of common image formats from magic bytes.
+
+    Defaults to `image/png` when nothing matches. The set is intentionally
+    minimal — we only need it for the formats Magpie's content extractor
+    produces (png from PDF render + png/jpeg/etc. for raw images on disk).
+    Adding webp/heic later is a one-liner if a user reports it.
+    """
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return "image/png"
+    if data[:3] == b"\xff\xd8\xff":
+        return "image/jpeg"
+    if data[:6] in (b"GIF87a", b"GIF89a"):
+        return "image/gif"
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "image/webp"
+    return "image/png"
+
+
+def _attach_images_to_last_user(
+    messages: list[dict],
+    images: Sequence[bytes],
+) -> list[dict]:
+    """Re-shape the message list to include image content blocks.
+
+    OpenAI / llama-server's chat completions API accepts a content list of
+    typed parts on user messages: `{"type": "text", "text": ...}` and
+    `{"type": "image_url", "image_url": {"url": "data:<media>;base64,..."}}`.
+    We promote the last user message's plain string content into that
+    list and append one `image_url` block per image. Earlier messages
+    (system, prior user/assistant turns) are left as plain strings.
+
+    Returns a NEW list — does not mutate `messages`.
+    """
+    if not images:
+        return messages
+
+    # Find the index of the last user message — that's where vision input
+    # belongs. If there isn't one (a system-only request, very unusual),
+    # skip the rewrite and return messages as-is.
+    last_user_idx = -1
+    for i in range(len(messages) - 1, -1, -1):
+        if messages[i].get("role") == "user":
+            last_user_idx = i
+            break
+    if last_user_idx < 0:
+        return messages
+
+    new_messages = list(messages)
+    user = dict(new_messages[last_user_idx])
+    text = user.get("content", "") or ""
+    parts: list[dict[str, Any]] = []
+    if text:
+        parts.append({"type": "text", "text": text})
+    for blob in images:
+        media = _detect_image_media_type(blob)
+        b64 = base64.b64encode(blob).decode("ascii")
+        parts.append(
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:{media};base64,{b64}"},
+            }
+        )
+    user["content"] = parts
+    new_messages[last_user_idx] = user
+    return new_messages
 
 
 # ---------------------------------------------------------------------------

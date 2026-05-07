@@ -37,7 +37,17 @@ _BIN_NAME = "llama-server" + (".exe" if sys.platform == "win32" else "")
 # llama.cpp release tags look like `b5400` or `b5400-12-gabc123` (build
 # number + commits-since + sha when built from a non-tag commit). We
 # only care about the numeric part for comparisons.
-_VERSION_RE = re.compile(r"\bb(\d{3,6})\b")
+# llama-server's `--version` ships in two shapes depending on the release
+# vintage. Older builds emit the bare release-tag form `b5400`. Newer
+# builds (b5400+ on macOS, observed 2026-05) emit `version: 5400 (sha)`
+# with no `b` prefix — bare digits. We accept both, plus the embedded-tag
+# form `b5400-12-gabc123` from local builds. Anchored to either a `b`
+# preceded by a word boundary OR `version:` to avoid latching onto random
+# 3-6 digit numbers in the surrounding text (commit hashes contain digits).
+_VERSION_RE = re.compile(
+    r"(?:\bb|version:\s*)(\d{3,6})\b",
+    re.IGNORECASE,
+)
 
 
 class LlamaServerBinaryError(RuntimeError):
@@ -113,7 +123,12 @@ def get_binary_version(binary: Path) -> tuple[str, int | None]:
             [str(binary), "--version"],
             capture_output=True,
             text=True,
-            timeout=10,
+            # Modern macOS builds (b9000+) load the Metal library on
+            # `--version`, which can take 12-15s on first invocation
+            # because it compiles and caches shaders. 30s leaves
+            # comfortable headroom; a binary that hangs longer than
+            # that is genuinely broken.
+            timeout=30,
             check=False,
         )
     except (subprocess.TimeoutExpired, OSError) as e:
@@ -164,7 +179,7 @@ def assert_min_version(binary: Path, min_version_tag: str) -> None:
 # Default min version pin — see `Specs/llama_server_migration.md` for
 # the rationale. Override via `LLAMA_SERVER_MIN_VERSION` if you need to
 # experiment with a newer or older tag.
-DEFAULT_MIN_VERSION = "b5400"
+DEFAULT_MIN_VERSION = "b9049"
 
 
 def resolve_and_check() -> Path:

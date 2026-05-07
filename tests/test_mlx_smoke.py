@@ -171,10 +171,14 @@ async def test_mlx_answer_from_image():
         pytest.skip("committed image fixture missing; can't verify content")
 
     agent = build_answer_agent()
+    # Phrase the prompt so the model returns prose, not a list. Gemma 4
+    # otherwise emits a JSON list when asked "list every X" and the
+    # Answer schema (answer: str) trips structured-output parsing —
+    # that's a schema concern, not a vision one.
     ans = await answer_question(
         agent,
-        "What text is visible in this image?",
-        [str(fixture.relative_to(REPO_ROOT))],
+        "Describe what you see in this image, including any visible text.",
+        [str(fixture)],
     )
 
     assert isinstance(ans, Answer)

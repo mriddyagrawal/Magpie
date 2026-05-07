@@ -91,7 +91,7 @@ Three PRs. Each commits cleanly on `llama-server` and is independently shippable
 |---|---|
 | `pyproject.toml` | Remove `llama-cpp-python` and `huggingface-hub` (the latter stays only if model_downloader still needs it — it does, for GGUFs). Keep `huggingface-hub`. |
 | `justfile` | **Delete** `install-llama` (the cpp-python rebuild recipe). **Add** `install-llama-server` (downloads platform-appropriate binary tarball from llama.cpp GitHub releases, extracts to `<APP_DATA_DIR>/bin/`, verifies `llama-server --version`). |
-| `.env` + `.env.example` | Remove `LOCAL_N_GPU_LAYERS` (replaced by per-profile `ngl`). Add `LLAMA_SERVER_PATH`, `LLAMA_SERVER_MIN_VERSION=b5400`, `LLAMA_SERVER_BASE_PORT=9100`, `LLAMA_SERVER_MAX_LOADED_MODELS=1`, `LLAMA_SERVER_IDLE_TIMEOUT_S=600`, `LLAMA_SERVER_STARTUP_TIMEOUT_S=60`. Keep `LOCAL_MODEL`, `LOCAL_QUANT`, `LOCAL_N_CTX`, `LOCAL_TEMPERATURE`, `LOCAL_THINKING`. |
+| `.env` + `.env.example` | Remove `LOCAL_N_GPU_LAYERS` (replaced by per-profile `ngl`). Add `LLAMA_SERVER_PATH`, `LLAMA_SERVER_MIN_VERSION=b9049` (post-validation correction; see decisions log + deviations log), `LLAMA_SERVER_BASE_PORT=9100`, `LLAMA_SERVER_MAX_LOADED_MODELS=1`, `LLAMA_SERVER_IDLE_TIMEOUT_S=600`, `LLAMA_SERVER_STARTUP_TIMEOUT_S=60`. Keep `LOCAL_MODEL`, `LOCAL_QUANT`, `LOCAL_N_CTX`, `LOCAL_TEMPERATURE`, `LOCAL_THINKING`. |
 | `README.md` | Replace the Metal/CUDA `CMAKE_ARGS` matrix with `just install-llama-server` instructions. |
 | `tests/inference/test_chat_template.py` | No change — pure unit tests. |
 | `tests/inference/test_message_flatten.py` | Update the warning-on-binary-drop test. With vision still unsupported in PR 1, the warning behavior stays — just emitted from `LlamaServerLLM` now. |
@@ -235,13 +235,17 @@ These are the diff between what PR 1's spec said and what actually shipped. Logg
 
 ## Bundling story (Plan #10 future)
 
-Today's `just install-llama-server` recipe downloads the platform-appropriate binary from llama.cpp's GitHub releases:
-- **macOS Apple Silicon** → `llama-bXXXX-bin-macos-arm64.zip`
-- **macOS Intel** → `llama-bXXXX-bin-macos-x64.zip`
-- **Linux x86_64** → `llama-bXXXX-bin-ubuntu-x64.zip`
-- **Windows x86_64** → `llama-bXXXX-bin-win-cuda-x64.zip` or `-cpu-x64.zip`
+Today's `just install-llama-server` recipe downloads the platform-appropriate binary from llama.cpp's GitHub releases (full asset table lives in PR 4 above; abbreviated here):
+- **macOS Apple Silicon** → `llama-bXXXX-bin-macos-arm64.tar.gz`
+- **macOS Intel** → `llama-bXXXX-bin-macos-x64.tar.gz`
+- **Linux x86_64** → `llama-bXXXX-bin-ubuntu-x64.tar.gz` (or `-vulkan-x64.tar.gz` with `LLAMA_SERVER_GPU=vulkan`)
+- **Linux aarch64** → `llama-bXXXX-bin-ubuntu-arm64.tar.gz`
+- **Windows x86_64** → `llama-bXXXX-bin-win-cpu-x64.zip` (or CUDA / Vulkan variants per `LLAMA_SERVER_GPU`)
+- **Windows arm64** → `llama-bXXXX-bin-win-cpu-arm64.zip`
 
-Extracts to `<APP_DATA_DIR>/bin/llama-server`. The discovery code looks for the binary in this order:
+Note: only Windows still ships .zip; macOS and Linux assets switched to .tar.gz upstream around the b8000+ release range. The Python installer handles both formats transparently via `tarfile` + `zipfile` from stdlib.
+
+Extracts to `<APP_DATA_DIR>/bin/llama-server` (or `llama-server.exe` on Windows). The discovery code looks for the binary in this order:
 1. `LLAMA_SERVER_PATH` env var
 2. `<APP_DATA_DIR>/bin/llama-server` (where `install-llama-server` puts it)
 3. `<bundled .app resources>/bin/llama-server` (Plan #10)
@@ -269,7 +273,7 @@ After PR 3 merges, T3 image-bearing calls use vision automatically. Users see be
 
 ## Risks
 
-1. **`<|think|>` token survives `--jinja` rendering — unverified.** PR 1's smoke test must confirm. **Likely outcome:** works fine — `--jinja` renders the GGUF's embedded chat template over the message list, and `<|think|>` inside system-message content is just text that passes through. **If it doesn't:** the fix is NOT switching to `/v1/completions` (raw, no chat template) — that's a much bigger rewrite because every call site assumes chat format with system/user/assistant roles. The right fallback is to inject the thinking token **after** the chat template is applied, by intercepting the rendered prompt and prepending the token before sending. llama-server exposes this via the `prefill` parameter on `/v1/chat/completions` in newer builds; if not available on b5400, we add a string-rewrite step on the rendered template. Either way, message construction stays in chat-format. Document the chosen path in PR 1 if the smoke test forces the fallback.
+1. **Thinking-mode handling under `--jinja` — RESOLVED 2026-05-07 with a fix that wasn't in the original plan.** The original concern (does our `<|think|>` system-message injection survive Jinja chat-template rendering) was the right *area* but the wrong *direction*. What actually happens on b9049 + Gemma 4 E4B: the GGUF's embedded chat template auto-enables thinking mode regardless of the injected token, routing 90%+ of the token budget into a separate `reasoning_content` channel and leaving `content` mostly empty. The fix is to send `chat_template_kwargs: {enable_thinking: <bool>}` on every chat-completions request, threaded from the caller's `thinking` kwarg. We also added a `_extract_content` fallback that surfaces `reasoning_content` when `content` is empty, in case a future build renames the kwarg. Verified against the vision integration test: was reproducibly empty without the fix, fully resolves with it. Logged in detail in the "Post-validation deviations log" section below.
 2. **Streaming + structured output don't compose.** Current code already handles this — `stream()` is `/generate`-only; `LocalAgent.run` is non-streaming. PR 1 keeps that boundary.
 3. **Subprocess port collisions.** If a previous run left an orphan process on port 9100, the next spawn fails. Pool manager picks the next available port automatically (port + 1, retry). The atexit handler should prevent this in practice.
 4. **Binary version skew at startup.** Hard-fail at startup with a clear message if `llama-server --version` is below `LLAMA_SERVER_MIN_VERSION`. User runs `just install-llama-server` to upgrade.

@@ -65,6 +65,7 @@ LLM/embedding model swaps, evaluation, cross-provider feature parity.
 - **#9** Liquid AI LFM2 model evaluation
 - **#16** LLM / inference settings UI + thinking-mode unification *(also: UI, Config)*
 - **#22** Adding a new local LLM — playbook (Qwen2.5-VL, LFM2-VL, MiniCPM-V, …)
+- **#23** MLX backend (Apple Silicon opt-in) for raw speed *(also: Config)*
 
 ---
 
@@ -1014,5 +1015,46 @@ Each one has bitten us at least once during the Gemma 4 work. Pre-empt by checki
 - The architectural assumption — mmproj idle for text-only — is verified for Gemma 4 (spec post-validation deviations log) and *expected* for Qwen / LFM2 / MiniCPM-V from llama.cpp's [multimodal docs](https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md), not separately verified. Step 7's real-corpus smoke is what closes that gap when adding a new family.
 - If the new model is text-only (no vision), skip step 1's mmproj dispatch and the profile's `mmproj_repo_id` field. The pool's `_build_argv` already handles the "no mmproj" case for the legacy `gemma-4-e4b-text` profile.
 - License check before defaulting: Gemma's license has commercial restrictions; LFM2 is Apache-2.0-derivative; Qwen is Tongyi Qianwen LICENSE (research-friendly, commercial restrictions over $10M ARR). Any profile we promote to the default needs license sign-off, not just technical sign-off.
+
+---
+
+## 23. MLX backend (Apple Silicon opt-in) for raw speed
+
+**Tags:** models · config
+
+**What:** Add Apple's [MLX](https://github.com/ml-explore/mlx) as a *parallel* local-inference backend for Mac users who want the extra throughput. Llama.cpp server stays the default and only cross-platform path; MLX runs alongside as an opt-in engine selected via `LLM_BACKEND=mlx` (or a Plan-#16 settings-UI dropdown). Both engines satisfy the existing `LocalLLM` Protocol, so callers (LocalAgent, /generate, the answer step) don't change.
+
+**Why we'd do it.** Independent benchmarks (see [contracollective.com](https://contracollective.com/blog/llama-cpp-vs-mlx-ollama-vllm-apple-silicon-2026), [arxiv 2511.05502](https://arxiv.org/pdf/2511.05502)) show MLX delivering 20-40% higher autoregressive throughput than llama.cpp on Apple Silicon for models under ~14B parameters — the regime Magpie lives in. On an M1 Max running Gemma 4 E4B Q5_K_XL we measured ~22 tok/s under llama.cpp `b9049` (post llama-server-migration); MLX equivalent should land around 27-30 tok/s. For a 76-second answer-step run, that's ~55s instead — a real felt difference for users who do many Q&A turns per session. The advantage narrows to ~zero at 27B+ where memory bandwidth (273 GB/s on M2, 400 GB/s on M2 Ultra) becomes the bottleneck, but Magpie's defaults sit comfortably below that threshold.
+
+**Why we did NOT do it now.**
+
+- **Apple-only.** Magpie's portability claim is the table stakes. Llama.cpp serves Mac, Linux x86_64, Linux arm64, and Windows from one binary; MLX can't help Rahul on his Linux box. Adding MLX as the *default* would split the team's testing matrix; adding it as an *opt-in* keeps the matrix manageable but is still real fork maintenance.
+- **Headline-vs-effective throughput trap.** [Famstack's analysis](https://famstack.dev/guides/mlx-vs-gguf-apple-silicon/) measured 51 tok/s reported but 3 tok/s wall-clock for Qwen3.5-35B at 8.5K context on M1 Max. The benchmark numbers above are mid-generation; Magpie's RAG workloads have heavy prefill (multiple file contents stuffed into the answer prompt). The real-world speedup may be far less than the benchmarks promise once prefill, KV-cache management, and image-encode time are counted. Doing this without measuring on Magpie's actual workload first is wasted effort.
+- **Vision parity gap.** Llama.cpp's `--mmproj` is the universal pattern across Gemma 4 / Qwen-VL / LFM2-VL / MiniCPM-V (spec deviation log + Plan #22). MLX has working multimodal support but the API surface is different — would need a separate weights downloader, a separate vision adapter, separate per-model verification. The work isn't impossible but it's the same scope as PR 2 of the llama-server migration, repeated per family.
+- **Bundling story differs.** Plan #10 (self-contained packaging) targets a single binary that ships in the .app. Llama.cpp is one C++ binary + GGUFs. MLX is a Python framework with its own compiled kernels, weight format, and pip-style dependency tree — packaging that into a notarized .app is meaningfully harder. Wait until Plan #10's macOS-specific build path is concrete before adding a Mac-specific runtime.
+
+**When to revisit.** Any of these triggers fire:
+
+- A Mac user (you, Rahul, or an early customer) reports answer latency or summary throughput as the bottleneck during real use — not as a hypothetical speedup. Should be measured on the actual Magpie workload (long-context RAG), not micro-benchmarks.
+- Plan #10 ships a bifurcated build pipeline that already produces Mac-specific .app artifacts (vs. a single cross-platform binary). At that point a Mac-only second backend is a marginal cost increase on top of the bifurcation.
+- A vision-capable MLX adapter for Gemma 4 / Qwen2.5-VL / LFM2-VL reaches parity with llama.cpp's mmproj in upstream MLX or community libraries (so we'd be wiring an existing adapter, not building one).
+- We hit a llama.cpp issue that MLX dodges (e.g., a regression in Gemma 4 thinking-mode handling that's already fixed upstream in MLX). Specific motivation, specific fix.
+
+**Scope sketch (~500-800 LOC if/when we do it):**
+
+- New `src/inference/mlx_local_llm.py` — `MLXLocalLLM` class implementing the `LocalLLM` Protocol. Same `complete` / `complete_sync` / `stream(images=...)` surface as `LlamaServerLLM`. Internally calls `mlx_lm.generate` / `mlx_vlm.generate`.
+- New `src/inference/mlx_weights.py` — analog of `model_downloader.py` for MLX weight format. MLX models are typically distributed as separate HF repos (e.g., `mlx-community/gemma-4-E4B-it-4bit`). Add the filename / variant dispatch table here, similar to Plan #22's pattern but for MLX.
+- Backend selector at the singleton level — `get_local_llm()` reads `LLM_BACKEND` env var, returns either `LlamaServerLLM()` (default) or `MLXLocalLLM()`. Exists at one place; everything else is unchanged.
+- No subprocess pool needed — MLX is in-process Python (no spawn / health-check / LRU machinery from `LlamaServerPool`). MLX has its own KV-cache management.
+- Settings UI integration (depends on Plan #16): a "Backend" dropdown surfaces `llama-server` / `mlx (Apple Silicon only)`. Greyed out on non-Apple-Silicon hosts.
+- Tests: new `tests/inference/test_mlx_local_llm.py` mocking `mlx_lm` / `mlx_vlm`. Real-spawn integration test gated by `LLAMA_SERVER_VISION_INTEGRATION` (or a new `MLX_VISION_INTEGRATION`) flag, same pattern as the llama.cpp one.
+
+**Notes for the future implementer:**
+
+- The `LocalLLM` Protocol was designed precisely so a swap like this doesn't ripple through callers — see [`Specs/llama_server_migration.md`](../Specs/llama_server_migration.md) Pre-flight audit. Verify that contract still holds before starting (the `images=` kwarg + `chat_template_kwargs.enable_thinking` body shape are post-2026-05 additions that MLX may need to mirror differently).
+- Don't pin MLX as the default even on Apple Silicon. The opt-in flag is load-bearing — users on tight RAM, users mixing platforms across machines, and users running into MLX-specific bugs all need a one-flag escape hatch back to llama.cpp.
+- Measure ONE specific thing first before committing: end-to-end answer-step latency on a typical Magpie corpus question (long retrieval prompt + Gemma 4-class model) under MLX vs. llama.cpp, on the same machine, with a warm pool. If the gap is < 15% wall-clock for our workload (not the benchmark workload), the engineering cost isn't justified — bail.
+- License sanity check: MLX itself is MIT (Apple). MLX-LM is Apache-2.0. The MLX-format model weights typically inherit from the upstream model's license — same Gemma / Qwen / LFM2 license caveats as Plan #22.
+- macOS-specific failure mode to watch: MLX requires macOS 13.5+. If we have users on older systems, the opt-in needs to gracefully reject + fall back to llama.cpp with a clear message.
 
 ---

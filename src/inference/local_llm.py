@@ -221,7 +221,9 @@ class LlamaServerLLM:
         )
         if images:
             prepared = _attach_images_to_last_user(prepared, images)
-        body = self._build_request_body(prepared, temperature, max_tokens, stream=False)
+        body = self._build_request_body(
+            prepared, temperature, max_tokens, stream=False, thinking=thinking
+        )
         url = self._base_url(profile_name) + "/v1/chat/completions"
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
             resp = await self._post_with_pool_recovery(client, url, body, profile_name)
@@ -249,7 +251,9 @@ class LlamaServerLLM:
         )
         if images:
             prepared = _attach_images_to_last_user(prepared, images)
-        body = self._build_request_body(prepared, temperature, max_tokens, stream=False)
+        body = self._build_request_body(
+            prepared, temperature, max_tokens, stream=False, thinking=thinking
+        )
         url = self._base_url(profile_name) + "/v1/chat/completions"
         with httpx.Client(timeout=self.request_timeout_s) as client:
             resp = self._post_with_pool_recovery_sync(client, url, body, profile_name)
@@ -314,16 +318,34 @@ class LlamaServerLLM:
         max_tokens: Optional[int],
         *,
         stream: bool,
+        thinking: bool = False,
     ) -> dict[str, Any]:
         """OpenAI-compatible chat-completions request body. We omit
         fields with None values so llama-server's defaults stay in
-        play (especially `max_tokens`, where None = no client-side cap)."""
+        play (especially `max_tokens`, where None = no client-side cap).
+
+        Gemma 4's embedded chat template auto-enables thinking mode
+        when rendered via `--jinja`. With thinking on, the model spends
+        most of its token budget in `reasoning_content` and leaves
+        `content` mostly empty — exactly the wrong default for our
+        structured-output callers. We pass
+        `chat_template_kwargs.enable_thinking` to llama-server so the
+        template emits the no-thinking variant when our caller passes
+        `thinking=False`. Validated empirically against b9049 + Gemma 4
+        E4B 2026-05-07 — without this the vision integration test
+        regressed (content empty, all 512 tokens went to reasoning).
+        """
         body: dict[str, Any] = {
             "messages": messages,
             "stream": stream,
             "temperature": (
                 temperature if temperature is not None else self.default_temperature
             ),
+            # The template kwarg is harmless on models whose templates
+            # don't read it (the Jinja renderer just ignores undefined
+            # vars). Always set it so the explicit choice is visible in
+            # the request — never rely on the model's default.
+            "chat_template_kwargs": {"enable_thinking": bool(thinking)},
         }
         if max_tokens is not None:
             body["max_tokens"] = max_tokens
@@ -334,9 +356,21 @@ class LlamaServerLLM:
         """Pull the assistant message content out of an OpenAI-shaped
         response. Defensive against null fields (some models emit
         `content: null` when the response is purely a tool call —
-        not relevant today, but harmless to handle)."""
+        not relevant today, but harmless to handle).
+
+        Fallback: if `content` is empty AND `reasoning_content` is
+        present, surface the reasoning. Belt-and-suspenders against
+        the Gemma 4 thinking-mode footgun — even if a future build's
+        `enable_thinking` kwarg gets renamed and our suppression
+        silently breaks, callers see *some* output rather than empty
+        strings + degraded JSON-repair fallback paths.
+        """
         try:
-            return payload["choices"][0]["message"]["content"] or ""
+            msg = payload["choices"][0]["message"]
+            content = msg.get("content") or ""
+            if content:
+                return content
+            return msg.get("reasoning_content") or ""
         except (KeyError, IndexError, TypeError):
             return ""
 

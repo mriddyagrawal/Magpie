@@ -599,6 +599,7 @@ def run_search(
     question: str | None = None,
     rerank: bool = False,
     skip_fast: bool = False,
+    enumerate_lists: bool = True,
 ) -> list[SearchResult]:
     """Run hybrid search across both the summary and fast-tier collections.
 
@@ -622,7 +623,7 @@ def run_search(
     """
     from src.stage2.query_classify import QueryClass, classify_and_config
 
-    if question is not None:
+    if question is not None and enumerate_lists:
         klass, cfg = classify_and_config(question)
         # Adaptive routing only **widens** top_k, never narrows. We bump the
         # caller's value only when (a) the class is one with a real

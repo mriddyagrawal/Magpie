@@ -79,7 +79,16 @@ async def ask(
     """
     import time
     t_start = time.monotonic()
-    print(f"\n[query] question: {question!r} (top_k={top_k}, rewrite={rewrite}, fast={fast})",
+    # Read the user's enumerate_lists toggle once per query. Off = treat
+    # every question as a regular semantic search (no top_k widening,
+    # no rerank suppression, no ENUMERATION MODE prompt addition).
+    try:
+        from src.config.settings import effective_settings
+        enumerate_lists = effective_settings().enumerate_lists
+    except Exception:  # noqa: BLE001 — defensive, never block on settings
+        enumerate_lists = True
+    print(f"\n[query] question: {question!r} (top_k={top_k}, rewrite={rewrite}, "
+          f"fast={fast}, enumerate_lists={enumerate_lists})",
           file=sys.stderr, flush=True)
 
     if rewrite:
@@ -95,7 +104,9 @@ async def ask(
 
     t = time.monotonic()
     retrieved = await asyncio.to_thread(
-        run_search, sq, top_k, question=question, skip_fast=not fast, rerank=True
+        run_search, sq, top_k,
+        question=question, skip_fast=not fast, rerank=True,
+        enumerate_lists=enumerate_lists,
     )
     print(f"[query] retrieval ({time.monotonic()-t:.2f}s): {len(retrieved)} hits",
           file=sys.stderr, flush=True)
@@ -149,6 +160,7 @@ async def ask(
     ans: Answer = await answer_question(
         agent, question, paths, search_query=sq,
         csv_row_hits=csv_row_hits or None,
+        enumerate_lists=enumerate_lists,
     )
     print(f"[query] answer ({time.monotonic()-t:.2f}s): "
           f"{len(ans.answer)} chars, sources_used={ans.sources_used}",

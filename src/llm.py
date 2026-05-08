@@ -116,29 +116,28 @@ PROVIDERS: dict[str, ProviderConfig] = {
 def active_provider() -> ProviderConfig:
     """Return the `ProviderConfig` pointed at by the current settings.
 
-    Resolution order (matches `Plans/UI/Implementation Plan.md` PR 3):
+    Resolution order:
 
-      1. `LLM_PROVIDER` env var — explicit override, wins absolutely.
-         Preserves today's dev-mode behavior (`LLM_PROVIDER=openrouter
-         just chat` keeps working).
-      2. `settings.json` (UserSettings) — the user's choice via the
-         Settings UI (Local vs Cloud). When provider="cloud", we
-         dispatch to `cloud_provider` (e.g., "openrouter") from
-         AppDefaults; the user never sees the provider name in the
-         UI.
-      3. Hardcoded fallback "openrouter" — preserves pre-PR-3 behavior
-         when neither env nor settings.json have been touched.
+      1. `settings.json` (UserSettings) — the user's choice via the
+         Settings → Search & AI tab (Local vs Cloud). When
+         provider="cloud", we dispatch to `cloud_provider` (e.g.,
+         "openrouter") from secrets.json, paired with the credentials
+         for that provider.
+      2. `LLM_PROVIDER` env var — fallback only when settings.json is
+         unavailable (degenerate test envs). In normal operation,
+         settings.json is seeded from defaults on first launch and
+         always carries a value, so env doesn't apply.
+      3. Hardcoded fallback "openrouter" — last-resort.
+
+    HISTORY: Earlier, env won absolutely so a dev's `LLM_PROVIDER=local`
+    in `.env` overrode the user's Cloud-button click in Settings —
+    silently. The env override was changed to a fallback on
+    2026-05-08 so the UI choice actually controls routing. The
+    justfile's `chat-cloud` recipe (which used `LLM_PROVIDER=magpie-cloud`)
+    no longer routes via env; toggle Settings → Cloud or edit
+    settings.json directly to test that path.
     """
-    raw_env = os.environ.get("LLM_PROVIDER", "").strip().lower()
-    if raw_env:
-        if raw_env not in PROVIDERS:
-            sys.exit(
-                f"error: LLM_PROVIDER={raw_env!r} is unknown. "
-                f"Valid values: {sorted(PROVIDERS)}."
-            )
-        return PROVIDERS[raw_env]
-
-    # No env override → consult settings.json. Lazy import to avoid a
+    # Settings.json is the source of truth. Lazy import to avoid a
     # cold cycle on `from src.llm import ...` and to keep this module
     # importable in environments where the config layer isn't built yet.
     try:
@@ -149,10 +148,9 @@ def active_provider() -> ProviderConfig:
 
     if s is not None:
         if s.provider == "cloud":
-            # Cloud routing now lives in secrets.json (paired with the
-            # credentials), not settings.json. secrets.json:cloud_provider
-            # is constrained to the v1 set (moonshot/openrouter) by
-            # Pydantic Literal, so this is safe.
+            # Cloud routing lives in secrets.json (paired with the
+            # credentials). cloud_provider is constrained to the v1 set
+            # (moonshot/openrouter) by Pydantic Literal, so this is safe.
             try:
                 from src.config.secrets import load_secrets
                 cloud_provider = load_secrets().cloud_provider
@@ -168,6 +166,10 @@ def active_provider() -> ProviderConfig:
         if s.provider == "local":
             return PROVIDERS["local"]
 
+    # Settings layer unavailable — last-resort fallback through env.
+    raw_env = os.environ.get("LLM_PROVIDER", "").strip().lower()
+    if raw_env and raw_env in PROVIDERS:
+        return PROVIDERS[raw_env]
     return PROVIDERS["openrouter"]
 
 

@@ -285,6 +285,7 @@ async def answer_question(
     history: list[tuple[str, str]] | None = None,
     search_query: "SearchQuery | None" = None,
     csv_row_hits: dict[str, list[int]] | None = None,
+    enumerate_lists: bool = True,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -528,7 +529,7 @@ async def answer_question(
     # answer stage sees the same class the search layer used. Pure regex,
     # no LLM call, cheap to run.
     from src.stage2.query_classify import QueryClass, classify as _classify_q
-    if _classify_q(question) is QueryClass.LIST_ALL:
+    if enumerate_lists and _classify_q(question) is QueryClass.LIST_ALL:
         intro_parts.append(
             ""
         )

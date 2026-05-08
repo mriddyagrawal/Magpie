@@ -226,10 +226,25 @@ export function MagpieWindow() {
       try {
         const { getCurrentWindow } = await import("@tauri-apps/api/window");
         const appWindow = getCurrentWindow();
+
+        // On focus (re-summon via Alt+Space, tray click, etc.), reset
+        // to resting so the user starts fresh — Spotlight-style.
+        // "Default action on activation: Empty ask bar" per the spec.
         const unFocus = await appWindow.listen("tauri://focus", () => {
+          setView({ kind: "resting" });
           requestAnimationFrame(() => inputRef.current?.focus());
         });
         cleanups.push(unFocus);
+
+        // On blur (user clicks another app or presses Cmd+Tab),
+        // hide the window. Spotlight pattern. The recents panel and
+        // any in-flight question state survive — re-summon brings the
+        // user back to a fresh resting bar; the recents panel will
+        // show the just-asked question on next type.
+        const unBlur = await appWindow.listen("tauri://blur", () => {
+          hideWindow();
+        });
+        cleanups.push(unBlur);
       } catch {
         // Not under Tauri — ignore.
       }
@@ -316,6 +331,30 @@ export function MagpieWindow() {
     submitQuestion(entry.question);
   }, [submitQuestion]);
 
+  // Click-to-edit / follow-up: revert to typing state with the
+  // current question pre-filled. Both the question-header click and
+  // the AnswerCard's "+ follow up" button route here. Lets the user
+  // refine a question and re-ask without going through Esc.
+  const editCurrentQuestion = useCallback(() => {
+    if (
+      view.kind === "answering" ||
+      view.kind === "not_found" ||
+      view.kind === "retrieving"
+    ) {
+      const q = view.question;
+      setView({ kind: "typing", query: q, selected: null });
+      requestAnimationFrame(() => {
+        const el = inputRef.current;
+        if (!el) return;
+        el.focus();
+        // Move caret to the end so the user can immediately keep
+        // typing (Ctrl-A to select-all if they want to replace).
+        const len = q.length;
+        try { el.setSelectionRange(len, len); } catch { /* ok */ }
+      });
+    }
+  }, [view]);
+
   // -------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------
@@ -384,6 +423,7 @@ export function MagpieWindow() {
           loading={view.kind === "retrieving"}
           booting={booting}
           submittedQuestion={submittedQuestion}
+          onEditQuestion={editCurrentQuestion}
         />
         <SettingsBlob port={port} />
       </div>
@@ -414,6 +454,7 @@ export function MagpieWindow() {
           result={view.result}
           selectedPath={view.selectedPath}
           onSelect={(path) => setView({ ...view, selectedPath: path })}
+          onFollowUp={editCurrentQuestion}
           highlights={highlights}
         />
       )}
@@ -444,11 +485,13 @@ function AnsweringBody({
   result,
   selectedPath,
   onSelect,
+  onFollowUp,
   highlights,
 }: {
   result: QueryResponse;
   selectedPath: string | null;
   onSelect: (path: string) => void;
+  onFollowUp: () => void;
   highlights: string[];
 }) {
   return (
@@ -460,7 +503,7 @@ function AnsweringBody({
           highlights={highlights}
           error={null}
           loading={false}
-          onFollowUp={() => undefined}
+          onFollowUp={onFollowUp}
           onSelectSource={onSelect}
         />
         <SourcesCard

@@ -76,6 +76,28 @@ REPO_ROOT = APP_DATA_DIR
 
 load_dotenv()
 
+# Eager-bootstrap the layered config files so they exist on disk for
+# the user to inspect. Both are lazy-bootstrapped on first call by the
+# code paths that need them (settings: settings UI; secrets: build
+# cloud chat model), but in pure-local mode neither path fires
+# during a session and the user wonders why <APP_DATA_DIR> looks
+# empty. Running the bootstraps here makes the files appear on first
+# server start regardless of which provider the user picks.
+def _eager_bootstrap_config() -> None:
+    try:
+        from src.config.settings import load_user_settings
+        load_user_settings()  # writes settings.json with defaults if missing
+    except Exception as e:  # noqa: BLE001
+        print(f"[server] settings bootstrap warning: {e}", file=sys.stderr)
+    try:
+        from src.config.secrets import load_secrets
+        load_secrets()  # writes secrets.json (mode 0600) seeded from .env
+    except Exception as e:  # noqa: BLE001
+        print(f"[server] secrets bootstrap warning: {e}", file=sys.stderr)
+
+
+_eager_bootstrap_config()
+
 app = FastAPI(title="Magpie", version="0.1.0")
 
 # Permissive CORS so the Vite dev server (typically localhost:5173) can hit

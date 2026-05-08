@@ -24,6 +24,10 @@ interface Props {
   loading: boolean;
   booting: boolean;
   submittedQuestion: string | null;
+  /** Click on the read-only question-header reverts to typing state
+   *  with the question pre-filled, so the user can refine and re-ask
+   *  without going through Esc. Only used when submittedQuestion !== null. */
+  onEditQuestion?: () => void;
 }
 
 // Explicit drag: call startDragging() on mousedown anywhere on the card that
@@ -44,7 +48,7 @@ function startDragOnMouseDown(e: React.MouseEvent) {
 
 export const QuestionCard = forwardRef<HTMLInputElement, Props>(
   function QuestionCard(
-    { value, onChange, onSubmit, loading, booting, submittedQuestion },
+    { value, onChange, onSubmit, loading, booting, submittedQuestion, onEditQuestion },
     ref
   ) {
     useEffect(() => {
@@ -71,9 +75,18 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
           />
         </picture>
         {isActive ? (
-          <div className="question-card__title" data-tauri-drag-region>
+          // Click-to-edit: tapping the read-only question header reverts
+          // the bar to typing state with the question pre-filled.
+          // Without this, the user has no obvious way to ask another
+          // question without pressing Esc.
+          <button
+            type="button"
+            className="question-card__title"
+            onClick={onEditQuestion}
+            title="Edit question"
+          >
             {display}
-          </div>
+          </button>
         ) : (
           <input
             ref={ref}

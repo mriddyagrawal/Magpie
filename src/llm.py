@@ -23,15 +23,18 @@ until per-provider reasoning APIs are wired (see Plans/Future Plans.md #16).
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
 import sys
+import time
 import warnings
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING, Generic, Protocol, TypeVar
 
+import httpx
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
@@ -39,6 +42,10 @@ if TYPE_CHECKING:
 
 
 API_MAX_RETRIES = 5
+# Per-request HTTP timeout for the direct cloud chat-completion call
+# in `_CloudAgent`. Generous because some providers + models cold-start
+# slowly on the first request of the day.
+API_REQUEST_TIMEOUT_S = 90.0
 LOCAL_MAX_TOKENS = 2048
 
 
@@ -249,7 +256,37 @@ def build_chat_model(*, provider_override: str | None = None) -> OpenAIChatModel
     )
     base_url = os.environ.get(cfg.base_url_env, cfg.default_base_url)
     client = AsyncOpenAI(api_key=api_key, base_url=base_url, max_retries=API_MAX_RETRIES)
-    return OpenAIChatModel(model, provider=OpenAIProvider(openai_client=client))
+
+    # Disable structured-output `response_format` at the profile level.
+    # Why: pydantic-ai's OpenAI client sends one of three things based on
+    # the profile flags:
+    #   - native mode + supports_json_schema_output → response_format =
+    #     {"type": "json_schema", ...}
+    #   - prompted mode + supports_json_object_output → response_format =
+    #     {"type": "json_object"}
+    #   - neither → no response_format field at all
+    # OpenRouter routes our Gemma free traffic to Google AI Studio,
+    # which silently rejects BOTH variants of response_format —
+    # symptom is a malformed completion with id/choices/model/object
+    # all None and pydantic-ai's validator throwing four "Input should
+    # be a valid X" errors. We force the third path: no response_format,
+    # rely on the SYSTEM_PROMPT's JSON-shape guidance + pydantic-ai's
+    # PromptedOutput template injection to coax JSON out of the model,
+    # then PydanticAI parses the text response.
+    # When we eventually add direct provider integrations (Anthropic,
+    # OpenAI), those CAN honor response_format and we should restore the
+    # flags per-provider. For now, OpenRouter is our only cloud route.
+    from pydantic_ai.profiles.openai import (
+        OpenAIJsonSchemaTransformer, OpenAIModelProfile,
+    )
+    profile = OpenAIModelProfile(
+        json_schema_transformer=OpenAIJsonSchemaTransformer,
+        supports_json_schema_output=False,
+        supports_json_object_output=False,
+    )
+    return OpenAIChatModel(
+        model, provider=OpenAIProvider(openai_client=client), profile=profile,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -283,9 +320,15 @@ class ChatAgent(Protocol, Generic[T]):
     unification work).
     """
 
-    async def run(self, message: list, *, thinking: bool = False) -> T: ...
+    async def run(
+        self, message: list, *, thinking: bool = False,
+        temperature: float | None = None,
+    ) -> T: ...
 
-    def run_sync(self, message: list, *, thinking: bool = False) -> T: ...
+    def run_sync(
+        self, message: list, *, thinking: bool = False,
+        temperature: float | None = None,
+    ) -> T: ...
 
 
 # Track that we've already warned about cloud thinking-mode this process,
@@ -307,10 +350,28 @@ def _warn_cloud_thinking_unsupported(provider_name: str) -> None:
 
 
 class _CloudAgent(Generic[T]):
-    """Thin adapter around a PydanticAI Agent so cloud and local share a shape.
+    """Direct-HTTP cloud agent. Same .run()/.run_sync() shape as LocalAgent.
 
-    `.run()` / `.run_sync()` return the parsed Pydantic object directly (i.e.
-    `result.output`), matching what `LocalAgent` returns.
+    HISTORY (2026-05-08): We previously used pydantic-ai's `Agent` with
+    `PromptedOutput`. That sent `response_format={"type": "json_object"}`
+    along with a pile of other fields (parallel_tool_calls, service_tier,
+    reasoning_effort, etc.) that OpenRouter forwarded to upstream. Google
+    AI Studio (which serves the free Gemma-4 line) rejected the request
+    silently — the response body was an error envelope, the OpenAI SDK
+    parsed it as a ChatCompletion, and pydantic-ai threw four "Input
+    should be a valid X" errors with id/choices/model/object all None.
+
+    Since the user's bare-curl test against the same model + key worked
+    fine (clean OpenAI-shape response), the simplest fix is to mirror
+    the bare-curl request: model, messages, optional temperature —
+    nothing else. No tools, no response_format, no thinking, no service
+    tier. Then parse the response with `parse_json_with_repair` (same
+    helper LocalAgent uses). PromptedOutput's value (system-prompt JSON
+    schema injection) is captured by our existing SYSTEM_PROMPT, which
+    already lists the four required keys and emits worked examples.
+
+    Pydantic-ai is still used for the Agent shape protocol (LocalAgent
+    inherits ChatAgent[T]) but is no longer in the cloud request path.
     """
 
     def __init__(
@@ -320,31 +381,274 @@ class _CloudAgent(Generic[T]):
         *,
         provider_override: str | None = None,
     ) -> None:
-        from pydantic_ai import Agent, NativeOutput
-
-        self._agent: Agent[None, T] = Agent(
-            build_chat_model(provider_override=provider_override),
-            output_type=NativeOutput(output_type),
-            system_prompt=system_prompt,
-            retries=3,
+        self._system_prompt = system_prompt
+        self._output_type = output_type
+        # Resolve credentials + base URL once. Same lookup as
+        # build_chat_model: env wins, secrets.json is the second-chance
+        # fallback (for bundled-app installs without a .env).
+        cfg = (
+            PROVIDERS[provider_override] if provider_override is not None
+            else active_provider()
         )
-        self._provider_name = (
-            provider_override
-            if provider_override is not None
-            else active_provider().name
-        )
+        if cfg.name == "local":
+            raise RuntimeError(
+                "_CloudAgent shouldn't be constructed for the local provider."
+            )
+        self._provider_name = cfg.name
+        api_key = os.environ.get(cfg.api_key_env, "").strip()
+        model = os.environ.get(cfg.model_env, "").strip()
+        if not api_key or not model:
+            try:
+                from src.config.secrets import cloud_credentials_for
+                sk, sm = cloud_credentials_for(cfg.name)
+                api_key = api_key or sk.strip()
+                model = model or sm.strip()
+            except Exception:  # noqa: BLE001
+                pass
+        if not api_key:
+            sys.exit(
+                f"error: {cfg.api_key_env} not set for cloud provider "
+                f"{cfg.name!r}. Configure it in .env, secrets.json, or "
+                f"Settings → Search & AI → switch to Local."
+            )
+        self._api_key = api_key
+        self._model = model or cfg.default_model
+        self._base_url = os.environ.get(cfg.base_url_env, cfg.default_base_url)
 
-    async def run(self, message: list, *, thinking: bool = False) -> T:
+    # Per-provider fallback chains for OpenRouter's `models` field — the
+    # provider's officially-recommended reliability pattern. When the
+    # primary model is overloaded / rate-limited / 5xx, OpenRouter
+    # automatically tries the next entry in order. Free Gemma routes are
+    # known to flake (504 "operation was aborted" / 502 provider_unavailable);
+    # the 31B fallback uses a different upstream so a same-time outage
+    # of the 26B route doesn't blow up the user's query. See
+    # https://openrouter.ai/docs/guides/routing/model-fallbacks
+    _OPENROUTER_FALLBACKS: dict[str, list[str]] = {
+        "google/gemma-4-26b-a4b-it:free": [
+            "google/gemma-4-26b-a4b-it:free",
+            "google/gemma-4-31b-it:free",
+        ],
+        "google/gemma-4-31b-it:free": [
+            "google/gemma-4-31b-it:free",
+            "google/gemma-4-26b-a4b-it:free",
+        ],
+    }
+
+    def _build_body(
+        self, message: list, temperature: float | None,
+    ) -> dict[str, Any]:
+        """Bare chat.completions request body — no tools, no
+        response_format, no thinking knobs. Mirrors a known-good curl.
+
+        For OpenRouter, also adds a `models` fallback chain when the
+        primary is one we know flakes (free Gemma routes). OpenRouter
+        cascades through the list automatically on upstream failure."""
+        # Reuse the local-side flattener: pulls images off (we drop
+        # them — vision through OpenRouter is provider-specific and
+        # not wired today), concatenates text into one user message,
+        # appends the JSON-shape reminder.
+        msgs, _images_dropped = _flatten_message_for_local(
+            _prepend_timestamp(message), self._system_prompt
+        )
+        body: dict[str, Any] = {
+            "model": self._model,
+            "messages": msgs,
+        }
+        if temperature is not None:
+            body["temperature"] = temperature
+        if self._provider_name == "openrouter":
+            fallbacks = self._OPENROUTER_FALLBACKS.get(self._model)
+            if fallbacks:
+                body["models"] = fallbacks
+        return body
+
+    # Retry transient upstream failures. Free OpenRouter routes
+    # frequently 502/504 ("provider_unavailable" / "operation was
+    # aborted") for a few seconds, then recover. Two retries with
+    # exponential backoff (1s, 2s) covers the common case without
+    # making the user wait long on genuine outages.
+    _CLOUD_RETRY_ATTEMPTS = 3
+    _CLOUD_RETRY_BACKOFF_S = 1.0
+
+    async def run(
+        self, message: list, *, thinking: bool = False,
+        temperature: float | None = None,
+    ) -> T:
+        from src.inference.llm_log import log_request, log_response
+
         if thinking:
             _warn_cloud_thinking_unsupported(self._provider_name)
-        result = await self._agent.run(_prepend_timestamp(message))
-        return result.output
+        body = self._build_body(message, temperature)
+        request_id = log_request(
+            provider=self._provider_name,
+            model=self._model,
+            messages=body["messages"],
+            system_prompt=self._system_prompt,
+            temperature=temperature,
+            extra={"models_fallback": body.get("models")},
+        )
+        last_err: Exception | None = None
+        for attempt in range(self._CLOUD_RETRY_ATTEMPTS):
+            t_start = time.monotonic()
+            try:
+                async with httpx.AsyncClient(timeout=API_REQUEST_TIMEOUT_S) as client:
+                    resp = await client.post(
+                        f"{self._base_url}/chat/completions",
+                        headers={"Authorization": f"Bearer {self._api_key}"},
+                        json=body,
+                    )
+                content, usage = self._parse_and_log(resp, request_id, t_start)
+                return parse_json_with_repair(content, self._output_type, None)
+            except RuntimeError as e:
+                if not self._is_retryable(e):
+                    log_response(
+                        request_id=request_id,
+                        provider=self._provider_name,
+                        model=self._model,
+                        latency_s=time.monotonic() - t_start,
+                        error=str(e),
+                    )
+                    raise
+                last_err = e
+                if attempt < self._CLOUD_RETRY_ATTEMPTS - 1:
+                    await asyncio.sleep(
+                        self._CLOUD_RETRY_BACKOFF_S * (2 ** attempt)
+                    )
+        log_response(
+            request_id=request_id, provider=self._provider_name,
+            model=self._model, latency_s=0.0,
+            error=f"all {self._CLOUD_RETRY_ATTEMPTS} attempts failed: {last_err}",
+        )
+        assert last_err is not None
+        raise last_err
 
-    def run_sync(self, message: list, *, thinking: bool = False) -> T:
+    def run_sync(
+        self, message: list, *, thinking: bool = False,
+        temperature: float | None = None,
+    ) -> T:
+        from src.inference.llm_log import log_request, log_response
+
         if thinking:
             _warn_cloud_thinking_unsupported(self._provider_name)
-        result = self._agent.run_sync(_prepend_timestamp(message))
-        return result.output
+        body = self._build_body(message, temperature)
+        request_id = log_request(
+            provider=self._provider_name,
+            model=self._model,
+            messages=body["messages"],
+            system_prompt=self._system_prompt,
+            temperature=temperature,
+            extra={"models_fallback": body.get("models")},
+        )
+        last_err: Exception | None = None
+        for attempt in range(self._CLOUD_RETRY_ATTEMPTS):
+            t_start = time.monotonic()
+            try:
+                with httpx.Client(timeout=API_REQUEST_TIMEOUT_S) as client:
+                    resp = client.post(
+                        f"{self._base_url}/chat/completions",
+                        headers={"Authorization": f"Bearer {self._api_key}"},
+                        json=body,
+                    )
+                content, usage = self._parse_and_log(resp, request_id, t_start)
+                return parse_json_with_repair(content, self._output_type, None)
+            except RuntimeError as e:
+                if not self._is_retryable(e):
+                    from src.inference.llm_log import log_response
+                    log_response(
+                        request_id=request_id,
+                        provider=self._provider_name,
+                        model=self._model,
+                        latency_s=time.monotonic() - t_start,
+                        error=str(e),
+                    )
+                    raise
+                last_err = e
+                if attempt < self._CLOUD_RETRY_ATTEMPTS - 1:
+                    time.sleep(self._CLOUD_RETRY_BACKOFF_S * (2 ** attempt))
+        from src.inference.llm_log import log_response
+        log_response(
+            request_id=request_id, provider=self._provider_name,
+            model=self._model, latency_s=0.0,
+            error=f"all {self._CLOUD_RETRY_ATTEMPTS} attempts failed: {last_err}",
+        )
+        assert last_err is not None
+        raise last_err
+
+    @staticmethod
+    def _is_retryable(err: Exception) -> bool:
+        """5xx upstream errors are transient — retry. 4xx (auth, rate
+        limits with retry-after, malformed body) are caller-driven —
+        don't retry, surface immediately."""
+        msg = str(err)
+        # Match "HTTP 5xx" or upstream code 5xx in malformed-response branch.
+        return "HTTP 5" in msg or "code': 5" in msg or "operation was aborted" in msg
+
+    def _parse_and_log(
+        self, resp: httpx.Response, request_id: str, t_start: float,
+    ) -> tuple[str, dict | None]:
+        """Validate the HTTP response, extract content + usage, log
+        them. Returns `(content, usage)`. Surfaces upstream error
+        envelopes as RuntimeError so the retry loop can decide whether
+        to retry — the response log is written either way."""
+        from src.inference.llm_log import log_response
+        latency = time.monotonic() - t_start
+        if resp.status_code != 200:
+            try:
+                payload = resp.json()
+                err = payload.get("error") if isinstance(payload, dict) else None
+                msg = err.get("message") if isinstance(err, dict) else str(payload)
+            except Exception:  # noqa: BLE001
+                msg = resp.text[:500]
+            log_response(
+                request_id=request_id, provider=self._provider_name,
+                model=self._model, latency_s=latency,
+                raw_status=resp.status_code, error=str(msg),
+            )
+            raise RuntimeError(
+                f"{self._provider_name} returned HTTP {resp.status_code}: {msg}"
+            )
+        try:
+            data = resp.json()
+        except Exception as e:  # noqa: BLE001
+            log_response(
+                request_id=request_id, provider=self._provider_name,
+                model=self._model, latency_s=latency,
+                raw_status=resp.status_code, error=f"non-JSON body: {resp.text[:500]}",
+            )
+            raise RuntimeError(
+                f"{self._provider_name} returned non-JSON body: {resp.text[:500]}"
+            ) from e
+        if not isinstance(data, dict) or "choices" not in data:
+            err = data.get("error") if isinstance(data, dict) else None
+            log_response(
+                request_id=request_id, provider=self._provider_name,
+                model=self._model, latency_s=latency,
+                raw_status=resp.status_code,
+                error=f"no choices: {err if err else str(data)[:500]}",
+            )
+            raise RuntimeError(
+                f"{self._provider_name} returned malformed response (no choices): "
+                f"{err if err else str(data)[:500]}"
+            )
+        try:
+            content = data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as e:
+            log_response(
+                request_id=request_id, provider=self._provider_name,
+                model=self._model, latency_s=latency,
+                raw_status=resp.status_code, error=str(data)[:500],
+            )
+            raise RuntimeError(
+                f"{self._provider_name} response missing choices[0].message.content: "
+                f"{str(data)[:500]}"
+            ) from e
+        usage = data.get("usage") if isinstance(data, dict) else None
+        log_response(
+            request_id=request_id, provider=self._provider_name,
+            model=self._model, latency_s=latency,
+            raw_status=resp.status_code, content=content, usage=usage,
+        )
+        return content, usage
 
 
 def build_agent(
@@ -583,10 +887,15 @@ class LocalAgent(Generic[T]):
     """llama-cpp-python-backed agent. Same .run()/.run_sync() shape as _CloudAgent.
 
     Uses the singleton `LocalLLM` (one engine, two surfaces — also serves
-    the `/generate` endpoint). Structured-output is achieved by
-    JSON-repair after-the-fact; small models don't reliably honor
-    schema instructions, so the repair pipeline (strip fences → extract
-    object → validate) is required.
+    the `/generate` endpoint). Structured-output is constrained at
+    generation time via llama-server's `response_format={"type":
+    "json_schema", ...}` — the schema is compiled to GBNF and the
+    sampler enforces it token-by-token, so the model literally cannot
+    produce invalid JSON or stray prose around the object. We retain
+    `parse_json_with_repair` as a defense-in-depth net (in case the
+    grammar compiler is ever defeated by a complex schema or a model
+    swap that doesn't honor the parameter), but the repair path
+    should be vestigial in practice.
     """
 
     def __init__(
@@ -598,9 +907,37 @@ class LocalAgent(Generic[T]):
         self._system_prompt = system_prompt
         self._output_type = output_type
         self._fallback = fallback
+        # Pre-compute the response_format payload once per agent. Pydantic
+        # model_json_schema() emits standard JSON Schema; llama-server's
+        # `json_schema_to_grammar` handles the common subset (objects,
+        # arrays, strings, ints, bools, enums, $defs/$ref). `strict: true`
+        # asks for full enforcement; if a future schema gets exotic
+        # enough to break the compiler, drop strict and fall back to
+        # `json_object` (loose JSON) or skip response_format entirely.
+        #
+        # We ensure `additionalProperties: false` — OpenAI strict mode
+        # requires it (and llama-server's strict json_schema follows the
+        # same convention), but pydantic v2 doesn't add it by default.
+        # Without it, the model could legally emit extra fields and the
+        # grammar wouldn't reject them.
+        schema = output_type.model_json_schema()
+        if schema.get("type") == "object" and "additionalProperties" not in schema:
+            schema["additionalProperties"] = False
+        self._response_format: dict[str, Any] = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": output_type.__name__,
+                "schema": schema,
+                "strict": True,
+            },
+        }
 
-    async def run(self, message: list, *, thinking: bool = False) -> T:
+    async def run(
+        self, message: list, *, thinking: bool = False,
+        temperature: float | None = None,
+    ) -> T:
         from src.inference import default_vision_profile, get_local_llm
+        from src.inference.llm_log import log_request, log_response
 
         msgs, images = _flatten_message_for_local(
             _prepend_timestamp(message), self._system_prompt
@@ -611,16 +948,45 @@ class LocalAgent(Generic[T]):
         if images and default_vision_profile() is None:
             images = []
         llm = get_local_llm()
-        raw = await llm.complete(
-            msgs,
-            thinking=thinking,
-            max_tokens=LOCAL_MAX_TOKENS,
-            images=images or None,
+        request_id = log_request(
+            provider="local",
+            model=getattr(llm, "model_id", "local"),
+            messages=msgs,
+            system_prompt=self._system_prompt,
+            temperature=temperature,
+            response_format=self._response_format,
+            extra={"images": len(images), "thinking": thinking},
+        )
+        t_start = time.monotonic()
+        try:
+            raw = await llm.complete(
+                msgs,
+                thinking=thinking,
+                temperature=temperature,
+                max_tokens=LOCAL_MAX_TOKENS,
+                images=images or None,
+                response_format=self._response_format,
+            )
+        except Exception as e:
+            log_response(
+                request_id=request_id, provider="local",
+                model=getattr(llm, "model_id", "local"),
+                latency_s=time.monotonic() - t_start, error=str(e),
+            )
+            raise
+        log_response(
+            request_id=request_id, provider="local",
+            model=getattr(llm, "model_id", "local"),
+            latency_s=time.monotonic() - t_start, content=raw,
         )
         return parse_json_with_repair(raw, self._output_type, self._fallback)
 
-    def run_sync(self, message: list, *, thinking: bool = False) -> T:
+    def run_sync(
+        self, message: list, *, thinking: bool = False,
+        temperature: float | None = None,
+    ) -> T:
         from src.inference import default_vision_profile, get_local_llm
+        from src.inference.llm_log import log_request, log_response
 
         msgs, images = _flatten_message_for_local(
             _prepend_timestamp(message), self._system_prompt
@@ -628,10 +994,35 @@ class LocalAgent(Generic[T]):
         if images and default_vision_profile() is None:
             images = []
         llm = get_local_llm()
-        raw = llm.complete_sync(
-            msgs,
-            thinking=thinking,
-            max_tokens=LOCAL_MAX_TOKENS,
-            images=images or None,
+        request_id = log_request(
+            provider="local",
+            model=getattr(llm, "model_id", "local"),
+            messages=msgs,
+            system_prompt=self._system_prompt,
+            temperature=temperature,
+            response_format=self._response_format,
+            extra={"images": len(images), "thinking": thinking},
+        )
+        t_start = time.monotonic()
+        try:
+            raw = llm.complete_sync(
+                msgs,
+                thinking=thinking,
+                temperature=temperature,
+                max_tokens=LOCAL_MAX_TOKENS,
+                images=images or None,
+                response_format=self._response_format,
+            )
+        except Exception as e:
+            log_response(
+                request_id=request_id, provider="local",
+                model=getattr(llm, "model_id", "local"),
+                latency_s=time.monotonic() - t_start, error=str(e),
+            )
+            raise
+        log_response(
+            request_id=request_id, provider="local",
+            model=getattr(llm, "model_id", "local"),
+            latency_s=time.monotonic() - t_start, content=raw,
         )
         return parse_json_with_repair(raw, self._output_type, self._fallback)

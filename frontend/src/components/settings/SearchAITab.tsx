@@ -118,11 +118,8 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
             label="Local"
             badge="private"
             badgeTone="neutral"
-            description={
-              providers?.local?.model
-                ? `${providers.local.model} · runs on your machine`
-                : "Runs on your machine"
-            }
+            // Don't surface the underlying model name (no-tech-leak).
+            description="Runs on your machine"
             selected={search.provider === "local"}
             onSelect={() => handleProvider("local")}
           />

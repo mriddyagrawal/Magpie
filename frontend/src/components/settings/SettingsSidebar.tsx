@@ -62,13 +62,13 @@ export function SettingsSidebar({ active, onChange, status }: Props) {
           label="size"
           value={status?.size_mb != null ? `${status.size_mb.toLocaleString()} MB` : "—"}
         />
+        {/* Provider only — the model name is intentionally hidden from
+            the user-facing surface. Internal terms ("Gemma 4",
+            "unsloth/gemma-...") shouldn't leak into the UI per the
+            no-tech-leak product principle. */}
         <SidebarFooterRow
           label="provider"
-          value={
-            status?.provider
-              ? `${capitalize(status.provider)}${status.model ? ` · ${status.model}` : ""}`
-              : "—"
-          }
+          value={status?.provider ? capitalize(status.provider) : "—"}
         />
       </div>
     </aside>

@@ -588,16 +588,43 @@ def open_file(path: str = Query(...)) -> JSONResponse:
 
 @app.get("/reveal")
 def reveal_file(path: str = Query(...)) -> JSONResponse:
-    abs_path = _resolve(path)
+    """Reveal a file or folder in the OS file browser.
+
+    Earlier versions used `_resolve()` which rejects directories — this
+    broke the Settings → Data tab's per-folder Reveal button when the
+    target was a folder. Now we accept either: files reveal-in-parent
+    (macOS `open -R`, Windows `explorer /select`), folders open the
+    folder itself (`open <path>`).
+    """
+    p = Path(path)
+    if not p.is_absolute():
+        p = (REPO_ROOT / p).resolve()
+    else:
+        p = p.resolve()
+    if not p.exists():
+        raise HTTPException(status_code=404, detail=f"no such path: {path}")
+
+    is_dir = p.is_dir()
     try:
         if sys.platform == "win32":
-            # explorer /select highlights the file in its parent folder.
-            # check=False: explorer.exe returns non-zero even on success.
-            subprocess.run(["explorer", f"/select,{abs_path}"], check=False)
+            if is_dir:
+                # `explorer <path>` opens the folder. `/select` is for files.
+                subprocess.run(["explorer", str(p)], check=False)
+            else:
+                # check=False: explorer.exe returns non-zero even on success.
+                subprocess.run(["explorer", f"/select,{p}"], check=False)
         elif sys.platform == "darwin":
-            subprocess.run(["open", "-R", str(abs_path)], check=True)
+            if is_dir:
+                # `open <dir>` opens the folder. `open -R` would reveal it
+                # in its parent — usually not what the user wants for a
+                # folder click.
+                subprocess.run(["open", str(p)], check=True)
+            else:
+                subprocess.run(["open", "-R", str(p)], check=True)
         else:
-            subprocess.run(["xdg-open", str(abs_path.parent)], check=True)
+            # Linux / xdg: same `xdg-open` call works for files and dirs.
+            target = str(p) if is_dir else str(p.parent)
+            subprocess.run(["xdg-open", target], check=True)
     except (OSError, subprocess.CalledProcessError) as e:
         raise HTTPException(status_code=500, detail=f"reveal failed: {e}") from e
     return JSONResponse({"ok": True})
@@ -680,6 +707,14 @@ def _do_ingest(folder: Path) -> None:
         print(f"[server] ingest error: {exc}", file=sys.stderr)
     finally:
         _ingest_state["running"] = False
+        # Invalidate cached folder stats so the next /settings/folders
+        # call re-aggregates the post-ingest manifest. Without this,
+        # rows show '0 files' for up to FOLDER_STATS_TTL seconds after
+        # indexing finishes, even though the manifest was just updated.
+        _invalidate_folder_stats_cache()
+        # Status cache holds indexed_count / size_mb; same staleness.
+        _status_cache["payload"] = None
+        _status_cache["ts"] = 0.0
 
 
 def _do_ingest_file(file_path: Path) -> None:
@@ -722,6 +757,14 @@ def _do_ingest_file(file_path: Path) -> None:
         print(f"[server] ingest_file error: {exc}", file=sys.stderr)
     finally:
         _ingest_state["running"] = False
+        # Invalidate cached folder stats so the next /settings/folders
+        # call re-aggregates the post-ingest manifest. Without this,
+        # rows show '0 files' for up to FOLDER_STATS_TTL seconds after
+        # indexing finishes, even though the manifest was just updated.
+        _invalidate_folder_stats_cache()
+        # Status cache holds indexed_count / size_mb; same staleness.
+        _status_cache["payload"] = None
+        _status_cache["ts"] = 0.0
 
 
 @app.post("/ingest/stop")
@@ -872,6 +915,14 @@ def _do_sync() -> None:
         print(f"[server] sync error: {exc}", file=sys.stderr)
     finally:
         _ingest_state["running"] = False
+        # Invalidate cached folder stats so the next /settings/folders
+        # call re-aggregates the post-ingest manifest. Without this,
+        # rows show '0 files' for up to FOLDER_STATS_TTL seconds after
+        # indexing finishes, even though the manifest was just updated.
+        _invalidate_folder_stats_cache()
+        # Status cache holds indexed_count / size_mb; same staleness.
+        _status_cache["payload"] = None
+        _status_cache["ts"] = 0.0
 
 
 def _do_reindex() -> None:
@@ -979,6 +1030,16 @@ def _compute_folder_stats() -> dict[str, dict[str, Any]]:
                 break  # one root per file
 
     return out
+
+
+def _invalidate_folder_stats_cache() -> None:
+    """Drop the cached folder stats so the next /settings/folders call
+    re-aggregates from a fresh manifest. Called after ingest completes
+    — without this, a folder that just finished indexing would keep
+    showing '0 files · — · not yet read' for the cache TTL window
+    because the cache was populated mid-ingest."""
+    _folder_stats_cache["payload"] = None
+    _folder_stats_cache["ts"] = 0.0
 
 
 def _get_folder_stats() -> dict[str, dict[str, Any]]:

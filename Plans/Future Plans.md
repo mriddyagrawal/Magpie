@@ -38,6 +38,8 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#25** Answer-step output schema — empirically evaluate two open choices *(also: Models, Evaluation)*
 - **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: UI, Config, Security)*
 - **#27** ⚠️ Abort in-flight queries on retype / blur (UI URGENT) *(also: Perf, Pipeline)*
+- **#28** Unified files-or-folders picker (single dialog) *(also: UI, Platform)*
+- **#29** peft import error during ingest_file path *(also: Dependencies, Ingest)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -49,6 +51,7 @@ Settings panels, in-app warnings, anything the user sees.
 - **#24** Batch indexing — surface upsert-phase progress + bad-file isolation *(also: Indexing, Perf)*
 - **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: Config, Security)*
 - **#27** ⚠️ Abort in-flight queries on retype / blur (UI URGENT) *(also: Perf, Pipeline)*
+- **#28** Unified files-or-folders picker (single dialog, multi-select) *(also: Platform)*
 
 ### 📦 Packaging, distribution & process lifecycle
 How Magpie ships and runs as an end-user app — from installer through process management.
@@ -1548,5 +1551,137 @@ cancellation today wastes 20-30 seconds of LLM compute that the
 user's NEXT ask sits behind. The current "gen counter drops stale
 responses" UX is a frontend lie; the backend reality is much
 slower than it feels.
+
+---
+
+## 28. Unified files-or-folders picker (single dialog, multi-select)
+
+**Tags:** ui · platform · ergonomics
+
+**What:** A single "Add to indexing" affordance in
+Settings → Data that opens ONE native picker letting the user
+multi-select a mix of files AND folders in the same dialog. Today
+the Data tab's `+ Add folder / file ▾` is a dropdown with two
+items, and clicking either opens a separate file-only or
+folder-only picker. The user explicitly wants one click → one
+dialog → pick anything.
+
+**Why we'd do it.** The user's quote: *"the add folder/file
+button should not ask me to add a folder or a file. I should
+just be able to select whatever I want. It should just directly
+open the dialog box where I can select either a folder or a file
+and the only thing that happens is that that gets added to
+indexing rules."* This is a single-click vs two-click ergonomic
+win on the most-trafficked Data tab affordance.
+
+**Why we did NOT do it now.** Tauri 2's `tauri-plugin-dialog`
+exposes `pick_file`, `pick_files`, `pick_folder`, `pick_folders`
+as separate calls — there's no built-in mode that combines
+files + directories in one panel. Implementing it requires
+platform-native code that the plugin doesn't expose:
+
+- **macOS** — `NSOpenPanel` natively supports
+  `canChooseFiles=true + canChooseDirectories=true +
+  allowsMultipleSelection=true`. We'd add `objc2` /
+  `objc2-app-kit` deps and call NSOpenPanel directly.
+- **Windows** — `IFileOpenDialog` with `FOS_PICKFOLDERS` is
+  folder-only; combined picking requires a custom common dialog
+  with `IFileDialogCustomize`. Non-trivial.
+- **Linux** — GTK `FileChooserDialog` supports
+  `select_multiple` and a custom filter, but combined
+  files+folders is awkward (separate "open file" vs "open
+  folder" actions in most environments). Likely needs to fall
+  back to two separate dialog invocations.
+
+The "common case" workaround (always-folders or always-files)
+covers ~80% of usage but the other 20% (single-file picks) is
+real and the user wants the unified flow.
+
+**Scope sketch (~150-300 LOC):**
+
+- Add a new `#[tauri::command] fn pick_paths(app)` in
+  `frontend/src-tauri/src/lib.rs`. Macros split per
+  `cfg(target_os = ...)`.
+- macOS: `objc2-app-kit::NSOpenPanel`. Set
+  `canChooseFiles = true, canChooseDirectories = true,
+  allowsMultipleSelection = true, allowsOtherFileTypes = true`.
+  Run modal on the main thread (`tauri::async_runtime::spawn_blocking`
+  with a `Mutex` guard). Return `Vec<String>` of POSIX paths.
+- Windows: ship as pick_folders + pick_files chained
+  (cancel-on-no-selection moves to the other), or invest in
+  `IFileDialog` + `IFileDialogCustomize` for a true combined
+  panel. Simpler approach acceptable for v1.
+- Linux: same — chain folder picker → file picker → combine
+  results.
+- Frontend: `api.ts` adds `pickPaths(): Promise<string[]>`.
+  DataTab's `+ Add` button drops the dropdown menu, just calls
+  `pickPaths()` directly. Each returned path goes through the
+  existing `addFolder()` flow regardless of file-vs-folder
+  shape (the IndexingRules layer already handles both).
+
+**When to do it.** When the macOS-specific cocoa dep cost is
+acceptable (likely after bundle-build pipeline lands per Plan
+#10), or when a user volunteers it as the most-felt UX gap. For
+now the dropdown is a one-extra-click annoyance, not a
+blocker.
+
+**Notes for the future implementer:**
+
+- `objc2` is no_std-friendly and Tauri-compatible; tested in
+  the wild. Small enough that the dep cost is a few hundred KB.
+- Always run NSOpenPanel on the main thread — if you call it
+  from a background thread, macOS will refuse to display.
+- Tauri's main-thread runtime supports `dispatch_async` via
+  `tauri::async_runtime`. Use `app.run_on_main_thread` with a
+  `oneshot::channel` to ferry the result back to the async
+  caller.
+
+---
+
+## 29. peft import error during ingest_file path (dependency hygiene)
+
+**Tags:** dependencies · ingest
+
+**What:** During Settings → Data → Add file ingest, the server
+logs:
+
+```
+[server] ingest_file error: cannot import name
+'_maybe_shard_state_dict_for_tp' from 'peft.utils.save_and_load'
+```
+
+This is a transitive dependency mismatch. `peft` (parameter-
+efficient fine-tuning) is pulled in by `sentence-transformers` /
+`transformers`. Some intermediate version of peft removed
+(or not-yet-added) `_maybe_shard_state_dict_for_tp`, but a
+downstream caller (likely a transformer-aware tokenizer init
+path) tries to import it.
+
+**Why we'd fix it.** It looks scary in stderr and triggers
+non-fatal-but-visible error log rows. Doesn't block ingest
+overall in the smoke session, but on edge-case file types or
+on first model load it might.
+
+**Why we did NOT do it now.** Out of scope for the UI branch —
+this is a dependency hygiene problem in the Python layer
+(`pyproject.toml` / `uv.lock`). The fix is to either pin peft
+to a known-good version or update transformers to a newer one
+that's compatible.
+
+**Scope sketch:**
+
+- Reproduce the error reliably (which file type triggers it?
+  The message says `ingest_file` so a single-file path was hit
+  with an importable that touched peft).
+- Run `uv tree` to see who pulls peft. Likely
+  `transformers` → `peft`. Pin transformers to a version whose
+  peft requirement aligns with our current peft, OR pin peft.
+- Test: re-ingest the same file type that surfaced the error.
+- Add a tiny test that imports the relevant module to lock the
+  resolution.
+
+**Trigger to start.** First user-visible failure that's traced
+to this error (vs. just stderr noise), or as part of a routine
+dependency upgrade pass.
 
 ---

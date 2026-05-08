@@ -81,7 +81,24 @@ def main() -> None:
         "--hidden-import", "src.ingest.walker",
         "--hidden-import", "src.ingest.common",
         "--hidden-import", "src.ingest.ignore",
+        "--hidden-import", "src.ingest.csv_stats",
+        "--hidden-import", "src.ingest.tier1",
         "--hidden-import", "src.router",
+        # Local LLM via llama-server subprocess. The pool / profiles / HTTP
+        # client are lazy-imported by src.llm only when LLM_PROVIDER=local,
+        # so PyInstaller's static analysis doesn't see them.
+        "--hidden-import", "src.inference",
+        "--hidden-import", "src.inference.local_llm",
+        "--hidden-import", "src.inference.llama_server_pool",
+        "--hidden-import", "src.inference.llama_server_binary",
+        "--hidden-import", "src.inference.profiles",
+        "--hidden-import", "src.inference.model_downloader",
+        "--hidden-import", "src.inference.chat_template",
+        # Indexing rules + backup are reached via /settings and /backup
+        # endpoints, also lazy.
+        "--hidden-import", "src.config",
+        "--hidden-import", "src.config.indexing_rules",
+        "--hidden-import", "src.backup",
         # Bundle the src package so relative imports resolve at runtime
         "--add-data", f"src{sep}src",
         # Packages that call importlib.metadata.version() on themselves at import

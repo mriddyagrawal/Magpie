@@ -15,8 +15,7 @@
  *     same recents id (caller handles the post-fresh swap).
  */
 
-import { useCallback, useEffect, useState } from "react";
-import { getRecents } from "../api";
+import { useCallback } from "react";
 import type { RecentEntry } from "../types";
 
 const SHOW_COUNT = 4;
@@ -27,17 +26,19 @@ interface Props {
    *  fresh question; the parent handles that branch). */
   selected: number | null;
   onSelectIndex: (i: number | null) => void;
-  /** Replay cached result. Parent renders the answer card from the
-   *  RecentEntry.result without firing /query. */
+  /** Replay cached result. Parent decides cached-vs-fresh based on
+   *  is_stale (manifest mtime); this just forwards the entry. */
   onReplay: (entry: RecentEntry) => void;
-  /** Force a fresh ask: parent fires postQuery(question) and updates
-   *  the recent's result in place when it lands. */
+  /** ↻ Ask-again button. Same smart cached-or-fresh logic as ⏎-on-row
+   *  in the parent — both honor staleness uniformly. */
   onAskAgain: (entry: RecentEntry) => void;
-  /** Recents list provided by the parent (so MagpieWindow can mutate
-   *  it after each fresh ask without re-fetching). null = still
-   *  loading on first mount. */
+  /** Recents list provided by the parent. null = still loading
+   *  (parent fetches once after boot completes). */
   recents: RecentEntry[] | null;
-  setRecents: (r: RecentEntry[]) => void;
+  /** No longer used — kept in the prop type so the parent's
+   *  setRecents is compatible. RecentsPanel doesn't fetch anymore;
+   *  the parent owns the list lifecycle. */
+  setRecents?: (r: RecentEntry[]) => void;
 }
 
 export function RecentsPanel({
@@ -46,36 +47,10 @@ export function RecentsPanel({
   onReplay,
   onAskAgain,
   recents,
-  setRecents,
 }: Props) {
-  const [error, setError] = useState<string | null>(null);
-
-  // Initial fetch on mount. Parent owns the list afterward.
-  useEffect(() => {
-    if (recents !== null) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const list = await getRecents();
-        if (!cancelled) setRecents(list);
-      } catch (e) {
-        if (!cancelled) setError((e as Error).message);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [recents, setRecents]);
-
-  if (error !== null) {
-    return (
-      <section className="recents-panel magpie-card recents-panel--error">
-        <span>Recents unavailable: {error}</span>
-      </section>
-    );
-  }
-
   if (recents === null) {
-    // Skeleton during the very first fetch. Boot poll usually
-    // completes before this surface ever shows so users rarely see it.
+    // Skeleton during the parent's very first fetch. The parent gates
+    // its fetch on !booting so users almost never see this state.
     return (
       <section className="recents-panel magpie-card recents-panel--loading">
         <span className="recents-panel__heading">RECENT</span>

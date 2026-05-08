@@ -20,9 +20,22 @@ function baseUrl(): string {
   return `http://127.0.0.1:${port}`;
 }
 
+export interface HistoryTurn {
+  question: string;
+  answer: string;
+}
+
 export async function postQuery(
   question: string,
-  opts: { topK?: number; rewrite?: boolean } = {}
+  opts: {
+    topK?: number;
+    rewrite?: boolean;
+    /** Conversational context: last N (question, answer) pairs sent to
+     *  the LLM so follow-ups resolve references. Empty/omit for a
+     *  single-shot ask. Lifetime is the caller's concern; the API
+     *  client just forwards. */
+    history?: HistoryTurn[];
+  } = {}
 ): Promise<QueryResponse> {
   // Build the body so the `rewrite` field is OMITTED (not sent as false)
   // when the caller doesn't pass a value. Pydantic on the server side
@@ -35,6 +48,9 @@ export async function postQuery(
   };
   if (opts.rewrite !== undefined) {
     body.rewrite = opts.rewrite;
+  }
+  if (opts.history && opts.history.length > 0) {
+    body.history = opts.history;
   }
   const res = await fetch(`${baseUrl()}/query`, {
     method: "POST",

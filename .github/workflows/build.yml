@@ -185,6 +185,63 @@ jobs:
           prerelease: false
           includeUpdaterJson: true # generates latest.json for the updater
 
+      # ── Smoke-test the bundled sidecar (validates exclude correctness) ───
+      # Plan #10 P10-2 Tier 2 excludes (torch.fx, torch._dynamo, sympy,
+      # mpmath) and any future Tier 3 exclusions can break the runtime
+      # import graph WITHOUT failing the build — PyInstaller succeeds at
+      # bundle time, but the user hits ImportError at first launch.
+      #
+      # This step launches the actual bundled binary, waits for /health
+      # to respond, and fails CI if either:
+      #   - the process dies before responding (ImportError on import)
+      #   - /health doesn't respond within 60s
+      #
+      # Runs on EVERY trigger (PR, push, tag, dispatch) — caught early.
+      # Each platform validates its own bundle independently. Cross-OS
+      # exclude regressions surface as N failed matrix jobs.
+      - name: Smoke-test bundled sidecar
+        shell: bash
+        run: |
+          set -e
+          BIN="frontend/src-tauri/binaries/magpie-sidecar-${{ matrix.target }}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            BIN="${BIN}.exe"
+          fi
+
+          if [ ! -x "$BIN" ]; then
+            echo "::error::binary missing or not executable: $BIN"
+            ls -la frontend/src-tauri/binaries/
+            exit 1
+          fi
+
+          echo "launching sidecar from $BIN on port 18765..."
+          "$BIN" --port 18765 > /tmp/sidecar.stdout 2> /tmp/sidecar.stderr &
+          SIDECAR_PID=$!
+
+          # Wait up to 60 s for /health to respond, polling every 1 s.
+          # Bail early if the sidecar process dies (most exclude-related
+          # ImportErrors crash on import, not after a network round-trip).
+          for i in $(seq 1 60); do
+            if ! kill -0 $SIDECAR_PID 2>/dev/null; then
+              echo "::error::sidecar died after $i s. stderr:"
+              tail -50 /tmp/sidecar.stderr
+              echo "::error::stdout:"
+              tail -20 /tmp/sidecar.stdout
+              exit 1
+            fi
+            if curl -fsS http://localhost:18765/health > /dev/null 2>&1; then
+              echo "✅ sidecar /health responded after $i s"
+              kill $SIDECAR_PID 2>/dev/null || true
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "::error::sidecar did not respond within 60 s. stderr:"
+          tail -50 /tmp/sidecar.stderr
+          kill $SIDECAR_PID 2>/dev/null || true
+          exit 1
+
       # ── Always upload local artifacts (so devs can grab build outputs) ────
       # Independent of the release flow — uploads as workflow run artifacts
       # (90-day retention, accessible via the Actions UI). Useful even on

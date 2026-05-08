@@ -960,9 +960,17 @@ class SearchSettingsPatch(BaseModel):
 
 def _resolved_model_name(provider: str) -> str:
     """The model the user-visible search-pill / status-footer should show."""
-    eff = _effective_settings()
     if provider == "cloud":
-        return eff.cloud_model
+        # Cloud routing now lives in secrets.json. Read whichever cloud
+        # provider is currently active and surface its per-provider model.
+        from src.config.secrets import load_secrets
+        try:
+            s = load_secrets()
+            if s.cloud_provider == "moonshot":
+                return s.moonshot_model or "Moonshot"
+            return s.openrouter_model or "OpenRouter"
+        except Exception:  # noqa: BLE001
+            return "Cloud"
     # Local: prefer the LOCAL_MODEL env (matches active_model_name's resolution
     # for the local provider). Defaults to "Gemma 4" as a friendly fallback.
     return os.environ.get("LOCAL_MODEL", "Gemma 4")
@@ -1008,22 +1016,33 @@ class ProvidersInfo(BaseModel):
 def settings_get_providers() -> ProvidersInfo:
     """Per-provider availability for the Search & AI tab's two cards.
     v1 stub — local "downloaded" is best-effort (the llama-server
-    binary's presence; the model itself is downloaded on first use)."""
+    binary's presence; the model itself is downloaded on first use).
+    Cloud reports configured iff the active cloud provider's API key
+    in secrets.json is non-empty."""
     from src.config.secrets import load_secrets
 
-    eff = _effective_settings()
-
-    # Local: report the configured model and whether the llama-server
-    # binary is installed. Heuristic — the binary lives at LLAMA_SERVER_PATH
-    # or in ~/.cache/magpie. Report it cheaply without invoking the
-    # subprocess (cold-load is ~12s).
+    # Local: report the configured model. The binary's presence check
+    # is parked for PR 5 — see the model-download flow in the spec.
     local_model = os.environ.get("LOCAL_MODEL", "Gemma 4")
 
-    # Cloud: configured iff secrets has a non-empty cloud_api_key.
+    # Cloud: introspect the active provider's per-provider key. If the
+    # user has cloud_provider="openrouter" but only has a moonshot key,
+    # we still report unconfigured — matches the runtime behavior of
+    # build_chat_model() which wouldn't be able to authenticate.
+    cloud_provider = "openrouter"
+    cloud_model_name = ""
+    cloud_configured = False
     try:
-        cloud_configured = bool(load_secrets().cloud_api_key.strip())
+        s = load_secrets()
+        cloud_provider = s.cloud_provider
+        if s.cloud_provider == "moonshot":
+            cloud_model_name = s.moonshot_model
+            cloud_configured = bool(s.moonshot_api_key.strip())
+        else:
+            cloud_model_name = s.openrouter_model
+            cloud_configured = bool(s.openrouter_api_key.strip())
     except Exception:  # noqa: BLE001
-        cloud_configured = False
+        pass
 
     return ProvidersInfo(
         local={
@@ -1033,8 +1052,9 @@ def settings_get_providers() -> ProvidersInfo:
         },
         cloud={
             "available": cloud_configured,
-            "model": eff.cloud_model,
+            "model": cloud_model_name,
             "configured": cloud_configured,
+            "provider": cloud_provider,  # internal info; UI may surface for debug
         },
     )
 

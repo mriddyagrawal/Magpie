@@ -260,13 +260,50 @@ def test_providers_reports_cloud_unconfigured_when_no_key(
 def test_providers_reports_cloud_configured_when_key_set(
     client: TestClient, isolated_app_data: Path
 ) -> None:
-    # Plant a valid secrets.json directly.
+    """Cloud is configured iff the active provider's API key is set.
+    Default cloud_provider is openrouter, so plant the openrouter key."""
     import src.config.secrets as secrets_mod
-    secrets_mod.save_secrets(secrets_mod.Secrets(cloud_api_key="sk-or-test"))
+    secrets_mod.save_secrets(secrets_mod.Secrets(
+        cloud_provider="openrouter",
+        openrouter_api_key="sk-or-test",
+    ))
 
     body = client.get("/settings/search/providers").json()
     assert body["cloud"]["configured"] is True
     assert body["cloud"]["available"] is True
+    assert body["cloud"]["provider"] == "openrouter"
+
+
+def test_providers_reports_unconfigured_when_only_other_provider_has_key(
+    client: TestClient, isolated_app_data: Path
+) -> None:
+    """If cloud_provider is openrouter but only moonshot has a key,
+    cloud is reported as unconfigured — matches build_chat_model()'s
+    runtime behavior (it would fail to authenticate)."""
+    import src.config.secrets as secrets_mod
+    secrets_mod.save_secrets(secrets_mod.Secrets(
+        cloud_provider="openrouter",
+        moonshot_api_key="sk-ms-only",
+    ))
+
+    body = client.get("/settings/search/providers").json()
+    assert body["cloud"]["configured"] is False
+
+
+def test_providers_reports_moonshot_when_active(
+    client: TestClient, isolated_app_data: Path
+) -> None:
+    import src.config.secrets as secrets_mod
+    secrets_mod.save_secrets(secrets_mod.Secrets(
+        cloud_provider="moonshot",
+        moonshot_api_key="sk-ms-1",
+        moonshot_model="kimi-test",
+    ))
+
+    body = client.get("/settings/search/providers").json()
+    assert body["cloud"]["configured"] is True
+    assert body["cloud"]["model"] == "kimi-test"
+    assert body["cloud"]["provider"] == "moonshot"
 
 
 # ---------------------------------------------------------------------------

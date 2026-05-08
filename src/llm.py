@@ -149,10 +149,19 @@ def active_provider() -> ProviderConfig:
 
     if s is not None:
         if s.provider == "cloud":
-            cfg = PROVIDERS.get(s.cloud_provider)
+            # Cloud routing now lives in secrets.json (paired with the
+            # credentials), not settings.json. secrets.json:cloud_provider
+            # is constrained to the v1 set (moonshot/openrouter) by
+            # Pydantic Literal, so this is safe.
+            try:
+                from src.config.secrets import load_secrets
+                cloud_provider = load_secrets().cloud_provider
+            except Exception:  # noqa: BLE001 — defensive, never block on secrets
+                cloud_provider = "openrouter"
+            cfg = PROVIDERS.get(cloud_provider)
             if cfg is None:
                 sys.exit(
-                    f"error: settings.json cloud_provider={s.cloud_provider!r} "
+                    f"error: secrets.json cloud_provider={cloud_provider!r} "
                     f"is unknown. Valid: {sorted(PROVIDERS)}."
                 )
             return cfg
@@ -199,28 +208,43 @@ def build_chat_model(*, provider_override: str | None = None) -> OpenAIChatModel
             "local inference uses LocalAgent directly (see build_agent)."
         )
     api_key = os.environ.get(cfg.api_key_env)
+    secrets_key: str = ""
+    secrets_model: str = ""
+    if not api_key or not os.environ.get(cfg.model_env):
+        # Bundled-app + per-provider fallback path. Production has no
+        # `.env`; secrets.json holds the per-provider key + model. Lazy
+        # import to keep cold-load cheap. Only consulted when the env
+        # var is genuinely unset — env wins, secrets is the
+        # second-chance lookup.
+        try:
+            from src.config.secrets import cloud_credentials_for
+            secrets_key, secrets_model = cloud_credentials_for(cfg.name)
+        except Exception:  # noqa: BLE001 — secrets layer must not block startup
+            secrets_key = secrets_model = ""
+
     if not api_key:
         # Ollama's local server ignores the Authorization header; we pass a
         # placeholder so the OpenAI client doesn't refuse to send the request.
         if cfg.name == "ollama":
             api_key = "ollama"
         else:
-            # Bundled-app fallback: in production there's no `.env`; the
-            # cloud key lives in `<APP_DATA_DIR>/secrets.json`. Lazy import
-            # to keep cold-load cheap. Only consulted when the env var is
-            # genuinely unset — env wins, secrets is the second-chance lookup.
-            try:
-                from src.config.secrets import load_secrets
-                api_key = (load_secrets().cloud_api_key or "").strip()
-            except Exception:  # noqa: BLE001 — secrets layer must not block startup
-                api_key = ""
+            api_key = secrets_key.strip()
             if not api_key:
                 sys.exit(
                     f"error: {cfg.api_key_env} not set for provider "
                     f"{cfg.name!r} (put it in .env, set it in Settings → "
                     f"Search & AI, or change LLM_PROVIDER)"
                 )
-    model = os.environ.get(cfg.model_env, cfg.default_model)
+
+    # Model resolution: env first, then secrets.json's per-provider
+    # field, then the hardcoded ProviderConfig default. This lets
+    # deployment swap models via `OPENROUTER_MODEL` env (dev) or
+    # secrets.json edits (production) without code changes.
+    model = (
+        os.environ.get(cfg.model_env)
+        or (secrets_model.strip() if secrets_model else "")
+        or cfg.default_model
+    )
     base_url = os.environ.get(cfg.base_url_env, cfg.default_base_url)
     client = AsyncOpenAI(api_key=api_key, base_url=base_url, max_retries=API_MAX_RETRIES)
     return OpenAIChatModel(model, provider=OpenAIProvider(openai_client=client))

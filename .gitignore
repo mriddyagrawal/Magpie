@@ -31,3 +31,8 @@ frontend/src-tauri/binaries/
 build/
 dist/
 *.spec
+
+# Local debug / scratch artifacts (do not commit)
+appzip/                          # Windows debug-build zips (huge, ~1 GB+)
+errors/                          # ad-hoc screenshots / failure captures
+conversation-export*.md          # local chat-session exports

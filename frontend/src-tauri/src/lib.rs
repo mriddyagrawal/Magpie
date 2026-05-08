@@ -217,6 +217,10 @@ pub fn run() {
         // `check()` from @tauri-apps/plugin-updater (see frontend/src/auto-updater.ts).
         // Endpoint + public key live in tauri.conf.json's plugins.updater block.
         .plugin(tauri_plugin_updater::Builder::new().build())
+        // process plugin is the Rust counterpart that backs `relaunch()` from
+        // @tauri-apps/plugin-process — used after the updater installs to bring
+        // the new version up. Without this, JS calls error at runtime.
+        .plugin(tauri_plugin_process::init())
         .manage(SidecarState(Mutex::new(None)))
         .manage(QdrantState(Mutex::new(None)))
         .manage(SidecarPort(Mutex::new(0)))

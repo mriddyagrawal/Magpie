@@ -26,6 +26,11 @@ tauri-plugin-autostart = "2"
 # Signing keys: TAURI_SIGNING_PRIVATE_KEY env var consumed at build time
 # by `tauri build`; public key is baked into the bundle via tauri.conf.json.
 tauri-plugin-updater = "2"
+# Plan #10 P10-6 — Tauri's process plugin. Required Rust counterpart for
+# JS-side `relaunch()` from @tauri-apps/plugin-process (see auto-updater.ts).
+# Without this, the JS call fails at runtime with "plugin process not found"
+# even though @tauri-apps/plugin-process is installed on the JS side.
+tauri-plugin-process = "2"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 window-vibrancy = "0.5"

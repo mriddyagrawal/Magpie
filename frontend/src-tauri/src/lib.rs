@@ -483,7 +483,23 @@ fn spawn_sidecar(
     qdrant_port: Option<u16>,
 ) -> Result<Child, String> {
     let mut cmd = if cfg!(debug_assertions) {
+        // Dev mode: spawn the Python sidecar via `uv run`. The cwd
+        // *must* be the repo root — `python -m src.server` relies on
+        // `src/` being importable, and at runtime Tauri's cwd is
+        // `frontend/src-tauri/` (where cargo run lives). Without
+        // current_dir(), the user sees the ask bar stuck on
+        // "Starting Magpie…" indefinitely because the sidecar
+        // crashes on import and /healthz never comes up.
+        //
+        // The repo root is computed at compile time from
+        // CARGO_MANIFEST_DIR (= frontend/src-tauri/) by walking up
+        // two directories. This hardcodes the layout, but dev mode
+        // always runs from this exact path; production uses the
+        // bundled PyInstaller binary which doesn't go through this
+        // branch at all.
+        let repo_root = concat!(env!("CARGO_MANIFEST_DIR"), "/../..");
         let mut c = Command::new("uv");
+        c.current_dir(repo_root);
         c.args(["run", "python", "-m", "src.server", "--port", &port.to_string()]);
         c
     } else {

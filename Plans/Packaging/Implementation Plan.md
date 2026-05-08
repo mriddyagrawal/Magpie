@@ -146,6 +146,33 @@ builder for Mac) around the `dist/` output the same `.spec` produces.
 collapses to ~2 days of remaining work (Tier 2 iteration + auto-updater
 wiring + onboarding pairing), plus whatever procurement signing certs takes.
 
+### Bug found while validating Tier 1 (caught by Linux smoke build, fixed in same commit)
+
+The bundle-trim PR-B replaced `pydantic-ai>=0.0.14` with
+`pydantic-ai-slim[openai,retries]>=1.0`. The Python import path stays
+the same (`pydantic_ai`), but the distribution name changes from
+`pydantic-ai` to `pydantic-ai-slim`. PyInstaller's `--copy-metadata
+pydantic_ai` flag fails because that distribution no longer exists:
+
+```
+importlib.metadata.PackageNotFoundError: No package metadata was
+found for pydantic_ai
+```
+
+Fixed by updating `scripts/build_sidecar.py`:
+
+```diff
+- "--copy-metadata", "pydantic_ai",
++ "--copy-metadata", "pydantic_ai_slim",
++ "--copy-metadata", "pydantic_graph",  # transitive — also calls version()
+```
+
+Without this fix, `build_sidecar.py` fails on every platform after the
+bundle-trim merge. **Validated by reaching past the failing line in the
+Linux smoke build.** Not merging this fix back into bundle-trim because
+build_sidecar.py only runs in CI / packaging contexts; bundle-trim itself
+doesn't need it. Lives on the `packaging` branch.
+
 ---
 
 ## 5. PR-E details — iterative two-tier exclude cycle
@@ -213,9 +240,12 @@ calculus:
    qwen2_5_vl, qwen2_5_omni, gemma/2/3, qwen2/2_5/3/3_5, siglip, idefics3,
    modernvbert).
 
-Real saving: **~150 architectures × 3-5 MB = ~450-750 MB.** That's the
-single biggest exclude-pass target by an order of magnitude — bigger than
-Tier 1 + Tier 2 combined.
+Real saving (measured 2026-05-08 against the trimmed venv): the
+[generator script](../../scripts/list_unused_transformers_models.py)
+prints **437 `--exclude-module` lines** out of **459 total architectures**
+(only 22 in the allowlist). At 3-5 MB per architecture this is
+**~1.3-2.2 GB** of potential strip — the single biggest exclude-pass
+target by an order of magnitude, bigger than Tier 1 + Tier 2 combined.
 
 #### Strategy: allowlist, don't blacklist
 

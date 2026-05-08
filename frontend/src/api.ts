@@ -35,6 +35,15 @@ export async function postQuery(
      *  single-shot ask. Lifetime is the caller's concern; the API
      *  client just forwards. */
     history?: HistoryTurn[];
+    /** Abort signal — when fired, the underlying fetch closes its
+     *  connection. The backend's /query handler detects the disconnect
+     *  via `request.is_disconnected()` and raises CancelledError,
+     *  which propagates through the pipeline (httpx awaits abort, the
+     *  llama-server slot frees on TCP close). Net effect: cancelling
+     *  a stale ask actually frees the local-LLM slot for the next
+     *  ask, instead of leaving 20+ seconds of wasted compute behind.
+     *  See Plan #27 in Plans/Future Plans.md. */
+    signal?: AbortSignal;
   } = {}
 ): Promise<QueryResponse> {
   // Build the body so the `rewrite` field is OMITTED (not sent as false)
@@ -56,6 +65,7 @@ export async function postQuery(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+    signal: opts.signal,
   });
   if (!res.ok) throw new Error(`query failed: ${res.status} ${await res.text()}`);
   return res.json();

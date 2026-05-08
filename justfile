@@ -18,6 +18,35 @@ sync-environment:
     uv sync
     uv pip install -e cli
 
+# Cheat-sheet for the dependency-group system (PR-F of Bundle Trim).
+# Prints the available groups + when to use each. Pairs with `just --list`,
+# which auto-shows every recipe in this file with its first comment line.
+deps:
+    @echo "==============================================================="
+    @echo " Magpie dependency-groups"
+    @echo "==============================================================="
+    @echo ""
+    @echo " Default (everyone, ~10 MB on top of project):"
+    @echo "   uv sync                       project + dev (pytest, notspotlight)"
+    @echo ""
+    @echo " Opt-in (only when you need them):"
+    @echo "   uv sync --group packaging     + PyInstaller (Plan #10 build pipeline)"
+    @echo "   uv sync --group notebooks     + Jupyter stack (~200 MB) for .ipynb files"
+    @echo ""
+    @echo " Production (used by CI to build the .dmg/.AppImage/.exe):"
+    @echo "   uv sync --no-dev              project only, ~1.3 GB on Mac/CPU-Linux"
+    @echo ""
+    @echo " GPU users on Linux who want CUDA torch instead of torch+cpu:"
+    @echo "   UV_TORCH_BACKEND=cu121 uv sync"
+    @echo ""
+    @echo " Inspect what would actually install:"
+    @echo "   uv tree                       full dep graph"
+    @echo "   uv tree --group packaging     just the packaging group"
+    @echo ""
+    @echo " For the full list of just recipes:"
+    @echo "   just --list"
+    @echo "==============================================================="
+
 # Download the llama-server binary for this platform from llama.cpp's
 # GitHub releases. Run this AFTER `just sync-environment`. The actual
 # install logic lives in src/tools/install_llama_server.py — pure

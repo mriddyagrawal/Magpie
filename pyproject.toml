@@ -55,27 +55,34 @@ build-backend = "setuptools.build_meta"
 include = ["src*"]
 
 [dependency-groups]
-# `dev` is the everyday developer group — auto-installed by plain `uv sync`.
-# Things every contributor needs: pytest for the test suite, pyinstaller for
-# the packaging pipeline (Plan #10), notspotlight for the workspace CLI.
-# These are ~5 MB total — small enough to always carry.
+# Three groups, ordered by who needs them:
+#
+#   - `dev` (default, ~10 MB)        : every contributor — pytest + workspace CLI
+#   - `packaging` (opt-in, ~30 MB)   : whoever runs the .dmg/.exe/.AppImage build pipeline
+#   - `notebooks` (opt-in, ~200 MB)  : whoever opens notebooks/*.ipynb in Jupyter
+#
+# Default `uv sync` only installs `dev`. Opt into the others as needed:
+#     uv sync                        # project + dev
+#     uv sync --group packaging      # + PyInstaller for distribution builds
+#     uv sync --group notebooks      # + Jupyter web server for .ipynb work
+#     uv sync --no-dev               # production (used by CI build pipeline)
+#
+# `just deps` prints this same cheat-sheet at runtime.
+# See `Plans/Bundle Trim/Implementation Plan.md` PR-F.
+
 dev = [
     "pytest>=8.0",
     "notspotlight",
-    "pyinstaller>=6.0",
 ]
 
-# `notebooks` is opt-in. The Jupyter stack (~200 MB of web-server transitives)
-# is only needed if you actually want to open `notebooks/*.ipynb` in a
-# browser. Most contributors don't — there's typically a `.py` sibling
-# (e.g. `notebooks/chat_local.py`) that handles the same prototyping use
-# case without Jupyter. Pull this group only when you need to:
-#     uv sync --group notebooks
-# See `Plans/Bundle Trim/Implementation Plan.md` PR-F.
+packaging = [
+    "pyinstaller>=6.0",     # used by Plan #10 packaging pipeline (PR-E excludes go in the .spec)
+]
+
 notebooks = [
-    "ipykernel",      # Jupyter Python kernel
-    "jupyter",        # Notebook server (web UI)
-    "notebook",       # Classic notebook frontend
+    "ipykernel",     # Jupyter Python kernel
+    "jupyter",       # Notebook server (web UI)
+    "notebook",      # Classic notebook frontend
 ]
 
 [tool.uv]

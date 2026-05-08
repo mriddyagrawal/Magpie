@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [main, front-back]
+    branches: [main, front-back, UI]
   pull_request:
-    branches: [main, front-back]
+    branches: [main, front-back, UI]
   workflow_dispatch:
 
 jobs:
@@ -150,4 +150,4 @@ jobs:
         with:
           name: magpie-${{ matrix.target }}
           path: ${{ matrix.artifact }}
-          if-no-files-found: warn
+          if-no-files-found: error

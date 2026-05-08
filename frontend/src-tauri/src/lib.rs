@@ -6,6 +6,8 @@ use std::thread;
 use std::time::Duration;
 
 use tauri::menu::{Menu, MenuItem};
+#[cfg(target_os = "macos")]
+use tauri::menu::Submenu;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{Manager, PhysicalPosition, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
@@ -31,6 +33,12 @@ fn anchor_spotlight(window: &WebviewWindow) {
 
 struct SidecarState(Mutex<Option<Child>>);
 struct QdrantState(Mutex<Option<Child>>);
+
+/// The port the Python sidecar is listening on. Picked once in setup()
+/// and read by the macOS menu / tray menu handlers when opening the
+/// settings window (those callers don't have the port as a function
+/// arg the way the frontend's invoke does).
+struct SidecarPort(Mutex<u16>);
 
 // ── Global shortcut: picker + persistence ────────────────────────────────────
 
@@ -165,6 +173,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(SidecarState(Mutex::new(None)))
         .manage(QdrantState(Mutex::new(None)))
+        .manage(SidecarPort(Mutex::new(0)))
         .setup(|app| {
             #[cfg(target_os = "macos")]
             {
@@ -190,6 +199,7 @@ pub fn run() {
             // window can appear immediately with the port already known — no
             // blocking on qdrant/sidecar startup inside setup().
             let sidecar_port = pick_free_port().unwrap_or(8765);
+            *app.state::<SidecarPort>().0.lock().unwrap() = sidecar_port;
             let qdrant_port_pre: Option<u16> = if cfg!(not(debug_assertions)) {
                 pick_free_port().ok()
             } else {
@@ -227,16 +237,47 @@ pub fn run() {
                 setup_global_shortcut(&shortcut_handle);
             });
 
-            // System tray icon: left-click toggles window, right-click → Quit.
-            // macOS: menu-bar icon (top-right). Windows/Linux: notification-area tray.
+            // System tray icon: left-click toggles window, right-click →
+            // Settings… / Quit. macOS: menu-bar icon (top-right). Windows/
+            // Linux: notification-area tray. Same menu on all three platforms.
+            let settings_tray_item = MenuItem::with_id(
+                app, "tray_settings", "Settings…", true, None::<&str>,
+            )?;
             let quit_item = MenuItem::with_id(app, "quit", "Quit Magpie", true, None::<&str>)?;
-            let tray_menu = Menu::with_items(app, &[&quit_item])?;
+            let tray_menu = Menu::with_items(app, &[&settings_tray_item, &quit_item])?;
+
+            // macOS application menu (the menubar at the top of the screen).
+            // The "Settings…" item gets `Cmd ,` as its accelerator — the
+            // standard macOS preferences shortcut. On Windows + Linux the
+            // ask bar's frontend listens for `Ctrl ,` instead (see
+            // useSettingsShortcut hook in MagpieWindow.tsx); the native
+            // app-menu pattern only applies on macOS.
+            #[cfg(target_os = "macos")]
+            {
+                let app_settings_item = MenuItem::with_id(
+                    app, "menu_settings", "Settings…", true, Some("Cmd+,"),
+                )?;
+                let magpie_menu = Submenu::with_items(
+                    app, "Magpie", true, &[&app_settings_item],
+                )?;
+                let app_menu = Menu::with_items(app, &[&magpie_menu])?;
+                app.set_menu(app_menu)?;
+                let app_handle_for_menu = app.handle().clone();
+                app.on_menu_event(move |_app, event| {
+                    if event.id() == "menu_settings" {
+                        open_settings_internal(&app_handle_for_menu, None);
+                    }
+                });
+            }
+
             let mut tray_builder = TrayIconBuilder::new()
                 .menu(&tray_menu)
                 .show_menu_on_left_click(false)
                 .tooltip("Magpie")
                 .on_menu_event(|app, event| {
-                    if event.id() == "quit" {
+                    if event.id() == "tray_settings" {
+                        open_settings_internal(app, None);
+                    } else if event.id() == "quit" {
                         app.exit(0);
                     }
                 })
@@ -340,7 +381,14 @@ pub fn run() {
                 let _ = window.hide();
             }
         })
-        .invoke_handler(tauri::generate_handler![hide_window, show_window, pick_folder, pick_file, open_settings])
+        .invoke_handler(tauri::generate_handler![
+            hide_window,
+            show_window,
+            pick_folder,
+            pick_file,
+            open_settings,
+            open_settings_with_action,
+        ])
         .build(tauri::generate_context!())
         .expect("error building magpie");
 
@@ -458,18 +506,37 @@ fn spawn_sidecar(
         .map_err(|e| format!("failed to spawn sidecar: {e}"))
 }
 
-#[tauri::command]
-fn open_settings(app: tauri::AppHandle, port: u16) {
+/// Open the settings window. Optionally inject a one-shot deep-link
+/// action that the SettingsWindow component reads on mount via
+/// `window.__MAGPIE_SETTINGS_ACTION__`. Used by the not-found CTA in the
+/// ask bar (`action="add-folder"` triggers the folder picker on open)
+/// and by the macOS menu / tray menu (`action=None` is just an open).
+fn open_settings_internal(app: &tauri::AppHandle, action: Option<&str>) {
+    // Read the sidecar port from app state — set once in setup() when
+    // the port is picked. Falls back to 8765 (the dev-default) if state
+    // isn't initialized yet (degenerate race during boot).
+    let port: u16 = app
+        .try_state::<SidecarPort>()
+        .map(|s| *s.0.lock().unwrap())
+        .filter(|p| *p != 0)
+        .unwrap_or(8765);
+    let action_js = action
+        .map(|a| format!("window.__MAGPIE_SETTINGS_ACTION__ = '{}';", escape_for_js(a)))
+        .unwrap_or_default();
     let init = format!(
-        "window.__MAGPIE_PORT__ = {}; window.__MAGPIE_WINDOW_TYPE__ = 'settings';",
-        port
+        "window.__MAGPIE_PORT__ = {}; window.__MAGPIE_WINDOW_TYPE__ = 'settings'; {}",
+        port, action_js
     );
     if let Some(win) = app.get_webview_window("settings") {
+        // Already open: re-inject the action so the SettingsWindow
+        // component picks it up on its next effect tick. Eval is safe
+        // since `action` is whitelisted at the command boundary.
+        let _ = win.eval(&init);
         let _ = win.show();
         let _ = win.set_focus();
         return;
     }
-    let _ = WebviewWindowBuilder::new(&app, "settings", WebviewUrl::default())
+    let _ = WebviewWindowBuilder::new(app, "settings", WebviewUrl::default())
         .title("Magpie Settings")
         .inner_size(560.0, 520.0)
         .min_inner_size(480.0, 400.0)
@@ -479,6 +546,30 @@ fn open_settings(app: tauri::AppHandle, port: u16) {
         .always_on_top(false)
         .initialization_script(&init)
         .build();
+}
+
+/// Whitelist for action strings injected into JS init scripts. Keeps
+/// the frontend's contract narrow — adding a new action is a
+/// deliberate edit here, not a freeform string passed through.
+fn escape_for_js(action: &str) -> String {
+    // Allow only known actions. Reject everything else.
+    match action {
+        "add-folder" => action.to_string(),
+        _ => String::new(),
+    }
+}
+
+#[tauri::command]
+fn open_settings(app: tauri::AppHandle, port: u16) {
+    let _ = port; // Port is read from the main window; the explicit arg
+                  // is preserved for backward compat with the existing
+                  // frontend caller.
+    open_settings_internal(&app, None);
+}
+
+#[tauri::command]
+fn open_settings_with_action(app: tauri::AppHandle, action: String) {
+    open_settings_internal(&app, Some(&action));
 }
 
 #[tauri::command]

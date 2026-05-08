@@ -266,7 +266,6 @@ export interface AppSettings {
   theme: "system" | "light" | "dark";
   accent: "ink" | "amber" | "jade" | "rose";
   launch_at_login: boolean;
-  show_in_tray: boolean;
 }
 
 export type AppSettingsPatch = Partial<AppSettings>;

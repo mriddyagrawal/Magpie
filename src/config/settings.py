@@ -80,7 +80,6 @@ class AppDefaults(BaseModel):
     theme: str = "system"  # "system" | "light" | "dark"
     accent: str = "ink"  # "ink" | "amber" | "jade" | "rose"
     launch_at_login: bool = False
-    show_in_tray: bool = True
 
 
 class UserSettings(BaseModel):
@@ -102,7 +101,6 @@ class UserSettings(BaseModel):
     theme: Optional[str] = None
     accent: Optional[str] = None
     launch_at_login: Optional[bool] = None
-    show_in_tray: Optional[bool] = None
 
 
 class EffectiveSettings(BaseModel):
@@ -122,7 +120,6 @@ class EffectiveSettings(BaseModel):
     theme: str
     accent: str
     launch_at_login: bool
-    show_in_tray: bool
 
 
 # ---------------------------------------------------------------------------
@@ -203,7 +200,6 @@ def load_user_settings(
             theme=defaults.theme,
             accent=defaults.accent,
             launch_at_login=defaults.launch_at_login,
-            show_in_tray=defaults.show_in_tray,
         )
         save_user_settings(s, p)
         return s

@@ -155,6 +155,5 @@
   "enumerate_lists": true,
   "theme": "system",
   "accent": "ink",
-  "launch_at_login": false,
-  "show_in_tray": true
+  "launch_at_login": false
 }

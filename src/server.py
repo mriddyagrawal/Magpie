@@ -1340,14 +1340,12 @@ class AppSettingsResponse(BaseModel):
     theme: str  # "system" | "light" | "dark"
     accent: str  # "ink" | "amber" | "jade" | "rose"
     launch_at_login: bool
-    show_in_tray: bool
 
 
 class AppSettingsPatch(BaseModel):
     theme: str | None = Field(default=None, pattern="^(system|light|dark)$")
     accent: str | None = Field(default=None, pattern="^(ink|amber|jade|rose)$")
     launch_at_login: bool | None = None
-    show_in_tray: bool | None = None
 
 
 @app.get("/settings/app")
@@ -1357,14 +1355,13 @@ def settings_get_app() -> AppSettingsResponse:
         theme=eff.theme,
         accent=eff.accent,
         launch_at_login=eff.launch_at_login,
-        show_in_tray=eff.show_in_tray,
     )
 
 
 @app.patch("/settings/app")
 def settings_patch_app(req: AppSettingsPatch) -> AppSettingsResponse:
     kwargs: dict[str, Any] = {}
-    for field in ("theme", "accent", "launch_at_login", "show_in_tray"):
+    for field in ("theme", "accent", "launch_at_login"):
         value = getattr(req, field)
         if value is not None:
             kwargs[field] = value

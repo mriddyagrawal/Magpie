@@ -152,9 +152,9 @@
   "rewrite_default": false,
   "temperature": 0.7,
   "cite_sources_inline": true,
+  "enumerate_lists": true,
   "theme": "system",
   "accent": "ink",
-  "default_action": "empty",
   "launch_at_login": false,
   "show_in_tray": true
 }

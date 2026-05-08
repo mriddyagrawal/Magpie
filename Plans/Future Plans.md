@@ -1745,36 +1745,51 @@ Settings screen):
 
 | Control | Persists? | Consumer? | Verdict |
 |---|---|---|---|
-| Cloud provider card | ✅ | ❌ | NOT WIRED |
-| Default action on activation (dropdown) | ✅ | ❌ | NOT WIRED |
+| Cloud provider card | ✅ | ✅ via `active_provider()` → secrets.json | **DONE** |
+| ~~Default action on activation~~ | — | — | **REMOVED** — superseded by ask-bar persistence |
 | Shortcut Change (recorder) | ✅ on save | ⚠ next launch only | NO RUNTIME UPDATE |
-| Launch at login (toggle) | ✅ | ❌ no OS hook | NOT WIRED |
+| Launch at login (toggle) | ✅ | ✅ via `tauri-plugin-autostart` | **DONE** |
 | Show in menu bar (toggle) | ✅ | ❌ tray always on | NOT WIRED |
 | Check for updates (button) | n/a | ❌ no-op stub | NOT WIRED |
 
 **Why each is broken (root causes):**
 
-1. **Cloud provider** — `/query` ([src/server.py:248](src/server.py#L248))
-   does not read `provider`; `pipeline.ask` always calls
-   `build_answer_agent()` which always builds a local agent.
-   `provider` is read only by `/status` for the sidebar footer.
-   Fix: branch on `effective_settings().provider` in the answer
-   step, build a `_CloudAgent` when `cloud`. Once Plan #26
-   (BYO API key) lands, Cloud becomes a real path; until then
-   it should at least respect `providers.cloud.configured`
-   gating (already does in the UI, so the button is just
-   silently no-op when configured).
+1. **Cloud provider** — DONE (2026-05-08).
+   The original audit thought `pipeline.ask` always built a local
+   agent, but `build_answer_agent` already routed through
+   `active_provider()` correctly. The actual bug was elsewhere:
+   `LLM_PROVIDER=local` in `.env` short-circuited
+   `active_provider()` before settings.json was consulted, so the
+   user's "Cloud" click was silently ignored.
+   Fix: in [src/llm.py:active_provider()](src/llm.py#L116),
+   precedence reversed — settings.json wins, env is a last-resort
+   fallback only when the settings layer is unavailable. Also
+   stripped the `LLM_PROVIDER` mapping from
+   [`_env_overrides()` in settings.py](src/config/settings.py)
+   so `effective_settings().provider` faithfully reflects the
+   user's UI choice. Privacy-respecting cloud path (sending only
+   the question, not file content) is still parked — Plan #26
+   covers it. Today's flow: click Cloud → `_CloudAgent` →
+   OpenRouter using `OPENROUTER_API_KEY` from env or
+   `secrets.json:openrouter_api_key`.
 
-2. **Default action on activation** — `default_action` round-
-   trips through `/settings/app` PATCH but no caller reads it.
-   The intended consumers are (a) the Tauri tray-click handler
-   in [`frontend/src-tauri/src/lib.rs`](frontend/src-tauri/src/lib.rs#L284)
-   (currently always opens the ask bar), and (b) the
-   `tauri://focus` handler in MagpieWindow.tsx that decides
-   whether to open the ask bar fresh or jump to the recents
-   list. Fix: read `appSettings.default_action` at activation
-   time on the frontend; pass it through to Tauri via an
-   `init.script` if needed for tray-click.
+   Side effect: justfile's `chat-cloud` recipe (which used
+   `LLM_PROVIDER=magpie-cloud`) no longer routes via env. Toggle
+   Settings → Cloud or edit settings.json directly to test that
+   path.
+
+2. **Default action on activation** — REMOVED. The two options
+   ("Empty ask bar" vs "Show last query") are subsumed by the
+   ask bar's persistence behavior: `MagpieWindow` keeps view
+   state across hide/show, so re-summoning naturally restores
+   whatever the user left there. A user who wants a clean slate
+   presses Esc — one keystroke. The dropdown was a phantom
+   choice. Removed from `/settings/app`, `AppDefaults`,
+   `UserSettings`, `EffectiveSettings`, `magpie_defaults.json`,
+   the frontend `AppSettings` interface, and the Settings UI on
+   2026-05-08. `extra="ignore"` on Pydantic models means stale
+   `default_action` keys in existing user settings.json files
+   are silently dropped on next save.
 
 3. **Shortcut Change** — `putShortcut()` writes shortcut.json
    but Tauri's `setup_global_shortcut()` reads it once at app
@@ -1786,12 +1801,16 @@ Settings screen):
    The persisted file is correct on next launch; the live
    process just doesn't reload it.
 
-4. **Launch at login** — needs `tauri-plugin-autostart`
-   (not in [`frontend/src-tauri/Cargo.toml`](frontend/src-tauri/Cargo.toml)
-   yet). Fix: add the plugin, wire the toggle to
-   `autostart::Manager::enable()` / `disable()` and read the
-   real OS state on Settings open. Until added, the toggle is
-   purely a UI lie.
+4. **Launch at login** — DONE (2026-05-08).
+   `tauri-plugin-autostart = "2"` added to
+   [`frontend/src-tauri/Cargo.toml`](frontend/src-tauri/Cargo.toml).
+   Plugin initialized with `MacosLauncher::LaunchAgent` in
+   [`lib.rs`](frontend/src-tauri/src/lib.rs). Two Tauri commands
+   exposed: `get_autostart() -> bool` and
+   `set_autostart(enabled: bool)`. ShortcutAppTab.tsx invokes
+   them on toggle; OS state is the source of truth, settings.json
+   `launch_at_login` is mirrored for display continuity.
+   Capabilities updated (`autostart:allow-enable / -disable / -is-enabled`).
 
 5. **Show in menu bar** — tray icon is built unconditionally
    in `setup()` ([frontend/src-tauri/src/lib.rs:273-306](frontend/src-tauri/src/lib.rs#L273)).

@@ -19,6 +19,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import {
   getAppSettings,
   getShortcut,
@@ -54,6 +55,10 @@ export function ShortcutAppTab({
   const [error, setError] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
   const [recordedKeys, setRecordedKeys] = useState<string>("");
+  // OS-level autostart state, source of truth for the "Launch at login"
+  // toggle. Independent of the settings.json mirror — the OS may have
+  // been re-configured outside Magpie.
+  const [autostart, setAutostart] = useState<boolean | null>(null);
 
   // Initial fetch.
   useEffect(() => {
@@ -63,7 +68,23 @@ export function ShortcutAppTab({
     if (shortcut === null) {
       getShortcut().then(setShortcut).catch(() => { /* non-fatal */ });
     }
+    invoke<boolean>("get_autostart")
+      .then(setAutostart)
+      .catch(() => setAutostart(false));
   }, [app, shortcut, setApp, setShortcut]);
+
+  const handleAutostart = useCallback(async (v: boolean) => {
+    setAutostart(v); // optimistic
+    try {
+      await invoke("set_autostart", { enabled: v });
+      // Mirror to settings.json so /settings/app reflects the same value
+      // for any consumer that reads from it (currently just display).
+      patchAppSettings({ launch_at_login: v }).catch(() => { /* non-fatal */ });
+    } catch (e) {
+      setAutostart(!v); // roll back
+      setError(`Couldn't change Launch at login: ${(e as Error).message ?? e}`);
+    }
+  }, []);
 
   const patchApp = useCallback(async (p: Partial<AppSettings>) => {
     if (app !== null) setApp({ ...app, ...p });  // optimistic
@@ -227,8 +248,8 @@ export function ShortcutAppTab({
           hint="Start Magpie automatically when you log in."
           control={
             <Toggle
-              checked={app.launch_at_login}
-              onChange={(v) => patchApp({ launch_at_login: v })}
+              checked={autostart ?? false}
+              onChange={handleAutostart}
               label="Launch at login"
             />
           }
@@ -242,24 +263,6 @@ export function ShortcutAppTab({
               onChange={(v) => patchApp({ show_in_tray: v })}
               label="Show in menu bar"
             />
-          }
-        />
-        <SettingRow
-          label="Default action on activation"
-          hint="What appears when you press the shortcut."
-          control={
-            <select
-              className="shortcut-app-tab__select"
-              value={app.default_action}
-              onChange={(e) =>
-                patchApp({
-                  default_action: e.target.value as AppSettings["default_action"],
-                })
-              }
-            >
-              <option value="empty">Empty ask bar</option>
-              <option value="last">Show last query</option>
-            </select>
           }
         />
       </Section>

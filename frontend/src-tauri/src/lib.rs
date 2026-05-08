@@ -10,6 +10,7 @@ use tauri::menu::{Menu, MenuItem};
 use tauri::menu::Submenu;
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{Manager, PhysicalPosition, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use tauri_plugin_autostart::{ManagerExt as AutostartManagerExt, MacosLauncher};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
@@ -169,6 +170,10 @@ pub fn run() {
                     .blocking_show();
             }
         }))
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            None,
+        ))
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
         .manage(SidecarState(Mutex::new(None)))
@@ -388,6 +393,8 @@ pub fn run() {
             pick_file,
             open_settings,
             open_settings_with_action,
+            get_autostart,
+            set_autostart,
         ])
         .build(tauri::generate_context!())
         .expect("error building magpie");
@@ -595,6 +602,25 @@ fn open_settings_with_action(app: tauri::AppHandle, action: String) {
 #[tauri::command]
 fn hide_window(window: tauri::Window) {
     let _ = window.hide();
+}
+
+// Launch-at-login wiring. The Settings → Shortcut & App tab's
+// "Launch at login" toggle calls these. The plugin handles all three
+// platforms behind one API: macOS LaunchAgent plist, Windows registry
+// Run key, Linux .desktop autostart entry. Source of truth is the OS
+// state, not the settings.json field — Settings UI calls
+// `get_autostart` to populate the toggle on open and `set_autostart`
+// on flip.
+#[tauri::command]
+fn get_autostart(app: tauri::AppHandle) -> bool {
+    app.autolaunch().is_enabled().unwrap_or(false)
+}
+
+#[tauri::command]
+fn set_autostart(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    let manager = app.autolaunch();
+    let result = if enabled { manager.enable() } else { manager.disable() };
+    result.map_err(|e| e.to_string())
 }
 
 #[tauri::command]

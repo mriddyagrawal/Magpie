@@ -1212,6 +1212,12 @@ class SearchSettingsResponse(BaseModel):
     top_k: int
     rewrite: bool
     temperature: float
+    cite_sources_inline: bool
+    # When True, "list all my X" / "what are every Y" style questions
+    # widen top_k, suppress cross-encoder rerank, and add an
+    # ENUMERATION MODE prompt addition. Off = every query takes the
+    # standard semantic-retrieval path.
+    enumerate_lists: bool
 
 
 class SearchSettingsPatch(BaseModel):
@@ -1219,6 +1225,8 @@ class SearchSettingsPatch(BaseModel):
     top_k: int | None = Field(default=None, ge=1, le=20)
     rewrite: bool | None = None
     temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    cite_sources_inline: bool | None = None
+    enumerate_lists: bool | None = None
 
 
 def _resolved_model_name(provider: str) -> str:
@@ -1248,6 +1256,8 @@ def settings_get_search() -> SearchSettingsResponse:
         top_k=eff.top_k,
         rewrite=eff.rewrite_default,
         temperature=eff.temperature,
+        cite_sources_inline=eff.cite_sources_inline,
+        enumerate_lists=eff.enumerate_lists,
     )
 
 
@@ -1265,6 +1275,10 @@ def settings_patch_search(req: SearchSettingsPatch) -> SearchSettingsResponse:
         kwargs["rewrite_default"] = req.rewrite
     if req.temperature is not None:
         kwargs["temperature"] = req.temperature
+    if req.cite_sources_inline is not None:
+        kwargs["cite_sources_inline"] = req.cite_sources_inline
+    if req.enumerate_lists is not None:
+        kwargs["enumerate_lists"] = req.enumerate_lists
     if kwargs:
         _patch_user_settings(**kwargs)
     return settings_get_search()
@@ -1325,7 +1339,6 @@ def settings_get_providers() -> ProvidersInfo:
 class AppSettingsResponse(BaseModel):
     theme: str  # "system" | "light" | "dark"
     accent: str  # "ink" | "amber" | "jade" | "rose"
-    default_action: str  # "empty" | "last"
     launch_at_login: bool
     show_in_tray: bool
 
@@ -1333,7 +1346,6 @@ class AppSettingsResponse(BaseModel):
 class AppSettingsPatch(BaseModel):
     theme: str | None = Field(default=None, pattern="^(system|light|dark)$")
     accent: str | None = Field(default=None, pattern="^(ink|amber|jade|rose)$")
-    default_action: str | None = Field(default=None, pattern="^(empty|last)$")
     launch_at_login: bool | None = None
     show_in_tray: bool | None = None
 
@@ -1344,7 +1356,6 @@ def settings_get_app() -> AppSettingsResponse:
     return AppSettingsResponse(
         theme=eff.theme,
         accent=eff.accent,
-        default_action=eff.default_action,
         launch_at_login=eff.launch_at_login,
         show_in_tray=eff.show_in_tray,
     )
@@ -1353,7 +1364,7 @@ def settings_get_app() -> AppSettingsResponse:
 @app.patch("/settings/app")
 def settings_patch_app(req: AppSettingsPatch) -> AppSettingsResponse:
     kwargs: dict[str, Any] = {}
-    for field in ("theme", "accent", "default_action", "launch_at_login", "show_in_tray"):
+    for field in ("theme", "accent", "launch_at_login", "show_in_tray"):
         value = getattr(req, field)
         if value is not None:
             kwargs[field] = value
@@ -1433,6 +1444,43 @@ def settings_remove_exclusion(
             raise HTTPException(status_code=404, detail=f"glob not found: {value}")
     save_user_rules(rules)
     return {"status": "removed"}
+
+
+# ---------------------------------------------------------------------------
+# /diagnostics/why-not — explain why a path was/wasn't indexed
+# ---------------------------------------------------------------------------
+# Surfaces the (bool, reason) pair from IndexingRules.should_index() that
+# the CLI's `walk-explain` already uses. Powers the "Why isn't this
+# indexed?" affordance in the Settings → Data tab and the future
+# Spotlight-style file diagnostic. The reason strings are already part
+# of the public API (Plans/Ingestion Rules/Implementation Plan.md §4).
+
+
+@app.get("/diagnostics/why-not")
+def diagnostics_why_not(path: str = Query(...)) -> dict[str, Any]:
+    """Run should_index(path) and return the verdict + reason.
+
+    `indexed` is the ground-truth bool (True = file would be indexed if
+    a sync ran now). `reason` is the short explanation suitable for the
+    GUI's tooltip/popover. `resolved_path` echoes back the absolute
+    path we actually evaluated, so the caller can confirm symlink/
+    relative-path resolution matched their expectation.
+    """
+    from src.config.indexing_rules import load_indexing_rules
+
+    rules = load_indexing_rules()
+    try:
+        resolved = str(Path(path).expanduser().resolve())
+    except OSError as e:
+        return {"path": path, "resolved_path": None, "indexed": False,
+                "reason": f"cannot resolve path: {e}"}
+    indexed, reason = rules.should_index(path)
+    return {
+        "path": path,
+        "resolved_path": resolved,
+        "indexed": indexed,
+        "reason": reason,
+    }
 
 
 # ---------------------------------------------------------------------------

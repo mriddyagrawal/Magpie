@@ -218,7 +218,8 @@ export interface SearchSettings {
   top_k: number;
   rewrite: boolean;
   temperature: number;
-  cite_sources_inline?: boolean;  // PR 5 addition
+  cite_sources_inline: boolean;
+  enumerate_lists: boolean;
 }
 
 export type SearchSettingsPatch = Partial<{
@@ -227,6 +228,7 @@ export type SearchSettingsPatch = Partial<{
   rewrite: boolean;
   temperature: number;
   cite_sources_inline: boolean;
+  enumerate_lists: boolean;
 }>;
 
 export async function getSearchSettings(): Promise<SearchSettings> {
@@ -263,7 +265,6 @@ export async function getProviders(): Promise<ProvidersInfo> {
 export interface AppSettings {
   theme: "system" | "light" | "dark";
   accent: "ink" | "amber" | "jade" | "rose";
-  default_action: "empty" | "last";
   launch_at_login: boolean;
   show_in_tray: boolean;
 }
@@ -283,6 +284,25 @@ export async function patchAppSettings(patch: AppSettingsPatch): Promise<AppSett
     body: JSON.stringify(patch),
   });
   if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Diagnostics — "Why isn't this indexed?"
+// ---------------------------------------------------------------------------
+
+export interface WhyNotResponse {
+  path: string;
+  resolved_path: string | null;
+  indexed: boolean;
+  reason: string;
+}
+
+export async function diagnosticsWhyNot(path: string): Promise<WhyNotResponse> {
+  const url = new URL(`${baseUrl()}/diagnostics/why-not`);
+  url.searchParams.set("path", path);
+  const res = await fetch(url.toString());
+  if (!res.ok) throw new Error(`why-not failed: ${res.status}`);
   return res.json();
 }
 

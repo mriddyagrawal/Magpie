@@ -90,6 +90,7 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
       rewrite: false,
       temperature: 0.7,
       cite_sources_inline: true,
+      enumerate_lists: true,
     });
   }, [immediatePatch]);
 
@@ -213,6 +214,12 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
               hint="Number sources in the answer with clickable footnotes."
               checked={search.cite_sources_inline ?? true}
               onChange={(v) => immediatePatch({ cite_sources_inline: v })}
+            />
+            <ToggleField
+              label="Enumerate list questions"
+              hint="Detect 'list all my X' / 'every Y' queries and pull a wider source set so the answer is exhaustive."
+              checked={search.enumerate_lists ?? true}
+              onChange={(v) => immediatePatch({ enumerate_lists: v })}
             />
           </div>
         )}

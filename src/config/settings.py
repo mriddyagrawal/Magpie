@@ -67,11 +67,18 @@ class AppDefaults(BaseModel):
     # the model emits plain prose; sources still appear below but are
     # not anchored to specific claims. Default True (Perplexity-style).
     cite_sources_inline: bool = True
+    # When True, queries that look like enumeration ("list all my X",
+    # "what are every Y") get adaptive treatment: top_k widened,
+    # cross-encoder rerank suppressed (it regresses list queries per
+    # the rememex postmortem), and an ENUMERATION MODE prompt addition
+    # tells the LLM to be exhaustive. When False, every query takes
+    # the standard semantic-retrieval path with no list-shaped
+    # adaptation. Default True.
+    enumerate_lists: bool = True
 
     # App appearance + behavior
     theme: str = "system"  # "system" | "light" | "dark"
     accent: str = "ink"  # "ink" | "amber" | "jade" | "rose"
-    default_action: str = "empty"  # "empty" | "last"
     launch_at_login: bool = False
     show_in_tray: bool = True
 
@@ -90,10 +97,10 @@ class UserSettings(BaseModel):
     rewrite_default: Optional[bool] = None
     temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
     cite_sources_inline: Optional[bool] = None
+    enumerate_lists: Optional[bool] = None
 
     theme: Optional[str] = None
     accent: Optional[str] = None
-    default_action: Optional[str] = None
     launch_at_login: Optional[bool] = None
     show_in_tray: Optional[bool] = None
 
@@ -111,9 +118,9 @@ class EffectiveSettings(BaseModel):
     rewrite_default: bool
     temperature: float
     cite_sources_inline: bool
+    enumerate_lists: bool
     theme: str
     accent: str
-    default_action: str
     launch_at_login: bool
     show_in_tray: bool
 
@@ -192,9 +199,9 @@ def load_user_settings(
             rewrite_default=defaults.rewrite_default,
             temperature=defaults.temperature,
             cite_sources_inline=defaults.cite_sources_inline,
+            enumerate_lists=defaults.enumerate_lists,
             theme=defaults.theme,
             accent=defaults.accent,
-            default_action=defaults.default_action,
             launch_at_login=defaults.launch_at_login,
             show_in_tray=defaults.show_in_tray,
         )
@@ -223,22 +230,14 @@ def save_user_settings(settings: UserSettings, path: Optional[Path] = None) -> N
 
 
 def _env_overrides() -> dict[str, Any]:
-    """Per-key env-var overrides. Opt-in: only the keys we explicitly
-    care about route through env. Bulk-overriding everything via env
-    makes settings.json behavior surprising."""
-    out: dict[str, Any] = {}
-
-    # LLM_PROVIDER → maps to the binary "local"/"cloud" choice. Any of
-    # the cloud provider names (openrouter, moonshot, magpie-cloud) maps
-    # to "cloud"; "local" maps to "local"; anything else is left alone
-    # (active_provider() handles the dispatch).
-    raw_provider = os.environ.get("LLM_PROVIDER", "").strip().lower()
-    if raw_provider == "local":
-        out["provider"] = "local"
-    elif raw_provider in {"openrouter", "moonshot", "ollama", "magpie-cloud"}:
-        out["provider"] = "cloud"
-
-    return out
+    """Per-key env-var overrides. Currently empty: `LLM_PROVIDER` was
+    removed on 2026-05-08 because it silently overrode the user's
+    Settings → Search & AI choice. Settings.json is now the sole
+    source of truth for provider routing. See `active_provider()` in
+    src/llm.py for the per-provider credential lookup, which still
+    honors `OPENROUTER_API_KEY` etc. from env (those are credentials,
+    not routing)."""
+    return {}
 
 
 def effective_settings(

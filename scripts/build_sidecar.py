@@ -103,8 +103,13 @@ def main() -> None:
         "--add-data", f"src{sep}src",
         # Packages that call importlib.metadata.version() on themselves at import
         # time — PyInstaller strips .dist-info by default, so the lookup crashes.
+        # NOTE: pydantic-ai metapackage was replaced by pydantic-ai-slim in
+        # bundle-trim PR-B (see pyproject.toml). The import path is still
+        # `pydantic_ai`, but the DISTRIBUTION name is now `pydantic_ai_slim`,
+        # so --copy-metadata must reference the new name.
         "--copy-metadata", "genai_prices",
-        "--copy-metadata", "pydantic_ai",
+        "--copy-metadata", "pydantic_ai_slim",
+        "--copy-metadata", "pydantic_graph",
         # ── Tier 1 excludes (high-confidence, ~80–100 MB savings) ────────────
         # These submodules are well-isolated; PyTorch never imports them
         # internally unless specific code paths run (multi-node training,

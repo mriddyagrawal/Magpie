@@ -32,11 +32,11 @@ import {
   getRecent,
   getRecents,
   getStatus,
-  postQuery,
+  postQueryStream,
   stopIngest,
 } from "../api";
 import type { IngestStatus } from "../api";
-import type { QueryResponse, RecentEntry } from "../types";
+import type { QueryResponse, RecentEntry, Source } from "../types";
 import type { View } from "./viewState";
 import { extractHighlightTokens } from "./Highlighted";
 
@@ -234,9 +234,17 @@ export function MagpieWindow() {
   // recents are populated (so they show on first summon).
   // -------------------------------------------------------------------
   const visibleRecentsCount = recents?.slice(0, 4).length ?? 0;
+  // Retrieving has two heights: the brief full-bleed RetrievingPanel
+  // window (rewrite + retrieval, ~500ms-3s) uses HEIGHTS.retrieving,
+  // and the moment partialSources arrive we expand to HEIGHTS.answering
+  // since the body adopts the answering-shaped two-column layout.
+  const retrievingWithSources =
+    view.kind === "retrieving" && view.partialSources !== null;
   const targetHeight =
     view.kind === "resting"
       ? (visibleRecentsCount > 0 ? HEIGHT_RESTING_WITH_RECENTS : HEIGHT_RESTING_EMPTY)
+      : retrievingWithSources
+      ? HEIGHTS.answering
       : HEIGHTS[view.kind];
   // Mirror targetHeight into a ref so the tauri://focus listener
   // (registered once on mount) can read the latest value without
@@ -382,52 +390,143 @@ export function MagpieWindow() {
     const trimmed = question.trim();
     if (!trimmed) return;
     const myGen = ++queryGenRef.current;
-    setView({ kind: "retrieving", question: trimmed });
-    // Snapshot the in-memory history at this point. The pipeline gets
-    // the user's prior turns as conversational context so follow-up
-    // questions can resolve references. Only the last HISTORY_TURNS
-    // pairs are sent — older turns drop off the back.
+    // Initial retrieving view — full-bleed RetrievingPanel until the
+    // `sources` SSE event lands. partialSources stays null during the
+    // rewrite + retrieval window so the renderer keeps showing the
+    // existing full-height spinner; once sources arrive we set them
+    // and the body switches to the answering-shaped layout.
+    setView({
+      kind: "retrieving",
+      question: trimmed,
+      partialSources: null,
+      selectedPath: null,
+    });
     const historyToSend = historyRef.current.slice(-HISTORY_TURNS);
+
+    // Streaming accumulator — captures every event as it arrives so we
+    // can build the final QueryResponse on `done`. Defaults match what
+    // an empty backend response would look like, so partial-stream
+    // failures still produce a coherent final view.
+    let sources: Source[] = [];
+    const searchQuery = { query: "", keywords: [] } as { query: string; keywords: string[] };
+    let rewrittenQuery: string | null = null;
+    let sourcesScannedCount = 0;
+    const answerChunks: string[] = [];
+    let sourcesUsed: string[] = [];
+    let notFoundTopic: string | null = null;
+    let recentId: string | null = null;
+    let streamError: string | null = null;
+
     try {
-      const result = await postQuery(trimmed, { history: historyToSend });
-      // Race guard: if the user typed something else, replayed a
-      // different recent, or otherwise changed context while this
-      // query was in flight, queryGenRef has advanced and our
-      // response is stale. Drop it on the floor.
+      for await (const ev of postQueryStream(trimmed, { history: historyToSend })) {
+        // Race guard at every event — if the user typed something
+        // else, replayed a different recent, or otherwise changed
+        // context mid-stream, queryGenRef has advanced and our
+        // remaining events are stale. Drop them on the floor; the
+        // sidecar finishes its work and writes the recent regardless.
+        if (myGen !== queryGenRef.current) return;
+        switch (ev.type) {
+          case "sources":
+            sources = ev.sources;
+            searchQuery.query = ev.searchQuery.query;
+            searchQuery.keywords = ev.searchQuery.keywords;
+            rewrittenQuery = ev.rewrittenQuery;
+            sourcesScannedCount = ev.sourcesScannedCount;
+            // Body transitions to the answering-shaped two-column
+            // layout. Spinner stays in the AnswerCard slot until the
+            // answer event arrives; sources card is interactive
+            // immediately (clickable, preview pane updates).
+            setView({
+              kind: "retrieving",
+              question: trimmed,
+              partialSources: ev.sources,
+              selectedPath: ev.sources[0]?.path ?? null,
+            });
+            break;
+          case "not_found_topic":
+            notFoundTopic = ev.topic;
+            break;
+          case "answer_chunk":
+            // Phase 1: this fires exactly once with the full answer
+            // text. Phase 2 (Plan #35) will fire many times; the
+            // accumulator handles both shapes identically.
+            answerChunks.push(ev.text);
+            break;
+          case "sources_used":
+            sourcesUsed = ev.paths;
+            break;
+          case "error":
+            streamError = ev.detail;
+            break;
+          case "done":
+            recentId = ev.recentId;
+            break;
+        }
+      }
+      // Final race guard before applying terminal state — defends
+      // against a context change that happened on the very last event.
       if (myGen !== queryGenRef.current) return;
+
+      if (streamError !== null) {
+        console.error("query stream error:", streamError);
+        setView({
+          kind: "not_found",
+          question: trimmed,
+          result: makeErrorResult(trimmed),
+        });
+        return;
+      }
+
+      const isNotFound = notFoundTopic !== null;
+      const finalAnswer = isNotFound ? "" : answerChunks.join("");
+      const citedSet = new Set(sourcesUsed);
+      const finalSources: Source[] = sources.map((s) => ({
+        ...s,
+        cited: citedSet.has(s.path),
+      }));
+      const result: QueryResponse = {
+        question: trimmed,
+        answer: finalAnswer,
+        sources: finalSources,
+        search_query: searchQuery,
+        not_found: isNotFound,
+        not_found_topic: notFoundTopic ?? "",
+        sources_scanned_count: sourcesScannedCount,
+        recent_id: recentId,
+      };
+
       // Append to in-memory history if we got a real answer (not the
       // not-found case). History serves the LLM, not the user, so
       // not-found turns aren't useful context. Single-session only;
       // historyRef dies with the React mount.
-      if (!result.not_found && result.answer) {
-        historyRef.current.push({ question: trimmed, answer: result.answer });
-        // Cap the in-memory list at HISTORY_TURNS so it doesn't grow
-        // unbounded over a long session.
+      if (!isNotFound && finalAnswer) {
+        historyRef.current.push({ question: trimmed, answer: finalAnswer });
         if (historyRef.current.length > HISTORY_TURNS) {
           historyRef.current = historyRef.current.slice(-HISTORY_TURNS);
         }
       }
       // Append to in-memory recents if the backend returned an id —
       // saves a re-fetch and keeps the panel snappy.
-      if (result.recent_id !== null) {
+      if (recentId !== null) {
         const newEntry: RecentEntry = {
-          id: result.recent_id,
+          id: recentId,
           asked_at: new Date().toISOString(),
           question: trimmed,
-          rewritten_query: result.search_query.query ?? null,
+          rewritten_query: rewrittenQuery,
           result: {
-            answer: result.answer,
-            sources_used: result.sources.filter((s) => s.cited).map((s) => s.path),
-            not_found: result.not_found,
-            not_found_topic: result.not_found_topic,
+            answer: finalAnswer,
+            sources_used: sourcesUsed,
+            not_found: isNotFound,
+            not_found_topic: notFoundTopic ?? "",
           },
         };
         setRecents((prev) => prev === null ? [newEntry] : [newEntry, ...prev].slice(0, 10));
       }
-      if (result.not_found) {
+
+      if (isNotFound) {
         setView({ kind: "not_found", question: trimmed, result });
       } else {
-        const firstCited = result.sources.find((s) => s.cited)?.path ?? null;
+        const firstCited = finalSources.find((s) => s.cited)?.path ?? null;
         setView({
           kind: "answering",
           question: trimmed,
@@ -439,9 +538,10 @@ export function MagpieWindow() {
       // Race guard applies to errors too — if context changed, drop
       // the failure rather than overriding the user's new state.
       if (myGen !== queryGenRef.current) return;
-      // Treat hard /query failures as not-found (the network/sidecar
-      // hiccup case). The error string isn't shown — Magpie's spec
-      // surface stays user-friendly. Devs see the failure in stderr.
+      // Treat hard /query/stream failures as not-found (the network/
+      // sidecar hiccup case). The error string isn't shown — Magpie's
+      // spec surface stays user-friendly. Devs see the failure in
+      // stderr.
       console.error("query failed:", e);
       setView({
         kind: "not_found",
@@ -648,8 +748,38 @@ export function MagpieWindow() {
         />
       )}
 
-      {view.kind === "retrieving" && (
+      {view.kind === "retrieving" && view.partialSources === null && (
         <RetrievingPanel documentsTotal={indexedCount} />
+      )}
+
+      {view.kind === "retrieving" && view.partialSources !== null && (
+        // Retrieving-with-sources: same two-column layout as answering,
+        // with the AnswerCard in `loading=true` (animated dots) until
+        // the answer event lands. Sources are clickable, the right-pane
+        // PreviewCard is live — the user can browse the pulled files
+        // while the LLM thinks. Synthesized QueryResponse here is just
+        // a shell to feed AnsweringBody; the real one is built when
+        // `done` arrives and the view transitions to `answering`.
+        <AnsweringBody
+          result={{
+            question: view.question,
+            answer: "",
+            sources: view.partialSources,
+            search_query: { query: "", keywords: [] },
+            not_found: false,
+            not_found_topic: "",
+            sources_scanned_count: 0,
+            recent_id: null,
+          }}
+          selectedPath={view.selectedPath}
+          onSelect={(path) => {
+            if (view.kind !== "retrieving") return;
+            setView({ ...view, selectedPath: path });
+          }}
+          onFollowUp={focusAndSelectInput}
+          highlights={[]}
+          loading={true}
+        />
       )}
 
       {view.kind === "answering" && (
@@ -659,6 +789,7 @@ export function MagpieWindow() {
           onSelect={(path) => setView({ ...view, selectedPath: path })}
           onFollowUp={focusAndSelectInput}
           highlights={highlights}
+          loading={false}
         />
       )}
 
@@ -690,12 +821,18 @@ function AnsweringBody({
   onSelect,
   onFollowUp,
   highlights,
+  loading,
 }: {
   result: QueryResponse;
   selectedPath: string | null;
   onSelect: (path: string) => void;
   onFollowUp: () => void;
   highlights: string[];
+  // True during retrieving-with-sources (answer LLM still running);
+  // false once the answer has arrived and the view is `answering`.
+  // AnswerCard renders animated dots when loading, the rendered
+  // answer text otherwise.
+  loading: boolean;
 }) {
   return (
     <div className="magpie-grid">
@@ -705,7 +842,7 @@ function AnsweringBody({
           sources={result.sources}
           highlights={highlights}
           error={null}
-          loading={false}
+          loading={loading}
           onFollowUp={onFollowUp}
           onSelectSource={onSelect}
         />

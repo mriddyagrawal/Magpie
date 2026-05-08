@@ -11,7 +11,7 @@
  * place.
  */
 
-import type { QueryResponse } from "../types";
+import type { QueryResponse, Source } from "../types";
 
 export type ViewKind =
   | "resting"
@@ -23,7 +23,21 @@ export type ViewKind =
 export type View =
   | { kind: "resting" }
   | { kind: "typing"; query: string; selected: number | null }
-  | { kind: "retrieving"; question: string }
+  | {
+      kind: "retrieving";
+      question: string;
+      // Partial-sources slot for streaming. Both null while we're still
+      // waiting on the `sources` SSE event from /query/stream (covers
+      // the rewrite + retrieval window — typically ~500ms-3s); both
+      // populate the moment that event lands and the body switches
+      // from a full-bleed RetrievingPanel to the answering-shaped
+      // two-column layout (loading spinner in the AnswerCard slot,
+      // sources card already populated below it). See
+      // Specs/UI/ask_bar.md and Plans/Future Plans.md #35 for the
+      // wider streaming story.
+      partialSources: Source[] | null;
+      selectedPath: string | null;
+    }
   | {
       kind: "answering";
       question: string;

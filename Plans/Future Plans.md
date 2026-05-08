@@ -2356,100 +2356,173 @@ work needs a streaming substrate to attach to.
 
 ---
 
-## 36. OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere
+## 36. OS-native file previews for the right-pane PreviewCard
 
 **Tags:** ui · platform · preview
 
-**What.** Today's `PreviewCard` renders a small set of file types in-app
-(text snippet, PDF page render, image, CSV grid). Anything beyond that
-falls back to "open in OS default app", which yanks the user out of the
-ask bar. The plan: when the user hits a "deep look" trigger (spacebar
-on a selected source, or a dedicated button), pop the OS's native
-quick-preview UI for that file. Native previewers handle every file
-type the OS knows about — videos with playhead scrubbing, archives with
-contents listing, code with syntax highlighting, audio with waveform,
-3D models, fonts, sketches, etc. — all for free.
-
-**Per-platform paths.**
-
-- **macOS — gold standard.** Quick Look (`qlmanage -p <path>` from the
-  CLI; the QuickLookUI framework from a real Cocoa app). Mature, ships
-  with the OS, supports plugins for niche formats. Tauri integration is
-  one of: (a) shell out to `qlmanage -p` and let the user dismiss the
-  panel manually, (b) call into QuickLookUI via a Rust bridge crate
-  (e.g. `quicklook-rs` if it exists, or write a tiny Objective-C
-  bridge through `cocoa-rs` / `objc2`). (a) is "good enough for a
-  spacebar shortcut"; (b) is "real native panel anchored to our window."
-- **Windows — IPreviewHandler COM API.** Explorer's preview pane uses
-  the IPreviewHandler interface that file-type handlers implement.
-  Rust crates (`windows`, `wio`) can call this; the panel can be hosted
-  in our window or detached. Heavier work than macOS — IPreviewHandler
-  has reentrancy and threading rules that bite if you don't follow
-  them carefully (apartment threading, GIT, etc.).
-- **Linux — no universal solution.** GNOME has `sushi` (Quick Look-ish
-  for Files); KDE has KQuickLook; Xfce has neither. Realistic options:
-  (a) shell out to `xdg-open` for the whole-app fallback we already do,
-  (b) detect-and-use sushi/kquicklook if present, falling back gracefully,
-  (c) build into the in-app PreviewCard with more rendering paths
-  (audio waveform via Web Audio API, video via `<video>`, archives via
-  a list-only library). Fragile no matter what.
+**What.** Today's `PreviewCard` (the always-visible right pane in
+`answering` and `retrieving`-with-sources views) renders a small set of
+file types in-app — text snippet, PDF page render, image, CSV grid.
+Anything else falls back to "open in OS default app", which yanks the
+user out of the ask bar. The plan: make the right-pane preview
+competitive with the OS's own previewer for everything a real corpus
+contains (videos, audio, archives, Pages docs, Numbers, Sketch files,
+code with proper syntax highlighting, fonts, 3D models, …). Plus a
+spacebar-triggered overlay using the OS's actual Quick Look panel for
+deep-look that's universal regardless of which path we pick for the
+right-pane.
 
 **Why we'd want this.**
 
 - The set of file types a real corpus contains is huge. We will never
   out-render the OS for niche formats (Pages docs, Numbers, Sketch,
-  Final Cut projects, OmniGraffle, Logic Pro sessions, Affinity files).
-  Native preview handles them all because file-type vendors ship
+  Final Cut projects, OmniGraffle, Logic Pro sessions, Affinity
+  files). Native preview "just works" because file-type vendors ship
   preview plugins.
-- One spacebar shortcut from the sources card → user gets a real
-  preview without leaving the ask bar. Matches Spotlight's own UX —
-  hit Cmd-Space, type, arrow to a result, hit space → preview.
-  We're already a Spotlight-style app (per Specs/window_lifecycle.md);
-  this completes the loop.
-- Frees the `PreviewCard` to focus on the "always-visible right pane"
-  use case rather than trying to be a universal previewer.
+- The right pane is the always-visible answer to "what is this file?".
+  When it can't render, the user has to leave the ask bar. That's the
+  feature gap.
+- Spacebar-on-source mirrors macOS Spotlight's own gesture — Cmd-Space
+  → type → arrow → spacebar → preview. We're already a Spotlight-
+  style app (per Specs/window_lifecycle.md); this completes the loop.
+
+**Two implementation paths to choose between.** Pick one for the
+right-pane PreviewCard. The spacebar overlay (below) is universal.
+
+### Path 1 — Web-native renderers + thumbnail fallback (B+C)
+
+The pragmatic, incremental path. Render everything inside the existing
+PreviewCard using web technologies, with an OS-thumbnail fallback for
+file types we can't embed.
+
+**Interactive types (need scroll, zoom, playhead, search): embed a
+web-native renderer.**
+- PDF: PDF.js — battle-tested, works in any WebView.
+- Video: `<video>` tag with the OS's codec.
+- Audio: `<audio>` plus a waveform via `wavesurfer.js` or Web Audio API.
+- Code/text: a syntax-highlight library (Shiki / Prism / highlight.js)
+  inside a scrollable container.
+- Archives (.zip/.tar): list-only via JSZip; no extraction.
+- HTML / Markdown: rendered inline; sandboxed iframe for HTML, a
+  markdown lib for `.md`.
+
+**Non-interactive types (Pages, Numbers, Sketch, OmniGraffle, Final
+Cut, fonts, 3D models, raw photos, …): static thumbnail from the OS.**
+- macOS: `qlmanage -t -s <px> -o <outdir> <path>` generates a PNG that
+  matches what Quick Look itself would render. Display as `<img>`.
+- Windows: invoke the WIC (Windows Imaging Component) thumbnail
+  provider via the `windows` Rust crate; same flow.
+- Linux: `gnome-desktop-thumbnailer` or `gdk_pixbuf_new_from_file`;
+  fallback to a generic file-icon if neither is available.
+
+**Pros:**
+- Fully cross-platform from day one — no platform behaves
+  second-class.
+- Incremental — ship one renderer at a time. PDF.js first because
+  it's already the highest-traffic type; video / audio next.
+- Zero new native UI surface area — all rendering lives inside the
+  WebView, no extra security or focus-routing concerns.
+- Works inside our existing right-pane layout without changing the
+  surrounding component shape.
+
+**Cons:**
+- Thumbnail-only fallback for ~20% of file types loses interactivity:
+  can't scrub a video on a thumbnailed `.mov`, can't open the inner
+  pages of a Pages doc. (Mitigation: those are exactly the types
+  spacebar-Quick-Look handles best, so users still have a path.)
+- The web-native renderer set is a long incremental tail — every new
+  file type the corpus surfaces is a new dep / config / styling pass.
+
+**Estimated cost.** 2–4 weeks of focused work, parallelizable per
+file type. Each renderer addition is a self-contained PR.
+
+### Path 2 — Embedded native preview pane (A)
+
+The "do it right" path. Host a real native preview view inside our
+window, positioned over where the WebView's right pane would render.
+
+- **macOS**: `QLPreviewView` (Quartz framework) embedded as a real
+  `NSView` subwindow on top of the Tauri WebView, anchored to the
+  preview-pane region. Drives the full Quick Look render pipeline —
+  every file type a Quick Look plugin handles is rendered fully
+  interactive.
+- **Windows**: `IPreviewHandler` COM API hosted in a window control,
+  similar to how Explorer's preview pane embeds it. Reentrancy and
+  apartment-threading rules are real footguns.
+- **Linux**: no native equivalent. Either fall back to Path 1 here
+  (web-native renderers), or accept that Linux users get a degraded
+  right pane.
+
+**Pros:**
+- Gold-standard fidelity. Anything Quick Look / Explorer renders, we
+  render — fonts, Pages, Logic Pro sessions, Sketch files, all of it,
+  all interactive, all forever-current with whatever preview plugins
+  the user installs.
+- Long-tail file types Just Work without Magpie ever shipping a
+  per-type renderer.
+
+**Cons:**
+- Significant native bridging work per platform. Tauri's WebView
+  lifecycle plus a parallel `NSView` / `HWND` is fiddly: window
+  resize, focus, keyboard routing, z-ordering across the WebView
+  surface — all need careful coordination.
+- Embedded Quick Look in a Tauri app is undocumented territory —
+  there's no public recipe; we'd be among the first to write one.
+  Risk of stuck-points without prior art to lean on.
+- No native equivalent on Linux means the implementation effort
+  yields nothing on that platform — Linux users still need Path 1
+  or accept a degraded pane.
+- Adds native UI surface area (and the security/IPC implications)
+  to a project that's currently all-WebView.
+
+**Estimated cost.** ~2 weeks per platform with real risk of
+stuck-points; probably 1–1.5 months wall-clock to land mac+win
+confidently. Linux still needs Path 1 anyway.
+
+### Spacebar overlay (universal — independent of which path wins)
+
+Regardless of which path the right pane takes, the spacebar gesture
+should pop the OS's actual full Quick Look panel. This is the
+"weekend hack" floor that gets us Spotlight-parity feel.
+
+1. Add a Tauri command `preview_in_quick_look(path: String)` in
+   `frontend/src-tauri/src/lib.rs`.
+   - macOS: shell out to `qlmanage -p <path>`. ~30 LOC.
+   - Windows: shell out to a tiny helper invoking
+     `IPreviewHandler`, or fall back to `cmd /c start "" <path>`
+     for a degraded floor.
+   - Linux: prefer `gio open` / `xdg-open`; degraded.
+2. Bind spacebar on a selected source row in the SourcesCard.
+3. On Windows / Linux without good preview support, the gesture
+   falls through to the existing `revealInFinder` / `openInOs`.
 
 **Why we did NOT do it now.**
 
-- The current `PreviewCard` covers the common cases for the demo
-  corpus (text / PDF / image / CSV).
-- Quick Look integration on Tauri is undocumented territory — every
-  approach has friction: shell-out works but feels janky; framework
-  integration needs an Objective-C bridge or a Rust wrapper crate
-  that doesn't fully exist for QuickLookUI yet.
-- Cross-platform parity is the harder half. If we ship Quick Look on
-  macOS and nothing equivalent on Windows / Linux, users on those
-  platforms feel second-class.
-- Our packaging story (PyInstaller `--onefile`, Plan #34's Nuitka
-  migration) needs to settle before adding native-API surface area
-  per platform.
+- The current PreviewCard covers the demo corpus's common types
+  adequately (text / PDF / image / CSV).
+- Path 1 is incremental but still 2–4 weeks of focused effort.
+- Path 2 is 1–1.5 months wall-clock with native-API risk.
+- Choosing between them depends on user signal we don't yet have —
+  which file types the actual user base hits often vs rarely. Real
+  usage data tells us whether Path 1's thumbnail fallback is good
+  enough or whether long-tail interactivity (Path 2) actually matters.
 
 **When to revisit.**
 
-- (a) When users start asking for previews of file types we don't
-  render well (a real demo corpus surfaces this fast — videos,
-  Pages docs, audio, archives).
-- (b) When macOS becomes the primary distribution target and we can
-  scope the plan to mac-only-first.
-- (c) When someone's free for 1-2 days of platform-API research; the
-  shell-out-to-qlmanage path is a 50-LOC weekend prototype, the real
-  framework integration is multiple days.
+- (a) Real users start asking for previews of file types we don't
+  render well — that signal tells us whether Path 1's static
+  thumbnails are acceptable or whether Path 2's interactivity is
+  worth the engineering cost.
+- (b) macOS becomes the primary distribution target — at that point,
+  Path 2 mac-first becomes a bigger win without paying for Windows
+  parity up front.
+- (c) Someone has a 1–2 day window to ship the spacebar overlay
+  alone (`qlmanage -p` shell-out) and prove the gesture even matters
+  before committing to either right-pane path.
 
-**Scope sketch (mac-first, simplest path).**
-
-1. Add a Tauri command `preview_in_quick_look(path: String)` in
-   `frontend/src-tauri/src/lib.rs` that shells out to `qlmanage -p
-   <path>` (macOS) or no-ops elsewhere with a returned "unsupported"
-   marker.
-2. Wire the SourcesCard to call it on a spacebar keypress when a
-   source row is selected, and on a dedicated "👁 preview" button.
-3. On Windows / Linux, the spacebar / button falls through to the
-   existing `revealInFinder` / `openInOs` so the gesture isn't dead.
-4. Document the platform asymmetry in `Specs/UI/ask_bar.md` so it's
-   not a surprise.
-
-That's the floor. Per-platform native panels (real Quick Look hosting,
-IPreviewHandler, sushi) come later if/when each platform is ranked
-high enough to do real.
+**Choosing between Path 1 and Path 2.** Decision deferred. The plan
+deliberately keeps both alive so we can pick once we have user
+signal. The spacebar overlay is independently shippable and worth
+doing first regardless.
 
 ---

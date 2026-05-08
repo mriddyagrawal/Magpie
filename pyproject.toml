@@ -55,15 +55,25 @@ build-backend = "setuptools.build_meta"
 include = ["src*"]
 
 [dependency-groups]
-# Dev-only: notebooks for prototyping, pytest for testing, pyinstaller for
-# packaging. None of these are imported by `src/` at runtime, so they don't
-# belong in the production install. Bring them back with `uv sync --group dev`.
-# See `Plans/Bundle Trim/Implementation Plan.md` PR-A.
+# `dev` is the everyday developer group — auto-installed by plain `uv sync`.
+# Things every contributor needs: pytest for the test suite, pyinstaller for
+# the packaging pipeline (Plan #10), notspotlight for the workspace CLI.
+# These are ~5 MB total — small enough to always carry.
 dev = [
     "pytest>=8.0",
     "notspotlight",
     "pyinstaller>=6.0",
-    "ipykernel",      # Jupyter Python kernel — opens .ipynb files in `notebooks/`
+]
+
+# `notebooks` is opt-in. The Jupyter stack (~200 MB of web-server transitives)
+# is only needed if you actually want to open `notebooks/*.ipynb` in a
+# browser. Most contributors don't — there's typically a `.py` sibling
+# (e.g. `notebooks/chat_local.py`) that handles the same prototyping use
+# case without Jupyter. Pull this group only when you need to:
+#     uv sync --group notebooks
+# See `Plans/Bundle Trim/Implementation Plan.md` PR-F.
+notebooks = [
+    "ipykernel",      # Jupyter Python kernel
     "jupyter",        # Notebook server (web UI)
     "notebook",       # Classic notebook frontend
 ]

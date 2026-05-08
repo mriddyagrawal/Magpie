@@ -19,6 +19,13 @@ on:
 
 jobs:
   build:
+    # `contents: write` is REQUIRED for tauri-action to create the draft
+    # GitHub Release on tag pushes. Without it, the action errors with
+    # "Resource not accessible by integration" — the most common
+    # tauri-action setup mistake. Per
+    # https://v2.tauri.app/distribute/pipelines/github/.
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -148,7 +155,22 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # Windows EV cert signing. Skipped automatically if not set.
+          # Windows EV cert signing — passed through but NOT YET WIRED.
+          # tauri-action does NOT sign Windows builds natively. Per Tauri docs
+          # (https://v2.tauri.app/distribute/sign/windows/), Windows signing
+          # requires EITHER:
+          #   (a) a pre-tauri-action step that imports the cert into the
+          #       Windows cert store + a `bundle.windows.signCommand` block
+          #       in tauri.conf.json that runs signtool during build, OR
+          #   (b) a post-tauri-action step that signs the produced .exe with
+          #       signtool, BUT — the GitHub Release attachment will be the
+          #       UNSIGNED version because tauri-action uploads before the
+          #       post-step runs.
+          # Until the EV cert is procured, leave these env vars passed through
+          # (no harm) and TODO: when the EV cert lands, switch to approach (a).
+          # The previous workflow used approach (b); accepted the
+          # release-uploads-unsigned-bytes trade-off because the cert wasn't
+          # in place yet.
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         with:

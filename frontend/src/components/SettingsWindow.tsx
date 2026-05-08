@@ -1,276 +1,263 @@
+/**
+ * SettingsWindow — the top-level orchestrator for the Settings UI.
+ *
+ * Replaces Rahul's first-pass implementation (276 LOC, single flat
+ * folder list) with the three-tab layout from
+ * Specs/UI/settings_window.md:
+ *
+ *   - Sidebar (left): Magpie / SETTINGS / nav (Data / Search & AI /
+ *     Shortcut & App) / status footer
+ *   - Header strip (top): Magpie · Settings · ● <state>
+ *   - Main content: tab-specific component
+ *
+ * State ownership:
+ *   - The orchestrator owns the four data slices (folders, search,
+ *     app, providers) so tabs share the same source of truth and a
+ *     PATCH from one tab can update the visible state in another
+ *     (e.g., changing accent in Shortcut & App immediately affects
+ *     Settings' own theme tokens).
+ *   - The ingest poll lives here too — same 1.5s tick pattern as
+ *     MagpieWindow. Running while the ingest is active; idle
+ *     otherwise.
+ *
+ * The deep-link useRef pattern from PR 4 is preserved: the
+ * NotFoundCard's "Add the folder where this knowledge might live"
+ * CTA opens this window with `__MAGPIE_SETTINGS_ACTION__ =
+ * "add-folder"`, which on mount switches to the Data tab AND fires
+ * the folder picker.
+ */
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  getAppSettings,
   getFolders,
-  addFolder,
-  removeFolder,
-  getShortcut,
-  pickFolder,
-  startIngest,
   getIngestStatus,
-  stopIngest,
-} from "../api";
-import type { FolderEntry, IngestStatus } from "../api";
-import "./SettingsWindow.css";
+  getProviders,
+  getSearchSettings,
+  getShortcut,
+  getStatus,
+} from "./../api";
+import type {
+  AppSettings,
+  FolderEntry,
+  IngestStatus,
+  ProvidersInfo,
+  SearchSettings,
+} from "./../api";
+import type { StatusResponse } from "./../types";
 
-function formatElapsed(s: number): string {
-  if (s < 60) return `${Math.round(s)}s`;
-  return `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`;
-}
+import { ConfirmModal } from "./settings/ConfirmModal";
+import { DataTab } from "./settings/DataTab";
+import { SearchAITab } from "./settings/SearchAITab";
+import { SettingsHeader } from "./settings/SettingsHeader";
+import { SettingsSidebar } from "./settings/SettingsSidebar";
+import type { SettingsTab } from "./settings/SettingsSidebar";
+import { ShortcutAppTab } from "./settings/ShortcutAppTab";
+
+import "./settings/Settings.css";
+
+// Status fetch — periodic so the sidebar footer stays live.
+const STATUS_POLL_MS = 5_000;
+const INGEST_POLL_MS = 1_500;
 
 export function SettingsWindow() {
-  const [folders, setFolders] = useState<FolderEntry[]>([]);
-  const [shortcut, setShortcut] = useState("Alt+Space");
+  const [tab, setTab] = useState<SettingsTab>("data");
+  const [folders, setFolders] = useState<FolderEntry[] | null>(null);
+  const [search, setSearch] = useState<SearchSettings | null>(null);
+  const [providers, setProviders] = useState<ProvidersInfo | null>(null);
+  const [app, setApp] = useState<AppSettings | null>(null);
+  const [shortcut, setShortcut] = useState<string | null>(null);
+  const [status, setStatus] = useState<StatusResponse | null>(null);
   const [ingest, setIngest] = useState<IngestStatus | null>(null);
-  const [addingFolder, setAddingFolder] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [appVersion, setAppVersion] = useState("0.1.0");
 
-  const loadFolders = useCallback(async () => {
+  // Stable ref for the deep-link "add folder" trigger. The handler
+  // closes over `setTab` + DataTab's onIngestStarted, so we update
+  // the ref on each render and call .current?.() in the
+  // mount-time effect.
+  const handleDeepLinkAddFolderRef = useRef<(() => void) | null>(null);
+
+  // ----------- Initial parallel fetch on mount -----------
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const tasks = [
+        getFolders().then((r) => !cancelled && setFolders(r.folders))
+          .catch((e) => console.warn("folders load failed:", e)),
+        getSearchSettings().then((r) => !cancelled && setSearch(r))
+          .catch((e) => console.warn("search-settings load failed:", e)),
+        getProviders().then((r) => !cancelled && setProviders(r))
+          .catch((e) => console.warn("providers load failed:", e)),
+        getAppSettings().then((r) => !cancelled && setApp(r))
+          .catch((e) => console.warn("app-settings load failed:", e)),
+        getShortcut().then((r) => !cancelled && setShortcut(r))
+          .catch((e) => console.warn("shortcut load failed:", e)),
+        getStatus().then((r) => {
+          if (cancelled) return;
+          setStatus(r);
+          setAppVersion(r.version);
+        }).catch((e) => console.warn("status load failed:", e)),
+      ];
+      await Promise.allSettled(tasks);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ----------- Status refresh poll (slow) -----------
+  useEffect(() => {
+    const id = setInterval(async () => {
+      try {
+        const r = await getStatus();
+        setStatus(r);
+      } catch { /* ignore */ }
+    }, STATUS_POLL_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  // ----------- Ingest poll (only when running) -----------
+  // Same pattern as MagpieWindow: tick every 1.5s. On running→done
+  // edge, refresh the folders list so per-row stats reflect the
+  // newly-indexed files.
+  const prevRunningRef = useRef(false);
+  useEffect(() => {
+    let cancelled = false;
+    const tick = async () => {
+      while (!cancelled) {
+        await new Promise((res) => setTimeout(res, INGEST_POLL_MS));
+        if (cancelled) break;
+        try {
+          const s = await getIngestStatus();
+          if (cancelled) break;
+          if (s.running) {
+            prevRunningRef.current = true;
+            setIngest(s);
+          } else if (prevRunningRef.current) {
+            prevRunningRef.current = false;
+            setIngest(null);
+            // Refresh folders so the new files appear with correct
+            // stats. Status refresh fires on its own poll.
+            try {
+              const r = await getFolders();
+              if (!cancelled) setFolders(r.folders);
+            } catch { /* ignore */ }
+          } else {
+            setIngest(null);
+          }
+        } catch {
+          // sidecar hiccup — try again next tick
+        }
+      }
+    };
+    tick();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ----------- Theme + accent application to <html> -----------
+  useEffect(() => {
+    if (app === null) return;
+    if (app.theme === "system") {
+      delete document.documentElement.dataset.theme;
+    } else {
+      document.documentElement.dataset.theme = app.theme;
+    }
+    document.documentElement.dataset.accent = app.accent;
+  }, [app?.theme, app?.accent]);
+
+  // ----------- Refresh helpers passed to tabs -----------
+  const refreshFolders = useCallback(async () => {
     try {
-      const data = await getFolders();
-      setFolders(data.folders);
+      const r = await getFolders();
+      setFolders(r.folders);
     } catch (e) {
-      setError((e as Error).message);
+      console.warn("refreshFolders failed:", e);
     }
   }, []);
 
-  useEffect(() => {
-    loadFolders();
-    getShortcut().then(setShortcut).catch(() => {});
-  }, [loadFolders]);
+  const onIngestStarted = useCallback(() => {
+    // Flag the poll so the running→done edge fires properly. The
+    // poll itself is always running; this just ensures we observe
+    // the start by setting a stub state to read against.
+    prevRunningRef.current = true;
+    // Fire-and-forget an immediate status fetch to surface progress
+    // sooner than the next 1.5s tick.
+    getIngestStatus().then((s) => setIngest(s)).catch(() => {});
+  }, []);
 
-  // Deep-link handler: the ask bar's NotFoundCard CTA opens settings
-  // via `open_settings_with_action({action: "add-folder"})`, which
-  // injects `window.__MAGPIE_SETTINGS_ACTION__` into the settings
-  // webview. On mount, consume that action and trigger the matching
-  // affordance (currently: "add-folder" → fire the folder picker).
-  // Cleared after consumption so a re-show doesn't refire.
+  // ----------- Deep-link handler (NotFoundCard → add folder) -----------
+  // Switch to Data tab + fire the folder picker. Lives as a stable
+  // useCallback; the ref-based dispatch below ensures the mount-time
+  // effect calls the LATEST closure (not the one captured at first
+  // render).
+  const handleDeepLinkAddFolder = useCallback(() => {
+    setTab("data");
+    requestAnimationFrame(() => {
+      import("./../api").then(async ({ addFolder, pickFolder, startIngest }) => {
+        const path = await pickFolder();
+        if (!path) return;
+        try {
+          await addFolder(path);
+          await startIngest(path);
+          onIngestStarted();
+          await refreshFolders();
+        } catch (e) {
+          console.warn("deep-link addFolder failed:", e);
+        }
+      });
+    });
+  }, [refreshFolders, onIngestStarted]);
+
+  useEffect(() => {
+    handleDeepLinkAddFolderRef.current = handleDeepLinkAddFolder;
+  }, [handleDeepLinkAddFolder]);
+
   useEffect(() => {
     const w = window as Window & { __MAGPIE_SETTINGS_ACTION__?: string };
     const action = w.__MAGPIE_SETTINGS_ACTION__;
     if (action === "add-folder") {
       w.__MAGPIE_SETTINGS_ACTION__ = undefined;
-      handleAddFolderRef.current?.();
+      handleDeepLinkAddFolderRef.current?.();
     }
   }, []);
-  // Stable ref to handleAddFolder so the deep-link effect doesn't have
-  // to re-run when the callback identity changes. Set inside the
-  // declaration below.
-  const handleAddFolderRef = useRef<(() => void) | null>(null);
-
-  // Poll ingest status while indexing is running.
-  useEffect(() => {
-    const tick = async () => {
-      try {
-        const s = await getIngestStatus();
-        setIngest(s);
-        if (!s.running) {
-          if (pollRef.current) clearInterval(pollRef.current);
-          pollRef.current = null;
-          loadFolders();
-        }
-      } catch {
-        // sidecar not ready yet — ignore
-      }
-    };
-
-    const startPolling = () => {
-      if (pollRef.current) return;
-      pollRef.current = setInterval(tick, 1000);
-      tick();
-    };
-
-    // Check once on mount to see if indexing is already running.
-    getIngestStatus()
-      .then((s) => {
-        setIngest(s);
-        if (s.running) startPolling();
-      })
-      .catch(() => {});
-
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, [loadFolders]);
-
-  const startPolling = useCallback(() => {
-    if (pollRef.current) return;
-    const tick = async () => {
-      try {
-        const s = await getIngestStatus();
-        setIngest(s);
-        if (!s.running) {
-          if (pollRef.current) clearInterval(pollRef.current);
-          pollRef.current = null;
-          loadFolders();
-        }
-      } catch {}
-    };
-    pollRef.current = setInterval(tick, 1000);
-    tick();
-  }, [loadFolders]);
-
-  const handleAddFolder = useCallback(async () => {
-    setAddingFolder(true);
-    setError(null);
-    try {
-      const path = await pickFolder();
-      if (!path) return;
-      await addFolder(path);
-      await loadFolders();
-      await startIngest(path);
-      startPolling();
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setAddingFolder(false);
-    }
-  }, [loadFolders, startPolling]);
-
-  // Wire the ref consumed by the deep-link useEffect above. Done here
-  // (after the callback definition) so the ref points at the latest
-  // closure on every render.
-  handleAddFolderRef.current = handleAddFolder;
-
-  const handleRemoveFolder = useCallback(async (path: string) => {
-    setError(null);
-    try {
-      await removeFolder(path);
-      setFolders((prev) => prev.filter((f) => f.path !== path));
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }, []);
-
-  const handleIndexFolder = useCallback(async (path: string) => {
-    setError(null);
-    try {
-      await startIngest(path);
-      startPolling();
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }, [startPolling]);
-
-  const handleStop = useCallback(async () => {
-    await stopIngest();
-  }, []);
-
-  const indexingPath = ingest?.running ? ingest.path : null;
 
   return (
     <div className="settings-window">
-      <h1 className="settings-window__title">Settings</h1>
-
-      {error && <p className="settings-window__error">{error}</p>}
-
-      {/* ── Indexed Locations ─────────────────────────────────────────── */}
-      <section className="settings-section">
-        <div className="settings-section__header">
-          <h2 className="settings-section__title">Indexed Locations</h2>
-          <button
-            className="settings-btn settings-btn--primary"
-            onClick={handleAddFolder}
-            disabled={addingFolder || (ingest?.running ?? false)}
-          >
-            {addingFolder ? "Picking…" : "+ Add Folder"}
-          </button>
+      <SettingsSidebar active={tab} onChange={setTab} status={status} />
+      <main className="settings-main">
+        <SettingsHeader status={status} ingest={ingest} />
+        <div className="settings-main__body">
+          {tab === "data" && (
+            <DataTab
+              folders={folders}
+              ingest={ingest}
+              refreshFolders={refreshFolders}
+              onIngestStarted={onIngestStarted}
+              pollActive={Boolean(ingest?.running)}
+            />
+          )}
+          {tab === "search-ai" && (
+            <SearchAITab
+              search={search}
+              setSearch={setSearch}
+              providers={providers}
+              setProviders={setProviders}
+            />
+          )}
+          {tab === "shortcut-app" && (
+            <ShortcutAppTab
+              app={app}
+              setApp={setApp}
+              shortcut={shortcut}
+              setShortcut={setShortcut}
+              appVersion={appVersion}
+            />
+          )}
         </div>
-
-        {folders.length === 0 ? (
-          <p className="settings-empty">No folders indexed yet.</p>
-        ) : (
-          <ul className="settings-folder-list">
-            {folders.map((f) => {
-              const isIndexingThis = indexingPath === f.path;
-              return (
-                <li key={f.path} className="settings-folder-item">
-                  <span className="settings-folder-item__path" title={f.path}>
-                    {f.path}
-                  </span>
-                  <div className="settings-folder-item__actions">
-                    {isIndexingThis ? (
-                      <span className="settings-folder-item__badge">Indexing…</span>
-                    ) : (
-                      <button
-                        className="settings-btn settings-btn--ghost"
-                        onClick={() => handleIndexFolder(f.path)}
-                        disabled={ingest?.running ?? false}
-                        title="Re-index this folder"
-                      >
-                        Re-index
-                      </button>
-                    )}
-                    <button
-                      className="settings-btn settings-btn--danger"
-                      onClick={() => handleRemoveFolder(f.path)}
-                      disabled={isIndexingThis}
-                      title="Remove from indexed locations"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-
-      {/* ── Indexing Progress ─────────────────────────────────────────── */}
-      {ingest?.running && (
-        <section className="settings-section settings-section--progress">
-          <h2 className="settings-section__title">Indexing</h2>
-          <p className="settings-progress__message">
-            {ingest.files_total
-              ? `${ingest.files_done} / ${ingest.files_total} files`
-              : "Scanning…"}
-          </p>
-          {ingest.files_total > 0 && (
-            <div className="settings-progress__bar">
-              <div
-                className="settings-progress__fill"
-                style={{ width: `${Math.round((ingest.files_done / ingest.files_total) * 100)}%` }}
-              />
-            </div>
-          )}
-          {ingest.current_file && (
-            <p className="settings-progress__detail">
-              {ingest.current_file.length > 52
-                ? `…${ingest.current_file.slice(-50)}`
-                : ingest.current_file}
-            </p>
-          )}
-          {ingest.elapsed_s != null && (
-            <p className="settings-progress__detail">{formatElapsed(ingest.elapsed_s)} elapsed</p>
-          )}
-          <button className="settings-btn settings-btn--stop" onClick={handleStop}>
-            Stop indexing
-          </button>
-        </section>
-      )}
-
-      {/* ── Keyboard Shortcut ─────────────────────────────────────────── */}
-      <section className="settings-section">
-        <h2 className="settings-section__title">Keyboard Shortcut</h2>
-        <div className="settings-shortcut-row">
-          <span className="settings-shortcut-row__label">Summon Magpie</span>
-          <kbd className="settings-shortcut-row__kbd">{shortcut}</kbd>
-        </div>
-        <p className="settings-hint">
-          To change the shortcut, quit and relaunch Magpie — it will offer alternatives if the
-          current shortcut is taken.
-        </p>
-      </section>
-
-      {/* ── About ─────────────────────────────────────────────────────── */}
-      <section className="settings-section">
-        <h2 className="settings-section__title">About</h2>
-        <p className="settings-hint">
-          Magpie — local AI search for your files. Built with ColPali, Qdrant, and a lot of
-          stubbornness.
-        </p>
-      </section>
+      </main>
     </div>
   );
 }
+
+// Re-export to keep existing callers (App.tsx etc.) compiling.
+// (Not strictly needed since they import { SettingsWindow } already,
+// but the explicit re-export documents the public surface.)
+export { ConfirmModal };

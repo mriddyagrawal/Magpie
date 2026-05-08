@@ -1,10 +1,17 @@
 import { forwardRef, useCallback, useEffect } from "react";
-// Two transparent variants. Dark-mode is the default — the Magpie window
-// renders with dark vibrancy (see styles/tokens.css `--bg-card`). The
-// light-mode asset swaps in via the <picture> media query below if the
-// user's system is in light mode (vibrancy lightens slightly there).
-import magpieLogoDark from "../assets/magpie-logo-dark.png";
-import magpieLogoLight from "../assets/magpie-logo-light.png";
+// Two transparent variants. The asset filenames describe the FILE COLOR
+// (a "dark" file is a dark-colored logo); rendering rules for which one
+// to show ARE INVERTED from the file name:
+//
+//   - DARK MODE (default vibrancy) → show the LIGHT-colored asset
+//     (`magpie-logo-light.png`) so the logo is visible on the dark bg.
+//   - LIGHT MODE → show the DARK-colored asset (`magpie-logo-dark.png`)
+//     so the logo is visible on the light bg.
+//
+// An earlier build had this backwards (rendering dark-on-dark and
+// light-on-light, both invisible). Per the user's report (PR 5).
+import magpieLogoDark from "../assets/magpie-logo-dark.png";   // dark-colored — for light bg
+import magpieLogoLight from "../assets/magpie-logo-light.png"; // light-colored — for dark bg
 
 import "./QuestionCard.css";
 
@@ -67,9 +74,11 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
         onMouseDown={onMouseDown}
       >
         <picture>
-          <source srcSet={magpieLogoLight} media="(prefers-color-scheme: light)" />
+          {/* Light mode → use the DARK-colored asset (visible on light bg). */}
+          <source srcSet={magpieLogoDark} media="(prefers-color-scheme: light)" />
+          {/* Default (dark mode) → use the LIGHT-colored asset (visible on dark bg). */}
           <img
-            src={magpieLogoDark}
+            src={magpieLogoLight}
             alt="Magpie"
             className={`question-card__logo ${value || isActive ? "is-active" : ""}`}
             data-tauri-drag-region

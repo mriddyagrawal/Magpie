@@ -38,8 +38,14 @@ class PipelineResult:
     question: str
     search_query: SearchQuery          # Kimi's rewritten dense/BM25 query
     retrieved: list[SearchResult]       # Qdrant top-k (path, summary, score)
-    answer: str                         # Kimi's final answer
+    answer: str                         # Kimi's final answer ("" if not_found)
     sources_used: list[str]             # Subset of retrieved paths Kimi cited
+    # Not-found state. When True, `answer` and `sources_used` are empty and the
+    # ask bar renders State 5 with the single "Add folder" CTA. The model sets
+    # these via the `not_found` / `not_found_topic` fields on Answer; see
+    # Specs/UI/ask_bar.md and Plan #25 in Plans/Future Plans.md.
+    not_found: bool = False
+    not_found_topic: str = ""
 
 
 async def ask(
@@ -99,15 +105,21 @@ async def ask(
               file=sys.stderr, flush=True)
 
     if not retrieved:
-        print(f"[query] no hits — returning empty answer "
+        # Empty retrieval is a special not-found shape: we never even reached
+        # the answer model. Synthesize a not_found result so the ask bar
+        # renders State 5 (the "Add folder" CTA) consistently with the case
+        # where the model did read sources but couldn't answer.
+        print(f"[query] no hits — emitting not_found "
               f"(total {time.monotonic()-t_start:.2f}s)",
               file=sys.stderr, flush=True)
         return PipelineResult(
             question=question,
             search_query=sq,
             retrieved=[],
-            answer="No matching documents found in the index.",
+            answer="",
             sources_used=[],
+            not_found=True,
+            not_found_topic=question.strip().rstrip("?").strip(),
         )
 
     paths = list(dict.fromkeys(r.path for r in retrieved if r.path))
@@ -149,6 +161,8 @@ async def ask(
         retrieved=retrieved,
         answer=ans.answer,
         sources_used=ans.sources_used,
+        not_found=ans.not_found,
+        not_found_topic=ans.not_found_topic,
     )
 
 

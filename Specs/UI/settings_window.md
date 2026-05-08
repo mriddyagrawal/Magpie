@@ -108,6 +108,49 @@ leaves your machine.
   - "Add a folder…" → folder picker
   - "Add a single file…" → file picker
 
+### Two utility buttons (left of the primary CTA)
+
+In the same header row as the "+ Add folder / file" CTA, two
+secondary buttons sit to its left:
+
+```
+                          [ ↻ Sync ]   [ ⟳ Reindex ]   [+ Add folder / file ▾]
+```
+
+- **Sync** — neutral / outline-style button. Runs the everyday
+  reconciliation: picks up new files, drops files that no longer
+  match the indexing rules (removed include_paths / new
+  exclusions / files deleted from disk), updates files whose mtime
+  changed. Does NOT re-read unchanged files. Safe to run anytime.
+  - Endpoint: `POST /index/sync` → kicks off the same job machinery
+    as Add-folder, with a global progress UI (the same row-level
+    progress users see on individual folders consolidates into a
+    single banner across all rows).
+  - Tooltip / helper: "Pick up new files and drop removed ones.
+    Won't re-read what hasn't changed."
+
+- **Reindex** — destructive-styled (subtle red border / muted
+  warning color, *not* a screaming-red button — this is a power
+  action, not a danger action). Wipes the entire index and runs
+  Sync from scratch.
+  - Click shows a confirmation modal:
+
+    > **Reindex everything?**
+    > This rebuilds Magpie's understanding of all your folders.
+    > It can take 10–60 minutes depending on how much you've
+    > added. Your files are not touched.
+    >
+    > [Cancel]  [Reindex]
+
+  - Endpoint: `POST /index/reindex` → drops Qdrant collection +
+    manifest, then runs the same job as Sync.
+  - Tooltip / helper: "Rebuild from scratch. Slow but thorough —
+    use only if Magpie's index seems off."
+
+These two buttons are the v1 manual-trigger surface for indexing.
+A file-watcher / scheduled-sync flow is parked for a later branch
+(see `Plans/UI/Implementation Plan.md` → Indexing triggers section).
+
 ### Folder/file row (the core unit)
 
 Each indexed source is a card. Composition (left → right):

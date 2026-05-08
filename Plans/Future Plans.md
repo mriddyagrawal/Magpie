@@ -16,7 +16,7 @@ What gets returned for a query: ranking, fusion, agentic loops, query rewriting,
 - **#2** Asymmetric-search-aware query path (HyDE)
 - **#3** Agentic retrieval loop (top-k → fetch more on demand)
 - **#5** Hierarchical chunking — the "400-page manual" problem
-- **#6** Cross-encoder reranker (Stage 3.5)
+- **#6** ✅ Cross-encoder reranker (Stage 3.5)
 - **#7** Structured payload filtering on date / merchant
 - **#8** Smarter T0 / large-CSV retrieval
 - **#9** Liquid AI LFM2 model evaluation *(also: Models)*
@@ -37,21 +37,27 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#24** Batch indexing — knobs, per-batch progress, error handling *(also: UI, Perf)*
 - **#25** Answer-step output schema — empirically evaluate two open choices *(also: Models, Evaluation)*
 - **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: UI, Config, Security)*
-- **#27** ⚠️ Abort in-flight queries on retype / blur (UI URGENT) *(also: Perf, Pipeline)*
+- **#27** ⚠️ Abort in-flight queries on retype / blur (UI URGENT) *(also: Perf, Pipeline)* — *attempted + reverted; still open*
 - **#28** Unified files-or-folders picker (single dialog) *(also: UI, Platform)*
 - **#29** peft import error during ingest_file path *(also: Dependencies, Ingest)*
+- **#31** ✅ Source-count semantics: manifest vs. retrieval vs. Qdrant *(also: UI, Diagnostics)* — *fix landed; 3 minor follow-ups deferred*
+- **#33** Sidecar `PYTHONIOENCODING=utf-8` to prevent Windows non-ASCII crashes *(also: Packaging)*
+- **#34** Sidecar PyInstaller native data assets — `--collect-data` for `pydantic_ai` and `genai_prices`, plus the Nuitka migration *(also: Packaging)*
+- **#35** Phase 2 of `/query/stream` — token-by-token answer streaming via JSON-stream substring-match parser *(also: Pipeline, Performance)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
 
 - **#14** Promote `MAGPIE_DEV_USE_MTIME` to a user-facing setting *(also: Indexing, Config)*
 - **#15** Auto-promotion of nested exclude paths into sub-roots *(also: Config)*
-- **#16** LLM / inference settings UI + cross-provider thinking-mode unification *(also: Models, Config)*
+- **#16** ⚠️ LLM / inference settings UI + cross-provider thinking-mode unification *(also: Models, Config)* — *Search & AI knobs done; local-backend tuning + thinking-unification still open*
 - **#21** Surface drift events: warn before silently dropping vanished files *(also: Indexing)*
 - **#24** Batch indexing — surface upsert-phase progress + bad-file isolation *(also: Indexing, Perf)*
 - **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: Config, Security)*
 - **#27** ⚠️ Abort in-flight queries on retype / blur (UI URGENT) *(also: Perf, Pipeline)*
 - **#28** Unified files-or-folders picker (single dialog, multi-select) *(also: Platform)*
+- **#30** ✅ Settings buttons that persist but don't act — wire-up audit *(also: Cross-cutting)* — *5 of 6 items done/removed; "Check for updates" gated on Plan #19*
+- **#32** Per-provider prompt-layout split (small-local vs. cloud) *(also: Models, Eval)*
 
 ### 📦 Packaging, distribution & process lifecycle
 How Magpie ships and runs as an end-user app — from installer through process management.
@@ -71,11 +77,12 @@ Auth, hardening, secret storage.
 LLM/embedding model swaps, evaluation, cross-provider feature parity.
 
 - **#2** Asymmetric models / HyDE *(also: Retrieval)*
-- **#6** Cross-encoder reranker *(also: Retrieval)*
+- **#6** ✅ Cross-encoder reranker *(also: Retrieval)*
 - **#9** Liquid AI LFM2 model evaluation
-- **#16** LLM / inference settings UI + thinking-mode unification *(also: UI, Config)*
+- **#16** ⚠️ LLM / inference settings UI + thinking-mode unification *(also: UI, Config)* — *Search & AI knobs done; local-backend tuning + thinking-unification still open*
 - **#22** Adding a new local LLM — playbook (Qwen2.5-VL, LFM2-VL, MiniCPM-V, …)
 - **#23** MLX backend (Apple Silicon opt-in) for raw speed *(also: Config)*
+- **#32** Per-provider prompt-layout split (small-local vs. cloud) *(also: UI, Eval)*
 
 ---
 
@@ -248,7 +255,7 @@ If `char_range` or `page_range` is set, Stage 4 reads only that slice instead of
 
 ---
 
-## 6. Cross-encoder reranker (Stage 3.5)
+## 6. Cross-encoder reranker (Stage 3.5) — IMPLEMENTED 2026-05-08
 
 **Tags:** retrieval · models
 
@@ -512,9 +519,23 @@ The fallback in `load_magpie_defaults()` already prints a warning and runs with 
 
 ---
 
-## 16. LLM / inference settings UI + cross-provider thinking-mode unification
+## 16. LLM / inference settings UI + cross-provider thinking-mode unification — PARTIAL
 
-**Tags:** ui · models · config
+**Tags:** ui · models · config · ⚠ partially done
+
+> **Status as of 2026-05-08:** Half of part (a) shipped through PR 5 / the
+> settings-wireup work — the **Search & AI tab** now exposes provider
+> (Local/Cloud), top_k, temperature, rewrite, cite_sources_inline, and
+> enumerate_lists, all wired end-to-end through `effective_settings()`.
+> What's still open from this plan:
+> - **Local-backend tuning knobs** (`LOCAL_MODEL`, `LOCAL_QUANT`,
+>   `LOCAL_N_CTX`, `LOCAL_N_GPU_LAYERS`) remain `.env`-only. No UI surface.
+> - **Cross-provider thinking-mode unification (part b)** — untouched.
+>   `_warn_cloud_thinking_unsupported` still emits the no-op warning;
+>   per-provider routing (OpenAI `reasoning_effort`, Anthropic
+>   `extra_body.thinking`, etc.) is not wired.
+>
+> Original plan kept below.
 
 **What:** Two related pieces of work that both belong upstream of the local-LLM migration shipped in `Plans/Local LLM Plan.md`:
 
@@ -1200,9 +1221,18 @@ the embedder.
 
 ---
 
-## 25. Answer-step output schema — empirically evaluate two open choices
+## 25. Answer-step output schema — empirically evaluate two open choices — IN PROGRESS
 
-**Tags:** models · answer · ux · evaluation
+**Tags:** models · answer · ux · evaluation · ⚠ partially done
+
+> **Status as of 2026-05-08:** Choice C (prompt-layout knobs — best-doc
+> position, question echo, history slot) was **added** as a third vertical
+> after the recency-bias work landed. Choices A and B remain open eval
+> questions. The eval harness itself (the bottleneck for actually closing
+> any of the three) is **not yet built** — it's described in the "Concrete
+> eval harness needed" section below but no code has been written. Until
+> the harness exists, none of the three choices can be empirically
+> resolved; today's defaults remain by judgment, not by data.
 
 **What:** Two design choices made by hand for the v1 ask-bar
 (`Specs/UI/ask_bar.md`) need empirical evaluation against the
@@ -1733,9 +1763,15 @@ that's compatible.
 to this error (vs. just stderr noise), or as part of a routine
 dependency upgrade pass.
 
-## 30. Settings buttons that persist but don't act — wire-up audit
+## 30. Settings buttons that persist but don't act — wire-up audit — SUBSTANTIALLY DONE 2026-05-08
 
-**Tags:** settings · UX · cross-cutting
+**Tags:** settings · UX · cross-cutting · ✅ 5/6 controls addressed
+
+> **Status:** 5 of 6 audit findings landed in the settings-wireup +
+> shortcut-tray-runtime + drop-show-in-tray + this-week's batches.
+> The only remaining item is **Check for updates**, which is gated on
+> Plan #19 (post-packaging configuration / release pipeline) and won't
+> ship until then. The detailed table below tracks per-control state.
 
 **What.** Several Settings controls accept clicks and PATCH the
 backend, but no consumer reads the resulting value at runtime.
@@ -1888,9 +1924,15 @@ half.
 buttons "doesn't work" — start with that specific control,
 not the whole bundle.
 
-## 31. Source-count semantics: manifest vs. retrieval vs. Qdrant
+## 31. Source-count semantics: manifest vs. retrieval vs. Qdrant — FIX LANDED 2026-05-08
 
-**Tags:** UX · ranking · diagnostics
+**Tags:** UX · ranking · diagnostics · ✅ primary fix done
+
+> **Status:** The headline fix (manifest-backed counts everywhere) shipped.
+> Three minor follow-ups are deferred — see "What's left" below — but
+> none are user-blocking. The "I read 20 likely sources" misleading copy
+> is gone; Settings sidebar's "understood: N" and the not-found card now
+> agree on what counts as a source.
 
 **What.** Three different "counts of files" floated around the
 codebase and leaked through to the UI inconsistently:
@@ -2022,5 +2064,216 @@ and the layout assumptions for "small + recency-biased" no
 longer hold (e.g. moving to a 30B local that's more flat-
 attention); (3) someone runs Plan #25's eval harness and finds
 that layout knobs split per provider.
+
+---
+
+## 33. Sidecar `PYTHONIOENCODING=utf-8` to prevent Windows non-ASCII crashes
+
+**Tags:** packaging · platform · stability
+
+**What.** Set `PYTHONIOENCODING=utf-8` (and ideally `PYTHONUTF8=1`) on the
+sidecar subprocess environment when Tauri spawns it
+([frontend/src-tauri/src/lib.rs:546](../frontend/src-tauri/src/lib.rs#L546),
+`spawn_sidecar`). One-line change in both the dev branch (`uv run python …`)
+and the production branch (the bundled binary).
+
+**Why.** On Windows the default Python I/O encoding is the system code page
+(typically `cp1252` or similar), not UTF-8. Any `print()` of a non-ASCII
+character crashes the sidecar with `UnicodeEncodeError`. The failure mode
+in the wild: llama-server returns a response containing CJK / Greek /
+emoji, the sidecar tries to log the answer (or echo it through pipeline
+trace prints), and the request stream dies mid-token. User sees a
+half-finished answer or a hard "connection reset" depending on timing.
+
+The two env vars are belt-and-suspenders:
+- `PYTHONIOENCODING=utf-8` — covers stdout / stderr / stdin specifically.
+- `PYTHONUTF8=1` — Python 3.7+ "UTF-8 mode" that forces UTF-8 across all
+  text I/O, including `open()` defaults and filesystem encoding decisions.
+
+macOS and Linux already default to UTF-8 in most setups, but setting the
+vars explicitly is a no-op on them and protects against weird locales.
+
+**Why we did NOT do this now.** Bundled with the streaming work
+(`/query` SSE shape) but kept on a separate roadmap entry because we
+haven't actually reproduced the crash on Windows. Adding the vars is
+defensive — costs nothing — but a real Windows test (CJK / emoji answer
+streamed end-to-end) is owed before declaring it fixed.
+
+**Why we'd want this:**
+- Cheap insurance — one line of code, zero runtime cost.
+- Closes a known footgun the substack reference article called out
+  ("UTF-8 encoding on Windows" causes crashes with emoji/special
+  characters in llama.cpp output) and that's likely to bite the moment
+  any non-English corpus is queried on Windows.
+
+**When to revisit.** Bundle with the next packaging-touching change, OR
+the moment a Windows tester reports a crash on a non-ASCII answer.
+Whichever happens first.
+
+---
+
+## 34. Sidecar PyInstaller native data assets — `--collect-data` + Nuitka migration
+
+**Tags:** packaging · stability · build
+
+**What.** Two related concerns about the bundled sidecar's static assets.
+
+**Part A — defensive `--collect-data` for `pydantic_ai` and `genai_prices`.**
+[scripts/build_sidecar.py](../scripts/build_sidecar.py) currently uses
+`--copy-metadata pydantic_ai` and `--copy-metadata genai_prices`. Those
+flags ship the `.dist-info` directory (so `importlib.metadata.version()`
+calls work at import time), but they do **not** ship the package's
+non-Python data files (JSON schemas, prompt templates, model price
+tables). If either library starts loading a packaged JSON / YAML file
+at runtime, the bundled sidecar will blow up at first call with a
+`FileNotFoundError` while the dev / `uv run` path keeps working. Add
+`--collect-data pydantic_ai` and `--collect-data genai_prices` as
+defensive insurance.
+
+**Part B — Nuitka migration.** PyInstaller `--onefile` mode causes a real
+process-management problem: Tauri spawns the bootloader exe and only
+holds that PID, but the actual Python code runs in a child process
+forked by the bootloader. `child.kill()` (in `RunEvent::Exit`) kills the
+bootloader; the Python child reparents to init and can linger as an
+orphan briefly — sometimes seconds, sometimes longer if it's mid-LLM
+call. The fix paths are: (1) switch to `--onedir` (~3-5x bigger artifact,
+but the bootloader IS the Python process — `kill()` works correctly);
+or (2) spawn with process-group semantics and kill the group.
+
+The plan is to skip both PyInstaller fixes and migrate the build to
+**Nuitka**. Nuitka compiles Python to C and emits a real native binary,
+which fixes the orphan problem automatically (no bootloader / child
+split exists) and dramatically reduces the `--hidden-import` flag list
+(Nuitka's static analysis is much stronger than PyInstaller's). Native
+data assets still need explicit `--include-package-data` for
+`pydantic_ai` / `genai_prices` / `sentence_transformers` /
+`fastembed` / `pymupdf` / `qdrant_client` — same story as PyInstaller's
+`--collect-data`, just renamed.
+
+**Why we did NOT do this now.**
+- Part A is a one-line defensive change, but neither library is currently
+  observed to need its data files at runtime — adding the flags increases
+  the artifact size for theoretical insurance.
+- Part B (Nuitka) is a real migration: 1-2 days of build-engineering
+  work, plus longer CI minutes (Nuitka compile is significantly slower
+  than PyInstaller's bytecode-bundle), plus testing every native dep
+  bundles correctly.
+
+**Why we'd want this:**
+- Part A — closes a silent-failure mode where the bundled binary ships
+  green, and the first user with a model-pricing-table lookup or a
+  pydantic_ai schema-load gets a `FileNotFoundError`.
+- Part B — eliminates the orphan-Python-child class of bug entirely,
+  removes the need for the long `--hidden-import` declaration list in
+  `build_sidecar.py`, and produces a single binary that behaves like
+  any other native app (kill-by-PID just works). Also makes auto-update
+  trivial: replace one binary instead of an exe + side-by-side data
+  folder.
+
+**When to revisit.**
+- Part A: bundle with the next packaging-touching change. Cheap.
+- Part B: when (a) we observe an orphaned Python process after
+  `child.kill()` causing actual user-visible problems, or (b) we want
+  to ship auto-update and the `--onefile` exe model becomes a ceiling,
+  or (c) we have a 1-2 day build-engineering window with no compelling
+  feature work blocking it.
+
+---
+
+## 35. Phase 2 of `/query/stream` — token-by-token answer streaming
+
+**Tags:** pipeline · performance · streaming · ux
+
+**What.** The `/query/stream` endpoint shipped in Phase 1 (2026-05) emits
+the correct SSE wire shape (`sources` → `answer_chunk` ×N → `sources_used`
+→ `done`), but `answer_chunk` currently fires **exactly once** with the
+full answer text. The frontend integration is already written against
+the multi-chunk shape — flipping the backend to per-token chunks needs
+zero frontend changes. This plan delivers that backend swap so the
+answer appears word-by-word in the AnswerCard as Gemma generates it,
+not all at once after the LLM call returns.
+
+**Why we did NOT do it now.**
+
+The blocker is `src/answer.py:answer_question`. That function is ~350
+lines that does ~250 lines of prompt-building (T0 ripgrep blocks, CSV
+row-window blocks, summary supplement prepending, history assembly,
+enumeration-mode classification, doc reordering per "Lost in the
+Middle") *before* the single `await agent.run(message)` call. Token
+streaming requires bypassing the pydantic_ai agent (which doesn't
+expose token-level access for structured output) and calling
+`local_llm.stream(messages, response_format=Answer.model_json_schema())`
+directly. Two paths:
+
+1. **Refactor** — extract `_build_answer_messages(question, paths,
+   history, search_query, csv_row_hits, enumerate_lists) -> list[Any]`
+   from `answer_question`. The existing function becomes
+   `agent.run(_build_answer_messages(...))`; the new streaming path
+   becomes `local_llm.stream(_build_answer_messages(...),
+   response_format=...)`. Cleanest, but touches a heavy file the
+   parallel-instance work also edits.
+2. **Duplicate** — copy ~150 LOC of prompt-building into the streaming
+   endpoint. Avoids touching `answer.py` but creates a long-term sync
+   burden any time prompt logic evolves.
+
+We skipped both because (a) the user-facing UX win even *with* the
+single-chunk Phase 1 shape is large (sources card paints in
+~500ms-3s instead of waiting 5-15s for the full answer), and (b) the
+refactor wants a clean window without parallel-instance edits to
+collide with. We took the wire-shape decision now so the frontend
+work isn't relitigated; the backend swap can land any time after.
+
+**Why we'd want this:**
+- True per-token UX. Gemma 4 E4B emits ~30 tok/s on M-series; the user
+  sees the answer building word-by-word starting at first token, not
+  blocked on full completion.
+- No frontend changes required — `api.ts:postQueryStream` is already a
+  multi-chunk async iterator, and any UX surface that subscribes to
+  `answer_chunk` events transparently sees more chunks instead of one.
+- Sets up Plan #27 (abort in-flight) cleanly: closing the SSE
+  connection naturally aborts the underlying llama-server slot via
+  TCP close → httpx response close → llama-server slot release. No
+  separate cancellation API endpoint needed.
+
+**Implementation sketch.**
+
+The "tiny state machine" the user described (the JSON-stream
+substring-match parser):
+
+```
+state: 'searching_not_found' | 'in_topic' | 'searching_answer' | 'in_answer' | 'done'
+buf: bytes accumulated so far
+out: emit answer_chunk(text) / not_found_topic(t) / sources_used(p)
+
+on each chunk arriving from local_llm.stream():
+  buf += chunk
+  if state == 'searching_not_found':
+    look for `"not_found": false` or `"not_found": true`
+    if false:   state = 'searching_answer'
+    if true:    state = 'in_topic' (next field is the topic string)
+  if state == 'in_topic':
+    parse the not_found_topic string, emit not_found_topic(text), state = 'done'
+  if state == 'searching_answer':
+    look for `"answer": "`; once found, state = 'in_answer'
+  if state == 'in_answer':
+    forward bytes after answer-start to client (with JSON unescape:
+    \" → ", \\ → \, \n → newline, \uXXXX → char) until unescaped " ends
+    emit answer_chunk(text) per chunk arrived
+    state = 'parsing_sources'
+  if state == 'parsing_sources':
+    accumulate the rest, parse the sources_used array, emit sources_used(paths)
+    state = 'done'
+```
+
+~80 LOC server-side parser + ~30-40 LOC for the
+`local_llm.stream(messages, response_format=…)` call setup +
+`_build_answer_messages` refactor or duplicate. Frontend already wired.
+
+**When to revisit.** Pick this up when (a) someone has a 2-3 hour
+window and the parallel-instance is not actively editing
+`src/answer.py`, or (b) the perceived-latency win from Phase 1 is no
+longer enough (likely once cloud streaming lands and frontier-model
+answer latency makes the gap more painful), or (c) Plan #27 (abort)
+work needs a streaming substrate to attach to.
 
 ---

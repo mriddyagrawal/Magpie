@@ -2,6 +2,8 @@ import type {
   CsvPreview,
   QueryResponse,
   RecentEntry,
+  SearchQuery,
+  Source,
   StatusResponse,
 } from "./types";
 import { invoke } from "@tauri-apps/api/core";
@@ -37,15 +39,17 @@ export async function postQuery(
     history?: HistoryTurn[];
   } = {}
 ): Promise<QueryResponse> {
-  // Build the body so the `rewrite` field is OMITTED (not sent as false)
-  // when the caller doesn't pass a value. Pydantic on the server side
-  // then defaults to None and falls back to the REWRITE env var. If we
-  // sent `rewrite: false` here it'd be an explicit override that
-  // shadows the .env setting silently. See `src/server.py:QueryRequest`.
-  const body: Record<string, unknown> = {
-    question,
-    top_k: opts.topK ?? 5,
-  };
+  // Build the body so `top_k` and `rewrite` are OMITTED (not sent as
+  // some hardcoded default) when the caller doesn't pass a value.
+  // Pydantic on the server side then defaults to None and falls back
+  // to the persisted setting (Settings → Search & AI's Top K slider /
+  // Rewrite toggle, both surfaced via `effective_settings()`). If we
+  // sent a hardcoded `top_k: 5` here it'd silently shadow the user's
+  // Settings choice. See `src/server.py:QueryRequest`.
+  const body: Record<string, unknown> = { question };
+  if (opts.topK !== undefined) {
+    body.top_k = opts.topK;
+  }
   if (opts.rewrite !== undefined) {
     body.rewrite = opts.rewrite;
   }
@@ -59,6 +63,206 @@ export async function postQuery(
   });
   if (!res.ok) throw new Error(`query failed: ${res.status} ${await res.text()}`);
   return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// /query/stream — SSE streaming variant
+// ---------------------------------------------------------------------------
+//
+// Same inputs as `postQuery`, but yields a typed event stream so the
+// caller can paint the sources card the moment retrieval finishes —
+// before the answer LLM call returns — and append answer text as
+// chunks arrive. Wire format defined in `src/server.py:query_stream`
+// block comment.
+//
+// The emitted shape:
+//
+//   `sources`         — fires once after retrieval. Frontend renders
+//                       the sources card with `cited: false` placeholders.
+//   `not_found_topic` — fires when the answer pipeline declares not-found.
+//                       Terminal branch: no `answer_chunk` / `sources_used`
+//                       follow. Frontend transitions to the not-found card.
+//   `answer_chunk`    — fires N times during the answer phase, each
+//                       carrying a slice of the answer text. Caller
+//                       appends `text` to its in-progress buffer.
+//                       Phase 1: this fires exactly once with the full
+//                       answer; Phase 2 will fire many times as tokens
+//                       stream from the LLM.
+//   `sources_used`    — fires once after the final `answer_chunk` with
+//                       the cited paths. Frontend reconciles the
+//                       `cited` flag on its sources state here.
+//   `done`            — terminal. Fires last in every successful and
+//                       error stream. Carries `recent_id` for the
+//                       persisted recents entry.
+//   `error`           — retrieval or answer threw. Followed by `done`.
+//
+// Usage:
+//   const buffer: string[] = [];
+//   for await (const ev of postQueryStream(question)) {
+//     switch (ev.type) {
+//       case 'sources':         setSources(ev.sources); break;
+//       case 'not_found_topic': setView({ kind: 'not_found', topic: ev.topic }); break;
+//       case 'answer_chunk':    buffer.push(ev.text); setAnswer(buffer.join('')); break;
+//       case 'sources_used':    setCited(ev.paths); break;
+//       case 'error':           setError(ev.detail); break;
+//       case 'done':            setRecentId(ev.recentId); break;
+//     }
+//   }
+
+export interface StreamSourcesEvent {
+  type: "sources";
+  sources: Source[];
+  searchQuery: SearchQuery;
+  rewrittenQuery: string | null;
+  sourcesScannedCount: number;
+}
+
+export interface StreamNotFoundTopicEvent {
+  type: "not_found_topic";
+  topic: string;
+}
+
+export interface StreamAnswerChunkEvent {
+  type: "answer_chunk";
+  text: string;
+}
+
+export interface StreamSourcesUsedEvent {
+  type: "sources_used";
+  paths: string[];
+}
+
+export interface StreamDoneEvent {
+  type: "done";
+  recentId: string | null;
+}
+
+export interface StreamErrorEvent {
+  type: "error";
+  detail: string;
+  phase: "retrieval" | "answer";
+}
+
+export type StreamEvent =
+  | StreamSourcesEvent
+  | StreamNotFoundTopicEvent
+  | StreamAnswerChunkEvent
+  | StreamSourcesUsedEvent
+  | StreamDoneEvent
+  | StreamErrorEvent;
+
+/** Parse one SSE frame (without the trailing blank line) into a typed
+ *  StreamEvent, or `null` if the frame doesn't carry one of our known
+ *  event names. Unknown event types are silently dropped — the wire is
+ *  forward-compatible with future backend additions. */
+function parseSseFrame(raw: string): StreamEvent | null {
+  let event = "";
+  const dataLines: string[] = [];
+  for (const line of raw.split("\n")) {
+    if (line.startsWith("event:")) {
+      event = line.slice(6).trim();
+    } else if (line.startsWith("data:")) {
+      // SSE allows multiple data: lines per frame; spec joins them with
+      // \n. Our backend always emits a single data: line per frame, but
+      // we honor the spec to stay compatible with proxy reformatters.
+      dataLines.push(line.slice(5).trimStart());
+    }
+    // Comment lines (lines starting with ":") and unknown fields ignored.
+  }
+  const data = dataLines.join("\n");
+  if (!event) return null;
+  let payload: any;
+  try {
+    payload = JSON.parse(data);
+  } catch {
+    return null;
+  }
+  switch (event) {
+    case "sources":
+      return {
+        type: "sources",
+        sources: payload.retrieved ?? [],
+        searchQuery: payload.search_query ?? { query: "", keywords: [] },
+        rewrittenQuery: payload.rewritten_query ?? null,
+        sourcesScannedCount: payload.sources_scanned_count ?? 0,
+      };
+    case "not_found_topic":
+      return { type: "not_found_topic", topic: payload.topic ?? "" };
+    case "answer_chunk":
+      return { type: "answer_chunk", text: payload.text ?? "" };
+    case "sources_used":
+      return { type: "sources_used", paths: payload.paths ?? [] };
+    case "done":
+      return { type: "done", recentId: payload.recent_id ?? null };
+    case "error":
+      return {
+        type: "error",
+        detail: payload.detail ?? "Something went wrong.",
+        phase: payload.phase === "retrieval" ? "retrieval" : "answer",
+      };
+    default:
+      return null;
+  }
+}
+
+export async function* postQueryStream(
+  question: string,
+  opts: {
+    topK?: number;
+    rewrite?: boolean;
+    history?: HistoryTurn[];
+  } = {}
+): AsyncGenerator<StreamEvent, void, unknown> {
+  // Body construction mirrors postQuery: omit fields we don't have so
+  // the server's effective_settings() is the source of truth.
+  const body: Record<string, unknown> = { question };
+  if (opts.topK !== undefined) body.top_k = opts.topK;
+  if (opts.rewrite !== undefined) body.rewrite = opts.rewrite;
+  if (opts.history && opts.history.length > 0) body.history = opts.history;
+
+  const res = await fetch(`${baseUrl()}/query/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok || !res.body) {
+    const detail = res.ok ? "no response body" : await res.text();
+    throw new Error(`query/stream failed: ${res.status} ${detail}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let buf = "";
+  // Frames are separated by blank lines (\n\n). Stream chunks may split
+  // a frame, so we accumulate into `buf` and flush whole frames on each
+  // \n\n boundary. Anything trailing stays in `buf` for the next chunk.
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) {
+      // Flush any final frame that didn't have a trailing \n\n. Real
+      // backends usually emit it; this is defense-in-depth.
+      if (buf.trim().length > 0) {
+        const ev = parseSseFrame(buf);
+        if (ev) yield ev;
+      }
+      return;
+    }
+    buf += decoder.decode(value, { stream: true });
+    let sep = buf.indexOf("\n\n");
+    while (sep !== -1) {
+      const frame = buf.slice(0, sep);
+      buf = buf.slice(sep + 2);
+      const ev = parseSseFrame(frame);
+      if (ev) yield ev;
+      // `done` is terminal — caller can break, but the server also
+      // closes the response right after, so the outer reader.read()
+      // will return done=true on the next iteration.
+      sep = buf.indexOf("\n\n");
+    }
+  }
 }
 
 export async function getStatus(): Promise<StatusResponse> {

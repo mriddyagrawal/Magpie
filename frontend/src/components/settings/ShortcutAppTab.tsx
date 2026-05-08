@@ -21,6 +21,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import {
+  isRegistered as isShortcutRegistered,
+  register as registerShortcut,
+  unregister as unregisterShortcut,
+} from "@tauri-apps/plugin-global-shortcut";
+import {
   getAppSettings,
   getShortcut,
   patchAppSettings,
@@ -86,6 +91,39 @@ export function ShortcutAppTab({
     }
   }, []);
 
+  // Runtime swap of the global shortcut. Pattern adapted from Kunkun's
+  // frontend/src/lib/utils/hotkey.ts: unregister the old binding, then
+  // register the new one with a callback that invokes the toggle command
+  // back into Rust. The Rust side has no runtime re-register path; this
+  // is the only mechanism that makes "Change…" take effect without an
+  // app restart. On next launch, lib.rs reads shortcut.json and
+  // registers the saved combo from Rust again — same outcome.
+  const swapShortcut = useCallback(async (newCombo: string, oldCombo?: string | null) => {
+    if (oldCombo && oldCombo !== newCombo) {
+      try {
+        if (await isShortcutRegistered(oldCombo)) {
+          await unregisterShortcut(oldCombo);
+        }
+      } catch { /* best-effort cleanup */ }
+    }
+    // If the new combo is already registered (e.g., by Rust at boot),
+    // drop it so register() doesn't error.
+    try {
+      if (await isShortcutRegistered(newCombo)) {
+        await unregisterShortcut(newCombo);
+      }
+    } catch { /* ignore */ }
+    await registerShortcut(newCombo, async (e) => {
+      if (e.state === "Pressed") {
+        try {
+          await invoke("toggle_main_window");
+        } catch (err) {
+          console.error("toggle_main_window failed:", err);
+        }
+      }
+    });
+  }, []);
+
   const patchApp = useCallback(async (p: Partial<AppSettings>) => {
     if (app !== null) setApp({ ...app, ...p });  // optimistic
     try {
@@ -126,11 +164,15 @@ export function ShortcutAppTab({
       const combo = `${mods.join("+")}+${formatKey(e.key)}`;
       setRecordedKeys(combo);
       setRecording(false);
+      // Try the live re-register first; if the OS rejects it (collision
+      // with another app), abort without persisting so the old binding
+      // stays intact on disk and on the next boot.
       try {
+        await swapShortcut(combo, shortcut);
         await putShortcut(combo);
         setShortcut(combo);
       } catch (err) {
-        setError((err as Error).message);
+        setError(`Couldn't bind ${combo}: ${(err as Error).message ?? err}`);
       }
     };
     window.addEventListener("keydown", onKey);
@@ -140,12 +182,13 @@ export function ShortcutAppTab({
   const handleUseDefault = useCallback(async () => {
     setError(null);
     try {
+      await swapShortcut("Alt+Space", shortcut);
       await putShortcut("Alt+Space");
       setShortcut("Alt+Space");
     } catch (e) {
-      setError((e as Error).message);
+      setError(`Couldn't restore default Alt+Space: ${(e as Error).message ?? e}`);
     }
-  }, [setShortcut]);
+  }, [setShortcut, swapShortcut, shortcut]);
 
   if (app === null) {
     return (
@@ -256,7 +299,7 @@ export function ShortcutAppTab({
         />
         <SettingRow
           label="Show in menu bar"
-          hint="The Magpie icon stays available in the system tray."
+          hint="The Magpie icon stays available in the system tray. Restart Magpie to apply."
           control={
             <Toggle
               checked={app.show_in_tray}

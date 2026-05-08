@@ -61,6 +61,26 @@ fn save_shortcut(label: &str) {
     let _ = std::fs::write(&path, format!(r#"{{"shortcut":"{}"}}"#, label));
 }
 
+/// Read `show_in_tray` from settings.json. Returns true (default) if
+/// the file is missing, malformed, or the field is absent — matches
+/// historical behavior where the tray was always built. Runtime toggle
+/// is not supported in v1: the user sees a hint that the change
+/// applies on next launch. Restart-to-apply is acceptable for a
+/// once-and-done preference.
+fn should_show_tray() -> bool {
+    let path = app_data_dir().join("settings.json");
+    let Ok(content) = std::fs::read_to_string(&path) else {
+        return true;
+    };
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(&content) else {
+        return true;
+    };
+    value
+        .get("show_in_tray")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true)
+}
+
 fn preset_shortcuts() -> Vec<(&'static str, Option<Modifiers>, Code)> {
     vec![
         ("Alt+Space", Some(Modifiers::ALT), Code::Space),
@@ -154,9 +174,28 @@ fn setup_global_shortcut(app: &tauri::AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
-        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            // A second instance tried to launch — focus the existing window instead.
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            // A second instance tried to launch. Two flows:
+            //   - `magpie --toggle` (or just `--toggle` as second-instance
+            //     argv): toggle window visibility silently. Useful for
+            //     autostart-launching a hidden Magpie that the user can
+            //     later summon by re-running the launcher binary, or for
+            //     scripted toggle from outside the app.
+            //   - Anything else: focus the existing window and show the
+            //     "already running" dialog.
+            let is_toggle = argv.iter().any(|s| s == "--toggle" || s == "toggle");
             if let Some(window) = app.get_webview_window("main") {
+                if is_toggle {
+                    let is_visible = window.is_visible().unwrap_or(false);
+                    if is_visible {
+                        let _ = window.hide();
+                    } else {
+                        anchor_spotlight(&window);
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                    return;
+                }
                 anchor_spotlight(&window);
                 let _ = window.show();
                 let _ = window.set_focus();
@@ -245,6 +284,14 @@ pub fn run() {
             // System tray icon: left-click toggles window, right-click →
             // Settings… / Quit. macOS: menu-bar icon (top-right). Windows/
             // Linux: notification-area tray. Same menu on all three platforms.
+            //
+            // Honors the user's "Show in menu bar" toggle from Settings →
+            // Shortcut & App. Read at startup only; toggling the setting
+            // requires a restart to take effect (the UI hint says so).
+            // Quit is always reachable via Cmd+Q / right-click in the
+            // ask-bar window, so disabling the tray doesn't strand the
+            // user without a way to exit.
+            let show_tray = should_show_tray();
             let settings_tray_item = MenuItem::with_id(
                 app, "tray_settings", "Settings…", true, None::<&str>,
             )?;
@@ -275,40 +322,42 @@ pub fn run() {
                 });
             }
 
-            let mut tray_builder = TrayIconBuilder::new()
-                .menu(&tray_menu)
-                .show_menu_on_left_click(false)
-                .tooltip("Magpie")
-                .on_menu_event(|app, event| {
-                    if event.id() == "tray_settings" {
-                        open_settings_internal(app, None);
-                    } else if event.id() == "quit" {
-                        app.exit(0);
-                    }
-                })
-                .on_tray_icon_event(|tray, event| {
-                    if let TrayIconEvent::Click {
-                        button: MouseButton::Left,
-                        button_state: MouseButtonState::Up,
-                        ..
-                    } = event
-                    {
-                        let app = tray.app_handle();
-                        if let Some(window) = app.get_webview_window("main") {
-                            if window.is_visible().unwrap_or(false) {
-                                let _ = window.hide();
-                            } else {
-                                anchor_spotlight(&window);
-                                let _ = window.show();
-                                let _ = window.set_focus();
+            if show_tray {
+                let mut tray_builder = TrayIconBuilder::new()
+                    .menu(&tray_menu)
+                    .show_menu_on_left_click(false)
+                    .tooltip("Magpie")
+                    .on_menu_event(|app, event| {
+                        if event.id() == "tray_settings" {
+                            open_settings_internal(app, None);
+                        } else if event.id() == "quit" {
+                            app.exit(0);
+                        }
+                    })
+                    .on_tray_icon_event(|tray, event| {
+                        if let TrayIconEvent::Click {
+                            button: MouseButton::Left,
+                            button_state: MouseButtonState::Up,
+                            ..
+                        } = event
+                        {
+                            let app = tray.app_handle();
+                            if let Some(window) = app.get_webview_window("main") {
+                                if window.is_visible().unwrap_or(false) {
+                                    let _ = window.hide();
+                                } else {
+                                    anchor_spotlight(&window);
+                                    let _ = window.show();
+                                    let _ = window.set_focus();
+                                }
                             }
                         }
-                    }
-                });
-            if let Some(icon) = app.default_window_icon() {
-                tray_builder = tray_builder.icon(icon.clone());
+                    });
+                if let Some(icon) = app.default_window_icon() {
+                    tray_builder = tray_builder.icon(icon.clone());
+                }
+                tray_builder.build(app)?;
             }
-            tray_builder.build(app)?;
 
             // Background thread: slow startup (qdrant + sidecar). The window is
             // already visible; the frontend polls /healthz and shows a booting
@@ -389,6 +438,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             hide_window,
             show_window,
+            toggle_main_window,
             pick_folder,
             pick_file,
             open_settings,
@@ -402,17 +452,36 @@ pub fn run() {
     // Kill both child processes when the app actually exits (force-quit,
     // system shutdown, etc.) so they don't linger as orphans.
     app.run(|app_handle, event| {
-        if let tauri::RunEvent::Exit = event {
-            if let Some(mut child) = app_handle.state::<SidecarState>().0.lock().unwrap().take() {
-                eprintln!("[magpie] shutting down sidecar");
-                let _ = child.kill();
-                let _ = child.wait();
+        match &event {
+            tauri::RunEvent::Exit => {
+                if let Some(mut child) = app_handle.state::<SidecarState>().0.lock().unwrap().take() {
+                    eprintln!("[magpie] shutting down sidecar");
+                    let _ = child.kill();
+                    let _ = child.wait();
+                }
+                if let Some(mut child) = app_handle.state::<QdrantState>().0.lock().unwrap().take() {
+                    eprintln!("[magpie] shutting down qdrant");
+                    let _ = child.kill();
+                    let _ = child.wait();
+                }
             }
-            if let Some(mut child) = app_handle.state::<QdrantState>().0.lock().unwrap().take() {
-                eprintln!("[magpie] shutting down qdrant");
-                let _ = child.kill();
-                let _ = child.wait();
+            // macOS-specific: a "reopen" fires when the user activates an
+            // already-running app via Spotlight, the Dock (if we had a Dock
+            // icon), or `open -a Magpie` from the shell. With
+            // ActivationPolicy::Accessory we have no Dock icon, but Spotlight
+            // can still reach us. Honor it as a summon — same anchor + show
+            // + focus the global shortcut does.
+            #[cfg(target_os = "macos")]
+            tauri::RunEvent::Reopen { has_visible_windows, .. } => {
+                if !has_visible_windows {
+                    if let Some(window) = app_handle.get_webview_window("main") {
+                        anchor_spotlight(&window);
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                }
             }
+            _ => {}
         }
     });
 }
@@ -602,6 +671,28 @@ fn open_settings_with_action(app: tauri::AppHandle, action: String) {
 #[tauri::command]
 fn hide_window(window: tauri::Window) {
     let _ = window.hide();
+}
+
+/// Toggle main-window visibility. Same logic as the Rust-registered
+/// global-shortcut callback — used by:
+///   - the JS-registered global-shortcut callback after the user
+///     changes the binding via Settings (runtime re-register flow,
+///     pattern borrowed from Kunkun's frontend hotkey.ts);
+///   - the single-instance handler when launched with `--toggle`
+///     (autostart-with-hidden-window pattern);
+///   - any future trigger that wants the spotlight toggle behavior.
+#[tauri::command]
+fn toggle_main_window(app: tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let is_visible = window.is_visible().unwrap_or(false);
+        if is_visible {
+            let _ = window.hide();
+        } else {
+            anchor_spotlight(&window);
+            let _ = window.show();
+            let _ = window.set_focus();
+        }
+    }
 }
 
 // Launch-at-login wiring. The Settings → Shortcut & App tab's

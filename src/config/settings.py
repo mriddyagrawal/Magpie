@@ -154,12 +154,33 @@ def load_app_defaults(path: Optional[Path] = None) -> AppDefaults:
 
 
 def load_user_settings(path: Optional[Path] = None) -> UserSettings:
-    """Read the user's `settings.json`. Creates an empty default file
-    on first call so the GUI can watch a real file."""
+    """Read the user's `settings.json`. Creates a defaults-populated
+    file on first call so the user can see what the bundled defaults
+    are without having to derive them from another file.
+
+    The created file mirrors the values of `AppDefaults` exactly —
+    every field gets a non-None value. Subsequent edits (via the
+    Settings UI's PATCH endpoints) replace those values; setting a
+    field back to None means "fall through to whatever AppDefaults
+    says at read time", which is the original lazy semantics."""
     p = path or _settings_path()
     if not p.exists():
         p.parent.mkdir(parents=True, exist_ok=True)
-        s = UserSettings()
+        # Seed the new file with the current bundled defaults so the
+        # user can inspect/edit and immediately see meaningful values
+        # rather than a wall of nulls.
+        defaults = load_app_defaults()
+        s = UserSettings(
+            provider=defaults.provider,
+            top_k=defaults.top_k,
+            rewrite_default=defaults.rewrite_default,
+            temperature=defaults.temperature,
+            theme=defaults.theme,
+            accent=defaults.accent,
+            default_action=defaults.default_action,
+            launch_at_login=defaults.launch_at_login,
+            show_in_tray=defaults.show_in_tray,
+        )
         save_user_settings(s, p)
         return s
     with p.open(encoding="utf-8") as f:

@@ -53,10 +53,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.answer import Answer
-from src.manifest import APP_DATA_DIR
+from src.manifest import APP_DATA_DIR, DEFAULT_MANIFEST_PATH
 
 RECENTS_FILENAME = "recents.json"
 MAX_STORED = 10
@@ -74,6 +74,8 @@ migration."""
 class RecentEntry(BaseModel):
     """One persisted ask. Mirrors the answer pipeline's structured output
     so re-firing the recent rehydrates the answer card byte-for-byte."""
+
+    model_config = ConfigDict(extra="ignore")
 
     id: str
     """Stable identifier. Format: `rec_<12 hex chars>`."""
@@ -93,6 +95,14 @@ class RecentEntry(BaseModel):
     """The answer payload at the time the question was asked. Includes
     `not_found` etc. — replays render whichever state was cached."""
 
+    is_stale: bool = Field(default=False, exclude=True)
+    """True when the search index has been updated since this entry was
+    persisted (i.e., the cached answer may not reflect what would come
+    out of a fresh /query). Computed from manifest.json's mtime; not
+    serialized to disk (Field exclude=True). The frontend uses this to
+    decide between rendering the cached payload vs. firing a fresh
+    /query when the user clicks ⏎ on a recent or hits the ↻ button."""
+
 
 # ---------------------------------------------------------------------------
 # Path resolution
@@ -111,7 +121,12 @@ def recents_path() -> Path:
 def list_recents() -> list[RecentEntry]:
     """Return all persisted recents, newest-first. Returns [] if the file
     doesn't exist or is unreadable / malformed (defensive — ask bar must
-    keep working even if recents.json is corrupt)."""
+    keep working even if recents.json is corrupt).
+
+    Each entry's `is_stale` is computed from the manifest's mtime —
+    True when the search index has been updated since the entry was
+    persisted. Frontend uses this to decide between cached-render
+    and fresh-/query when the user replays a recent."""
     path = recents_path()
     if not path.exists():
         return []
@@ -125,16 +140,21 @@ def list_recents() -> list[RecentEntry]:
         print(f"  warn: recents.json is not a list (got {type(raw).__name__}); "
               f"returning empty list", file=sys.stderr)
         return []
+    # Compute index mtime once per call — manifest.json changes are
+    # rare per-tick, no need to stat per-entry.
+    index_mtime = _index_mtime()
     out: list[RecentEntry] = []
     for item in raw:
         try:
-            out.append(RecentEntry.model_validate(item))
+            entry = RecentEntry.model_validate(item)
         except ValidationError as e:
             # Skip individual bad entries rather than failing the whole load —
             # one malformed entry shouldn't hide the user's other history.
             print(f"  warn: dropping malformed recents entry: {e}",
                   file=sys.stderr)
             continue
+        entry.is_stale = _is_stale_against(entry.asked_at, index_mtime)
+        out.append(entry)
     return out
 
 
@@ -180,6 +200,37 @@ def clear_recents() -> None:
 # ---------------------------------------------------------------------------
 # Internals
 # ---------------------------------------------------------------------------
+
+
+def _index_mtime() -> datetime | None:
+    """Return the manifest.json's mtime as a UTC datetime, or None if
+    the manifest doesn't exist yet (first-launch state).
+
+    Manifest mtime is a simple proxy for "did the search index change?"
+    — the ingest pipeline saves the manifest at the end of every walk
+    and after orphan cleanup, which is also when Qdrant gets new
+    points. Using the manifest's mtime instead of asking Qdrant
+    directly avoids a network round-trip on every recents fetch."""
+    if not DEFAULT_MANIFEST_PATH.exists():
+        return None
+    try:
+        ts = DEFAULT_MANIFEST_PATH.stat().st_mtime
+    except OSError:
+        return None
+    return datetime.fromtimestamp(ts, tz=timezone.utc)
+
+
+def _is_stale_against(asked_at_iso: str, index_mtime: datetime | None) -> bool:
+    """Decide whether an entry's cached payload is stale. True iff the
+    index was updated AFTER the entry was persisted."""
+    if index_mtime is None:
+        return False
+    try:
+        asked_at = datetime.fromisoformat(asked_at_iso).astimezone(timezone.utc)
+    except ValueError:
+        # Malformed timestamp — be conservative and treat as fresh.
+        return False
+    return index_mtime > asked_at
 
 
 def _save(entries: list[RecentEntry]) -> None:

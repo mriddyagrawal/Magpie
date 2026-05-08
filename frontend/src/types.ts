@@ -50,6 +50,12 @@ export interface RecentEntry {
   question: string;
   rewritten_query: string | null;
   result: RecentResult;
+  // True when the search index has been updated since this entry was
+  // persisted (computed server-side from manifest.json's mtime). The
+  // ask bar uses this to decide between rendering the cached payload
+  // (fresh) vs firing a fresh /query (stale). Default false when the
+  // backend hasn't been updated to populate the field.
+  is_stale?: boolean;
 }
 
 export interface StatusResponse {

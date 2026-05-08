@@ -11,10 +11,12 @@ name: Build
 #     useful for testing the release pipeline without cutting a tag.
 on:
   push:
-    branches: [main, front-back, UI]
+    # `packaging` is a temporary trigger — Plan #10 validation branch.
+    # Remove from this list once `packaging` merges to main.
+    branches: [main, front-back, UI, packaging]
     tags: ['v*']
   pull_request:
-    branches: [main, front-back, UI]
+    branches: [main, front-back, UI, packaging]
   workflow_dispatch:
 
 jobs:

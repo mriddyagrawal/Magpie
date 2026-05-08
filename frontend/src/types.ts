@@ -17,6 +17,39 @@ export interface QueryResponse {
   answer: string;
   sources: Source[];
   search_query: SearchQuery;
+  // Not-found state — when the answer pipeline could not find an answer
+  // in the retrieved files. The ask bar's State 5 ("Answer not found"
+  // with single Add-folder CTA) renders when this is true. See
+  // Specs/UI/ask_bar.md.
+  not_found: boolean;
+  not_found_topic: string;
+  sources_scanned_count: number;
+  // The recents.json entry id this ask was just persisted to. Lets the
+  // frontend update its in-memory recents list without an extra GET.
+  recent_id: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Recents — mirror of src/recents.py:RecentEntry
+// ---------------------------------------------------------------------------
+
+// The discriminated-union-style Answer shape from the backend. We keep
+// it as a flat type rather than a Pydantic-style discriminated union
+// because (a) the backend's `Answer` is also flat-with-bool (Plan #25),
+// and (b) the renderer just dispatches on `not_found` regardless.
+export interface RecentResult {
+  answer: string;
+  sources_used: string[];
+  not_found: boolean;
+  not_found_topic: string;
+}
+
+export interface RecentEntry {
+  id: string;                       // "rec_<12 hex chars>"
+  asked_at: string;                 // ISO-8601 with timezone
+  question: string;
+  rewritten_query: string | null;
+  result: RecentResult;
 }
 
 export interface StatusResponse {

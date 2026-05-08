@@ -297,17 +297,6 @@ export function ShortcutAppTab({
             />
           }
         />
-        <SettingRow
-          label="Show in menu bar"
-          hint="The Magpie icon stays available in the system tray. Restart Magpie to apply."
-          control={
-            <Toggle
-              checked={app.show_in_tray}
-              onChange={(v) => patchApp({ show_in_tray: v })}
-              label="Show in menu bar"
-            />
-          }
-        />
       </Section>
 
       <section className="about-card">

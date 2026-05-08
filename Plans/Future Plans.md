@@ -1749,7 +1749,7 @@ Settings screen):
 | ~~Default action on activation~~ | — | — | **REMOVED** — superseded by ask-bar persistence |
 | Shortcut Change (recorder) | ✅ on save | ✅ runtime via JS plugin | **DONE** |
 | Launch at login (toggle) | ✅ | ✅ via `tauri-plugin-autostart` | **DONE** |
-| Show in menu bar (toggle) | ✅ | ⚠ startup-honored only (restart to apply) | **PARTIAL** |
+| ~~Show in menu bar (toggle)~~ | — | — | **REMOVED** — tray always shows; simpler |
 | Check for updates (button) | n/a | ❌ no-op stub | NOT WIRED |
 
 **Why each is broken (root causes):**
@@ -1820,23 +1820,18 @@ Settings screen):
    `launch_at_login` is mirrored for display continuity.
    Capabilities updated (`autostart:allow-enable / -disable / -is-enabled`).
 
-5. **Show in menu bar** — PARTIAL DONE (2026-05-08).
-   Startup honoring shipped: `should_show_tray()` reads
-   `show_in_tray` from settings.json; if false, the
-   `TrayIconBuilder` block is skipped entirely. UI hint
-   updated to "Restart Magpie to apply". User-visible
-   behavior matches the spec for v1; runtime toggle is the
-   open work. Quit is still reachable via right-click on the
-   ask-bar window or `Cmd+Q`, so disabling the tray doesn't
-   strand the user.
-
-   **Still open — runtime reconfigure.** Storing the
-   `TrayIcon` handle in `tauri::State` and exposing a
-   `set_tray_visible(enabled)` Tauri command would close
-   this. Tauri 2's `TrayIcon::set_visible(bool)` exists for
-   the visible/hidden flip; for full destroy/recreate (Linux
-   compatibility), we'd `Drop` the existing handle and call
-   `TrayIconBuilder::new().build(app)` again. ~40 LOC.
+5. **Show in menu bar** — REMOVED (2026-05-08).
+   Briefly landed as PARTIAL (startup-honored toggle), then
+   the toggle was removed entirely the same day to simplify
+   the surface. Magpie always shows in the menu bar; users
+   who want to hide it can use OS-level menu bar managers
+   (Bartender on macOS, etc.). `should_show_tray()` helper
+   removed, `show_in_tray` field stripped from
+   `AppDefaults` / `UserSettings` / `EffectiveSettings` /
+   `magpie_defaults.json` / `/settings/app` GET+PATCH /
+   frontend `AppSettings` interface / Settings UI.
+   Pydantic `extra="ignore"` silently drops stale
+   `show_in_tray` keys in existing user settings.json files.
 
 6. **Check for updates** — Tauri has `tauri-plugin-updater`.
    The UI currently has an explicit `/* no-op stub for v1 */`

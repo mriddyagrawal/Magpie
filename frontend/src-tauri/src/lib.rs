@@ -61,25 +61,6 @@ fn save_shortcut(label: &str) {
     let _ = std::fs::write(&path, format!(r#"{{"shortcut":"{}"}}"#, label));
 }
 
-/// Read `show_in_tray` from settings.json. Returns true (default) if
-/// the file is missing, malformed, or the field is absent — matches
-/// historical behavior where the tray was always built. Runtime toggle
-/// is not supported in v1: the user sees a hint that the change
-/// applies on next launch. Restart-to-apply is acceptable for a
-/// once-and-done preference.
-fn should_show_tray() -> bool {
-    let path = app_data_dir().join("settings.json");
-    let Ok(content) = std::fs::read_to_string(&path) else {
-        return true;
-    };
-    let Ok(value) = serde_json::from_str::<serde_json::Value>(&content) else {
-        return true;
-    };
-    value
-        .get("show_in_tray")
-        .and_then(|v| v.as_bool())
-        .unwrap_or(true)
-}
 
 fn preset_shortcuts() -> Vec<(&'static str, Option<Modifiers>, Code)> {
     vec![
@@ -284,14 +265,8 @@ pub fn run() {
             // System tray icon: left-click toggles window, right-click →
             // Settings… / Quit. macOS: menu-bar icon (top-right). Windows/
             // Linux: notification-area tray. Same menu on all three platforms.
-            //
-            // Honors the user's "Show in menu bar" toggle from Settings →
-            // Shortcut & App. Read at startup only; toggling the setting
-            // requires a restart to take effect (the UI hint says so).
-            // Quit is always reachable via Cmd+Q / right-click in the
-            // ask-bar window, so disabling the tray doesn't strand the
-            // user without a way to exit.
-            let show_tray = should_show_tray();
+            // Always built — the "Show in menu bar" Settings toggle was
+            // removed 2026-05-08 to keep the surface simple.
             let settings_tray_item = MenuItem::with_id(
                 app, "tray_settings", "Settings…", true, None::<&str>,
             )?;
@@ -322,42 +297,40 @@ pub fn run() {
                 });
             }
 
-            if show_tray {
-                let mut tray_builder = TrayIconBuilder::new()
-                    .menu(&tray_menu)
-                    .show_menu_on_left_click(false)
-                    .tooltip("Magpie")
-                    .on_menu_event(|app, event| {
-                        if event.id() == "tray_settings" {
-                            open_settings_internal(app, None);
-                        } else if event.id() == "quit" {
-                            app.exit(0);
-                        }
-                    })
-                    .on_tray_icon_event(|tray, event| {
-                        if let TrayIconEvent::Click {
-                            button: MouseButton::Left,
-                            button_state: MouseButtonState::Up,
-                            ..
-                        } = event
-                        {
-                            let app = tray.app_handle();
-                            if let Some(window) = app.get_webview_window("main") {
-                                if window.is_visible().unwrap_or(false) {
-                                    let _ = window.hide();
-                                } else {
-                                    anchor_spotlight(&window);
-                                    let _ = window.show();
-                                    let _ = window.set_focus();
-                                }
+            let mut tray_builder = TrayIconBuilder::new()
+                .menu(&tray_menu)
+                .show_menu_on_left_click(false)
+                .tooltip("Magpie")
+                .on_menu_event(|app, event| {
+                    if event.id() == "tray_settings" {
+                        open_settings_internal(app, None);
+                    } else if event.id() == "quit" {
+                        app.exit(0);
+                    }
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            if window.is_visible().unwrap_or(false) {
+                                let _ = window.hide();
+                            } else {
+                                anchor_spotlight(&window);
+                                let _ = window.show();
+                                let _ = window.set_focus();
                             }
                         }
-                    });
-                if let Some(icon) = app.default_window_icon() {
-                    tray_builder = tray_builder.icon(icon.clone());
-                }
-                tray_builder.build(app)?;
+                    }
+                });
+            if let Some(icon) = app.default_window_icon() {
+                tray_builder = tray_builder.icon(icon.clone());
             }
+            tray_builder.build(app)?;
 
             // Background thread: slow startup (qdrant + sidecar). The window is
             // already visible; the frontend polls /healthz and shows a booting

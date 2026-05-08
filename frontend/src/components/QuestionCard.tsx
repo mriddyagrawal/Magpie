@@ -15,6 +15,8 @@ interface Props {
   loading: boolean;
   booting: boolean;
   submittedQuestion: string | null;
+  onOpenSettings: () => void;
+  shortcutLabel: string;
 }
 
 // Explicit drag: call startDragging() on mousedown anywhere on the card that
@@ -34,7 +36,7 @@ function startDragOnMouseDown(e: React.MouseEvent) {
 }
 
 export const QuestionCard = forwardRef<HTMLInputElement, Props>(
-  function QuestionCard({ value, onChange, onSubmit, loading, booting, submittedQuestion }, ref) {
+  function QuestionCard({ value, onChange, onSubmit, loading, booting, submittedQuestion, onOpenSettings, shortcutLabel }, ref) {
     useEffect(() => {
       if (typeof ref === "object" && ref?.current) ref.current.focus();
     }, [ref]);
@@ -81,8 +83,17 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
           />
         )}
         <kbd className="question-card__hint" data-tauri-drag-region>
-          ⌥ Space
+          {shortcutLabel}
         </kbd>
+        <button
+          className="question-card__settings-btn"
+          onClick={onOpenSettings}
+          title="Settings"
+          tabIndex={-1}
+          aria-label="Open settings"
+        >
+          ⚙
+        </button>
       </div>
     );
   }

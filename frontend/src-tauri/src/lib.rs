@@ -340,7 +340,7 @@ pub fn run() {
                 let _ = window.hide();
             }
         })
-        .invoke_handler(tauri::generate_handler![hide_window, show_window, pick_folder, pick_file])
+        .invoke_handler(tauri::generate_handler![hide_window, show_window, pick_folder, pick_file, open_settings])
         .build(tauri::generate_context!())
         .expect("error building magpie");
 
@@ -456,6 +456,29 @@ fn spawn_sidecar(
         .stderr(Stdio::inherit())
         .spawn()
         .map_err(|e| format!("failed to spawn sidecar: {e}"))
+}
+
+#[tauri::command]
+fn open_settings(app: tauri::AppHandle, port: u16) {
+    let init = format!(
+        "window.__MAGPIE_PORT__ = {}; window.__MAGPIE_WINDOW_TYPE__ = 'settings';",
+        port
+    );
+    if let Some(win) = app.get_webview_window("settings") {
+        let _ = win.show();
+        let _ = win.set_focus();
+        return;
+    }
+    let _ = WebviewWindowBuilder::new(&app, "settings", WebviewUrl::default())
+        .title("Magpie Settings")
+        .inner_size(560.0, 520.0)
+        .min_inner_size(480.0, 400.0)
+        .resizable(true)
+        .decorations(true)
+        .transparent(false)
+        .always_on_top(false)
+        .initialization_script(&init)
+        .build();
 }
 
 #[tauri::command]

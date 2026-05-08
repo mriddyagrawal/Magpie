@@ -111,20 +111,24 @@ jobs:
       # ── Branch / PR builds: just compile, no release ──────────────────────
       # `pnpm tauri build` directly. Validates compilation across all four
       # platforms in the matrix. Artifacts uploaded below for download.
+      #
+      # NO signing env vars are passed here — the branch path validates
+      # COMPILATION only, never signing. Why this matters: GitHub Actions
+      # resolves an unset secret to an empty string, not to an unset env
+      # var. Passing `APPLE_SIGNING_IDENTITY=""` makes Tauri's macOS
+      # bundler attempt codesign with the literal empty identity, which
+      # fails on a CI runner with an empty keychain ("Signing with
+      # identity '' / The specified item could not be found in the
+      # keychain"). Same shape on Linux/Windows for the updater key.
+      # Beta posture is unsigned (see Plans/Packaging/Implementation
+      # Plan.md §Step 5), so just don't trigger any signing path here.
+      # Once secrets are populated AND tauri.conf.json's
+      # createUpdaterArtifacts / plugins.updater.active are flipped on,
+      # signing happens only on the tag/dispatch path below.
       - name: Build Tauri app (compile-only)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
         working-directory: frontend
         run: pnpm tauri build
-        env:
-          # Apple notarization vars — passed through but no-ops if secrets unset.
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # Auto-updater signing key — only used if you've added the secret.
-          # Without it, builds still succeed; updater just won't sign artifacts.
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       # ── Tag / dispatch builds: full release flow via tauri-action ─────────
       # Replaces the previous custom "Import Apple cert" → "Build" → "Sign

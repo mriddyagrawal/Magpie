@@ -33,6 +33,9 @@ dist/
 *.spec
 
 # Local debug / scratch artifacts (do not commit)
-appzip/                          # Windows debug-build zips (huge, ~1 GB+)
-errors/                          # ad-hoc screenshots / failure captures
-conversation-export*.md          # local chat-session exports
+# - appzip/ holds Windows debug-build zips (~1 GB+ each)
+# - errors/ holds ad-hoc screenshots / failure captures
+# - conversation-export*.md are local chat-session exports
+appzip/
+errors/
+conversation-export*.md

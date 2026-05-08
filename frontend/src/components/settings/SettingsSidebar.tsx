@@ -61,7 +61,7 @@ export function SettingsSidebar({ active, onChange, status }: Props) {
       <div className="settings-sidebar__footer">
         <SidebarFooterRow
           label="understood"
-          value={status?.indexed_count != null ? status.indexed_count.toLocaleString() : "—"}
+          value={status?.indexed_count != null ? `${status.indexed_count.toLocaleString()} files` : "—"}
         />
         {/* Provider only — the model name is intentionally hidden from
             the user-facing surface. Internal terms ("Gemma 4",

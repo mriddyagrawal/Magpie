@@ -39,6 +39,25 @@ export function SettingsWindow() {
     getShortcut().then(setShortcut).catch(() => {});
   }, [loadFolders]);
 
+  // Deep-link handler: the ask bar's NotFoundCard CTA opens settings
+  // via `open_settings_with_action({action: "add-folder"})`, which
+  // injects `window.__MAGPIE_SETTINGS_ACTION__` into the settings
+  // webview. On mount, consume that action and trigger the matching
+  // affordance (currently: "add-folder" → fire the folder picker).
+  // Cleared after consumption so a re-show doesn't refire.
+  useEffect(() => {
+    const w = window as Window & { __MAGPIE_SETTINGS_ACTION__?: string };
+    const action = w.__MAGPIE_SETTINGS_ACTION__;
+    if (action === "add-folder") {
+      w.__MAGPIE_SETTINGS_ACTION__ = undefined;
+      handleAddFolderRef.current?.();
+    }
+  }, []);
+  // Stable ref to handleAddFolder so the deep-link effect doesn't have
+  // to re-run when the callback identity changes. Set inside the
+  // declaration below.
+  const handleAddFolderRef = useRef<(() => void) | null>(null);
+
   // Poll ingest status while indexing is running.
   useEffect(() => {
     const tick = async () => {
@@ -107,6 +126,11 @@ export function SettingsWindow() {
       setAddingFolder(false);
     }
   }, [loadFolders, startPolling]);
+
+  // Wire the ref consumed by the deep-link useEffect above. Done here
+  // (after the callback definition) so the ref points at the latest
+  // closure on every render.
+  handleAddFolderRef.current = handleAddFolder;
 
   const handleRemoveFolder = useCallback(async (path: string) => {
     setError(null);

@@ -1208,17 +1208,34 @@ from src.recents import list_recents as _list_recents, get_recent as _get_recent
 
 @app.get("/recents")
 def recents_list() -> dict[str, Any]:
-    """Return the last N persisted recents, newest-first."""
-    return {"recents": [r.model_dump(mode="json") for r in _list_recents()]}
+    """Return the last N persisted recents, newest-first.
+
+    Each entry includes `is_stale: bool` — True when the search index
+    has been updated since the entry was persisted. The frontend uses
+    this to decide between rendering the cached payload (fresh) vs
+    firing a fresh /query (stale). model_dump(by_alias=False,
+    exclude_unset=False) keeps is_stale in the response even though
+    Field(exclude=True) excludes it from the persisted JSON."""
+    return {
+        "recents": [
+            {**r.model_dump(mode="json"), "is_stale": r.is_stale}
+            for r in _list_recents()
+        ]
+    }
 
 
 @app.get("/recents/{entry_id}")
 def recents_get(entry_id: str) -> dict[str, Any]:
-    """Look up a recent by id. Used by the ask bar's replay path."""
+    """Look up a recent by id. Used by the ask bar's replay path.
+
+    Includes `is_stale: bool` so the frontend can re-check freshness
+    immediately before rendering — list_recents stamped the field at
+    fetch-time, but a sync may have completed between the recents
+    list-fetch and the user's click."""
     entry = _get_recent(entry_id)
     if entry is None:
         raise HTTPException(status_code=404, detail=f"recent not found: {entry_id}")
-    return entry.model_dump(mode="json")
+    return {**entry.model_dump(mode="json"), "is_stale": entry.is_stale}
 
 
 # ---------------------------------------------------------------------------

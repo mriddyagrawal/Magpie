@@ -29,6 +29,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 import {
   getIngestStatus,
+  getRecent,
   postQuery,
   stopIngest,
 } from "../api";
@@ -53,8 +54,13 @@ import "./MagpieWindow.css";
 // table. Values are approximate — designer derives the exact sizes
 // during PR 6 polish; these are the working baselines for now.
 const WIDTH = 800;
-const HEIGHTS: Record<View["kind"], number> = {
-  resting: 96,
+// Resting comes in two flavors: empty (just the bar, ~96px) and
+// with-recents (room for the recents panel below, ~320px). The
+// resize effect picks the right value at render time based on the
+// recents list length.
+const HEIGHT_RESTING_EMPTY = 96;
+const HEIGHT_RESTING_WITH_RECENTS = 320;
+const HEIGHTS: Omit<Record<View["kind"], number>, "resting"> = {
   typing: 320,
   retrieving: 380,
   answering: 680,
@@ -77,6 +83,16 @@ export function MagpieWindow() {
   // The previous `running` value from /ingest/status. Used to detect
   // the running→done transition without state churn.
   const prevIngestRunning = useRef(false);
+
+  // Generation counter for race protection. Incremented on every new
+  // ask submission. The async response checks if its captured gen
+  // matches the current value; if not, the user has typed something
+  // else / re-summoned / replayed a different recent in the meantime,
+  // and the stale response is discarded. Without this, an in-flight
+  // /query whose user-action context has changed would clobber the
+  // current view (e.g., user blurred while retrieving, came back,
+  // typed something new — old response still wins).
+  const queryGenRef = useRef(0);
 
   // The Tauri sidecar port — pre-injected by lib.rs's setup() into
   // window.__MAGPIE_PORT__. Used by SettingsBlob for the open_settings
@@ -142,21 +158,28 @@ export function MagpieWindow() {
   }, []);
 
   // -------------------------------------------------------------------
-  // Window resize per view state.
+  // Window resize per view state. Resting is the only state with a
+  // length-dependent height: empty when no recents, taller when
+  // recents are populated (so they show on first summon).
   // -------------------------------------------------------------------
+  const visibleRecentsCount = recents?.slice(0, 4).length ?? 0;
+  const targetHeight =
+    view.kind === "resting"
+      ? (visibleRecentsCount > 0 ? HEIGHT_RESTING_WITH_RECENTS : HEIGHT_RESTING_EMPTY)
+      : HEIGHTS[view.kind];
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
         if (cancelled) return;
-        await getCurrentWindow().setSize(new LogicalSize(WIDTH, HEIGHTS[view.kind]));
+        await getCurrentWindow().setSize(new LogicalSize(WIDTH, targetHeight));
       } catch {
         // Not under Tauri (browser dev) — ignore.
       }
     })();
     return () => { cancelled = true; };
-  }, [view.kind]);
+  }, [targetHeight]);
 
   // -------------------------------------------------------------------
   // Esc handler — dispatch by view.
@@ -193,6 +216,42 @@ export function MagpieWindow() {
   }, [view]);
 
   // -------------------------------------------------------------------
+  // Spotlight-style typing-replaces-selection for views WITHOUT an
+  // input element (answering / not_found). The question header in
+  // those states is a button, not an input — so a real
+  // setSelectionRange isn't possible. We simulate it: any printable
+  // single-character keystroke transitions to typing state with that
+  // character as the new input; Backspace transitions to typing
+  // with empty input. Net effect matches Spotlight: re-summon,
+  // start typing → replaces; backspace → clears.
+  // -------------------------------------------------------------------
+  useEffect(() => {
+    if (view.kind !== "answering" && view.kind !== "not_found") return;
+    const onKey = (e: KeyboardEvent) => {
+      // Skip if any modifier keys other than Shift are held — those
+      // are app-level shortcuts (Cmd+C, Cmd+,, etc.), not typing.
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // Skip non-printable except Backspace (Enter, arrow keys, F-keys, etc.).
+      const isPrintable = e.key.length === 1;
+      if (!isPrintable && e.key !== "Backspace") return;
+      e.preventDefault();
+      const newQuery = e.key === "Backspace" ? "" : e.key;
+      // Increment the gen counter so any in-flight /query from this
+      // view's question gets discarded on return.
+      queryGenRef.current++;
+      setView({ kind: "typing", query: newQuery, selected: null });
+      requestAnimationFrame(() => {
+        const el = inputRef.current;
+        if (!el) return;
+        el.focus();
+        try { el.setSelectionRange(newQuery.length, newQuery.length); } catch { /* ok */ }
+      });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [view.kind]);
+
+  // -------------------------------------------------------------------
   // Cmd+, / Ctrl+, → open settings. macOS uses the native menu
   // accelerator (registered in lib.rs); Windows + Linux use this
   // window-level keydown listener so the shortcut still works there.
@@ -227,12 +286,26 @@ export function MagpieWindow() {
         const { getCurrentWindow } = await import("@tauri-apps/api/window");
         const appWindow = getCurrentWindow();
 
-        // On focus (re-summon via Alt+Space, tray click, etc.), reset
-        // to resting so the user starts fresh — Spotlight-style.
-        // "Default action on activation: Empty ask bar" per the spec.
+        // On focus (re-summon via Alt+Space, tray click, etc.), DO NOT
+        // reset the view state — the user expects to come back to
+        // whatever they were doing (still-retrieving, the previous
+        // answer, the not-found card).
+        //
+        // Spotlight-style "select all" on focus: when the input is
+        // visible (resting/typing) and contains text, select it so
+        // the user's next keystroke replaces it and Backspace clears
+        // it wholesale. For answering/not_found states (no input —
+        // the question is a header button), the keystroke handler
+        // below provides the same UX without needing real selection.
         const unFocus = await appWindow.listen("tauri://focus", () => {
-          setView({ kind: "resting" });
-          requestAnimationFrame(() => inputRef.current?.focus());
+          requestAnimationFrame(() => {
+            const el = inputRef.current;
+            if (!el) return;
+            el.focus();
+            if (el.value.length > 0) {
+              try { el.setSelectionRange(0, el.value.length); } catch { /* ok */ }
+            }
+          });
         });
         cleanups.push(unFocus);
 
@@ -259,9 +332,15 @@ export function MagpieWindow() {
   const submitQuestion = useCallback(async (question: string) => {
     const trimmed = question.trim();
     if (!trimmed) return;
+    const myGen = ++queryGenRef.current;
     setView({ kind: "retrieving", question: trimmed });
     try {
       const result = await postQuery(trimmed);
+      // Race guard: if the user typed something else, replayed a
+      // different recent, or otherwise changed context while this
+      // query was in flight, queryGenRef has advanced and our
+      // response is stale. Drop it on the floor.
+      if (myGen !== queryGenRef.current) return;
       // Append to in-memory recents if the backend returned an id —
       // saves a re-fetch and keeps the panel snappy.
       if (result.recent_id !== null) {
@@ -291,6 +370,9 @@ export function MagpieWindow() {
         });
       }
     } catch (e) {
+      // Race guard applies to errors too — if context changed, drop
+      // the failure rather than overriding the user's new state.
+      if (myGen !== queryGenRef.current) return;
       // Treat hard /query failures as not-found (the network/sidecar
       // hiccup case). The error string isn't shown — Magpie's spec
       // surface stays user-friendly. Devs see the failure in stderr.
@@ -303,10 +385,38 @@ export function MagpieWindow() {
     }
   }, []);
 
+  // Both ⏎-on-recent and the ↻ Ask-again button route through this.
+  // Per the user's resolved decision: cached if fresh, fresh /query if
+  // the index has changed since the recent was persisted (server-side
+  // is_stale flag, manifest mtime as the proxy).
+  //
+  // We re-fetch the recent right before deciding so a sync that
+  // completed between the initial /recents fetch and the user's click
+  // is reflected. The list-fetch's stamped is_stale is a hint; this is
+  // the authoritative read.
   const replayRecent = useCallback(async (entry: RecentEntry) => {
-    // The cached payload mirrors the backend's Answer shape; we
-    // synthesize a QueryResponse-shaped object so the answering view
-    // has everything it needs without a re-fetch.
+    // Race guard: replays count as a context change too. Bumping the
+    // gen counter discards any /query response that arrives later.
+    const myGen = ++queryGenRef.current;
+
+    // Re-check freshness server-side. Network failure → fall back to
+    // the optimistic in-memory value.
+    let isStale = entry.is_stale ?? false;
+    try {
+      const fresh = await getRecent(entry.id);
+      if (fresh && fresh.is_stale !== undefined) isStale = fresh.is_stale;
+    } catch {
+      // sidecar hiccup; trust the optimistic value
+    }
+    if (myGen !== queryGenRef.current) return;
+
+    if (isStale) {
+      // Index changed — re-run the pipeline.
+      submitQuestion(entry.question);
+      return;
+    }
+
+    // Render the cached payload directly (no LLM call).
     if (entry.result.not_found) {
       setView({
         kind: "not_found",
@@ -322,14 +432,15 @@ export function MagpieWindow() {
       result: synth,
       selectedPath: synth.sources.find((s) => s.cited)?.path ?? null,
     });
-  }, []);
-
-  const askAgain = useCallback(async (entry: RecentEntry) => {
-    // Background fresh /query that replaces the cached recent
-    // in-place when it lands. The user sees the recents list keep
-    // their entry's id; only the underlying result swaps.
-    submitQuestion(entry.question);
   }, [submitQuestion]);
+
+  // The ↻ Ask-again button. Same smart-cached behavior as ⏎-on-recent
+  // — both buttons honor staleness uniformly (per the resolved
+  // decision). Kept as a separate user-facing affordance for the
+  // explicit "give me this question again" gesture.
+  const askAgain = useCallback(async (entry: RecentEntry) => {
+    replayRecent(entry);
+  }, [replayRecent]);
 
   // Click-to-edit / follow-up: revert to typing state with the
   // current question pre-filled. Both the question-header click and
@@ -389,22 +500,34 @@ export function MagpieWindow() {
     submitQuestion(inputValue);
   };
 
-  // Recents-keyboard nav: only active in the typing state.
+  // Recents-keyboard nav: active in both resting and typing state, so
+  // the user can ↑/↓ through recents immediately on summon (no typing
+  // required to discover them).
   useEffect(() => {
-    if (view.kind !== "typing" || !recents) return;
+    if (view.kind !== "resting" && view.kind !== "typing") return;
+    if (!recents) return;
+    const visible = recents.slice(0, 4);
+    if (visible.length === 0) return;
+    const currentSelected = view.kind === "typing" ? view.selected : null;
     const onKey = (e: KeyboardEvent) => {
-      const visible = recents.slice(0, 4);
-      if (visible.length === 0) return;
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        const next = view.selected === null ? 0 :
-          Math.min(view.selected + 1, visible.length - 1);
-        setView({ ...view, selected: next });
+        const next = currentSelected === null ? 0 :
+          Math.min(currentSelected + 1, visible.length - 1);
+        if (view.kind === "typing") {
+          setView({ ...view, selected: next });
+        } else {
+          setView({ kind: "typing", query: "", selected: next });
+        }
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        const next = view.selected === null ? visible.length - 1 :
-          Math.max(view.selected - 1, 0);
-        setView({ ...view, selected: next });
+        const next = currentSelected === null ? visible.length - 1 :
+          Math.max(currentSelected - 1, 0);
+        if (view.kind === "typing") {
+          setView({ ...view, selected: next });
+        } else {
+          setView({ kind: "typing", query: "", selected: next });
+        }
       }
     };
     window.addEventListener("keydown", onKey);
@@ -433,11 +556,21 @@ export function MagpieWindow() {
         <IndexingOverlay ingest={ingest} onStop={stopIngest} />
       )}
 
-      {/* Body per view. */}
-      {view.kind === "typing" && (
+      {/* Body per view. Recents panel renders in BOTH resting and
+          typing — so the user sees their history immediately on
+          summon and doesn't have to type to discover it. */}
+      {(view.kind === "resting" || view.kind === "typing") && (
         <RecentsPanel
-          selected={view.selected}
-          onSelectIndex={(i) => setView({ ...view, selected: i })}
+          selected={view.kind === "typing" ? view.selected : null}
+          onSelectIndex={(i) => {
+            // Selection only meaningful in typing state. Promote
+            // from resting on first arrow-key navigation.
+            if (view.kind === "typing") {
+              setView({ ...view, selected: i });
+            } else {
+              setView({ kind: "typing", query: "", selected: i });
+            }
+          }}
           onReplay={replayRecent}
           onAskAgain={askAgain}
           recents={recents}
@@ -602,7 +735,7 @@ async function hideWindow() {
   try {
     const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
     const win = getCurrentWindow();
-    await win.setSize(new LogicalSize(WIDTH, HEIGHTS.resting));
+    await win.setSize(new LogicalSize(WIDTH, HEIGHT_RESTING_EMPTY));
     await win.hide();
   } catch {
     // not under Tauri

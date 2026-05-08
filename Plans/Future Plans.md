@@ -36,6 +36,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#21** Surface drift events: warn before silently dropping vanished files *(also: UI)*
 - **#24** Batch indexing — knobs, per-batch progress, error handling *(also: UI, Perf)*
 - **#25** Answer-step output schema — empirically evaluate two open choices *(also: Models, Evaluation)*
+- **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: UI, Config, Security)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -45,6 +46,7 @@ Settings panels, in-app warnings, anything the user sees.
 - **#16** LLM / inference settings UI + cross-provider thinking-mode unification *(also: Models, Config)*
 - **#21** Surface drift events: warn before silently dropping vanished files *(also: Indexing)*
 - **#24** Batch indexing — surface upsert-phase progress + bad-file isolation *(also: Indexing, Perf)*
+- **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: Config, Security)*
 
 ### 📦 Packaging, distribution & process lifecycle
 How Magpie ships and runs as an end-user app — from installer through process management.
@@ -1341,5 +1343,116 @@ extension once we have ground-truth citation positions.
   produced + the backend's `sources_scanned_count`. Both schema
   variants serialize cleanly; replays are unaffected by which
   variant is in use at ask time.
+
+---
+
+## 26. Bring-your-own cloud API key — Settings → Advanced → API Keys
+
+**Tags:** ui · config · security
+
+**What:** Expose `secrets.json`'s per-provider API keys (and
+optionally the model fields) for end-user editing through the
+Settings UI. Currently parked behind PR 3's "v1 is implicit Cloud"
+decision: the Search & AI tab shows a binary Local/Cloud choice;
+Cloud routes through whatever credentials shipped in the bundle
+(via `bundled_key.txt`) or got bootstrapped from `.env` in dev. A
+power user with their own OpenRouter or Moonshot account can't
+swap in their key without editing `<APP_DATA_DIR>/secrets.json`
+by hand.
+
+**Why we'd do it.** Three drivers, in priority order:
+
+- **Bundled-subsidy unsustainable.** If the build-time-baked
+  OpenRouter key in `bundled_key.txt` gets rate-limited, banned,
+  or the bill outruns marketing budget, we need users to be able
+  to plug their own key in instantly — without a code release,
+  without manual file editing.
+- **Provider preference.** Some users have a Moonshot subscription
+  with a higher quota than our free-tier OpenRouter default, or
+  prefer a specific OpenRouter model. Today they can edit
+  `secrets.json` directly; ergonomically that's a power-user
+  trap (mode 0600 file, no validation, typo-prone).
+- **Adding a third provider.** When Plan #16 expands the LLM/inference
+  settings UI (or we add `magpie-cloud` as a real hosted backend),
+  the per-provider key surface needs a UI home. Better to design
+  it once than retrofit.
+
+**Why we did NOT do it now.** PR 3's spec parks this as the
+"Advanced" sidebar's first tab. Shipping it in v1 would: (a)
+require a key-validation probe per provider (cost a real API call
+per Save), (b) need careful UX around password-masked input
+(never re-displayed, masked preview format), (c) blow up the v1
+"binary Local/Cloud" simplicity goal that the user explicitly
+chose. Build it once we have either the trigger above or a stable
+v1 surface to layer on.
+
+**Sketch (~300-500 LOC, mostly frontend):**
+
+- **Endpoints** in `src/server.py` (mirror existing /settings/*
+  pattern):
+
+  ```
+  GET    /settings/keys                    → per-provider {set, masked, valid}
+  PUT    /settings/keys/{provider}         → { value }    — sets/replaces
+  DELETE /settings/keys/{provider}         → clears the key
+  POST   /settings/keys/{provider}/test    → probe call, returns {valid, error}
+  ```
+
+  - `GET` returns `{openrouter: {set: true, masked: "sk-or-…fcd10",
+    last_validated_at: "...", valid: true}, moonshot: {set: false, ...}}`.
+    Never returns the raw key — masking is applied server-side.
+  - `PUT` validates with a single test call before persisting (no
+    invalid keys in storage). Pydantic length / charset validation
+    on the `value` field.
+  - `POST .../test` is the same probe for keys already on disk.
+    Useful for a "Re-test" button when a provider's auth changes.
+
+- **Storage:** no new fields needed. `secrets.json` already has
+  `openrouter_api_key` / `moonshot_api_key`. Add a parallel
+  `last_validated_at_<provider>: datetime | null` for staleness
+  hints, OR just call `POST /test` on UI mount.
+
+- **Frontend (Settings → Advanced → API Keys tab):**
+  - Per-provider row: provider name, status pill (Set / Not set /
+    Invalid), masked preview (`sk-or-…fcd10`), last-tested time,
+    Set/Replace/Remove/Test buttons.
+  - Set/Replace input is password-masked, never re-displayed after
+    save. On submit, call `PUT` (which validates server-side) and
+    surface the result inline.
+  - Remove confirmation: "Magpie won't be able to use OpenRouter
+    until you add a key again." Single-button confirm.
+
+- **Provider-test logic** (server side): a tiny probe per provider.
+  OpenRouter: `GET /api/v1/auth/key` (returns `{data: {label,
+  rate_limit, ...}}` — proves the key is live without consuming
+  quota). Moonshot: a small `chat.completions` call with `max_tokens=1`
+  on a cheap model. Both cap at 5s timeout.
+
+- **Tests:**
+  - `tests/test_keys_endpoints.py` — TestClient + monkeypatched
+    httpx for the probe.
+  - Unit test for the masking helper (`sk-or-v1-…fcd10` shape, no
+    leading/trailing leak).
+
+**Trigger to start.** Earliest of:
+- We add a third cloud provider (Plan #16 expansion).
+- A real user reports needing to swap in their own key.
+- Bundled-subsidy bill / quota becomes a problem.
+
+**Notes for the future implementer:**
+- Don't store the validation timestamp in `secrets.json` (it's
+  read-only-ish, mode 0600). Use a separate `keys_meta.json` at
+  mode 0644 with `{provider: last_validated_at}` if that's wanted —
+  keeps the secrets file scoped to credentials only.
+- If/when we ship Magpie Cloud (Plan #16's `magpie-cloud` provider),
+  the API key for that lives in the same surface but with a
+  different UX (tied to a Magpie account, not a provider portal).
+  The endpoint surface should be provider-agnostic — `/settings/keys/{provider}`
+  works for `magpie-cloud` too.
+- Consider OS keychain integration via Plan #19 *before* shipping
+  this. Plan #19 moves secrets out of a flat JSON into the OS-managed
+  Keychain (macOS) / Credential Locker (Windows) / Secret Service
+  (Linux). If keychain lands first, Plan #26's storage shifts —
+  same endpoints, different backing store.
 
 ---

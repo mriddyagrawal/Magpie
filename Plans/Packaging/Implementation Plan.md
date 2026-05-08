@@ -479,12 +479,59 @@ Pure frontend work. When `indexing_rules.json` has zero `include_paths`:
 Coordination point: Rahul's `src/config/secrets.py` + Settings UI work
 should be the foundation for this; no need to reinvent.
 
-### Step 5 — Procure signing certs (Mridul's call)
+### Step 5 — Procure signing certs (DEFERRED for beta)
+
+**Decision (2026-05-08): we ship beta unsigned.** Cert procurement is
+$300–600/yr in recurring fees and 1–4 weeks of identity vetting; beta
+testing doesn't need that yet. The CI signing pathway already exists
+(via `tauri-action`), it just degrades gracefully when the secrets
+aren't populated — meaning we can flip this on at any time without
+rewriting the pipeline. Capture the trade-off explicitly here so we
+don't drift back into "should we sign?" debates mid-beta.
+
+#### Beta posture: what users will actually see
+
+| Platform | Without signing | Workaround we tell beta users |
+|---|---|---|
+| macOS | Gatekeeper "damaged / can't be opened" warning on first launch | Right-click → Open → Open Anyway. Or: `xattr -cr /Applications/Magpie.app` |
+| Windows | SmartScreen "Microsoft Defender protected your PC" warning | Click "More info" → "Run anyway" |
+| Linux | No warning (users trust source for `.AppImage` / `.deb`) | None needed |
+
+We document these workarounds in the beta install instructions. The UX
+hit is real but acceptable for friends/family/internal beta. It is NOT
+acceptable for paid public release — that's the trigger for procurement
+(see below).
+
+#### Auto-updater works without certs
+
+Important nuance: the auto-updater's ed25519 signing
+(`TAURI_SIGNING_PRIVATE_KEY`) is **separate** from OS-level signing.
+We DO need updater signing populated (todo OPS #15) so users receive
+authenticated updates — that's a free key we generate with
+`pnpm tauri signer generate`, no vendor or fee involved. Without it,
+the auto-updater won't apply updates (it refuses unsigned manifests
+by design). **Beta posture: unsigned at OS level, signed for updates.**
+
+#### Triggers for moving to signed (post-beta)
+
+Procure when ANY of these become true:
+
+1. **Public launch** — once we're listing on a website, accepting paid
+   sign-ups, or pitching to investors, the warning dialogs become an
+   acquisition tax we can't afford.
+2. **Beta tester complaints exceed the workaround tolerance** — if more
+   than ~10–15% of beta installs require us to walk a user through the
+   bypass, the cost-benefit flips.
+3. **Enterprise / B2B conversation** — IT departments will not approve
+   unsigned binaries on managed Windows fleets. First serious B2B
+   conversation = procure same week.
+
+#### Procurement specifics (when triggered)
 
 - **Apple Developer Program** — ~$99/yr. ~1 week to issue. Required for
   notarization; without it Mac users see the Gatekeeper "damaged"
   warning.
-- **Windows EV Code Signing certificate** — ~$200–500/yr. ~2-4 weeks for
+- **Windows EV Code Signing certificate** — ~$200–500/yr. ~2–4 weeks for
   the vendor to vet identity. Required to dodge SmartScreen warnings.
 - **Linux** — optional GPG signature on `.AppImage` / `.deb`; users
   mostly trust source.
@@ -494,10 +541,14 @@ and add to GitHub secrets as `APPLE_CERTIFICATE` / `WINDOWS_CERTIFICATE`
 (plus passwords). The existing CI [`.github/workflows/build.yml`](../../.github/workflows/build.yml)
 already has the steps; they're just gated on the secrets existing.
 
----
+#### Known gap (revisit at procurement time)
 
-**Stopped here on the Linux box because the disk is having severe I/O
-errors. All edits this session landed on disk but not git (couldn't
-commit/push). Mridul re-applies them on Mac (the Tier 1 + Tier 2
-exclude changes to `scripts/build_sidecar.py` are the only code edits
-that didn't make it to git from this session).**
+The current `tauri-action@v0` flow does NOT sign Windows builds
+natively. Tauri docs are clear: Windows signing requires either (a) a
+pre-tauri-action step that imports the EV cert into the Windows cert
+store + a `bundle.windows.signCommand` block in `tauri.conf.json`, OR
+(b) a post-tauri-action signtool step (which uploads UNSIGNED bytes
+to the GitHub Release because tauri-action attaches before the
+post-step runs). We'll go with approach (a) when the EV cert lands —
+see `.github/workflows/build.yml` comments around the
+`WINDOWS_CERTIFICATE` env var for the inline TODO.

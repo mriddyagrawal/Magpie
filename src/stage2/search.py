@@ -579,12 +579,17 @@ def _rrf_merge(
     return ordered[:top_k]
 
 
-RERANK_OVERSAMPLE = 10
+RERANK_OVERSAMPLE = 2
+RERANK_MIN_CANDIDATES = 10
 """When reranking, how many RRF-fused candidates to feed the cross-encoder.
 
-A factor of 10 means top_k=5 fetches 50 candidates from RRF before reranking
-down to 5. Standard practice in RAG papers; balances recall headroom against
-the cross-encoder's per-pair cost."""
+`fetch_k = max(RERANK_MIN_CANDIDATES, top_k * RERANK_OVERSAMPLE)`. The floor
+matters for the common `top_k=5` case: 5×2=10 satisfies the floor exactly,
+giving the cross-encoder real options to reorder without paying the cost of
+50+ pairs. The user's framing was "always pull at least 10 files, rerank
+down to top 5". Per-pair cost on the default ms-marco-MiniLM-L-6-v2 is
+~50-100 ms on CPU, batched in one `predict()` call, so 10 pairs is
+~200-400 ms total — well under the answer-step's multi-second LLM cost."""
 
 
 def run_search(
@@ -675,7 +680,7 @@ def run_search(
 
     # If reranking, fetch a wider RRF-fused candidate pool so the cross-encoder
     # has real options to reorder. Otherwise stick with the original top_k.
-    fetch_k = top_k * RERANK_OVERSAMPLE if rerank else top_k
+    fetch_k = max(RERANK_MIN_CANDIDATES, top_k * RERANK_OVERSAMPLE) if rerank else top_k
 
     summary_hits = _search_summary_tier(sq, fetch_k * 2)
     # Feed the raw dense-query text (same as summary tier) to ColPali; it

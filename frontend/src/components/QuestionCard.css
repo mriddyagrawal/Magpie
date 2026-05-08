@@ -49,6 +49,17 @@
   color: var(--text-primary);
   padding: 4px 0;
   letter-spacing: -0.2px;
+  /* Click-to-edit affordance: it's a button now (not a div), so reset
+     button chrome and let the hover state hint that the row is
+     interactive. */
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: text;
+  transition: opacity 100ms ease-out;
+}
+.question-card__title:hover {
+  opacity: 0.85;
 }
 
 .question-card__hint {

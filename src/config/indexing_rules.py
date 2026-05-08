@@ -447,6 +447,35 @@ class IndexingRules:
                 return (root, inc)
         return None
 
+    def _find_explicit_file_include(self, abs_path: Path) -> Optional[Path]:
+        """Return the include_paths entry path if `abs_path` is an EXACT
+        match for an enabled include_paths entry whose target is a file
+        (not a directory). None otherwise.
+
+        Powers the precedence-#0 short-circuit in `should_index`: when the
+        user has explicitly listed a single file as an include_path, that
+        is the strongest possible signal of intent — it overrides every
+        downstream filter (exclude_paths, gitignore, hidden, category,
+        size). The user has clicked "include this exact file" and rule
+        machinery shouldn't override that.
+
+        Directories listed in include_paths do NOT trigger this — they
+        flow through the normal precedence chain (exclude_paths still
+        wins for files inside them, gitignore still applies, etc.).
+        """
+
+        for root, inc in self._resolved_includes:
+            if not inc.enabled:
+                continue
+            if root != abs_path:
+                continue
+            try:
+                if root.is_file():
+                    return root
+            except OSError:
+                continue
+        return None
+
     def _matches_exclude_path(self, abs_path: Path) -> Optional[Path]:
         """Return the matching exclude_paths entry if `abs_path` IS one or is
         UNDER one. None otherwise.
@@ -510,7 +539,19 @@ class IndexingRules:
         except OSError as e:
             return (False, f"cannot resolve path: {e}")
 
-        # 1. exclude_paths always wins.
+        # 0. Explicit file-include short-circuits everything. If the user
+        # listed THIS EXACT file as an include_paths entry, that's their
+        # strongest possible signal of intent and beats every other rule
+        # (including `exclude_paths`, gitignore, category disable, size
+        # cap). See Plans/Ingestion Rules/Implementation Plan.md §4 row 0.
+        # Directories listed in include_paths fall through to the normal
+        # chain — only file-typed entries trigger this branch.
+        explicit_file = self._find_explicit_file_include(p)
+        if explicit_file is not None:
+            return (True, f"explicitly included file: {explicit_file}")
+
+        # 1. exclude_paths always wins (over everything except an explicit
+        # file include — handled in step 0 above).
         ep_match = self._matches_exclude_path(p)
         if ep_match is not None:
             return (False, f"explicitly excluded: {ep_match}")

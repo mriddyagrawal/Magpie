@@ -20,6 +20,12 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-single-instance = "2"
 tauri-plugin-autostart = "2"
+# Plan #10 P10-6 — Tauri's built-in updater. Triggered via JS-side
+# check() on app launch (see frontend/src/auto-updater.ts). Endpoint
+# + public key configured in tauri.conf.json's plugins.updater block.
+# Signing keys: TAURI_SIGNING_PRIVATE_KEY env var consumed at build time
+# by `tauri build`; public key is baked into the bundle via tauri.conf.json.
+tauri-plugin-updater = "2"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 window-vibrancy = "0.5"

@@ -47,6 +47,17 @@
       "icons/icon.ico"
     ],
     "category": "Productivity",
-    "shortDescription": "Semantic search over your local files"
+    "shortDescription": "Semantic search over your local files",
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "dialog": false,
+      "endpoints": [
+        "https://github.com/mriddyagrawal/NotAnotherSpotlight/releases/latest/download/latest.json"
+      ],
+      "pubkey": "REPLACE_WITH_PUBLIC_KEY_FROM_TAURI_SIGNER_GENERATE"
+    }
   }
 }

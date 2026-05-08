@@ -195,7 +195,7 @@ jobs:
       # Scope: catches Tier 1 (torch.distributed, torch.onnx, ...) and Tier 2
       # (torch.fx, torch._dynamo, sympy, mpmath) breaks. These excludes break
       # at MODULE-IMPORT TIME — if PyInstaller cuts something the binary needs
-      # at startup, the process dies in the first second and /health never
+      # at startup, the process dies in the first second and /healthz never
       # responds. Launch + poll catches that on every push, every platform.
       #
       # Out of scope: Tier 3 (transformers.models.<arch>). Those don't break
@@ -209,7 +209,7 @@ jobs:
       #
       # Failure modes caught:
       #   - the process dies before responding (T1/T2 ImportError on import)
-      #   - /health doesn't respond within 60s (server hung)
+      #   - /healthz doesn't respond within 60s (server hung)
       #
       # Runs on EVERY trigger (PR, push, tag, dispatch). Each platform
       # validates its own bundle independently — cross-OS exclude regressions
@@ -233,7 +233,7 @@ jobs:
           "$BIN" --port 18765 > /tmp/sidecar.stdout 2> /tmp/sidecar.stderr &
           SIDECAR_PID=$!
 
-          # Wait up to 60 s for /health to respond, polling every 1 s.
+          # Wait up to 60 s for /healthz to respond, polling every 1 s.
           # Bail early if the sidecar process dies (most exclude-related
           # ImportErrors crash on import, not after a network round-trip).
           for i in $(seq 1 60); do
@@ -244,16 +244,24 @@ jobs:
               tail -20 /tmp/sidecar.stdout
               exit 1
             fi
-            if curl -fsS http://localhost:18765/health > /dev/null 2>&1; then
-              echo "✅ sidecar /health responded after $i s"
+            if curl -fsS http://localhost:18765/healthz > /dev/null 2>&1; then
+              echo "✅ sidecar /healthz responded after $i s"
               kill $SIDECAR_PID 2>/dev/null || true
               exit 0
             fi
             sleep 1
           done
 
+          # Timeout. Always dump BOTH streams — the previous version only
+          # tailed stderr, which made debugging harder when the actual
+          # symptom was on stdout (e.g. uvicorn binding messages, route
+          # registration logs).
           echo "::error::sidecar did not respond within 60 s. stderr:"
-          tail -50 /tmp/sidecar.stderr
+          tail -100 /tmp/sidecar.stderr
+          echo "::error::stdout:"
+          tail -100 /tmp/sidecar.stdout
+          echo "::error::process state:"
+          ps -p $SIDECAR_PID -o pid,stat,etime,command 2>&1 || echo "(process gone)"
           kill $SIDECAR_PID 2>/dev/null || true
           exit 1
 

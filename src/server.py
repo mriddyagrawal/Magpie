@@ -56,7 +56,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="qdrant_client")
 warnings.filterwarnings("ignore", category=UserWarning, module="torch.cuda")
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import (
     FileResponse,
@@ -245,7 +245,7 @@ def _user_facing_error(exc: Exception) -> tuple[int, str]:
 
 
 @app.post("/query", response_model=QueryResponse)
-async def query(req: QueryRequest, request: Request) -> QueryResponse:
+async def query(req: QueryRequest) -> QueryResponse:
     from src.answer import Answer
     from src.pipeline import ask
     from src.recents import add_recent
@@ -259,34 +259,14 @@ async def query(req: QueryRequest, request: Request) -> QueryResponse:
         (turn.question, turn.answer) for turn in req.history
     ]
 
-    # Plan #27 — abort propagation. The frontend sends an AbortSignal
-    # via fetch, which closes the TCP connection on cancel. Starlette
-    # exposes that as `request.is_disconnected()`. We poll it
-    # cooperatively at phase boundaries; on disconnect we raise
-    # CancelledError, which propagates through the pipeline's awaits
-    # (httpx, AsyncOpenAI, llama-server stream). The local-LLM slot
-    # frees on TCP close — the user's NEXT ask gets an empty queue
-    # instead of waiting 20+ seconds behind the cancelled one.
-    async def _bail_if_disconnected() -> None:
-        if await request.is_disconnected():
-            raise asyncio.CancelledError("client disconnected")
-
     try:
-        await _bail_if_disconnected()
         result = await ask(
             req.question,
             top_k=req.top_k,
             rewrite=rewrite,
             fast=req.fast,
             history=history_pairs,
-            cancel_check=_bail_if_disconnected,
         )
-    except asyncio.CancelledError:
-        # Client disconnected mid-pipeline. Don't return — Starlette
-        # will see no response was written and close the socket. The
-        # frontend's AbortError handler treats this as a silent
-        # cancellation (no error UI).
-        raise
     except Exception as e:  # pylint: disable=broad-except
         status_code, detail = _user_facing_error(e)
         raise HTTPException(status_code=status_code, detail=detail) from e

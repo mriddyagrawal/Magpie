@@ -111,19 +111,6 @@ export function MagpieWindow() {
   const HISTORY_TURNS = 5;
   const historyRef = useRef<Array<{ question: string; answer: string }>>([]);
 
-  // Abort controller for the in-flight /query (Plan #27). Aborted on
-  // retype, blur, or new submit. The TCP close propagates through
-  // FastAPI → httpx → llama-server, freeing the LLM slot for the next
-  // ask instead of leaving wasted compute behind.
-  const abortRef = useRef<AbortController | null>(null);
-  const cancelInFlight = useCallback(() => {
-    const c = abortRef.current;
-    if (c && !c.signal.aborted) {
-      c.abort();
-    }
-    abortRef.current = null;
-  }, []);
-
   // The Tauri sidecar port — pre-injected by lib.rs's setup() into
   // window.__MAGPIE_PORT__. Used by SettingsBlob for the open_settings
   // invoke arg.
@@ -271,12 +258,8 @@ export function MagpieWindow() {
           setView({ kind: "resting" });
           break;
         case "retrieving":
-          // Abort the in-flight pipeline (Plan #27) so the local-LLM
-          // slot frees immediately and the next ask doesn't queue
-          // behind it. Then transition back to typing with the
-          // question pre-filled.
-          cancelInFlight();
-          queryGenRef.current++;
+          // No /query/cancel API yet; just transition back to
+          // typing with the question pre-filled.
           setView({ kind: "typing", query: view.question, selected: null });
           break;
         case "answering":
@@ -290,7 +273,7 @@ export function MagpieWindow() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [view, cancelInFlight]);
+  }, [view]);
 
   // -------------------------------------------------------------------
   // Cmd+, / Ctrl+, → open settings. macOS uses the native menu
@@ -381,12 +364,6 @@ export function MagpieWindow() {
   const submitQuestion = useCallback(async (question: string) => {
     const trimmed = question.trim();
     if (!trimmed) return;
-    // Cancel any prior in-flight query. The new submit gets its own
-    // AbortController so the pipeline's TCP connection closes on
-    // abort, freeing the local-LLM slot for the new ask immediately.
-    cancelInFlight();
-    const controller = new AbortController();
-    abortRef.current = controller;
     const myGen = ++queryGenRef.current;
     setView({ kind: "retrieving", question: trimmed });
     // Snapshot the in-memory history at this point. The pipeline gets
@@ -395,7 +372,7 @@ export function MagpieWindow() {
     // pairs are sent — older turns drop off the back.
     const historyToSend = historyRef.current.slice(-HISTORY_TURNS);
     try {
-      const result = await postQuery(trimmed, { history: historyToSend, signal: controller.signal });
+      const result = await postQuery(trimmed, { history: historyToSend });
       // Race guard: if the user typed something else, replayed a
       // different recent, or otherwise changed context while this
       // query was in flight, queryGenRef has advanced and our
@@ -445,9 +422,6 @@ export function MagpieWindow() {
       // Race guard applies to errors too — if context changed, drop
       // the failure rather than overriding the user's new state.
       if (myGen !== queryGenRef.current) return;
-      // AbortError is the deliberate-cancel path (user retyped /
-      // blurred / submitted again); silently ignore — no error UI.
-      if (e instanceof DOMException && e.name === "AbortError") return;
       // Treat hard /query failures as not-found (the network/sidecar
       // hiccup case). The error string isn't shown — Magpie's spec
       // surface stays user-friendly. Devs see the failure in stderr.
@@ -457,12 +431,8 @@ export function MagpieWindow() {
         question: trimmed,
         result: makeErrorResult(trimmed),
       });
-    } finally {
-      // Clear the ref only if it's still pointing at *our* controller
-      // (a newer submit may have replaced it).
-      if (abortRef.current === controller) abortRef.current = null;
     }
-  }, [cancelInFlight]);
+  }, []);
 
   // Both ⏎-on-recent and the ↻ Ask-again button route through this.
   // Per the user's resolved decision: cached if fresh, fresh /query if
@@ -563,11 +533,8 @@ export function MagpieWindow() {
   const onInputChange = (q: string) => {
     // Any edit transitions to typing/resting state. Bumping the gen
     // counter discards any /query response that's still in flight
-    // from a prior submit. We deliberately do NOT abort the in-flight
-    // request here — typing alone might just be the user touching
-    // keys mid-thought, and the prior pipeline result might still be
-    // useful when it arrives. Abort happens only on explicit Enter
-    // (new submit replaces) or Esc (cancel current). See Plan #27.
+    // from a prior submit — so old answers don't clobber the new
+    // typing state.
     if (view.kind !== "typing" && view.kind !== "resting") {
       queryGenRef.current++;
     }

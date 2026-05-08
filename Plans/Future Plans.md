@@ -37,6 +37,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#24** Batch indexing — knobs, per-batch progress, error handling *(also: UI, Perf)*
 - **#25** Answer-step output schema — empirically evaluate two open choices *(also: Models, Evaluation)*
 - **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: UI, Config, Security)*
+- **#27** ⚠️ Abort in-flight queries on retype / blur (UI URGENT) *(also: Perf, Pipeline)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -47,6 +48,7 @@ Settings panels, in-app warnings, anything the user sees.
 - **#21** Surface drift events: warn before silently dropping vanished files *(also: Indexing)*
 - **#24** Batch indexing — surface upsert-phase progress + bad-file isolation *(also: Indexing, Perf)*
 - **#26** Bring-your-own cloud API key — Settings → Advanced → API Keys *(also: Config, Security)*
+- **#27** ⚠️ Abort in-flight queries on retype / blur (UI URGENT) *(also: Perf, Pipeline)*
 
 ### 📦 Packaging, distribution & process lifecycle
 How Magpie ships and runs as an end-user app — from installer through process management.
@@ -1454,5 +1456,97 @@ v1 surface to layer on.
   Keychain (macOS) / Credential Locker (Windows) / Secret Service
   (Linux). If keychain lands first, Plan #26's storage shifts —
   same endpoints, different backing store.
+
+---
+
+## 27. Abort in-flight queries on retype / window blur (UI URGENT)
+
+**Tags:** ui · perf · pipeline
+
+**What:** When the user types something else mid-retrieval or
+re-summons during an in-flight query, kill the underlying pipeline
+work end-to-end — not just discard the response on the frontend.
+Today the gen counter in MagpieWindow drops stale responses on
+arrival, but the Python sidecar runs the full rewrite + retrieval +
+answer LLM call regardless. On local Gemma 4 that's ~26s of wasted
+GPU compute per cancellation, AND because llama-server processes
+requests serially, the user's *next* ask waits for the cancelled
+one to finish before its own LLM call starts — real felt latency.
+
+**Why we'd do it.** Three drivers:
+
+- **Local-LLM serial queue.** llama-server (one slot, one model
+  loaded) processes one completion at a time. Stale-but-running
+  completions block new asks. The user types Q2 mid-Q1; Q1 hogs
+  the slot for 20+ seconds before Q2 even starts. Net: typing
+  during retrieving feels responsive in the UI but slow in
+  practice.
+- **Cloud spend.** Once the bring-your-own-cloud-key flow lands
+  (Plan #26), every cancelled query bills the user's account for
+  the wasted tokens. Aborting saves real money.
+- **Pipeline health.** Long-tail compute that nobody's reading
+  the result of is just heat. Killing it tightens the system.
+
+**Why we did NOT do it now.** The frontend gen-counter UX fix
+covered the visible symptom in PR 4. End-to-end abort is invisible
+to the user (they see the same responsive typing), but it's
+non-trivial: needs AbortController plumbing through `postQuery`,
+FastAPI disconnect detection through every `await` point in the
+pipeline, and explicit cancellation propagation to llama-server's
+streaming connection. Worth doing as a focused sweep, not bolted
+onto PR 4.
+
+**Scope sketch (~150-300 LOC):**
+
+- **Frontend `postQuery`** ([frontend/src/api.ts](../frontend/src/api.ts))
+  — accept an `AbortSignal` arg, pass to `fetch({ signal })`. The
+  ask-bar's `submitQuestion` creates one per ask; the gen-counter
+  mismatch path now also calls `controller.abort()`.
+- **Backend `/query` handler** ([src/server.py](../src/server.py))
+  — accept the `Request` object, check `request.is_disconnected()`
+  at the start of each major pipeline phase (rewrite, retrieve,
+  answer). Raise `asyncio.CancelledError` to propagate.
+- **`src/pipeline.py:ask`** — accept an asyncio cancellation
+  signal; propagate `CancelledError` from `answer_question` and
+  `rewrite_query`.
+- **`src/inference/local_llm.py`** — when the streaming HTTP
+  connection to llama-server is closed (because the parent task
+  was cancelled), llama-server detects the client disconnect
+  and aborts the in-flight slot. Verify llama.cpp build's
+  behavior here; may need to send an explicit `/slot/N?action=
+  release` if natural disconnect doesn't free the slot.
+- **`src/llm.py` cloud path** — pass abort signal through to
+  `AsyncOpenAI` clients; OpenAI's SDK already supports `signal`
+  parameter.
+
+**Notes for the future implementer:**
+
+- Verify llama.cpp behavior under client disconnect first. Some
+  llama-server builds don't free the slot on disconnect, in which
+  case the next ask waits anyway and the abort is cosmetic. Test
+  with a stopwatch: cancel mid-completion, immediately ask again,
+  measure latency to first token of the second ask. Should match
+  cold-cache latency, not "wait for the cancelled completion to
+  finish + cold-cache" latency.
+- Order: ship the AbortController frontend wiring + FastAPI
+  disconnect detection FIRST, even before the llama-server
+  cancellation. That alone prevents the wasted compute on cloud
+  providers (where the SDK + HTTP-2 stream aborts work cleanly)
+  and provides obvious UX value once Plan #26 lands.
+- Add a small visible indicator in the retrieving / answering
+  state ("Press Esc to cancel") so the user has a deliberate
+  cancel path beyond "type something else". Probably reuses the
+  status-footer's keyboard-hint slot.
+- The submit-disabled-while-loading prop on the QuestionCard's
+  ⏎ button stays — once abort lands, the user can either
+  retype-to-cancel-old-and-replace OR Esc-to-cancel-and-stay-in-
+  typing. The submit button is the third path: only re-enables
+  after a fresh edit.
+
+**When to do it.** Marked **URGENT for UI** per the user — every
+cancellation today wastes 20-30 seconds of LLM compute that the
+user's NEXT ask sits behind. The current "gen counter drops stale
+responses" UX is a frontend lie; the backend reality is much
+slower than it feels.
 
 ---

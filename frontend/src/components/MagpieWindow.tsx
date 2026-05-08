@@ -49,6 +49,7 @@ import { RetrievingPanel } from "./RetrievingPanel";
 import { SettingsBlob } from "./SettingsBlob";
 import { SourcesCard } from "./SourcesCard";
 import { StatusFooter } from "./StatusFooter";
+import { WelcomeCard } from "./WelcomeCard";
 
 import "./MagpieWindow.css";
 
@@ -62,6 +63,10 @@ const WIDTH = 800;
 // recents list length.
 const HEIGHT_RESTING_EMPTY = 96;
 const HEIGHT_RESTING_WITH_RECENTS = 320;
+// Height when the WelcomeCard is showing (empty corpus, first launch).
+// Same value as HEIGHT_RESTING_WITH_RECENTS — the card occupies a
+// similar amount of body space as the recents panel does.
+const HEIGHT_RESTING_WELCOME = 320;
 const HEIGHTS: Omit<Record<View["kind"], number>, "resting"> = {
   typing: 320,
   retrieving: 380,
@@ -240,9 +245,21 @@ export function MagpieWindow() {
   // since the body adopts the answering-shaped two-column layout.
   const retrievingWithSources =
     view.kind === "retrieving" && view.partialSources !== null;
+  // First-launch / empty-corpus onboarding card. Renders below the input
+  // bar in resting state when Magpie has no indexed files, the sidecar
+  // is up, and no ingest is currently running (which would have its own
+  // IndexingOverlay). Takes priority over the recents panel because the
+  // user can't have recents without files to query against.
+  const showWelcomeCard =
+    view.kind === "resting" &&
+    !booting &&
+    !ingest?.running &&
+    indexedCount === 0;
   const targetHeight =
     view.kind === "resting"
-      ? (visibleRecentsCount > 0 ? HEIGHT_RESTING_WITH_RECENTS : HEIGHT_RESTING_EMPTY)
+      ? (showWelcomeCard
+          ? HEIGHT_RESTING_WELCOME
+          : (visibleRecentsCount > 0 ? HEIGHT_RESTING_WITH_RECENTS : HEIGHT_RESTING_EMPTY))
       : retrievingWithSources
       ? HEIGHTS.answering
       : HEIGHTS[view.kind];
@@ -726,10 +743,17 @@ export function MagpieWindow() {
         <IndexingOverlay ingest={ingest} onStop={stopIngest} />
       )}
 
+      {/* First-launch / empty-corpus onboarding. Takes priority over the
+          recents panel since the user can't have recents without a corpus. */}
+      {showWelcomeCard && <WelcomeCard />}
+
       {/* Body per view. Recents panel renders in BOTH resting and
           typing — so the user sees their history immediately on
-          summon and doesn't have to type to discover it. */}
-      {(view.kind === "resting" || view.kind === "typing") && (
+          summon and doesn't have to type to discover it. Suppressed
+          when the WelcomeCard is showing (resting + empty corpus);
+          typing-with-empty-corpus still renders RecentsPanel which
+          will simply be empty — that path is rare and harmless. */}
+      {(view.kind === "resting" || view.kind === "typing") && !showWelcomeCard && (
         <RecentsPanel
           selected={view.kind === "typing" ? view.selected : null}
           onSelectIndex={(i) => {

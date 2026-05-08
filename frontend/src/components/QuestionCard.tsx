@@ -87,12 +87,21 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
               onSubmit();
             }
           }}
-          disabled={loading || booting}
+          // Only block typing while the sidecar is still booting. NOT
+          // disabled during retrieving — the user should be able to
+          // edit / re-ask mid-pipeline. The gen-counter race guard
+          // in MagpieWindow's submitQuestion discards the old
+          // response when the new question fires, so editing during
+          // retrieving is safe.
+          disabled={booting}
           spellCheck={false}
           autoComplete="off"
         />
         {/* Submit-affordance glyph on the right edge of the pill. Click
-            equivalent to Enter; visually echoes "you can press return". */}
+            equivalent to Enter; visually echoes "you can press return".
+            Stays disabled while loading so an enter-mash doesn't fire
+            a second /query before the user has changed the input —
+            but the input stays editable so they CAN change it. */}
         <button
           type="button"
           className="question-card__submit"

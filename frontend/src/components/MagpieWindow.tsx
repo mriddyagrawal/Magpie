@@ -31,6 +31,7 @@ import {
   getIngestStatus,
   getRecent,
   getRecents,
+  getStatus,
   postQuery,
   stopIngest,
 } from "../api";
@@ -79,6 +80,11 @@ export function MagpieWindow() {
   const [booting, setBooting] = useState(true);
   const [recents, setRecents] = useState<RecentEntry[] | null>(null);
   const [ingest, setIngest] = useState<IngestStatus | null>(null);
+  // Total file count Magpie has read (manifest size, surfaced via
+  // /status). Used by RetrievingPanel for "scanning N docs" copy
+  // and by NotFoundCard's recents-replay fallback. Refreshed on
+  // boot and after each ingest completion.
+  const [indexedCount, setIndexedCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // The previous `running` value from /ingest/status. Used to detect
@@ -140,6 +146,14 @@ export function MagpieWindow() {
     return () => { cancelled = true; };
   }, [port]);
 
+  // Indexed file count — refreshed on boot and after each ingest run.
+  // Used by RetrievingPanel ("scanning N docs") and as the fallback
+  // count when replaying not-found recents.
+  useEffect(() => {
+    if (booting) return;
+    getStatus().then((s) => setIndexedCount(s.indexed_count)).catch(() => { /* non-fatal */ });
+  }, [booting]);
+
   // -------------------------------------------------------------------
   // Recents fetch — fires once after boot completes. Doing this here
   // (not inside RecentsPanel) avoids a race where RecentsPanel's
@@ -199,6 +213,9 @@ export function MagpieWindow() {
             // Re-focus the input on the running→done edge so the user
             // can immediately start typing without clicking back.
             requestAnimationFrame(() => inputRef.current?.focus());
+            // Refresh the indexed count so "scanning N docs" reflects
+            // the post-ingest manifest size on the next retrieval.
+            getStatus().then((st) => setIndexedCount(st.indexed_count)).catch(() => {});
           } else {
             setIngest(null);
           }
@@ -632,7 +649,7 @@ export function MagpieWindow() {
       )}
 
       {view.kind === "retrieving" && (
-        <RetrievingPanel documentsTotal={view.question.length /* placeholder */} />
+        <RetrievingPanel documentsTotal={indexedCount} />
       )}
 
       {view.kind === "answering" && (

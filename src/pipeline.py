@@ -95,7 +95,7 @@ async def ask(
 
     t = time.monotonic()
     retrieved = await asyncio.to_thread(
-        run_search, sq, top_k, question=question, skip_fast=not fast
+        run_search, sq, top_k, question=question, skip_fast=not fast, rerank=True
     )
     print(f"[query] retrieval ({time.monotonic()-t:.2f}s): {len(retrieved)} hits",
           file=sys.stderr, flush=True)

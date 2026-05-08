@@ -1305,6 +1305,54 @@ than a false-precise post-hoc attribution.
   point a post-process *de-duplication* step layered on top of
   the markers makes sense — a hybrid.
 
+### Choice C — Prompt-layout knobs (best-doc position, question echo, history slot)
+
+**v1 picked** (after reading "Lost in the Middle", Liu et al,
+2023, against our 4B Gemma backend):
+
+- **Doc order:** reversed so the highest-ranked retrieval
+  result is closest to generation
+  ([src/answer.py:550-565](src/answer.py)). Recency-biased
+  small models attend most to the end of the context; paper
+  Section 4.3 shows up-to-20-point accuracy swings from doc
+  position alone.
+- **Question echo at the bottom:** "Now answer this question:
+  <Q>" appended after the file blocks
+  ([src/answer.py:574-580](src/answer.py)). Liu et al's
+  query-aware contextualization finding was *neutral* on
+  multi-doc QA for the 30B+ models they tested, but smaller
+  models are dominated by recency (paper: Llama-2 7B is
+  "solely recency-biased") so the question text in the recency
+  zone may help — extrapolation, not a tested result.
+- **History at the top** of the user message, flat-text format
+  (`[Turn 1] Q:... A:...`), not real chat-turn structure.
+
+All three are reasonable bets, none are eval-validated.
+
+**The same eval harness can A/B them.** Each is a one-line
+toggle, so the matrix is small:
+
+| Knob | A | B |
+|---|---|---|
+| Doc order | best-first | best-last (current) |
+| Question echo | off | on at bottom (current) |
+| History slot | top (current) | bottom (just before docs) |
+| Real chat-turn history | flat text (current) | role: user/assistant pairs |
+
+For each cell, run the same eval set and score answer
+correctness, citation precision/recall, and not_found
+calibration. Likely worth keeping the current settings if the
+spread is < 2 points (within noise) but flipping any knob
+that costs > 5 points.
+
+Especially relevant when:
+- Swapping the local model (a different small model may have
+  a different recency profile — Phi, Qwen 2.5 small, etc.)
+- Adding cloud as default (see Plan #32 — different optimum).
+- After 20+ real-user query logs surface "model didn't read
+  the question" failures or "model only used the last
+  document" tells.
+
 ### Concrete eval harness needed
 
 The cheapest path to revisit either choice is the same harness:
@@ -1312,13 +1360,14 @@ The cheapest path to revisit either choice is the same harness:
 1. Take the existing eval files (`benchmarks/*/eval_answer_*.json`)
    and add ground-truth citation positions (which sources should
    each correct answer cite, ideally with page/row numbers).
-2. Run the same questions twice — once under each schema/citation
-   choice — capture answer + sources + cite positions.
+2. Run the same questions through each variant under
+   evaluation (schemas, citation styles, prompt-layout knobs)
+   — capture answer + sources + cite positions.
 3. Score: precision/recall on `not_found` detection, precision/recall
    on citations, answer correctness (existing rubric).
-4. The model that wins both schemas/citations on the same
-   benchmark is the right one. If results split, document which
-   half of the workload favors which choice.
+4. The variant that wins on the same benchmark is the right
+   one. If results split, document which half of the workload
+   favors which choice.
 
 This harness doesn't exist yet but isn't far from
 `benchmarks/student_notes/runner.py` — perhaps 200 LOC of
@@ -1683,5 +1732,252 @@ that's compatible.
 **Trigger to start.** First user-visible failure that's traced
 to this error (vs. just stderr noise), or as part of a routine
 dependency upgrade pass.
+
+## 30. Settings buttons that persist but don't act — wire-up audit
+
+**Tags:** settings · UX · cross-cutting
+
+**What.** Several Settings controls accept clicks and PATCH the
+backend, but no consumer reads the resulting value at runtime.
+The user discovers this only by trying — the UI shows the new
+state confidently. Audit findings (one-pass review of the
+Settings screen):
+
+| Control | Persists? | Consumer? | Verdict |
+|---|---|---|---|
+| Cloud provider card | ✅ | ❌ | NOT WIRED |
+| Default action on activation (dropdown) | ✅ | ❌ | NOT WIRED |
+| Shortcut Change (recorder) | ✅ on save | ⚠ next launch only | NO RUNTIME UPDATE |
+| Launch at login (toggle) | ✅ | ❌ no OS hook | NOT WIRED |
+| Show in menu bar (toggle) | ✅ | ❌ tray always on | NOT WIRED |
+| Check for updates (button) | n/a | ❌ no-op stub | NOT WIRED |
+
+**Why each is broken (root causes):**
+
+1. **Cloud provider** — `/query` ([src/server.py:248](src/server.py#L248))
+   does not read `provider`; `pipeline.ask` always calls
+   `build_answer_agent()` which always builds a local agent.
+   `provider` is read only by `/status` for the sidebar footer.
+   Fix: branch on `effective_settings().provider` in the answer
+   step, build a `_CloudAgent` when `cloud`. Once Plan #26
+   (BYO API key) lands, Cloud becomes a real path; until then
+   it should at least respect `providers.cloud.configured`
+   gating (already does in the UI, so the button is just
+   silently no-op when configured).
+
+2. **Default action on activation** — `default_action` round-
+   trips through `/settings/app` PATCH but no caller reads it.
+   The intended consumers are (a) the Tauri tray-click handler
+   in [`frontend/src-tauri/src/lib.rs`](frontend/src-tauri/src/lib.rs#L284)
+   (currently always opens the ask bar), and (b) the
+   `tauri://focus` handler in MagpieWindow.tsx that decides
+   whether to open the ask bar fresh or jump to the recents
+   list. Fix: read `appSettings.default_action` at activation
+   time on the frontend; pass it through to Tauri via an
+   `init.script` if needed for tray-click.
+
+3. **Shortcut Change** — `putShortcut()` writes shortcut.json
+   but Tauri's `setup_global_shortcut()` reads it once at app
+   boot. The backend explicitly notes this gap
+   ([src/server.py:1129-1131](src/server.py#L1129)). Fix:
+   add a Tauri command `update_global_shortcut(combo)` that
+   unregisters the old binding and registers the new one,
+   then have the recorder call it after the PATCH succeeds.
+   The persisted file is correct on next launch; the live
+   process just doesn't reload it.
+
+4. **Launch at login** — needs `tauri-plugin-autostart`
+   (not in [`frontend/src-tauri/Cargo.toml`](frontend/src-tauri/Cargo.toml)
+   yet). Fix: add the plugin, wire the toggle to
+   `autostart::Manager::enable()` / `disable()` and read the
+   real OS state on Settings open. Until added, the toggle is
+   purely a UI lie.
+
+5. **Show in menu bar** — tray icon is built unconditionally
+   in `setup()` ([frontend/src-tauri/src/lib.rs:273-306](frontend/src-tauri/src/lib.rs#L273)).
+   Fix: read `show_in_tray` at startup; if false, skip
+   `TrayIconBuilder`. For runtime toggle, store the
+   `TrayIcon` handle and call `.set_visible(false)` /
+   re-create on flip. (No native macOS API for "hide from
+   menu bar without quitting" — destroying the icon is the
+   pragmatic answer.)
+
+6. **Check for updates** — Tauri has `tauri-plugin-updater`.
+   The UI currently has an explicit `/* no-op stub for v1 */`
+   comment. Real fix is plumbing through the updater plugin
+   with a release feed (GitHub releases or a self-hosted
+   `latest.json`). This is a packaging concern, not a UI
+   one — defer until Plan #19 (post-packaging configuration)
+   ships.
+
+**Why this happened.** PR 5 sprinted to make the Settings
+*shape* match the spec. Persistence was the easy half; consumer
+wiring touches Tauri Rust + multiple unrelated runtime systems
+(global shortcut, autostart, tray, updater) and didn't fit in
+one PR. The audit was done after the user reported the Cloud
+button silently doing nothing.
+
+**Recommended sequencing.**
+
+- **First (small, in-process):** Cloud provider routing in
+  `/query` (Python only — no Rust changes). Even without an
+  API key, returning a "Cloud not configured" stub answer is
+  better than the silent fall-through.
+- **Second (Rust, contained):** Shortcut runtime update — one
+  Tauri command, well-bounded.
+- **Third (Rust, plugin add):** `tauri-plugin-autostart` for
+  Launch at Login. Same shape as adding `globalShortcut`.
+- **Fourth (Rust, lifecycle):** Show-in-menu-bar runtime
+  reconfigure. More invasive because tray is a singleton in
+  the app's setup path.
+- **Fifth (Python + frontend):** `default_action` consumer.
+  Cheap; depends on what the menu of actions actually is
+  (open ask bar / open recents / open Settings).
+- **Sixth (packaging):** Real updater. Tied to release infra.
+
+Until then, **disable the unwired controls in the UI** so the
+user doesn't get fooled. Add a "Coming soon" hint to the
+ones that have a planned home (or just `disabled={true}` on
+the form element). One-paragraph PR; cuts misleading UX in
+half.
+
+**Trigger to start.** Any time a user reports one of the
+buttons "doesn't work" — start with that specific control,
+not the whole bundle.
+
+## 31. Source-count semantics: manifest vs. retrieval vs. Qdrant
+
+**Tags:** UX · ranking · diagnostics
+
+**What.** Three different "counts of files" floated around the
+codebase and leaked through to the UI inconsistently:
+
+| Field | Meaning | Where it appeared |
+|---|---|---|
+| `len(result.retrieved)` | chunks short-listed by RRF | `/query`'s `sources_scanned_count` (was) |
+| `len(get_all_point_ids())` | Qdrant points (chunks) | `/status`'s `indexed_count` (was) |
+| `len(Manifest().entries)` | files Magpie has read end-to-end | manifest, internal only |
+
+The user reported `top_k=5` in Settings still showing
+*"I read 20 likely sources…"* in the not-found card, plus
+inconsistent terminal log counts (5 sometimes, 8 sometimes).
+
+**Fix landed.** Both `/query.sources_scanned_count` and
+`/status.indexed_count` now read `len(Manifest().entries)` —
+files, not chunks. Settings sidebar's "understood: N" and
+not-found card's headline now agree on what "a source" means.
+Not-found copy rephrased to *"I checked all N sources I've
+read but didn't find anything about X"* — the count makes
+sense as a corpus total.
+
+**What's left.**
+
+1. **Recents replay path.** [`MagpieWindow.tsx:769`](frontend/src/components/MagpieWindow.tsx#L769)
+   synthesizes a `QueryResponse` from a recents entry and sets
+   `sources_scanned_count: entry.result.sources_used.length`,
+   which collapses to `0` for `not_found` replays — the not-
+   found card then shows the empty branch ("Magpie hasn't read
+   any folders…") instead of "I checked all N sources". Fix:
+   plumb `indexed_count` from a `getStatus()` poll into the
+   replay synthesis. Low priority — replaying a not_found is
+   rare.
+
+2. **Adaptive top_k widening for LIST_ALL queries.** Terminal
+   logs show *"top_k 5→8"* when the classifier
+   ([src/stage2/search.py:620-658](src/stage2/search.py#L620-L658))
+   detects an enumeration query and bumps `top_k` to 8 (local
+   backend cap). This is intentional but silent — user sees 8
+   sources for a `top_k=5` setting and assumes a bug. Either
+   surface the widening in the UI ("widened to 8 to enumerate
+   list-style query") or cap at user's setting and accept
+   shorter enumerations.
+
+3. **Manifest read on every /query.** `len(Manifest().entries)`
+   re-reads the JSON file on every query. Fine at 4K-file
+   scale (~10ms) but won't scale to 100K files. Cache + invalidate
+   on ingest end (same pattern as `_invalidate_folder_stats_cache`
+   added in PR 5 polish).
+
+**Trigger to start.** (1) anyone replays a not-found recent
+and reports the wrong copy; (2) anyone reports a `top_k`
+discrepancy after this fix; (3) corpus crosses 50K files.
+
+## 32. Per-provider prompt-layout split (small-local vs. cloud)
+
+**Tags:** prompt-engineering · models · evaluation
+
+**What.** The prompt layout that's right for our small local
+model (Gemma 4 E4B, ~4B params) is probably **not** the right
+layout for cloud frontier models (Claude, GPT-5, Gemini). PR 5
+tuned the prompt for Gemma based on findings in Liu et al.
+("Lost in the Middle", 2023) but every knob below is sized for
+the local case:
+
+- Reverse doc order (best-last) — paper says this matters
+  most for recency-biased small models. Frontier models have
+  flatter attention curves and may not need it.
+- Question-echo at the bottom — added because small models
+  are "solely recency-biased" per the paper. The same paper
+  explicitly shows this is **neutral or slightly negative**
+  for multi-doc QA on the 30B+ models they tested
+  (GPT-3.5-Turbo, Claude-1.3, MPT-30B-Instruct, Figure 9).
+- Flat-text history — bypasses the chat-template training
+  that frontier models lean into harder than small models.
+- Token budget assumptions — Gemma 4 has a 32-131K context
+  cap (LOCAL_MAX_TOP_K caps top_k at 8 for that reason);
+  Claude 200K and GPT-5 1M+ don't need that throttling.
+
+**Why this isn't urgent today.** We don't ship cloud-as-default
+right now. Plan #26 (BYO API key) gates this on a real cloud
+flow first. The Cloud provider button in Settings doesn't even
+route to a cloud agent yet (Plan #30) — so layout choice is
+academic until that plumbing exists.
+
+**Why this matters when cloud lands.** Once the user can
+realistically pick Cloud and get a real frontier-model answer:
+
+- Echoing the question at the bottom is paper-evidenced as
+  neutral-or-worse for big models. We're paying ~30 tokens
+  per query for nothing, possibly hurting answer quality on
+  borderline cases.
+- Best-last ordering may invert if the cloud model is more
+  primacy-biased than recency-biased — at frontier scale the
+  curve is closer to flat, but residual primacy bias from
+  instruction-tuning ("the task statement is at the start")
+  is a real signal.
+- The cap on top_k (currently `LOCAL_MAX_TOP_K=8` for list
+  enumeration queries on local) should lift to ~30 for cloud,
+  per `query_classify.py`'s widening logic.
+
+**Scope sketch.**
+
+- A `PromptLayout` named tuple in `src/answer.py` carrying:
+  `reverse_docs: bool`, `echo_question: bool`,
+  `history_format: Literal["flat", "chat-turns"]`,
+  `enumeration_top_k_cap: int`. Two presets:
+  `LOCAL_LAYOUT` (current state) and `CLOUD_LAYOUT` (best-first
+  or natural order, no echo, real chat-turn history, no
+  enumeration cap).
+- `build_answer_agent()` accepts a `provider:
+  "local"|"cloud"` (or reads `effective_settings().provider`)
+  and selects the layout.
+- `answer_question` honors the layout flags.
+- Once provider routing in `/query` lands (Plan #30 / #26),
+  this kicks in automatically.
+
+**Eval coupling.** Plan #25's harness already extends to layout
+knobs (Choice C added there). When Plan #32 is implemented,
+re-run the matrix per provider and record both winning configs
+in the docstring next to the layout presets. Keep the diff
+trail: future model swaps (Gemma 4 → Gemma 5, Claude X → Y)
+should re-run the eval, not just inherit yesterday's optimum.
+
+**Trigger to start.** (1) Plan #26 ships, BYO cloud key works
+end-to-end, and we observe answer-quality regressions on cloud
+that aren't present on local; (2) we change the local model
+and the layout assumptions for "small + recency-biased" no
+longer hold (e.g. moving to a 30B local that's more flat-
+attention); (3) someone runs Plan #25's eval harness and finds
+that layout knobs split per provider.
 
 ---

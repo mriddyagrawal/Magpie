@@ -247,6 +247,7 @@ def _user_facing_error(exc: Exception) -> tuple[int, str]:
 @app.post("/query", response_model=QueryResponse)
 async def query(req: QueryRequest) -> QueryResponse:
     from src.answer import Answer
+    from src.manifest import Manifest
     from src.pipeline import ask
     from src.recents import add_recent
 
@@ -307,7 +308,11 @@ async def query(req: QueryRequest) -> QueryResponse:
         search_query={"query": result.search_query.query, "keywords": result.search_query.keywords},
         not_found=result.not_found,
         not_found_topic=result.not_found_topic,
-        sources_scanned_count=len(result.retrieved),
+        # File-level count from the manifest, not chunk count from
+        # `result.retrieved` — the latter inflates with CSV row hits
+        # (one file → many chunk rows), which made the not-found
+        # card say "I read 20 likely sources" when top_k was 5.
+        sources_scanned_count=len(Manifest().entries),
         recent_id=recent_id,
     )
 
@@ -505,10 +510,20 @@ def status() -> StatusResponse:
     if _status_cache["payload"] is not None and now - _status_cache["ts"] < _STATUS_TTL:
         return _status_cache["payload"]
 
-    from src.stage2.db import COLLECTION_NAME, get_all_point_ids, get_qdrant_client
+    from src.stage2.db import COLLECTION_NAME, get_qdrant_client
 
+    # `indexed_count` is the file count from the manifest, not the
+    # Qdrant point count. Manifest = files Magpie has read end-to-end;
+    # Qdrant points include per-chunk rows (CSV row hits, PDF pages),
+    # which inflates beyond a user's mental model of "indexed files".
+    # The Settings sidebar's "understood: N" and the not-found card's
+    # "I checked all N sources" both want the file count.
     try:
-        indexed_count = len(get_all_point_ids())
+        from src.manifest import Manifest
+        indexed_count = len(Manifest().entries)
+        # Liveness is still a Qdrant probe — manifest could be populated
+        # while Qdrant is down, in which case search would fail.
+        get_qdrant_client().get_collections()
         ready = True
     except Exception:  # pylint: disable=broad-except
         indexed_count = 0

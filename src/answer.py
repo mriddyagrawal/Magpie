@@ -547,10 +547,31 @@ async def answer_question(
             "headline few."
         )
 
+    # Reverse so the highest-ranked retrieval result lands closest to
+    # generation. Liu et al. (2023, "Lost in the Middle") found that
+    # smaller decoder-only models are heavily recency-biased
+    # (Llama-2 7B is "solely recency-biased"); Gemma 4 E4B sits in the
+    # same size class. Position effect is large — up to 20 points of
+    # accuracy and worse-than-closed-book in the worst case. The
+    # "File N" header is just an identifier — citation numbers
+    # (`[1]`, `[2]`) are 1-based into `sources_used`, which the model
+    # assembles itself, so reversing the prompt order doesn't affect
+    # the citation contract.
+    ordered_blocks = list(reversed(per_file_blocks))
     message: list = ["\n".join(intro_parts)]
-    for i, (display, blocks) in enumerate(per_file_blocks, 1):
+    for i, (display, blocks) in enumerate(ordered_blocks, 1):
         message.append(f"\n--- File {i}: {display} ---")
         message.extend(blocks)
+
+    # Echo the question once more at the bottom (query-aware
+    # contextualization). Liu et al. found this had minimal impact on
+    # multi-document QA for 30B+ models, but small recency-biased models
+    # benefit from having the question text in the recency zone right
+    # before generation — otherwise the question can effectively be
+    # "forgotten" after the model reads thousands of tokens of file
+    # content. Cheap (~15-30 tokens) for what could be a real win on the
+    # local Gemma 4 backend.
+    message.append(f"\nNow answer this question: {question}")
 
     ans = await agent.run(message)
 

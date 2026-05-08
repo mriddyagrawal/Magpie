@@ -38,11 +38,12 @@ export function NotFoundCard({ scannedCount, topic }: Props) {
     }
   }, []);
 
-  // Pluralize "source" / "sources" gracefully. 0 sources is also a
-  // valid not-found shape (empty retrieval branch in pipeline.ask).
+  // The count is the total file count from the manifest (everything
+  // Magpie has read), not the per-query retrieval count — that gives
+  // the user an honest "I checked everything I have" framing.
   const sourceWord = scannedCount === 1 ? "source" : "sources";
   const headline = scannedCount > 0
-    ? `I read ${scannedCount.toLocaleString()} likely ${sourceWord} but didn't find anything about ${topic} in the folders Magpie has read.`
+    ? `I checked all ${scannedCount.toLocaleString()} ${sourceWord} I've read but didn't find anything about ${topic}.`
     : `Magpie hasn't read any folders that look like they'd contain ${topic}.`;
 
   return (

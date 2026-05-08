@@ -221,6 +221,12 @@ export function MagpieWindow() {
     view.kind === "resting"
       ? (visibleRecentsCount > 0 ? HEIGHT_RESTING_WITH_RECENTS : HEIGHT_RESTING_EMPTY)
       : HEIGHTS[view.kind];
+  // Mirror targetHeight into a ref so the tauri://focus listener
+  // (registered once on mount) can read the latest value without
+  // re-registering every time the height changes. Otherwise the
+  // listener would close over a stale value.
+  const targetHeightRef = useRef(targetHeight);
+  useEffect(() => { targetHeightRef.current = targetHeight; }, [targetHeight]);
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -309,13 +315,21 @@ export function MagpieWindow() {
         // whatever they were doing (still-retrieving, the previous
         // answer, the not-found card).
         //
-        // Spotlight-style "select all" on focus: when the input is
-        // visible (resting/typing) and contains text, select it so
-        // the user's next keystroke replaces it and Backspace clears
-        // it wholesale. For answering/not_found states (no input —
-        // the question is a header button), the keystroke handler
-        // below provides the same UX without needing real selection.
-        const unFocus = await appWindow.listen("tauri://focus", () => {
+        // Two things happen on focus:
+        //   1. Force a window resize to the current targetHeight.
+        //      This is defense in depth — if the window size drifted
+        //      while hidden (it shouldn't, but Tauri/macOS sometimes
+        //      mutate dimensions on hide/show), we restore it before
+        //      the user sees a clipped body.
+        //   2. Spotlight-style "select all" on focus when the input
+        //      has text. The input is now ALWAYS rendered (post the
+        //      "always-input" rewrite), so selectAll works in every
+        //      view state including answering / not_found.
+        const unFocus = await appWindow.listen("tauri://focus", async () => {
+          try {
+            const { LogicalSize } = await import("@tauri-apps/api/window");
+            await appWindow.setSize(new LogicalSize(WIDTH, targetHeightRef.current));
+          } catch { /* not under Tauri */ }
           requestAnimationFrame(() => {
             const el = inputRef.current;
             if (!el) return;
@@ -771,11 +785,18 @@ function makeErrorResult(question: string): QueryResponse {
 }
 
 async function hideWindow() {
+  // DO NOT shrink the window before hiding. Earlier versions did
+  // setSize(WIDTH, HEIGHT_RESTING_EMPTY) here for the "next summon
+  // appears compact" effect, but it broke state preservation: on
+  // re-summon, the window stayed at 96px even though view.kind was
+  // still answering/retrieving (the resize useEffect's deps include
+  // targetHeight, which didn't change across the hide/show), so the
+  // body content rendered below the input was simply clipped — the
+  // user saw a blank bar and thought the state was lost. Keeping the
+  // current size means re-summon shows the same window the user left.
   try {
-    const { getCurrentWindow, LogicalSize } = await import("@tauri-apps/api/window");
-    const win = getCurrentWindow();
-    await win.setSize(new LogicalSize(WIDTH, HEIGHT_RESTING_EMPTY));
-    await win.hide();
+    const { getCurrentWindow } = await import("@tauri-apps/api/window");
+    await getCurrentWindow().hide();
   } catch {
     // not under Tauri
   }

@@ -139,8 +139,9 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
           />
         </div>
         <p className="search-ai-tab__privacy">
-          Local stays on your machine. Cloud only ever sees your
-          question, never your files.
+          Local: nothing leaves your machine. Cloud: your question and
+          the file snippets needed to answer it. Your full corpus and
+          search index stay local either way.
         </p>
       </section>
 

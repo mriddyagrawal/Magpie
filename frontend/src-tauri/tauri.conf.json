@@ -48,11 +48,11 @@
     ],
     "category": "Productivity",
     "shortDescription": "Semantic search over your local files",
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": false
   },
   "plugins": {
     "updater": {
-      "active": true,
+      "active": false,
       "dialog": false,
       "endpoints": [
         "https://github.com/mriddyagrawal/NotAnotherSpotlight/releases/latest/download/latest.json"

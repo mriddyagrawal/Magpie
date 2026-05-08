@@ -5,7 +5,7 @@
 > — bundle-trim shrinks the venv we'll bundle; this plan turns that venv into
 > shippable installers (`.dmg` / `.AppImage` / `.exe` / `.msi`).
 >
-> **Owner:** Mridul (distribution pipeline focus).
+> **Owner:** Mridul & Rahul (distribution pipeline focus).
 >
 > **Status of sibling work:** bundle-trim PR-A/B/C/D/F all shipped on branch
 > `bundle-trim`. Production install is now ~1.3 GB. PR-E (PyInstaller
@@ -110,17 +110,30 @@ Either way: meaningful, but secondary to the bundle-trim wins from PR-A/B/C/D/F.
 
 ## 4. Plan #10 PR breakdown (proposed)
 
-Each PR is small enough to ship individually so the build pipeline matures incrementally.
+**Framing:** every PR produces cross-platform output. PyInstaller's `.spec`
+is platform-agnostic (95% of it) — `Analysis(...)`, `excludes`, `datas`,
+`hiddenimports` all run identically on Mac/Linux/Windows. The only OS-specific
+parts are small `if sys.platform == 'darwin'/'linux'/'win32'` blocks for
+bundle wrapping (`.app` vs `.AppImage` vs `.exe`) and per-OS icons. **One
+`.spec` file, three CI runners, three installer outputs.**
+
+P10-1 chooses Mac as the **validation target** (because Mridul iterates
+fastest there) but the `.spec` it produces is intended to build cleanly on
+all three platforms from day 1. P10-4 adds the CI matrix + per-OS wrappers
+around the same `.spec` output — it does NOT rewrite the spec.
+
+Each PR is small enough to ship individually so the build pipeline matures
+incrementally.
 
 | PR | Scope | Output |
 |---|---|---|
-| **P10-1** | First-pass PyInstaller `.spec` for macOS one-folder mode | `Magpie.app` that launches and shows the GUI on the dev's Mac (no signing yet) |
-| **P10-2** | PR-E excludes — apply the candidate list, validate one at a time | Same `.app`, ~150–250 MB smaller |
-| **P10-3** | Bundle Qdrant + llama-server binaries into `Resources/bin/` | `.app` works end-to-end without `just qdrant-install` etc. |
-| **P10-4** | Cross-platform: Linux `.AppImage` + Windows `.msi` | Three installer formats, dev-signed only |
-| **P10-5** | Apple Developer signing + notarization wiring in CI | `.dmg` users can open without Gatekeeper warnings |
-| **P10-6** | Auto-updater (Tauri's built-in) — release endpoint, signing keys | Users get updates without re-downloading |
-| **P10-7** | First-launch onboarding flow (paired with Rahul on UI side) | New users see folder picker + model warm-up progress, not a silent broken app |
+| **P10-1** | First-pass cross-platform `magpie.spec` (one-folder mode). Validated on Mac. | A `magpie.spec` that builds successfully on Mac → `Magpie.app`. The same `.spec` is *expected* to build on Linux → `dist/magpie/` and Windows → `dist/magpie/` but those runs are deferred to P10-4. No signing yet. |
+| **P10-2** | PR-E excludes — apply the candidate list, validate one at a time on the working baseline | All three platforms ~150–250 MB smaller (excludes are platform-agnostic; saving applies everywhere) |
+| **P10-3** | Bundle native binaries (Qdrant, llama-server) into `Resources/bin/` per-arch | `.app` (Mac), `dist/magpie/` (Linux), `dist/magpie/` (Windows) all run end-to-end without external binary installs |
+| **P10-4** | Per-OS wrappers + CI matrix runs the same `.spec` on Mac/Linux/Windows | `.dmg` (Mac), `.AppImage` + `.deb` (Linux), `.exe` installer + `.msi` (Windows) — dev-signed only |
+| **P10-5** | Apple Developer signing + notarization (Mac), EV cert signing (Windows), GPG signature (Linux) | All three installers open without OS-vendor security warnings |
+| **P10-6** | Auto-updater (Tauri's built-in) — release endpoint + signing keys for all three platforms | Users get updates regardless of OS without re-downloading |
+| **P10-7** | First-launch onboarding flow (paired with Rahul on UI side) — purely frontend, OS-agnostic | New users on any platform see folder picker + model warm-up progress, not a silent broken app |
 
 ---
 

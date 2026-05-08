@@ -213,6 +213,10 @@ pub fn run() {
         ))
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
+        // Plan #10 P10-6 — auto-updater. The frontend triggers checks via
+        // `check()` from @tauri-apps/plugin-updater (see frontend/src/auto-updater.ts).
+        // Endpoint + public key live in tauri.conf.json's plugins.updater block.
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(SidecarState(Mutex::new(None)))
         .manage(QdrantState(Mutex::new(None)))
         .manage(SidecarPort(Mutex::new(0)))

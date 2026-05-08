@@ -112,17 +112,39 @@ builder for Mac) around the `dist/` output the same `.spec` produces.
 
 ---
 
-## 4. PR Breakdown — seven sequential PRs
+## 4. PR Breakdown — what's already done vs. remaining
 
-| PR | Scope | Output | Ship-blocker for next |
-|---|---|---|---|
-| **P10-1** | First-pass cross-platform `magpie.spec` (one-folder mode). Validated on Mac. | `Magpie.app` launches and shows the GUI on Mridul's Mac. The same `.spec` is *expected* to build on Linux → `dist/magpie/` and Windows → `dist/magpie/`, but those runs deferred to P10-4. **No signing yet — Gatekeeper warning is OK at this stage.** | P10-2: needs the working baseline to add excludes against |
-| **P10-2** | PR-E excludes — Tier 1 (high-confidence) → smoke test → Tier 2 (medium-confidence, one at a time) → smoke test → stop | All three platforms ~150–200 MB smaller. Tier 3 deferred. Detailed below. | P10-3: not blocking, but nice to do before adding native binaries to keep total size honest |
-| **P10-3** | Bundle native binaries (Qdrant, llama-server) into `Resources/bin/` per-arch. Update Tauri Rust spawn code to find them by relative path instead of `uv run python3`. | `.app` (Mac), `dist/magpie/` (Linux), `dist/magpie/` (Windows) all run end-to-end without external installs. **This is where the `uv run python3` failure mode finally goes away.** | P10-4: needs the working bundle to wrap |
-| **P10-4** | Per-OS wrappers + CI matrix runs the same `.spec` on Mac/Linux/Windows | `.dmg` (Mac), `.AppImage` + `.deb` (Linux), `.exe` installer + `.msi` (Windows). Dev-signed only — no Apple/MS cert yet. | P10-5: signing layered on top |
-| **P10-5** | Apple Developer signing + notarization (Mac), EV cert signing (Windows), GPG signature (Linux) | All three installers open without OS-vendor security warnings. Needs *real money* — Apple Dev ID $99/yr + Win EV cert $200–500/yr. | P10-6: signing keys reused for the updater |
-| **P10-6** | Auto-updater (Tauri's built-in) — release endpoint, signing keys for all three platforms | Users get updates regardless of OS without re-downloading. | P10-7: not blocking; ship in parallel |
-| **P10-7** | First-launch onboarding flow (paired with Rahul on UI side) — purely frontend, OS-agnostic | New users see folder picker + model warm-up progress, not a silent broken app. | — |
+> **2026-05-08 reality-check:** when this plan was first written, I assumed
+> P10-1 through P10-7 were all greenfield. They aren't — Mridul shipped most
+> of the packaging pipeline before the bundle-trim conversation started.
+> Commits like `ebe3e80 feat: cross-platform sidecar bundling via PyInstaller`,
+> `d5d7f72 build: extend PyInstaller hidden-imports`, `5cbda20 Phase 3: fix
+> staging path` did the heavy lifting. This table now reflects actual state.
+
+### Already done ✅
+
+| PR | What was done | Where it lives |
+|---|---|---|
+| **P10-1** | Cross-platform sidecar build via PyInstaller, all hidden imports + `--collect-all` flags + `--copy-metadata` for libraries that call `importlib.metadata.version()` | [`scripts/build_sidecar.py`](../../scripts/build_sidecar.py). Uses CLI args directly, NOT a `.spec` file. |
+| **P10-3** | Native binary bundling — Qdrant pre-downloaded into `frontend/src-tauri/binaries/qdrant-<target-triple>` for each platform. Tauri's `externalBin` config bundles them into the `.app`/`.AppImage`/`.exe`. The Rust sidecar spawn ([frontend/src-tauri/src/lib.rs:573](../../frontend/src-tauri/src/lib.rs#L573)) finds them by `resource_dir().join("magpie-sidecar")`. | [`scripts/download_qdrant.py`](../../scripts/download_qdrant.py), [`tauri.conf.json` line 41](../../frontend/src-tauri/tauri.conf.json) (`"externalBin": ["binaries/magpie-sidecar", "binaries/qdrant"]`) |
+| **P10-4** | Cross-platform CI matrix — Mac arm64, Mac x86_64, Linux x86_64, Windows x86_64 — running the full pipeline (uv sync → build_sidecar.py → download_qdrant.py → pnpm tauri build → upload artifacts) | [`.github/workflows/build.yml`](../../.github/workflows/build.yml). `.dmg` for Mac, `.AppImage` + `.deb` for Linux, `.exe` (NSIS) for Windows. |
+| **P10-5 infra** | Code-signing infrastructure wired into CI, gated on `APPLE_CERTIFICATE` / `WINDOWS_CERTIFICATE` GitHub secrets being set. CI silently skips signing if the secret is absent. | [`.github/workflows/build.yml`](../../.github/workflows/build.yml) lines 92-145 |
+| **P10-2 Tier 1** | High-confidence excludes (`torch.distributed`, `torch.onnx`, `torch.profiler`, `torch.tensorboard`, `torch.optim`, `torch.autograd.profiler`, `IPython`, `babel`) added to `build_sidecar.py`. ~80–100 MB savings. Zero runtime risk — these submodules are well-isolated. | [`scripts/build_sidecar.py`](../../scripts/build_sidecar.py) — added 2026-05-08 |
+
+### Remaining work (the real Plan #10 backlog)
+
+| PR | Scope | Notes |
+|---|---|---|
+| **P10-2 Tier 2** | Apply `torch.fx`, `torch._dynamo`, `sympy`, `mpmath` excludes ONE AT A TIME with smoke tests in between. | Already added as commented-out `--exclude-module` lines in `build_sidecar.py`. On Mac, uncomment one, rebuild, smoke-test (ingest tiny corpus → run query → exercise T4 image tier). If green, keep; if ImportError, leave commented. ~80–100 MB additional if all four work. |
+| **P10-2 Tier 3** | `transformers.models.<unused arch>` narrow exclusions | **Deferred.** ~30–50 MB potential saving but high-risk (transformers loads classes by string name dynamically; wrong exclude breaks ColPali/sentence-transformers at runtime). Revisit only on user-facing size complaint. |
+| **P10-5 procurement** | Apple Dev ID ($99/yr) + Windows EV cert ($200–500/yr). Add to GitHub secrets. | The CI is ready; just needs a budget owner to procure and upload base64-encoded `.p12`/`.pfx` to the repo's secrets. |
+| **P10-6** | Auto-updater. Tauri 2's built-in `tauri-plugin-updater` — needs (a) plugin in Cargo.toml, (b) `updater` block in tauri.conf.json with endpoint URL + public key, (c) Rust registration in lib.rs, (d) signing keys checked into CI as `TAURI_SIGNING_PRIVATE_KEY` secret. | NOT started. Estimated ~half-day of focused work. Detail in §5. |
+| **P10-7** | First-launch onboarding — folder picker dialog, model-download progress UI, "we're warming up the embedder" messaging. | NOT started. Frontend work, paired with Rahul. The `MAGPIE_DATA_DIR` empty-state needs a real UX, not just a 503. |
+| **P10-? (renormalize)** | Update naming so binary at `dist/magpie-sidecar` is correctly placed at `frontend/src-tauri/binaries/magpie-sidecar-<target-triple>` for Tauri's `externalBin` to pick up. | Already done in `build_sidecar.py:117` (the `shutil.move(src_exe, dst_exe)` line). No work needed. |
+
+**Net:** the brainstorm-era estimate of "1–2 weeks for Plan #10 from scratch"
+collapses to ~2 days of remaining work (Tier 2 iteration + auto-updater
+wiring + onboarding pairing), plus whatever procurement signing certs takes.
 
 ---
 
@@ -175,17 +197,89 @@ excludes_tier_2_candidates = [
 Total expected: ~80–100 MB additional. Realistically 1-2 of the four
 candidates will need to be backed out or narrowed.
 
-### Tier 3 — deferred (skip for v1)
+### Tier 3 — `transformers.models.<unused arch>` (RE-OPENED 2026-05-08)
 
-`transformers.models.<unused arch>` exclusions are deferred. `transformers`
-loads model classes dynamically by name (`AutoModel.from_pretrained` →
-runtime lookup), so excluding the wrong submodule breaks ColPali /
-sentence-transformers at first user query, not at build. Getting the
-right narrow set is hours of trial-and-error for ~30–50 MB of saving —
-poor ROI compared to Tier 1+2.
+Originally deferred on the assumption of "30–50 MB potential saving, hours
+of trial-and-error." Web research surfaced two facts that flipped the
+calculus:
 
-**Revisit only if:** a user-facing size complaint arises, or we want to
-push the bundle size below ~250 MB.
+1. **`transformers` ships ~200 model architectures** under
+   `transformers/models/<arch>/`. Each is ~3-5 MB on disk (~600 MB to
+   1 GB total). PyInstaller bundles every one because static analysis
+   can't see that AutoModel does string-based lookup at runtime.
+2. **ColPali's actual surface is narrow** — per the
+   [`colpali_engine/models/__init__.py`](https://github.com/illuin-tech/colpali/blob/main/colpali_engine/models/__init__.py)
+   imports, it pulls only ~12 architecture families (paligemma, qwen2_vl,
+   qwen2_5_vl, qwen2_5_omni, gemma/2/3, qwen2/2_5/3/3_5, siglip, idefics3,
+   modernvbert).
+
+Real saving: **~150 architectures × 3-5 MB = ~450-750 MB.** That's the
+single biggest exclude-pass target by an order of magnitude — bigger than
+Tier 1 + Tier 2 combined.
+
+#### Strategy: allowlist, don't blacklist
+
+Listing 150 `--exclude-module` flags by hand is brittle (transformers adds
+new architectures every release). Instead: maintain a small ALLOWLIST of
+architectures we KNOW are needed, and exclude everything else
+programmatically.
+
+The helper script [`scripts/list_unused_transformers_models.py`](../../scripts/list_unused_transformers_models.py):
+1. Imports `transformers`, walks `transformers/models/`
+2. Subtracts the allowlist (vision-language families used by ColPali +
+   common embedder backbones for sentence-transformers)
+3. Prints `--exclude-module transformers.models.<arch>` lines for the
+   leftover ~150
+
+Run it on Mac in the project venv:
+```bash
+uv run python scripts/list_unused_transformers_models.py >> /tmp/tier3-excludes.txt
+# Paste contents of /tmp/tier3-excludes.txt into build_sidecar.py's `cmd` list
+# (right before the closing `]` per the comment block in that file).
+```
+
+#### Validation
+
+This is the highest-risk exclude pass — broken excludes don't surface at
+build time, only at first user query. Validation needs to exercise EVERY
+tier:
+
+| Tier | Triggers |
+|---|---|
+| T0 (raw text) | `.txt` ingestion |
+| T1 (code) | `.py` / `.js` ingestion |
+| T2 (PDF text) | `.pdf` with extractable text |
+| T3 (PDF vision-fallback) | `.pdf` with no extractable text (scanned image PDF) → `pix2struct`-shape lookup |
+| T4 (ColPali) | image file or vision-heavy PDF → ColQwen2 load |
+
+If any of these ImportError at runtime: identify the missing architecture
+from the traceback, ADD it to the ALLOWLIST in the helper script, re-run,
+rebuild.
+
+#### Allowlist as committed (subject to refinement)
+
+```python
+ALLOWLIST = frozenset({
+    "auto",                                    # NEVER exclude — dispatch tables
+
+    # ColPali backbones (per colpali_engine 0.3.x)
+    "paligemma", "qwen2", "qwen2_5", "qwen3", "qwen3_5",
+    "qwen2_vl", "qwen2_5_vl", "qwen2_5_omni",
+    "gemma", "gemma2", "gemma3", "siglip",
+    "idefics3", "modernvbert",
+
+    # Sentence-transformers / embedder backbones
+    "bert", "distilbert", "mpnet", "roberta",
+    "xlm_roberta", "deberta_v2",
+
+    # Tokenizer dispatch
+    "llama", "t5",
+})
+```
+
+Conservative — start here, refine downward by trying smaller subsets
+(e.g., drop `gemma3` if you're sure no Gemma-3 model is loaded, drop
+`qwen3` family if only Qwen2.5 is in use). Each removal saves ~3-5 MB.
 
 ---
 
@@ -267,13 +361,107 @@ spctl -a -v dist/Magpie.app                          # Mac Gatekeeper
 
 ---
 
-## 10. What "ready to start P10-1" looks like
+## 10. What to do next (revised after the 2026-05-08 reality check)
 
-1. `bundle-trim` branch verified on Mac (uv sync produces ~1.3 GB venv, tests pass, Tauri dev launches).
-2. Mridul cuts a new branch off latest `UI` (which by then has bundle-trim merged in): `git checkout -b packaging`.
-3. `uv sync --group packaging` → installs PyInstaller.
-4. Spike a minimal `magpie.spec` with NO excludes yet — just enough that `pyinstaller magpie.spec` produces a `Magpie.app` that launches.
-5. Once that baseline works, P10-2 layers excludes on top.
+Most of the plan is already shipped. The remaining work, in priority order:
 
-**Today's session ends here** with the locked plan committed. Implementation
-deferred to when Mridul is on his Mac with bundle-trim verified locally.
+### Step 1 — Validate Tier 1 excludes on Mac (~1 hour)
+
+```bash
+git fetch origin
+git checkout bundle-trim    # has the Tier 1 exclude additions to build_sidecar.py
+uv sync                      # confirm 1.3 GB venv + pyinstaller installs
+
+# Build the sidecar with Tier 1 excludes applied
+uv run python scripts/build_sidecar.py
+# → frontend/src-tauri/binaries/magpie-sidecar-aarch64-apple-darwin
+# Note the size; should be ~80-100 MB smaller than your last build.
+
+# Build the full app
+cd frontend && pnpm tauri build
+# Verify the .dmg builds successfully and Magpie.app launches.
+
+# Smoke test: ingest a tiny corpus, run a query, exercise T4 (image)
+open /tmp/magpie-test          # any folder with mixed file types
+just walk /tmp/magpie-test     # via the bundled CLI
+just check-dir /tmp/magpie-test
+# Open Magpie.app, search → should return hits
+```
+
+If everything works, Tier 1 is locked. If something ImportErrors → narrow
+the offending exclude and rebuild.
+
+### Step 2 — Iterate Tier 2 excludes (~1-2 hours)
+
+In `scripts/build_sidecar.py`, uncomment ONE of the four Tier-2
+`--exclude-module` lines. Repeat the build + smoke test. If green, keep
+that one uncommented and try the next. Order doesn't matter much; suggested:
+
+1. `mpmath` (lowest risk — leaf node)
+2. `sympy` (next — depends on mpmath)
+3. `torch.fx`
+4. `torch._dynamo` (highest risk — torch.compile machinery)
+
+Each successful exclude saves ~20-25 MB. Realistic expectation: 2-3 of the
+four will work cleanly.
+
+### Step 3 — Auto-updater (P10-6, ~half day)
+
+Tauri 2 has a built-in updater plugin. Wiring:
+
+1. **Cargo.toml** — add `tauri-plugin-updater = "2"` to `[dependencies]`.
+2. **lib.rs** — register the plugin in `tauri::Builder::default().plugin(tauri_plugin_updater::Builder::new().build())`.
+3. **tauri.conf.json** — add a `plugins.updater` block:
+   ```json
+   "plugins": {
+     "updater": {
+       "active": true,
+       "endpoints": [
+         "https://github.com/mriddyagrawal/NotAnotherSpotlight/releases/latest/download/latest.json"
+       ],
+       "dialog": true,
+       "pubkey": "<base64-public-key>"
+     }
+   }
+   ```
+4. **Generate signing keys** — `pnpm tauri signer generate -- -w ~/.tauri/magpie-updater.key`. Public key goes in `pubkey` above; private key goes into CI as `TAURI_SIGNING_PRIVATE_KEY` secret.
+5. **Generate `latest.json`** in CI — Tauri's GitHub Action template handles this; or write a small script that produces it after `pnpm tauri build`.
+6. **Frontend hook** — call `check()` from `@tauri-apps/plugin-updater` on app launch (or behind a "Check for updates" menu item).
+
+Test: build v0.1.0, install, publish v0.1.1 to GitHub Releases, confirm the
+in-app prompt appears on next launch and successfully updates.
+
+### Step 4 — Onboarding flow (P10-7, paired with Rahul, ~1 day)
+
+Pure frontend work. When `indexing_rules.json` has zero `include_paths`:
+
+1. Show a welcome screen with "Pick the folders Magpie should index" + a folder-picker button (uses `tauri-plugin-dialog`).
+2. After folder pick → call `POST /settings/include-path` (or wire via the existing settings UI Rahul built).
+3. While first ingest runs, show progress: "Downloading models (~5 GB, one time)…", "Indexing 1234 files…".
+4. When done → drop into normal search UI.
+
+Coordination point: Rahul's `src/config/secrets.py` + Settings UI work
+should be the foundation for this; no need to reinvent.
+
+### Step 5 — Procure signing certs (Mridul's call)
+
+- **Apple Developer Program** — ~$99/yr. ~1 week to issue. Required for
+  notarization; without it Mac users see the Gatekeeper "damaged"
+  warning.
+- **Windows EV Code Signing certificate** — ~$200–500/yr. ~2-4 weeks for
+  the vendor to vet identity. Required to dodge SmartScreen warnings.
+- **Linux** — optional GPG signature on `.AppImage` / `.deb`; users
+  mostly trust source.
+
+Once you have them: base64-encode the `.p12` (Apple) and `.pfx` (Windows)
+and add to GitHub secrets as `APPLE_CERTIFICATE` / `WINDOWS_CERTIFICATE`
+(plus passwords). The existing CI [`.github/workflows/build.yml`](../../.github/workflows/build.yml)
+already has the steps; they're just gated on the secrets existing.
+
+---
+
+**Stopped here on the Linux box because the disk is having severe I/O
+errors. All edits this session landed on disk but not git (couldn't
+commit/push). Mridul re-applies them on Mac (the Tier 1 + Tier 2
+exclude changes to `scripts/build_sidecar.py` are the only code edits
+that didn't make it to git from this session).**

@@ -1899,12 +1899,14 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "ipykernel" },
-    { name = "jupyter" },
-    { name = "notebook" },
     { name = "notspotlight" },
     { name = "pyinstaller" },
     { name = "pytest" },
+]
+notebooks = [
+    { name = "ipykernel" },
+    { name = "jupyter" },
+    { name = "notebook" },
 ]
 
 [package.metadata]
@@ -1936,12 +1938,14 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "ipykernel" },
-    { name = "jupyter" },
-    { name = "notebook" },
     { name = "notspotlight", editable = "cli" },
     { name = "pyinstaller", specifier = ">=6.0" },
     { name = "pytest", specifier = ">=8.0" },
+]
+notebooks = [
+    { name = "ipykernel" },
+    { name = "jupyter" },
+    { name = "notebook" },
 ]
 
 [[package]]

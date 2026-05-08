@@ -44,9 +44,21 @@ Transitions animate via Tauri window resize. The width never changes.
 
 ## Universal elements (shown in every state)
 
-### The input bar (top)
+### The top row — search pill + settings blob
 
-Composition, left to right:
+The top of the window is a **horizontal arrangement** of two
+elements, side-by-side, sharing the same vibrancy/blur background
+treatment:
+
+```
+┌────────────────────────────────────────────────────┐ ┌────┐
+│ 🪶  Ask Magpie about your files…                ⏎ │ │ ⚙  │
+└────────────────────────────────────────────────────┘ └────┘
+```
+
+#### 1. Search pill (left, dominant)
+
+A rounded pill containing, left to right:
 
 1. **Magpie logo** (small, theme-aware — dark variant by default,
    light via `prefers-color-scheme: light`).
@@ -56,6 +68,33 @@ Composition, left to right:
 3. **Submit affordance** — a small `⏎` (return) glyph button on the
    right of the input. Visible-only-on-hover or always-visible is the
    designer's call. Enter on the keyboard does the same thing.
+
+#### 2. Settings blob (right, separate)
+
+A **separate circular button** to the right of the search pill,
+matching macOS Spotlight's pattern of secondary-action blobs
+(Spotlight ships App Store, Folders, Stacks, Files blobs to the
+right of its search pill — Magpie ships exactly one: Settings).
+
+- **Shape:** circular, ~48–64px diameter (designer's exact size).
+- **Background:** same vibrancy treatment as the search pill —
+  feels like a sibling element on the same translucent surface,
+  not a button on top of it.
+- **Icon:** the classic gear glyph (`⚙` or a designed equivalent),
+  centered.
+- **Behavior:** click → opens the Settings window (raises if
+  already open). Tooltip "Settings" on hover.
+- **Always visible** across all five states. The user can open
+  Settings while typing, while reading an answer, while in the
+  not-found card. Esc still hides the ask bar; clicking the blob
+  opens Settings without closing the ask bar.
+- **Keyboard shortcut alias:** `Cmd ,` / `Ctrl ,` from anywhere
+  in the ask bar fires the same action — so the blob is the
+  visible affordance and the keyboard shortcut is the power-user
+  accelerator.
+
+The total window width (still 800px) accommodates the search pill
+~720px + ~16px gap + ~64px blob.
 
 ### The status footer (bottom)
 

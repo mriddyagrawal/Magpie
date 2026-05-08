@@ -13,11 +13,25 @@
  * =========================================================================== */
 
 /* ---------- Light / dark theme tokens ---------- */
-/* The default tokens (in tokens.css) target dark mode. When the user picks
-   a non-system theme, [data-theme] on <html> overrides the relevant tokens.
-   System mode falls back to (prefers-color-scheme) media queries. */
+/* The default tokens (in tokens.css) target the ASK BAR's vibrancy:
+   --bg-window is transparent so the Tauri vibrancy layer shows
+   through. The SETTINGS WINDOW does NOT have transparent enabled
+   (lib.rs sets transparent: false), so transparent --bg-window
+   would leak the Tauri default white background — which makes
+   dark-mode text invisible.
+ *
+ * Fix: scope the overrides to `.settings-window` so the ask bar
+ * keeps its existing values, and the Settings window gets solid
+ * backgrounds in dark mode + light values when [data-theme="light"]
+ * (or system is light AND no explicit theme set). */
 
-:root[data-theme="light"] {
+/* Default (= dark) — solid dark window background. */
+.settings-window {
+  --bg-window: rgba(20, 22, 28, 1);
+}
+
+/* Explicit light theme — solid light. */
+:root[data-theme="light"] .settings-window {
   --bg-window: rgba(245, 246, 250, 1);
   --bg-card: rgba(255, 255, 255, 0.96);
   --bg-card-inner: rgba(244, 246, 250, 0.85);
@@ -31,8 +45,9 @@
   --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.10);
 }
 
+/* System mode + system is light → light variant. */
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
+  :root:not([data-theme]) .settings-window {
     --bg-window: rgba(245, 246, 250, 1);
     --bg-card: rgba(255, 255, 255, 0.96);
     --bg-card-inner: rgba(244, 246, 250, 0.85);
@@ -45,6 +60,16 @@
     --text-placeholder: rgba(20, 22, 28, 0.35);
     --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.10);
   }
+}
+
+/* Explicit dark theme — already covered by the .settings-window
+   default override above, but we add an explicit selector so an
+   explicit data-theme="dark" wins over a system-light fallback. */
+:root[data-theme="dark"] .settings-window {
+  --bg-window: rgba(20, 22, 28, 1);
+  /* Keep the rest of the tokens at their tokens.css dark defaults
+     (translucent --bg-card etc.), which work fine atop a solid dark
+     --bg-window. */
 }
 
 /* ---------- Accent override ---------- */

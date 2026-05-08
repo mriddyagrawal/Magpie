@@ -654,6 +654,178 @@ def ingest_status() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# /index/sync and /index/reindex — global Sync/Reindex buttons
+# ---------------------------------------------------------------------------
+# Backs the Settings → Data tab's two-button design. Both reuse the
+# existing _ingest_state + _stop_event machinery (single in-flight job
+# across /ingest, /index/sync, /index/reindex). Polling goes through
+# the existing GET /ingest/status. See Specs/UI/settings_window.md
+# "Two utility buttons" + Plans/UI/Implementation Plan.md "Indexing
+# triggers".
+
+
+class IndexJobResponse(BaseModel):
+    status: str  # "started"
+    kind: str    # "sync" | "reindex"
+
+
+def _init_ingest_state(*, path_label: str) -> None:
+    """Bootstrap _ingest_state for a new job. Caller must already have
+    confirmed `_ingest_state["running"] is False` and held that contract
+    through to setting running=True."""
+    _stop_event.clear()
+    _ingest_state.update(
+        running=True, done=False, error=None,
+        path=path_label,
+        files_total=0, files_done=0, current_file=None,
+        started_at=time.time(), stopped=False,
+    )
+
+
+def _on_progress_update(done: int, total: int, current: str | None = None) -> None:
+    """Shared progress callback for sync/reindex jobs. Mirrors the inline
+    one in _do_ingest. Pulled out so multiple workers reuse the same
+    update logic."""
+    _ingest_state["files_done"] = done
+    _ingest_state["files_total"] = total
+    if current is not None:
+        _ingest_state["current_file"] = current
+
+
+def _drop_manifest_rows_outside_enabled_roots(enabled_prefixes: list[str]) -> int:
+    """The `Sync` button must drop manifest rows whose root is no longer
+    enabled (e.g., user removed a folder, or toggled it off). `run_batch`
+    only walks the enabled roots; it doesn't see the disabled ones, so
+    those rows would otherwise stay forever.
+
+    Returns the number of rows dropped. Mirrors `walker.py:632-637`'s
+    in-walk drift logic but for cross-walk root removal."""
+    from src.manifest import Manifest, REPO_ROOT
+    from src.ingest.walker import _delete_if_exists
+
+    manifest = Manifest()
+    dropped = 0
+    for rel in list(manifest.paths()):
+        # Resolve the path the same way the walker does. Manifest paths
+        # are stored as the source's str() — typically absolute, but
+        # historical entries may be REPO_ROOT-relative.
+        absolute = rel if Path(rel).is_absolute() else str(REPO_ROOT / rel)
+        if not any(absolute.startswith(p) for p in enabled_prefixes):
+            entry = manifest.drop(rel)
+            if entry and entry.summary_file:
+                _delete_if_exists(entry.summary_file)
+            dropped += 1
+    if dropped:
+        manifest.save()
+    return dropped
+
+
+def _do_sync() -> None:
+    """Background worker for POST /index/sync.
+
+    1. Pre-compute enabled roots from `indexing_rules.json`.
+    2. Drop manifest rows under any root that's no longer enabled.
+    3. Walk each enabled root via `run_batch` (which already handles
+       new-files / mtime-changes / deleted-files within its scope).
+    4. End-of-run `ingest_from_manifest` for orphan Qdrant cleanup.
+    """
+    try:
+        from src.config.indexing_rules import load_user_rules
+        from src.ingest.walker import run_batch
+        from src.stage2.__main__ import ingest_from_manifest
+
+        rules = load_user_rules()
+        roots: list[Path] = []
+        for ip in rules.include_paths:
+            if not ip.enabled:
+                continue
+            p = Path(ip.path).expanduser()
+            if p.exists():
+                roots.append(p)
+        enabled_prefixes = [str(r.resolve()) for r in roots]
+
+        # Drift cleanup BEFORE walking — drops manifest rows under
+        # disabled/removed roots so end-of-run orphan cleanup picks up
+        # the corresponding Qdrant points.
+        dropped = _drop_manifest_rows_outside_enabled_roots(enabled_prefixes)
+        if dropped:
+            print(f"[server] sync drift cleanup: dropped {dropped} rows", file=sys.stderr)
+
+        # Walk every enabled root. run_batch handles its own progress
+        # callback per-walk; we reset files_done/files_total per root
+        # so progress is observable, even if the global "files_total"
+        # only reflects the current root mid-run.
+        for root in roots:
+            if _stop_event.is_set():
+                break
+            asyncio.run(run_batch(
+                root,
+                push_to_qdrant=True,
+                concurrency=4,
+                progress_callback=_on_progress_update,
+                stop_event=_stop_event,
+            ))
+
+        if _stop_event.is_set():
+            _ingest_state["stopped"] = True
+        # End-of-run orphan cleanup (this is what drops Qdrant points
+        # whose source_path is no longer in the manifest).
+        ingest_from_manifest(force=False, verbose=False)
+        _ingest_state["done"] = True
+    except Exception as exc:  # noqa: BLE001 — fail-safe: surface to UI, don't crash sidecar
+        _ingest_state["error"] = str(exc)
+        print(f"[server] sync error: {exc}", file=sys.stderr)
+    finally:
+        _ingest_state["running"] = False
+
+
+def _do_reindex() -> None:
+    """Background worker for POST /index/reindex.
+
+    Calls `pipeline.reset()` (drops summaries + manifest + both Qdrant
+    collections), then runs `_do_sync()` from a clean slate. The reset
+    step reuses the same proven helper that `just reset-index` calls.
+    """
+    try:
+        from src.pipeline import reset as _reset
+
+        stats = _reset()
+        print(f"[server] reindex reset stats: {stats}", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001
+        _ingest_state["error"] = str(exc)
+        _ingest_state["running"] = False
+        print(f"[server] reindex reset error: {exc}", file=sys.stderr)
+        return
+
+    # Sync from clean slate. _do_sync sets running=False in its finally.
+    _do_sync()
+
+
+@app.post("/index/sync")
+def index_sync() -> IndexJobResponse:
+    """Pick up new files; drop files that no longer match the rules.
+    409 if any indexing job is already running."""
+    if _ingest_state["running"]:
+        raise HTTPException(status_code=409, detail="Indexing already in progress")
+    _init_ingest_state(path_label="<sync: all enabled folders>")
+    threading.Thread(target=_do_sync, daemon=True).start()
+    return IndexJobResponse(status="started", kind="sync")
+
+
+@app.post("/index/reindex")
+def index_reindex() -> IndexJobResponse:
+    """Wipe the entire index, then sync from scratch. Destructive but
+    reversible by syncing again. 409 if any indexing job is already
+    running. Frontend is responsible for the typed-confirmation modal
+    before calling this."""
+    if _ingest_state["running"]:
+        raise HTTPException(status_code=409, detail="Indexing already in progress")
+    _init_ingest_state(path_label="<reindex: all enabled folders>")
+    threading.Thread(target=_do_reindex, daemon=True).start()
+    return IndexJobResponse(status="started", kind="reindex")
+
+
+# ---------------------------------------------------------------------------
 # Settings endpoints — folder management + shortcut read
 # ---------------------------------------------------------------------------
 
@@ -717,6 +889,267 @@ def settings_get_shortcut() -> dict[str, str]:
         except Exception:
             pass
     return {"shortcut": "Alt+Space"}
+
+
+class ShortcutPutRequest(BaseModel):
+    shortcut: str = Field(min_length=1, max_length=64)
+
+
+@app.put("/settings/shortcut")
+def settings_put_shortcut(req: ShortcutPutRequest) -> dict[str, str]:
+    """Atomic write to shortcut.json. Tauri-side picks up the change on
+    next app launch; we don't try to re-register the global shortcut
+    in-flight (that's a Tauri API concern, not the sidecar's)."""
+    import json as _json
+    _SHORTCUT_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tmp = _SHORTCUT_FILE_PATH.with_suffix(_SHORTCUT_FILE_PATH.suffix + ".tmp")
+    tmp.write_text(
+        _json.dumps({"shortcut": req.shortcut}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    tmp.replace(_SHORTCUT_FILE_PATH)
+    return {"status": "saved", "shortcut": req.shortcut}
+
+
+class FolderTogglePatch(BaseModel):
+    path: str
+    enabled: bool
+
+
+@app.patch("/settings/folders")
+def settings_toggle_folder(req: FolderTogglePatch) -> dict[str, str]:
+    """Toggle an existing IncludePath's `enabled` flag. 404 if path not
+    found. The Settings UI's Data tab uses this for the per-row switch."""
+    rules = load_user_rules()
+    target = str(Path(req.path).expanduser().resolve())
+    for entry in rules.include_paths:
+        if str(Path(entry.path).expanduser().resolve()) == target:
+            entry.enabled = req.enabled
+            save_user_rules(rules)
+            return {"status": "updated", "enabled": str(req.enabled).lower()}
+    raise HTTPException(status_code=404, detail=f"folder not found: {req.path}")
+
+
+# ---------------------------------------------------------------------------
+# Settings endpoints — Search & AI / App appearance / providers
+# ---------------------------------------------------------------------------
+# Settings UI's Search & AI tab + Shortcut & App tab. All four routes
+# below read/patch the layered config (settings.json over magpie_defaults.json
+# over hardcoded). Spec: Specs/UI/settings_window.md.
+
+from src.config.settings import (
+    effective_settings as _effective_settings,
+    patch_user_settings as _patch_user_settings,
+)
+
+
+class SearchSettingsResponse(BaseModel):
+    provider: str  # "local" | "cloud"
+    model: str  # resolved per-provider (cloud_model for cloud, model_env for local)
+    top_k: int
+    rewrite: bool
+    temperature: float
+
+
+class SearchSettingsPatch(BaseModel):
+    provider: str | None = Field(default=None, pattern="^(local|cloud)$")
+    top_k: int | None = Field(default=None, ge=1, le=20)
+    rewrite: bool | None = None
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+
+
+def _resolved_model_name(provider: str) -> str:
+    """The model the user-visible search-pill / status-footer should show."""
+    eff = _effective_settings()
+    if provider == "cloud":
+        return eff.cloud_model
+    # Local: prefer the LOCAL_MODEL env (matches active_model_name's resolution
+    # for the local provider). Defaults to "Gemma 4" as a friendly fallback.
+    return os.environ.get("LOCAL_MODEL", "Gemma 4")
+
+
+@app.get("/settings/search")
+def settings_get_search() -> SearchSettingsResponse:
+    eff = _effective_settings()
+    return SearchSettingsResponse(
+        provider=eff.provider,
+        model=_resolved_model_name(eff.provider),
+        top_k=eff.top_k,
+        rewrite=eff.rewrite_default,
+        temperature=eff.temperature,
+    )
+
+
+@app.patch("/settings/search")
+def settings_patch_search(req: SearchSettingsPatch) -> SearchSettingsResponse:
+    """PATCH any subset of search fields. None = leave unchanged.
+    Frontend can chain a PATCH then GET, or just trust the response
+    here as the new effective view."""
+    kwargs: dict[str, Any] = {}
+    if req.provider is not None:
+        kwargs["provider"] = req.provider
+    if req.top_k is not None:
+        kwargs["top_k"] = req.top_k
+    if req.rewrite is not None:
+        kwargs["rewrite_default"] = req.rewrite
+    if req.temperature is not None:
+        kwargs["temperature"] = req.temperature
+    if kwargs:
+        _patch_user_settings(**kwargs)
+    return settings_get_search()
+
+
+class ProvidersInfo(BaseModel):
+    local: dict[str, Any]  # {available, model, downloaded}
+    cloud: dict[str, Any]  # {available, model, configured}
+
+
+@app.get("/settings/search/providers")
+def settings_get_providers() -> ProvidersInfo:
+    """Per-provider availability for the Search & AI tab's two cards.
+    v1 stub — local "downloaded" is best-effort (the llama-server
+    binary's presence; the model itself is downloaded on first use)."""
+    from src.config.secrets import load_secrets
+
+    eff = _effective_settings()
+
+    # Local: report the configured model and whether the llama-server
+    # binary is installed. Heuristic — the binary lives at LLAMA_SERVER_PATH
+    # or in ~/.cache/magpie. Report it cheaply without invoking the
+    # subprocess (cold-load is ~12s).
+    local_model = os.environ.get("LOCAL_MODEL", "Gemma 4")
+
+    # Cloud: configured iff secrets has a non-empty cloud_api_key.
+    try:
+        cloud_configured = bool(load_secrets().cloud_api_key.strip())
+    except Exception:  # noqa: BLE001
+        cloud_configured = False
+
+    return ProvidersInfo(
+        local={
+            "available": True,
+            "model": local_model,
+            "downloaded": True,  # v1 assumption; PR 5 wires the real check
+        },
+        cloud={
+            "available": cloud_configured,
+            "model": eff.cloud_model,
+            "configured": cloud_configured,
+        },
+    )
+
+
+class AppSettingsResponse(BaseModel):
+    theme: str  # "system" | "light" | "dark"
+    accent: str  # "ink" | "amber" | "jade" | "rose"
+    default_action: str  # "empty" | "last"
+    launch_at_login: bool
+    show_in_tray: bool
+
+
+class AppSettingsPatch(BaseModel):
+    theme: str | None = Field(default=None, pattern="^(system|light|dark)$")
+    accent: str | None = Field(default=None, pattern="^(ink|amber|jade|rose)$")
+    default_action: str | None = Field(default=None, pattern="^(empty|last)$")
+    launch_at_login: bool | None = None
+    show_in_tray: bool | None = None
+
+
+@app.get("/settings/app")
+def settings_get_app() -> AppSettingsResponse:
+    eff = _effective_settings()
+    return AppSettingsResponse(
+        theme=eff.theme,
+        accent=eff.accent,
+        default_action=eff.default_action,
+        launch_at_login=eff.launch_at_login,
+        show_in_tray=eff.show_in_tray,
+    )
+
+
+@app.patch("/settings/app")
+def settings_patch_app(req: AppSettingsPatch) -> AppSettingsResponse:
+    kwargs: dict[str, Any] = {}
+    for field in ("theme", "accent", "default_action", "launch_at_login", "show_in_tray"):
+        value = getattr(req, field)
+        if value is not None:
+            kwargs[field] = value
+    if kwargs:
+        _patch_user_settings(**kwargs)
+    return settings_get_app()
+
+
+# ---------------------------------------------------------------------------
+# Settings endpoints — exclusions (paths + globs)
+# ---------------------------------------------------------------------------
+# Backs the Data tab's Exclusions sub-panel. UserRules carries the
+# user-level lists; magpie_defaults.json carries the immutable safety
+# rails (which the UI doesn't surface).
+
+
+class ExclusionsResponse(BaseModel):
+    paths: list[str]
+    globs: list[str]
+
+
+class ExclusionAddRequest(BaseModel):
+    path: str | None = None
+    glob: str | None = None
+
+
+@app.get("/settings/exclusions")
+def settings_get_exclusions() -> ExclusionsResponse:
+    rules = load_user_rules()
+    return ExclusionsResponse(
+        paths=list(rules.exclude_paths),
+        globs=list(rules.global_rules.exclude_globs),
+    )
+
+
+@app.post("/settings/exclusions")
+def settings_add_exclusion(req: ExclusionAddRequest) -> dict[str, str]:
+    if (req.path is None) == (req.glob is None):
+        # Exactly one of {path, glob} must be set.
+        raise HTTPException(
+            status_code=400,
+            detail="exactly one of `path` or `glob` must be provided",
+        )
+    rules = load_user_rules()
+    if req.path is not None:
+        target = str(Path(req.path).expanduser().resolve())
+        if target in rules.exclude_paths:
+            return {"status": "already_exists"}
+        rules.exclude_paths.append(target)
+    else:
+        if req.glob in rules.global_rules.exclude_globs:
+            return {"status": "already_exists"}
+        rules.global_rules.exclude_globs.append(req.glob or "")
+    save_user_rules(rules)
+    return {"status": "added"}
+
+
+@app.delete("/settings/exclusions")
+def settings_remove_exclusion(
+    type: str = Query(..., pattern="^(path|glob)$"),
+    value: str = Query(..., min_length=1),
+) -> dict[str, str]:
+    """Delete a single exclude entry. Query: ?type=path|glob&value=..."""
+    rules = load_user_rules()
+    if type == "path":
+        target = str(Path(value).expanduser().resolve())
+        before = len(rules.exclude_paths)
+        rules.exclude_paths = [p for p in rules.exclude_paths if p != target]
+        if len(rules.exclude_paths) == before:
+            raise HTTPException(status_code=404, detail=f"path not found: {value}")
+    else:
+        before = len(rules.global_rules.exclude_globs)
+        rules.global_rules.exclude_globs = [
+            g for g in rules.global_rules.exclude_globs if g != value
+        ]
+        if len(rules.global_rules.exclude_globs) == before:
+            raise HTTPException(status_code=404, detail=f"glob not found: {value}")
+    save_user_rules(rules)
+    return {"status": "removed"}
 
 
 # ---------------------------------------------------------------------------

@@ -114,14 +114,52 @@ PROVIDERS: dict[str, ProviderConfig] = {
 
 
 def active_provider() -> ProviderConfig:
-    """Return the `ProviderConfig` pointed at by the current `LLM_PROVIDER`."""
-    name = os.environ.get("LLM_PROVIDER", "openrouter").strip().lower()
-    if name not in PROVIDERS:
-        sys.exit(
-            f"error: LLM_PROVIDER={name!r} is unknown. "
-            f"Valid values: {sorted(PROVIDERS)}."
-        )
-    return PROVIDERS[name]
+    """Return the `ProviderConfig` pointed at by the current settings.
+
+    Resolution order (matches `Plans/UI/Implementation Plan.md` PR 3):
+
+      1. `LLM_PROVIDER` env var — explicit override, wins absolutely.
+         Preserves today's dev-mode behavior (`LLM_PROVIDER=openrouter
+         just chat` keeps working).
+      2. `settings.json` (UserSettings) — the user's choice via the
+         Settings UI (Local vs Cloud). When provider="cloud", we
+         dispatch to `cloud_provider` (e.g., "openrouter") from
+         AppDefaults; the user never sees the provider name in the
+         UI.
+      3. Hardcoded fallback "openrouter" — preserves pre-PR-3 behavior
+         when neither env nor settings.json have been touched.
+    """
+    raw_env = os.environ.get("LLM_PROVIDER", "").strip().lower()
+    if raw_env:
+        if raw_env not in PROVIDERS:
+            sys.exit(
+                f"error: LLM_PROVIDER={raw_env!r} is unknown. "
+                f"Valid values: {sorted(PROVIDERS)}."
+            )
+        return PROVIDERS[raw_env]
+
+    # No env override → consult settings.json. Lazy import to avoid a
+    # cold cycle on `from src.llm import ...` and to keep this module
+    # importable in environments where the config layer isn't built yet.
+    try:
+        from src.config.settings import effective_settings
+        s = effective_settings()
+    except Exception:  # noqa: BLE001 — defensive, never block on settings
+        s = None
+
+    if s is not None:
+        if s.provider == "cloud":
+            cfg = PROVIDERS.get(s.cloud_provider)
+            if cfg is None:
+                sys.exit(
+                    f"error: settings.json cloud_provider={s.cloud_provider!r} "
+                    f"is unknown. Valid: {sorted(PROVIDERS)}."
+                )
+            return cfg
+        if s.provider == "local":
+            return PROVIDERS["local"]
+
+    return PROVIDERS["openrouter"]
 
 
 def active_model_name() -> str:
@@ -167,10 +205,21 @@ def build_chat_model(*, provider_override: str | None = None) -> OpenAIChatModel
         if cfg.name == "ollama":
             api_key = "ollama"
         else:
-            sys.exit(
-                f"error: {cfg.api_key_env} not set for provider {cfg.name!r} "
-                f"(put it in .env or change LLM_PROVIDER)"
-            )
+            # Bundled-app fallback: in production there's no `.env`; the
+            # cloud key lives in `<APP_DATA_DIR>/secrets.json`. Lazy import
+            # to keep cold-load cheap. Only consulted when the env var is
+            # genuinely unset — env wins, secrets is the second-chance lookup.
+            try:
+                from src.config.secrets import load_secrets
+                api_key = (load_secrets().cloud_api_key or "").strip()
+            except Exception:  # noqa: BLE001 — secrets layer must not block startup
+                api_key = ""
+            if not api_key:
+                sys.exit(
+                    f"error: {cfg.api_key_env} not set for provider "
+                    f"{cfg.name!r} (put it in .env, set it in Settings → "
+                    f"Search & AI, or change LLM_PROVIDER)"
+                )
     model = os.environ.get(cfg.model_env, cfg.default_model)
     base_url = os.environ.get(cfg.base_url_env, cfg.default_base_url)
     client = AsyncOpenAI(api_key=api_key, base_url=base_url, max_retries=API_MAX_RETRIES)

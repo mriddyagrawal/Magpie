@@ -167,7 +167,12 @@ class QueryHistoryTurn(BaseModel):
 
 class QueryRequest(BaseModel):
     question: str = Field(min_length=1)
-    top_k: int = Field(default=5, ge=1, le=20)
+    # `top_k` may be omitted by the client. When absent, the handler
+    # falls back to `effective_settings().top_k` so the user's Settings
+    # → Search & AI → Advanced → Top K slider is the single source of
+    # truth for retrieval depth. An explicit per-request value still
+    # wins. Same shape as the `rewrite` field below.
+    top_k: int | None = Field(default=None, ge=1, le=20)
     # `rewrite` enables Kimi-style query expansion before retrieval (~20s
     # extra LLM round-trip; produces a keyword-rich SearchQuery). When the
     # client omits the field, the server falls back to the `REWRITE` env
@@ -251,8 +256,16 @@ async def query(req: QueryRequest) -> QueryResponse:
     from src.pipeline import ask
     from src.recents import add_recent
 
-    # Resolve `rewrite`: explicit body value wins; otherwise REWRITE env.
-    rewrite = req.rewrite if req.rewrite is not None else _env_bool("REWRITE", default=False)
+    # Resolve `rewrite` and `top_k`: explicit body values win; otherwise
+    # use the user's Settings → Search & AI choices (persisted in
+    # settings.json, surfaced via `effective_settings()`). The legacy
+    # `REWRITE` env var is no longer consulted — same precedence flip
+    # we did for `LLM_PROVIDER` on 2026-05-08, since env was silently
+    # shadowing the UI toggle. To force a per-query override, pass
+    # `rewrite` in the request body.
+    eff = _effective_settings()
+    rewrite = req.rewrite if req.rewrite is not None else eff.rewrite_default
+    top_k = req.top_k if req.top_k is not None else eff.top_k
 
     # Convert the history Pydantic models to the (q, a) tuples answer.py
     # expects. Empty list when no history was sent.
@@ -263,7 +276,7 @@ async def query(req: QueryRequest) -> QueryResponse:
     try:
         result = await ask(
             req.question,
-            top_k=req.top_k,
+            top_k=top_k,
             rewrite=rewrite,
             fast=req.fast,
             history=history_pairs,
@@ -315,6 +328,230 @@ async def query(req: QueryRequest) -> QueryResponse:
         sources_scanned_count=len(Manifest().entries),
         recent_id=recent_id,
     )
+
+
+# ---------------------------------------------------------------------------
+# /query/stream — same RAG pipeline, surfaces retrieval before the answer
+# ---------------------------------------------------------------------------
+#
+# Mirrors `/query` 1:1 in inputs, but emits results as an SSE stream so
+# the ask bar can paint the sources card the moment retrieval finishes
+# (~500ms-3s), before the answer LLM call returns. The answer itself is
+# delivered as a sequence of `answer_chunk` events that the frontend
+# appends to the AnswerCard as they arrive — token-by-token UX once
+# Phase 2 lands (see below).
+#
+# Wire format (SSE, `text/event-stream`):
+#
+#   event: sources
+#   data: {"retrieved": [...], "search_query": {...},
+#          "rewritten_query": "..." | null, "sources_scanned_count": N}
+#   ── fires once after retrieval, before the answer LLM call.
+#
+#   event: not_found_topic
+#   data: {"topic": "..."}
+#   ── fires only when the answer pipeline declares not-found. Terminal
+#      branch: no `answer_chunk` / `sources_used` will follow.
+#
+#   event: answer_chunk
+#   data: {"text": "..."}
+#   ── fires N times during the answer phase, each with a slice of the
+#      answer text. Caller appends `text` to its in-progress answer
+#      buffer. Newlines / Unicode preserved verbatim (JSON-encoded).
+#
+#   event: sources_used
+#   data: {"paths": [...]}
+#   ── fires once after the final `answer_chunk`, with the subset of
+#      retrieved paths the model actually cited. Frontend reconciles
+#      the `cited` flag on its sources state at this point.
+#
+#   event: done
+#   data: {"recent_id": "..." | null}
+#   ── terminal sentinel. Always fires last (success, not-found, or
+#      error). Frontend stops the SSE reader on this event.
+#
+#   event: error
+#   data: {"detail": "user-safe message", "phase": "retrieval"|"answer"}
+#   ── fires when retrieval or the answer step throws. Followed by
+#      `done`. No `answer_chunk` / `sources_used` will follow.
+#
+# **Phase status (2026-05).** Phase 1 (this implementation) emits the
+# answer as **a single `answer_chunk`** containing the full answer text,
+# emitted after the agent's structured-output call returns. The wire
+# shape is correct for token-by-token streaming; Phase 2 (Plan #35)
+# replaces the single-chunk emission with real per-token chunks by:
+# (a) extracting `_build_answer_messages` from `answer_question`, and
+# (b) calling `local_llm.stream(messages, response_format=…json_schema…)`
+# instead of `agent.run`, then routing the streamed JSON bytes through
+# a substring-match parser that watches for the `"answer": "` field
+# start and emits everything between the opening and closing quotes
+# as `answer_chunk` events.
+
+@app.post("/query/stream")
+async def query_stream(req: QueryRequest):
+    """Streaming variant of `/query`. See block comment above for wire format."""
+    # Inline imports mirror /query — keeps cold-start cheap when the
+    # endpoint isn't called.
+    from src.answer import Answer, answer_question, build_answer_agent
+    from src.manifest import Manifest
+    from src.recents import add_recent
+    from src.stage2.search import raw_query, rewrite_query, run_search
+
+    eff = _effective_settings()
+    rewrite = req.rewrite if req.rewrite is not None else eff.rewrite_default
+    top_k = req.top_k if req.top_k is not None else eff.top_k
+    history_pairs: list[tuple[str, str]] = [
+        (turn.question, turn.answer) for turn in req.history
+    ]
+
+    async def sse_iter():
+        # Helper: format an SSE frame. JSON-encode the payload so newlines
+        # inside fields (e.g. multi-line answers) get escaped — raw
+        # newlines would break the `data: ...\n\n` frame boundary.
+        def _frame(event: str, payload: dict[str, Any] | None = None) -> str:
+            data = json.dumps(payload or {}, ensure_ascii=False)
+            return f"event: {event}\ndata: {data}\n\n"
+
+        # Mirror pipeline.ask's enumerate_lists read with the same
+        # defensive fallback.
+        try:
+            enumerate_lists = _effective_settings().enumerate_lists
+        except Exception:  # noqa: BLE001 — defensive, never block on settings
+            enumerate_lists = True
+
+        # ── Phase 1: retrieval ────────────────────────────────────────
+        try:
+            if rewrite:
+                sq = await asyncio.to_thread(rewrite_query, req.question)
+            else:
+                sq = raw_query(req.question)
+
+            retrieved = await asyncio.to_thread(
+                run_search, sq, top_k,
+                question=req.question, skip_fast=not req.fast, rerank=True,
+                enumerate_lists=enumerate_lists,
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            _, detail = _user_facing_error(e)
+            yield _frame("error", {"detail": detail, "phase": "retrieval"})
+            yield _frame("done")
+            return
+
+        sources_scanned_count = len(Manifest().entries)
+
+        # Empty-retrieval is a not-found shape — no sources, no answer
+        # call. Emit one sources frame with an empty list, then the
+        # synthetic not_found_topic, then done.
+        if not retrieved:
+            not_found_topic = req.question.strip().rstrip("?").strip()
+            yield _frame("sources", {
+                "retrieved": [],
+                "search_query": {"query": sq.query, "keywords": sq.keywords},
+                "rewritten_query": sq.query if rewrite else None,
+                "sources_scanned_count": sources_scanned_count,
+            })
+            try:
+                recent_entry = add_recent(
+                    question=req.question,
+                    result=Answer(
+                        answer="", sources_used=[],
+                        not_found=True, not_found_topic=not_found_topic,
+                    ),
+                    rewritten_query=(sq.query if rewrite else None),
+                )
+                recent_id: str | None = recent_entry.id
+            except Exception as e:  # pylint: disable=broad-except
+                print(f"[server] recents persist failed (non-fatal): {e}", file=sys.stderr)
+                recent_id = None
+            yield _frame("not_found_topic", {"topic": not_found_topic})
+            yield _frame("done", {"recent_id": recent_id})
+            return
+
+        # Sources frame — the whole point of streaming. Frontend renders
+        # the sources card immediately and parks the answer card on a
+        # spinner until the answer_chunk events start arriving.
+        sources_payload_list = [
+            {
+                "path": r.path,
+                "summary": r.summary,
+                "score": r.score,
+                # `cited` is False here because the answer model hasn't
+                # run yet. The `sources_used` frame (after the answer
+                # finishes) supersedes this — the frontend reconciles
+                # the cited set on event=sources_used.
+                "cited": False,
+            }
+            for r in retrieved
+        ]
+        yield _frame("sources", {
+            "retrieved": sources_payload_list,
+            "search_query": {"query": sq.query, "keywords": sq.keywords},
+            "rewritten_query": sq.query if rewrite else None,
+            "sources_scanned_count": sources_scanned_count,
+        })
+
+        # ── Phase 2: answer ───────────────────────────────────────────
+        paths = list(dict.fromkeys(r.path for r in retrieved if r.path))
+        csv_row_hits: dict[str, list[int]] = {}
+        for r in retrieved:
+            if r.path and r.chunk_index is not None:
+                csv_row_hits.setdefault(r.path, []).append(int(r.chunk_index))
+
+        try:
+            agent = build_answer_agent()
+            ans: Answer = await answer_question(
+                agent, req.question, paths,
+                history=history_pairs,
+                search_query=sq,
+                csv_row_hits=csv_row_hits or None,
+                enumerate_lists=enumerate_lists,
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            _, detail = _user_facing_error(e)
+            yield _frame("error", {"detail": detail, "phase": "answer"})
+            yield _frame("done", {"recent_id": None})
+            return
+
+        # Persist recent — non-fatal on failure, same as /query.
+        try:
+            recent_entry = add_recent(
+                question=req.question,
+                result=Answer(
+                    answer=ans.answer,
+                    sources_used=ans.sources_used,
+                    not_found=ans.not_found,
+                    not_found_topic=ans.not_found_topic,
+                ),
+                rewritten_query=(sq.query if rewrite else None),
+            )
+            recent_id = recent_entry.id
+        except Exception as e:  # pylint: disable=broad-except
+            print(f"[server] recents persist failed (non-fatal): {e}", file=sys.stderr)
+            recent_id = None
+
+        # Not-found branch — single not_found_topic event, no answer
+        # chunks, no sources_used. Frontend transitions to the not-found
+        # card on this event without waiting for further frames.
+        if ans.not_found:
+            yield _frame("not_found_topic", {"topic": ans.not_found_topic})
+            yield _frame("done", {"recent_id": recent_id})
+            return
+
+        # Found branch.
+        # Phase 1: emit the entire answer as a single chunk. Phase 2 will
+        # replace this `for chunk in [ans.answer]:` with a true per-token
+        # iterator backed by `local_llm.stream()` + a substring-match
+        # JSON parser that watches the streamed bytes for the `"answer":
+        # "..."` field and pipes through everything between the quotes.
+        # The wire format is already correct — Phase 2 is a backend
+        # implementation swap; api.ts and MagpieWindow integration land
+        # on day one.
+        if ans.answer:
+            yield _frame("answer_chunk", {"text": ans.answer})
+        yield _frame("sources_used", {"paths": ans.sources_used})
+        yield _frame("done", {"recent_id": recent_id})
+
+    return StreamingResponse(sse_iter(), media_type="text/event-stream")
 
 
 # ---------------------------------------------------------------------------

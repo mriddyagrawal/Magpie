@@ -185,20 +185,29 @@ jobs:
           prerelease: false
           includeUpdaterJson: true # generates latest.json for the updater
 
-      # ── Smoke-test the bundled sidecar (validates exclude correctness) ───
-      # Plan #10 P10-2 Tier 2 excludes (torch.fx, torch._dynamo, sympy,
-      # mpmath) and any future Tier 3 exclusions can break the runtime
-      # import graph WITHOUT failing the build — PyInstaller succeeds at
-      # bundle time, but the user hits ImportError at first launch.
+      # ── Smoke-test the bundled sidecar (validates T1+T2 exclude correctness) ──
+      # Scope: catches Tier 1 (torch.distributed, torch.onnx, ...) and Tier 2
+      # (torch.fx, torch._dynamo, sympy, mpmath) breaks. These excludes break
+      # at MODULE-IMPORT TIME — if PyInstaller cuts something the binary needs
+      # at startup, the process dies in the first second and /health never
+      # responds. Launch + poll catches that on every push, every platform.
       #
-      # This step launches the actual bundled binary, waits for /health
-      # to respond, and fails CI if either:
-      #   - the process dies before responding (ImportError on import)
-      #   - /health doesn't respond within 60s
+      # Out of scope: Tier 3 (transformers.models.<arch>). Those don't break
+      # bundle import — they ImportError only when AutoModel.from_pretrained
+      # dynamically loads a missing arch at query time. Catching that in CI
+      # would require downloading 5 GB of HF models per matrix job, which is
+      # wasteful and fragile. Decision: Tier 3 is validated manually on each
+      # target platform (macOS arm64/x86_64, Linux, Windows) before tagging
+      # releases, never in CI. See scripts/build_sidecar.py comments around
+      # the Tier 3 block for the per-platform manual validation flow.
       #
-      # Runs on EVERY trigger (PR, push, tag, dispatch) — caught early.
-      # Each platform validates its own bundle independently. Cross-OS
-      # exclude regressions surface as N failed matrix jobs.
+      # Failure modes caught:
+      #   - the process dies before responding (T1/T2 ImportError on import)
+      #   - /health doesn't respond within 60s (server hung)
+      #
+      # Runs on EVERY trigger (PR, push, tag, dispatch). Each platform
+      # validates its own bundle independently — cross-OS exclude regressions
+      # surface as N failed matrix jobs.
       - name: Smoke-test bundled sidecar
         shell: bash
         run: |

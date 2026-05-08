@@ -1747,9 +1747,9 @@ Settings screen):
 |---|---|---|---|
 | Cloud provider card | ✅ | ✅ via `active_provider()` → secrets.json | **DONE** |
 | ~~Default action on activation~~ | — | — | **REMOVED** — superseded by ask-bar persistence |
-| Shortcut Change (recorder) | ✅ on save | ⚠ next launch only | NO RUNTIME UPDATE |
+| Shortcut Change (recorder) | ✅ on save | ✅ runtime via JS plugin | **DONE** |
 | Launch at login (toggle) | ✅ | ✅ via `tauri-plugin-autostart` | **DONE** |
-| Show in menu bar (toggle) | ✅ | ❌ tray always on | NOT WIRED |
+| Show in menu bar (toggle) | ✅ | ⚠ startup-honored only (restart to apply) | **PARTIAL** |
 | Check for updates (button) | n/a | ❌ no-op stub | NOT WIRED |
 
 **Why each is broken (root causes):**
@@ -1791,15 +1791,23 @@ Settings screen):
    `default_action` keys in existing user settings.json files
    are silently dropped on next save.
 
-3. **Shortcut Change** — `putShortcut()` writes shortcut.json
-   but Tauri's `setup_global_shortcut()` reads it once at app
-   boot. The backend explicitly notes this gap
-   ([src/server.py:1129-1131](src/server.py#L1129)). Fix:
-   add a Tauri command `update_global_shortcut(combo)` that
-   unregisters the old binding and registers the new one,
-   then have the recorder call it after the PATCH succeeds.
-   The persisted file is correct on next launch; the live
-   process just doesn't reload it.
+3. **Shortcut Change** — DONE (2026-05-08).
+   Pattern adapted from Kunkun's
+   [`apps/desktop/src/lib/utils/hotkey.ts`](https://github.com/kunkun-app/kunkun)
+   — pure-frontend implementation using
+   `@tauri-apps/plugin-global-shortcut`. After the recorder
+   captures a combo: `swapShortcut(new, old)` calls
+   `unregister(old)` then `register(new, callback)` from JS.
+   The callback invokes a new
+   [`toggle_main_window`](frontend/src-tauri/src/lib.rs)
+   Tauri command that runs the same anchor + show + focus the
+   Rust-registered boot shortcut does. No new Rust unregister
+   logic needed — the plugin's JS API talks to the same
+   underlying registry.
+   Failure mode handled: live re-register is attempted FIRST;
+   only if it succeeds do we persist to shortcut.json. If the
+   OS rejects the new combo, the old binding stays intact on
+   disk and on next boot.
 
 4. **Launch at login** — DONE (2026-05-08).
    `tauri-plugin-autostart = "2"` added to
@@ -1812,14 +1820,23 @@ Settings screen):
    `launch_at_login` is mirrored for display continuity.
    Capabilities updated (`autostart:allow-enable / -disable / -is-enabled`).
 
-5. **Show in menu bar** — tray icon is built unconditionally
-   in `setup()` ([frontend/src-tauri/src/lib.rs:273-306](frontend/src-tauri/src/lib.rs#L273)).
-   Fix: read `show_in_tray` at startup; if false, skip
-   `TrayIconBuilder`. For runtime toggle, store the
-   `TrayIcon` handle and call `.set_visible(false)` /
-   re-create on flip. (No native macOS API for "hide from
-   menu bar without quitting" — destroying the icon is the
-   pragmatic answer.)
+5. **Show in menu bar** — PARTIAL DONE (2026-05-08).
+   Startup honoring shipped: `should_show_tray()` reads
+   `show_in_tray` from settings.json; if false, the
+   `TrayIconBuilder` block is skipped entirely. UI hint
+   updated to "Restart Magpie to apply". User-visible
+   behavior matches the spec for v1; runtime toggle is the
+   open work. Quit is still reachable via right-click on the
+   ask-bar window or `Cmd+Q`, so disabling the tray doesn't
+   strand the user.
+
+   **Still open — runtime reconfigure.** Storing the
+   `TrayIcon` handle in `tauri::State` and exposing a
+   `set_tray_visible(enabled)` Tauri command would close
+   this. Tauri 2's `TrayIcon::set_visible(bool)` exists for
+   the visible/hidden flip; for full destroy/recreate (Linux
+   compatibility), we'd `Drop` the existing handle and call
+   `TrayIconBuilder::new().build(app)` again. ~40 LOC.
 
 6. **Check for updates** — Tauri has `tauri-plugin-updater`.
    The UI currently has an explicit `/* no-op stub for v1 */`
@@ -1828,6 +1845,18 @@ Settings screen):
    `latest.json`). This is a packaging concern, not a UI
    one — defer until Plan #19 (post-packaging configuration)
    ships.
+
+**Cheap polish borrowed from Kunkun (landed 2026-05-08):**
+
+- **macOS `RunEvent::Reopen` handler** — Spotlight / `open -a Magpie`
+  / dock-click triggers reopen; we now anchor + show + focus on
+  reopen when no window is visible. `ActivationPolicy::Accessory`
+  hides the dock icon, but Spotlight can still surface us. Mirrors
+  Kunkun's lib.rs:369-381.
+- **Single-instance `--toggle` arg** — second-instance handler
+  detects `--toggle` (or just `toggle`) in `argv` and toggles
+  visibility silently. Useful for autostart-launching hidden +
+  scripted toggle. Mirrors Kunkun's lib.rs:75-91.
 
 **Why this happened.** PR 5 sprinted to make the Settings
 *shape* match the spec. Persistence was the easy half; consumer

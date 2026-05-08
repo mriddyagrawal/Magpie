@@ -47,15 +47,22 @@ def test_save_then_load_roundtrip(tmp_path: Path) -> None:
 
 
 def test_load_creates_default_file_when_missing(tmp_path: Path) -> None:
+    """First-launch creates settings.json populated with the bundled
+    AppDefaults (provider='local', top_k=5, theme='system', etc.) so
+    the user can inspect the file and immediately see what they're
+    starting with — instead of a wall of nulls. Subsequent edits via
+    PATCH endpoints replace these values; explicitly setting a field
+    to None at the API level falls through to AppDefaults at merge
+    time."""
     p = tmp_path / "missing.json"
     assert not p.exists()
     s = load_user_settings(p)
     assert p.exists()
-    # Empty UserSettings — every field None bar `version`.
+    # Seeded with the live bundled AppDefaults.
     assert s.version == 1
-    assert s.provider is None
-    assert s.top_k is None
-    assert s.theme is None
+    assert s.provider == "local"
+    assert s.top_k == 5
+    assert s.theme == "system"
 
 
 def test_malformed_json_raises_clearly(tmp_path: Path) -> None:

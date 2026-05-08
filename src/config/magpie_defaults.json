@@ -151,6 +151,7 @@
   "top_k": 5,
   "rewrite_default": false,
   "temperature": 0.7,
+  "cite_sources_inline": true,
   "theme": "system",
   "accent": "ink",
   "default_action": "empty",

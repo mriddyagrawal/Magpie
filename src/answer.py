@@ -152,21 +152,7 @@ SYSTEM_PROMPT = (
     "sources_used). Otherwise keep the prose clean. "
     "\n\n"
     "\n\n"
-    "INLINE CITATION MARKERS. As you write the answer, cite the supporting "
-    "file with a numbered marker in square brackets: `[1]` for the first "
-    "file you cite, `[2]` for the second, and so on. The number is the "
-    "1-based index into your `sources_used` list (the first entry of "
-    "`sources_used` is `[1]`, the second is `[2]`, etc.). Place each "
-    "marker immediately after the claim it supports, with no space "
-    "before the bracket. Re-use the same number whenever you cite the "
-    "same file again. Examples:\n"
-    "  - 'The chair of the Mathematics department is Dr. Elena Marquez[1].'\n"
-    "  - 'CSC-105 has 4 credit hours[1] and is offered every fall[2].'\n"
-    "Do NOT use markers like `[Source 1]`, `[file: foo.pdf]`, or `(1)` — "
-    "the bracketed number alone is the only accepted form. Do NOT invent "
-    "citation numbers that exceed the length of `sources_used`. If you "
-    "have nothing to cite for a claim, omit the marker entirely.\n"
-    "\n\n"
+    "{citation_block}"
     "WHEN YOU CANNOT ANSWER FROM THE PROVIDED FILES. If, after reading the "
     "files carefully (including the synonym/unit mapping above), none of "
     "them contain the information needed to answer the question, do NOT "
@@ -221,8 +207,52 @@ _ANSWER_FALLBACK = Answer(
 )
 
 
-def build_answer_agent() -> ChatAgent[Answer]:
-    return build_agent(SYSTEM_PROMPT, Answer, _ANSWER_FALLBACK)
+# The inline-citation-marker instructions are factored out so the
+# Settings → Search & AI → Advanced → "Cite sources inline" toggle can
+# remove them at agent-build time when the user prefers plain prose.
+# Cost: ~80 prompt tokens that the small model doesn't have to process
+# when off. The frontend's renderAnswer() handles markerless prose
+# gracefully (no orphan-pill warnings), so toggling at runtime is safe.
+_INLINE_CITATION_BLOCK = (
+    "INLINE CITATION MARKERS. As you write the answer, cite the supporting "
+    "file with a numbered marker in square brackets: `[1]` for the first "
+    "file you cite, `[2]` for the second, and so on. The number is the "
+    "1-based index into your `sources_used` list (the first entry of "
+    "`sources_used` is `[1]`, the second is `[2]`, etc.). Place each "
+    "marker immediately after the claim it supports, with no space "
+    "before the bracket. Re-use the same number whenever you cite the "
+    "same file again. Examples:\n"
+    "  - 'The chair of the Mathematics department is Dr. Elena Marquez[1].'\n"
+    "  - 'CSC-105 has 4 credit hours[1] and is offered every fall[2].'\n"
+    "Do NOT use markers like `[Source 1]`, `[file: foo.pdf]`, or `(1)` — "
+    "the bracketed number alone is the only accepted form. Do NOT invent "
+    "citation numbers that exceed the length of `sources_used`. If you "
+    "have nothing to cite for a claim, omit the marker entirely.\n"
+    "\n\n"
+)
+
+
+def _resolve_system_prompt(cite_inline: bool) -> str:
+    """Final system prompt with the citation block included or stripped
+    based on the user's `cite_sources_inline` setting."""
+    return SYSTEM_PROMPT.replace(
+        "{citation_block}",
+        _INLINE_CITATION_BLOCK if cite_inline else "",
+    )
+
+
+def build_answer_agent(*, cite_inline: bool | None = None) -> ChatAgent[Answer]:
+    """Build the answer agent. `cite_inline` overrides the setting; if
+    None, reads the user's preference from settings.json. Lazy import
+    of the settings layer keeps this module importable in environments
+    where the config layer isn't built yet (e.g., test fixtures)."""
+    if cite_inline is None:
+        try:
+            from src.config.settings import effective_settings
+            cite_inline = effective_settings().cite_sources_inline
+        except Exception:  # noqa: BLE001
+            cite_inline = True  # safe default — match the original behavior
+    return build_agent(_resolve_system_prompt(cite_inline), Answer, _ANSWER_FALLBACK)
 
 
 def _strip_fragment(p: str) -> str:

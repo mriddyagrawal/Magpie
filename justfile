@@ -271,7 +271,7 @@ build: download-qdrant build-sidecar build-app
 
 # Dev mode: hot-reload frontend + Tauri shell. Python server spawns via uv.
 # Qdrant is NOT spawned automatically — run `just qdrant-up` in another terminal.
-dev:
+dev: _stub-sidecar-binaries
     cd frontend && pnpm tauri dev
 
 # ----------------------------------------------------------------------------
@@ -294,8 +294,42 @@ serve-dev:
 # Want hot-reload of Python code? That needs `just serve-dev` in a
 # separate terminal AND a small lib.rs change to make Tauri skip its
 # auto-spawn. See the note in the recipe — ask if you want it.
-run-magpie:
+run-magpie: _stub-sidecar-binaries
     cd frontend && pnpm tauri dev
+
+# Internal helper: create empty stub files at the externalBin paths
+# `tauri.conf.json` declares (binaries/magpie-sidecar +
+# binaries/qdrant). Tauri's build script validates these exist even in
+# dev mode, but lib.rs's spawn_sidecar uses `uv run python -m src.server`
+# directly under cfg!(debug_assertions) — so the stubs are never
+# actually executed. They're only present to satisfy build validation.
+# Folder is .gitignore'd; nothing committed.
+# Production builds replace the stubs with real PyInstaller / Qdrant
+# binaries via `just build-sidecar` and `just download-qdrant`.
+_stub-sidecar-binaries:
+    #!/usr/bin/env bash
+    set -e
+    BIN_DIR="frontend/src-tauri/binaries"
+    mkdir -p "$BIN_DIR"
+    # Detect the current target triple. Tauri's externalBin name is
+    # `binaries/<name>-<triple>` so the stub filename has to match.
+    case "$(uname -s)-$(uname -m)" in
+        Darwin-arm64)  TRIPLE="aarch64-apple-darwin" ;;
+        Darwin-x86_64) TRIPLE="x86_64-apple-darwin" ;;
+        Linux-x86_64)  TRIPLE="x86_64-unknown-linux-gnu" ;;
+        Linux-aarch64) TRIPLE="aarch64-unknown-linux-gnu" ;;
+        *)             echo "warn: unrecognized platform; stubbing macOS arm64 anyway" >&2
+                       TRIPLE="aarch64-apple-darwin" ;;
+    esac
+    for name in magpie-sidecar qdrant; do
+        STUB="$BIN_DIR/${name}-${TRIPLE}"
+        # Only create if missing — don't clobber a real PyInstaller
+        # build when one is present.
+        if [ ! -f "$STUB" ]; then
+            touch "$STUB"
+            echo "[stub] created $STUB"
+        fi
+    done
 
 # Start Magpie Cloud (the LLM-orchestration backend that holds prompts
 # and proxies LLM calls). Different process from `just serve` — that

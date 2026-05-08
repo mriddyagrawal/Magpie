@@ -220,36 +220,76 @@ exists today.
 These were open questions; recording the resolutions so reviewers
 can see why we picked each option.
 
-### "Cloud" in v1 — implicit, env-backed (option (b) per the original menu)
+### "Cloud" in v1 — implicit, secrets.json-backed (with .env bootstrap)
 
 User direction: "Cloud in V1 should be implicit. The user is not
-allowed to edit the API keys and stuff. Maybe in the [secrets/env]
-file, write something as default provider and then default API
-key."
+allowed to edit the API keys and stuff. … Cloud in V1 should also
+be stored in whatever settings file or secrets file [in] the app
+directory or somewhere else."
 
-Implementation:
-- Two new vars in `.env.example` (and the runtime `.env` for dev):
-  ```
-  # The provider invoked when the user picks "Cloud" in Settings.
-  # User cannot override these from the UI in v1. Bundled-app users
-  # get whatever values ship in magpie_defaults.json (PR 3 bakes a
-  # subsidized key in if/when we have one); dev users keep their
-  # .env values.
-  CLOUD_PROVIDER=openrouter
-  CLOUD_API_KEY=<shipped key or user's dev key>
-  CLOUD_MODEL=google/gemma-4-26b-a4b-it:free
-  ```
-- The Search & AI tab's "Cloud" card is a *user-facing alias* for
-  whatever CLOUD_PROVIDER points at. The user never sees
-  "OpenRouter" or "Moonshot" in the UI — just "Cloud."
-- Provider selection in `src/llm.py`: when `settings.json`'s
-  provider is `"cloud"`, resolve `CLOUD_PROVIDER` / `CLOUD_API_KEY`
-  / `CLOUD_MODEL` from env (or defaults), instantiate the matching
-  client. When provider is `"local"`, llama-server pool path
-  (today's behavior).
-- API Keys tab stays parked. Bring-your-own is a future addition
-  when (1) we add a second cloud provider, or (2) the bundled
-  subsidy is unsustainable.
+#### Where the cloud config lives
+
+Three layers, chosen for: secrecy of the key, immutability of
+non-secret defaults, dev-mode ergonomics.
+
+```
+APP_DATA_DIR/
+├── secrets.json          (mode 0600)   — cloud_api_key
+├── settings.json         (mode 0644)   — user preferences
+└── magpie_defaults.json  (mode 0644)   — non-secret defaults
+                                          (cloud_provider, cloud_model)
+```
+
+- **`secrets.json`** holds the only sensitive value: the cloud API
+  key. Created on first launch (see bootstrap below). Mode 0600 so
+  casual filesystem access can't read it. Not user-editable from
+  the UI in v1.
+- **`magpie_defaults.json`** holds the non-secret cloud routing
+  config: `cloud_provider` ("openrouter" | "moonshot" | …) and
+  `cloud_model` ("google/gemma-4-26b-a4b-it:free"). Ships with the
+  bundle; user can edit if they're determined, but the UI doesn't.
+- **`settings.json`** holds the user's *choice* of provider
+  ("local" vs "cloud") plus other UI prefs.
+
+#### Bootstrap on first launch
+
+- **Dev (running from a checkout):** if `secrets.json` doesn't
+  exist, read `OPENROUTER_API_KEY` (or whatever provider matches
+  `cloud_provider`) from `.env`, write it into `secrets.json`. Same
+  cycle for the other defaults — `.env` is the seed, `secrets.json`
+  is the runtime store. After first launch, `.env` changes don't
+  retroactively update `secrets.json` (intentional — user can
+  delete `secrets.json` to re-bootstrap).
+- **Bundled app:** `secrets.json` is created from a key baked into
+  the bundle at build time (or a key fetched from a Magpie
+  bootstrap endpoint on first launch — punt that decision until we
+  actually ship a build pipeline). v1 just bakes; rotation is a
+  future concern.
+
+#### Provider resolution at query time
+
+```
+1. settings.json:provider = "local"  →  llama-server path (today's behavior)
+2. settings.json:provider = "cloud"  →
+     a. read magpie_defaults.json:cloud_provider, cloud_model
+     b. read secrets.json:cloud_api_key
+     c. instantiate the matching cloud client (OpenRouter, etc.)
+3. LLM_PROVIDER env var, when set, OVERRIDES settings.json
+   (dev mode + power users)
+```
+
+The Search & AI tab's "Cloud" card is a user-facing alias for
+whatever `cloud_provider` points at. The user never sees
+"OpenRouter" or "Moonshot" — just "Cloud."
+
+API Keys tab stays parked. Bring-your-own is a future addition
+when (1) we add a second cloud provider, or (2) the bundled
+subsidy is unsustainable.
+
+The existing `OPENROUTER_API_KEY` in `.env` is preserved as-is —
+PR 3's bootstrap reads it on first launch but doesn't rename it.
+Keep both `OPENROUTER_API_KEY` (dev) and `secrets.json:cloud_api_key`
+(runtime). One bootstraps the other.
 
 ### Citation overflow — plain-text fallback
 
@@ -274,28 +314,29 @@ background, replacing the cached payload when it lands. The recents
 entry's `id` is preserved (we update it in place — same `asked_at`,
 same `id`, fresh `result`).
 
+### Settings entry points — ship all four
+
+User direction: gear becomes a Spotlight-style circular blob (not
+the inside-the-bar gear from Rahul's build); also add Cmd+,.
+
+v1 ships four general entry points plus a contextual deep-link:
+
+| # | Surface | Discoverability | Notes |
+|---|---|---|---|
+| 1 | **Settings blob** — circular gear button to the right of the search pill, matching macOS Spotlight's secondary-blobs pattern | High; always on screen when the ask bar is open | See `ask_bar.md` "Settings blob" — replaces the inside-the-bar gear from Rahul's build. PR 4 ships. |
+| 2 | **`Cmd ,` / `Ctrl ,`** keyboard shortcut from the ask bar | Medium; standard OS-prefs convention | Tauri-side shortcut, scoped to the ask bar window. Doesn't conflict with the input field because we register it as a window-shortcut (not a global), so it only fires when the ask bar has focus. |
+| 3 | **System tray menu → "Settings…"** | High; right-click on the menu-bar icon | Adds a menu item to `lib.rs`'s tray menu (currently "Quit" only). Same handler as the blob. |
+| 4 | **macOS menu bar → Magpie → Settings…** (`Cmd ,` accelerator) | High on macOS; n/a elsewhere | Free win on Mac via Tauri's menu API. The accelerator overlaps with #2; both fire the same handler. |
+| 5 | **Deep-link from Not Found state's "Add folder" CTA** | High when needed; contextual | Already required for PR 4 — opens Settings + lands on Data + triggers folder picker. |
+
+PR 4 ships the blob (#1) and registers the in-window `Cmd ,`
+shortcut (#2). The Tauri-side tray menu update (#3) and macOS
+menu bar (#4) ride in PR 4 as well, since they all touch
+`lib.rs`. Deep-link (#5) is part of PR 4's NotFoundCard.
+
 ## Active design decisions still open
 
-### Settings entry points — pick the surfaces
-
-How does the user open the settings window? Five candidate surfaces;
-v1 should ship at least two. Asking the user to pick.
-
-| # | Surface | Discoverability | Cost to implement |
-|---|---|---|---|
-| 1 | **Gear icon in the ask bar** (top-right of the search bar — already exists in Rahul's build) | High; always on screen when the ask bar is open | None — already works |
-| 2 | **`Cmd ,` / `Ctrl ,`** keyboard shortcut from the ask bar | Medium; standard OS-prefs convention | Low — one Tauri global shortcut |
-| 3 | **System tray menu → "Settings…"** | High; right-click on the menu-bar icon | Low — extend `lib.rs`'s tray menu (currently just "Quit") |
-| 4 | **macOS menu bar → Magpie → Settings…** (`Cmd ,` is its standard accelerator) | High on macOS; nonexistent elsewhere | Low — Tauri menu API |
-| 5 | **Deep-link from Not Found state's "Add folder" CTA** | High when needed; not a general entry point | Already required for PR 4 |
-
-Recommendation: ship **1 + 3 + 4**. Gear icon stays (cheap and
-visible), tray menu adds the standard "open prefs" entry, macOS
-menu bar gets the native `Cmd ,` for free. Skip 2 — it'd conflict
-with the in-app input field's focus when the ask bar is showing.
-
-(5 isn't a "settings entry point" in the menu sense; it's a
-deep-linked sub-view that happens to land on Settings.)
+(None right now — all PR-3-blocking questions are resolved.)
 
 ## Indexing triggers — Sync vs Reindex (v1 design)
 

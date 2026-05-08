@@ -1,4 +1,9 @@
-import type { QueryResponse, StatusResponse, CsvPreview } from "./types";
+import type {
+  CsvPreview,
+  QueryResponse,
+  RecentEntry,
+  StatusResponse,
+} from "./types";
 import { invoke } from "@tauri-apps/api/core";
 
 // Tauri's shell injects `window.__MAGPIE_PORT__` at startup, reading it from
@@ -153,6 +158,27 @@ export async function getShortcut(): Promise<string> {
   if (!res.ok) return "Alt+Space";
   const data = await res.json();
   return data.shortcut ?? "Alt+Space";
+}
+
+// ---------------------------------------------------------------------------
+// /recents — the user's last N questions, with cached results
+// ---------------------------------------------------------------------------
+// Backs the ask bar's RECENT panel (Specs/UI/ask_bar.md State 2). Replaying
+// a recent calls `getRecent(id)` and re-renders the answer card from the
+// cached payload without firing a fresh /query call.
+
+export async function getRecents(): Promise<RecentEntry[]> {
+  const res = await fetch(`${baseUrl()}/recents`);
+  if (!res.ok) throw new Error(`recents failed: ${res.status}`);
+  const data = await res.json();
+  return (data.recents ?? []) as RecentEntry[];
+}
+
+export async function getRecent(id: string): Promise<RecentEntry | null> {
+  const res = await fetch(`${baseUrl()}/recents/${encodeURIComponent(id)}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`recent ${id} failed: ${res.status}`);
+  return res.json();
 }
 
 /** File-extension router — drives which preview component is rendered. */

@@ -671,6 +671,72 @@ disk-usage:
     print(f'  Avg fast-tier page:  {ft_bytes / 1024 / max(fast_pages,1):.0f} KB')\
     "
 
+# Pretty-print the latest LLM session log. Pages through `less -R` so
+# you can scroll. The on-disk format stays JSONL (one record per line)
+# for tooling — `tail -f`, `jq -c`, line-based grep all keep working.
+# This recipe is just a convenient viewer for "I want to read it in
+# my editor / terminal." Path resolution goes through Python's
+# APP_DATA_DIR helper so it works on macOS / Linux / Windows without
+# hard-coding `~/Library/Application Support` (which has spaces that
+# trip up shell word-splitting).
+
+llm-log:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    LOG_DIR=$(uv run python -c 'from src.manifest import APP_DATA_DIR; print(APP_DATA_DIR / "logs")')
+    LATEST=$(ls -t "$LOG_DIR"/llm-*.log 2>/dev/null | head -1)
+    if [ -z "${LATEST:-}" ]; then
+        echo "No llm-*.log files in $LOG_DIR" >&2
+        echo "Run a query through Magpie first, then re-run this command." >&2
+        exit 1
+    fi
+    echo "Reading: $LATEST" >&2
+    jq -C . "$LATEST" | less -R
+
+# Tail the latest LLM session log live, pretty-printed. Useful while
+# debugging — keep this open in one terminal, run queries in another.
+llm-log-tail:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    LOG_DIR=$(uv run python -c 'from src.manifest import APP_DATA_DIR; print(APP_DATA_DIR / "logs")')
+    LATEST=$(ls -t "$LOG_DIR"/llm-*.log 2>/dev/null | head -1)
+    if [ -z "${LATEST:-}" ]; then
+        echo "No llm-*.log files in $LOG_DIR yet — start a query first." >&2
+        exit 1
+    fi
+    echo "Tailing: $LATEST" >&2
+    tail -f "$LATEST" | jq -C .
+
+# Open the latest LLM session log in $EDITOR (or VS Code if EDITOR is unset).
+# Writes a `.pretty.json` sibling so the editor gets multi-line
+# syntax-highlighted JSON; the JSONL original stays intact.
+llm-log-open:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    LOG_DIR=$(uv run python -c 'from src.manifest import APP_DATA_DIR; print(APP_DATA_DIR / "logs")')
+    LATEST=$(ls -t "$LOG_DIR"/llm-*.log 2>/dev/null | head -1)
+    if [ -z "${LATEST:-}" ]; then
+        echo "No llm-*.log files in $LOG_DIR" >&2
+        exit 1
+    fi
+    PRETTY="${LATEST}.pretty.json"
+    jq . "$LATEST" > "$PRETTY"
+    EDITOR_CMD="${EDITOR:-code}"
+    "$EDITOR_CMD" "$PRETTY"
+    echo "Opened pretty copy: $PRETTY" >&2
+    echo "(The original JSONL is still at: $LATEST)" >&2
+
+# List all session logs with size + last-modified.
+llm-log-list:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    LOG_DIR=$(uv run python -c 'from src.manifest import APP_DATA_DIR; print(APP_DATA_DIR / "logs")')
+    if [ ! -d "$LOG_DIR" ]; then
+        echo "No log dir yet: $LOG_DIR" >&2
+        exit 1
+    fi
+    ls -lhrt "$LOG_DIR"/llm-*.log 2>/dev/null || echo "(no logs yet in $LOG_DIR)"
+
 # Show point counts for all Qdrant collections
 qdrant-counts:
     #!/usr/bin/env bash

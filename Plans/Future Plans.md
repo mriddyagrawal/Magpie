@@ -44,6 +44,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#33** Sidecar `PYTHONIOENCODING=utf-8` to prevent Windows non-ASCII crashes *(also: Packaging)*
 - **#34** Sidecar PyInstaller native data assets — `--collect-data` for `pydantic_ai` and `genai_prices`, plus the Nuitka migration *(also: Packaging)*
 - **#35** Phase 2 of `/query/stream` — token-by-token answer streaming via JSON-stream substring-match parser *(also: Pipeline, Performance)*
+- **#36** OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere *(also: UI, Platform)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -58,6 +59,7 @@ Settings panels, in-app warnings, anything the user sees.
 - **#28** Unified files-or-folders picker (single dialog, multi-select) *(also: Platform)*
 - **#30** ✅ Settings buttons that persist but don't act — wire-up audit *(also: Cross-cutting)* — *5 of 6 items done/removed; "Check for updates" gated on Plan #19*
 - **#32** Per-provider prompt-layout split (small-local vs. cloud) *(also: Models, Eval)*
+- **#36** OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere *(also: Platform)*
 
 ### 📦 Packaging, distribution & process lifecycle
 How Magpie ships and runs as an end-user app — from installer through process management.
@@ -1383,6 +1385,81 @@ Especially relevant when:
   the question" failures or "model only used the last
   document" tells.
 
+### Choice D — Affirmative vs negative discriminator (`found` vs `not_found`)
+
+**v1 picked:** the flat schema's verdict field is named `not_found:
+bool` (paired with `not_found_topic: str`). The common case (model
+answered the question) sets `not_found = false` — a double negation.
+The failure case sets `not_found = true`.
+
+**The alternative considered:** flip to `found: bool` + a renamed
+topic field (`missing_topic` or `unanswered_topic`). Common case
+becomes `found = true` — affirmative. Failure case becomes
+`found = false` + the topic.
+
+**Why this might matter for Gemma 4 E4B.** Small models (≤ 7B)
+handle negation worse than larger models — research-backed
+(negation handling is a documented weakness of sub-7B-class
+models). The current `not_found` field forces the model to make
+two compound decisions:
+
+1. "Did I find an answer?" (affirmative thought)
+2. "Set the negation of that to the boolean field" (translation step)
+
+With `found`, step 2 is identity — the affirmative thought maps
+directly to the boolean. The system prompt's instructions also
+read more naturally:
+
+- Today: *"set not_found=true when..., leave answer empty when
+  not_found=true"* (compound negation)
+- Flipped: *"set found=false when..., leave answer empty when
+  found=false"* (single negation, easier to track)
+
+The grammar still enforces correctness either way; this is purely
+about the model's **token-level decoding** confidence on borderline
+not-found cases.
+
+**Why we did NOT do it now.** Migration cost is non-trivial:
+~30-40 LOC across the `Answer` model, `SYSTEM_PROMPT` body
+(8-12 string occurrences referencing the field name), the
+`answer_question` post-process normalization, the frontend's
+`QueryResponse.not_found` / `view.kind === "not_found"` /
+`NotFoundCard` props, plus a one-shot migration for existing
+`recents.json` entries. Without eval data, the lift is
+theoretical — we'd be churning working code for an effect we
+can't measure.
+
+**What would change our minds.** Any of these:
+
+- Eval harness shows the rename moves not-found-precision /
+  not-found-recall by ≥ 3 percentage points on the existing
+  benchmark sets (smaller than that is within noise).
+- A user reports "Magpie hedges instead of admitting it doesn't
+  know" — the not-found path firing late or unreliably is a
+  symptom that affirmative naming might fix.
+- We move the local default to a different small model with
+  weaker negation handling than Gemma 4 E4B.
+- We're already migrating the schema for another reason
+  (e.g., Choice A discriminated-union flip) — bundle the
+  rename to amortize the churn.
+
+**Implementation sketch (when triggered):**
+
+- Rename `Answer.not_found` → `Answer.found`, flip boolean
+  semantic. Default `False` so legacy callers that didn't set
+  the field land in the failure path safely.
+- Rename `Answer.not_found_topic` → `Answer.missing_topic`.
+- Update every string in `SYSTEM_PROMPT` (around `src/answer.py:88-200`)
+  — examples, OUTPUT FORMAT block, WHEN-YOU-CANNOT-ANSWER
+  section, the not-found contract bullets.
+- Add Pydantic `Field(alias="not_found")` for one release cycle
+  so old `recents.json` entries still parse.
+- `answer_question` normalization: `if not ans.found:` instead
+  of `if ans.not_found:`.
+- Frontend rename + sign-flip across `QueryResponse`,
+  `viewState`, `NotFoundCard`, `MagpieWindow`'s view-resolution.
+- Run the harness pre/post; record the delta in this plan.
+
 ### Concrete eval harness needed
 
 The cheapest path to revisit either choice is the same harness:
@@ -1391,7 +1468,8 @@ The cheapest path to revisit either choice is the same harness:
    and add ground-truth citation positions (which sources should
    each correct answer cite, ideally with page/row numbers).
 2. Run the same questions through each variant under
-   evaluation (schemas, citation styles, prompt-layout knobs)
+   evaluation (schemas, citation styles, prompt-layout knobs,
+   verdict-field naming)
    — capture answer + sources + cite positions.
 3. Score: precision/recall on `not_found` detection, precision/recall
    on citations, answer correctness (existing rubric).
@@ -2275,5 +2353,176 @@ window and the parallel-instance is not actively editing
 longer enough (likely once cloud streaming lands and frontier-model
 answer latency makes the gap more painful), or (c) Plan #27 (abort)
 work needs a streaming substrate to attach to.
+
+---
+
+## 36. OS-native file previews for the right-pane PreviewCard
+
+**Tags:** ui · platform · preview
+
+**What.** Today's `PreviewCard` (the always-visible right pane in
+`answering` and `retrieving`-with-sources views) renders a small set of
+file types in-app — text snippet, PDF page render, image, CSV grid.
+Anything else falls back to "open in OS default app", which yanks the
+user out of the ask bar. The plan: make the right-pane preview
+competitive with the OS's own previewer for everything a real corpus
+contains (videos, audio, archives, Pages docs, Numbers, Sketch files,
+code with proper syntax highlighting, fonts, 3D models, …). Plus a
+spacebar-triggered overlay using the OS's actual Quick Look panel for
+deep-look that's universal regardless of which path we pick for the
+right-pane.
+
+**Why we'd want this.**
+
+- The set of file types a real corpus contains is huge. We will never
+  out-render the OS for niche formats (Pages docs, Numbers, Sketch,
+  Final Cut projects, OmniGraffle, Logic Pro sessions, Affinity
+  files). Native preview "just works" because file-type vendors ship
+  preview plugins.
+- The right pane is the always-visible answer to "what is this file?".
+  When it can't render, the user has to leave the ask bar. That's the
+  feature gap.
+- Spacebar-on-source mirrors macOS Spotlight's own gesture — Cmd-Space
+  → type → arrow → spacebar → preview. We're already a Spotlight-
+  style app (per Specs/window_lifecycle.md); this completes the loop.
+
+**Two implementation paths to choose between.** Pick one for the
+right-pane PreviewCard. The spacebar overlay (below) is universal.
+
+### Path 1 — Web-native renderers + thumbnail fallback (B+C)
+
+The pragmatic, incremental path. Render everything inside the existing
+PreviewCard using web technologies, with an OS-thumbnail fallback for
+file types we can't embed.
+
+**Interactive types (need scroll, zoom, playhead, search): embed a
+web-native renderer.**
+- PDF: PDF.js — battle-tested, works in any WebView.
+- Video: `<video>` tag with the OS's codec.
+- Audio: `<audio>` plus a waveform via `wavesurfer.js` or Web Audio API.
+- Code/text: a syntax-highlight library (Shiki / Prism / highlight.js)
+  inside a scrollable container.
+- Archives (.zip/.tar): list-only via JSZip; no extraction.
+- HTML / Markdown: rendered inline; sandboxed iframe for HTML, a
+  markdown lib for `.md`.
+
+**Non-interactive types (Pages, Numbers, Sketch, OmniGraffle, Final
+Cut, fonts, 3D models, raw photos, …): static thumbnail from the OS.**
+- macOS: `qlmanage -t -s <px> -o <outdir> <path>` generates a PNG that
+  matches what Quick Look itself would render. Display as `<img>`.
+- Windows: invoke the WIC (Windows Imaging Component) thumbnail
+  provider via the `windows` Rust crate; same flow.
+- Linux: `gnome-desktop-thumbnailer` or `gdk_pixbuf_new_from_file`;
+  fallback to a generic file-icon if neither is available.
+
+**Pros:**
+- Fully cross-platform from day one — no platform behaves
+  second-class.
+- Incremental — ship one renderer at a time. PDF.js first because
+  it's already the highest-traffic type; video / audio next.
+- Zero new native UI surface area — all rendering lives inside the
+  WebView, no extra security or focus-routing concerns.
+- Works inside our existing right-pane layout without changing the
+  surrounding component shape.
+
+**Cons:**
+- Thumbnail-only fallback for ~20% of file types loses interactivity:
+  can't scrub a video on a thumbnailed `.mov`, can't open the inner
+  pages of a Pages doc. (Mitigation: those are exactly the types
+  spacebar-Quick-Look handles best, so users still have a path.)
+- The web-native renderer set is a long incremental tail — every new
+  file type the corpus surfaces is a new dep / config / styling pass.
+
+**Estimated cost.** 2–4 weeks of focused work, parallelizable per
+file type. Each renderer addition is a self-contained PR.
+
+### Path 2 — Embedded native preview pane (A)
+
+The "do it right" path. Host a real native preview view inside our
+window, positioned over where the WebView's right pane would render.
+
+- **macOS**: `QLPreviewView` (Quartz framework) embedded as a real
+  `NSView` subwindow on top of the Tauri WebView, anchored to the
+  preview-pane region. Drives the full Quick Look render pipeline —
+  every file type a Quick Look plugin handles is rendered fully
+  interactive.
+- **Windows**: `IPreviewHandler` COM API hosted in a window control,
+  similar to how Explorer's preview pane embeds it. Reentrancy and
+  apartment-threading rules are real footguns.
+- **Linux**: no native equivalent. Either fall back to Path 1 here
+  (web-native renderers), or accept that Linux users get a degraded
+  right pane.
+
+**Pros:**
+- Gold-standard fidelity. Anything Quick Look / Explorer renders, we
+  render — fonts, Pages, Logic Pro sessions, Sketch files, all of it,
+  all interactive, all forever-current with whatever preview plugins
+  the user installs.
+- Long-tail file types Just Work without Magpie ever shipping a
+  per-type renderer.
+
+**Cons:**
+- Significant native bridging work per platform. Tauri's WebView
+  lifecycle plus a parallel `NSView` / `HWND` is fiddly: window
+  resize, focus, keyboard routing, z-ordering across the WebView
+  surface — all need careful coordination.
+- Embedded Quick Look in a Tauri app is undocumented territory —
+  there's no public recipe; we'd be among the first to write one.
+  Risk of stuck-points without prior art to lean on.
+- No native equivalent on Linux means the implementation effort
+  yields nothing on that platform — Linux users still need Path 1
+  or accept a degraded pane.
+- Adds native UI surface area (and the security/IPC implications)
+  to a project that's currently all-WebView.
+
+**Estimated cost.** ~2 weeks per platform with real risk of
+stuck-points; probably 1–1.5 months wall-clock to land mac+win
+confidently. Linux still needs Path 1 anyway.
+
+### Spacebar overlay (universal — independent of which path wins)
+
+Regardless of which path the right pane takes, the spacebar gesture
+should pop the OS's actual full Quick Look panel. This is the
+"weekend hack" floor that gets us Spotlight-parity feel.
+
+1. Add a Tauri command `preview_in_quick_look(path: String)` in
+   `frontend/src-tauri/src/lib.rs`.
+   - macOS: shell out to `qlmanage -p <path>`. ~30 LOC.
+   - Windows: shell out to a tiny helper invoking
+     `IPreviewHandler`, or fall back to `cmd /c start "" <path>`
+     for a degraded floor.
+   - Linux: prefer `gio open` / `xdg-open`; degraded.
+2. Bind spacebar on a selected source row in the SourcesCard.
+3. On Windows / Linux without good preview support, the gesture
+   falls through to the existing `revealInFinder` / `openInOs`.
+
+**Why we did NOT do it now.**
+
+- The current PreviewCard covers the demo corpus's common types
+  adequately (text / PDF / image / CSV).
+- Path 1 is incremental but still 2–4 weeks of focused effort.
+- Path 2 is 1–1.5 months wall-clock with native-API risk.
+- Choosing between them depends on user signal we don't yet have —
+  which file types the actual user base hits often vs rarely. Real
+  usage data tells us whether Path 1's thumbnail fallback is good
+  enough or whether long-tail interactivity (Path 2) actually matters.
+
+**When to revisit.**
+
+- (a) Real users start asking for previews of file types we don't
+  render well — that signal tells us whether Path 1's static
+  thumbnails are acceptable or whether Path 2's interactivity is
+  worth the engineering cost.
+- (b) macOS becomes the primary distribution target — at that point,
+  Path 2 mac-first becomes a bigger win without paying for Windows
+  parity up front.
+- (c) Someone has a 1–2 day window to ship the spacebar overlay
+  alone (`qlmanage -p` shell-out) and prove the gesture even matters
+  before committing to either right-pane path.
+
+**Choosing between Path 1 and Path 2.** Decision deferred. The plan
+deliberately keeps both alive so we can pick once we have user
+signal. The spacebar overlay is independently shippable and worth
+doing first regardless.
 
 ---

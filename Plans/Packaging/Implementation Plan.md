@@ -437,6 +437,12 @@ four will work cleanly.
 
 ### Step 3 — Auto-updater (P10-6, ~half day)
 
+**Pattern: mirror Tauri's official OSS `tauri-action` template.** Every
+Tauri project that ships releases uses `tauri-apps/tauri-action@v0` —
+familiar to any reviewer, smaller `build.yml` than what we have now,
+handles signing + `latest.json` generation + GitHub Release upload as one
+step. Don't write custom signing/upload logic; reuse the standard.
+
 Tauri 2 has a built-in updater plugin. Wiring:
 
 1. **Cargo.toml** — add `tauri-plugin-updater = "2"` to `[dependencies]`.

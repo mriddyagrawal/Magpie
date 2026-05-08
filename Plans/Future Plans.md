@@ -34,6 +34,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#14** Promote `MAGPIE_DEV_USE_MTIME` to a user-facing setting *(also: UI, Config)*
 - **#17** ✅ CSV redesign — proper summaries at ingest *(also: Retrieval, CSV)*
 - **#21** Surface drift events: warn before silently dropping vanished files *(also: UI)*
+- **#24** Batch indexing — knobs, per-batch progress, error handling *(also: UI, Perf)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -42,6 +43,7 @@ Settings panels, in-app warnings, anything the user sees.
 - **#15** Auto-promotion of nested exclude paths into sub-roots *(also: Config)*
 - **#16** LLM / inference settings UI + cross-provider thinking-mode unification *(also: Models, Config)*
 - **#21** Surface drift events: warn before silently dropping vanished files *(also: Indexing)*
+- **#24** Batch indexing — surface upsert-phase progress + bad-file isolation *(also: Indexing, Perf)*
 
 ### 📦 Packaging, distribution & process lifecycle
 How Magpie ships and runs as an end-user app — from installer through process management.
@@ -1056,5 +1058,136 @@ Each one has bitten us at least once during the Gemma 4 work. Pre-empt by checki
 - Measure ONE specific thing first before committing: end-to-end answer-step latency on a typical Magpie corpus question (long retrieval prompt + Gemma 4-class model) under MLX vs. llama.cpp, on the same machine, with a warm pool. If the gap is < 15% wall-clock for our workload (not the benchmark workload), the engineering cost isn't justified — bail.
 - License sanity check: MLX itself is MIT (Apple). MLX-LM is Apache-2.0. The MLX-format model weights typically inherit from the upstream model's license — same Gemma / Qwen / LFM2 license caveats as Plan #22.
 - macOS-specific failure mode to watch: MLX requires macOS 13.5+. If we have users on older systems, the opt-in needs to gracefully reject + fall back to llama.cpp with a clear message.
+
+---
+
+## 24. Batch indexing — knobs, per-batch progress, error handling
+
+**Tags:** ingest · ux · perf
+
+**What:** Make the upsert phase of indexing more transparent (finer
+progress in the GUI), more configurable (a settings knob, sane defaults
+per backend), and more resilient (one bad summary should not poison its
+batch). The current implementation is `BATCH_SIZE = 32` in
+[src/stage2/db.py:304](../src/stage2/db.py) for summaries and
+`BATCH_SIZE = 64` in [src/stage2/csv_ingest.py:12](../src/stage2/csv_ingest.py)
+for CSV rows — both hardcoded constants with no live progress reporting
+through to the GUI's onboard card.
+
+**Why we'd do it.** Three drivers, all surfaced post-llama-server-migration:
+
+- **Progress feels frozen during upsert phase.** After summarization
+  finishes, `ingest_from_manifest` runs the upsert phase — but no
+  progress callback is wired through to `_ingest_state["files_done"]`
+  in [src/server.py](../src/server.py), so the spotlight onboard card
+  sits at 100% / "Indexing N / N files…" while Qdrant is actually still
+  receiving batches for another 30-90 seconds. On the Furman corpus
+  (1,481 files) the upsert phase is ~46 batches at ~1-2s each —
+  observable, but invisible.
+- **One poisoned batch wastes 32 files of work.** `_upsert_with_retry`
+  retries the whole batch; if the failure is deterministic (one
+  malformed payload, an embedder OOM on one over-long text, a
+  Qdrant payload-validation error), the batch keeps failing forever.
+  The current behavior is to abort the run. Per-batch fallback to
+  one-by-one on persistent failure would isolate the bad point and
+  let the rest land.
+- **Settings UX surface area.** Plan #16 (LLM/inference settings UI)
+  proposes user-facing knobs for backend behavior. `BATCH_SIZE` is
+  the kind of knob someone running on a 16GB Mac wants to lower
+  (lower memory pressure on the embedder) and someone on a 96GB
+  workstation wants to raise (higher throughput). It should not stay
+  buried as a Python constant.
+
+**Why we did NOT do it now.** The current setup is *correct* — the
+embedder's batch parallelism is the load-bearing reason for non-1
+batches; see the analysis below. What's missing is observability and
+graceful degradation, not the batching itself. The right time to add
+all of this is when Plan #16's settings UI lands, so the new knob has
+a place to live.
+
+**Numbers we know today.**
+
+| Batch size | Embed phase (relative) | Qdrant phase | Total upsert (1500 files) | UI granularity |
+|---:|---:|---:|---:|---|
+| 1 | ~30× slower | ~5× slower (HTTP overhead) | ~30 min | Per-file |
+| 8 | ~3× slower | ~1.2× slower | ~5 min | Every 8 files |
+| **32 (current)** | baseline | baseline | **~1-2 min** | Every 32 files |
+| 64 (csv default) | ~10% faster | ~5% faster | ~1.5 min | Every 64 files |
+| 128 | marginal | marginal | ~1.5 min | Coarse |
+
+The cliff is between batch=1 and batch=8: the dense+sparse embedders
+(sentence-transformers + fastembed) pay a fixed per-call overhead
+(kernel launch, tokenizer warmup, attention dispatch) that gets
+amortized across the batch. Going below ~8 makes ingest dramatically
+slower; going above ~32 has rapidly diminishing returns. This is
+*not* a Qdrant-server cost — Qdrant is a persistent process and
+[get_qdrant_client()](../src/stage2/db.py) caches the HTTP client,
+so per-call HTTP overhead is small (~1-5 ms locally). The cost is
+the embedder.
+
+**Scope sketch (~150-300 LOC):**
+
+- **Wire `on_batch_complete` through to the GUI.** The function in
+  [src/stage2/db.py:307](../src/stage2/db.py) already accepts a
+  callback that fires with the indices of the just-upserted batch.
+  `ingest_from_manifest` in
+  [src/stage2/__main__.py](../src/stage2/__main__.py) doesn't pass
+  one; [src/server.py:_do_ingest](../src/server.py) needs to thread
+  a callback that updates `_ingest_state["files_done"]` and
+  `_ingest_state["current_file"]` during the upsert phase too —
+  not just during summarization. Two-phase progress: phase A
+  (summarize, file-level), phase B (upsert, batch-level).
+  Distinguish in the GUI ("Summarizing 423 / 1,481…" vs.
+  "Indexing 1,440 / 1,481…").
+- **Per-batch one-by-one fallback on persistent failure.** Wrap
+  `_upsert_with_retry`'s retry loop: if all retries on a 32-point
+  batch fail with a deterministic-looking error (4xx from Qdrant,
+  any non-network-y exception), split the batch in half and retry;
+  recurse to single-point. Skip the one bad point with a clear
+  log line and a structured entry on the manifest so the user can
+  see "5 files failed during indexing" in Settings → Index Health.
+  Keep network errors (timeouts, connection-refused) on the
+  whole-batch retry path — splitting won't help.
+- **Make `BATCH_SIZE` a setting.** Move the constant into
+  `magpie_defaults.json` (ingest.summary_batch_size,
+  ingest.csv_row_batch_size). Override per user via the settings
+  endpoint added in Plan #16. Bound the range: [4, 128]. Default
+  stays at 32 / 64 to preserve current behavior.
+- **Per-backend defaults.** Cloud LLM ingest paths don't run an
+  embedder at upsert time (different code path), so their batch
+  cost is purely Qdrant HTTP — those can default to 64 or 128.
+  Local-LLM users on lower-spec Macs may want to drop to 16 to
+  reduce memory pressure during the dense+sparse embed step.
+  Defaults table lives next to the constant.
+
+**Notes for the future implementer:**
+
+- Don't lower the default below 16. The cliff between batch=1 and
+  batch=8 is the load-bearing reason this Plan exists *as a Plan*
+  rather than as "just lower the constant." Users won't know what
+  number to pick; defaults need to stay in the safe zone.
+- The bisect-on-failure logic must short-circuit on the *first*
+  network-shaped exception (`ConnectionError`, `ReadTimeout`) and
+  fall back to whole-batch retry-with-backoff. Bisecting through a
+  flaky network adds latency without helping. Reserve bisection for
+  errors that look deterministic (Qdrant 400s, payload validation,
+  `ValidationError`).
+- The progress callback's `indices` argument is into `summaries`,
+  not the manifest. The GUI's `files_done` counter wants
+  manifest-relative numbering — call sites need to translate. See
+  the existing `manifest.mark_ingested(...)` for how the indirection
+  is handled today.
+- "Two-phase progress" is honest UI but might confuse a non-technical
+  user. The settings spec ([Specs/settings_window.md](../Specs/settings_window.md))
+  says the user surface is "folders + files + questions + answers" —
+  exposing "summarizing vs upserting" violates that. Internal terms
+  for power users (visible in Settings → Index Health activity log)
+  are fine; the spotlight onboard card should keep saying "Indexing
+  N / N files…" but the *N* should advance through both phases.
+- Consider deleting [src/stage2/csv_ingest.py:12](../src/stage2/csv_ingest.py)'s
+  separate `BATCH_SIZE = 64` if the unified setting moves both. CSV
+  rows are smaller payloads than file summaries (no markdown body,
+  just a row dict), so a higher default is appropriate, but having
+  two unrelated constants drift is a maintenance smell.
 
 ---

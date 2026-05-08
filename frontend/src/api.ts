@@ -120,6 +120,41 @@ export async function stopIngest(): Promise<void> {
   await fetch(`${baseUrl()}/ingest/stop`, { method: "POST" });
 }
 
+export interface FolderEntry {
+  path: string;
+  enabled: boolean;
+}
+
+export async function getFolders(): Promise<{ folders: FolderEntry[]; ingest_running: boolean }> {
+  const res = await fetch(`${baseUrl()}/settings/folders`);
+  if (!res.ok) throw new Error(`settings/folders failed: ${res.status}`);
+  return res.json();
+}
+
+export async function addFolder(path: string): Promise<{ status: string }> {
+  const res = await fetch(`${baseUrl()}/settings/folders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ path }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function removeFolder(path: string): Promise<void> {
+  const res = await fetch(`${baseUrl()}/settings/folders?path=${encodeURIComponent(path)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error(await res.text());
+}
+
+export async function getShortcut(): Promise<string> {
+  const res = await fetch(`${baseUrl()}/settings/shortcut`);
+  if (!res.ok) return "Alt+Space";
+  const data = await res.json();
+  return data.shortcut ?? "Alt+Space";
+}
+
 /** File-extension router — drives which preview component is rendered. */
 export type PreviewKind = "image" | "pdf" | "csv" | "text" | "unsupported";
 

@@ -614,6 +614,72 @@ def ingest_status() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Settings endpoints — folder management + shortcut read
+# ---------------------------------------------------------------------------
+
+from src.config.indexing_rules import (
+    load_user_rules,
+    save_user_rules,
+    IncludePath as _IncludePath,
+)
+
+_SHORTCUT_FILE_PATH = APP_DATA_DIR / "shortcut.json"
+
+
+@app.get("/settings/folders")
+def settings_get_folders() -> dict[str, Any]:
+    rules = load_user_rules()
+    return {
+        "folders": [{"path": p.path, "enabled": p.enabled} for p in rules.include_paths],
+        "ingest_running": _ingest_state["running"],
+    }
+
+
+class FolderAddRequest(BaseModel):
+    path: str
+
+
+@app.post("/settings/folders")
+def settings_add_folder(req: FolderAddRequest) -> dict[str, str]:
+    rules = load_user_rules()
+    target = str(Path(req.path).expanduser().resolve())
+    for entry in rules.include_paths:
+        if str(Path(entry.path).expanduser().resolve()) == target:
+            if not entry.enabled:
+                entry.enabled = True
+                save_user_rules(rules)
+                return {"status": "enabled"}
+            return {"status": "already_exists"}
+    rules.include_paths.append(_IncludePath(path=target, enabled=True))
+    save_user_rules(rules)
+    return {"status": "added"}
+
+
+@app.delete("/settings/folders")
+def settings_remove_folder(path: str) -> dict[str, str]:
+    rules = load_user_rules()
+    target = str(Path(path).expanduser().resolve())
+    rules.include_paths = [
+        p for p in rules.include_paths
+        if str(Path(p.path).expanduser().resolve()) != target
+    ]
+    save_user_rules(rules)
+    return {"status": "removed"}
+
+
+@app.get("/settings/shortcut")
+def settings_get_shortcut() -> dict[str, str]:
+    if _SHORTCUT_FILE_PATH.exists():
+        try:
+            import json as _json
+            data = _json.loads(_SHORTCUT_FILE_PATH.read_text(encoding="utf-8"))
+            return {"shortcut": data.get("shortcut", "Alt+Space")}
+        except Exception:
+            pass
+    return {"shortcut": "Alt+Space"}
+
+
+# ---------------------------------------------------------------------------
 # Sidecar entrypoint: pick a free port, print it, serve.
 # ---------------------------------------------------------------------------
 

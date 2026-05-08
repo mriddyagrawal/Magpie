@@ -21,7 +21,6 @@ import argparse
 import asyncio
 import json
 import sys
-from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 from dotenv import load_dotenv
@@ -56,7 +55,6 @@ async def ask(
     rewrite: bool = False,
     fast: bool = False,
     history: list[tuple[str, str]] | None = None,
-    cancel_check: Callable[[], Awaitable[None]] | None = None,
 ) -> PipelineResult:
     """Run the full retrieve -> answer pipeline for one question.
 
@@ -84,15 +82,6 @@ async def ask(
     print(f"\n[query] question: {question!r} (top_k={top_k}, rewrite={rewrite}, fast={fast})",
           file=sys.stderr, flush=True)
 
-    # Plan #27 — null-safe cancel poll. The /query handler sets this
-    # to a coroutine that raises CancelledError if the client TCP
-    # connection has dropped. None means "no cancellation source"
-    # (sync callers, tests, etc.).
-    async def _check() -> None:
-        if cancel_check is not None:
-            await cancel_check()
-
-    await _check()
     if rewrite:
         t = time.monotonic()
         sq: SearchQuery = await asyncio.to_thread(rewrite_query, question)
@@ -103,7 +92,6 @@ async def ask(
         sq = raw_query(question)
         print(f"[query] rewrite: skipped (using raw question)",
               file=sys.stderr, flush=True)
-    await _check()
 
     t = time.monotonic()
     retrieved = await asyncio.to_thread(
@@ -156,7 +144,6 @@ async def ask(
     print(f"[query] reading {len(paths)} unique file(s) for answer step",
           file=sys.stderr, flush=True)
 
-    await _check()
     agent = build_answer_agent()
     t = time.monotonic()
     ans: Answer = await answer_question(

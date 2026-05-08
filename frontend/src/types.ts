@@ -62,6 +62,10 @@ export interface StatusResponse {
   ready: boolean;
   indexed_count: number;
   version: string;
+  // Settings UI extras (PR 5):
+  provider: string;       // "local" | "cloud"
+  model: string;          // human-readable model name
+  size_mb: number | null; // on-disk Qdrant collection size
 }
 
 export interface CsvPreview {

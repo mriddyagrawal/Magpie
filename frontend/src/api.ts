@@ -144,6 +144,11 @@ export async function stopIngest(): Promise<void> {
 export interface FolderEntry {
   path: string;
   enabled: boolean;
+  // Settings → Data tab (PR 5):
+  display_name?: string | null;     // user-friendly label override
+  files: number;                     // count from manifest
+  size_bytes: number;                // sum of entry.size for files under this root
+  last_read_at: string | null;       // ISO; max ingested_at across the folder
 }
 
 export async function getFolders(): Promise<{ folders: FolderEntry[]; ingest_running: boolean }> {
@@ -169,11 +174,170 @@ export async function removeFolder(path: string): Promise<void> {
   if (!res.ok) throw new Error(await res.text());
 }
 
+export interface FolderPatchBody {
+  path: string;
+  enabled?: boolean;
+  display_name?: string | null;
+}
+
+export async function patchFolder(body: FolderPatchBody): Promise<{
+  status: string; path: string; enabled: boolean; display_name: string | null;
+}> {
+  const res = await fetch(`${baseUrl()}/settings/folders`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 export async function getShortcut(): Promise<string> {
   const res = await fetch(`${baseUrl()}/settings/shortcut`);
   if (!res.ok) return "Alt+Space";
   const data = await res.json();
   return data.shortcut ?? "Alt+Space";
+}
+
+export async function putShortcut(shortcut: string): Promise<void> {
+  const res = await fetch(`${baseUrl()}/settings/shortcut`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ shortcut }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+}
+
+// ---------------------------------------------------------------------------
+// Settings — Search & AI tab
+// ---------------------------------------------------------------------------
+
+export interface SearchSettings {
+  provider: string;       // "local" | "cloud"
+  model: string;
+  top_k: number;
+  rewrite: boolean;
+  temperature: number;
+  cite_sources_inline?: boolean;  // PR 5 addition
+}
+
+export type SearchSettingsPatch = Partial<{
+  provider: "local" | "cloud";
+  top_k: number;
+  rewrite: boolean;
+  temperature: number;
+  cite_sources_inline: boolean;
+}>;
+
+export async function getSearchSettings(): Promise<SearchSettings> {
+  const res = await fetch(`${baseUrl()}/settings/search`);
+  if (!res.ok) throw new Error(`settings/search failed: ${res.status}`);
+  return res.json();
+}
+
+export async function patchSearchSettings(patch: SearchSettingsPatch): Promise<SearchSettings> {
+  const res = await fetch(`${baseUrl()}/settings/search`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export interface ProvidersInfo {
+  local: { available: boolean; model: string; downloaded: boolean };
+  cloud: { available: boolean; model: string; configured: boolean; provider?: string };
+}
+
+export async function getProviders(): Promise<ProvidersInfo> {
+  const res = await fetch(`${baseUrl()}/settings/search/providers`);
+  if (!res.ok) throw new Error(`settings/search/providers failed: ${res.status}`);
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Settings — Shortcut & App tab
+// ---------------------------------------------------------------------------
+
+export interface AppSettings {
+  theme: "system" | "light" | "dark";
+  accent: "ink" | "amber" | "jade" | "rose";
+  default_action: "empty" | "last";
+  launch_at_login: boolean;
+  show_in_tray: boolean;
+}
+
+export type AppSettingsPatch = Partial<AppSettings>;
+
+export async function getAppSettings(): Promise<AppSettings> {
+  const res = await fetch(`${baseUrl()}/settings/app`);
+  if (!res.ok) throw new Error(`settings/app failed: ${res.status}`);
+  return res.json();
+}
+
+export async function patchAppSettings(patch: AppSettingsPatch): Promise<AppSettings> {
+  const res = await fetch(`${baseUrl()}/settings/app`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Settings — Exclusions sub-panel (Data tab)
+// ---------------------------------------------------------------------------
+
+export interface ExclusionsResponse {
+  paths: string[];
+  globs: string[];
+}
+
+export async function getExclusions(): Promise<ExclusionsResponse> {
+  const res = await fetch(`${baseUrl()}/settings/exclusions`);
+  if (!res.ok) throw new Error(`settings/exclusions failed: ${res.status}`);
+  return res.json();
+}
+
+export async function addExclusion(body: { path?: string; glob?: string }): Promise<{ status: string }> {
+  const res = await fetch(`${baseUrl()}/settings/exclusions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function removeExclusion(type: "path" | "glob", value: string): Promise<void> {
+  const res = await fetch(
+    `${baseUrl()}/settings/exclusions?type=${type}&value=${encodeURIComponent(value)}`,
+    { method: "DELETE" }
+  );
+  if (!res.ok) throw new Error(await res.text());
+}
+
+// ---------------------------------------------------------------------------
+// Index — global Sync / Reindex buttons
+// ---------------------------------------------------------------------------
+
+export interface IndexJobResponse {
+  status: string;  // "started"
+  kind: string;    // "sync" | "reindex"
+}
+
+export async function runSync(): Promise<IndexJobResponse> {
+  const res = await fetch(`${baseUrl()}/index/sync`, { method: "POST" });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function runReindex(): Promise<IndexJobResponse> {
+  const res = await fetch(`${baseUrl()}/index/reindex`, { method: "POST" });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
 // ---------------------------------------------------------------------------

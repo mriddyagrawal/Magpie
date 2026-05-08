@@ -288,6 +288,23 @@ def find_candidates(
         rules = load_indexing_rules()
     else:
         rules = indexing_rules
+
+    # Single-file root short-circuit. When the walker is invoked on a file
+    # path (e.g. an entry in include_paths that points at a single file),
+    # we skip the os.walk + asset-library pipeline entirely and just feed
+    # the one file forward — assuming `should_index()` accepts it. The
+    # explicit-file-include precedence rule (#0) means user-listed file
+    # includes pass even when gitignore / category / size would reject.
+    if root.is_file():
+        ok, reason = rules.should_index(root)
+        if not ok:
+            print(
+                f"  warn: {root} not eligible for indexing: {reason}",
+                flush=True,
+            )
+            return [], 1, 0
+        return [root], 0, 0
+
     pre_accepted: list[Path] = []
     ignored = 0
     nasconfig_cache: dict[Path, bool] = {}
@@ -921,8 +938,8 @@ def main() -> None:
     root = Path(args.path)
     if not root.exists():
         sys.exit(f"error: no such path: {root}")
-    if not root.is_dir():
-        sys.exit(f"error: ingest walker expects a directory, got: {root}")
+    if not root.is_dir() and not root.is_file():
+        sys.exit(f"error: ingest walker expects a file or directory, got: {root}")
 
     # --list-children: just print would-be commands and exit. Cheap preview.
     if args.list_children:

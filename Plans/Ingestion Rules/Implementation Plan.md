@@ -150,7 +150,7 @@ Migrated from the ~250 patterns in `src/ingest/ignore.py:DEFAULT_IGNORE_PATTERNS
 
 | Field | Type | Meaning |
 |---|---|---|
-| `include_paths[].path` | absolute dir path | A directory to walk. Files only allowed by future iteration; for now, directories only. |
+| `include_paths[].path` | absolute path | A directory to walk OR a single file to index. **File entries are explicit user picks and override every other rule** (exclude_paths, gitignore, hidden, category-disabled, size cap) — see [§4 row 0](#precedence-top-wins). Directory entries flow through the normal precedence chain. |
 | `include_paths[].enabled` | bool | Disabled = not walked, but manifest entries kept (re-enabling restores them without re-summarizing). |
 | `include_paths[].rules` | optional `RuleSet` | Per-folder overrides. **Most users won't touch this** — it's the advanced panel. |
 | `exclude_paths` | list of absolute paths | Files OR directories the user clicked "exclude" on. Always wins over includes. |
@@ -215,8 +215,9 @@ Returns `tuple[bool, str]`. The reason string powers `walk-explain` and the futu
 
 ### Precedence (top wins)
 
-| # | Check | Reject reason |
+| # | Check | Reason string |
 |---|---|---|
+| **0** | **Path is itself an enabled `include_paths` entry that resolves to a FILE (not a directory).** Short-circuits every check below — the user's most specific pick beats everything. | **`"explicitly included file: <path>"`** (accept) |
 | 1 | Path matches an entry in `exclude_paths` (the path itself OR an ancestor) | `"explicitly excluded: <which path>"` |
 | 2 | Path is not under any **enabled** `include_paths` | `"not under any included folder"` |
 | 3 | Find the **most specific (longest matching prefix) enabled** include_path. Apply its `rules` (if set): exclude_globs match → reject; include_globs match → accept | `"folder rule exclude: <pattern>"` / `"folder rule include: <pattern>"` |
@@ -229,6 +230,19 @@ Returns `tuple[bool, str]`. The reason string powers `walk-explain` and the futu
 | 10 | File extension belongs to a category in `categories_enabled` that's `false`. Resolve `categories_enabled` per-root override → globals. **Unknown extensions: allowed.** | `"category disabled: <category>"` |
 | 11 | File size > `max_file_size_mb` (per-root override → globals) | `"exceeds max file size"` |
 | 12 | All checks passed | `"ok"` |
+
+#### Why row 0 exists
+
+A user who has gone to the trouble of explicitly listing one specific file as an include_paths entry has made the strongest possible statement of intent: "index THIS file." The rule machinery should respect that intent above every default safety rail. Concrete cases that motivated the rule:
+
+- A user disables the `data` category globally (CSV noise) but wants ONE specific CSV indexed → drop it in `include_paths`, done.
+- A `.env.example` documentation file is hidden (starts with `.`) but the user wants it searchable → explicit file include bypasses `ignore_hidden`.
+- A particular tax PDF is huge (over `max_file_size_mb`) but is critical to find → explicit file include bypasses the size cap.
+- A user accidentally has the same path in both `include_paths` and `exclude_paths` (UI-edit race, hand-edited JSON) → most-specific-wins says the include side wins, so the user's most recent positive action takes precedence.
+
+Directory-typed `include_paths` entries do NOT trigger row 0 — they flow through the normal chain so files inside an included directory still respect `exclude_paths`, gitignore, etc. Only file-typed entries bypass everything.
+
+The behavior is implemented in [`IndexingRules._find_explicit_file_include`](../../src/config/indexing_rules.py) and tested at [tests/test_indexing_rules_should_index.py](../../tests/test_indexing_rules_should_index.py) under "Precedence row 0".
 
 ### Why this order
 
@@ -424,7 +438,8 @@ The original spec ([Promts/build_ingestion_rules.md](../../Promts/build_ingestio
 |---|---|---|
 | `roots[]` with mandatory per-root `rules` | `include_paths[]` with optional `rules` | UI-driven thinking (file/folder picker buttons). Most users won't set per-folder rules; making them optional removes a layer of forced complexity. |
 | `RuleSet.exclude_dirs` / `exclude_extensions` per-root | Removed from per-root `RuleSet` (only `exclude_globs`, `include_globs`, `categories_enabled`, `max_file_size_mb`) | The "exclude this specific thing" use case is served by top-level `exclude_paths`. Per-root only needs PATTERN rules. |
-| `include_globs` / `include_extensions` as primary mechanism for force-include | Replaced by user clicking "Include this specific file" → entry in top-level `include_paths` (when files are allowed) OR `.magpieinclude` for pattern-based force-include | Direct path picks are clearer than glob inversion. |
+| `include_globs` / `include_extensions` as primary mechanism for force-include | Replaced by user clicking "Include this specific file" → entry in top-level `include_paths` (file-typed entries supported as of 2026-05-08; see [§4 row 0](#precedence-top-wins)) OR `.magpieinclude` for pattern-based force-include | Direct path picks are clearer than glob inversion. |
+| `include_paths[].path` accepts directories only ("Files only allowed by future iteration") | File entries supported as of 2026-05-08. File-typed entries trigger the precedence-row-0 short-circuit and override every other rule (exclude_paths, gitignore, hidden, category, size). Directory entries unchanged. | Surfaced when a user added a single-file include via the future GUI's "Include file" button mockup; without it, the walker erred with "expects a directory" mid-sync, leaving the auto-backup to clobber the prior good state. |
 | Drop `.nasignore` support entirely | Keep `.nasignore` for back-compat. Add `.magpieinclude`/`.magpieexclude` as on-brand alternatives | User direction: "we should respect gitignore and nasignores." |
 | Auto-promotion of nested rules into sub-roots | Deferred to Future Plan #15 | Round-trip surprise + GUI doesn't exist yet to render the promoted shape. |
 | Daemon process owns API endpoints | Sidecar-absorbs-daemon (provisional, decided at start of PR2) | Simpler MVP. Trade-off: file watching only happens while Tauri is open. Future plan to extract back. |

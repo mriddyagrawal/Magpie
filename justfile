@@ -66,18 +66,34 @@ sync *args:
         echo "No included folders configured. Add one with: just walk <folder>"
         exit 0
     fi
+    # Track whether any walk exited nonzero. We can't trust `set -e`
+    # because `|| true` is what lets the loop finish — so capture exit
+    # codes ourselves and gate the auto-backup on the result.
+    all_walks_ok=1
     while IFS= read -r path; do
         echo "== walking $path =="
-        uv run python -m src.ingest "$path" {{args}} || true
+        if ! uv run python -m src.ingest "$path" {{args}}; then
+            all_walks_ok=0
+            echo "  warn: walk failed for '$path' (continuing with remaining paths)"
+        fi
     done <<< "$paths"
     # Auto-backup the resulting state so the next reset-index can restore in
     # ~30s instead of forcing a 15-minute re-summarize. Single backup slot
-    # under <APP_DATA_DIR>/backup/, overwritten each run. See src/backup.py.
+    # under <APP_DATA_DIR>/backup/. Skip the backup entirely if any walk
+    # failed — a partial-success state could still pass create_backup's
+    # in-process empty-overwrite guard yet be a regression vs the prior
+    # backup. Belt-and-suspenders with the guard inside src/backup.py.
     # Wrapped in `|| ...` so a backup failure doesn't make sync exit nonzero;
     # the warning + manual `just backup` is the recovery path.
-    echo
-    echo "== auto-backup =="
-    just backup || echo "warn: auto-backup failed; run 'just backup' manually once Qdrant is healthy"
+    if [ "$all_walks_ok" = "1" ]; then
+        echo
+        echo "== auto-backup =="
+        just backup || echo "warn: auto-backup failed; run 'just backup' manually once Qdrant is healthy"
+    else
+        echo
+        echo "== auto-backup skipped: at least one walk failed (see warnings above) =="
+        echo "Fix the failing path(s), then run 'just backup' manually."
+    fi
 
 # Check whether a single file or folder will be indexed under the current
 # rules. Prints the (allowed/skipped) decision and the reason that fired
@@ -151,17 +167,10 @@ reset-index: qdrant-up
 # Qdrant collection via the native snapshot API) to <APP_DATA_DIR>/backup/.
 # Single backup slot — overwrites the previous one atomically. Auto-fired
 # by `just sync` at the end of every walk so reset-index has something to
-# restore from. Implementation: src/backup.py.
+# restore from. Refuses to overwrite a non-empty backup with an empty one
+# (safety guard against failed-sync clobber). Implementation: src/backup.py.
 backup: qdrant-up
-    @uv run python -c "\
-    from src.backup import create_backup; \
-    s = create_backup(); \
-    print(f'manifest backed up:           {s[\"manifest_present\"]}'); \
-    print(f'summary markdowns backed up:  {s[\"summary_count\"]}'); \
-    print(f'qdrant collections backed up: {len(s[\"qdrant_collections\"])}'); \
-    [print(f'  - {c[\"name\"]:20s} {c[\"points\"]:>8} points  {c[\"size_bytes\"]/1024/1024:>7.1f} MB') for c in s['qdrant_collections']]; \
-    print(f'backup dir:                   {s[\"backup_dir\"]}')\
-    "
+    @uv run python -m src.backup
 
 # Restore the entire indexed state from <APP_DATA_DIR>/backup/. DESTRUCTIVE:
 # drops current Qdrant collections, replaces manifest + summary markdowns on
@@ -171,14 +180,7 @@ backup: qdrant-up
 # preserve segment binaries directly. Pair with the auto-backup that
 # `just sync` writes at the end of every walk.
 restore: qdrant-up
-    @uv run python -c "\
-    from src.backup import restore_backup; \
-    s = restore_backup(); \
-    print(f'collections restored:  {s[\"restored_collections\"]}'); \
-    print(f'manifest restored:     {s[\"manifest_restored\"]}'); \
-    print(f'summary markdowns:     {s[\"summary_count\"]}'); \
-    print(f'from backup created:   {s[\"from_backup_created_at\"]}')\
-    "
+    @uv run python -m src.backup restore
 
 # Per-child mode: ingest each immediate subdirectory of <path> sequentially.
 # Useful for huge multi-TB roots where a single walk feels stuck.

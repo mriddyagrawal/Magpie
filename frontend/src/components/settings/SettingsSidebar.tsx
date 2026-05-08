@@ -2,11 +2,16 @@
  * SettingsSidebar — left rail with three nav entries + a status
  * footer pinned at the bottom. Used by SettingsWindow.tsx.
  *
- * The status footer mirrors the same numbers shown on the ask bar's
- * StatusFooter: `understood: N / size: N MB / provider: Local · Gemma 4`.
- * Acts as a quiet operational indicator while the user pokes at
- * settings — they always know the corpus health without leaving
- * the window.
+ * The status footer shows `understood: N / provider: Local`. Acts as
+ * a quiet operational indicator while the user pokes at settings —
+ * they always know the corpus health without leaving the window.
+ *
+ * The Qdrant collection size used to live here too (`size: N MB`)
+ * but was removed: it only reflected the `summaries` collection's
+ * on-disk footprint, not the total Magpie-on-disk footprint
+ * (fast_tier collection, summary markdown files, manifest, etc.),
+ * which made the number misleading as a "how much space am I
+ * using" indicator.
  */
 
 import type { StatusResponse } from "../../types";
@@ -57,10 +62,6 @@ export function SettingsSidebar({ active, onChange, status }: Props) {
         <SidebarFooterRow
           label="understood"
           value={status?.indexed_count != null ? status.indexed_count.toLocaleString() : "—"}
-        />
-        <SidebarFooterRow
-          label="size"
-          value={status?.size_mb != null ? `${status.size_mb.toLocaleString()} MB` : "—"}
         />
         {/* Provider only — the model name is intentionally hidden from
             the user-facing surface. Internal terms ("Gemma 4",

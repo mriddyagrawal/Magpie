@@ -35,6 +35,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#17** ✅ CSV redesign — proper summaries at ingest *(also: Retrieval, CSV)*
 - **#21** Surface drift events: warn before silently dropping vanished files *(also: UI)*
 - **#24** Batch indexing — knobs, per-batch progress, error handling *(also: UI, Perf)*
+- **#25** Answer-step output schema — empirically evaluate two open choices *(also: Models, Evaluation)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -1189,5 +1190,156 @@ the embedder.
   rows are smaller payloads than file summaries (no markdown body,
   just a row dict), so a higher default is appropriate, but having
   two unrelated constants drift is a maintenance smell.
+
+---
+
+## 25. Answer-step output schema — empirically evaluate two open choices
+
+**Tags:** models · answer · ux · evaluation
+
+**What:** Two design choices made by hand for the v1 ask-bar
+(`Specs/UI/ask_bar.md`) need empirical evaluation against the
+Gemma 4 E4B local backend on real Magpie corpora. Both decisions
+favored "what works on a 4B model today" over "what's most
+type-safe in principle." When we have the eval infrastructure
+to back-test alternatives — or when we move to a larger Local
+model or default-Cloud — revisit them.
+
+### Choice A — Flat-schema-with-`not_found`-boolean vs. discriminated union
+
+**v1 picked:** flat schema with a `not_found: bool` discriminator
+and optional `not_found_topic` field, validated by Pydantic but
+not via a discriminated-union type.
+
+```python
+class AnswerResult(BaseModel):
+    answer: str
+    sources_used: list[SourceCitation]
+    not_found: bool = False
+    not_found_topic: str = ""
+```
+
+**The alternative considered:** a Pydantic-AI-native discriminated
+union with two variants (`AnsweredResult` | `NotFoundResult`),
+each with its own required fields, dispatched via `kind` literal.
+
+**Why we picked the flat shape on Gemma 4 E4B.** Discriminated
+unions are correct *type design*. They're also harder for small
+models to *choose between* — empirically, 4B-class models tend to
+default to "always answer" when asked to pick between variants,
+even when retrieved sources don't contain the answer. The flat
+schema has only three fields the model thinks about ("set
+answer+sources OR set not_found+topic"), and the boolean
+discriminator pattern already works reliably in our `FileSummary`
+and other structured outputs. Server-side JSON-schema enforcement
+catches malformed JSON in either approach; the difference is the
+model's *decision* quality, not its parse correctness.
+
+**What would change our minds.** Any of these:
+
+- A third structured-output state appears (e.g., `partial_answer`,
+  or `needs_clarification`). At that point the boolean breaks down
+  and a tagged union is mandatory.
+- We move the default Local model to a 12B+ class (Plan #22 family —
+  Qwen2.5-VL, LFM2-VL larger, etc.) where the model can handle
+  variant selection reliably.
+- We adopt Cloud as default for free-tier users (the Search & AI
+  spec's "Cloud — Our free model for faster answers" path) and
+  the Cloud model is a frontier-class model that doesn't have the
+  small-model-decision-defaulting problem.
+- Empirical evidence: an A/B test on the existing benchmark sets
+  (`benchmarks/student_notes`, `benchmarks/course_information`,
+  `benchmarks/furman_directory`) shows discriminated-union prompts
+  actually getting *better* not_found-recall than the flat
+  schema. This is the cheapest experiment to run; should be ~50
+  LOC of pipeline plumbing.
+
+### Choice B — LLM-emitted citation markers vs. post-process matching
+
+**v1 picked:** the LLM emits inline citation markers (`[1]`, `[2]`)
+in its prose; the frontend renders them as numbered green pill
+tags (matching the mockup at `Specs/UI/Screenshot 2026-05-07 at
+10.28.51 PM.png`). The schema's `sources_used` is the indexed
+list those numbers point at.
+
+**The alternative considered:** the LLM emits prose without
+markers; a deterministic post-process step matches phrases in the
+answer to passages in the retrieved sources via embedding-cosine
+or fuzzy matching, and inserts the citations programmatically.
+
+**Why we picked LLM-emitted markers on Gemma 4 E4B.** It's how
+Perplexity, Claude, ChatGPT all do it — the model has full context
+on which source supported which claim, so it's the only entity
+that can attribute correctly. Post-processing with cosine-match is
+prone to false attribution: a passage about "Dr. Marquez" exists in
+both `math-dept-2024.pdf` and `faculty-roster.csv`, and the
+matcher has no idea which one the model was actually drawing from
+when it wrote the sentence. We accept that small models sometimes
+miss markers or fabricate them; we'd rather have an honest miss
+than a false-precise post-hoc attribution.
+
+**What would change our minds.** Any of these:
+
+- Empirical evaluation shows Gemma 4 E4B miscites > ~10% of the
+  time on the existing benchmarks. (The math-dept question on
+  Furman is a good test: Dr. Marquez should cite `math-dept-2024.pdf`
+  page 4, not `faculty-roster.csv`.) If miss/wrong-cite rates are
+  high enough, post-processing might be a net win even with its
+  own false-positive rate.
+- We add a *second* post-process step anyway (e.g., snippet
+  highlighting in the source row) and the matching infrastructure
+  is already available. Reusing it for citations becomes free.
+- A fast small reranker (Cohere-style) becomes available and can
+  do citation grounding as a separate pass — different problem,
+  different model, more reliable than asking the answer model to
+  do everything in one shot.
+- Frontier models from Cloud start over-citing (Claude does this
+  occasionally — citing five sources for one sentence). At that
+  point a post-process *de-duplication* step layered on top of
+  the markers makes sense — a hybrid.
+
+### Concrete eval harness needed
+
+The cheapest path to revisit either choice is the same harness:
+
+1. Take the existing eval files (`benchmarks/*/eval_answer_*.json`)
+   and add ground-truth citation positions (which sources should
+   each correct answer cite, ideally with page/row numbers).
+2. Run the same questions twice — once under each schema/citation
+   choice — capture answer + sources + cite positions.
+3. Score: precision/recall on `not_found` detection, precision/recall
+   on citations, answer correctness (existing rubric).
+4. The model that wins both schemas/citations on the same
+   benchmark is the right one. If results split, document which
+   half of the workload favors which choice.
+
+This harness doesn't exist yet but isn't far from
+`benchmarks/student_notes/runner.py` — perhaps 200 LOC of
+extension once we have ground-truth citation positions.
+
+### When to do the eval
+
+- After the first ~20 real users have used Magpie and we have
+  question logs to validate the assumption that "not_found" cases
+  are a meaningful fraction of asks.
+- Before we add a Cloud default (because the Cloud model's
+  schema-following will be different from the Local model's, and
+  decisions made on the Local model may not transfer).
+- Before any model swap on the Local backend.
+
+### Notes for the future implementer
+
+- These are *behavioral* choices, not architectural ones — both
+  alternatives are within ~50 LOC of swapping in. The Plan exists
+  so that "the right answer is empirical" is on the record;
+  someone shouldn't quietly switch to discriminated unions because
+  it's the more "correct" type without first running the eval.
+- Whichever choice ships, the user-facing surface (`ask_bar.md`'s
+  five states) is the same. This is a backend-quality concern,
+  not a UX concern.
+- The `recents.json` payload shape only stores what the LLM
+  produced + the backend's `sources_scanned_count`. Both schema
+  variants serialize cleanly; replays are unaffected by which
+  variant is in use at ask time.
 
 ---

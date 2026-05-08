@@ -161,6 +161,16 @@ class QueryResponse(BaseModel):
     answer: str
     sources: list[SourceOut]
     search_query: dict[str, Any]
+    # Not-found state — set by the answer pipeline when none of the retrieved
+    # files contain enough information to answer the question. The frontend
+    # renders the ask bar's State 5 (single "Add folder where this knowledge
+    # might live" CTA) when not_found=True. See Specs/UI/ask_bar.md.
+    not_found: bool = False
+    not_found_topic: str = ""
+    sources_scanned_count: int = 0
+    # Recent id — the entry just persisted to recents.json. Lets the frontend
+    # append the new ask to its in-memory recents list without an extra GET.
+    recent_id: str | None = None
 
 
 def _user_facing_error(exc: Exception) -> tuple[int, str]:
@@ -197,7 +207,9 @@ def _user_facing_error(exc: Exception) -> tuple[int, str]:
 
 @app.post("/query", response_model=QueryResponse)
 async def query(req: QueryRequest) -> QueryResponse:
+    from src.answer import Answer
     from src.pipeline import ask
+    from src.recents import add_recent
 
     # Resolve `rewrite`: explicit body value wins; otherwise REWRITE env.
     rewrite = req.rewrite if req.rewrite is not None else _env_bool("REWRITE", default=False)
@@ -218,11 +230,39 @@ async def query(req: QueryRequest) -> QueryResponse:
         SourceOut(path=r.path, summary=r.summary, score=r.score, cited=r.path in cited)
         for r in result.retrieved
     ]
+
+    # Persist this ask as a recent so the user can replay it without paying
+    # LLM cost again. We mirror the Answer payload exactly — the cached state
+    # is what gets re-rendered on replay. See Specs/UI/ask_bar.md.
+    answer_for_recent = Answer(
+        answer=result.answer,
+        sources_used=result.sources_used,
+        not_found=result.not_found,
+        not_found_topic=result.not_found_topic,
+    )
+    rewritten = result.search_query.query if rewrite else None
+    try:
+        recent_entry = add_recent(
+            question=result.question,
+            result=answer_for_recent,
+            rewritten_query=rewritten,
+        )
+        recent_id: str | None = recent_entry.id
+    except Exception as e:  # pylint: disable=broad-except
+        # Recents persistence failure must not break the user's ask. Log and
+        # continue with no recent_id; the ask bar falls back to GET /recents.
+        print(f"[server] recents persist failed (non-fatal): {e}", file=sys.stderr)
+        recent_id = None
+
     return QueryResponse(
         question=result.question,
         answer=result.answer,
         sources=sources,
         search_query={"query": result.search_query.query, "keywords": result.search_query.keywords},
+        not_found=result.not_found,
+        not_found_topic=result.not_found_topic,
+        sources_scanned_count=len(result.retrieved),
+        recent_id=recent_id,
     )
 
 
@@ -677,6 +717,33 @@ def settings_get_shortcut() -> dict[str, str]:
         except Exception:
             pass
     return {"shortcut": "Alt+Space"}
+
+
+# ---------------------------------------------------------------------------
+# /recents — the user's last N questions, with cached results
+# ---------------------------------------------------------------------------
+# Backs the ask bar's "RECENT" panel. The /query endpoint appends new
+# entries automatically (see _record_recent below). The frontend can
+# read /recents to populate the typing state and replay a recent by id
+# without re-running the pipeline.
+# Spec: Specs/UI/ask_bar.md, "Recents storage shape".
+
+from src.recents import list_recents as _list_recents, get_recent as _get_recent
+
+
+@app.get("/recents")
+def recents_list() -> dict[str, Any]:
+    """Return the last N persisted recents, newest-first."""
+    return {"recents": [r.model_dump(mode="json") for r in _list_recents()]}
+
+
+@app.get("/recents/{entry_id}")
+def recents_get(entry_id: str) -> dict[str, Any]:
+    """Look up a recent by id. Used by the ask bar's replay path."""
+    entry = _get_recent(entry_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail=f"recent not found: {entry_id}")
+    return entry.model_dump(mode="json")
 
 
 # ---------------------------------------------------------------------------

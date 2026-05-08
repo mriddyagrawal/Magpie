@@ -47,15 +47,36 @@ class Answer(BaseModel):
     answer: str = Field(
         description=(
             "Natural-language answer grounded strictly in the provided files. "
-            "If the files do not contain the information, say so explicitly."
+            "Empty string when the question cannot be answered from the provided "
+            "files (set `not_found=true` in that case)."
         )
     )
     sources_used: list[str] = Field(
         description=(
             "Subset of the input file paths the answer actually depends on. "
             "Copied verbatim from the '--- File N: <path> ---' headers. "
-            "Do not include files you consulted but did not actually use."
+            "Do not include files you consulted but did not actually use. "
+            "Empty list when `not_found=true`."
         )
+    )
+    not_found: bool = Field(
+        default=False,
+        description=(
+            "Set to true when the provided files do not contain enough information "
+            "to answer the question. When true, leave `answer` empty, leave "
+            "`sources_used` empty, and set `not_found_topic` to a short noun "
+            "phrase summarizing what the user was asking about."
+        ),
+    )
+    not_found_topic: str = Field(
+        default="",
+        description=(
+            "Short noun phrase summarizing what the user asked about, used in "
+            "the UI's not-found copy ('I read 5 likely sources but didn't find "
+            "anything about <topic>...'). Only set when `not_found=true`. "
+            "Examples: 'a landlord's emergency phone number', 'the chemistry "
+            "final exam time', 'who chairs the math department'."
+        ),
     )
 
 
@@ -131,20 +152,61 @@ SYSTEM_PROMPT = (
     "sources_used). Otherwise keep the prose clean. "
     "\n\n"
     "\n\n"
+    "INLINE CITATION MARKERS. As you write the answer, cite the supporting "
+    "file with a numbered marker in square brackets: `[1]` for the first "
+    "file you cite, `[2]` for the second, and so on. The number is the "
+    "1-based index into your `sources_used` list (the first entry of "
+    "`sources_used` is `[1]`, the second is `[2]`, etc.). Place each "
+    "marker immediately after the claim it supports, with no space "
+    "before the bracket. Re-use the same number whenever you cite the "
+    "same file again. Examples:\n"
+    "  - 'The chair of the Mathematics department is Dr. Elena Marquez[1].'\n"
+    "  - 'CSC-105 has 4 credit hours[1] and is offered every fall[2].'\n"
+    "Do NOT use markers like `[Source 1]`, `[file: foo.pdf]`, or `(1)` — "
+    "the bracketed number alone is the only accepted form. Do NOT invent "
+    "citation numbers that exceed the length of `sources_used`. If you "
+    "have nothing to cite for a claim, omit the marker entirely.\n"
+    "\n\n"
+    "WHEN YOU CANNOT ANSWER FROM THE PROVIDED FILES. If, after reading the "
+    "files carefully (including the synonym/unit mapping above), none of "
+    "them contain the information needed to answer the question, do NOT "
+    "fabricate. Instead, set the result fields as follows:\n"
+    "  - `not_found`: true\n"
+    "  - `answer`: \"\" (empty string)\n"
+    "  - `sources_used`: [] (empty list)\n"
+    "  - `not_found_topic`: a short noun phrase summarizing what the user "
+    "    asked about. Examples: 'a landlord's emergency phone number', "
+    "    'the chemistry final exam time', 'who chairs the math department'. "
+    "    Keep it short (a few words). Do not restate the full question.\n"
+    "Use this branch ONLY when the files genuinely don't contain the answer. "
+    "If the files contain the answer under a synonym, abbreviation, or "
+    "different unit (per the mapping rules above), DO answer normally — "
+    "that's not a not-found case.\n"
+    "\n\n"
     "OUTPUT FORMAT — required schema. Respond with a single JSON object that "
-    "has EXACTLY these two keys, named EXACTLY as shown:\n"
-    "  {\"answer\": <string with your full natural-language answer>, "
-    "\"sources_used\": [<file path string>, <file path string>, ...]}\n"
-    "Both keys are required. Do NOT rename `answer` to something descriptive "
-    "like `result` / `summary` / `courses_mentioned` / `findings` — small models "
-    "tend to do this and it breaks downstream parsing. The key is literally "
-    "the four letters `answer` regardless of what the question is about. "
-    "If the answer is naturally a list (e.g. 'list every X'), join the items "
-    "into a single string inside the `answer` value (use bullets `- ` or "
-    "newlines), do NOT make `answer` a JSON array.\n"
+    "has EXACTLY these four keys, named EXACTLY as shown:\n"
+    "  {\"answer\": <string>, \"sources_used\": [<file path>, ...], "
+    "\"not_found\": <boolean>, \"not_found_topic\": <string>}\n"
+    "All four keys are required. Do NOT rename `answer` to something "
+    "descriptive like `result` / `summary` / `courses_mentioned` / "
+    "`findings` — small models tend to do this and it breaks downstream "
+    "parsing. The key is literally the four letters `answer` regardless "
+    "of what the question is about. "
+    "If the answer is naturally a list (e.g. 'list every X'), join the "
+    "items into a single string inside the `answer` value (use bullets "
+    "`- ` or newlines), do NOT make `answer` a JSON array.\n"
+    "Example for a successful answer with citations:\n"
+    "  {\"answer\": \"The chair of the Mathematics department is "
+    "Dr. Elena Marquez[1].\", \"sources_used\": "
+    "[\"path/to/math-dept-2024.pdf\"], \"not_found\": false, "
+    "\"not_found_topic\": \"\"}\n"
     "Example for a list-shaped question:\n"
-    "  {\"answer\": \"- Item one\\n- Item two\\n- Item three\", "
-    "\"sources_used\": [\"path/to/file.md\"]}\n"
+    "  {\"answer\": \"- Item one[1]\\n- Item two[2]\\n- Item three[1]\", "
+    "\"sources_used\": [\"path/to/file-a.md\", \"path/to/file-b.md\"], "
+    "\"not_found\": false, \"not_found_topic\": \"\"}\n"
+    "Example for a not-found case:\n"
+    "  {\"answer\": \"\", \"sources_used\": [], \"not_found\": true, "
+    "\"not_found_topic\": \"a landlord's emergency phone number\"}\n"
     "\n"
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
@@ -154,6 +216,8 @@ SYSTEM_PROMPT = (
 _ANSWER_FALLBACK = Answer(
     answer="(model output could not be parsed into Answer)",
     sources_used=[],
+    not_found=False,
+    not_found_topic="",
 )
 
 
@@ -459,6 +523,22 @@ async def answer_question(
         message.extend(blocks)
 
     ans = await agent.run(message)
+
+    # If the model declared not_found, normalize the rest of the payload so the
+    # downstream consumer doesn't have to think about partial fills. Some small
+    # models set not_found=true but still write a hedging "answer" and pick a
+    # source — that's an inconsistent state, and the UI's not-found card has
+    # no slot for either, so we drop them.
+    if ans.not_found:
+        if ans.answer or ans.sources_used:
+            print(
+                "  note: not_found=true but answer/sources_used were non-empty; "
+                "clearing them to match the not-found contract",
+                file=sys.stderr,
+            )
+        ans.answer = ""
+        ans.sources_used = []
+        return ans
 
     # Defensive: drop any path the model invented that wasn't in our input.
     # Match is whitespace-tolerant — the model sometimes collapses double-spaces

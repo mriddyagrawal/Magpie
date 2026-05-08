@@ -73,11 +73,12 @@ def test_malformed_json_raises_clearly(tmp_path: Path) -> None:
 def test_load_real_app_defaults_succeeds() -> None:
     """Bundled `magpie_defaults.json` must parse cleanly — a regression
     here breaks first-run for every new user. Same gate as the
-    indexing-rules test."""
+    indexing-rules test. Cloud routing fields (cloud_provider,
+    per-provider models, API keys) live in secrets.json now, not
+    AppDefaults — so they're not asserted here."""
     d = load_app_defaults()
     assert d.version == 1
     assert d.provider in {"local", "cloud"}
-    assert d.cloud_provider in {"openrouter", "moonshot", "magpie-cloud"}
     assert 1 <= d.top_k <= 20
     assert d.theme in {"system", "light", "dark"}
 

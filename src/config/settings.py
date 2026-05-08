@@ -45,11 +45,10 @@ class AppDefaults(BaseModel):
     `magpie_defaults.json` as MagpieDefaults; Pydantic's `extra="ignore"`
     lets the two models coexist in one file without conflict.
 
-    `cloud_provider` and `cloud_model` live here (not in UserSettings)
-    because in v1 the user is not allowed to edit them — they're a
-    deployment-time choice baked into the bundle. The user only
-    chooses Local-vs-Cloud via the `provider` field.
-    """
+    Cloud routing (which cloud provider, per-provider models, API keys)
+    does NOT live here — it lives in `secrets.json` next to the
+    credentials. Settings carries only the user-facing "Local vs Cloud"
+    binary; secrets carries the which-cloud + the keys."""
 
     model_config = ConfigDict(extra="ignore")
 
@@ -57,10 +56,6 @@ class AppDefaults(BaseModel):
 
     # Provider selection (binary user-facing choice)
     provider: str = "local"  # "local" | "cloud"
-
-    # Cloud routing config — not user-editable in v1
-    cloud_provider: str = "openrouter"
-    cloud_model: str = "google/gemma-4-26b-a4b-it:free"
 
     # Search / retrieval knobs
     top_k: int = Field(default=5, ge=1, le=20)
@@ -99,11 +94,12 @@ class UserSettings(BaseModel):
 class EffectiveSettings(BaseModel):
     """Merged view: env > user > defaults, every field populated.
     What the rest of the app reads when it needs to act on a setting.
-    """
+
+    Cloud routing fields are NOT here — they're a Secrets concern.
+    Callers that need to know which cloud provider runs should
+    `load_secrets().cloud_provider` directly."""
 
     provider: str
-    cloud_provider: str
-    cloud_model: str
     top_k: int
     rewrite_default: bool
     temperature: float

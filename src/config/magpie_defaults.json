@@ -145,11 +145,9 @@
 
   "ignore_hidden": true,
 
-  "_app_settings_comment": "Below: defaults for the user-facing app settings (provider choice, retrieval knobs, theme, etc.). Read by AppDefaults in src/config/settings.py; ignored by MagpieDefaults (indexing-rules side) via Pydantic extra='ignore'. The user can override most of these from the Settings UI; cloud_provider / cloud_model are deployment-time values not exposed to users in v1.",
+  "_app_settings_comment": "Below: defaults for the user-facing app settings (provider choice, retrieval knobs, theme, etc.). Read by AppDefaults in src/config/settings.py; ignored by MagpieDefaults (indexing-rules side) via Pydantic extra='ignore'. Cloud routing (cloud_provider, per-provider models, API keys) lives in secrets.json next to the credentials, not here.",
 
   "provider": "local",
-  "cloud_provider": "openrouter",
-  "cloud_model": "google/gemma-4-26b-a4b-it:free",
   "top_k": 5,
   "rewrite_default": false,
   "temperature": 0.7,

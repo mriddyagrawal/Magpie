@@ -154,6 +154,17 @@ def _env_bool(name: str, default: bool) -> bool:
     return default
 
 
+class QueryHistoryTurn(BaseModel):
+    """One prior (question, answer) pair from the user's recent history.
+    Sent to the LLM as conversational context so follow-up questions
+    resolve references like 'it', 'the test', 'the same one'. The
+    files / sources from the prior turn are NOT re-sent — only the
+    question and answer text. See answer.py:SYSTEM_PROMPT for the
+    history-handling instructions."""
+    question: str
+    answer: str
+
+
 class QueryRequest(BaseModel):
     question: str = Field(min_length=1)
     top_k: int = Field(default=5, ge=1, le=20)
@@ -169,6 +180,12 @@ class QueryRequest(BaseModel):
     # is ~25s for a model that's only useful for a small fraction of queries
     # (visual / scanned-PDF questions). Same default as the CLI's `.fast off`.
     fast: bool = Field(default=False)
+    # Conversational context: the last N (question, answer) pairs from
+    # the user's recents, oldest-first. Sent to the answer LLM so it can
+    # resolve references in follow-ups ('what's on the test' after 'what
+    # did Ram say about the test'). Files are NOT re-sent — only the
+    # text. None / empty = no context (single-shot ask).
+    history: list[QueryHistoryTurn] = Field(default_factory=list)
 
 
 class SourceOut(BaseModel):
@@ -236,12 +253,19 @@ async def query(req: QueryRequest) -> QueryResponse:
     # Resolve `rewrite`: explicit body value wins; otherwise REWRITE env.
     rewrite = req.rewrite if req.rewrite is not None else _env_bool("REWRITE", default=False)
 
+    # Convert the history Pydantic models to the (q, a) tuples answer.py
+    # expects. Empty list when no history was sent.
+    history_pairs: list[tuple[str, str]] = [
+        (turn.question, turn.answer) for turn in req.history
+    ]
+
     try:
         result = await ask(
             req.question,
             top_k=req.top_k,
             rewrite=rewrite,
             fast=req.fast,
+            history=history_pairs,
         )
     except Exception as e:  # pylint: disable=broad-except
         status_code, detail = _user_facing_error(e)

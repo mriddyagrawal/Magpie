@@ -54,6 +54,7 @@ async def ask(
     top_k: int = 5,
     rewrite: bool = False,
     fast: bool = False,
+    history: list[tuple[str, str]] | None = None,
 ) -> PipelineResult:
     """Run the full retrieve -> answer pipeline for one question.
 

@@ -30,6 +30,7 @@ import { invoke } from "@tauri-apps/api/core";
 import {
   getIngestStatus,
   getRecent,
+  getRecents,
   postQuery,
   stopIngest,
 } from "../api";
@@ -94,6 +95,22 @@ export function MagpieWindow() {
   // typed something new — old response still wins).
   const queryGenRef = useRef(0);
 
+  // Conversation history — last N (question, answer) pairs sent to
+  // the answer LLM as context so follow-up questions resolve
+  // references like "the test", "it", "the same one". Session-scoped
+  // ONLY: empty on app start, populated as the user asks, destroyed
+  // when the React mount unmounts (= app quit). Distinct from
+  // recents.json (which is persisted to disk and drives the recents
+  // panel's UI). Recents > history because recents survive restarts;
+  // history dies with the session per the user's spec.
+  //
+  // Cap kept low (HISTORY_TURNS = 5) so the prompt doesn't bloat —
+  // each turn adds ~300-500 tokens of (Q, A) text. answer.py's
+  // SYSTEM_PROMPT already has the "use prior turns to resolve
+  // references" instruction.
+  const HISTORY_TURNS = 5;
+  const historyRef = useRef<Array<{ question: string; answer: string }>>([]);
+
   // The Tauri sidecar port — pre-injected by lib.rs's setup() into
   // window.__MAGPIE_PORT__. Used by SettingsBlob for the open_settings
   // invoke arg.
@@ -122,6 +139,43 @@ export function MagpieWindow() {
     tick();
     return () => { cancelled = true; };
   }, [port]);
+
+  // -------------------------------------------------------------------
+  // Recents fetch — fires once after boot completes. Doing this here
+  // (not inside RecentsPanel) avoids a race where RecentsPanel's
+  // useEffect ran on mount before the sidecar was ready, getting a
+  // network error and rendering "Recents unavailable: Load failed".
+  // After this, the recents list is owned in MagpieWindow state and
+  // mutated locally after each ask (no re-fetch needed).
+  // -------------------------------------------------------------------
+  useEffect(() => {
+    if (booting || recents !== null) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await getRecents();
+        if (!cancelled) setRecents(list);
+      } catch (e) {
+        if (cancelled) return;
+        // One retry after a short delay — the boot poll's /healthz
+        // might have responded before all routes were live.
+        await new Promise((r) => setTimeout(r, 750));
+        if (cancelled) return;
+        try {
+          const list = await getRecents();
+          if (!cancelled) setRecents(list);
+        } catch (err) {
+          // Still failing — fall back to empty list. The user gets a
+          // panel that says "no recents yet" rather than "load
+          // failed", which is at least visually clean. They can ask
+          // a question; the recents will populate from there.
+          console.warn("recents load failed; falling back to empty:", err);
+          if (!cancelled) setRecents([]);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [booting, recents]);
 
   // -------------------------------------------------------------------
   // Ingest poll: 1.5s tick. Detects running→done transition for the
@@ -216,42 +270,6 @@ export function MagpieWindow() {
   }, [view]);
 
   // -------------------------------------------------------------------
-  // Spotlight-style typing-replaces-selection for views WITHOUT an
-  // input element (answering / not_found). The question header in
-  // those states is a button, not an input — so a real
-  // setSelectionRange isn't possible. We simulate it: any printable
-  // single-character keystroke transitions to typing state with that
-  // character as the new input; Backspace transitions to typing
-  // with empty input. Net effect matches Spotlight: re-summon,
-  // start typing → replaces; backspace → clears.
-  // -------------------------------------------------------------------
-  useEffect(() => {
-    if (view.kind !== "answering" && view.kind !== "not_found") return;
-    const onKey = (e: KeyboardEvent) => {
-      // Skip if any modifier keys other than Shift are held — those
-      // are app-level shortcuts (Cmd+C, Cmd+,, etc.), not typing.
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      // Skip non-printable except Backspace (Enter, arrow keys, F-keys, etc.).
-      const isPrintable = e.key.length === 1;
-      if (!isPrintable && e.key !== "Backspace") return;
-      e.preventDefault();
-      const newQuery = e.key === "Backspace" ? "" : e.key;
-      // Increment the gen counter so any in-flight /query from this
-      // view's question gets discarded on return.
-      queryGenRef.current++;
-      setView({ kind: "typing", query: newQuery, selected: null });
-      requestAnimationFrame(() => {
-        const el = inputRef.current;
-        if (!el) return;
-        el.focus();
-        try { el.setSelectionRange(newQuery.length, newQuery.length); } catch { /* ok */ }
-      });
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [view.kind]);
-
-  // -------------------------------------------------------------------
   // Cmd+, / Ctrl+, → open settings. macOS uses the native menu
   // accelerator (registered in lib.rs); Windows + Linux use this
   // window-level keydown listener so the shortcut still works there.
@@ -334,13 +352,30 @@ export function MagpieWindow() {
     if (!trimmed) return;
     const myGen = ++queryGenRef.current;
     setView({ kind: "retrieving", question: trimmed });
+    // Snapshot the in-memory history at this point. The pipeline gets
+    // the user's prior turns as conversational context so follow-up
+    // questions can resolve references. Only the last HISTORY_TURNS
+    // pairs are sent — older turns drop off the back.
+    const historyToSend = historyRef.current.slice(-HISTORY_TURNS);
     try {
-      const result = await postQuery(trimmed);
+      const result = await postQuery(trimmed, { history: historyToSend });
       // Race guard: if the user typed something else, replayed a
       // different recent, or otherwise changed context while this
       // query was in flight, queryGenRef has advanced and our
       // response is stale. Drop it on the floor.
       if (myGen !== queryGenRef.current) return;
+      // Append to in-memory history if we got a real answer (not the
+      // not-found case). History serves the LLM, not the user, so
+      // not-found turns aren't useful context. Single-session only;
+      // historyRef dies with the React mount.
+      if (!result.not_found && result.answer) {
+        historyRef.current.push({ question: trimmed, answer: result.answer });
+        // Cap the in-memory list at HISTORY_TURNS so it doesn't grow
+        // unbounded over a long session.
+        if (historyRef.current.length > HISTORY_TURNS) {
+          historyRef.current = historyRef.current.slice(-HISTORY_TURNS);
+        }
+      }
       // Append to in-memory recents if the backend returned an id —
       // saves a re-fetch and keeps the panel snappy.
       if (result.recent_id !== null) {
@@ -442,29 +477,20 @@ export function MagpieWindow() {
     replayRecent(entry);
   }, [replayRecent]);
 
-  // Click-to-edit / follow-up: revert to typing state with the
-  // current question pre-filled. Both the question-header click and
-  // the AnswerCard's "+ follow up" button route here. Lets the user
-  // refine a question and re-ask without going through Esc.
-  const editCurrentQuestion = useCallback(() => {
-    if (
-      view.kind === "answering" ||
-      view.kind === "not_found" ||
-      view.kind === "retrieving"
-    ) {
-      const q = view.question;
-      setView({ kind: "typing", query: q, selected: null });
-      requestAnimationFrame(() => {
-        const el = inputRef.current;
-        if (!el) return;
-        el.focus();
-        // Move caret to the end so the user can immediately keep
-        // typing (Ctrl-A to select-all if they want to replace).
-        const len = q.length;
-        try { el.setSelectionRange(len, len); } catch { /* ok */ }
-      });
-    }
-  }, [view]);
+  // Follow-up affordance: focus the input + select-all so the user's
+  // next keystroke either replaces the question (typing replaces the
+  // selection) or refines via arrow keys. The input is always
+  // rendered now (no question-as-button), so we just hand focus.
+  const focusAndSelectInput = useCallback(() => {
+    requestAnimationFrame(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      el.focus();
+      if (el.value.length > 0) {
+        try { el.setSelectionRange(0, el.value.length); } catch { /* ok */ }
+      }
+    });
+  }, []);
 
   // -------------------------------------------------------------------
   // Render
@@ -476,17 +502,28 @@ export function MagpieWindow() {
     [view]
   );
 
-  // Search-pill props per view.
+  // Search-pill props per view. The input is now ALWAYS rendered (no
+  // more question-as-button); its value is the question for active
+  // states (so re-summon shows the previous question selectable), the
+  // typed-so-far for typing, and empty for resting.
   const inputValue =
     view.kind === "typing" ? view.query :
     view.kind === "retrieving" ? view.question :
     view.kind === "answering" || view.kind === "not_found" ? view.question :
     "";
-  const submittedQuestion =
-    view.kind === "retrieving" || view.kind === "answering" || view.kind === "not_found"
-      ? view.question : null;
+  const isActive =
+    view.kind === "retrieving" ||
+    view.kind === "answering" ||
+    view.kind === "not_found";
 
   const onInputChange = (q: string) => {
+    // Any edit transitions to typing/resting state. Bumping the gen
+    // counter discards any /query response that's still in flight
+    // from a prior submit — so old answers don't clobber the new
+    // typing state.
+    if (view.kind !== "typing" && view.kind !== "resting") {
+      queryGenRef.current++;
+    }
     if (q === "") setView({ kind: "resting" });
     else setView({ kind: "typing", query: q, selected: null });
   };
@@ -497,6 +534,9 @@ export function MagpieWindow() {
       const sel = visible[view.selected];
       if (sel) { replayRecent(sel); return; }
     }
+    // Submit-on-already-asked is a re-ask of the same question. The
+    // user explicitly pressed Enter — honor it. (Smart cached-replay
+    // is on the recents path; direct re-submit always fires fresh.)
     submitQuestion(inputValue);
   };
 
@@ -545,8 +585,7 @@ export function MagpieWindow() {
           onSubmit={onInputSubmit}
           loading={view.kind === "retrieving"}
           booting={booting}
-          submittedQuestion={submittedQuestion}
-          onEditQuestion={editCurrentQuestion}
+          isActive={isActive}
         />
         <SettingsBlob port={port} />
       </div>
@@ -587,7 +626,7 @@ export function MagpieWindow() {
           result={view.result}
           selectedPath={view.selectedPath}
           onSelect={(path) => setView({ ...view, selectedPath: path })}
-          onFollowUp={editCurrentQuestion}
+          onFollowUp={focusAndSelectInput}
           highlights={highlights}
         />
       )}

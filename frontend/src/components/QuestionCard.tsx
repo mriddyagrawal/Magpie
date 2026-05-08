@@ -10,12 +10,15 @@ import "./QuestionCard.css";
 
 /**
  * Props as of PR 4 ([Specs/UI/ask_bar.md] universal-elements
- * rewrite). The settings gear has been lifted OUT of the search pill
- * and into the sibling SettingsBlob component, so QuestionCard is now
- * just logo + input/title + submit-affordance. The previous
- * `onOpenSettings` and `shortcutLabel` props are gone — the blob
- * handles both jobs (the keyboard hint moved to StatusFooter, since
- * the right-side hint there is more discoverable).
+ * rewrite, refined post-smoke). The component is now a single
+ * always-rendered <input>. The earlier "submitted question becomes
+ * a read-only button" pattern was dropped because it broke the
+ * Spotlight selection flow the user wanted: in answering / not_found
+ * state, the input shows the submitted question as its value, the
+ * focus handler in MagpieWindow selects it on re-summon, and any
+ * keystroke replaces it natively (transitioning to typing state via
+ * onChange). This also kills a class of view-state-manipulation
+ * keydown handlers that were intercepting events in non-input states.
  */
 interface Props {
   value: string;
@@ -23,11 +26,11 @@ interface Props {
   onSubmit: () => void;
   loading: boolean;
   booting: boolean;
-  submittedQuestion: string | null;
-  /** Click on the read-only question-header reverts to typing state
-   *  with the question pre-filled, so the user can refine and re-ask
-   *  without going through Esc. Only used when submittedQuestion !== null. */
-  onEditQuestion?: () => void;
+  /** True when the bar is showing a result (answering / not_found /
+   *  retrieving). Drives a subtle styling change so the user can
+   *  distinguish "this is a fresh question" from "this is what I
+   *  just asked"; the input remains fully editable either way. */
+  isActive: boolean;
 }
 
 // Explicit drag: call startDragging() on mousedown anywhere on the card that
@@ -48,7 +51,7 @@ function startDragOnMouseDown(e: React.MouseEvent) {
 
 export const QuestionCard = forwardRef<HTMLInputElement, Props>(
   function QuestionCard(
-    { value, onChange, onSubmit, loading, booting, submittedQuestion, onEditQuestion },
+    { value, onChange, onSubmit, loading, booting, isActive },
     ref
   ) {
     useEffect(() => {
@@ -56,8 +59,6 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
     }, [ref]);
 
     const onMouseDown = useCallback(startDragOnMouseDown, []);
-    const display = submittedQuestion ?? value;
-    const isActive = submittedQuestion !== null;
 
     return (
       <div
@@ -74,37 +75,22 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
             data-tauri-drag-region
           />
         </picture>
-        {isActive ? (
-          // Click-to-edit: tapping the read-only question header reverts
-          // the bar to typing state with the question pre-filled.
-          // Without this, the user has no obvious way to ask another
-          // question without pressing Esc.
-          <button
-            type="button"
-            className="question-card__title"
-            onClick={onEditQuestion}
-            title="Edit question"
-          >
-            {display}
-          </button>
-        ) : (
-          <input
-            ref={ref}
-            className="question-card__input"
-            value={value}
-            placeholder={booting ? "Starting Magpie…" : "Ask Magpie about your files…"}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                onSubmit();
-              }
-            }}
-            disabled={loading || booting}
-            spellCheck={false}
-            autoComplete="off"
-          />
-        )}
+        <input
+          ref={ref}
+          className={`question-card__input ${isActive ? "question-card__input--active" : ""}`}
+          value={value}
+          placeholder={booting ? "Starting Magpie…" : "Ask Magpie about your files…"}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSubmit();
+            }
+          }}
+          disabled={loading || booting}
+          spellCheck={false}
+          autoComplete="off"
+        />
         {/* Submit-affordance glyph on the right edge of the pill. Click
             equivalent to Enter; visually echoes "you can press return". */}
         <button

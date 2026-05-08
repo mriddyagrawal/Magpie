@@ -107,6 +107,12 @@ class IncludePath(BaseModel):
     path: str
     enabled: bool = True
     rules: Optional[RuleSet] = None
+    # Optional user-friendly label shown in the Settings → Data tab's
+    # folder rows. None = the UI falls back to the path's basename. Set
+    # via PATCH /settings/folders body.display_name. Forward-compatible:
+    # existing indexing_rules.json files load fine since the field is
+    # optional with a None default.
+    display_name: Optional[str] = None
 
 
 class GlobalRules(BaseModel):

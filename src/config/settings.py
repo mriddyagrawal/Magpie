@@ -61,6 +61,12 @@ class AppDefaults(BaseModel):
     top_k: int = Field(default=5, ge=1, le=20)
     rewrite_default: bool = False
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
+    # When True, the answer LLM emits inline [N] citation markers that
+    # the frontend renders as numbered green pills linked to sources.
+    # When False, the system prompt skips the marker instructions and
+    # the model emits plain prose; sources still appear below but are
+    # not anchored to specific claims. Default True (Perplexity-style).
+    cite_sources_inline: bool = True
 
     # App appearance + behavior
     theme: str = "system"  # "system" | "light" | "dark"
@@ -83,6 +89,7 @@ class UserSettings(BaseModel):
     top_k: Optional[int] = Field(default=None, ge=1, le=20)
     rewrite_default: Optional[bool] = None
     temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
+    cite_sources_inline: Optional[bool] = None
 
     theme: Optional[str] = None
     accent: Optional[str] = None
@@ -103,6 +110,7 @@ class EffectiveSettings(BaseModel):
     top_k: int
     rewrite_default: bool
     temperature: float
+    cite_sources_inline: bool
     theme: str
     accent: str
     default_action: str
@@ -153,7 +161,10 @@ def load_app_defaults(path: Optional[Path] = None) -> AppDefaults:
     return AppDefaults.model_validate(raw)
 
 
-def load_user_settings(path: Optional[Path] = None) -> UserSettings:
+def load_user_settings(
+    path: Optional[Path] = None,
+    defaults_path: Optional[Path] = None,
+) -> UserSettings:
     """Read the user's `settings.json`. Creates a defaults-populated
     file on first call so the user can see what the bundled defaults
     are without having to derive them from another file.
@@ -162,19 +173,25 @@ def load_user_settings(path: Optional[Path] = None) -> UserSettings:
     every field gets a non-None value. Subsequent edits (via the
     Settings UI's PATCH endpoints) replace those values; setting a
     field back to None means "fall through to whatever AppDefaults
-    says at read time", which is the original lazy semantics."""
+    says at read time", which is the original lazy semantics.
+
+    `defaults_path`, when provided, is forwarded to `load_app_defaults`
+    so the seed reflects the same defaults file the caller intends to
+    use at merge time. (Tests inject a custom defaults file via this
+    arg; production passes None and reads the bundled file.)"""
     p = path or _settings_path()
     if not p.exists():
         p.parent.mkdir(parents=True, exist_ok=True)
         # Seed the new file with the current bundled defaults so the
         # user can inspect/edit and immediately see meaningful values
         # rather than a wall of nulls.
-        defaults = load_app_defaults()
+        defaults = load_app_defaults(defaults_path)
         s = UserSettings(
             provider=defaults.provider,
             top_k=defaults.top_k,
             rewrite_default=defaults.rewrite_default,
             temperature=defaults.temperature,
+            cite_sources_inline=defaults.cite_sources_inline,
             theme=defaults.theme,
             accent=defaults.accent,
             default_action=defaults.default_action,
@@ -233,7 +250,7 @@ def effective_settings(
     per-call — settings reads are infrequent and we want the GUI's
     PATCH to take effect on the next request without reload."""
     defaults = load_app_defaults(defaults_path)
-    user = load_user_settings(user_path)
+    user = load_user_settings(user_path, defaults_path)
     env = _env_overrides()
 
     # Start from the defaults, overlay non-None user fields, overlay env.

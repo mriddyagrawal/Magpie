@@ -484,13 +484,19 @@ _STATUS_TTL = 5.0
 
 
 class StatusResponse(BaseModel):
-    """User-facing status. Deliberately omits LLM provider, model name,
-    Qdrant provider, GPU info, etc. — those are implementation details
-    that should never be visible in the GUI. See IO/IO - Repo Structure.md
-    for the no-tech-leak product principle."""
+    """User-facing status. Originally omitted provider/model/disk size
+    on the no-tech-leak principle, but the Settings sidebar's status
+    footer (`understood: N · size: N MB · provider: Local · Gemma 4`)
+    needs them. They're surfaced here, not in any user-facing tooltip
+    on the ask bar — Settings is the chrome that shows operational
+    state. The ask bar's StatusFooter consumes the same data."""
     ready: bool
     indexed_count: int
     version: str
+    # Settings UI extras (PR 5):
+    provider: str = "local"  # "local" | "cloud"
+    model: str = ""          # human-readable model name
+    size_mb: int | None = None  # on-disk Qdrant collection size; null if unknown
 
 
 @app.get("/status", response_model=StatusResponse)
@@ -499,7 +505,7 @@ def status() -> StatusResponse:
     if _status_cache["payload"] is not None and now - _status_cache["ts"] < _STATUS_TTL:
         return _status_cache["payload"]
 
-    from src.stage2.db import get_all_point_ids
+    from src.stage2.db import COLLECTION_NAME, get_all_point_ids, get_qdrant_client
 
     try:
         indexed_count = len(get_all_point_ids())
@@ -508,10 +514,53 @@ def status() -> StatusResponse:
         indexed_count = 0
         ready = False
 
+    # Provider / model — read from layered config. Lazy import to keep
+    # the cold path of /status fast and to allow the config layer to
+    # not be importable in degenerate test envs.
+    provider = "local"
+    model = ""
+    try:
+        from src.config.settings import effective_settings
+        eff = effective_settings()
+        provider = eff.provider
+        # Reuse the helper added in PR 3 for the search-pill resolution.
+        model = _resolved_model_name(provider)
+    except Exception:  # pylint: disable=broad-except
+        pass
+
+    # On-disk Qdrant size — best-effort. Qdrant 1.7+ exposes
+    # disk_data_size on get_collection's response; older builds may
+    # return None or omit the field. We catch broadly: a None disk
+    # value just means the Settings sidebar shows "size: …" rather
+    # than crashing.
+    size_mb: int | None = None
+    try:
+        client = get_qdrant_client()
+        info = client.get_collection(COLLECTION_NAME)
+        # Different qdrant-client versions expose this differently —
+        # try the common attribute names in order.
+        raw_bytes: int | None = None
+        for attr in ("disk_data_size", "disk_data_size_bytes"):
+            v = getattr(info, attr, None)
+            if isinstance(v, (int, float)) and v > 0:
+                raw_bytes = int(v)
+                break
+        if raw_bytes is None and hasattr(info, "config"):
+            v = getattr(info.config, "disk_data_size", None)
+            if isinstance(v, (int, float)) and v > 0:
+                raw_bytes = int(v)
+        if raw_bytes is not None:
+            size_mb = raw_bytes // (1024 * 1024)
+    except Exception:  # pylint: disable=broad-except
+        size_mb = None
+
     payload = StatusResponse(
         ready=ready,
         indexed_count=indexed_count,
         version=app.version,
+        provider=provider,
+        model=model,
+        size_mb=size_mb,
     )
     _status_cache["payload"] = payload
     _status_cache["ts"] = now
@@ -884,11 +933,84 @@ from src.config.indexing_rules import (
 _SHORTCUT_FILE_PATH = APP_DATA_DIR / "shortcut.json"
 
 
+_folder_stats_cache: dict[str, Any] = {"payload": None, "ts": 0.0}
+_FOLDER_STATS_TTL = 3.0
+
+
+def _compute_folder_stats() -> dict[str, dict[str, Any]]:
+    """Return {folder_path: {files, size_bytes, last_read_at}} aggregated
+    from the manifest. Cheap-ish (~O(manifest entries)) but cached for
+    a few seconds so the Settings UI's poll-on-tick doesn't re-scan
+    on every refresh.
+
+    `last_read_at` is the max `ingested_at` across files under that
+    root (= when this folder's contents most recently landed in
+    Qdrant). Folders with no entries return zeros.
+    """
+    from src.manifest import Manifest, REPO_ROOT
+    manifest = Manifest()
+    rules = load_user_rules()
+
+    # Pre-resolve each include_path's absolute prefix once.
+    roots: list[tuple[str, str]] = []  # (raw_path, resolved_prefix)
+    for ip in rules.include_paths:
+        try:
+            resolved = str(Path(ip.path).expanduser().resolve())
+        except OSError:
+            resolved = ip.path
+        roots.append((ip.path, resolved))
+
+    out: dict[str, dict[str, Any]] = {
+        raw: {"files": 0, "size_bytes": 0, "last_read_at": None}
+        for raw, _ in roots
+    }
+
+    for rel, entry in manifest.entries.items():
+        absolute = rel if Path(rel).is_absolute() else str(REPO_ROOT / rel)
+        for raw, prefix in roots:
+            if absolute == prefix or absolute.startswith(prefix + "/"):
+                stats = out[raw]
+                stats["files"] += 1
+                stats["size_bytes"] += int(entry.size or 0)
+                if entry.ingested_at:
+                    prev = stats["last_read_at"]
+                    if prev is None or entry.ingested_at > prev:
+                        stats["last_read_at"] = entry.ingested_at
+                break  # one root per file
+
+    return out
+
+
+def _get_folder_stats() -> dict[str, dict[str, Any]]:
+    now = time.monotonic()
+    if (
+        _folder_stats_cache["payload"] is not None
+        and now - _folder_stats_cache["ts"] < _FOLDER_STATS_TTL
+    ):
+        return _folder_stats_cache["payload"]
+    payload = _compute_folder_stats()
+    _folder_stats_cache["payload"] = payload
+    _folder_stats_cache["ts"] = now
+    return payload
+
+
 @app.get("/settings/folders")
 def settings_get_folders() -> dict[str, Any]:
     rules = load_user_rules()
+    stats = _get_folder_stats()
+    folders = []
+    for p in rules.include_paths:
+        s = stats.get(p.path, {"files": 0, "size_bytes": 0, "last_read_at": None})
+        folders.append({
+            "path": p.path,
+            "enabled": p.enabled,
+            "display_name": p.display_name,  # may be None
+            "files": s["files"],
+            "size_bytes": s["size_bytes"],
+            "last_read_at": s["last_read_at"],  # ISO string or None
+        })
     return {
-        "folders": [{"path": p.path, "enabled": p.enabled} for p in rules.include_paths],
+        "folders": folders,
         "ingest_running": _ingest_state["running"],
     }
 
@@ -957,22 +1079,41 @@ def settings_put_shortcut(req: ShortcutPutRequest) -> dict[str, str]:
     return {"status": "saved", "shortcut": req.shortcut}
 
 
-class FolderTogglePatch(BaseModel):
+class FolderPatch(BaseModel):
+    """PATCH /settings/folders body. Identifies the folder by `path`;
+    any of `enabled` / `display_name` may be set. Unset fields are
+    left unchanged. Setting `display_name` to `null` clears the
+    override (UI falls back to the path's basename)."""
     path: str
-    enabled: bool
+    enabled: bool | None = None
+    display_name: str | None = None
 
 
 @app.patch("/settings/folders")
-def settings_toggle_folder(req: FolderTogglePatch) -> dict[str, str]:
-    """Toggle an existing IncludePath's `enabled` flag. 404 if path not
-    found. The Settings UI's Data tab uses this for the per-row switch."""
+def settings_patch_folder(req: FolderPatch) -> dict[str, Any]:
+    """Patch an existing IncludePath. 404 if path not found. The
+    Settings UI's Data tab uses this for the per-row toggle and for
+    the overflow-menu rename action."""
     rules = load_user_rules()
     target = str(Path(req.path).expanduser().resolve())
     for entry in rules.include_paths:
         if str(Path(entry.path).expanduser().resolve()) == target:
-            entry.enabled = req.enabled
+            if req.enabled is not None:
+                entry.enabled = req.enabled
+            # display_name is patched even when None — None means
+            # "clear the override" (per the model docstring). Use
+            # FastAPI's "unset" idiom would conflict with that; we
+            # rely on the request body explicitly including the field.
+            # Pydantic exclude_unset gates this for us via model_fields_set.
+            if "display_name" in req.model_fields_set:
+                entry.display_name = req.display_name
             save_user_rules(rules)
-            return {"status": "updated", "enabled": str(req.enabled).lower()}
+            return {
+                "status": "updated",
+                "path": entry.path,
+                "enabled": entry.enabled,
+                "display_name": entry.display_name,
+            }
     raise HTTPException(status_code=404, detail=f"folder not found: {req.path}")
 
 

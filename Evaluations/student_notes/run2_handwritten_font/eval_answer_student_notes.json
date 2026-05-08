@@ -2,7 +2,7 @@
   {
     "id": "q01",
     "question": "When is the CS 301 midterm?",
-    "expert_ground_truth": "October 21. Lecture06 (Sep 30, handwritten PDF) explicitly states: 'midterm is moved to Oct 21 (was Oct 14 on syllabus)'. Lecture05 (Sep 23) had Dr. Rahm tentatively floating the move ('she might push the midterm back a week to Oct 21'); lecture06 confirmed it. Lecture08 (Oct 14) confirms the original slot got filled with 'unsupervised learning: clustering' instead.",
+    "ground_truth": "October 21. Lecture06 (Sep 30, handwritten PDF) explicitly states: 'midterm is moved to Oct 21 (was Oct 14 on syllabus)'. Lecture05 (Sep 23) had Dr. Rahm tentatively floating the move ('she might push the midterm back a week to Oct 21'); lecture06 confirmed it. Lecture08 (Oct 14) confirms the original slot got filled with 'unsupervised learning: clustering' instead.",
     "magpie_answer": "The CS 301 midterm is scheduled for October 21st (Tuesday).",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/weekly_planning_oct19.pdf"
@@ -36,7 +36,7 @@
   {
     "id": "q02",
     "question": "Is the CS 301 midterm open-book or closed-book?",
-    "expert_ground_truth": "Open-note. Lecture06 (Sep 30, handwritten) states: 'She also confirmed it's open-note — bring whatever printed/handwritten notes you want, just no electronics.' The original syllabus PDF Midterm Exam Policy says 'closed-book, closed-notes, one 8.5×11 handwritten cheat sheet permitted.' Lecture05 (Sep 23) had Dr. Rahm tentatively considering it ('mentioned that the midterm be open-note this year??'). Lecture07 (Oct 7) re-confirms ('any printed or handwritten materials, no laptops/phones'). Study group Oct 12 has a peer-rumor distractor ('someone who took CS 301 last year said the midterm was closed-book').",
+    "ground_truth": "Open-note. Lecture06 (Sep 30, handwritten) states: 'She also confirmed it's open-note — bring whatever printed/handwritten notes you want, just no electronics.' The original syllabus PDF Midterm Exam Policy says 'closed-book, closed-notes, one 8.5×11 handwritten cheat sheet permitted.' Lecture05 (Sep 23) had Dr. Rahm tentatively considering it ('mentioned that the midterm be open-note this year??'). Lecture07 (Oct 7) re-confirms ('any printed or handwritten materials, no laptops/phones'). Study group Oct 12 has a peer-rumor distractor ('someone who took CS 301 last year said the midterm was closed-book').",
     "magpie_answer": "The provided files mention midterm preparation, midterm review, and midterm results, but they do not specify whether the CS 301 midterm exam is open-book or closed-book.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture07_oct07.pdf",
@@ -74,7 +74,7 @@
   {
     "id": "q03",
     "question": "What are the grading weights for CS 301?",
-    "expert_ground_truth": "As officially announced in lecture09 (Oct 28), the new grading weights are: Homework (value cut off in handwriting but can be inferred as 25% to make sum 100), Midterm 20% (was 25% per syllabus), Final Project (handwritten value unclear but the student's note 'So Marcus was right about the proj[ect]' implies 40%), Participation (handwritten value unclear but inferred 15%). Original syllabus PDF: HW 30%, Midterm 25%, Final Project 35%, Participation & Quizzes 10%. The TA Marcus mentioned the change tentatively in his Oct 3 office-hours notes ('don't quote me') with 'final project worth [60 or 40]' — the digit is genuinely ambiguous in his handwriting.",
+    "ground_truth": "As officially announced in lecture09 (Oct 28), the new grading weights are: Homework (value cut off in handwriting but can be inferred as 25% to make sum 100), Midterm 20% (was 25% per syllabus), Final Project (handwritten value unclear but the student's note 'So Marcus was right about the proj[ect]' implies 40%), Participation (handwritten value unclear but inferred 15%). Original syllabus PDF: HW 30%, Midterm 25%, Final Project 35%, Participation & Quizzes 10%. The TA Marcus mentioned the change tentatively in his Oct 3 office-hours notes ('don't quote me') with 'final project worth [60 or 40]' — the digit is genuinely ambiguous in his handwriting.",
     "magpie_answer": "The grading weights for CS 301 are:\n- Homework: 25%\n- Midterm: 20%\n- Final Project: 40%\n- Participation: 15%",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture09_oct28.pdf"
@@ -120,7 +120,7 @@
   {
     "id": "q04",
     "question": "When is HW1 for CS 301 due?",
-    "expert_ground_truth": "September 12 (Friday) by 11:59pm on Canvas. Lecture03 (Sep 9, handwritten) states: 'HW1 note: she said the deadline is actually Sep 12 (Friday) not Sep 9 as on syllabus. \"I realized Tuesday is too tight.\" Submit on Canvas by 11:59pm.' The syllabus PDF Week 3 row implies Sep 9 due (HW1 column).",
+    "ground_truth": "September 12 (Friday) by 11:59pm on Canvas. Lecture03 (Sep 9, handwritten) states: 'HW1 note: she said the deadline is actually Sep 12 (Friday) not Sep 9 as on syllabus. \"I realized Tuesday is too tight.\" Submit on Canvas by 11:59pm.' The syllabus PDF Week 3 row implies Sep 9 due (HW1 column).",
     "magpie_answer": "HW1 will be posted next week, due September 9th.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture01_aug26.pdf"
@@ -154,7 +154,7 @@
   {
     "id": "q05",
     "question": "What topics does the CS 301 midterm cover?",
-    "expert_ground_truth": "Weeks 1-7: linear regression, logistic regression, SVMs / kernel methods, decision trees & ensembles, neural networks (perceptrons, MLPs, backprop, CNN intro). Lecture06 (Sep 30, handwritten) states midterm covers 'everything through neural networks now' (post-move). Lecture07 (Oct 7) midterm review explicitly lists topics: 'today (linear regression, logistic regression, SVMs, decision trees/ensembles, neural nets basics)'. Bishop PRML chapters 1, 3.1, 4.1-4.3, 7, 5.1-5.5 + ISL Ch 8 per the syllabus's Week 1-7 readings column.",
+    "ground_truth": "Weeks 1-7: linear regression, logistic regression, SVMs / kernel methods, decision trees & ensembles, neural networks (perceptrons, MLPs, backprop, CNN intro). Lecture06 (Sep 30, handwritten) states midterm covers 'everything through neural networks now' (post-move). Lecture07 (Oct 7) midterm review explicitly lists topics: 'today (linear regression, logistic regression, SVMs, decision trees/ensembles, neural nets basics)'. Bishop PRML chapters 1, 3.1, 4.1-4.3, 7, 5.1-5.5 + ISL Ch 8 per the syllabus's Week 1-7 readings column.",
     "magpie_answer": "The CS 301 midterm covers topics such as:\n- Supervised and unsupervised learning (from the syllabus).\n- Neural networks, including CNNs, LeNet, and AlexNet (from lecture notes).\n- Gradient descent and loss functions (from lecture notes).\n- Bias-variance trade-off and various evaluation metrics (from TA meeting notes).\n- Linear and logistic regression (from study group notes).\n- Principal Component Analysis (PCA), including finding eigenvectors and eigenvalues, and connections to Singular Value Decomposition (SVD) (from lecture notes).\n- Short answer conceptual questions and computation problems (from lecture notes).\n- Concepts related to the SVM derivation (from study group notes).",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/syllabus_cs301_fall2025.pdf",
@@ -204,7 +204,7 @@
   {
     "id": "q06",
     "question": "Who is the TA for CS 301 and when are their office hours?",
-    "expert_ground_truth": "Marcus Webb (marcus.webb@university.edu). Office hours: Mondays 1-3pm and Fridays 10am-12pm in Uris 105. From the syllabus PDF header.",
+    "ground_truth": "Marcus Webb (marcus.webb@university.edu). Office hours: Mondays 1-3pm and Fridays 10am-12pm in Uris 105. From the syllabus PDF header.",
     "magpie_answer": "Marcus is the TA for CS 301, and their office hours were noted on Friday, Oct 3rd, in the TA meeting notes.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/ta_meeting_oct03.pdf"
@@ -238,7 +238,7 @@
   {
     "id": "q07",
     "question": "What format is the CS 301 midterm?",
-    "expert_ground_truth": "Per lecture07 (Oct 7) midterm review: 5 short-answer conceptual questions (5 pts each = 25 pts), 3 calculation/derivation problems (15 pts each = 45 pts; the handwriting could plausibly be read as '13 pts' but that doesn't sum to 90, so 15 is the consistent reading), and 1 longer 'design' question (20 pts). Total 90 points scaled to 100. Marcus had earlier mentioned a vaguer '60% conceptual / 40% short derivations' in the Oct 3 TA meeting — lecture07 is more specific and authoritative.",
+    "ground_truth": "Per lecture07 (Oct 7) midterm review: 5 short-answer conceptual questions (5 pts each = 25 pts), 3 calculation/derivation problems (15 pts each = 45 pts; the handwriting could plausibly be read as '13 pts' but that doesn't sum to 90, so 15 is the consistent reading), and 1 longer 'design' question (20 pts). Total 90 points scaled to 100. Marcus had earlier mentioned a vaguer '60% conceptual / 40% short derivations' in the Oct 3 TA meeting — lecture07 is more specific and authoritative.",
     "magpie_answer": "The midterm exam format includes short answer conceptual questions (5 points each), computation problems (15 points each), and one problem where you propose an ML approach for a scenario (20 points). The total points scored are out of 100.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture07_oct07.pdf"
@@ -272,7 +272,7 @@
   {
     "id": "q08",
     "question": "Does the Psych 250 Exam 1 have an essay question?",
-    "expert_ground_truth": "Yes. Lecture03 (Sep 10, Psych 250 handwritten) notes that Prof Chen announced Exam 1 will have ~30 multiple choice plus an essay portion ('the essay part is [worth 20%] of grade' — handwriting partially clipped on the percentage but clearly mentions essay as a new addition). The syllabus PDF says only 'multiple choice + short answer' under Exam Policy. The Sep 26 lab section notes capture TA Sarah saying 'I think it's just MC and short answer' — directly contradicting Prof Chen's class announcement. The Oct 8 lecture (post-Exam-1) confirms the essay existed: 'He said the essay question tripped people up (so there WAS one, Sarah was wrong).'",
+    "ground_truth": "Yes. Lecture03 (Sep 10, Psych 250 handwritten) notes that Prof Chen announced Exam 1 will have ~30 multiple choice plus an essay portion ('the essay part is [worth 20%] of grade' — handwriting partially clipped on the percentage but clearly mentions essay as a new addition). The syllabus PDF says only 'multiple choice + short answer' under Exam Policy. The Sep 26 lab section notes capture TA Sarah saying 'I think it's just MC and short answer' — directly contradicting Prof Chen's class announcement. The Oct 8 lecture (post-Exam-1) confirms the essay existed: 'He said the essay question tripped people up (so there WAS one, Sarah was wrong).'",
     "magpie_answer": "Yes, Exam 1 for PSYC 250 had an essay question, as noted by Prof. Chen: \"He said the essay question tripped people up\" in the lecture notes from October 8th.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/lecture07_oct08.pdf"
@@ -306,7 +306,7 @@
   {
     "id": "q09",
     "question": "When is the Psych 250 research paper proposal due?",
-    "expert_ground_truth": "October 15. The syllabus PDF says Oct 8. Lecture05 (Sep 24) handwritten: 'Originally Oct 8 (syllabus says so) but now it's Oct 15 because too many students are stressed about the e[xam at the] same time.' Lecture07 (Oct 8) confirms: 'Paper proposals now due Oct 15 (reminder he already pushed this back).' The student's weekly_planning_oct19 note expresses uncertainty about a possible Oct 22 extension ('check Canvas'); not confirmed in any other source.",
+    "ground_truth": "October 15. The syllabus PDF says Oct 8. Lecture05 (Sep 24) handwritten: 'Originally Oct 8 (syllabus says so) but now it's Oct 15 because too many students are stressed about the e[xam at the] same time.' Lecture07 (Oct 8) confirms: 'Paper proposals now due Oct 15 (reminder he already pushed this back).' The student's weekly_planning_oct19 note expresses uncertainty about a possible Oct 22 extension ('check Canvas'); not confirmed in any other source.",
     "magpie_answer": "The research paper proposal for Psych 250 is due on December 3rd (for the revised guidelines, not the original syllabus).",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/syllabus_psych250_fall2025.pdf",
@@ -341,7 +341,7 @@
   {
     "id": "q10",
     "question": "How long should the Psych 250 research paper be?",
-    "expert_ground_truth": "6-8 pages. The syllabus PDF says 8-10 pages. Lecture05 (Sep 24) handwritten: 'He also said the paper only needs to be 6-8 pages now, not 8-10 as on the syllabus. \"[Q]uality [over] quantity.\"' Study group Nov 2 confirms: 'Paper is due Dec 3 (6-8 pages per the revised guidelines, NOT 8-10 as syllabus says).'",
+    "ground_truth": "6-8 pages. The syllabus PDF says 8-10 pages. Lecture05 (Sep 24) handwritten: 'He also said the paper only needs to be 6-8 pages now, not 8-10 as on the syllabus. \"[Q]uality [over] quantity.\"' Study group Nov 2 confirms: 'Paper is due Dec 3 (6-8 pages per the revised guidelines, NOT 8-10 as syllabus says).'",
     "magpie_answer": "The required length for the research paper in PSYCH 250 is 6-8 pages, not 8-10 pages, according to the syllabus notes.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/syllabus_psych250_fall2025.pdf"
@@ -375,7 +375,7 @@
   {
     "id": "q11",
     "question": "What topics are covered on Psych 250 Exam 2?",
-    "expert_ground_truth": "Retrieval from long-term memory; everyday memory and forgetting; knowledge and categorization; and the Kirchhoff guest lecture material on false memories. Visual imagery is NOT on Exam 2 despite being listed under Week 10 of the syllabus schedule. Confirmed in study_group_nov02: 'Maya emailed Sarah (TA) and Sarah confirmed: Exam 2 covers retrieval, everyday memory or[/]forgetting, and knowledge[/categorization]. Also includes the Kirchhoff guest lecture on false memories.' Tyler also reported Prof Chen said in class that Exam 2 covers 'through last Wednesday' (Oct 29 = knowledge & categorization), implying NO visual imagery.",
+    "ground_truth": "Retrieval from long-term memory; everyday memory and forgetting; knowledge and categorization; and the Kirchhoff guest lecture material on false memories. Visual imagery is NOT on Exam 2 despite being listed under Week 10 of the syllabus schedule. Confirmed in study_group_nov02: 'Maya emailed Sarah (TA) and Sarah confirmed: Exam 2 covers retrieval, everyday memory or[/]forgetting, and knowledge[/categorization]. Also includes the Kirchhoff guest lecture on false memories.' Tyler also reported Prof Chen said in class that Exam 2 covers 'through last Wednesday' (Oct 29 = knowledge & categorization), implying NO visual imagery.",
     "magpie_answer": "Based on the provided study group notes, Psych 250 Exam 2 covers topics including:\n- Retrieval, encoding, and various memory theories like DRM and semantic networks.\n- Different types of memory, specifically episodic and semantic memory.\n- Topics related to false memories, such as memory distortion, memory formation processes, and the impact of misinformation, including implications for eyewitness testimony and how social media reinforces false memories.\n- The notes mention that the scope for Exam 2 covers retrieval, everyday memory, knowledge/categorization, and false memories.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/study_group_nov02.pdf",
@@ -422,7 +422,7 @@
   {
     "id": "q12",
     "question": "Who is giving the guest lecture in Psych 250 and what is it about?",
-    "expert_ground_truth": "Dr. Lena Kirchhoff from Stanford's Cognition & Law Lab (handwritten lecture09 says 'Cognition [&] Law Lab at Stanford'). She spoke on October 22 about false memories. Announced in lab_section_sep26 ('memory researcher, Dr. Lena Kirchhoff, to speak on Oct 22 (the knowledge categorization day)... amazing work on false memories'). Confirmed by lecture09 on the day of the talk.",
+    "ground_truth": "Dr. Lena Kirchhoff from Stanford's Cognition & Law Lab (handwritten lecture09 says 'Cognition [&] Law Lab at Stanford'). She spoke on October 22 about false memories. Announced in lab_section_sep26 ('memory researcher, Dr. Lena Kirchhoff, to speak on Oct 22 (the knowledge categorization day)... amazing work on false memories'). Confirmed by lecture09 on the day of the talk.",
     "magpie_answer": "Dr. Lena Kirchoff is giving a guest lecture in Psych 250 on false memories, discussing how memories are distorted, memory formation processes, misinformation, eyewitness testimony, and how social media reinforces false memories.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/lecture09_oct22.pdf"
@@ -456,7 +456,7 @@
   {
     "id": "q13",
     "question": "Who is giving the guest lecture in CS 301 and what is it about?",
-    "expert_ground_truth": "Dr. Jaya Patel from the AI Ethics Lab. Per lecture11 (Nov 11) handwritten: 'She invited a guest speaker for the ethics lecture: Dr. Jaya Patel from the AI Ethics Lab. Originally this was going to be Prof. Thompson from Philosophy dept but he had a scheduling conflict.' The talk was originally on Nov 18 in the syllabus (Ethics in ML / fairness), but lecture11 says it's being swapped with RL part 2 — so the new date is Dec 2 alongside project presentations (Week 15 in the syllabus schedule).",
+    "ground_truth": "Dr. Jaya Patel from the AI Ethics Lab. Per lecture11 (Nov 11) handwritten: 'She invited a guest speaker for the ethics lecture: Dr. Jaya Patel from the AI Ethics Lab. Originally this was going to be Prof. Thompson from Philosophy dept but he had a scheduling conflict.' The talk was originally on Nov 18 in the syllabus (Ethics in ML / fairness), but lecture11 says it's being swapped with RL part 2 — so the new date is Dec 2 alongside project presentations (Week 15 in the syllabus schedule).",
     "magpie_answer": "The provided files do not mention any guest lectures in CS 301.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture01_aug26.pdf",
@@ -494,7 +494,7 @@
   {
     "id": "q14",
     "question": "What is the student's CS 301 final project about and who are their teammates?",
-    "expert_ground_truth": "Using ML to predict student dropout from LMS engagement data. Teammates are Priya and Jordan. Per weekly_planning_oct19 handwritten Tuesday section: 'CS 301 project proposal due (emailed rough draft to Priya and Jordan, need to finalize). Our project: using ML to predict student dropout from LMS engagement data. Need [to] confirm dataset availability.' Alex appears in the study_group_oct12 study group with the student (alongside Priya and Jordan) but is NOT on the project team — he's a study buddy only.",
+    "ground_truth": "Using ML to predict student dropout from LMS engagement data. Teammates are Priya and Jordan. Per weekly_planning_oct19 handwritten Tuesday section: 'CS 301 project proposal due (emailed rough draft to Priya and Jordan, need to finalize). Our project: using ML to predict student dropout from LMS engagement data. Need [to] confirm dataset availability.' Alex appears in the study_group_oct12 study group with the student (alongside Priya and Jordan) but is NOT on the project team — he's a study buddy only.",
     "magpie_answer": "The final project is a proposal due on October 21st and the final report and code due on December 2nd, with presentations during Week 15. The team members mentioned are Priya, Jordan, and Alex.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/syllabus_cs301_fall2025.pdf"
@@ -528,7 +528,7 @@
   {
     "id": "q15",
     "question": "What readings are due before the CS 301 midterm?",
-    "expert_ground_truth": "Per the syllabus PDF Week 1-7 readings column: PRML Chapters 1, 3.1, 4.1-4.3, 7, 5.1-5.5; plus ISL Chapter 8.",
+    "ground_truth": "Per the syllabus PDF Week 1-7 readings column: PRML Chapters 1, 3.1, 4.1-4.3, 7, 5.1-5.5; plus ISL Chapter 8.",
     "magpie_answer": "The syllabus for CS 301 indicates that the midterm exam covers material from Week 1 through Week 7, which includes topics like linear regression, logistic regression, SVMs, decision trees, and neural networks [syllabus_cs301_fall2025.pdf]. Lecture 7, which is a midterm review, covers Neural Networks II, CNNs, and suggests reviewing prior material including gradient descent and loss functions [lecture07_oct07.pdf].",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/syllabus_cs301_fall2025.pdf",
@@ -563,7 +563,7 @@
   {
     "id": "q16",
     "question": "What was the median score on the CS 301 midterm?",
-    "expert_ground_truth": "Per lecture09 (Oct 28, handwritten): 'Mean: 72/?? (??), Median: 75/?? (83%)' — the denominators and exact mean/median numerals are partially obscured in the student's handwriting but '75' median and '83%' are legibly written. 'Dr. Rahm said she's pleased overall and no curve needed.' So: median 75 out of 90 (83%), no curve.",
+    "ground_truth": "Per lecture09 (Oct 28, handwritten): 'Mean: 72/?? (??), Median: 75/?? (83%)' — the denominators and exact mean/median numerals are partially obscured in the student's handwriting but '75' median and '83%' are legibly written. 'Dr. Rahm said she's pleased overall and no curve needed.' So: median 75 out of 90 (83%), no curve.",
     "magpie_answer": "The median score on the CS 301 midterm was 75/90 (83%).",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture09_oct28.pdf"
@@ -597,7 +597,7 @@
   {
     "id": "q17",
     "question": "What study strategies does the student use or plan to use across their courses?",
-    "expert_ground_truth": "For CS 301: study groups (study_group_oct12 lists meeting with Priya, Jordan, and Alex at the library); divides topics among group members (Priya did logistic regression, Jordan did SVMs, Alex did decision trees / ensembles); attends Marcus's TA office hours regularly (ta_meeting_oct03). For Psych 250: study group with Maya, Tyler, Reese (study_group_nov02); applies Prof. Chen's quiz-yourself-not-re-read advice (lecture05_sep24); occasionally emails TA Sarah for clarification (e.g. on Exam 2 scope). The student also notes in weekly_planning_oct19 that ML mental models from CS 301 helped them understand Psych 250 concepts better.",
+    "ground_truth": "For CS 301: study groups (study_group_oct12 lists meeting with Priya, Jordan, and Alex at the library); divides topics among group members (Priya did logistic regression, Jordan did SVMs, Alex did decision trees / ensembles); attends Marcus's TA office hours regularly (ta_meeting_oct03). For Psych 250: study group with Maya, Tyler, Reese (study_group_nov02); applies Prof. Chen's quiz-yourself-not-re-read advice (lecture05_sep24); occasionally emails TA Sarah for clarification (e.g. on Exam 2 scope). The student also notes in weekly_planning_oct19 that ML mental models from CS 301 helped them understand Psych 250 concepts better.",
     "magpie_answer": "The provided files do not contain information about the study strategies a student uses or plans to use across their courses.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/edu.csv",
@@ -633,7 +633,7 @@
   {
     "id": "q18",
     "question": "When is CS 301 HW3 due?",
-    "expert_ground_truth": "October 28. The syllabus's Week 9 (Oct 21) row implies HW3 due. Lecture08 (Oct 14, handwritten) explicitly extends it: 'She also said HW3 (the backprop implementation) deadline is extended to Oct 28 since we've been focused on midterm prep. Originally was due Oct 21.' Lecture09 (Oct 28) confirms HW3 due that day.",
+    "ground_truth": "October 28. The syllabus's Week 9 (Oct 21) row implies HW3 due. Lecture08 (Oct 14, handwritten) explicitly extends it: 'She also said HW3 (the backprop implementation) deadline is extended to Oct 28 since we've been focused on midterm prep. Originally was due Oct 21.' Lecture09 (Oct 28) confirms HW3 due that day.",
     "magpie_answer": "HW1 was due on September 12th.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture03_sep09.pdf"
@@ -667,7 +667,7 @@
   {
     "id": "q19",
     "question": "What extra credit opportunities are available in Psych 250?",
-    "expert_ground_truth": "Attend Dr. Kirchhoff's guest talk on October 22 and write a 1-page reflection — worth 2% added to final grade. Per lecture07 (Oct 8 handwritten): 'Extra credit opportunity: attend Dr. Kirchhoff's talk on Oct 22 and write a 1-page reflection. Worth 2% added to your [final] grade.' Reaffirmed in weekly_planning_oct19 as 'extra credit if I write a reflection'.",
+    "ground_truth": "Attend Dr. Kirchhoff's guest talk on October 22 and write a 1-page reflection — worth 2% added to final grade. Per lecture07 (Oct 8 handwritten): 'Extra credit opportunity: attend Dr. Kirchhoff's talk on Oct 22 and write a 1-page reflection. Worth 2% added to your [final] grade.' Reaffirmed in weekly_planning_oct19 as 'extra credit if I write a reflection'.",
     "magpie_answer": "The syllabus for PSYCH 250 lists the following grading components: exams, homework, research paper, and lab reports. There is no mention of extra credit opportunities in the provided materials.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/syllabus_psych250_fall2025.pdf"
@@ -701,7 +701,7 @@
   {
     "id": "q20",
     "question": "Is there any connection between what the student is learning in CS 301 and Psych 250?",
-    "expert_ground_truth": "Yes. The student's weekly_planning_oct19 (handwritten) Side Thought section: 'ML helped me understand some psych concepts better. The \"pattern recognition\" stuff from CS 301 maps onto perception in Psych 250. And the bias-variance tradeoff is kind of like the speed-accuracy tradeoff in attention research? Maybe I should write my psych paper on computational models of cognition.' This is a single-source self-reflection.",
+    "ground_truth": "Yes. The student's weekly_planning_oct19 (handwritten) Side Thought section: 'ML helped me understand some psych concepts better. The \"pattern recognition\" stuff from CS 301 maps onto perception in Psych 250. And the bias-variance tradeoff is kind of like the speed-accuracy tradeoff in attention research? Maybe I should write my psych paper on computational models of cognition.' This is a single-source self-reflection.",
     "magpie_answer": "The provided files do not contain any information detailing a connection between the topics learned in CS 301 (Introduction to Machine Learning) and Psych 250 (Cognitive Psychology).",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/syllabus_psych250_fall2025.pdf",
@@ -736,7 +736,7 @@
   {
     "id": "q21",
     "question": "Where and when are Prof. Chen's office hours?",
-    "expert_ground_truth": "Wednesdays 1-3pm in Psych Building 308. From the syllabus PDF header.",
+    "ground_truth": "Wednesdays 1-3pm in Psych Building 308. From the syllabus PDF header.",
     "magpie_answer": "Prof. Chen's office hours for PSYCH 250 are on Wednesdays from 10 am to 12 pm in Psych Building 308. TA Sarah Okotar's office hours are on Thursdays from 10 am to 12 pm (Section A) or 2 pm to 3 pm (Section B).",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/syllabus_psych250_fall2025.pdf"
@@ -770,7 +770,7 @@
   {
     "id": "q22",
     "question": "What happened to the CS 301 schedule on October 14?",
-    "expert_ground_truth": "The midterm was originally scheduled for Oct 14 but Dr. Rahm moved it to Oct 21 (announced Sep 30, lecture06). On Oct 14 itself, lecture08 records: 'Since the midterm got pushed to next week, Dr. Rahm moved clustering [unsupervised learning, originally a later week's material] up to fill today.' She also extended HW3 in the same lecture (Oct 21 → Oct 28).",
+    "ground_truth": "The midterm was originally scheduled for Oct 14 but Dr. Rahm moved it to Oct 21 (announced Sep 30, lecture06). On Oct 14 itself, lecture08 records: 'Since the midterm got pushed to next week, Dr. Rahm moved clustering [unsupervised learning, originally a later week's material] up to fill today.' She also extended HW3 in the same lecture (Oct 21 → Oct 28).",
     "magpie_answer": "The CS 301 midterm exam was scheduled for October 14th.",
     "magpie_sources_used": [],
     "magpie_retrieved": [
@@ -802,7 +802,7 @@
   {
     "id": "q23",
     "question": "When did Dr. Rahm work before joining the university?",
-    "expert_ground_truth": "DeepMind. Lecture01 (Aug 26, handwritten) says: 'Dr. Rahm seems cool, very [enthusiastic], worked at DeepMind before coming here.' The 'DeepMind' word is reasonably legible.",
+    "ground_truth": "DeepMind. Lecture01 (Aug 26, handwritten) says: 'Dr. Rahm seems cool, very [enthusiastic], worked at DeepMind before coming here.' The 'DeepMind' word is reasonably legible.",
     "magpie_answer": "The provided files do not contain information about when Dr. Rahm worked before joining the university.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/syllabus_cs301_fall2025.pdf"
@@ -836,7 +836,7 @@
   {
     "id": "q24",
     "question": "Will the Psych 250 Exam 2 cover visual imagery?",
-    "expert_ground_truth": "No. Visual imagery (Goldstein Ch 10) is listed under Week 10 in the syllabus PDF (which falls in Exam 2's W6-W10 range), but the schedule was rearranged: visual imagery moved to Nov 12, after the Nov 5 exam. Confirmed by TA Sarah per study_group_nov02 handwritten: 'Maya emailed Sarah (TA) and Sarah confirmed: Exam 2 covers retrieval, everyday memory[/forgetting], and knowledge[/categorization]. NO visual imagery. Also includes the Kirchhoff guest lecture on false memories.'",
+    "ground_truth": "No. Visual imagery (Goldstein Ch 10) is listed under Week 10 in the syllabus PDF (which falls in Exam 2's W6-W10 range), but the schedule was rearranged: visual imagery moved to Nov 12, after the Nov 5 exam. Confirmed by TA Sarah per study_group_nov02 handwritten: 'Maya emailed Sarah (TA) and Sarah confirmed: Exam 2 covers retrieval, everyday memory[/forgetting], and knowledge[/categorization]. NO visual imagery. Also includes the Kirchhoff guest lecture on false memories.'",
     "magpie_answer": "Study group notes indicate that Exam 2 will cover retrieval, encoding, episodic memory, and semantic memory, but they explicitly state that there will be NO visual imagery on Exam 2.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/psych250/study_group_nov02.pdf"
@@ -870,7 +870,7 @@
   {
     "id": "q25",
     "question": "What should I bring to the CS 301 midterm?",
-    "expert_ground_truth": "Bring printed or handwritten notes (the exam is open-note, per lecture06 and lecture07). No electronics. Lecture07 (Oct 7) midterm review confirms: 'any printed or handwritten materials, no laptops/phones.' Bring a pen/pencil. The exam is 90 points scaled to 100 with 5 short-answer + 3 calculation + 1 design questions per the lecture07 format announcement.",
+    "ground_truth": "Bring printed or handwritten notes (the exam is open-note, per lecture06 and lecture07). No electronics. Lecture07 (Oct 7) midterm review confirms: 'any printed or handwritten materials, no laptops/phones.' Bring a pen/pencil. The exam is 90 points scaled to 100 with 5 short-answer + 3 calculation + 1 design questions per the lecture07 format announcement.",
     "magpie_answer": "The midterm exam is closed book, and students should bring one 8.5x11 handwritten cheat sheet (both sides) which is permitted. Review material includes concepts like bias-variance trade-off, evaluation metrics, gradient descent, loss functions, CNNs, LeNet, and AlexNet, and the exam format includes short answer conceptual questions and computation problems.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/student notes_handwritten_font/cs301/lecture07_oct07.pdf",

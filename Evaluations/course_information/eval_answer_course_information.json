@@ -2,7 +2,7 @@
   {
     "id": "q01",
     "question": "What are the prerequisites for CSC-122 (Data Structures and Algorithms)?",
-    "expert_ground_truth": "CSC-121.",
+    "ground_truth": "CSC-121.",
     "magpie_answer": "The prerequisite for CSC-122 (Data Structures and Algorithms) is CSC-121.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv"
@@ -48,7 +48,7 @@
   {
     "id": "q02",
     "question": "How many credits is CSC-105?",
-    "expert_ground_truth": "4 credits.",
+    "ground_truth": "4 credits.",
     "magpie_answer": "CSC-105 is worth 4 credits.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by GER/mr.csv"
@@ -82,7 +82,7 @@
   {
     "id": "q03",
     "question": "What course has coid 67390?",
-    "expert_ground_truth": "CSC-025 (Programming Workshop), in csc.csv. It's a 0-credit lab course where students strengthen problem-solving and build a portfolio.",
+    "ground_truth": "CSC-025 (Programming Workshop), in csc.csv. It's a 0-credit lab course where students strengthen problem-solving and build a portfolio.",
     "magpie_answer": "The course with coid 67390 is not found in the provided files.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/ids.csv",
@@ -134,7 +134,7 @@
   {
     "id": "q04",
     "question": "Which Furman courses fulfill the MR (Mathematical and Formal Reasoning) general education requirement?",
-    "expert_ground_truth": "10 courses fulfill MR. They are: CSC-105, CSC-121, ECN-120, MTH-095, MTH-098, MTH-105, MTH-145, MTH-150, MTH-160, PHL-235.",
+    "ground_truth": "10 courses fulfill MR. They are: CSC-105, CSC-121, ECN-120, MTH-095, MTH-098, MTH-105, MTH-145, MTH-150, MTH-160, PHL-235.",
     "magpie_answer": "The Furman courses that fulfill the MR (Mathematical and Formal Reasoning) general education requirement are:\n- MXP-251: Applied Sports Analytics\n- MTH-110: Finite Mathematics\n- MTH-115: Ideas in Mathematics\n- MTH-150: Analytic Geometry and Calculus I",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/mxp.csv",
@@ -170,7 +170,7 @@
   {
     "id": "q05",
     "question": "What are the prerequisites for CSC-372 (Machine Learning with Big Data)?",
-    "expert_ground_truth": "(CSC-122 AND CSC-272) AND (MTH-120 OR MTH-150). The student needs both CSC-122 and CSC-272, plus either MTH-120 or MTH-150.",
+    "ground_truth": "(CSC-122 AND CSC-272) AND (MTH-120 OR MTH-150). The student needs both CSC-122 and CSC-272, plus either MTH-120 or MTH-150.",
     "magpie_answer": "The prerequisites for CSC-372 (Machine Learning with Big Data) are (CSC-122 and CSC-272) and (MTH-120 or MTH-150).",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv"
@@ -216,7 +216,7 @@
   {
     "id": "q06",
     "question": "I'm a CS major. List every CSC course that requires CSC-122 as a prerequisite.",
-    "expert_ground_truth": "10 CSC courses require CSC-122 as a prerequisite (substring match on prereq column): CSC-223, CSC-332, CSC-341, CSC-342, CSC-347, CSC-351, CSC-352, CSC-362, CSC-372, CSC-461. CSC-475 is a notable exception — its prerequisites are buried in the description column rather than the prerequisites column due to a data-entry issue.",
+    "ground_truth": "10 CSC courses require CSC-122 as a prerequisite (substring match on prereq column): CSC-223, CSC-332, CSC-341, CSC-342, CSC-347, CSC-351, CSC-352, CSC-362, CSC-372, CSC-461. CSC-475 is a notable exception — its prerequisites are buried in the description column rather than the prerequisites column due to a data-entry issue.",
     "magpie_answer": "- CSC-351\n- CSC-347\n- CSC-475",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv",
@@ -263,7 +263,7 @@
   {
     "id": "q07",
     "question": "How many courses are in the Sustainability Studies (SUS) major?",
-    "expert_ground_truth": "27 courses are in the Sustainability Studies (SUS) major.",
+    "ground_truth": "27 courses are in the Sustainability Studies (SUS) major.",
     "magpie_answer": "The file contains information on several courses within the Sustainability Studies (SUS) major, including SUS-210, SUS-200, SUS-120, SUS-201, SUS-230, SUS-220, SUS-216, SUS-240, SUS-325, SUS-351, SUS-345, SUS-342, SUS-352, SUS-475, SUS-410, SUS-474, and SUS-473, but it does not state the total number of courses in the major.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/sus.csv"
@@ -297,7 +297,7 @@
   {
     "id": "q08",
     "question": "How many courses count for the Visual and Performing Arts (VP) GER?",
-    "expert_ground_truth": "56 courses count for the Visual and Performing Arts (VP) GER.",
+    "ground_truth": "56 courses count for the Visual and Performing Arts (VP) GER.",
     "magpie_answer": "There are 5 courses listed that count for the Visual and Performing Arts (VP) GER:",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by GER/vp.csv"
@@ -331,7 +331,7 @@
   {
     "id": "q09",
     "question": "What CSC course satisfies the UQ (Ultimate Questions) general education requirement?",
-    "expert_ground_truth": "CSC-271 (Digital Dilemmas: Data, Technology, and Being Human) satisfies the UQ (Ultimate Questions) GER.",
+    "ground_truth": "CSC-271 (Digital Dilemmas: Data, Technology, and Being Human) satisfies the UQ (Ultimate Questions) GER.",
     "magpie_answer": "The provided files do not contain a CSC course that satisfies the UQ (Ultimate Questions) general education requirement.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/phl.csv",
@@ -368,7 +368,7 @@
   {
     "id": "q10",
     "question": "What's the difference between CSC-221 and CSC-241?",
-    "expert_ground_truth": "Both are 2-credit CSC courses with CSC-121 as the prerequisite, but the topic differs: CSC-221 (Topics in Programming) is an intensive course where students study a new programming language or paradigm — the topic varies and the course can be repeated. CSC-241 (Mobile Apps) is specifically about developing applications for mobile platforms (iPhone, Apple Watch, iPad).",
+    "ground_truth": "Both are 2-credit CSC courses with CSC-121 as the prerequisite, but the topic differs: CSC-221 (Topics in Programming) is an intensive course where students study a new programming language or paradigm — the topic varies and the course can be repeated. CSC-241 (Mobile Apps) is specifically about developing applications for mobile platforms (iPhone, Apple Watch, iPad).",
     "magpie_answer": "CSC-221 is a course where students receive intensive experience by studying a new programming language or programming paradigm, involving both individual and team problem-solving with a significant laboratory component, and it has 2 credits. CSC-241 is not present in the provided course catalog data.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv"
@@ -402,7 +402,7 @@
   {
     "id": "q11",
     "question": "Are there any courses that count for both the HB (Empirical Study of Human Behavior) GER and the WC (World Cultures) GER?",
-    "expert_ground_truth": "Yes — there are 12 unique courses listed under combined 'HB and WC' GER labels in hb.csv. The labels appear with several inconsistent string variants: 7 rows under 'HB (Empirical Study of Human Behavior) and WC (World Cultures)', 2 under 'HB ... and WC ... and IEJ ...' (triple GER), 1 under 'HB (Empirical Studies of Human Behavior)' (note plural), 1 with reversed order 'WC ... and HB ...', and 1 with lowercase 'human behavior'. The string inconsistencies make this a stress test for exact-match retrieval.",
+    "ground_truth": "Yes — there are 12 unique courses listed under combined 'HB and WC' GER labels in hb.csv. The labels appear with several inconsistent string variants: 7 rows under 'HB (Empirical Study of Human Behavior) and WC (World Cultures)', 2 under 'HB ... and WC ... and IEJ ...' (triple GER), 1 under 'HB (Empirical Studies of Human Behavior)' (note plural), 1 with reversed order 'WC ... and HB ...', and 1 with lowercase 'human behavior'. The string inconsistencies make this a stress test for exact-match retrieval.",
     "magpie_answer": "- ANT-254, The Power and Politics of Black Foodways\n- ANT-264, Psychological Anthropology\n- AST-215, Archaeology of East Asia",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by GER/hb.csv",
@@ -439,7 +439,7 @@
   {
     "id": "q12",
     "question": "Who teaches MHC courses, and how many are there?",
-    "expert_ground_truth": "There is exactly 1 MHC course in the catalog: MHC-503 (Individualized Internship). Instructor information is NOT in the source data — the catalog CSVs do not have an instructor column, so the question's 'who teaches' part cannot be answered from this corpus. A correct answer must say so explicitly rather than hallucinate an instructor name.",
+    "ground_truth": "There is exactly 1 MHC course in the catalog: MHC-503 (Individualized Internship). Instructor information is NOT in the source data — the catalog CSVs do not have an instructor column, so the question's 'who teaches' part cannot be answered from this corpus. A correct answer must say so explicitly rather than hallucinate an instructor name.",
     "magpie_answer": "The provided files do not contain information about who teaches MHC courses.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/mhc.csv"
@@ -473,7 +473,7 @@
   {
     "id": "q13",
     "question": "Are there any courses listed under the major prefix NLY?",
-    "expert_ground_truth": "No. There is no nly.csv file under 'courses by majors/' (the prefix doesn't exist as a major), but nly.csv DOES exist under 'courses by GER/' as the 'Natural World Lab' GER list, with 7 courses. So the answer depends on interpretation: as a major prefix → no NLY major exists; as a GER → 7 courses fulfill the NLY GER.",
+    "ground_truth": "No. There is no nly.csv file under 'courses by majors/' (the prefix doesn't exist as a major), but nly.csv DOES exist under 'courses by GER/' as the 'Natural World Lab' GER list, with 7 courses. So the answer depends on interpretation: as a major prefix → no NLY major exists; as a GER → 7 courses fulfill the NLY GER.",
     "magpie_answer": "No courses were listed under the major prefix NLY.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/lng.csv",
@@ -511,7 +511,7 @@
   {
     "id": "q14",
     "question": "What is CSC-475 and what are its prerequisites?",
-    "expert_ground_truth": "CSC-475 is 'Seminar in Computer Science', 4 credits. It fulfills the WR (Writing-Research Intensive) GER. Students prepare papers on topics from CS research journals and give oral presentations; enrollment is limited to juniors and seniors. The prerequisites are 'any first year writing seminar, CSC-122, and one CSC course numbered 300 or greater' — but these prerequisites are written into the start of the description text rather than the dedicated prerequisites column, which is empty for this course.",
+    "ground_truth": "CSC-475 is 'Seminar in Computer Science', 4 credits. It fulfills the WR (Writing-Research Intensive) GER. Students prepare papers on topics from CS research journals and give oral presentations; enrollment is limited to juniors and seniors. The prerequisites are 'any first year writing seminar, CSC-122, and one CSC course numbered 300 or greater' — but these prerequisites are written into the start of the description text rather than the dedicated prerequisites column, which is empty for this course.",
     "magpie_answer": "CSC-475 is a Seminar in Computer Science, and its prerequisites are any first year writing seminar, CSC-122, and one CSC course numbered 300 or greater.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by GER/wr.csv"
@@ -545,7 +545,7 @@
   {
     "id": "q15",
     "question": "How many credits is CSC-372?",
-    "expert_ground_truth": "4 credits. The credits column is empty for CSC-372 in the CSV, but the description text ends with '...real world problem domain. 4'. Other CSC 300/400-level courses with similar intensity are 4 credits, and the trailing '4' in the description is the credit value. This is the same data-quality issue as a few other rows where the credit value got entered at the tail of the description rather than in the credits column.",
+    "ground_truth": "4 credits. The credits column is empty for CSC-372 in the CSV, but the description text ends with '...real world problem domain. 4'. Other CSC 300/400-level courses with similar intensity are 4 credits, and the trailing '4' in the description is the credit value. This is the same data-quality issue as a few other rows where the credit value got entered at the tail of the description rather than in the credits column.",
     "magpie_answer": "CSC-372 is worth 4 credits.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv"
@@ -579,7 +579,7 @@
   {
     "id": "q16",
     "question": "I want to take an introductory course on artificial intelligence. What does Furman offer?",
-    "expert_ground_truth": "Furman offers several CSC courses related to AI/ML at different levels: CSC-272 (Introduction to Data Mining), CSC-343 (Artificial Intelligence), and CSC-372 (Machine Learning with Big Data). For a true introduction, CSC-343 is the AI-titled course; CSC-272 is the most directly introductory in spirit (data mining/ML foundations). CSC-105 (Intro to CS) mentions AI as one possible theme but isn't AI-specific.",
+    "ground_truth": "Furman offers several CSC courses related to AI/ML at different levels: CSC-272 (Introduction to Data Mining), CSC-343 (Artificial Intelligence), and CSC-372 (Machine Learning with Big Data). For a true introduction, CSC-343 is the AI-titled course; CSC-272 is the most directly introductory in spirit (data mining/ML foundations). CSC-105 (Intro to CS) mentions AI as one possible theme but isn't AI-specific.",
     "magpie_answer": "Furman offers the following introductory courses that mention artificial intelligence (AI):\n- CSC-105: Intro to Computer Science, which has 'artificial intelligence' as one of the sample topics.\n- FYW-1128: \"Turing: Thinking Machines, Codes and Other Enigmas,\" which explores Alan Turing's pioneering work in the field of artificial intelligence.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by GER/mr.csv",
@@ -615,7 +615,7 @@
   {
     "id": "q17",
     "question": "I want to take CSC-372 next semester. What sequence of CSC and MTH courses do I need to complete first?",
-    "expert_ground_truth": "To take CSC-372 (Machine Learning with Big Data) — prereqs are (CSC-122 AND CSC-272) AND (MTH-120 OR MTH-150). Working backwards: CSC-122 itself requires CSC-121 (Intro to Computer Programming). CSC-272 requires CSC-122 (so same chain). MTH-120 (Calculus I) and MTH-150 (Calculus with Theory) are independent prereqs. Minimal sequence: CSC-121 → CSC-122 → CSC-272 → CSC-372, alongside MTH-120 OR MTH-150 anywhere before CSC-372.",
+    "ground_truth": "To take CSC-372 (Machine Learning with Big Data) — prereqs are (CSC-122 AND CSC-272) AND (MTH-120 OR MTH-150). Working backwards: CSC-122 itself requires CSC-121 (Intro to Computer Programming). CSC-272 requires CSC-122 (so same chain). MTH-120 (Calculus I) and MTH-150 (Calculus with Theory) are independent prereqs. Minimal sequence: CSC-121 → CSC-122 → CSC-272 → CSC-372, alongside MTH-120 OR MTH-150 anywhere before CSC-372.",
     "magpie_answer": "To take CSC-372, you must have completed CSC-122 and CSC-272, along with either MTH-120 or MTH-150.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv"
@@ -649,7 +649,7 @@
   {
     "id": "q18",
     "question": "What writing-intensive courses (GER: WR) does the Computer Science department offer?",
-    "expert_ground_truth": "Two CSC courses fulfill the WR (Writing-Research Intensive) GER: CSC-475 (Seminar in Computer Science) and CSC-502 (Research). Both are upper-division.",
+    "ground_truth": "Two CSC courses fulfill the WR (Writing-Research Intensive) GER: CSC-475 (Seminar in Computer Science) and CSC-502 (Research). Both are upper-division.",
     "magpie_answer": "- CSC-475: Seminar in Computer Science\n- CSC-502: Research",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv"
@@ -683,7 +683,7 @@
   {
     "id": "q19",
     "question": "Are there any duplicate course entries in the catalog?",
-    "expert_ground_truth": "Yes, two genuine duplicate rows in 'courses by majors/': WGS-220 (Sexuality in Modern America) appears twice in wgs.csv with different coids (68553 and 68277) but same code/title. THA-241 also appears twice in tha.csv. These are likely data-entry duplicates. Note: the 'courses by GER/' files contain many courses that also appear in 'courses by majors/' files, but those are NOT duplicates — they are the same courses cross-listed under their GER tags by design (the file structure is intentionally double-indexed).",
+    "ground_truth": "Yes, two genuine duplicate rows in 'courses by majors/': WGS-220 (Sexuality in Modern America) appears twice in wgs.csv with different coids (68553 and 68277) but same code/title. THA-241 also appears twice in tha.csv. These are likely data-entry duplicates. Note: the 'courses by GER/' files contain many courses that also appear in 'courses by majors/' files, but those are NOT duplicates — they are the same courses cross-listed under their GER tags by design (the file structure is intentionally double-indexed).",
     "magpie_answer": "The provided course catalog files do not contain information indicating the presence of duplicate course entries.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by GER/hb.csv",
@@ -721,7 +721,7 @@
   {
     "id": "q20",
     "question": "What does CSC-271 cover, and what GER does it fulfill?",
-    "expert_ground_truth": "CSC-271 is 'Digital Dilemmas: Data, Technology, and Being Human'. It fulfills the UQ (Ultimate Questions) GER. The course covers ethical, social, and philosophical questions surrounding emerging digital technologies.",
+    "ground_truth": "CSC-271 is 'Digital Dilemmas: Data, Technology, and Being Human'. It fulfills the UQ (Ultimate Questions) GER. The course covers ethical, social, and philosophical questions surrounding emerging digital technologies.",
     "magpie_answer": "The provided files do not contain information about a course with the code CSC-271.",
     "magpie_sources_used": [],
     "magpie_retrieved": [
@@ -753,7 +753,7 @@
   {
     "id": "q21",
     "question": "How many courses are listed in the May Experience (MXP) program?",
-    "expert_ground_truth": "84 courses are listed in the May Experience (MXP) program (rows in mxp.csv).",
+    "ground_truth": "84 courses are listed in the May Experience (MXP) program (rows in mxp.csv).",
     "magpie_answer": "There are 5 courses listed in the May Experience (MXP) program: MXP-112, MXP-113, MXP-111, MXP-115, and MXP-116.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/mxp.csv"
@@ -787,7 +787,7 @@
   {
     "id": "q22",
     "question": "What CSC course teaches database management, and what's its prerequisite?",
-    "expert_ground_truth": "CSC-341 (Database Management Systems) covers database management. Its prerequisite is CSC-122. CSC-342 (Web-Based Application Design & Development) also touches database topics in the context of web apps but is not the dedicated database course.",
+    "ground_truth": "CSC-341 (Database Management Systems) covers database management. Its prerequisite is CSC-122. CSC-342 (Web-Based Application Design & Development) also touches database topics in the context of web apps but is not the dedicated database course.",
     "magpie_answer": "The CSC course that teaches database management is CSC-341, and its prerequisite is CSC-122.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv"
@@ -821,7 +821,7 @@
   {
     "id": "q23",
     "question": "List all courses across all majors that are 0 credits.",
-    "expert_ground_truth": "There are 28 zero-credit courses across all majors. They include workshops, seminars, recital attendance, supervised research, and individualized internship slots — examples: EST-001 (Biodiesel Production), CHM-075 (Seminar in Chemistry), CSC-025 (Programming Workshop), BIO-075/503/508 (Seminar/Internship/Research), MUS-050 (Recital Attendance), MLL-050 (Community Based Learning), HSC-075 (Seminar in Public Health), MUS-051 (Freshman Music Colloquium), and others.",
+    "ground_truth": "There are 28 zero-credit courses across all majors. They include workshops, seminars, recital attendance, supervised research, and individualized internship slots — examples: EST-001 (Biodiesel Production), CHM-075 (Seminar in Chemistry), CSC-025 (Programming Workshop), BIO-075/503/508 (Seminar/Internship/Research), MUS-050 (Recital Attendance), MLL-050 (Community Based Learning), HSC-075 (Seminar in Public Health), MUS-051 (Freshman Music Colloquium), and others.",
     "magpie_answer": "- MUS-079: Bluegrass Ensemble\n- SPN-505: Structured Internship",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/mus.csv",
@@ -868,7 +868,7 @@
   {
     "id": "q24",
     "question": "What are the requirements for a Senior Capstone in the Sustainability Studies major?",
-    "expert_ground_truth": "The Sustainability Studies major has TWO capstone courses, not one: SUS-474 (Senior Capstone) — synthesis course integrating research experience across EES and SUS majors with focus on writing, collaboration, and communication; and SUS-473 (Sustainability Science Practicum) — applied solution-based research conducted at the local level in partnership with local organizations. SUS-473 has a prerequisite of 'any first year writing seminar'; SUS-474's prerequisites column is empty.",
+    "ground_truth": "The Sustainability Studies major has TWO capstone courses, not one: SUS-474 (Senior Capstone) — synthesis course integrating research experience across EES and SUS majors with focus on writing, collaboration, and communication; and SUS-473 (Sustainability Science Practicum) — applied solution-based research conducted at the local level in partnership with local organizations. SUS-473 has a prerequisite of 'any first year writing seminar'; SUS-474's prerequisites column is empty.",
     "magpie_answer": "The requirements for the Senior Capstone in the Sustainability Studies major are met by the course SUS-474, which is described as: \"Synthesis integrating the research experience into the interdisciplinary context across EES and SUS majors. Develop writing, collaboration, and communication skills.\"",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/sus.csv"
@@ -914,7 +914,7 @@
   {
     "id": "q25",
     "question": "I'm interested in cryptography. What courses can I take?",
-    "expert_ground_truth": "Two courses are most relevant: CSC-362 (Information Security) — covers cryptographic primitives in the context of information security; and MTH-320 (Number Theory) — number theory is the mathematical foundation of modern cryptography. There is no course titled 'Cryptography' specifically. CSC-362 is the most direct hit.",
+    "ground_truth": "Two courses are most relevant: CSC-362 (Information Security) — covers cryptographic primitives in the context of information security; and MTH-320 (Number Theory) — number theory is the mathematical foundation of modern cryptography. There is no course titled 'Cryptography' specifically. CSC-362 is the most direct hit.",
     "magpie_answer": "- CSC-362: Information Security (CSC-122 prerequisite) - Topics include... cryptography.\n- MTH-116: Introduction to Cryptology (No prerequisites listed) - An introduction to cryptology, the making and breaking of codes and ciphers, from a mathematical perspective. Cryptology related topics include monoalphabetic substitution ciphers, polyalphabetic substitution ciphers, the index of coincidence, the Playfair cipher, transposition ciphers, matrix ciphers, stream ciphers, the data encryption standard, the Diffie-Hellman Key Exchange, and RSA.",
     "magpie_sources_used": [
       "/Users/mriddy/Desktop/Magpie testing/Course Information/courses by majors/csc.csv",

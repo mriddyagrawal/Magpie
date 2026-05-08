@@ -1,0 +1,364 @@
+[
+  {
+    "id": "q01",
+    "question": "What are the prerequisites for CSC-122 (Data Structures and Algorithms)?",
+    "ground_truth": "CSC-121.",
+    "reasoning_type": [
+      "single_doc"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Pure single-row lookup. The prerequisites column for CSC-122 contains literally 'CSC-121'. Original GT is fine but slightly editorialized — adds the prereq's full title which the source doesn't include in the prereq field.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q02",
+    "question": "How many credits is CSC-105?",
+    "ground_truth": "4 credits.",
+    "reasoning_type": [
+      "single_doc"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Direct field lookup; CSC-105 row, credits column is '4 credits'.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q03",
+    "question": "What course has coid 67390?",
+    "ground_truth": "CSC-025 (Programming Workshop), in csc.csv. It's a 0-credit lab course where students strengthen problem-solving and build a portfolio.",
+    "reasoning_type": [
+      "single_doc",
+      "field_lookup"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Reverse lookup by coid (catalog ID). Tests whether the system can search by the numeric ID column rather than the human-readable code.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q04",
+    "question": "Which Furman courses fulfill the MR (Mathematical and Formal Reasoning) general education requirement?",
+    "ground_truth": "10 courses fulfill MR. They are: CSC-105, CSC-121, ECN-120, MTH-095, MTH-098, MTH-105, MTH-145, MTH-150, MTH-160, PHL-235.",
+    "reasoning_type": [
+      "single_doc",
+      "aggregation"
+    ],
+    "key_files": [
+      "Course Information/courses by GER/mr.csv"
+    ],
+    "notes": "Direct enumeration from the MR GER file. Note original GT may show a count without listing — the file has exactly 10 rows.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q05",
+    "question": "What are the prerequisites for CSC-372 (Machine Learning with Big Data)?",
+    "ground_truth": "(CSC-122 AND CSC-272) AND (MTH-120 OR MTH-150). The student needs both CSC-122 and CSC-272, plus either MTH-120 or MTH-150.",
+    "reasoning_type": [
+      "single_doc",
+      "boolean_logic"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Tests whether the system preserves AND/OR boolean structure rather than flattening to a list. Original GT correctly preserves it.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q06",
+    "question": "I'm a CS major. List every CSC course that requires CSC-122 as a prerequisite.",
+    "ground_truth": "10 CSC courses require CSC-122 as a prerequisite (substring match on prereq column): CSC-223, CSC-332, CSC-341, CSC-342, CSC-347, CSC-351, CSC-352, CSC-362, CSC-372, CSC-461. CSC-475 is a notable exception — its prerequisites are buried in the description column rather than the prerequisites column due to a data-entry issue.",
+    "reasoning_type": [
+      "single_doc",
+      "aggregation",
+      "data_quality"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Aggregation requiring substring match. Original GT correctly catches the CSC-475 data-quality wrinkle. Tests whether the system relies on the structured prereq column or also reads description.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q07",
+    "question": "How many courses are in the Sustainability Studies (SUS) major?",
+    "ground_truth": "27 courses are in the Sustainability Studies (SUS) major.",
+    "reasoning_type": [
+      "single_doc",
+      "aggregation"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/sus.csv"
+    ],
+    "notes": "Row count of sus.csv. Single number answer.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q08",
+    "question": "How many courses count for the Visual and Performing Arts (VP) GER?",
+    "ground_truth": "56 courses count for the Visual and Performing Arts (VP) GER.",
+    "reasoning_type": [
+      "single_doc",
+      "aggregation"
+    ],
+    "key_files": [
+      "Course Information/courses by GER/vp.csv"
+    ],
+    "notes": "Row count of vp.csv.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q09",
+    "question": "What CSC course satisfies the UQ (Ultimate Questions) general education requirement?",
+    "ground_truth": "CSC-271 (Digital Dilemmas: Data, Technology, and Being Human) satisfies the UQ (Ultimate Questions) GER.",
+    "reasoning_type": [
+      "cross_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv",
+      "Course Information/courses by GER/uq.csv"
+    ],
+    "notes": "Either source resolves it: csc.csv has CSC-271 with ger='GER: UQ (Ultimate Questions)', and uq.csv lists CSC-271 directly. Only one such CSC-prefixed course.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q10",
+    "question": "What's the difference between CSC-221 and CSC-241?",
+    "ground_truth": "Both are 2-credit CSC courses with CSC-121 as the prerequisite, but the topic differs: CSC-221 (Topics in Programming) is an intensive course where students study a new programming language or paradigm — the topic varies and the course can be repeated. CSC-241 (Mobile Apps) is specifically about developing applications for mobile platforms (iPhone, Apple Watch, iPad).",
+    "reasoning_type": [
+      "single_doc",
+      "comparative"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Comparative reasoning across two rows. Tests whether the system contrasts rather than just listing both descriptions.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q11",
+    "question": "Are there any courses that count for both the HB (Empirical Study of Human Behavior) GER and the WC (World Cultures) GER?",
+    "ground_truth": "Yes — there are 12 unique courses listed under combined 'HB and WC' GER labels in hb.csv. The labels appear with several inconsistent string variants: 7 rows under 'HB (Empirical Study of Human Behavior) and WC (World Cultures)', 2 under 'HB ... and WC ... and IEJ ...' (triple GER), 1 under 'HB (Empirical Studies of Human Behavior)' (note plural), 1 with reversed order 'WC ... and HB ...', and 1 with lowercase 'human behavior'. The string inconsistencies make this a stress test for exact-match retrieval.",
+    "reasoning_type": [
+      "cross_doc",
+      "string_normalization",
+      "data_quality"
+    ],
+    "key_files": [
+      "Course Information/courses by GER/hb.csv",
+      "Course Information/courses by GER/wc.csv"
+    ],
+    "notes": "Original GT says '14 courses' but my actual count of unique codes intersecting hb.csv ∩ wc.csv is 12. The original may be counting label-variant rows (some courses have entries under multiple variant labels) rather than unique course codes. Either reading is defensible — flag this ambiguity for the question author.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q12",
+    "question": "Who teaches MHC courses, and how many are there?",
+    "ground_truth": "There is exactly 1 MHC course in the catalog: MHC-503 (Individualized Internship). Instructor information is NOT in the source data — the catalog CSVs do not have an instructor column, so the question's 'who teaches' part cannot be answered from this corpus. A correct answer must say so explicitly rather than hallucinate an instructor name.",
+    "reasoning_type": [
+      "single_doc",
+      "data_absence",
+      "honest_refusal"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/mhc.csv"
+    ],
+    "notes": "Tests honest refusal. The CSV columns are coid/code/title/ger/prerequisites/description/credits — no instructor field. A model that invents a name fails the test.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q13",
+    "question": "Are there any courses listed under the major prefix NLY?",
+    "ground_truth": "No. There is no nly.csv file under 'courses by majors/' (the prefix doesn't exist as a major), but nly.csv DOES exist under 'courses by GER/' as the 'Natural World Lab' GER list, with 7 courses. So the answer depends on interpretation: as a major prefix → no NLY major exists; as a GER → 7 courses fulfill the NLY GER.",
+    "reasoning_type": [
+      "single_doc",
+      "data_absence",
+      "ambiguous_question"
+    ],
+    "key_files": [
+      "Course Information/courses by GER/nly.csv"
+    ],
+    "notes": "Original GT says 'nly.csv exists but contains no course records (header row only, 0 courses)' — this is INCORRECT. The actual nly.csv (in courses by GER/) has 7 rows. The 'major prefix NLY' framing is the wrong frame: NLY is a GER, not a major. Question author may have been thinking of a different version of the corpus. Recommend question rewrite to disambiguate 'major prefix' vs 'GER prefix'.",
+    "difficulty": "very_hard"
+  },
+  {
+    "id": "q14",
+    "question": "What is CSC-475 and what are its prerequisites?",
+    "ground_truth": "CSC-475 is 'Seminar in Computer Science', 4 credits. It fulfills the WR (Writing-Research Intensive) GER. Students prepare papers on topics from CS research journals and give oral presentations; enrollment is limited to juniors and seniors. The prerequisites are 'any first year writing seminar, CSC-122, and one CSC course numbered 300 or greater' — but these prerequisites are written into the start of the description text rather than the dedicated prerequisites column, which is empty for this course.",
+    "reasoning_type": [
+      "single_doc",
+      "data_quality"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Data quality probe. Tests inferential robustness: a system relying only on the prereq column would say 'no prerequisites'; reading description recovers the truth.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q15",
+    "question": "How many credits is CSC-372?",
+    "ground_truth": "4 credits. The credits column is empty for CSC-372 in the CSV, but the description text ends with '...real world problem domain. 4'. Other CSC 300/400-level courses with similar intensity are 4 credits, and the trailing '4' in the description is the credit value. This is the same data-quality issue as a few other rows where the credit value got entered at the tail of the description rather than in the credits column.",
+    "reasoning_type": [
+      "single_doc",
+      "data_quality",
+      "inferential"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Same class of data-quality issue as q14. The dedicated credits column is empty; the value is at the tail of description.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q16",
+    "question": "I want to take an introductory course on artificial intelligence. What does Furman offer?",
+    "ground_truth": "Furman offers several CSC courses related to AI/ML at different levels: CSC-272 (Introduction to Data Mining), CSC-343 (Artificial Intelligence), and CSC-372 (Machine Learning with Big Data). For a true introduction, CSC-343 is the AI-titled course; CSC-272 is the most directly introductory in spirit (data mining/ML foundations). CSC-105 (Intro to CS) mentions AI as one possible theme but isn't AI-specific.",
+    "reasoning_type": [
+      "single_doc",
+      "subject_matching",
+      "recommendation"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Subjective question — multiple courses are reasonable answers. Tests whether the system surfaces multiple options + their differences, or picks one without explanation.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q17",
+    "question": "I want to take CSC-372 next semester. What sequence of CSC and MTH courses do I need to complete first?",
+    "ground_truth": "To take CSC-372 (Machine Learning with Big Data) — prereqs are (CSC-122 AND CSC-272) AND (MTH-120 OR MTH-150). Working backwards: CSC-122 itself requires CSC-121 (Intro to Computer Programming). CSC-272 requires CSC-122 (so same chain). MTH-120 (Calculus I) and MTH-150 (Calculus with Theory) are independent prereqs. Minimal sequence: CSC-121 → CSC-122 → CSC-272 → CSC-372, alongside MTH-120 OR MTH-150 anywhere before CSC-372.",
+    "reasoning_type": [
+      "cross_doc",
+      "recursive_prereq_chain",
+      "planning"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv",
+      "Course Information/courses by majors/mth.csv"
+    ],
+    "notes": "Multi-hop prerequisite resolution. Tests whether the system traces the dependency graph rather than just listing the immediate prereqs of CSC-372.",
+    "difficulty": "very_hard"
+  },
+  {
+    "id": "q18",
+    "question": "What writing-intensive courses (GER: WR) does the Computer Science department offer?",
+    "ground_truth": "Two CSC courses fulfill the WR (Writing-Research Intensive) GER: CSC-475 (Seminar in Computer Science) and CSC-502 (Research). Both are upper-division.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv",
+      "Course Information/courses by GER/wr.csv"
+    ],
+    "notes": "Filter csc.csv where the ger column contains 'WR'. Could also cross-reference wr.csv.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q19",
+    "question": "Are there any duplicate course entries in the catalog?",
+    "ground_truth": "Yes, two genuine duplicate rows in 'courses by majors/': WGS-220 (Sexuality in Modern America) appears twice in wgs.csv with different coids (68553 and 68277) but same code/title. THA-241 also appears twice in tha.csv. These are likely data-entry duplicates. Note: the 'courses by GER/' files contain many courses that also appear in 'courses by majors/' files, but those are NOT duplicates — they are the same courses cross-listed under their GER tags by design (the file structure is intentionally double-indexed).",
+    "reasoning_type": [
+      "cross_doc",
+      "aggregation",
+      "data_quality"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/wgs.csv",
+      "Course Information/courses by majors/tha.csv"
+    ],
+    "notes": "Original GT only mentions WGS-220 and misses THA-241. Also adds an irrelevant note about Brittany Champion (people directory) that doesn't belong in this question's answer.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q20",
+    "question": "What does CSC-271 cover, and what GER does it fulfill?",
+    "ground_truth": "CSC-271 is 'Digital Dilemmas: Data, Technology, and Being Human'. It fulfills the UQ (Ultimate Questions) GER. The course covers ethical, social, and philosophical questions surrounding emerging digital technologies.",
+    "reasoning_type": [
+      "single_doc"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Direct lookup by code. Two-part question: title/topic + GER classification.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q21",
+    "question": "How many courses are listed in the May Experience (MXP) program?",
+    "ground_truth": "84 courses are listed in the May Experience (MXP) program (rows in mxp.csv).",
+    "reasoning_type": [
+      "single_doc",
+      "aggregation"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/mxp.csv"
+    ],
+    "notes": "Row count of mxp.csv.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q22",
+    "question": "What CSC course teaches database management, and what's its prerequisite?",
+    "ground_truth": "CSC-341 (Database Management Systems) covers database management. Its prerequisite is CSC-122. CSC-342 (Web-Based Application Design & Development) also touches database topics in the context of web apps but is not the dedicated database course.",
+    "reasoning_type": [
+      "single_doc",
+      "topic_search"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv"
+    ],
+    "notes": "Title/description search for 'database'. Two CSC courses match; the dedicated one is CSC-341.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q23",
+    "question": "List all courses across all majors that are 0 credits.",
+    "ground_truth": "There are 28 zero-credit courses across all majors. They include workshops, seminars, recital attendance, supervised research, and individualized internship slots — examples: EST-001 (Biodiesel Production), CHM-075 (Seminar in Chemistry), CSC-025 (Programming Workshop), BIO-075/503/508 (Seminar/Internship/Research), MUS-050 (Recital Attendance), MLL-050 (Community Based Learning), HSC-075 (Seminar in Public Health), MUS-051 (Freshman Music Colloquium), and others.",
+    "reasoning_type": [
+      "cross_doc",
+      "aggregation",
+      "filter"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/*.csv (all major files)"
+    ],
+    "notes": "Cross-corpus aggregation. Tests whether the system iterates all major files, not just one. The 28 0-credit rows span ~15 different majors.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q24",
+    "question": "What are the requirements for a Senior Capstone in the Sustainability Studies major?",
+    "ground_truth": "The Sustainability Studies major has TWO capstone courses, not one: SUS-474 (Senior Capstone) — synthesis course integrating research experience across EES and SUS majors with focus on writing, collaboration, and communication; and SUS-473 (Sustainability Science Practicum) — applied solution-based research conducted at the local level in partnership with local organizations. SUS-473 has a prerequisite of 'any first year writing seminar'; SUS-474's prerequisites column is empty.",
+    "reasoning_type": [
+      "single_doc",
+      "subject_matching"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/sus.csv"
+    ],
+    "notes": "Two courses match 'capstone' criteria; the question implies one but there are two. A complete answer surfaces both and explains the difference.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q25",
+    "question": "I'm interested in cryptography. What courses can I take?",
+    "ground_truth": "Two courses are most relevant: CSC-362 (Information Security) — covers cryptographic primitives in the context of information security; and MTH-320 (Number Theory) — number theory is the mathematical foundation of modern cryptography. There is no course titled 'Cryptography' specifically. CSC-362 is the most direct hit.",
+    "reasoning_type": [
+      "cross_doc",
+      "topic_search"
+    ],
+    "key_files": [
+      "Course Information/courses by majors/csc.csv",
+      "Course Information/courses by majors/mth.csv"
+    ],
+    "notes": "Topic search across descriptions. Tests whether the system surfaces both the applied (CSC-362) and foundational (MTH-320) angles.",
+    "difficulty": "medium"
+  }
+]

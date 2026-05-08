@@ -79,16 +79,24 @@ async def ask(
     """
     import time
     t_start = time.monotonic()
-    # Read the user's enumerate_lists toggle once per query. Off = treat
-    # every question as a regular semantic search (no top_k widening,
-    # no rerank suppression, no ENUMERATION MODE prompt addition).
+    # Read the user's Settings → Search & AI knobs once per query.
+    #   - enumerate_lists: off = treat every query as a regular search
+    #     (no top_k widening, no rerank suppression, no ENUMERATION MODE
+    #     prompt addition).
+    #   - temperature: applied to the answer-step LLM call (the rewrite
+    #     step keeps its own low-temp default — temperature is a
+    #     creativity knob for prose, not for keyword extraction).
     try:
         from src.config.settings import effective_settings
-        enumerate_lists = effective_settings().enumerate_lists
+        eff = effective_settings()
+        enumerate_lists = eff.enumerate_lists
+        answer_temperature = eff.temperature
     except Exception:  # noqa: BLE001 — defensive, never block on settings
         enumerate_lists = True
+        answer_temperature = None
     print(f"\n[query] question: {question!r} (top_k={top_k}, rewrite={rewrite}, "
-          f"fast={fast}, enumerate_lists={enumerate_lists})",
+          f"fast={fast}, enumerate_lists={enumerate_lists}, "
+          f"temperature={answer_temperature})",
           file=sys.stderr, flush=True)
 
     if rewrite:
@@ -161,6 +169,7 @@ async def ask(
         agent, question, paths, search_query=sq,
         csv_row_hits=csv_row_hits or None,
         enumerate_lists=enumerate_lists,
+        temperature=answer_temperature,
     )
     print(f"[query] answer ({time.monotonic()-t:.2f}s): "
           f"{len(ans.answer)} chars, sources_used={ans.sources_used}",

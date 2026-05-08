@@ -92,6 +92,7 @@ class LocalLLM(Protocol):
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
+        response_format: Optional[dict[str, Any]] = None,
     ) -> str: ...
 
     def complete_sync(
@@ -102,6 +103,7 @@ class LocalLLM(Protocol):
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
+        response_format: Optional[dict[str, Any]] = None,
     ) -> str: ...
 
     async def stream(
@@ -201,6 +203,7 @@ class LlamaServerLLM:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
+        response_format: Optional[dict[str, Any]] = None,
     ) -> str:
         """Run a non-streaming chat completion. Returns the response text.
 
@@ -213,6 +216,14 @@ class LlamaServerLLM:
         last user message. Routes to the vision profile transparently;
         the pool's LRU may unload the text model on the first vision
         request when `MAX_LOADED_MODELS=1`.
+
+        `response_format` is forwarded verbatim to llama-server. The
+        OpenAI shape `{"type": "json_schema", "json_schema": {"schema":
+        ..., "strict": true}}` is the high-value case: llama-server
+        compiles the schema to a GBNF grammar and constrains generation
+        token-by-token, so the model literally cannot emit invalid
+        JSON. Far more reliable than relying on the prompt + post-hoc
+        repair. None means "no constraint" (free-form chat).
         """
 
         profile_name = self._select_profile(images)
@@ -222,7 +233,8 @@ class LlamaServerLLM:
         if images:
             prepared = _attach_images_to_last_user(prepared, images)
         body = self._build_request_body(
-            prepared, temperature, max_tokens, stream=False, thinking=thinking
+            prepared, temperature, max_tokens, stream=False, thinking=thinking,
+            response_format=response_format,
         )
         url = self._base_url(profile_name) + "/v1/chat/completions"
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
@@ -237,12 +249,14 @@ class LlamaServerLLM:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
+        response_format: Optional[dict[str, Any]] = None,
     ) -> str:
         """Synchronous variant. Used by `LocalAgent.run_sync` from
         non-async paths (`src.stage2.search.rewrite_query`).
 
         Avoids the asyncio.run / nested-loop awkwardness of wrapping
-        `complete()` in a sync caller.
+        `complete()` in a sync caller. `response_format` semantics
+        match `complete()` — see that docstring.
         """
 
         profile_name = self._select_profile(images)
@@ -252,7 +266,8 @@ class LlamaServerLLM:
         if images:
             prepared = _attach_images_to_last_user(prepared, images)
         body = self._build_request_body(
-            prepared, temperature, max_tokens, stream=False, thinking=thinking
+            prepared, temperature, max_tokens, stream=False, thinking=thinking,
+            response_format=response_format,
         )
         url = self._base_url(profile_name) + "/v1/chat/completions"
         with httpx.Client(timeout=self.request_timeout_s) as client:
@@ -319,6 +334,7 @@ class LlamaServerLLM:
         *,
         stream: bool,
         thinking: bool = False,
+        response_format: Optional[dict[str, Any]] = None,
     ) -> dict[str, Any]:
         """OpenAI-compatible chat-completions request body. We omit
         fields with None values so llama-server's defaults stay in
@@ -349,6 +365,12 @@ class LlamaServerLLM:
         }
         if max_tokens is not None:
             body["max_tokens"] = max_tokens
+        if response_format is not None:
+            # llama-server (b3000+ at least) reads `response_format`
+            # with type `json_object` (loose) or `json_schema` (strict —
+            # compiles the schema to a GBNF grammar and constrains
+            # generation token-by-token).
+            body["response_format"] = response_format
         return body
 
     @staticmethod

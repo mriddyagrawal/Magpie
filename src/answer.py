@@ -44,23 +44,20 @@ ANSWER_SUPPLEMENT_MAX_CHARS = 10_000
 
 
 class Answer(BaseModel):
-    answer: str = Field(
-        description=(
-            "Natural-language answer grounded strictly in the provided files. "
-            "Empty string when the question cannot be answered from the provided "
-            "files (set `not_found=true` in that case)."
-        )
-    )
-    sources_used: list[str] = Field(
-        description=(
-            "Subset of the input file paths the answer actually depends on. "
-            "Copied verbatim from the '--- File N: <path> ---' headers. "
-            "Do not include files you consulted but did not actually use. "
-            "Empty list when `not_found=true`."
-        )
-    )
+    # Field order matters: this is the order llama-server's GBNF grammar
+    # forces the model to emit. Putting `not_found` first lets the model
+    # commit to the verdict before generating any content — natural for
+    # the not-found path (answer="", sources_used=[]) and harmless for
+    # the found path. Reverse order (answer first) forces the model to
+    # commit to either real-text or empty-string before it has finished
+    # "deciding" whether the files contain the answer; under grammar
+    # constraint that's a known small-model failure mode (Tam et al.,
+    # "Let me speak freely?", 2024). The flat-vs-discriminated-union
+    # question stays parked at Plan #25 Choice A.
     not_found: bool = Field(
-        default=False,
+        ...,  # required — the schema's `required` list controls what the
+              # GBNF grammar enforces; with a Python default, pydantic
+              # would mark this optional and the model could legally omit it.
         description=(
             "Set to true when the provided files do not contain enough information "
             "to answer the question. When true, leave `answer` empty, leave "
@@ -69,13 +66,31 @@ class Answer(BaseModel):
         ),
     )
     not_found_topic: str = Field(
-        default="",
+        ...,  # required: emit "" in found cases, the topic phrase in not-found cases.
         description=(
             "Short noun phrase summarizing what the user asked about, used in "
             "the UI's not-found copy ('I read 5 likely sources but didn't find "
             "anything about <topic>...'). Only set when `not_found=true`. "
             "Examples: 'a landlord's emergency phone number', 'the chemistry "
             "final exam time', 'who chairs the math department'."
+        ),
+    )
+    answer: str = Field(
+        ...,  # required: in not-found cases the model emits an empty string,
+              # not a missing field — the strict JSON schema requires presence.
+        description=(
+            "Natural-language answer grounded strictly in the provided files. "
+            "Empty string when the question cannot be answered from the provided "
+            "files (set `not_found=true` in that case)."
+        ),
+    )
+    sources_used: list[str] = Field(
+        ...,  # required: emit an empty list in not-found cases, not a missing field.
+        description=(
+            "Subset of the input file paths the answer actually depends on. "
+            "Copied verbatim from the '--- File N: <path> ---' headers. "
+            "Do not include files you consulted but did not actually use. "
+            "Empty list when `not_found=true`."
         ),
     )
 
@@ -170,29 +185,32 @@ SYSTEM_PROMPT = (
     "that's not a not-found case.\n"
     "\n\n"
     "OUTPUT FORMAT — required schema. Respond with a single JSON object that "
-    "has EXACTLY these four keys, named EXACTLY as shown:\n"
-    "  {\"answer\": <string>, \"sources_used\": [<file path>, ...], "
-    "\"not_found\": <boolean>, \"not_found_topic\": <string>}\n"
-    "All four keys are required. Do NOT rename `answer` to something "
-    "descriptive like `result` / `summary` / `courses_mentioned` / "
-    "`findings` — small models tend to do this and it breaks downstream "
-    "parsing. The key is literally the four letters `answer` regardless "
-    "of what the question is about. "
+    "has EXACTLY these four keys, named EXACTLY as shown, IN THIS ORDER:\n"
+    "  {\"not_found\": <boolean>, \"not_found_topic\": <string>, "
+    "\"answer\": <string>, \"sources_used\": [<file path>, ...]}\n"
+    "All four keys are required. The order above is load-bearing — emit "
+    "`not_found` first so you commit to the verdict before generating "
+    "content. Do NOT rename `answer` to something descriptive like "
+    "`result` / `summary` / `courses_mentioned` / `findings` — small "
+    "models tend to do this and it breaks downstream parsing. The key "
+    "is literally the four letters `answer` regardless of what the "
+    "question is about. "
     "If the answer is naturally a list (e.g. 'list every X'), join the "
     "items into a single string inside the `answer` value (use bullets "
     "`- ` or newlines), do NOT make `answer` a JSON array.\n"
     "Example for a successful answer with citations:\n"
-    "  {\"answer\": \"The chair of the Mathematics department is "
+    "  {\"not_found\": false, \"not_found_topic\": \"\", "
+    "\"answer\": \"The chair of the Mathematics department is "
     "Dr. Elena Marquez[1].\", \"sources_used\": "
-    "[\"path/to/math-dept-2024.pdf\"], \"not_found\": false, "
-    "\"not_found_topic\": \"\"}\n"
+    "[\"path/to/math-dept-2024.pdf\"]}\n"
     "Example for a list-shaped question:\n"
-    "  {\"answer\": \"- Item one[1]\\n- Item two[2]\\n- Item three[1]\", "
-    "\"sources_used\": [\"path/to/file-a.md\", \"path/to/file-b.md\"], "
-    "\"not_found\": false, \"not_found_topic\": \"\"}\n"
+    "  {\"not_found\": false, \"not_found_topic\": \"\", "
+    "\"answer\": \"- Item one[1]\\n- Item two[2]\\n- Item three[1]\", "
+    "\"sources_used\": [\"path/to/file-a.md\", \"path/to/file-b.md\"]}\n"
     "Example for a not-found case:\n"
-    "  {\"answer\": \"\", \"sources_used\": [], \"not_found\": true, "
-    "\"not_found_topic\": \"a landlord's emergency phone number\"}\n"
+    "  {\"not_found\": true, \"not_found_topic\": "
+    "\"a landlord's emergency phone number\", "
+    "\"answer\": \"\", \"sources_used\": []}\n"
     "\n"
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
@@ -286,6 +304,7 @@ async def answer_question(
     search_query: "SearchQuery | None" = None,
     csv_row_hits: dict[str, list[int]] | None = None,
     enumerate_lists: bool = True,
+    temperature: float | None = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -574,7 +593,7 @@ async def answer_question(
     # local Gemma 4 backend.
     message.append(f"\nNow answer this question: {question}")
 
-    ans = await agent.run(message)
+    ans = await agent.run(message, temperature=temperature)
 
     # If the model declared not_found, normalize the rest of the payload so the
     # downstream consumer doesn't have to think about partial fills. Some small

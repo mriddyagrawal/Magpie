@@ -1383,6 +1383,81 @@ Especially relevant when:
   the question" failures or "model only used the last
   document" tells.
 
+### Choice D — Affirmative vs negative discriminator (`found` vs `not_found`)
+
+**v1 picked:** the flat schema's verdict field is named `not_found:
+bool` (paired with `not_found_topic: str`). The common case (model
+answered the question) sets `not_found = false` — a double negation.
+The failure case sets `not_found = true`.
+
+**The alternative considered:** flip to `found: bool` + a renamed
+topic field (`missing_topic` or `unanswered_topic`). Common case
+becomes `found = true` — affirmative. Failure case becomes
+`found = false` + the topic.
+
+**Why this might matter for Gemma 4 E4B.** Small models (≤ 7B)
+handle negation worse than larger models — research-backed
+(negation handling is a documented weakness of sub-7B-class
+models). The current `not_found` field forces the model to make
+two compound decisions:
+
+1. "Did I find an answer?" (affirmative thought)
+2. "Set the negation of that to the boolean field" (translation step)
+
+With `found`, step 2 is identity — the affirmative thought maps
+directly to the boolean. The system prompt's instructions also
+read more naturally:
+
+- Today: *"set not_found=true when..., leave answer empty when
+  not_found=true"* (compound negation)
+- Flipped: *"set found=false when..., leave answer empty when
+  found=false"* (single negation, easier to track)
+
+The grammar still enforces correctness either way; this is purely
+about the model's **token-level decoding** confidence on borderline
+not-found cases.
+
+**Why we did NOT do it now.** Migration cost is non-trivial:
+~30-40 LOC across the `Answer` model, `SYSTEM_PROMPT` body
+(8-12 string occurrences referencing the field name), the
+`answer_question` post-process normalization, the frontend's
+`QueryResponse.not_found` / `view.kind === "not_found"` /
+`NotFoundCard` props, plus a one-shot migration for existing
+`recents.json` entries. Without eval data, the lift is
+theoretical — we'd be churning working code for an effect we
+can't measure.
+
+**What would change our minds.** Any of these:
+
+- Eval harness shows the rename moves not-found-precision /
+  not-found-recall by ≥ 3 percentage points on the existing
+  benchmark sets (smaller than that is within noise).
+- A user reports "Magpie hedges instead of admitting it doesn't
+  know" — the not-found path firing late or unreliably is a
+  symptom that affirmative naming might fix.
+- We move the local default to a different small model with
+  weaker negation handling than Gemma 4 E4B.
+- We're already migrating the schema for another reason
+  (e.g., Choice A discriminated-union flip) — bundle the
+  rename to amortize the churn.
+
+**Implementation sketch (when triggered):**
+
+- Rename `Answer.not_found` → `Answer.found`, flip boolean
+  semantic. Default `False` so legacy callers that didn't set
+  the field land in the failure path safely.
+- Rename `Answer.not_found_topic` → `Answer.missing_topic`.
+- Update every string in `SYSTEM_PROMPT` (around `src/answer.py:88-200`)
+  — examples, OUTPUT FORMAT block, WHEN-YOU-CANNOT-ANSWER
+  section, the not-found contract bullets.
+- Add Pydantic `Field(alias="not_found")` for one release cycle
+  so old `recents.json` entries still parse.
+- `answer_question` normalization: `if not ans.found:` instead
+  of `if ans.not_found:`.
+- Frontend rename + sign-flip across `QueryResponse`,
+  `viewState`, `NotFoundCard`, `MagpieWindow`'s view-resolution.
+- Run the harness pre/post; record the delta in this plan.
+
 ### Concrete eval harness needed
 
 The cheapest path to revisit either choice is the same harness:
@@ -1391,7 +1466,8 @@ The cheapest path to revisit either choice is the same harness:
    and add ground-truth citation positions (which sources should
    each correct answer cite, ideally with page/row numbers).
 2. Run the same questions through each variant under
-   evaluation (schemas, citation styles, prompt-layout knobs)
+   evaluation (schemas, citation styles, prompt-layout knobs,
+   verdict-field naming)
    — capture answer + sources + cite positions.
 3. Score: precision/recall on `not_found` detection, precision/recall
    on citations, answer correctness (existing rubric).

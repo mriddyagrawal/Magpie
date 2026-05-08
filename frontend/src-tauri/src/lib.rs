@@ -554,8 +554,12 @@ fn open_settings_internal(app: &tauri::AppHandle, action: Option<&str>) {
     }
     let _ = WebviewWindowBuilder::new(app, "settings", WebviewUrl::default())
         .title("Magpie Settings")
-        .inner_size(560.0, 520.0)
-        .min_inner_size(480.0, 400.0)
+        // Sized for the new three-tab layout (Specs/UI/settings_window.md).
+        // The mockups assume ~720×640 to comfortably show the sidebar +
+        // main content area; min 620×560 keeps the data tab's folder
+        // rows readable when the user shrinks the window.
+        .inner_size(720.0, 640.0)
+        .min_inner_size(620.0, 560.0)
         .resizable(true)
         .decorations(true)
         .transparent(false)

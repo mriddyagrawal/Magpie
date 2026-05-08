@@ -1135,6 +1135,21 @@ def _do_sync() -> None:
                 roots.append(p)
         enabled_prefixes = [str(r.resolve()) for r in roots]
 
+        # Honor `global_rules.categories_enabled.data` for the walker's
+        # `_DATA_EXTS_DEFAULT_OFF` filter (.json / .csv / .dat). Without
+        # this, even with `data: true` set in indexing_rules.json, the
+        # UI Sync button silently skipped data-extension files because
+        # `run_batch`'s `include_data` arg defaulted to False — gate #1
+        # (extension whitelist) blocked the file before gate #2
+        # (`rules.should_index` consulting `categories_enabled`) ever
+        # got a chance to weigh in. CLI `--include-data` worked because
+        # it set the flag explicitly; the UI had no equivalent. Fix:
+        # derive `include_data` from the saved global rule so the UI
+        # toggle (when one is wired) and the rules file agree.
+        include_data = bool(
+            rules.global_rules.categories_enabled.get("data", False)
+        )
+
         # Drift cleanup BEFORE walking — drops manifest rows under
         # disabled/removed roots so end-of-run orphan cleanup picks up
         # the corresponding Qdrant points.
@@ -1155,6 +1170,7 @@ def _do_sync() -> None:
                 concurrency=4,
                 progress_callback=_on_progress_update,
                 stop_event=_stop_event,
+                include_data=include_data,
             ))
 
         if _stop_event.is_set():

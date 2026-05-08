@@ -5,7 +5,13 @@ description = "RAG-style semantic search over the local file system."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pydantic-ai>=0.0.14",
+    # `pydantic-ai` (the metapackage) pulls in `pydantic-ai-slim` with ~20
+    # extras (bedrock→boto3, temporal→temporalio, google, cohere, anthropic,
+    # vertex, xai, ...). We only use OpenAI-compatible chat (OpenRouter +
+    # Moonshot are both OpenAI-shape). Depend on `pydantic-ai-slim` directly
+    # with the narrow extras we actually call. Saves ~70 MB of dead code +
+    # a much faster fresh install. See `Plans/Bundle Trim/Implementation Plan.md` PR-B.
+    "pydantic-ai-slim[openai,retries]>=1.0",
     "pydantic>=2.8",
     "psutil>=5.9",            # cross-platform memory/cpu probes; used by daemon backpressure (PR2). Harmless ~3MB add.
     "pypdf>=4.3",
@@ -24,12 +30,21 @@ dependencies = [
     "trafilatura>=1.12",
     "huggingface-hub>=0.24",
     "httpx>=0.27",
-    "ipykernel",
-    "jupyter",
-    "notebook",
     "fastapi>=0.110",
     "uvicorn[standard]>=0.30",
     "platformdirs>=4.0",
+    # torch is transitively required by colpali-engine + sentence-transformers,
+    # but PyPI's default wheel ships ~2.7 GB of CUDA libs (nvidia-*, triton,
+    # cuda-bindings) on every platform — useless on Mac (MPS) and CPU-only
+    # Linux. Pin explicitly so [tool.uv.sources] can route this through the
+    # pytorch-cpu index. Mac users still get MPS via the same wheel — "cpu"
+    # here means "no bundled CUDA libs," NOT "no GPU." Linux+NVIDIA users
+    # who genuinely want CUDA acceleration should override the index at
+    # install time:
+    #     UV_TORCH_BACKEND=cu121 uv sync
+    # (or directly: `uv pip install torch --index-url https://download.pytorch.org/whl/cu121 --reinstall`)
+    # See `Plans/Bundle Trim/Implementation Plan.md` PR-C.
+    "torch>=2.4",
 ]
 
 [build-system]
@@ -40,10 +55,30 @@ build-backend = "setuptools.build_meta"
 include = ["src*"]
 
 [dependency-groups]
-dev = ["pytest>=8.0", "notspotlight", "pyinstaller>=6.0"]
+# Dev-only: notebooks for prototyping, pytest for testing, pyinstaller for
+# packaging. None of these are imported by `src/` at runtime, so they don't
+# belong in the production install. Bring them back with `uv sync --group dev`.
+# See `Plans/Bundle Trim/Implementation Plan.md` PR-A.
+dev = [
+    "pytest>=8.0",
+    "notspotlight",
+    "pyinstaller>=6.0",
+    "ipykernel",      # Jupyter Python kernel — opens .ipynb files in `notebooks/`
+    "jupyter",        # Notebook server (web UI)
+    "notebook",       # Classic notebook frontend
+]
 
 [tool.uv]
 workspace = { members = ["cli"] }
 
 [tool.uv.sources]
 notspotlight = { workspace = true }
+# Route torch through the pytorch-cpu index by default. Saves ~2.7 GB of
+# bundled CUDA libs that nobody on Mac/Windows/CPU-Linux uses. CUDA users
+# override at install time per the comment in the `dependencies` block above.
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

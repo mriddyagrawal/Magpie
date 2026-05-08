@@ -12,7 +12,13 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from pydantic_ai import BinaryContent
+# `pydantic_ai` is deliberately NOT imported at module scope here. It pulls in
+# the entire pydantic-ai agent graph (~800 ms cold-start cost as measured by
+# `python -X importtime`), which would fire on every module that transitively
+# imports `src.content` (src.answer, src.server, src.ingest.tier2, ...).
+# The only thing we need from pydantic_ai is `BinaryContent`, used in two
+# branches of `build_content_blocks` below — moved to a deferred import at
+# function scope. See `Plans/Bundle Trim/Implementation Plan.md` PR-D.
 
 
 IMAGE_EXTS = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
@@ -439,6 +445,10 @@ def build_content_blocks(
     Raises SummarizeError for unsupported extensions, encrypted PDFs, corrupt
     Office files, non-UTF-8 text files, or empty content.
     """
+    # Deferred — only paid when this function is actually called, not on
+    # every import of src.content. See module-level comment.
+    from pydantic_ai import BinaryContent
+
     ext = path.suffix.lower()
 
     if ext in IMAGE_EXTS:

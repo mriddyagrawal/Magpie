@@ -69,6 +69,132 @@ def _build(root: Path, *,
 
 
 # ---------------------------------------------------------------------------
+# Precedence row 0: explicit FILE include_paths overrides every other rule.
+# ---------------------------------------------------------------------------
+#
+# When a user adds a single file (not a directory) to include_paths, that's
+# their strongest possible signal of intent — it beats exclude_paths,
+# gitignore, hidden-file rule, category-disabled, file-size cap. Directory
+# entries in include_paths fall through to the normal precedence chain
+# (exclude_paths still wins for files INSIDE them).
+
+
+def _build_with_file_include(file_path: Path, **user_kwargs) -> IndexingRules:
+    """Build rules where the include_paths entry IS the file itself."""
+
+    user = UserRules(
+        include_paths=[IncludePath(path=str(file_path), enabled=True)],
+        global_rules=user_kwargs.pop("global_rules", None) or GlobalRules(),
+        **user_kwargs,
+    )
+    return IndexingRules(
+        defaults=user_kwargs.pop("defaults", None) or MagpieDefaults(),
+        user=user,
+        user_path=file_path.parent / "fake.json",
+    )
+
+
+def test_explicit_file_include_overrides_exclude_path(root: Path) -> None:
+    """If a path is in BOTH include_paths (as a file) AND exclude_paths,
+    the explicit file include wins."""
+
+    f = root / "important.txt"
+    f.write_text("x")
+    user = UserRules(
+        include_paths=[IncludePath(path=str(f), enabled=True)],
+        exclude_paths=[str(f)],
+    )
+    rules = IndexingRules(
+        defaults=MagpieDefaults(), user=user, user_path=root / "fake.json",
+    )
+    ok, reason = rules.should_index(f)
+    assert ok is True
+    assert "explicitly included file" in reason
+
+
+def test_explicit_file_include_overrides_gitignore(root: Path) -> None:
+    """A `.gitignore` entry that would normally hide the file is bypassed."""
+
+    f = root / "build_artifact.bin"
+    f.write_text("x")
+    (root / ".gitignore").write_text("*.bin\n")
+    rules = _build_with_file_include(f)
+    ok, _ = rules.should_index(f)
+    assert ok is True
+
+
+def test_explicit_file_include_overrides_hidden(root: Path) -> None:
+    """`.foo.txt` in include_paths is indexed even with ignore_hidden=True."""
+
+    f = root / ".secret_notes.txt"
+    f.write_text("x")
+    rules = _build_with_file_include(f, ignore_hidden=True)
+    ok, _ = rules.should_index(f)
+    assert ok is True
+
+
+def test_explicit_file_include_overrides_disabled_category(root: Path) -> None:
+    """Even with the file's category turned off globally, the explicit
+    include wins. Common case: user disabled `data: false` for noise
+    reduction but wants ONE specific CSV indexed."""
+
+    f = root / "important_metrics.csv"
+    f.write_text("x")
+    rules = _build_with_file_include(
+        f,
+        global_rules=GlobalRules(
+            categories_enabled={"text": True, "document": True, "image": True,
+                                "data": False, "code": True, "archive": False},
+        ),
+    )
+    ok, _ = rules.should_index(f)
+    assert ok is True
+
+
+def test_explicit_file_include_overrides_size_cap(root: Path, monkeypatch) -> None:
+    """File-size cap is bypassed for explicit file includes."""
+
+    f = root / "huge.bin"
+    f.write_text("x" * 1024)
+    rules = _build_with_file_include(
+        f,
+        global_rules=GlobalRules(max_file_size_mb=0.0001),  # ~100 bytes
+    )
+    ok, _ = rules.should_index(f)
+    assert ok is True
+
+
+def test_directory_include_does_not_trigger_file_short_circuit(root: Path) -> None:
+    """include_paths entries pointing at DIRECTORIES still flow through
+    the normal precedence chain — exclude_paths still wins for files
+    inside them. Only file-typed entries trigger row 0."""
+
+    f = root / "secret.txt"
+    f.write_text("x")
+    rules = _build(root, exclude_paths=[str(f)])
+    ok, reason = rules.should_index(f)
+    assert ok is False
+    assert "explicitly excluded" in reason
+
+
+def test_disabled_explicit_file_include_does_not_short_circuit(root: Path) -> None:
+    """An explicit file include with enabled=False falls back to the normal
+    chain (which will reject the file as "not under any included folder")."""
+
+    f = root / "important.txt"
+    f.write_text("x")
+    user = UserRules(
+        include_paths=[IncludePath(path=str(f), enabled=False)],
+    )
+    rules = IndexingRules(
+        defaults=MagpieDefaults(), user=user, user_path=root / "fake.json",
+    )
+    ok, reason = rules.should_index(f)
+    assert ok is False
+    assert "not under any included folder" in reason
+
+
+# ---------------------------------------------------------------------------
 # Precedence row 1: explicit exclude_paths always wins
 # ---------------------------------------------------------------------------
 

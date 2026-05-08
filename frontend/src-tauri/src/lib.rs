@@ -1,6 +1,7 @@
 use std::net::{SocketAddr, TcpStream};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::thread;
 use std::time::Duration;
@@ -30,6 +31,22 @@ fn anchor_spotlight(window: &WebviewWindow) {
     let x = ((screen.width as i32) - (win_size.width as i32)) / 2;
     let y = ((screen.height as f64) * 0.22) as i32;
     let _ = window.set_position(PhysicalPosition::new(x.max(0), y.max(0)));
+}
+
+// Process-lifetime flag: true once `anchor_spotlight_once` has run. The
+// atomic dies with the process so Cmd-Q → relaunch re-anchors fresh,
+// while hide → resummon within the same session preserves whatever
+// position the user dragged the window to. See Specs/window_lifecycle.md.
+static SPOTLIGHT_ANCHORED: AtomicBool = AtomicBool::new(false);
+
+// Anchor the window to the Spotlight position only the first time this
+// fires per process. All show / re-summon paths must call this — bare
+// `anchor_spotlight()` calls override the user's dragged position on
+// every summon, which was the v0 design and is no longer wanted.
+fn anchor_spotlight_once(window: &WebviewWindow) {
+    if !SPOTLIGHT_ANCHORED.swap(true, Ordering::Relaxed) {
+        anchor_spotlight(window);
+    }
 }
 
 struct SidecarState(Mutex<Option<Child>>);
@@ -82,7 +99,7 @@ fn try_register_shortcut(app: &tauri::AppHandle, modifiers: Option<Modifiers>, c
                 if is_visible {
                     let _ = window.hide();
                 } else {
-                    anchor_spotlight(&window);
+                    anchor_spotlight_once(&window);
                     let _ = window.show();
                     let _ = window.set_focus();
                 }
@@ -171,13 +188,13 @@ pub fn run() {
                     if is_visible {
                         let _ = window.hide();
                     } else {
-                        anchor_spotlight(&window);
+                        anchor_spotlight_once(&window);
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
                     return;
                 }
-                anchor_spotlight(&window);
+                anchor_spotlight_once(&window);
                 let _ = window.show();
                 let _ = window.set_focus();
                 let shortcut = load_saved_shortcut().unwrap_or_else(|| "Alt+Space".to_string());
@@ -238,7 +255,7 @@ pub fn run() {
             );
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.eval(&init_script);
-                anchor_spotlight(&window);
+                anchor_spotlight_once(&window);
             } else {
                 let window = WebviewWindowBuilder::new(&handle, "main", WebviewUrl::default())
                     .title("Magpie")
@@ -250,7 +267,7 @@ pub fn run() {
                     .always_on_top(true)
                     .initialization_script(&init_script)
                     .build()?;
-                anchor_spotlight(&window);
+                anchor_spotlight_once(&window);
             }
 
             // Shortcut registration runs in a background thread so the picker
@@ -320,7 +337,7 @@ pub fn run() {
                             if window.is_visible().unwrap_or(false) {
                                 let _ = window.hide();
                             } else {
-                                anchor_spotlight(&window);
+                                anchor_spotlight_once(&window);
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }
@@ -448,7 +465,7 @@ pub fn run() {
             tauri::RunEvent::Reopen { has_visible_windows, .. } => {
                 if !has_visible_windows {
                     if let Some(window) = app_handle.get_webview_window("main") {
-                        anchor_spotlight(&window);
+                        anchor_spotlight_once(&window);
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
@@ -661,7 +678,7 @@ fn toggle_main_window(app: tauri::AppHandle) {
         if is_visible {
             let _ = window.hide();
         } else {
-            anchor_spotlight(&window);
+            anchor_spotlight_once(&window);
             let _ = window.show();
             let _ = window.set_focus();
         }

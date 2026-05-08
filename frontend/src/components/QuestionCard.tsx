@@ -8,6 +8,15 @@ import magpieLogoLight from "../assets/magpie-logo-light.png";
 
 import "./QuestionCard.css";
 
+/**
+ * Props as of PR 4 ([Specs/UI/ask_bar.md] universal-elements
+ * rewrite). The settings gear has been lifted OUT of the search pill
+ * and into the sibling SettingsBlob component, so QuestionCard is now
+ * just logo + input/title + submit-affordance. The previous
+ * `onOpenSettings` and `shortcutLabel` props are gone — the blob
+ * handles both jobs (the keyboard hint moved to StatusFooter, since
+ * the right-side hint there is more discoverable).
+ */
 interface Props {
   value: string;
   onChange: (v: string) => void;
@@ -15,8 +24,6 @@ interface Props {
   loading: boolean;
   booting: boolean;
   submittedQuestion: string | null;
-  onOpenSettings: () => void;
-  shortcutLabel: string;
 }
 
 // Explicit drag: call startDragging() on mousedown anywhere on the card that
@@ -36,7 +43,10 @@ function startDragOnMouseDown(e: React.MouseEvent) {
 }
 
 export const QuestionCard = forwardRef<HTMLInputElement, Props>(
-  function QuestionCard({ value, onChange, onSubmit, loading, booting, submittedQuestion, onOpenSettings, shortcutLabel }, ref) {
+  function QuestionCard(
+    { value, onChange, onSubmit, loading, booting, submittedQuestion },
+    ref
+  ) {
     useEffect(() => {
       if (typeof ref === "object" && ref?.current) ref.current.focus();
     }, [ref]);
@@ -69,7 +79,7 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
             ref={ref}
             className="question-card__input"
             value={value}
-            placeholder={booting ? "Starting Magpie…" : "Ask magpie"}
+            placeholder={booting ? "Starting Magpie…" : "Ask Magpie about your files…"}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -82,17 +92,17 @@ export const QuestionCard = forwardRef<HTMLInputElement, Props>(
             autoComplete="off"
           />
         )}
-        <kbd className="question-card__hint" data-tauri-drag-region>
-          {shortcutLabel}
-        </kbd>
+        {/* Submit-affordance glyph on the right edge of the pill. Click
+            equivalent to Enter; visually echoes "you can press return". */}
         <button
-          className="question-card__settings-btn"
-          onClick={onOpenSettings}
-          title="Settings"
+          type="button"
+          className="question-card__submit"
+          onClick={onSubmit}
+          disabled={loading || booting || !value.trim()}
+          aria-label="Ask"
           tabIndex={-1}
-          aria-label="Open settings"
         >
-          ⚙
+          ⏎
         </button>
       </div>
     );

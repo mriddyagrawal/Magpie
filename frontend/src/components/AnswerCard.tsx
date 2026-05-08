@@ -1,16 +1,34 @@
-import { Highlighted } from "./Highlighted";
+import { renderAnswer } from "./citations";
+import type { Source } from "../types";
 
 import "./AnswerCard.css";
 
 interface Props {
   answer: string;
+  /** The full sources list — required to resolve `[N]` markers in the
+   *  answer prose to clickable citation pills. The renderer falls back
+   *  to plain-text spans for out-of-range markers (Plan #25). */
+  sources: Source[];
+  /** Tokens to highlight in non-citation text (currency, dates, etc.). */
   highlights: string[];
   loading: boolean;
   error: string | null;
   onFollowUp: () => void;
+  /** Called when a citation pill or any source-anchored span is
+   *  clicked. Parent uses this to update the selected source in the
+   *  sources list / preview pane. */
+  onSelectSource?: (path: string) => void;
 }
 
-export function AnswerCard({ answer, highlights, loading, error, onFollowUp }: Props) {
+export function AnswerCard({
+  answer,
+  sources,
+  highlights,
+  loading,
+  error,
+  onFollowUp,
+  onSelectSource,
+}: Props) {
   return (
     <div className="answer-card magpie-card">
       <div className="answer-card__label">ANSWER</div>
@@ -24,7 +42,12 @@ export function AnswerCard({ answer, highlights, loading, error, onFollowUp }: P
             <span className="answer-card__dot" />
           </span>
         ) : (
-          <Highlighted text={answer} tokens={highlights} />
+          renderAnswer({
+            text: answer,
+            sources,
+            highlightTokens: highlights,
+            onSelectSource,
+          })
         )}
       </div>
       {!loading && !error && (

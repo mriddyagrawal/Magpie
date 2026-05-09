@@ -1,10 +1,12 @@
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::net::{SocketAddr, TcpStream};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use tauri::menu::{Menu, MenuItem};
 #[cfg(target_os = "macos")]
@@ -245,16 +247,35 @@ pub fn run() {
 
             let handle = app.handle().clone();
 
+            // Defensive cleanup BEFORE we spawn fresh children: any qdrant /
+            // magpie-sidecar / llama-server left running from a prior crash
+            // or force-quit would otherwise hold the storage dir / port and
+            // make the new spawn fail. macOS reparents orphans to launchd
+            // (PID 1), so they live forever otherwise. Logged to bootstrap.log.
+            kill_orphan_subprocesses();
+
             // Pre-pick ports instantly (just binds + releases a socket) so the
             // window can appear immediately with the port already known — no
             // blocking on qdrant/sidecar startup inside setup().
+            //
+            // Qdrant needs TWO ports (HTTP + gRPC). Old code only pre-picked
+            // HTTP and let qdrant default gRPC to 6334 — which collides with
+            // any other qdrant-using app on the same machine (OpenWhispr's
+            // qdrant binds 6333/6334 on devs' machines, e.g.). Pre-picking
+            // both eliminates the collision and the silent qdrant exit it
+            // caused.
             let sidecar_port = pick_free_port().unwrap_or(8765);
             *app.state::<SidecarPort>().0.lock().unwrap() = sidecar_port;
-            let qdrant_port_pre: Option<u16> = if cfg!(not(debug_assertions)) {
-                pick_free_port().ok()
+            let qdrant_ports: Option<(u16, u16)> = if cfg!(not(debug_assertions)) {
+                match (pick_free_port(), pick_free_port()) {
+                    (Ok(http), Ok(grpc)) => Some((http, grpc)),
+                    _ => None,
+                }
             } else {
                 None
             };
+            let qdrant_port_pre: Option<u16> = qdrant_ports.map(|(http, _)| http);
+            let qdrant_grpc_pre: Option<u16> = qdrant_ports.map(|(_, grpc)| grpc);
 
             // Inject the port and show the window immediately.
             let init_script = format!(
@@ -367,17 +388,29 @@ pub fn run() {
                     let port = match qdrant_port_pre {
                         Some(p) => p,
                         None => {
-                            eprintln!("[magpie] fatal: could not pre-pick qdrant port");
+                            bootstrap_log("fatal: could not pre-pick qdrant HTTP port");
                             return;
                         }
                     };
-                    match spawn_qdrant(&bg, port) {
+                    let grpc_port = match qdrant_grpc_pre {
+                        Some(p) => p,
+                        None => {
+                            bootstrap_log("fatal: could not pre-pick qdrant gRPC port");
+                            return;
+                        }
+                    };
+                    bootstrap_log(format!(
+                        "spawning qdrant on http={port} grpc={grpc_port}"
+                    ));
+                    match spawn_qdrant(&bg, port, grpc_port) {
                         Err(e) => {
-                            eprintln!("[magpie] fatal: qdrant failed to start: {e}");
+                            bootstrap_log(format!("fatal: qdrant failed to start: {e}"));
                             bg.dialog()
                                 .message(format!(
                                     "Magpie could not start its search database.\n\n\
-                                     Error: {e}\n\nPlease reinstall the app."
+                                     Error: {e}\n\n\
+                                     See bootstrap log: {}",
+                                    bootstrap_log_path().display(),
                                 ))
                                 .kind(MessageDialogKind::Error)
                                 .title("Magpie failed to start")
@@ -387,17 +420,26 @@ pub fn run() {
                         Ok(child) => {
                             *bg.state::<QdrantState>().0.lock().unwrap() = Some(child);
                             if !wait_for_port(port, 30) {
-                                eprintln!("[magpie] fatal: qdrant not ready after 15s");
+                                bootstrap_log(
+                                    "fatal: qdrant not ready after 15s. \
+                                     Check bootstrap.log for qdrant's stderr — \
+                                     most likely cause is a port collision (gRPC \
+                                     6334 is the historical default), a corrupt \
+                                     storage dir, or qdrant exiting silently.",
+                                );
                                 bg.dialog()
-                                    .message(
+                                    .message(format!(
                                         "Magpie's search database took too long to start.\n\n\
+                                         See bootstrap log: {}\n\n\
                                          Please try relaunching the app.",
-                                    )
+                                        bootstrap_log_path().display(),
+                                    ))
                                     .kind(MessageDialogKind::Error)
                                     .title("Magpie failed to start")
                                     .blocking_show();
                                 return;
                             }
+                            bootstrap_log(format!("qdrant ready on http={port}"));
                             Some(port)
                         }
                     }
@@ -406,13 +448,18 @@ pub fn run() {
                 };
 
                 // Start the Python sidecar on the pre-picked port.
+                bootstrap_log(format!(
+                    "spawning sidecar on port {sidecar_port} (qdrant={qdrant_port:?})"
+                ));
                 match spawn_sidecar(&bg, sidecar_port, qdrant_port) {
                     Err(e) => {
-                        eprintln!("[magpie] fatal: sidecar failed to start: {e}");
+                        bootstrap_log(format!("fatal: sidecar failed to start: {e}"));
                         bg.dialog()
                             .message(format!(
                                 "Magpie could not start its search backend.\n\n\
-                                 Error: {e}\n\nPlease reinstall the app."
+                                 Error: {e}\n\n\
+                                 See bootstrap log: {}",
+                                bootstrap_log_path().display(),
                             ))
                             .kind(MessageDialogKind::Error)
                             .title("Magpie failed to start")
@@ -420,7 +467,7 @@ pub fn run() {
                     }
                     Ok(child) => {
                         *bg.state::<SidecarState>().0.lock().unwrap() = Some(child);
-                        eprintln!("[magpie] sidecar started on port {sidecar_port}");
+                        bootstrap_log(format!("sidecar spawned, pid={:?}", bg.state::<SidecarState>().0.lock().unwrap().as_ref().map(|c| c.id())));
                     }
                 }
             });
@@ -516,6 +563,211 @@ fn pick_free_port() -> Result<u16, std::io::Error> {
     Ok(listener.local_addr()?.port())
 }
 
+// ---------------------------------------------------------------------------
+// Bootstrap logging — write everything Tauri's spawn paths used to
+// silently drop. Old code passed `Stdio::null()` for both qdrant and
+// magpie-sidecar, which meant the user got "took too long" dialogs with
+// zero diagnostic. Now every spawn pipes stderr (and qdrant's stdout)
+// into APP_DATA_DIR/logs/bootstrap-<utc-ts>.log. The .log path is also
+// printed to stderr on first write so the user can `tail -f` it.
+// ---------------------------------------------------------------------------
+
+/// Per-launch bootstrap log path. Resolved lazily on first write to
+/// `APP_DATA_DIR/logs/bootstrap-YYYYMMDDTHHMMSSZ.log`. Filesystem-safe
+/// timestamp (no `:` for Windows). Never errors back to the caller —
+/// logging must never block the actual spawn path.
+fn bootstrap_log_path() -> PathBuf {
+    static ONCE: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    ONCE.get_or_init(|| {
+        let logs_dir = app_data_dir().join("logs");
+        let _ = std::fs::create_dir_all(&logs_dir);
+        let ts = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        // Compact ISO-ish timestamp via integer seconds-since-epoch is
+        // boring but unambiguous; `date -ud @<n>` decodes it cleanly.
+        let path = logs_dir.join(format!("bootstrap-{ts}.log"));
+        eprintln!("[magpie] bootstrap log: {}", path.display());
+        path
+    })
+    .clone()
+}
+
+/// Append a one-line UTF-8 message with a "[magpie] " prefix to the
+/// bootstrap log AND mirror to stderr. Best-effort; failures are
+/// swallowed to keep the spawn path resilient.
+fn bootstrap_log(msg: impl AsRef<str>) {
+    let line = format!(
+        "[{}] {}\n",
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0),
+        msg.as_ref()
+    );
+    eprint!("[magpie] {line}");
+    if let Ok(mut f) = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(bootstrap_log_path())
+    {
+        let _ = f.write_all(line.as_bytes());
+    }
+}
+
+/// Open the bootstrap log file for `Stdio::from()` use. Spawns get
+/// their stderr / stdout redirected here so any later crash leaves a
+/// trail. Falls back to `Stdio::null()` if the open fails — losing
+/// logs is preferable to crashing the parent.
+fn bootstrap_stdio() -> Stdio {
+    OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(bootstrap_log_path())
+        .map(Stdio::from)
+        .unwrap_or_else(|_| Stdio::null())
+}
+
+// ---------------------------------------------------------------------------
+// Orphan cleanup — kill any qdrant / magpie-sidecar / llama-server
+// subprocess whose argv path resolves under our app bundle or
+// APP_DATA_DIR. These are leftovers from prior crashes / force-quits /
+// OS kills that the graceful Exit handler never got to clean up. macOS
+// reparents orphans to launchd, so they live forever otherwise.
+//
+// We shell out to `ps -ax -o pid=,args=` rather than pulling in the
+// `sysinfo` crate — keeps the dependency budget flat. macOS + Linux
+// support this exact flag set; Windows uses `tasklist` (separate
+// branch below). Worst case: the scan misses an orphan (unkillable
+// edge case) and the next sync fails the same way it failed today —
+// we're no worse off than before this code existed.
+// ---------------------------------------------------------------------------
+
+/// Best-effort kill of any orphaned magpie subprocess from a prior run.
+/// Runs early in `setup()` before we spawn fresh children. Logs every
+/// match (killed or skipped) to the bootstrap log so a future user
+/// running into "took too long" can see the cleanup history.
+fn kill_orphan_subprocesses() {
+    let app_dir = app_data_dir();
+    let app_dir_str = app_dir.to_string_lossy().to_string();
+    // Resolve our .app bundle path so we can scope the match. On Mac
+    // .app: <bundle>/Contents/MacOS/<name>. On Linux/Windows: directory
+    // containing the running executable.
+    let bundle_root = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(Path::to_path_buf))
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_default();
+
+    let processes = scan_magpie_processes();
+    if processes.is_empty() {
+        bootstrap_log("orphan scan: no leftover qdrant/sidecar/llama-server processes");
+        return;
+    }
+
+    for (pid, args) in processes {
+        // Decide if this PID belongs to a previous Magpie run. Heuristic:
+        // (a) argv0 starts with our bundle dir, OR
+        // (b) argv0 starts with APP_DATA_DIR (covers older versions that
+        //     copied binaries into Application Support).
+        // Otherwise leave it alone — could be another app's qdrant
+        // (e.g., OpenWhispr ships its own qdrant in /Applications).
+        let belongs_to_magpie = (!bundle_root.is_empty() && args.starts_with(&bundle_root))
+            || args.starts_with(&app_dir_str);
+        if !belongs_to_magpie {
+            bootstrap_log(format!("orphan scan: skipped pid={pid} (not ours): {args}"));
+            continue;
+        }
+        bootstrap_log(format!("orphan scan: killing pid={pid}: {args}"));
+        // SIGKILL — graceful SIGTERM would be nicer but if a previous
+        // SIGTERM / Exit handler already failed to clean up, SIGKILL
+        // is the right escalation. Best-effort: ignore failure.
+        #[cfg(unix)]
+        {
+            let _ = Command::new("kill").args(["-9", &pid]).status();
+        }
+        #[cfg(windows)]
+        {
+            let _ = Command::new("taskkill")
+                .args(["/F", "/PID", &pid])
+                .status();
+        }
+    }
+}
+
+/// Cross-platform process scanner. Returns `(pid, full_argv)` pairs
+/// for every running process whose binary name matches `qdrant`,
+/// `magpie-sidecar`, or `llama-server`. The caller filters further
+/// by argv path. Empty list on any platform-specific error.
+fn scan_magpie_processes() -> Vec<(String, String)> {
+    #[cfg(unix)]
+    {
+        // `ps -ax -o pid=,args=` prints every process with PID + full
+        // argv on one line. Trailing `=` removes the column header.
+        let out = Command::new("ps")
+            .args(["-ax", "-o", "pid=,args="])
+            .output();
+        let Ok(out) = out else {
+            return Vec::new();
+        };
+        let stdout = String::from_utf8_lossy(&out.stdout);
+        return parse_unix_ps(&stdout);
+    }
+    #[cfg(windows)]
+    {
+        // tasklist in CSV mode: `,"<image>","<session>","<pid>",...`. We
+        // don't have full argv from tasklist alone; the image name is
+        // enough since Magpie's children have unique names.
+        let out = Command::new("tasklist")
+            .args(["/FO", "CSV", "/NH"])
+            .output();
+        let Ok(out) = out else {
+            return Vec::new();
+        };
+        let stdout = String::from_utf8_lossy(&out.stdout);
+        return parse_windows_tasklist(&stdout);
+    }
+}
+
+#[cfg(unix)]
+fn parse_unix_ps(stdout: &str) -> Vec<(String, String)> {
+    let names = ["qdrant", "magpie-sidecar", "llama-server"];
+    let mut out = Vec::new();
+    for line in stdout.lines() {
+        // Each line: `  <pid> <argv0> <args...>`. Trim leading whitespace,
+        // split on the first whitespace.
+        let line = line.trim_start();
+        let Some((pid_str, rest)) = line.split_once(char::is_whitespace) else {
+            continue;
+        };
+        let rest = rest.trim_start();
+        if names.iter().any(|n| rest.contains(n)) {
+            out.push((pid_str.to_string(), rest.to_string()));
+        }
+    }
+    out
+}
+
+#[cfg(windows)]
+fn parse_windows_tasklist(stdout: &str) -> Vec<(String, String)> {
+    // Each CSV row: "image.exe","session","pid","mem"
+    let names = ["qdrant.exe", "magpie-sidecar.exe", "llama-server.exe"];
+    let mut out = Vec::new();
+    for line in stdout.lines() {
+        let parts: Vec<_> = line.trim_matches('"').split("\",\"").collect();
+        if parts.len() < 3 {
+            continue;
+        }
+        let image = parts[0];
+        let pid = parts[1]; // skip session in cols
+        if names.iter().any(|n| image.eq_ignore_ascii_case(n)) {
+            out.push((pid.to_string(), image.to_string()));
+        }
+    }
+    out
+}
+
 // Poll until the TCP port accepts a connection or we exhaust attempts (500 ms each).
 fn wait_for_port(port: u16, max_attempts: u32) -> bool {
     let addr = SocketAddr::from(([127, 0, 0, 1], port));
@@ -552,7 +804,15 @@ fn bundled_bin_dir() -> Result<PathBuf, String> {
 }
 
 // Spawn qdrant on a pre-picked port; caller is responsible for storing the child.
-fn spawn_qdrant(_app: &tauri::AppHandle, port: u16) -> Result<Child, String> {
+//
+// `http_port` and `grpc_port` are both passed via env so qdrant doesn't fall
+// back to its 6334 gRPC default (which collides with any other qdrant-using
+// app on the machine — OpenWhispr is the canonical case).
+//
+// Both stdout and stderr are piped into `bootstrap.log` so a future spawn
+// failure leaves a trail. Old code used `Stdio::null()` and that's exactly
+// why "took too long" dialogs were impossible to debug.
+fn spawn_qdrant(_app: &tauri::AppHandle, http_port: u16, grpc_port: u16) -> Result<Child, String> {
     let storage = app_data_dir().join("qdrant_storage");
     std::fs::create_dir_all(&storage).map_err(|e| e.to_string())?;
 
@@ -561,9 +821,10 @@ fn spawn_qdrant(_app: &tauri::AppHandle, port: u16) -> Result<Child, String> {
 
     let mut cmd = Command::new(&bin);
     cmd.env("QDRANT__STORAGE__STORAGE_PATH", &storage)
-        .env("QDRANT__SERVICE__HTTP_PORT", port.to_string())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
+        .env("QDRANT__SERVICE__HTTP_PORT", http_port.to_string())
+        .env("QDRANT__SERVICE__GRPC_PORT", grpc_port.to_string())
+        .stdout(bootstrap_stdio())
+        .stderr(bootstrap_stdio());
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
@@ -613,8 +874,12 @@ fn spawn_sidecar(
         c
     };
 
-    cmd.stdout(Stdio::null())
-        .stderr(Stdio::inherit())
+    // Pipe stdout AND stderr into bootstrap.log. Sidecar's own per-session
+    // LLM log lives in APP_DATA_DIR/logs/llm-*.log; this catches everything
+    // that comes out before the logger initializes (PyInstaller bootstrap,
+    // import errors, fastapi startup messages, etc.).
+    cmd.stdout(bootstrap_stdio())
+        .stderr(bootstrap_stdio())
         .spawn()
         .map_err(|e| format!("failed to spawn sidecar: {e}"))
 }

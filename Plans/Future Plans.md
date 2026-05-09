@@ -2950,15 +2950,28 @@ trade-off.
 
 ---
 
-## 41. App-quit lifecycle — Cmd+Q binding + graceful child shutdown
+## 41. App-quit lifecycle — keyboard-shortcut binding + graceful child shutdown + window-close UX (cross-platform)
 
-**Tags:** desktop · ux · process-lifecycle · cleanup · post-beta
+**Tags:** desktop · ux · process-lifecycle · cleanup · cross-platform · post-beta
 
-**Two related gaps in the macOS Quit flow surfaced during the
-2026-05-09 packaging smoke. Functional today via the orphan-cleanup
-safety net, but worth fixing before the polish bar gets raised.**
+**Three related gaps in the Quit flow surfaced during the 2026-05-09
+packaging smoke. Functional today via the orphan-cleanup safety net,
+but worth fixing before the polish bar gets raised. The shape of each
+gap is universal across macOS / Linux / Windows; the FIX differs per
+platform — captured below per gap.**
 
-### Gap A — Cmd+Q does nothing
+### Cross-platform symptom matrix
+
+| Concern | macOS | Linux | Windows |
+|---|---|---|---|
+| Standard quit shortcut | `Cmd+Q` | `Ctrl+Q` (varies by DE) | `Alt+F4` to close window; `Ctrl+Q` rare |
+| Quit MenuItem with that shortcut today | ❌ none | ❌ none | ❌ none |
+| Window X close behavior today | Hides ✅ (matches macOS Accessory norm) | Hides ⚠️ (varies — KDE/Xfce expect quit; GNOME 40+ tolerates background) | Hides ❌ (Windows users expect X to quit) |
+| Tray "Quit Magpie" works | ✅ | ✅ | ✅ |
+| SIGKILL orphans llama-server (sidecar's grandchild) | ✅ confirmed (reparents to launchd) | ✅ same (reparents to PID 1 / systemd) | ✅ same architectural issue (orphan unless Job Objects) |
+| Orphan cleanup at next launch | ✅ `ps -ax` + path-match | ✅ same | ⚠️ `tasklist` returns image name only — less precise (todo) |
+
+### Gap A — No quit keyboard shortcut bound on any platform
 
 The macOS app menu currently has only "Settings…":
 
@@ -2972,32 +2985,49 @@ let magpie_menu = Submenu::with_items(
 )?;
 ```
 
-There's no Quit MenuItem registered, so the system Cmd+Q shortcut
-has nothing to bind to and silently does nothing on the macOS side.
-The tray menu's "Quit Magpie" still works (separate widget), but
-users discover Cmd+Q first and report "can't quit."
+There's no Quit MenuItem with a keyboard accelerator. As a result:
 
-**Fix (~5 LOC):** add a Quit MenuItem with `Some("Cmd+Q")`
-accelerator to the Magpie submenu, route its menu event id to
-the same `app.exit(0)` path the tray menu uses:
+- **macOS users** hit `Cmd+Q` (the system Quit shortcut) — silently
+  does nothing because no Quit menu binds to it.
+- **Linux users** hit `Ctrl+Q` (typical GTK / Qt convention) — same
+  outcome. We don't even register an app menu on Linux.
+- **Windows users** hit `Alt+F4` to close the window — which on
+  Windows means "quit" to most users. We DO close the window, but
+  via the prevent-close+hide handler (see Gap C), so it just hides
+  and the user is confused.
+
+**Fix:**
+
+**macOS** — add Quit MenuItem with `Some("Cmd+Q")` accelerator to the
+Magpie submenu, route its menu event id to `app.exit(0)`:
 
 ```rust
-let quit_app_item = MenuItem::with_id(
-    app, "menu_quit", "Quit Magpie", true, Some("Cmd+Q"),
-)?;
-let magpie_menu = Submenu::with_items(
-    app, "Magpie", true, &[&app_settings_item, &quit_app_item],
-)?;
-// ... in on_menu_event:
-} else if event.id() == "menu_quit" {
-    app_handle.exit(0);
+#[cfg(target_os = "macos")]
+{
+    let quit_app_item = MenuItem::with_id(
+        app, "menu_quit", "Quit Magpie", true, Some("Cmd+Q"),
+    )?;
+    let magpie_menu = Submenu::with_items(
+        app, "Magpie", true, &[&app_settings_item, &quit_app_item],
+    )?;
+    // ... in on_menu_event:
+    } else if event.id() == "menu_quit" {
+        app_handle.exit(0);
+    }
 }
 ```
 
-Cross-platform note: only fires under `#[cfg(target_os = "macos")]`
-(matches the existing app-menu block). Linux/Windows don't have a
-native app menu pattern to mirror; their Quit goes through the tray
-menu, which already works.
+**Linux** — register a global shortcut for `Ctrl+Q` via the
+`tauri-plugin-global-shortcut` plugin (already a dep), scoped to fire
+only when a Magpie window has focus. Or: add a hidden Quit MenuItem
+with `Ctrl+Q` to the tray menu submenu so it's discoverable without
+having to right-click → Quit.
+
+**Windows** — handled implicitly by Gap C below. If we let the X
+close button actually quit the app on Windows (instead of hide),
+`Alt+F4` works because Windows binds it to "close active window"
+which then invokes our window-close handler. No extra menu item
+needed unless we want a discoverable `Ctrl+Q`.
 
 ### Gap B — Tray Quit kills sidecar via SIGKILL → llama-server orphans
 
@@ -3010,45 +3040,42 @@ RunEvent::Exit => {
 }
 ```
 
-`child.kill()` on Unix sends SIGKILL — uncatchable, instant
-termination. The Python sidecar dies before its `atexit` /
-signal handlers can clean up its own subprocesses (most notably
-`llama-server`, which it spawned via subprocess.Popen). llama-server
-gets reparented to launchd and lives on.
+`child.kill()` is **SIGKILL on Unix, TerminateProcess on Windows**.
+Both are uncatchable, instant termination. The Python sidecar dies
+before its `atexit` / signal handlers can clean up its own
+subprocesses (most notably `llama-server`, spawned via
+subprocess.Popen). llama-server gets reparented to:
 
-Empirical evidence (2026-05-09 bootstrap logs across multiple
-launches):
+- macOS: `launchd`
+- Linux: `init` / `systemd` (PID 1)
+- Windows: typically the Service Control Manager or just orphaned
+  in the user's session — survives until logout
+
+Empirical evidence (2026-05-09 bootstrap logs from macOS):
 ```
 orphan scan: killing pid=34305: .../llama-server --model gemma-4-...
 orphan scan: killing pid=36843: .../llama-server --model gemma-4-...
 ```
 The orphan-cleanup-at-startup catches these, so the system is
 **self-healing across restarts**. But the in-session Quit isn't
-fully clean, and on machines short on RAM the orphaned llama-server
+fully clean; on machines short on RAM the orphaned llama-server
 keeps holding ~2-4 GB until the next Magpie launch.
 
-**Fix:** SIGTERM-then-SIGKILL escalation. Send SIGTERM first, give
-the sidecar ~2-3s to handle it gracefully (which means killing
-llama-server itself), then SIGKILL if it didn't exit. Plus the
-sidecar needs a SIGTERM handler that calls
-`llama_server_pool.shutdown()` to terminate llama-server children.
+#### Fix — Unix (macOS + Linux): SIGTERM-then-SIGKILL escalation
 
 ```rust
-// Rust side — frontend/src-tauri/src/lib.rs:
-RunEvent::Exit => {
-    if let Some(mut child) = ...sidecar... {
-        // Try graceful first.
-        unsafe { libc::kill(child.id() as i32, libc::SIGTERM); }
-        let deadline = std::time::Instant::now() + Duration::from_secs(3);
-        while child.try_wait().ok().flatten().is_none()
-            && std::time::Instant::now() < deadline
-        {
-            std::thread::sleep(Duration::from_millis(50));
-        }
-        let _ = child.kill();   // SIGKILL if still alive
-        let _ = child.wait();
+// Rust side — frontend/src-tauri/src/lib.rs (Unix branch):
+#[cfg(unix)]
+fn graceful_kill(child: &mut Child, grace: Duration) {
+    unsafe { libc::kill(child.id() as i32, libc::SIGTERM); }
+    let deadline = std::time::Instant::now() + grace;
+    while child.try_wait().ok().flatten().is_none()
+        && std::time::Instant::now() < deadline
+    {
+        std::thread::sleep(Duration::from_millis(50));
     }
-    // Same pattern for qdrant.
+    let _ = child.kill();   // SIGKILL if still alive
+    let _ = child.wait();
 }
 ```
 
@@ -3068,31 +3095,145 @@ signal.signal(signal.SIGTERM, _handle_sigterm)
 [`llama_server_pool.py:197`](../src/inference/llama_server_pool.py#L197);
 just needs the signal binding.)
 
+#### Fix — Windows: Job Objects (better than Unix's SIGTERM approach)
+
+Windows doesn't have SIGTERM; the closest analog is
+`GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, pgrp)` which only works
+for processes that share a console. A cleaner mechanism is Windows
+**Job Objects** with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` — assigning
+the sidecar (and its descendants) to a Job that auto-terminates
+every member when the parent dies, regardless of *how* the parent
+dies (clean exit, panic, force-quit via Task Manager, OS shutdown).
+
+```rust
+#[cfg(windows)]
+fn assign_to_job(child: &Child) -> Result<HANDLE, String> {
+    use windows::Win32::System::JobObjects::*;
+    let job = unsafe { CreateJobObjectW(None, None) }?;
+    let mut info = JOBOBJECT_EXTENDED_LIMIT_INFORMATION::default();
+    info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    unsafe {
+        SetInformationJobObject(
+            job,
+            JobObjectExtendedLimitInformation,
+            &info as *const _ as *const _,
+            std::mem::size_of_val(&info) as u32,
+        )?;
+        AssignProcessToJobObject(job, HANDLE(child.id() as isize))?;
+    }
+    Ok(job)
+}
+```
+
+Then on Quit: simply close the Job Object handle. Windows kills the
+sidecar AND every descendant (including llama-server) atomically.
+**Strictly better than the Unix SIGTERM escalation** because:
+- No grace-period guesswork
+- Survives crashes and force-quits
+- Doesn't require the sidecar to register signal handlers
+
+(Adopting Job Objects on Unix isn't possible — Linux has cgroups but
+they require root. SIGTERM is the right Unix idiom.)
+
+### Gap C — Window-close-X hides on every platform (Windows-hostile)
+
+Current handler unconditionally hides on close:
+
+```rust
+.on_window_event(|window, event| {
+    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+        api.prevent_close();
+        let _ = window.hide();
+    }
+})
+```
+
+This is **macOS-correct** — Mac apps stay running in the menu bar
+when the last window closes. The Magpie tray icon serves the
+"background mode" affordance.
+
+It's **Linux-mixed**:
+- GNOME 40+ users: tolerate background-mode apps (similar to macOS)
+- KDE / Xfce / older GNOME users: expect X to quit
+
+It's **Windows-hostile**:
+- Windows users overwhelmingly expect X to quit the app
+- They click X, app disappears from taskbar, they think it quit
+- They might not discover the system tray icon (smaller surface
+  on Windows than macOS' menu bar)
+- Re-launching from Start Menu hits single-instance and just
+  toggles the existing hidden window — confusing
+
+**Fix:** gate the prevent-close behavior:
+
+```rust
+.on_window_event(|window, event| {
+    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+        #[cfg(target_os = "macos")]
+        {
+            api.prevent_close();
+            let _ = window.hide();
+        }
+        #[cfg(not(target_os = "macos"))]
+        {
+            // Linux + Windows: X actually quits.
+            let _ = window.app_handle().exit(0);
+        }
+    }
+})
+```
+
+Side benefit: on Linux + Windows this implicitly fixes Gap A's
+Linux (`Ctrl+Q`) and Windows (`Alt+F4`) cases — both keybindings
+end up routed through `WindowEvent::CloseRequested` → `app.exit(0)`
+→ `RunEvent::Exit` → graceful child shutdown.
+
+For users who explicitly want the macOS-style "stay-running-when-
+window-closes" behavior on Linux/Windows, expose it as a Settings
+toggle (`app.run_in_background_when_closed = false` by default on
+non-Mac). Not blocking, but a nice-to-have.
+
 ### Why "post-beta"
 
-Both gaps are functional today via the orphan-cleanup-at-startup
-safety net (5cabf92 / `kill_orphan_subprocesses()`). Beta testers
-won't notice unless they're watching Activity Monitor, and even
-then the reaper catches things on next launch. Worth fixing for
-public release because:
+All three gaps are **functional today** via the orphan-cleanup-at-
+startup safety net (5cabf92 / `kill_orphan_subprocesses()`). Beta
+testers won't notice the SIGKILL orphan unless they're watching
+Activity Monitor / `top` / Task Manager, and even then the reaper
+catches things on next launch. Cmd+Q "broken" is a polish-tier
+report. X-button-hides only bites Windows beta testers, who we
+don't have yet.
+
+Worth fixing for public release because:
 
 - Power users notice the orphan llama-server (2-4 GB RSS)
-- Cmd+Q is a discoverable expectation; "can't quit" reports look
-  bad even if the tray menu works
+- "Can't quit with Cmd+Q / Ctrl+Q / Alt+F4" is a discoverable
+  expectation; first-impression reports look bad even if the tray
+  menu works
+- Windows users on a public download will hit Gap C immediately;
+  it's the most visible of the three on that platform
 - Cleaner shutdown reduces "took too long" failure modes during
   rapid Magpie restart cycles
 
-Estimated total: ~half day. Cmd+Q is 15 minutes; SIGTERM
-escalation + Python signal handler is the bigger piece.
+### Estimated work
+
+| Gap | macOS | Linux | Windows |
+|---|---|---|---|
+| A — Quit shortcut bound | 15 min (Quit MenuItem + Cmd+Q) | 30 min (global-shortcut Ctrl+Q OR menu item) | 0 (covered by Gap C fix) |
+| B — Graceful sidecar shutdown | 1-2 hrs (libc::kill SIGTERM + Python signal handler + grace loop) | Same code as macOS, validate on real Linux | 1-2 hrs (Job Object setup + windows-rs wiring) |
+| C — Window X behavior | 0 (correct as-is) | 5 min (cfg gate) | 5 min (cfg gate, included with Linux change) |
+
+Total: ~half day for macOS + Linux, +half day for Windows Job
+Object work. ~1 day end-to-end across all three.
 
 ### Trigger to start
 
 Any of:
-- First public download or pre-announce demo (Cmd+Q "broken" is a
-  too-easy first impression to give)
+- First public download or pre-announce demo (broken Quit shortcut
+  is a too-easy first impression to give)
+- First Windows beta tester report — Gap C is most visible there
 - Beta tester reports "Magpie left a process running" / observes
   high memory after quit
-- Plan #40 lands (since hosted Cloud users will use Magpie more
-  often → more launches → more orphan accumulation observed)
+- Plan #40 lands (hosted Cloud users use Magpie more often → more
+  launches → more orphan accumulation observed)
 
 ---

@@ -39,3 +39,10 @@ dist/
 appzip/
 errors/
 conversation-export*.md
+
+# Bundled OpenRouter API key — baked into release builds at build time
+# so the Cloud toggle works for end users without any setup. NEVER commit
+# the real key. The .example file is the format contract; the actual key
+# lives only on whoever's machine builds the release. Plan: replace with
+# Magpie Cloud backend (Plan #40) once beta validates the toggle UX.
+src/config/bundled_key.txt

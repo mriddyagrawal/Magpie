@@ -2784,3 +2784,107 @@ unify with #37 because key generation + custody story is
 identical to the other signing concerns.
 
 ---
+
+## 40. Magpie Cloud backend — replace bundled OpenRouter key with hosted proxy (fly.io)
+
+**Tags:** ci · cloud · backend · distribution · cost-control · post-beta
+
+**What.** v1 (beta) ships an OpenRouter API key inside the binary at
+`src/config/bundled_key.txt` (gitignored, populated only on the
+release-builder's machine). The Cloud toggle in Settings reads this
+key on first launch via `src/config/secrets.py:_bundled_key()` and
+seeds `secrets.json`. End users see no key entry, no setup — just a
+toggle. Acceptable for a small beta; **not acceptable for a public
+download** because:
+
+- The key is extractable from any installed bundle in ~5 minutes
+  (`unzip Magpie.app && grep -r "sk-or-v1"`).
+- Once leaked, it can be used by anyone, anywhere, until rotated.
+- A single rotation requires a new release on every channel
+  (.dmg / .deb / .AppImage / .exe + apt PPA + Homebrew tap).
+- Cost ceiling is whatever monthly cap we set on OpenRouter; abuse
+  drains the entire budget regardless of which user caused it.
+
+**The migration.** Replace direct-to-OpenRouter calls with a hosted
+proxy that holds the real key server-side. The desktop app calls our
+backend with a much-cheaper-to-rotate credential.
+
+**Architecture (post-migration):**
+
+```
+[Magpie.app] ──HTTPS──► [magpie-api.fly.dev]   ──HTTPS──►  [api.openrouter.ai]
+              bearer    (FastAPI server)         our         (real LLM)
+              token     - rate-limit per token   OpenRouter
+              baked     - log usage per token    key (fly.io
+              into      - revoke on abuse        secret)
+              binary    - swap LLM provider
+                          without app update
+```
+
+**What's already in the repo (~80% done):**
+
+- `server/magpie_server/` — FastAPI app with `/llm/rewrite`,
+  `/llm/answer`, `/llm/summarize` endpoints
+- `server/magpie_server/auth.py` — invite-code bearer-token middleware
+- `server/Dockerfile` + `server/fly.toml` — fly.io deployment scaffolding
+- `src/llm.py` — `magpie-cloud` provider entry already in the
+  dispatch table (uses `MAGPIE_INVITE_CODE` env var)
+- `src/cloud_provider.py` — desktop-side HTTP client for the backend
+
+**What's missing:**
+
+- The actual `fly launch` + `fly deploy` (one-evening job)
+- A way to bundle a credential the desktop app uses to authenticate.
+  Three options, in order of investment:
+    1. **Single bundled invite code** — same extraction risk as the
+       bundled OpenRouter key, but rate-limited per-code on the
+       backend so leak damage is bounded. Rotation = ship a new
+       release; backend revokes old code.
+    2. **Per-install token via `/register`** — desktop app calls
+       `POST /register` on first launch, gets a unique token, stores
+       in `secrets.json`. Backend rate-limits + revokes per-install.
+       ~50 LOC addition to `auth.py`.
+    3. **Anonymous + IP rate limiting** — exploitable in obvious
+       ways; not worth considering.
+
+**Recommended migration sequence:**
+
+1. Stand up `magpie-api.fly.dev`. Verify health endpoint, deploy
+   one or two invite codes. (~1 evening)
+2. Set OpenRouter spend cap and per-code rate limits on backend.
+3. Update `MAGPIE_CLOUD_URL` and `MAGPIE_INVITE_CODE` defaults in
+   `tauri.conf.json` build env or a similar build-time injection.
+4. Cut a release. Both old (bundled-key) installs and new
+   (cloud-proxied) installs work — no forced upgrade.
+5. Once new install share is dominant, rotate the bundled OpenRouter
+   key out of circulation. Bundled-key installs lose Cloud; auto-
+   updater (Plan #39) prompts them forward.
+6. Later: implement `/register` for per-install tokens (option 2
+   above). Migrate users from shared invite code to per-install
+   tokens via app update.
+
+**Cost model:**
+
+- fly.io: free tier covers a small always-on instance (`shared-cpu-1x`,
+  256MB RAM, ~$0/mo with current pricing) for low traffic. Scale to
+  `shared-cpu-2x` (~$5/mo) when needed.
+- OpenRouter: pay-per-use. Hard monthly cap stays in our control.
+- Per-token rate limits prevent any single leak from exhausting budget.
+
+**Trigger to start.** Any of:
+- Public download page goes live (extends reach beyond a hand-picked
+  beta circle)
+- Cumulative beta install count exceeds ~50
+- Any indication the bundled key has leaked (anomalous OpenRouter
+  usage spikes, key showing up in pastes / Discord)
+- Decision to swap LLM provider mid-version (tied to Plan #34 or a
+  cost-driven change)
+
+**Why not in v1 / beta.** Pure infrastructure investment (~1–2 days
+plus ongoing monitoring) that doesn't change the product UX. Beta
+goal is validating that "click toggle, get cloud answer" is the
+right shape; we can validate that with a bundled key and 5–20 testers
+without ever spinning up fly.io. Burning that engineering time before
+the beta UX is even confirmed would be the wrong order.
+
+---

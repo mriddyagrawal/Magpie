@@ -22,6 +22,7 @@ import argparse
 import asyncio
 import csv
 import json
+import multiprocessing
 import os
 import socket
 import subprocess
@@ -31,6 +32,26 @@ import time
 import warnings
 from pathlib import Path
 from typing import Any
+
+# PyInstaller + multiprocessing pitfall: when a frozen binary uses
+# `multiprocessing.spawn`, Python's worker-bootstrap machinery
+# re-invokes argv[0] with Python interpreter flags
+# (`-B -S -I -c "from multiprocessing.resource_tracker import main; main(N)"`).
+# The frozen `magpie-sidecar` binary's argparse doesn't understand these
+# flags, so the worker fails silently with `unrecognized arguments`. The
+# parent's worker-pool try/except swallows the failure, summarization
+# returns no result, the manifest never gets `mark_summarized`, and
+# stage 2 fails with "manifest is empty".
+#
+# `multiprocessing.freeze_support()` adds the special handling that
+# detects "we're being re-invoked as a worker" and runs the worker
+# bootstrap correctly. MUST be called before any code that might
+# trigger multiprocessing.spawn (huggingface_hub downloads,
+# transformers, etc.). At module-import time is the safest spot.
+#
+# In dev (non-frozen): no-op. In frozen builds: critical. See
+# https://pyinstaller.org/en/stable/common-issues-and-pitfalls.html
+multiprocessing.freeze_support()
 
 # Suppress library noise BEFORE importing torch / transformers / qdrant_client.
 # These show up as scary-looking warnings and progress bars in dev terminals,

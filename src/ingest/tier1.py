@@ -221,7 +221,7 @@ async def _do_csv_summarize(
         summary = FileSummary(
             title=f"{path.name} (unreadable CSV)",
             summary=f"CSV file at {source_rel} could not be read for summarization.",
-            content_type="other",
+            content_type="csv",
             keywords=[path.name, "csv", "error"],
             key_entities=[],
             identifiers=[path.name],
@@ -275,7 +275,7 @@ async def _do_csv_summarize(
                     f"stub so the file is still indexed and its rows are still "
                     f"searchable via row-level retrieval. Header: {header_preview}"
                 ),
-                content_type="other",
+                content_type="csv",
                 keywords=[path.name, "csv", "auto-stub"],
                 key_entities=[],
                 identifiers=[path.name],

@@ -56,14 +56,17 @@ def _warn_if_bundled_key_missing() -> None:
     Plan #40 tracks the post-beta migration to a hosted backend that
     replaces this bundled-key approach.
     """
+    # Stick to ASCII in print() — Windows runners default to cp1252 stdout
+    # encoding, and any non-ASCII (emoji, em-dash, ⚠) raises
+    # UnicodeEncodeError that crashes the build before PyInstaller starts.
     key_path = ROOT / "src" / "config" / "bundled_key.txt"
     if key_path.exists() and key_path.read_text(encoding="utf-8").strip():
-        print(f"  bundled_key.txt present — Cloud toggle will work in this build")
+        print("  bundled_key.txt present - Cloud toggle will work in this build")
     else:
-        print(f"  ⚠  bundled_key.txt MISSING — Cloud toggle will 401 in this build")
-        print(f"  ⚠  copy src/config/bundled_key.txt.example → bundled_key.txt and")
-        print(f"  ⚠  paste the OpenRouter key. Acceptable for dev builds; release")
-        print(f"  ⚠  builds need this populated before tagging.")
+        print("  WARNING: bundled_key.txt MISSING - Cloud toggle will 401 in this build")
+        print("  WARNING: copy src/config/bundled_key.txt.example -> bundled_key.txt")
+        print("  WARNING: and paste the OpenRouter key. Acceptable for dev builds;")
+        print("  WARNING: release builds need this populated before tagging.")
 
 
 def main() -> None:

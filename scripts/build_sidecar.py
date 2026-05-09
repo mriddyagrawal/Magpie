@@ -145,22 +145,37 @@ def main() -> None:
         # in ONE AT A TIME with smoke tests; Tier 3 (transformers.models.<unused>)
         # is deferred. See `Plans/Packaging/Implementation Plan.md` §5.
         #
-        # NOTE 2026-05-09: `torch.distributed` was originally excluded under the
-        # "multi-node training only" assumption. That assumption is wrong:
-        # sentence-transformers / transformers / colpali-engine all reach into
-        # `torch.distributed.*` (e.g. `torch.distributed.fsdp`, ProcessGroup
-        # symbols imported at module-load time of certain transformer
-        # architectures). Excluding it raises `ModuleNotFoundError: No module
-        # named 'torch.distributed'` on the FIRST query — after retrieval
-        # completes, when the cross-encoder reranker / answer model loads.
-        # CI's /healthz smoke doesn't exercise this path so the regression slips
-        # through. Removed from the exclude list. ~30-50 MB lost vs broken
-        # queries; trivially worth it.
-        "--exclude-module", "torch.onnx",              # we don't export
-        "--exclude-module", "torch.profiler",          # debug-only
-        "--exclude-module", "torch.tensorboard",       # tensorboard logging
-        "--exclude-module", "torch.optim",             # we never train
-        "--exclude-module", "torch.autograd.profiler", # same family
+        # NOTE 2026-05-09: Plan #10 §5's "high-confidence, well-isolated"
+        # claim about most of these is empirically wrong. The Tier 1 list has
+        # been pared down to ONLY the modules that pass the test of
+        # "transformers / sentence-transformers / colpali / pydantic-ai never
+        # touches them at module-load time of any code path Magpie executes."
+        #
+        # Removed-with-rationale:
+        #
+        # `torch.distributed` (3cc15cb): sentence-transformers / transformers /
+        #   colpali reach into `torch.distributed.*` at module-load time of
+        #   certain transformer architectures (ProcessGroup, FSDP wrappers).
+        #   Excluding it crashed queries with ModuleNotFoundError after
+        #   retrieval succeeded. ~30-50 MB lost.
+        #
+        # `torch.autograd.profiler` (THIS COMMIT): `torch/autograd/__init__.py`
+        #   line 601 unconditionally does `from . import profiler` at module
+        #   load. Excluding it crashes the SIDECAR ITSELF at boot with:
+        #     ImportError: cannot import name 'profiler' from partially
+        #     initialized module 'torch.autograd'
+        #   The "partially initialized" wording is misleading — the actual
+        #   issue is the unconditional import at line 601. ~10-15 MB lost.
+        #
+        # `torch.profiler` (THIS COMMIT): same family as torch.autograd.profiler,
+        #   pre-emptively removed before it bites us in a different code path.
+        #   Will reconsider once we have a CI /query smoke test that would
+        #   catch a regression here. ~5-10 MB lost.
+        #
+        # Kept-because-truly-isolated:
+        "--exclude-module", "torch.onnx",              # only fires on torch.onnx.export, never called
+        "--exclude-module", "torch.tensorboard",       # only fires when SummaryWriter constructed
+        "--exclude-module", "torch.optim",             # only used by training loops, we infer-only
         "--exclude-module", "IPython",                 # debug REPL (defensive)
         "--exclude-module", "babel",                   # i18n; we don't translate
         # ── Tier 2 (medium confidence, ~80–100 MB more) ─────────────────────

@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Literal
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from src.content import (
     IMAGE_EXTS,
@@ -76,6 +76,70 @@ class FileSummary(BaseModel):
             "Empty list only if the file genuinely has none."
         )
     )
+
+    # Cloud-provider drift tolerances. Local Gemma's grammar-constrained
+    # generation enforces these field shapes at the token level so the
+    # validators below are no-ops. Cloud (OpenRouter / Moonshot) only
+    # has prompt-mode JSON instructions — Gemma in particular sometimes
+    # emits a different-shaped value for these fields. Without these
+    # coercions the whole FileSummary fails Pydantic validation, which
+    # causes parse_json_with_repair to give up and the file to drop out
+    # of the manifest entirely (silent data loss). Better to coerce.
+
+    @field_validator("content_type", mode="before")
+    @classmethod
+    def _coerce_content_type(cls, v):
+        # The schema's `ContentType` Literal is all-lowercase
+        # ('image', 'pdf', 'docx', 'xlsx', 'text', 'code', 'markdown',
+        # 'other'). Cloud output drifts on this field in two ways:
+        # (1) capitalization ('CSV', 'PDF') — fixed by lowercasing.
+        # (2) values outside the Literal entirely ('csv', 'html',
+        # 'json', 'audio', 'video') — these aren't valid content_type
+        # values today; map them all to 'other' so the validation
+        # passes. The downstream consumer never branches on the niche
+        # values anyway, so 'other' is harmless. Without this, every
+        # cloud-summarized CSV crashes here.
+        _VALID = {
+            "image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other",
+        }
+        if isinstance(v, str):
+            lowered = v.lower().strip()
+            return lowered if lowered in _VALID else "other"
+        return v
+
+    @field_validator("key_entities", "keywords", "identifiers", mode="before")
+    @classmethod
+    def _coerce_string_list(cls, v):
+        # The schema asks for `list[str]`. Cloud output sometimes returns
+        # `list[dict]` shaped like `[{"name": "Furman Clarinet Society",
+        # "type": "organization"}]` for `key_entities`, or occasionally
+        # mixes strings and dicts inside `identifiers`. Coerce each item:
+        # dict → first non-empty value of the conventional name keys;
+        # else str()-fall-through. Keeps the downstream consumer's
+        # `list[str]` invariant intact.
+        if not isinstance(v, list):
+            return v
+        out: list[str] = []
+        for item in v:
+            if isinstance(item, str):
+                out.append(item)
+                continue
+            if isinstance(item, dict):
+                # Try common name-ish keys in order. Models drift
+                # toward {"name": ..., "type": ...} most often, but
+                # occasionally use "value", "label", "text", or "id".
+                for key in ("name", "value", "label", "text", "title", "id"):
+                    val = item.get(key)
+                    if isinstance(val, str) and val.strip():
+                        out.append(val.strip())
+                        break
+                else:
+                    # Last-ditch fallback: stringify the whole dict.
+                    out.append(str(item))
+                continue
+            # Numbers / bools / None → str().
+            out.append(str(item))
+        return out
 
 
 # NOTE: Until Phase 2.5 step 5 lands, this prompt is duplicated in
@@ -423,11 +487,61 @@ async def summarize_one(
     try:
         summary = await _run_with_retry(agent, message, path.name)
     except JSONParseError as e:
-        # Re-raise as SummarizeError so worker() prints a "skip:" line and
-        # leaves the manifest untouched — next sync will retry.
-        raise SummarizeError(
-            f"model output could not be parsed into FileSummary for {path.name}"
-        ) from e
+        # Cloud LLMs (OpenRouter Gemma especially) sometimes emit JSON
+        # that even FileSummary's relaxed coercion validators can't
+        # rescue. Pre-2026-05 we re-raised as SummarizeError, which
+        # caused the walker to skip the file silently — meaning every
+        # cloud-side parse failure dropped a real document from the
+        # index. Now: write a deterministic stub summary so the file
+        # still lands in the manifest and stays searchable on filename
+        # / content alone (BM25 over the body, the file path, etc.).
+        # The stub is intentionally honest about being a stub so a
+        # future re-sync (or a switch to local Gemma) can detect and
+        # replace it.
+        from tqdm import tqdm
+        tqdm.write(
+            f"  warn: structured summary parse failed for {path.name} "
+            f"({type(e).__name__}); falling back to a deterministic stub "
+            f"so the file still indexes"
+        )
+        suffix = path.suffix.lower().lstrip(".") or "other"
+        # Map known extensions to the FileSummary `ContentType` Literal
+        # values; fall through to "other" for anything not in the set.
+        content_type: ContentType
+        if suffix in ("png", "jpg", "jpeg", "webp", "gif"):
+            content_type = "image"
+        elif suffix == "pdf":
+            content_type = "pdf"
+        elif suffix in ("docx", "doc"):
+            content_type = "docx"
+        elif suffix in ("xlsx", "xlsm", "xls"):
+            content_type = "xlsx"
+        elif suffix in ("md", "markdown"):
+            content_type = "markdown"
+        elif suffix in ("txt", "log"):
+            content_type = "text"
+        elif suffix in (
+            "py", "js", "ts", "tsx", "jsx", "go", "rs", "java", "c", "cpp",
+            "h", "hpp", "cs", "rb", "swift", "kt", "sh", "sql",
+        ):
+            content_type = "code"
+        else:
+            content_type = "other"
+        summary = FileSummary(
+            title=f"{path.name} (auto-stub)",
+            summary=(
+                f"File at {source_rel}. The structured-summary LLM call failed "
+                f"to return parseable JSON; this is a deterministic stub so "
+                f"the file is still indexed. Re-running sync (or switching "
+                f"the indexing-time provider to local Gemma, which uses "
+                f"grammar-constrained generation) should produce a real "
+                f"summary."
+            ),
+            content_type=content_type,
+            keywords=[path.name, suffix, "auto-stub"],
+            key_entities=[],
+            identifiers=[path.name],
+        )
     await asyncio.to_thread(write_summary_at, out_path, summary, source_rel)
 
     new_summary_rel = str(out_path.relative_to(REPO_ROOT))

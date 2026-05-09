@@ -21,6 +21,7 @@ the file's summary attached as supplement. See Plans/Future Plans.md #17.
 from __future__ import annotations
 
 import asyncio
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -210,13 +211,13 @@ async def _do_csv_summarize(
     """The actual LLM-summary work for a CSV. Factored out so the dedup
     short-circuits don't duplicate the call site."""
     # Deferred imports keep this module import-cheap for non-CSV walks.
-    from src.stage1.summarize import _run_with_retry, render_markdown
+    from src.llm import JSONParseError
+    from src.stage1.summarize import FileSummary, _run_with_retry, render_markdown
 
     sample_text, n_rows = await asyncio.to_thread(_csv_sample, path)
     if not sample_text:
         # File unreadable — fall back to a minimal summary so we don't break
         # the manifest. Stage 2 row-ingest will skip it cleanly too.
-        from src.stage1.summarize import FileSummary
         summary = FileSummary(
             title=f"{path.name} (unreadable CSV)",
             summary=f"CSV file at {source_rel} could not be read for summarization.",
@@ -237,7 +238,48 @@ async def _do_csv_summarize(
             f"row contents.",
             sample_text,
         ]
-        summary = await _run_with_retry(agent, message, path.name)
+        try:
+            summary = await _run_with_retry(agent, message, path.name)
+        except JSONParseError as e:
+            # Cloud LLMs (OpenRouter Gemma especially) sometimes emit
+            # JSON that even the relaxed FileSummary validators in
+            # src/stage1/summarize.py can't coerce — stray top-level
+            # keys, unrecoverable nesting, etc. Without this fallback,
+            # the bubble-up would skip the manifest update and the file
+            # would silently fall out of the index — including its
+            # row-level Qdrant points, since csv_ingest.ingest_csv_rows
+            # is keyed off manifest entries with T1 in routes. Better
+            # to write a deterministic stub from filename + first row
+            # so the file lands and row-level ingest can proceed; the
+            # downstream stats block (rows / columns / distributions
+            # appended below) does most of the heavy lifting for
+            # aggregation queries anyway. The semantic file-level
+            # summary point is degraded; the row-level points are not.
+            print(
+                f"  warn: CSV summary parse failed for {path.name} ({type(e).__name__}); "
+                f"falling back to a deterministic stub so the file still indexes",
+                file=sys.stderr,
+            )
+            # First non-empty line of `sample_text` is the header; it's
+            # the most valuable discriminator we have without an LLM
+            # call. Limit length so the stub doesn't blow the markdown.
+            first_line = next(
+                (ln for ln in sample_text.splitlines() if ln.strip()), ""
+            )
+            header_preview = first_line[:300]
+            summary = FileSummary(
+                title=f"{path.name} (auto-stub)",
+                summary=(
+                    f"CSV file at {source_rel}. The structured-summary LLM call "
+                    f"failed to return parseable JSON; this is a deterministic "
+                    f"stub so the file is still indexed and its rows are still "
+                    f"searchable via row-level retrieval. Header: {header_preview}"
+                ),
+                content_type="other",
+                keywords=[path.name, "csv", "auto-stub"],
+                key_entities=[],
+                identifiers=[path.name],
+            )
 
     body_markdown = render_markdown(summary, source_rel)
     # Append a deterministic stats block (row count, column names, per-column

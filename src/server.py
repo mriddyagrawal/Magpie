@@ -248,7 +248,14 @@ def _user_facing_error(exc: Exception) -> tuple[int, str]:
     name = type(exc).__name__
     text = str(exc)
 
+    # Full stack trace to stderr so packaged-build runtime errors
+    # (e.g. PyInstaller exclude regressions like `ModuleNotFoundError:
+    # torch.distributed`) leave a real diagnostic, not just a one-line
+    # "internal error". Tauri pipes stderr to bootstrap.log, so this
+    # ends up in the user's APP_DATA_DIR/logs/ for postmortem.
+    import traceback
     print(f"[server] internal error {name}: {text}", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
 
     # 429 rate-limit / quota-exhausted from any LLM provider
     if "429" in text or "rate" in text.lower() or "quota" in text.lower():

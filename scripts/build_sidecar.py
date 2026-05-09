@@ -40,12 +40,39 @@ def target_triple() -> str:
     raise RuntimeError(f"unsupported platform: {system} {machine}")
 
 
+def _warn_if_bundled_key_missing() -> None:
+    """Bundled OpenRouter key powers the in-app Cloud toggle for end users.
+
+    Lives at `src/config/bundled_key.txt` (gitignored). When present, it gets
+    pulled into the bundle automatically via `--add-data src:src` below, so
+    `src/config/secrets.py:_bundled_key()` finds it at runtime and seeds
+    `secrets.json` on first launch. When MISSING, the bundled binary still
+    builds and runs fine — but the Cloud toggle in Settings will silently
+    401 because there's no key for it to use.
+
+    Print a clear warning so the dev sees this in build output. Don't fail
+    the build; dev iteration shouldn't require the key.
+
+    Plan #40 tracks the post-beta migration to a hosted backend that
+    replaces this bundled-key approach.
+    """
+    key_path = ROOT / "src" / "config" / "bundled_key.txt"
+    if key_path.exists() and key_path.read_text(encoding="utf-8").strip():
+        print(f"  bundled_key.txt present — Cloud toggle will work in this build")
+    else:
+        print(f"  ⚠  bundled_key.txt MISSING — Cloud toggle will 401 in this build")
+        print(f"  ⚠  copy src/config/bundled_key.txt.example → bundled_key.txt and")
+        print(f"  ⚠  paste the OpenRouter key. Acceptable for dev builds; release")
+        print(f"  ⚠  builds need this populated before tagging.")
+
+
 def main() -> None:
     triple = target_triple()
     is_windows = platform.system() == "Windows"
     output_name = f"magpie-sidecar-{triple}" + (".exe" if is_windows else "")
 
     print(f"Building magpie-sidecar for {triple}...")
+    _warn_if_bundled_key_missing()
     BINARIES_DIR.mkdir(parents=True, exist_ok=True)
 
     # PyInstaller --add-data separator is ; on Windows, : elsewhere

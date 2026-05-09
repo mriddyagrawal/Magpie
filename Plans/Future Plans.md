@@ -45,6 +45,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#34** Sidecar PyInstaller native data assets — `--collect-data` for `pydantic_ai` and `genai_prices`, plus the Nuitka migration *(also: Packaging)*
 - **#35** Phase 2 of `/query/stream` — token-by-token answer streaming via JSON-stream substring-match parser *(also: Pipeline, Performance)*
 - **#36** OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere *(also: UI, Platform)*
+- **#42** Content-hash dedup at the Qdrant layer — N identical files → 1 point, returned once *(also: Qdrant, Retrieval, Storage)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -3235,5 +3236,132 @@ Any of:
   high memory after quit
 - Plan #40 lands (hosted Cloud users use Magpie more often → more
   launches → more orphan accumulation observed)
+
+---
+
+## 42. Content-hash dedup at the Qdrant layer — N identical files → 1 point, returned once
+
+**Tags:** qdrant · retrieval · storage · ingestion
+
+**What.** Today's content-hash dedup is a *summarization* optimization, not a
+*retrieval* optimization. When N byte-identical files exist at different
+paths (extremely common in this codebase's natural corpora — template
+constitutions copied into every org's folder, identical roster PDFs
+re-uploaded year-over-year, etc.), the pipeline does:
+
+- One LLM call per unique content hash → ✅ cost optimization works
+- One `<hash>_<tier>.md` summary on disk → ✅ disk dedup works
+- **N manifest entries** (one per path, all pointing at the same summary
+  file) → ❌ no dedup
+- **N Qdrant points** in `summaries` (one per path, all with identical
+  vector content but different `id = md5(rel_path)` and `source_path`) →
+  ❌ no dedup
+- Top-K retrieval can return N hits all referencing the same content,
+  displacing other relevant files from the result set → ❌ wasteful
+- Answer step reads each path independently (even though all are
+  byte-identical) → ❌ N× redundant disk reads
+
+The plan: collapse N → 1 at the Qdrant layer so the corpus's natural
+duplication doesn't bloat the index, doesn't crowd out distinct results,
+and doesn't make the answer step re-read the same content.
+
+**Why we'd want this.**
+- **Index size.** A corpus with 4× duplication ratio (the SyncDin
+  constitution-template case observed 2026-05) stores 4× the Qdrant
+  points and 4× the BM25 inverted-index entries for nothing.
+- **Retrieval relevance.** A top-K of 5 hits could be 5 paths to the
+  *same* file content. The user sees 5 sources but it's effectively one
+  document — and the other 4 slots crowd out genuinely-distinct results
+  the search would otherwise have surfaced. Plan #21 (drift events) and
+  this plan share the "what's in the index?" surface area.
+- **Answer step efficiency.** `paths = list(dict.fromkeys(r.path for r
+  in retrieved))` dedupes by *path string*, but byte-identical paths
+  with different names defeat that. Result: the LLM gets the same file
+  text 5 times, paying tokens 5×.
+- **Sources card UX.** Today the user sees five rows that look like
+  five distinct sources but are byte-identical. Confusing.
+
+**Two design directions to choose between.**
+
+### Direction A — Dedup at write time (one Qdrant point per content)
+
+The "do it right" path. At Stage 2 push, key the Qdrant point by
+`content_hash` instead of `md5(rel_path)`. Payload carries
+`source_paths: list[str]` (all paths sharing this content) instead of
+a single `source_path`. The path with which to display the result
+(canonical or all of them) becomes a frontend concern.
+
+- ✅ Lowest index size (1 point per unique content).
+- ✅ Top-K is naturally diverse (5 distinct contents, not 5 paths to
+  same content).
+- ❌ Migration story is non-trivial — existing Qdrant point IDs would
+  change. Plan a `just reset-index` flow + bump a migration version.
+- ❌ Frontend changes: SourcesCard / payload typing now `paths[]`, not
+  `path`. Manageable since the codebase already passes a single path
+  through; refactor `Source` to carry a list and pick a display path.
+- ❌ The "which path is canonical" question still needs an answer
+  (alphabetical first? user-folder-priority? first-walked? render the
+  list verbatim?). Probably user-folder-priority based on
+  `indexing_rules.json` order.
+
+### Direction B — Dedup at read time (collapse hits server-side)
+
+The lighter migration. Keep N Qdrant points, but the search/answer
+pipeline collapses by `content_hash` after retrieval. The hit
+collection's payload would need to carry `content_hash` (which it
+should anyway for orphan cleanup hygiene), so the post-process is
+just a `groupby` step.
+
+- ✅ No Qdrant migration. Existing index keeps working unchanged.
+- ✅ Frontend can stay path-keyed; the post-processed result emits
+  one entry per content hash with paths[] alongside.
+- ❌ Index size still 4× bloated (just less visible to users).
+- ❌ Top-K math: if Qdrant returns 5 hits and 4 are dupes of one
+  content, post-collapse leaves 2 distinct results. Need to over-fetch
+  (e.g. top-15 → collapse → take top-5) so collapsed-K matches user
+  intent. Mild logic + a tiny perf cost.
+- ❌ Doesn't help BM25 inverted-index bloat.
+
+**My read.** Direction A is the long-term-correct path; Direction B is
+the cheap interim fix that makes the user-visible problems go away.
+Worth doing B first when this becomes a felt issue, then A when an
+index reset is happening anyway (Plan #11 / orphan-cleanup unification
+is a natural cohort).
+
+**Why we did NOT do this now.**
+- Current corpora are small enough that 4× bloat is hundreds of points,
+  not millions. Storage cost is a few MB extra; retrieval crowding is
+  observable but not catastrophic.
+- Direction A's migration cost is real — Qdrant point IDs changing
+  means existing users `reset-index`.
+- The "canonical path" UX question wants a real product decision (list
+  all? first? user-priority?) that's better made when we have user
+  signal.
+
+**When to revisit.**
+- (a) A user complains that all 5 search results are the same file —
+  Direction B unblocks immediately.
+- (b) Corpus duplication ratio exceeds ~3× across many files (template
+  files in shared folders, design corpora) — index bloat starts mattering.
+- (c) We're already doing an index reset for another reason (Plan #11
+  orphan cleanup, Plan #17 follow-ups, Qdrant schema change) — Direction
+  A piggybacks cleanly.
+
+**Implementation sketch for Direction B (cheapest first step).**
+1. Stage 2 push already has `content_hash` available from the manifest
+   row. Add it to the Qdrant point payload at upsert time. ~5 LOC in
+   `src/stage2/__main__.py`.
+2. In the answer-step query path, after Qdrant returns top-K, group by
+   `content_hash` and keep one representative per group (highest score,
+   or first by alphabetical path — pick one rule and document it).
+3. In the SourcesCard payload, augment each row with `additional_paths:
+   list[str]` so the user can see "this content also appears at: X, Y, Z"
+   if they care. Optional UI detail.
+4. Increase Qdrant `top_k` request by ~3× (configurable) so the
+   collapse step doesn't starve the result set when the top of the index
+   is full of dupes.
+
+Total scope sketch: ~50-80 LOC. No migration. Reversible. Picks up the
+~80% of the win without the schema change.
 
 ---

@@ -324,6 +324,31 @@ export interface IngestStatus {
   current_file: string | null;
   elapsed_s: number | null;
   stopped: boolean;
+  // "idle" | "scanning" | "indexing". Frontend uses this to label the
+  // status pill differently during the scan phase (no per-file
+  // progress yet). Backwards-compat: missing field → "idle".
+  phase?: "idle" | "scanning" | "indexing";
+}
+
+export interface IndexPlanFolder {
+  path: string;
+  enabled: boolean;
+  total: number;       // candidate files under this root
+  remaining: number;   // candidates not yet in the manifest
+}
+
+export interface IndexPlan {
+  folders: IndexPlanFolder[];
+  grand_total: number;
+  grand_remaining: number;
+}
+
+/** Read-only preview of what /index/sync would do. Walks each enabled
+ * root and returns per-folder counts. Cached server-side for 10s. */
+export async function getIndexPlan(): Promise<IndexPlan> {
+  const res = await fetch(`${baseUrl()}/index/plan`);
+  if (!res.ok) throw new Error(`index/plan failed: ${res.status}`);
+  return res.json();
 }
 
 export async function startIngest(path: string): Promise<void> {

@@ -191,12 +191,14 @@ export function SettingsWindow() {
   const handleDeepLinkAddFolder = useCallback(() => {
     setTab("data");
     requestAnimationFrame(() => {
-      import("./../api").then(async ({ addFolder, pickFolder, startIngest }) => {
+      // Backend auto-fires sync from POST /settings/folders, so the
+      // separate startIngest call is redundant. Keep onIngestStarted
+      // so the parent kicks off polling immediately.
+      import("./../api").then(async ({ addFolder, pickFolder }) => {
         const path = await pickFolder();
         if (!path) return;
         try {
           await addFolder(path);
-          await startIngest(path);
           onIngestStarted();
           await refreshFolders();
         } catch (e) {

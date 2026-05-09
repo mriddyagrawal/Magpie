@@ -101,6 +101,25 @@ _eager_bootstrap_config()
 
 app = FastAPI(title="Magpie", version="0.1.0")
 
+
+@app.on_event("startup")
+def _startup_auto_resume() -> None:
+    """Once the sidecar is up and routes are wired, fire an auto-sync if
+    there's anything to do. Runs in a daemon thread (spawned inside
+    `_spawn_sync_or_coalesce`), so this handler returns instantly and
+    FastAPI keeps serving. Safe to fire on every launch — `_do_sync()`
+    is idempotent.
+
+    Why startup-event, not module-level: at module-import time the sidecar
+    isn't yet bound to its port. If we fired sync there, the user's first
+    `/ingest/status` poll could land before uvicorn finishes binding,
+    leading to a confusing "fetch failed" → "indexing started" sequence.
+    The startup event runs after binding."""
+    try:
+        _maybe_auto_resume_on_startup()
+    except Exception as e:  # noqa: BLE001 — never crash the sidecar on auto-resume
+        print(f"[server] auto-resume hook failed: {e}", file=sys.stderr)
+
 # Permissive CORS so the Vite dev server (typically localhost:5173) can hit
 # the sidecar on localhost:<port> without friction. In production, the
 # frontend is loaded by Tauri under the `tauri://` origin which CORS treats
@@ -902,9 +921,22 @@ _ingest_state: dict[str, Any] = {
     "current_file": None,
     "started_at": None,
     "stopped": False,
+    # "idle" before any job; "scanning" while find_candidates is enumerating
+    # files (no per-file progress yet); "indexing" once the worker pool has
+    # started chewing through the candidate list. The Settings UI's status
+    # pill reads this so the user sees scan-vs-ingest distinctly — on a
+    # 50K-file root the scan alone can take ~30s.
+    "phase": "idle",
 }
 
 _stop_event = threading.Event()
+
+# Coalesce flag — flipped True by `_spawn_sync_or_coalesce()` if a rule
+# change arrives while a sync is already in flight. The in-flight `_do_sync`
+# checks this in its `finally` block and respawns once. Single-job model
+# preserved (no queue), but rule edits made mid-sync don't get lost.
+_rerun_pending: bool = False
+_rerun_lock = threading.Lock()
 
 
 class IngestRequest(BaseModel):
@@ -1041,6 +1073,11 @@ def ingest_status() -> dict[str, Any]:
         "current_file": _ingest_state["current_file"],
         "elapsed_s": elapsed,
         "stopped": _ingest_state["stopped"],
+        # "scanning" before find_candidates returns; "indexing" once the
+        # worker pool starts processing files; "idle" between jobs.
+        # Frontend uses this to label the status pill differently during
+        # the scan phase (which shows no per-file progress).
+        "phase": _ingest_state.get("phase", "idle"),
     }
 
 
@@ -1070,6 +1107,10 @@ def _init_ingest_state(*, path_label: str) -> None:
         path=path_label,
         files_total=0, files_done=0, current_file=None,
         started_at=time.time(), stopped=False,
+        # Jobs always start in scanning phase — find_candidates runs before
+        # any file work. _on_progress_update flips to "indexing" once the
+        # walker reports a non-zero total.
+        phase="scanning",
     )
 
 
@@ -1081,6 +1122,11 @@ def _on_progress_update(done: int, total: int, current: str | None = None) -> No
     _ingest_state["files_total"] = total
     if current is not None:
         _ingest_state["current_file"] = current
+    # First progress callback with a known total marks the transition from
+    # scan to ingest. Stay in "scanning" until run_batch tells us how many
+    # files it found; from then on this is the worker pool churning.
+    if total > 0 and _ingest_state.get("phase") != "indexing":
+        _ingest_state["phase"] = "indexing"
 
 
 def _drop_manifest_rows_outside_enabled_roots(enabled_prefixes: list[str]) -> int:
@@ -1184,6 +1230,7 @@ def _do_sync() -> None:
         print(f"[server] sync error: {exc}", file=sys.stderr)
     finally:
         _ingest_state["running"] = False
+        _ingest_state["phase"] = "idle"
         # Invalidate cached folder stats so the next /settings/folders
         # call re-aggregates the post-ingest manifest. Without this,
         # rows show '0 files' for up to FOLDER_STATS_TTL seconds after
@@ -1192,6 +1239,25 @@ def _do_sync() -> None:
         # Status cache holds indexed_count / size_mb; same staleness.
         _status_cache["payload"] = None
         _status_cache["ts"] = 0.0
+        # /index/plan reflects manifest state; invalidate so the next
+        # poll re-walks the roots against the now-updated manifest.
+        _invalidate_plan_cache()
+        # Coalesce: if any rule edit landed while we were running, respawn
+        # exactly one fresh sync so the new rules.json gets picked up.
+        # Single-job model preserved (the new sync starts after this one's
+        # `running=False`). The flag is one-shot — if N edits arrive during
+        # one sync, they all collapse into a single rerun.
+        global _rerun_pending
+        with _rerun_lock:
+            should_rerun = _rerun_pending
+            _rerun_pending = False
+        if should_rerun:
+            print(
+                "[server] sync coalesce: rule changed mid-run, respawning",
+                file=sys.stderr,
+            )
+            _init_ingest_state(path_label="<sync: coalesced rerun>")
+            threading.Thread(target=_do_sync, daemon=True).start()
 
 
 def _do_reindex() -> None:
@@ -1216,6 +1282,63 @@ def _do_reindex() -> None:
     _do_sync()
 
 
+def _spawn_sync_or_coalesce(*, reason: str) -> str:
+    """Auto-fire helper for non-button code paths (rule changes, app launch
+    auto-resume). Returns one of: "started" / "coalesced" / "noop".
+
+    Contract:
+      - If no sync is running → start one immediately.
+      - If a sync IS running → set rerun_pending=True. The in-flight sync's
+        finally block will respawn once. Multiple calls during one run
+        collapse into a single rerun (no queue).
+      - Caller should treat all three return values as success — whatever
+        state it ends in, the user's request is going to land.
+
+    `reason` is purely a stderr breadcrumb for debugging — it shows up in
+    logs as "[server] auto-sync: <reason>" so you can tell why a sync
+    fired without a button press.
+    """
+    global _rerun_pending
+    if _ingest_state["running"]:
+        with _rerun_lock:
+            _rerun_pending = True
+        print(f"[server] auto-sync deferred (running): {reason}", file=sys.stderr)
+        return "coalesced"
+    _init_ingest_state(path_label=f"<auto-sync: {reason}>")
+    threading.Thread(target=_do_sync, daemon=True).start()
+    print(f"[server] auto-sync started: {reason}", file=sys.stderr)
+    return "started"
+
+
+def _maybe_auto_resume_on_startup() -> None:
+    """Called once during sidecar startup. Fires `_do_sync()` if there's
+    any drift between the manifest and the current rules — i.e., if the
+    user has enabled folders whose files aren't all in the manifest, or
+    manifest rows whose root is no longer enabled.
+
+    For a packaged user this is the "I closed Magpie mid-index, double-
+    clicked it again, expected it to pick up where it left off" path.
+    `_do_sync()` is idempotent: if there's nothing to do, the diff-walk
+    is a no-op (~30s scan, zero file work). So even erring on the side
+    of always firing is cheap.
+    """
+    try:
+        # Local import — `_maybe_auto_resume_on_startup` is defined above the
+        # Settings-endpoints block where `load_user_rules` is imported at
+        # module scope. Local import keeps this function self-contained and
+        # robust to definition-order shuffling.
+        from src.config.indexing_rules import load_user_rules as _load_rules
+        rules = _load_rules()
+    except Exception as e:  # noqa: BLE001
+        print(f"[server] auto-resume: rules load failed, skipping: {e}", file=sys.stderr)
+        return
+    enabled_paths = [ip for ip in rules.include_paths if ip.enabled]
+    if not enabled_paths:
+        # Empty corpus / first launch — nothing to resume.
+        return
+    _spawn_sync_or_coalesce(reason="startup-resume")
+
+
 @app.post("/index/sync")
 def index_sync() -> IndexJobResponse:
     """Pick up new files; drop files that no longer match the rules.
@@ -1238,6 +1361,136 @@ def index_reindex() -> IndexJobResponse:
     _init_ingest_state(path_label="<reindex: all enabled folders>")
     threading.Thread(target=_do_reindex, daemon=True).start()
     return IndexJobResponse(status="started", kind="reindex")
+
+
+# Plan endpoint cache. /index/plan does a real filesystem walk per enabled
+# root via find_candidates — cheap-ish (~30s on a 50K-file root) but the
+# Settings UI polls /ingest/status on a tick and would otherwise hammer
+# this endpoint on every refresh. Cache for a few seconds; invalidate
+# when sync starts/finishes via the same hooks as folder stats.
+_plan_cache: dict[str, Any] = {"payload": None, "ts": 0.0}
+_PLAN_TTL_S = 10.0
+
+
+def _invalidate_plan_cache() -> None:
+    _plan_cache["payload"] = None
+    _plan_cache["ts"] = 0.0
+
+
+def _compute_index_plan() -> dict[str, Any]:
+    """Run `find_candidates` over each enabled root and report per-folder
+    file counts vs how many are already in the manifest.
+
+    Approximation: a file is counted as "remaining" if its rel_path is
+    NOT in the manifest at all. Files whose size has changed (would
+    re-summarize on next sync) are NOT counted as remaining — that
+    would require statting every candidate (~50ms × N files), and
+    the UX value here is "rough total left to do," not exact.
+
+    Returns:
+      {
+        "folders": [
+          {
+            "path": str,        # raw user-facing path (rules.json value)
+            "enabled": bool,
+            "total": int,       # candidates under this root
+            "remaining": int,   # candidates not in manifest yet
+          },
+          ...
+        ],
+        "grand_total": int,
+        "grand_remaining": int,
+      }
+    """
+    from src.config.indexing_rules import (
+        load_indexing_rules,
+        load_user_rules as _load_rules,
+    )
+    from src.ingest.common import source_rel_path
+    from src.ingest.walker import find_candidates
+    from src.manifest import Manifest
+
+    user_rules = _load_rules()
+    indexing_rules = load_indexing_rules()
+    manifest = Manifest()
+    manifest_keys = set(manifest.entries.keys())
+
+    folders_out: list[dict[str, Any]] = []
+    grand_total = 0
+    grand_remaining = 0
+
+    for ip in user_rules.include_paths:
+        try:
+            p = Path(ip.path).expanduser()
+        except OSError:
+            p = Path(ip.path)
+        # Disabled folders are reported with zero counts — UI can still
+        # show them in the list but they shouldn't contribute to "files
+        # left to index." Keeps the grand-total honest.
+        if not ip.enabled or not p.exists():
+            folders_out.append({
+                "path": ip.path,
+                "enabled": ip.enabled,
+                "total": 0,
+                "remaining": 0,
+            })
+            continue
+        try:
+            files, _ignored, _asset = find_candidates(
+                p, indexing_rules=indexing_rules, include_data=False,
+            )
+        except Exception as e:  # noqa: BLE001 — never crash plan on one bad root
+            print(f"[server] /index/plan scan failed for {ip.path}: {e}", file=sys.stderr)
+            folders_out.append({
+                "path": ip.path,
+                "enabled": ip.enabled,
+                "total": 0,
+                "remaining": 0,
+            })
+            continue
+        total = len(files)
+        remaining = sum(
+            1 for f in files if source_rel_path(f) not in manifest_keys
+        )
+        folders_out.append({
+            "path": ip.path,
+            "enabled": ip.enabled,
+            "total": total,
+            "remaining": remaining,
+        })
+        grand_total += total
+        grand_remaining += remaining
+
+    return {
+        "folders": folders_out,
+        "grand_total": grand_total,
+        "grand_remaining": grand_remaining,
+    }
+
+
+@app.get("/index/plan")
+def index_plan() -> dict[str, Any]:
+    """Read-only preview of what `/index/sync` would do.
+
+    Walks each enabled root (Phase A only — no ingestion) and returns
+    per-folder counts. The Settings UI uses the grand totals to show
+    "8,200 files across 4 folders, 1,234 still to index" without firing
+    any work.
+
+    Cached for 10s — Settings polls every couple of seconds and the
+    walk is non-trivial (filesystem stats × N files). Refreshed
+    automatically after sync completes (same invalidation as folder
+    stats / status caches)."""
+    now = time.monotonic()
+    if (
+        _plan_cache["payload"] is not None
+        and now - _plan_cache["ts"] < _PLAN_TTL_S
+    ):
+        return _plan_cache["payload"]
+    payload = _compute_index_plan()
+    _plan_cache["payload"] = payload
+    _plan_cache["ts"] = now
+    return payload
 
 
 # ---------------------------------------------------------------------------
@@ -1351,6 +1604,10 @@ class FolderAddRequest(BaseModel):
 
 @app.post("/settings/folders")
 def settings_add_folder(req: FolderAddRequest) -> dict[str, str]:
+    """Add (or re-enable) a folder. Auto-fires `_do_sync()` so the new
+    folder's files get ingested without a separate "Sync" click. If a
+    sync is already running, the rule edit is coalesced — the in-flight
+    sync's finally block respawns once with the fresh rules."""
     rules = load_user_rules()
     target = str(Path(req.path).expanduser().resolve())
     for entry in rules.include_paths:
@@ -1358,22 +1615,31 @@ def settings_add_folder(req: FolderAddRequest) -> dict[str, str]:
             if not entry.enabled:
                 entry.enabled = True
                 save_user_rules(rules)
+                _spawn_sync_or_coalesce(reason=f"folder-enabled: {target}")
                 return {"status": "enabled"}
             return {"status": "already_exists"}
     rules.include_paths.append(_IncludePath(path=target, enabled=True))
     save_user_rules(rules)
+    _spawn_sync_or_coalesce(reason=f"folder-added: {target}")
     return {"status": "added"}
 
 
 @app.delete("/settings/folders")
 def settings_remove_folder(path: str) -> dict[str, str]:
+    """Remove a folder. Auto-fires `_do_sync()` so the orphan-cleanup pass
+    drops the folder's manifest rows + Qdrant points. Without auto-fire,
+    queries would keep returning hits from the just-removed folder until
+    the user manually clicked Sync."""
     rules = load_user_rules()
     target = str(Path(path).expanduser().resolve())
+    before = len(rules.include_paths)
     rules.include_paths = [
         p for p in rules.include_paths
         if str(Path(p.path).expanduser().resolve()) != target
     ]
     save_user_rules(rules)
+    if len(rules.include_paths) < before:
+        _spawn_sync_or_coalesce(reason=f"folder-removed: {target}")
     return {"status": "removed"}
 
 
@@ -1423,11 +1689,18 @@ class FolderPatch(BaseModel):
 def settings_patch_folder(req: FolderPatch) -> dict[str, Any]:
     """Patch an existing IncludePath. 404 if path not found. The
     Settings UI's Data tab uses this for the per-row toggle and for
-    the overflow-menu rename action."""
+    the overflow-menu rename action.
+
+    Auto-fires `_do_sync()` only when `enabled` actually changed —
+    `display_name` is purely cosmetic (no ingest impact) so it
+    shouldn't trigger a possibly-expensive walk."""
     rules = load_user_rules()
     target = str(Path(req.path).expanduser().resolve())
     for entry in rules.include_paths:
         if str(Path(entry.path).expanduser().resolve()) == target:
+            enabled_changed = (
+                req.enabled is not None and req.enabled != entry.enabled
+            )
             if req.enabled is not None:
                 entry.enabled = req.enabled
             # display_name is patched even when None — None means
@@ -1438,6 +1711,9 @@ def settings_patch_folder(req: FolderPatch) -> dict[str, Any]:
             if "display_name" in req.model_fields_set:
                 entry.display_name = req.display_name
             save_user_rules(rules)
+            if enabled_changed:
+                action = "enabled" if entry.enabled else "disabled"
+                _spawn_sync_or_coalesce(reason=f"folder-{action}: {entry.path}")
             return {
                 "status": "updated",
                 "path": entry.path,

@@ -35,6 +35,12 @@ def target_triple() -> str:
     if system == "Darwin":
         return "aarch64-apple-darwin" if machine == "arm64" else "x86_64-apple-darwin"
     if system == "Linux":
+        # Linux ARM (Raspberry Pi, Asahi Linux on Apple silicon, AWS Graviton, …)
+        # produces `aarch64` from platform.machine(); some distros report `arm64`.
+        # Without this branch we'd label an ARM binary as x86_64 and Tauri's
+        # externalBin would refuse it at bundle time.
+        if machine in ("aarch64", "arm64"):
+            return "aarch64-unknown-linux-gnu"
         return "x86_64-unknown-linux-gnu"
 
     raise RuntimeError(f"unsupported platform: {system} {machine}")
@@ -189,44 +195,50 @@ def main() -> None:
         # Kept excludes — non-torch, truly unrelated:
         "--exclude-module", "IPython",                 # debug REPL (defensive)
         "--exclude-module", "babel",                   # i18n; we don't translate
-        # ── Tier 3 (transformers.models.<unused arch>) — NOT IN CI ─────────
-        # Tier 3 excludes interact with HuggingFace's `AutoModel.from_pretrained`
-        # dynamic-string-name dispatch: a missing architecture does NOT break
-        # bundle import (so /health stays green) — it ImportErrors only when
-        # someone runs a query that loads that specific arch. Catching this
-        # in CI would require actually loading ColPali / sentence-transformers
-        # models (~5 GB downloads per matrix job) which is wasteful, slow,
-        # and fragile in CI runners.
+        # ── transformers.models.<unused arch> excludes — RELEASE-CUT ONLY ───
         #
-        # DECISION (2026-05-08): Tier 3 is validated MANUALLY ON EACH TARGET
-        # PLATFORM (macOS arm64, macOS x86_64, Linux x86_64, Windows x86_64)
-        # before tagging a release, never in CI. The /health smoke test in
-        # build.yml deliberately covers T1+T2 only. Do not add T3 flags to
-        # this list as part of branch/PR work — only add them on a release-
-        # cutting machine after the per-platform validation flow below.
+        # NOT included in this build. Documented here as the release-time
+        # optimization path, applied manually before tagging — never in CI.
         #
-        # Per-platform matters because each matrix job produces its own
-        # PyInstaller bundle, and a missing arch can ImportError on any one
-        # of them at query time. In practice this means: at least one team
-        # member on Mac, one on Linux, one on Windows runs the manual flow.
+        # The mechanism: HuggingFace's `AutoModel.from_pretrained` does
+        # dynamic-string-name dispatch (`AutoModel.from_pretrained("bert-...")`
+        # imports `transformers.models.bert.*` at call time). Excluding an
+        # architecture does NOT break bundle import (so /healthz stays green)
+        # — it ImportErrors only when a query loads that specific arch. So
+        # CI smoke can't catch a wrong exclude here without downloading
+        # ~5 GB of HF models per matrix job, which is wasteful + fragile.
         #
-        # Generator: `python scripts/list_unused_transformers_models.py`.
-        # That script imports transformers, walks transformers/models/, and
-        # subtracts an ALLOWLIST of architectures we know are needed by
-        # colpali_engine (paligemma, qwen2_vl, gemma, siglip, ...) and
-        # sentence-transformers (bert, mpnet, ...). Everything else is
-        # printed as `--exclude-module transformers.models.X` lines.
+        # 2026-05-09 lessons: the `torch.*` Tier 1/2 excludes (originally
+        # alongside this Tier 3 strategy in Plan #10 §5) all turned out to
+        # be wrong — they were "broken at module-import time" rather than
+        # "broken at first query," and produced four runtime regressions in
+        # one packaging session. Those are gone (we --collect-all torch now).
+        # This transformers-architecture exclude path is DIFFERENT: the failure
+        # mode is genuinely lazy, the validation is genuinely expensive, and
+        # the saving is large (~450-750 MB). Stays as a release-cut tool.
         #
-        # Estimated saving: ~150 architectures × 3-5 MB each = ~450-750 MB.
+        # Validation flow (run on EACH target platform before tagging):
+        #   1. Run `scripts/list_unused_transformers_models.py` → prints
+        #      candidate `--exclude-module transformers.models.X` lines.
+        #      The script's ALLOWLIST keeps architectures known to be needed
+        #      by colpali_engine (paligemma, qwen2_vl, gemma, siglip, ...) and
+        #      sentence-transformers (bert, mpnet, ...).
+        #   2. Paste output into the cmd list above (in this same block).
+        #   3. Rebuild: `uv run python scripts/build_sidecar.py`.
+        #   4. End-to-end smoke on a real corpus, exercising every tier:
+        #      T0 plain text, T1 CSV/code, T2 PDF text, T3 vision-PDF,
+        #      T4 ColPali image.
+        #   5. If anything ImportErrors at runtime → identify the missing
+        #      architecture from the traceback, ADD it to the ALLOWLIST in
+        #      the helper script, regen, retry.
+        #   6. Repeat for every target platform (each PyInstaller matrix job
+        #      produces its own bundle; a missing arch can break on any of
+        #      them independently).
+        #   7. Only after green on every platform: commit the exclude lines
+        #      to this file, tag release.
         #
-        # Manual release-cutting validation (run on each target platform):
-        #   1. Run scripts/list_unused_transformers_models.py, paste output here
-        #   2. Rebuild (uv run python scripts/build_sidecar.py)
-        #   3. End-to-end smoke EVERY tier (T0 text, T1 code, T2 PDF,
-        #      T3 vision PDF, T4 ColPali) on a real corpus.
-        #   4. If anything ImportErrors at runtime → identify the missing
-        #      architecture, ADD it to ALLOWLIST in the helper script, regen.
-        #   5. Only after green on every platform: commit T3 lines, tag release.
+        # Estimated saving: ~150 architectures × 3-5 MB each = ~450-750 MB
+        # off the bundle. By far the biggest single optimization remaining.
     ]
 
     subprocess.run(cmd, cwd=ROOT, check=True)

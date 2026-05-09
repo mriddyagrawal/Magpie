@@ -97,6 +97,19 @@ if getattr(sys, "frozen", False):
     # this, every subsequent `import torch` is a cached no-op and the
     # whole pipeline works.
     #
+    # 2026-05-09 NOTE: `--collect-all torch` was added to build_sidecar.py
+    # in commit 99658a1 — that may have changed how PyInstaller bundles
+    # torch's C extensions, possibly avoiding the duplicate-registration
+    # scenario entirely. Kept this workaround as a defensive safety net:
+    # if the speculative `import torch` succeeds (no RuntimeError), the
+    # except branch never fires and we eat ~3-5s of warm-up that we'd
+    # pay anyway on first query. If the bug still fires, the workaround
+    # rescues us and logs `[server] applying torch.distributed.rpc
+    # PyInstaller workaround` so we know. Remove this block once we
+    # have positive evidence (a clean bootstrap.log without the warning
+    # line) across multiple builds AND the CI /query smoke test
+    # exercises the rerank path.
+    #
     # Cost: ~3-5s of torch loading at sidecar startup that previously
     # was lazy. Acceptable in exchange for "queries actually work."
     # Skipped in dev because non-frozen `import torch` doesn't hit

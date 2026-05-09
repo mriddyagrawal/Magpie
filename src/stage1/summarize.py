@@ -45,7 +45,7 @@ HASH_CHUNK = 1 << 20  # 1 MiB
 # Now points to the portable per-OS app data dir (see src/manifest.py).
 REPO_ROOT = APP_DATA_DIR
 
-ContentType = Literal["image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other"]
+ContentType = Literal["image", "pdf", "docx", "xlsx", "csv", "text", "code", "markdown", "other"]
 
 
 class FileSummary(BaseModel):
@@ -100,7 +100,7 @@ class FileSummary(BaseModel):
         # values anyway, so 'other' is harmless. Without this, every
         # cloud-summarized CSV crashes here.
         _VALID = {
-            "image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other",
+            "image", "pdf", "docx", "xlsx", "csv", "text", "code", "markdown", "other",
         }
         if isinstance(v, str):
             lowered = v.lower().strip()
@@ -186,7 +186,7 @@ LOCAL_SYSTEM_PROMPT = """You are a file analyzer. Given a file's content, output
 The JSON MUST have exactly these keys (and only these keys):
 - title (string, <=80 chars)
 - summary (string, 3-7 sentences of natural prose)
-- content_type (one of: "image", "pdf", "docx", "xlsx", "text", "code", "markdown", "other")
+- content_type (one of: "image", "pdf", "docx", "xlsx", "csv", "text", "code", "markdown", "other")
 - keywords (list of 3-10 topical words)
 - key_entities (list of named entities: people, organisations, places, products, branches — copied verbatim from the file)
 - identifiers (list of exact tokens that uniquely distinguish this file: numeric IDs, dates in their ORIGINAL format, SKUs, version strings, exact prices with currency, URLs — copied verbatim)
@@ -516,6 +516,8 @@ async def summarize_one(
             content_type = "docx"
         elif suffix in ("xlsx", "xlsm", "xls"):
             content_type = "xlsx"
+        elif suffix == "csv":
+            content_type = "csv"
         elif suffix in ("md", "markdown"):
             content_type = "markdown"
         elif suffix in ("txt", "log"):

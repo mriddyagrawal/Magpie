@@ -1,5 +1,10 @@
 name: Build
 
+# (no-op edit to force GitHub to re-scan + register the workflow on
+# rahulranjansah's fork — workflow discovery on forked private repos
+# only fires when the .github/workflows file itself receives a push,
+# even though the file was already present in the branch.)
+
 # Trigger matrix:
 #   - Push to main / front-back / UI: validates build compiles, uploads
 #     artifacts for inspection. NO release created.

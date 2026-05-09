@@ -2526,3 +2526,261 @@ signal. The spacebar overlay is independently shippable and worth
 doing first regardless.
 
 ---
+
+## 37. Code signing + notarization across all three platforms (Apple, Windows, Tauri auto-updater)
+
+**Tags:** ci · packaging · distribution · security
+
+**What.** Three independent signing flows are currently scaffolded
+in `.github/workflows/build.yml` but **none are operational** — all
+three are gated on secrets that don't exist yet:
+
+1. **Apple Developer ID + notarization** for macOS `.dmg` /
+   `.app`. Without this, macOS users see "Apple cannot verify
+   this app is free of malware" and bounce.
+2. **Windows authenticode (EV cert or Azure Trusted Signing)**
+   for the NSIS installer. Without this, users see SmartScreen's
+   "Windows protected your PC" dialog.
+3. **Tauri auto-updater minisign key** for signed update
+   manifests. Without this, the in-app updater can't verify
+   downloads. Currently disabled in `tauri.conf.json`
+   (`createUpdaterArtifacts: false`, `plugins.updater.active:
+   false`) — the JS-side `auto-updater.ts` no-ops gracefully.
+
+**Why we are not doing this for v1:**
+- Apple Developer Program: $99/yr.
+- Windows EV cert: $200–400/yr traditional, OR Azure Trusted
+  Signing ~$10/mo (cheaper modern path).
+- Auto-updater key generation: free, but the *infrastructure*
+  (key custody, CI secret, public-key-in-config) is engineering
+  time we don't need until we have users to update.
+- Pre-launch we have zero external testers. Workarounds for the
+  friend-of-the-team case are good enough:
+  - **macOS:** `xattr -cr /Applications/Magpie.app` strips
+    quarantine, or right-click → Open the first time.
+  - **Windows:** "More info → Run anyway" through SmartScreen.
+  - **Auto-update:** doesn't matter; we'll ship updates by
+    asking testers to redownload.
+
+**Why this matters when we launch:**
+- All three "scary dialog" paths are conversion killers on a
+  download landing page. Users bounce before they ever launch
+  the app.
+- Signed auto-updates are the difference between "users stay on
+  the latest version" and "users are stuck on whatever they
+  installed six months ago."
+
+**Scope sketch when we trigger this:**
+
+*Apple:*
+1. Enroll in Apple Developer Program.
+2. Generate **Developer ID Application** cert (NOT App Store).
+   Export as `.p12` with password.
+3. Add GitHub secrets: `APPLE_CERTIFICATE` (base64 `.p12`),
+   `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`,
+   `APPLE_ID`, `APPLE_PASSWORD` (app-specific password from
+   appleid.apple.com), `APPLE_TEAM_ID`.
+4. Existing `if: env.APPLE_CERTIFICATE != ''` guard auto-enables.
+5. Verify: `spctl -a -v -t open --context context:primary-signature MagpieInstaller.dmg`
+   returns "accepted" + `stapler validate MagpieInstaller.dmg`
+   confirms notarization.
+
+*Windows:*
+1. Choose between traditional EV cert or Azure Trusted Signing.
+2. Add GitHub secrets matching the chosen path.
+3. Wire signtool into the build (Tauri 2 supports
+   `bundle.windows.signCommand` in `tauri.conf.json` for
+   pre-bundle signing — cleaner than post-bundle resigning).
+
+*Auto-updater:*
+1. `pnpm tauri signer generate -- -w ~/.tauri/magpie-updater.key`
+   on a trusted local machine.
+2. Add `TAURI_SIGNING_PRIVATE_KEY` (the printed private key) and
+   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` to GitHub secrets.
+3. Paste matching public key into
+   `tauri.conf.json:plugins.updater.pubkey`.
+4. Flip `bundle.createUpdaterArtifacts: true` and
+   `plugins.updater.active: true` in `tauri.conf.json`.
+5. Test: tag a release, confirm `latest.json` is generated and
+   signed, install old version on a test machine, confirm
+   in-app updater fetches + verifies + installs.
+
+**Trigger to start.** (1) public download link goes live; (2)
+first non-team-member tester reports bouncing off a "scary
+dialog"; (3) we're shipping more than ~weekly updates and
+re-installs become annoying.
+
+---
+
+## 38. Linux build flavor strategy — CPU vs GPU artifacts + smart installer
+
+**Tags:** ci · packaging · sidecar · pyinstaller · linux
+
+**What.** PyInstaller's `--onefile` mode caps the embedded archive
+at **~4 GB** (its cookie packs the offset as a 32-bit unsigned
+int via `struct.pack('I', …)`). On Linux, the default PyPI
+torch wheel is CUDA-enabled (~2.7 GB unpacked: cuDNN, cuBLAS,
+cuFFT, NCCL, libtorch_cuda.so) and pushes the bundle past that
+limit. Result: the Linux CI job crashes with
+`struct.error: 'I' format requires 0 <= number <= 4294967295`.
+macOS torch wheels have no CUDA (~200 MB, fine) and Windows
+CUDA wheels are smaller (squeak under, fine). Linux is the
+unlucky cell.
+
+**The product question this raises.** Should Linux end users:
+(a) carry ~1.8 GB of CUDA libs they don't use (CPU users), or
+(b) lose GPU acceleration entirely (GPU users), or
+(c) get the right thing for their hardware automatically?
+
+The product principle is (c) — same UX as Windows (where torch
+auto-detects GPU at runtime) and Mac ARM (where MPS just
+works). The *implementation* required to deliver (c) on Linux
+is non-trivial because of the 4 GB cap.
+
+**The chosen approach: smart installer + per-hardware artifacts.**
+
+CI builds **two Linux artifacts in parallel**:
+- `magpie-linux-cpu.AppImage` (~700 MB): CPU-only torch
+  (forced via `pip install torch --index-url
+  https://download.pytorch.org/whl/cpu --reinstall`),
+  PyInstaller `--onefile`. Targets the typical user with no
+  NVIDIA GPU.
+- `magpie-linux-gpu.AppImage` (~2.5 GB): default CUDA torch,
+  PyInstaller `--onedir` (no 4 GB cap because of different
+  archive layout), wrapped via a thin launcher binary so
+  Tauri's `externalBin` still gets a single binary as input.
+
+Users see **one download button**. Behind it, a tiny shell
+script (~5 KB) detects hardware and pulls the right artifact:
+
+```bash
+if command -v nvidia-smi &>/dev/null && nvidia-smi -L | grep -q GPU; then
+  curl -L https://.../magpie-linux-gpu.AppImage -o ~/Applications/Magpie.AppImage
+else
+  curl -L https://.../magpie-linux-cpu.AppImage -o ~/Applications/Magpie.AppImage
+fi
+chmod +x ~/Applications/Magpie.AppImage
+```
+
+This pattern is what Ollama, LM Studio, and ComfyUI all use.
+Same UX could optionally extend to Windows (CPU vs CUDA
+flavors there too), but Windows isn't blocked the way Linux is
+— the default Windows wheel already fits and works for both
+hardware tiers, so deferring Windows split until there's a
+reason.
+
+**Why we are not doing this for v1 (the conservative call):**
+- Pre-launch we have zero Linux users, period. Optimizing for
+  "Linux non-GPU users don't carry CUDA libs" solves a problem
+  nobody yet has.
+- The smart installer adds CI variants (4 instead of 2 for
+  Linux), an install-script per OS, release-page plumbing,
+  and update-mechanism complexity (does the smart installer
+  re-run on every update? what if hardware changes?). All real
+  engineering, days not hours.
+- A single "fat" Linux artifact (~2.5 GB, CUDA torch, --onedir)
+  matches what Windows already ships (~2 GB) and works
+  adaptively on whatever hardware the user has. Industry-
+  standard ML-app size. Defensible v1 default.
+
+**v1 default:** ship one Linux artifact, GPU-capable, ~2.5 GB.
+Same UX as Windows. CPU users carry unused CUDA libs (the
+honest tradeoff).
+
+**Trigger to revisit (move to smart installer):**
+(1) first real user complains about Linux download size;
+(2) we want to ship to bandwidth-constrained markets where
+2.5 GB is a real friction;
+(3) telemetry shows >X% of Linux installs are on hardware
+without an NVIDIA GPU and the carry cost feels disrespectful.
+
+**Implementation roadmap when triggered:**
+1. Modify `scripts/build_sidecar.py`: add `--mode onefile|onedir`
+   and `--torch cpu|default` flags. Local builds unaffected.
+2. Update `.github/workflows/build.yml`: split Linux matrix
+   entry into `flavor: cpu` and `flavor: gpu`. Both run in
+   parallel; total CI time barely changes.
+3. Tauri `externalBin` shim for `--onedir` — small launcher
+   binary in `frontend/src-tauri/` that exec's into the onedir
+   directory.
+4. Write `install-magpie.sh` (Linux) and `install-magpie.ps1`
+   (Windows) detection scripts. Host on download page.
+5. Release-page UX: one "Download Magpie" button per OS, that
+   serves the install script.
+
+---
+
+## 39. Auto-updater plugin signing — operationalize Plan #37's third lane
+
+**Tags:** ci · auto-updater · signing · distribution
+
+**What.** This was the immediate cause of CI failure on
+2026-05-08: `tauri.conf.json` had `bundle.createUpdaterArtifacts:
+true` and `plugins.updater.active: true`, but the matching
+`TAURI_SIGNING_PRIVATE_KEY` GitHub secret was never created
+and the public key in config was still the placeholder string
+`REPLACE_WITH_PUBLIC_KEY_FROM_TAURI_SIGNER_GENERATE`. Tauri's
+post-bundle signer (minisign-based) tried to use an empty key
+and failed with:
+
+```
+failed to decode secret key: incorrect updater private key
+password: Missing comment in secret key
+```
+
+**Immediate fix landed 2026-05-08:**
+- `tauri.conf.json:bundle.createUpdaterArtifacts` set to
+  `false`.
+- `tauri.conf.json:plugins.updater.active` set to `false`.
+- Workflow comment in `build.yml` corrected (previous claim
+  "builds still succeed without the secret" was wrong because
+  `createUpdaterArtifacts: true` *forces* signing).
+- The JS-side `frontend/src/auto-updater.ts:checkForUpdates()`
+  catches all failures silently, so disabling the Rust-side
+  plugin is safe — no user-facing regression.
+
+**Why we are not finishing this now.** The whole auto-update
+flow has dependencies that aren't met yet:
+- We don't ship public releases.
+- We don't have a public download URL.
+- We haven't decided the cadence at which we'd ship signed
+  updates (weekly? per-fix?).
+- Fixing this now means generating + custodying a key that
+  isn't used until someone is actually receiving updates.
+
+**What this plan ships when triggered:**
+1. Generate a minisign key locally on a trusted machine:
+   `pnpm tauri signer generate -- -w ~/.tauri/magpie-updater.key`.
+   Save the password somewhere safe (1Password / OS keychain).
+2. Add `TAURI_SIGNING_PRIVATE_KEY` and
+   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` to GitHub repo secrets.
+3. Replace the placeholder string in
+   `tauri.conf.json:plugins.updater.pubkey` with the real
+   public key (printed alongside the private key during step 1).
+4. Flip both flags back to `true`:
+   - `bundle.createUpdaterArtifacts`
+   - `plugins.updater.active`
+5. Run a test release: tag `v0.1.1`, confirm `latest.json` is
+   generated, install `v0.1.0` on a clean machine, confirm
+   in-app updater detects + verifies + installs `v0.1.1`.
+
+**Key custody warning.** The minisign private key is the
+*only* thing standing between an attacker who breaches your
+release pipeline and the ability to ship malicious updates to
+every Magpie user. If you ever leak it, you have to:
+(a) generate a new key,
+(b) change `pubkey` in `tauri.conf.json`,
+(c) ship a manual-update notice (because old installs verify
+against the *old* pubkey and won't accept anything signed
+with the new one).
+That's a one-way door. Treat the key like a production root
+credential — store offline if at all possible, never commit
+it, don't paste it into Slack / email.
+
+**Trigger to start.** Bundled with Plan #37 trigger conditions
+— specifically when (1) a public download link goes live and
+(2) we expect to ship more than one release. Deliberately
+unify with #37 because key generation + custody story is
+identical to the other signing concerns.
+
+---

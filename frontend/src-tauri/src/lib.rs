@@ -1,5 +1,5 @@
 use std::net::{SocketAddr, TcpStream};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
@@ -528,13 +528,36 @@ fn wait_for_port(port: u16, max_attempts: u32) -> bool {
     false
 }
 
+/// Resolve the directory containing externalBin sidecars at runtime.
+///
+/// Tauri 2 places `externalBin` entries from `tauri.conf.json` ALONGSIDE
+/// the main executable on every platform — never in `Resources/`:
+///
+///   - macOS .app:        `Contents/MacOS/<name>`         (next to `Magpie`)
+///   - Linux AppImage:    `usr/bin/<name>`                (next to `magpie`)
+///   - Linux .deb:        `/usr/bin/<name>`               (next to `magpie`)
+///   - Windows MSI/NSIS:  `<install-dir>/<name>.exe`      (next to `Magpie.exe`)
+///
+/// Earlier code resolved sidecars via `app.path().resource_dir()` which on
+/// macOS returns `Contents/Resources/` — wrong by one directory. The bundle
+/// shipped fine but the spawn always failed with `No such file or directory
+/// (os error 2)` on user machines. This helper uses `current_exe().parent()`
+/// which is correct on all three platforms.
+fn bundled_bin_dir() -> Result<PathBuf, String> {
+    std::env::current_exe()
+        .map_err(|e| format!("could not resolve current_exe: {e}"))?
+        .parent()
+        .map(Path::to_path_buf)
+        .ok_or_else(|| "current_exe has no parent directory".to_string())
+}
+
 // Spawn qdrant on a pre-picked port; caller is responsible for storing the child.
-fn spawn_qdrant(app: &tauri::AppHandle, port: u16) -> Result<Child, String> {
+fn spawn_qdrant(_app: &tauri::AppHandle, port: u16) -> Result<Child, String> {
     let storage = app_data_dir().join("qdrant_storage");
     std::fs::create_dir_all(&storage).map_err(|e| e.to_string())?;
 
-    let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
-    let bin = resource_dir.join(if cfg!(windows) { "qdrant.exe" } else { "qdrant" });
+    let bin = bundled_bin_dir()?
+        .join(if cfg!(windows) { "qdrant.exe" } else { "qdrant" });
 
     let mut cmd = Command::new(&bin);
     cmd.env("QDRANT__STORAGE__STORAGE_PATH", &storage)
@@ -552,7 +575,7 @@ fn spawn_qdrant(app: &tauri::AppHandle, port: u16) -> Result<Child, String> {
 
 // Spawn the Python sidecar on a pre-picked port; no stdout blocking.
 fn spawn_sidecar(
-    app: &tauri::AppHandle,
+    _app: &tauri::AppHandle,
     port: u16,
     qdrant_port: Option<u16>,
 ) -> Result<Child, String> {
@@ -577,9 +600,9 @@ fn spawn_sidecar(
         c.args(["run", "python", "-m", "src.server", "--port", &port.to_string()]);
         c
     } else {
-        let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
-        let bin =
-            resource_dir.join(if cfg!(windows) { "magpie-sidecar.exe" } else { "magpie-sidecar" });
+        let bin = bundled_bin_dir()?.join(
+            if cfg!(windows) { "magpie-sidecar.exe" } else { "magpie-sidecar" },
+        );
         let mut c = Command::new(&bin);
         c.arg("--port").arg(port.to_string());
         c.env("MAGPIE_DATA_DIR", app_data_dir());

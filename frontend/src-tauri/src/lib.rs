@@ -236,11 +236,18 @@ pub fn run() {
             {
                 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
                 if let Some(window) = app.get_webview_window("main") {
+                    // Last argument = corner radius (points) for the
+                    // NSVisualEffectView backdrop on macOS. `0.0` = sharp
+                    // rectangular corners. Previously `18.0` (more rounded
+                    // than the macOS system default of ~10pt). Inner cards
+                    // (status pill, blob, sources, etc.) keep their own
+                    // CSS border-radius — only the OUTER window frame is
+                    // affected here.
                     let _ = apply_vibrancy(
                         &window,
                         NSVisualEffectMaterial::FullScreenUI,
                         Some(NSVisualEffectState::Active),
-                        Some(18.0),
+                        Some(0.0),
                     );
                 }
             }

@@ -74,6 +74,54 @@ if getattr(sys, "frozen", False):
         except OSError:
             return ""
     _inspect.getsource = _safe_getsource
+
+    # PyInstaller + torch.distributed.rpc workaround.
+    #
+    # The bundled `torch._C` C extension registers `RpcBackendOptions`
+    # at load time. Later, `torch._jit_internal.py:44` does
+    # `import torch.distributed.rpc`, whose `__init__.py:28` calls
+    # `torch._C._rpc_init()` — which tries to register the same type
+    # AGAIN and fails with:
+    #
+    #   RuntimeError: generic_type: cannot initialize type
+    #   "RpcBackendOptions": an object with that name is already defined
+    #
+    # The error is process-sticky: once thrown, every subsequent
+    # `import torch` in the same sidecar process fails the same way,
+    # which knocks out indexing, summarization, AND query rerank.
+    #
+    # Strategy: speculatively `import torch` once at sidecar startup
+    # (frozen-only). On the expected RuntimeError, stub
+    # `torch._C._rpc_init` to a no-op (we don't use distributed RPC),
+    # clear partial torch.* state from sys.modules, and retry. After
+    # this, every subsequent `import torch` is a cached no-op and the
+    # whole pipeline works.
+    #
+    # Cost: ~3-5s of torch loading at sidecar startup that previously
+    # was lazy. Acceptable in exchange for "queries actually work."
+    # Skipped in dev because non-frozen `import torch` doesn't hit
+    # this bug — it'd just slow down dev startup for no benefit.
+    try:
+        import torch  # noqa: F401  # eager-import warm-up
+    except RuntimeError as e:
+        if "RpcBackendOptions" not in str(e) or "already defined" not in str(e):
+            raise
+        print(
+            "[server] applying torch.distributed.rpc PyInstaller workaround "
+            "(stubbing torch._C._rpc_init)",
+            file=sys.stderr,
+        )
+        _torch_c = sys.modules.get("torch._C")
+        if _torch_c is not None:
+            _torch_c._rpc_init = lambda: True  # type: ignore[attr-defined]
+        # Clear partial torch.* state EXCEPT torch._C (which holds our
+        # stub) so the retry doesn't see torch.distributed.rpc as
+        # already-loaded-but-broken.
+        for _k in list(sys.modules.keys()):
+            if _k != "torch._C" and _k.startswith("torch"):
+                sys.modules.pop(_k, None)
+        import torch  # noqa: F401  # retry — should succeed via stub
+
 warnings.filterwarnings("ignore", category=UserWarning, module="qdrant_client")
 warnings.filterwarnings("ignore", category=UserWarning, module="torch.cuda")
 

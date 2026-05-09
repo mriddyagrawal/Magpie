@@ -85,7 +85,21 @@ def main() -> None:
         "--onefile",
         "--noconsole",
         "--noconfirm",
-        # Heavy packages that use dynamic imports or include non-Python assets
+        # Heavy packages that use dynamic imports or include non-Python assets.
+        #
+        # `torch` is the most dynamically-imported library in our stack:
+        # transformers / sentence-transformers / colpali-engine / pydantic-ai
+        # all reach into torch submodules (distributed.rpc, autograd.profiler,
+        # _dynamo, fx, ...) at module-load time of architectures we don't
+        # statically reference. Plan #10 §5's Tier 1/2 static-analysis
+        # exclude approach has produced 4 separate runtime regressions
+        # tonight (torch.distributed, torch.autograd.profiler, RpcBackendOptions
+        # registration, multiprocessing.spawn). Going `--collect-all torch`
+        # to make the bundle "all-in" on torch — adds ~300-400 MB but
+        # eliminates the entire class of "module excluded but transitively
+        # needed" regression. Will revisit once a CI /query smoke test
+        # exercises real reranker + answer paths and can gate exclusions.
+        "--collect-all", "torch",
         "--collect-all", "sentence_transformers",
         "--collect-all", "fastembed",
         "--collect-all", "qdrant_client",
@@ -137,60 +151,44 @@ def main() -> None:
         "--copy-metadata", "genai_prices",
         "--copy-metadata", "pydantic_ai_slim",
         "--copy-metadata", "pydantic_graph",
-        # ── Tier 1 excludes (high-confidence, ~80–100 MB savings) ────────────
-        # These submodules are well-isolated; PyTorch never imports them
-        # internally unless specific code paths run (multi-node training,
-        # ONNX export, profiling, training APIs) — none of which Magpie does.
-        # Plan #10 PR-E. Tier 2 (torch.fx, torch._dynamo, sympy, mpmath) goes
-        # in ONE AT A TIME with smoke tests; Tier 3 (transformers.models.<unused>)
-        # is deferred. See `Plans/Packaging/Implementation Plan.md` §5.
+        # ── Excludes ─────────────────────────────────────────────────────────
         #
-        # NOTE 2026-05-09: Plan #10 §5's "high-confidence, well-isolated"
-        # claim about most of these is empirically wrong. The Tier 1 list has
-        # been pared down to ONLY the modules that pass the test of
-        # "transformers / sentence-transformers / colpali / pydantic-ai never
-        # touches them at module-load time of any code path Magpie executes."
+        # NOTE 2026-05-09: ALL torch-related excludes (Tier 1 + Tier 2 from
+        # Plan #10 §5) have been REMOVED. Decision: ship all of torch / sympy /
+        # mpmath until we have a CI /query smoke test that exercises the full
+        # pipeline (rerank, answer, ColPali) and can prove which submodules
+        # are genuinely unreachable.
         #
-        # Removed-with-rationale:
+        # Why: tonight's packaging smoke produced four separate runtime
+        # regressions from supposedly "high-confidence Tier 1" excludes:
+        #   - `torch.distributed`         → ModuleNotFoundError on first query
+        #                                   (sentence-transformers reaches in)
+        #   - `torch.autograd.profiler`   → SIDECAR FAILS TO START
+        #                                   (torch.autograd/__init__.py:601
+        #                                   does `from . import profiler`
+        #                                   unconditionally)
+        #   - `torch.profiler`            → preemptive removal (sibling of above)
+        #   - RpcBackendOptions conflict  → required a separate runtime stub
+        #                                   in src/server.py (42bd7d4)
         #
-        # `torch.distributed` (3cc15cb): sentence-transformers / transformers /
-        #   colpali reach into `torch.distributed.*` at module-load time of
-        #   certain transformer architectures (ProcessGroup, FSDP wrappers).
-        #   Excluding it crashed queries with ModuleNotFoundError after
-        #   retrieval succeeded. ~30-50 MB lost.
+        # The static-analysis approach to picking excludes (Plan #10 §5)
+        # missed real runtime dependencies in transformers's load chain.
+        # Until we have CI that actually runs `/query` against a small
+        # corpus, every "this submodule is well-isolated" claim is a
+        # guess. Better to ship a fat bundle that works than a thin
+        # bundle that crashes.
         #
-        # `torch.autograd.profiler` (THIS COMMIT): `torch/autograd/__init__.py`
-        #   line 601 unconditionally does `from . import profiler` at module
-        #   load. Excluding it crashes the SIDECAR ITSELF at boot with:
-        #     ImportError: cannot import name 'profiler' from partially
-        #     initialized module 'torch.autograd'
-        #   The "partially initialized" wording is misleading — the actual
-        #   issue is the unconditional import at line 601. ~10-15 MB lost.
+        # Bundle size impact: +300-500 MB. Acceptable given the alternative
+        # is "indeterminate runtime regressions, debugged by user reports."
+        # Re-enable selective excludes when:
+        #   1. `Add CI smoke step that exercises a real /query` (todo #11) lands
+        #   2. The smoke test runs on a real corpus and exercises rerank +
+        #      answer paths (i.e., loads sentence-transformers + transformers)
+        #   3. THEN, with empirical proof, narrow excludes can come back
         #
-        # `torch.profiler` (THIS COMMIT): same family as torch.autograd.profiler,
-        #   pre-emptively removed before it bites us in a different code path.
-        #   Will reconsider once we have a CI /query smoke test that would
-        #   catch a regression here. ~5-10 MB lost.
-        #
-        # Kept-because-truly-isolated:
-        "--exclude-module", "torch.onnx",              # only fires on torch.onnx.export, never called
-        "--exclude-module", "torch.tensorboard",       # only fires when SummaryWriter constructed
-        "--exclude-module", "torch.optim",             # only used by training loops, we infer-only
+        # Kept excludes — non-torch, truly unrelated:
         "--exclude-module", "IPython",                 # debug REPL (defensive)
         "--exclude-module", "babel",                   # i18n; we don't translate
-        # ── Tier 2 (medium confidence, ~80–100 MB more) ─────────────────────
-        # PyTorch occasionally lazy-imports these in unexpected places, so
-        # they CAN break runtime if a code path we don't notice triggers
-        # them. The CI smoke-test step in .github/workflows/build.yml
-        # (`Smoke-test bundled sidecar`) launches the bundled binary and
-        # hits /health on every push — if any of these break the import
-        # graph, that step fails immediately on whichever platform broke.
-        # If you see CI red on a specific platform after a Tier 2 change,
-        # comment that one out and reopen as a narrow workaround.
-        "--exclude-module", "torch.fx",                # symbolic graph tracing
-        "--exclude-module", "torch._dynamo",           # torch.compile machinery
-        "--exclude-module", "sympy",                   # torch's symbolic shapes (~29 MB)
-        "--exclude-module", "mpmath",                  # transitive sympy
         # ── Tier 3 (transformers.models.<unused arch>) — NOT IN CI ─────────
         # Tier 3 excludes interact with HuggingFace's `AutoModel.from_pretrained`
         # dynamic-string-name dispatch: a missing architecture does NOT break

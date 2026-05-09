@@ -655,13 +655,26 @@ async def run_batch(
 
     # Defer LLM agent construction until we actually need it (many corpora will
     # be entirely T1/T2/T0 and shouldn't require an API key).
+    #
+    # Re-check the active provider on every call. If the user toggles
+    # Local ↔ Cloud mid-batch (via Settings → Search & AI), the next file
+    # picked up by a worker rebuilds the agent against the new provider.
+    # Without this, the agent is bound to whatever provider was active
+    # at first call and ignores `settings.json` edits for the rest of
+    # the batch — which silently kept Cloud running for ~30 minutes
+    # after a user switched to Local. The settings lookup costs ~120 µs
+    # vs an LLM call at 1-30 SECONDS, so this is invisible overhead.
     agent = None
+    agent_provider: str | None = None
 
     def get_agent():
-        nonlocal agent
-        if agent is None:
+        nonlocal agent, agent_provider
+        from src.config.settings import effective_settings
+        current = effective_settings().provider
+        if agent is None or agent_provider != current:
             from src.stage1.summarize import build_agent as _build
             agent = _build()
+            agent_provider = current
         return agent
 
     gpu = _gpu_available()

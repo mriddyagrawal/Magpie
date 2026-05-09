@@ -809,18 +809,31 @@ fn bundled_bin_dir() -> Result<PathBuf, String> {
 // back to its 6334 gRPC default (which collides with any other qdrant-using
 // app on the machine — OpenWhispr is the canonical case).
 //
+// `current_dir` is set to a WRITABLE directory under APP_DATA_DIR. Qdrant
+// creates several files / dirs relative to cwd (`./snapshots/`, `./snapshots/tmp/`,
+// `.qdrant-initialized` indicator, etc.). When Tauri spawns from a .app bundle,
+// the inherited cwd is `Contents/MacOS/` which macOS marks read-only for code
+// integrity → qdrant panics with `ReadOnlyFilesystem` and exits silently.
+// Pointing cwd at app_data_dir makes those relative paths land somewhere
+// writable, matching the explicit STORAGE_PATH env we already set.
+//
 // Both stdout and stderr are piped into `bootstrap.log` so a future spawn
 // failure leaves a trail. Old code used `Stdio::null()` and that's exactly
 // why "took too long" dialogs were impossible to debug.
 fn spawn_qdrant(_app: &tauri::AppHandle, http_port: u16, grpc_port: u16) -> Result<Child, String> {
     let storage = app_data_dir().join("qdrant_storage");
     std::fs::create_dir_all(&storage).map_err(|e| e.to_string())?;
+    // Dedicated runtime dir keeps qdrant's relative-path artifacts (snapshots/,
+    // .qdrant-initialized, etc.) tidy and out of the storage tree.
+    let runtime = app_data_dir().join("qdrant_runtime");
+    std::fs::create_dir_all(&runtime).map_err(|e| e.to_string())?;
 
     let bin = bundled_bin_dir()?
         .join(if cfg!(windows) { "qdrant.exe" } else { "qdrant" });
 
     let mut cmd = Command::new(&bin);
-    cmd.env("QDRANT__STORAGE__STORAGE_PATH", &storage)
+    cmd.current_dir(&runtime)
+        .env("QDRANT__STORAGE__STORAGE_PATH", &storage)
         .env("QDRANT__SERVICE__HTTP_PORT", http_port.to_string())
         .env("QDRANT__SERVICE__GRPC_PORT", grpc_port.to_string())
         .stdout(bootstrap_stdio())

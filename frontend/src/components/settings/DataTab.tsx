@@ -19,6 +19,7 @@ import {
   addFolder,
   addExclusion,
   getExclusions,
+  getIndexPlan,
   patchFolder,
   pickFile,
   pickFolder,
@@ -27,12 +28,12 @@ import {
   revealInFinder,
   runReindex,
   runSync,
-  startIngest,
   stopIngest,
 } from "../../api";
 import type {
   ExclusionsResponse,
   FolderEntry,
+  IndexPlan,
   IngestStatus,
 } from "../../api";
 import { ConfirmModal } from "./ConfirmModal";
@@ -65,6 +66,7 @@ export function DataTab({
   const [exclusionsOpen, setExclusionsOpen] = useState(false);
   const [exclusions, setExclusions] = useState<ExclusionsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [plan, setPlan] = useState<IndexPlan | null>(null);
 
   const addMenuRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +82,38 @@ export function DataTab({
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [showAddMenu]);
 
+  // Fetch the index plan on mount and whenever folders change. Refresh
+  // again whenever the ingest poll transitions from running → idle, so
+  // the "X files left to index" line follows reality. Server caches for
+  // 10s; spamming this endpoint mid-poll is cheap.
+  const refreshPlan = useCallback(async () => {
+    try {
+      const p = await getIndexPlan();
+      setPlan(p);
+    } catch (e) {
+      // Plan failures are non-fatal — fall back to silent (no grand
+      // total banner); the rest of the tab still works.
+      console.warn("[settings] /index/plan failed:", e);
+    }
+  }, []);
+  useEffect(() => {
+    void refreshPlan();
+  }, [refreshPlan, folders?.length]);
+  // Re-fetch after each ingest job ends. We watch `done` (server flips
+  // it true after the finally block) — the dependency on `running`
+  // alone would miss the transition because by the time the next poll
+  // tick fires, `running` is already false and `done` true.
+  const ingestDone = ingest?.done ?? false;
+  useEffect(() => {
+    if (ingestDone) {
+      void refreshPlan();
+    }
+  }, [ingestDone, refreshPlan]);
+
+  // The backend auto-fires `_do_sync()` from POST /settings/folders now,
+  // so we no longer need a separate POST /ingest call here. We still
+  // notify the parent so it starts polling /ingest/status and surfacing
+  // progress in the UI.
   const handlePickFolder = useCallback(async () => {
     setShowAddMenu(false);
     setError(null);
@@ -87,7 +121,6 @@ export function DataTab({
       const path = await pickFolder();
       if (!path) return;
       await addFolder(path);
-      await startIngest(path);
       onIngestStarted();
       refreshFolders();
     } catch (e) {
@@ -102,7 +135,6 @@ export function DataTab({
       const path = await pickFile();
       if (!path) return;
       await addFolder(path);
-      await startIngest(path);
       onIngestStarted();
       refreshFolders();
     } catch (e) {
@@ -135,11 +167,15 @@ export function DataTab({
     setError(null);
     try {
       await patchFolder({ path, enabled });
+      // Backend auto-fires sync when `enabled` flips — start polling so
+      // the user sees the orphan-cleanup pass (or the new-files pass)
+      // light up the status pill.
+      onIngestStarted();
       refreshFolders();
     } catch (e) {
       setError((e as Error).message);
     }
-  }, [refreshFolders]);
+  }, [onIngestStarted, refreshFolders]);
 
   const handleRemove = useCallback((path: string) => {
     const target = (folders ?? []).find((f) => f.path === path);
@@ -153,11 +189,15 @@ export function DataTab({
     setError(null);
     try {
       await removeFolder(path);
+      // Backend auto-fires sync on remove (orphan cleanup runs at the
+      // end of _do_sync) — start polling so the user sees the count
+      // drop in real time.
+      onIngestStarted();
       refreshFolders();
     } catch (e) {
       setError((e as Error).message);
     }
-  }, [removeTarget, refreshFolders]);
+  }, [removeTarget, onIngestStarted, refreshFolders]);
 
   const handleResync = useCallback(async (_path: string) => {
     // v1: per-folder Refresh fires the global Sync. When we add
@@ -242,6 +282,7 @@ export function DataTab({
         syncDisabled={pollActive}
       />
       {error && <ErrorBanner message={error} />}
+      <PlanSummary plan={plan} ingest={ingest} />
       <div className="data-tab__list">
         {folders === null ? (
           <SkeletonList />
@@ -374,6 +415,45 @@ function ErrorBanner({ message }: { message: string }) {
   return (
     <div className="data-tab__error" role="alert">
       ⚠ {message}
+    </div>
+  );
+}
+
+/** Single-line summary above the folder list:
+ *   "12,431 files across 4 folders · 1,234 still to index"
+ *   "12,431 files across 4 folders · all caught up"
+ *   "Scanning your folders…"  (during scan phase, no plan yet)
+ *
+ * The summary is informational — buttons live in the header, not here.
+ * Hidden entirely when the plan endpoint hasn't responded yet AND
+ * there's no scan in progress (avoids a flash of empty content). */
+function PlanSummary({
+  plan,
+  ingest,
+}: {
+  plan: IndexPlan | null;
+  ingest: IngestStatus | null;
+}) {
+  const scanning = ingest?.phase === "scanning";
+  if (scanning) {
+    return (
+      <div className="data-tab__plan-summary data-tab__plan-summary--scanning">
+        Scanning your folders…
+      </div>
+    );
+  }
+  if (!plan || plan.folders.length === 0) return null;
+  const enabled = plan.folders.filter((f) => f.enabled).length;
+  const totalLabel = plan.grand_total.toLocaleString();
+  const folderLabel = enabled === 1 ? "1 folder" : `${enabled} folders`;
+  const tail =
+    plan.grand_remaining > 0
+      ? `${plan.grand_remaining.toLocaleString()} still to index`
+      : "all caught up";
+  return (
+    <div className="data-tab__plan-summary">
+      {totalLabel} {plan.grand_total === 1 ? "file" : "files"} across{" "}
+      {folderLabel} · {tail}
     </div>
   );
 }

@@ -350,6 +350,27 @@
   gap: 8px;
 }
 
+/* PlanSummary — single-line totals/progress banner above the folder
+   list. Quiet visual treatment: the buttons live in the header, this
+   line is just informational. */
+.data-tab__plan-summary {
+  padding: 6px 10px;
+  font-size: var(--size-sm);
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+}
+.data-tab__plan-summary--scanning {
+  color: var(--text-secondary);
+  font-style: italic;
+  /* Subtle pulse so the user knows scanning is active even though
+     there's no per-file progress yet. */
+  animation: plan-summary-pulse 1.6s ease-in-out infinite;
+}
+@keyframes plan-summary-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1.0; }
+}
+
 .data-tab__empty {
   display: flex;
   flex-direction: column;

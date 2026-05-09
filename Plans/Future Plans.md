@@ -2887,4 +2887,65 @@ right shape; we can validate that with a bundled key and 5–20 testers
 without ever spinning up fly.io. Burning that engineering time before
 the beta UX is even confirmed would be the wrong order.
 
+### Addendum 2026-05-09 — bundled-key handling decision
+
+Specific operational call made during tonight's first end-to-end
+packaged-build smoke:
+
+**Decision:** `src/config/bundled_key.txt` stays out of git history,
+even on the private repo. Stays `.gitignore`'d, lives only on the
+release builder's local disk. Each release build copies the
+`bundled_key.txt.example` template, fills in the live OpenRouter
+key, runs `pnpm tauri build`, ships.
+
+**Why not commit it (even to the private repo):**
+
+- Once in git history, removal requires destructive rewrites
+  (`git filter-repo`) and even those don't reach forks / GitHub's
+  internal logs / anyone who already cloned. Effectively permanent.
+- Private repos can be opened up later (open-sourced, contributors
+  added, transferred). The key would survive any of those moves.
+- Doesn't reduce attack surface vs. the existing distribution
+  model — the key is already extractable from any installed `.app`
+  via `strings` on the binary. Adding it to git just adds a second
+  exposure vector with worse durability.
+- A Claude Code permission hook actively flagged this pattern when
+  asked to stage the file; the policy is the right one and we
+  honor it.
+
+**Industry alternatives reviewed (none chosen for beta, but logged
+for context):**
+
+| # | Pattern | Used by | Why not for Magpie beta |
+|---|---|---|---|
+| 1 | Backend proxy (server holds key) | ChatGPT, Claude, Cursor, Raycast Pro, ~all consumer AI desktops | This IS the Plan #40 migration target — just not built yet (~1-2 days of fly.io work) |
+| 2 | BYOK — user pastes own key | Open WebUI, LM Studio, Continue.dev | Adds technical friction non-developers don't want to navigate |
+| 3 | OAuth sign-in → session token | Linear, Slack, Discord, Anthropic Console | Needs identity infra + Tauri deep-link OAuth handoff (~3-5 days) |
+| 4 | Time-limited tokens issued by your server | Some enterprise apps | Strict superset of option 1; premature without 1 first |
+| 5 | Bundled shared key (current Magpie beta) | Closed betas, prototypes, internal tools | Acceptable for ≤50 trusted testers with spend cap; not for public launch |
+
+The migration trigger remains as documented above (public download
+page, ~50 installs, leak indicators, or provider swap). Until then,
+the bundled-key + spend-cap posture is the explicitly-accepted
+trade-off.
+
+**Release-build operational checklist** (until Plan #40 ships):
+
+1. Confirm `src/config/bundled_key.txt` is present on the local
+   build machine (build script's `_warn_if_bundled_key_missing`
+   prints `bundled_key.txt present` when so).
+2. Run `uv run python scripts/build_sidecar.py`. Confirm no
+   `⚠ bundled_key.txt MISSING` warning.
+3. Build the .app, smoke-test that the Cloud toggle returns a real
+   answer (validates the bundled key survived PyInstaller's
+   `_MEIPASS` extraction at runtime).
+4. **Don't commit the file.** Don't paste it in Slack / Discord /
+   docs. Rotate immediately if it leaks.
+5. CI builds (eventual) will need a `BUNDLED_OPENROUTER_KEY` GitHub
+   secret + a workflow step that writes it to
+   `src/config/bundled_key.txt` before `pnpm tauri build`. NOT
+   YET WIRED — current CI builds will produce binaries with no
+   Cloud key, so Cloud toggle will be unavailable until either
+   Plan #40 ships or this CI wiring lands.
+
 ---

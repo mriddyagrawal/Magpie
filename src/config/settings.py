@@ -54,8 +54,13 @@ class AppDefaults(BaseModel):
 
     version: int = 1
 
-    # Provider selection (binary user-facing choice)
-    provider: str = "local"  # "local" | "cloud"
+    # Provider selection (binary user-facing choice). Default "cloud"
+    # because (a) the bundled OpenRouter key works out of the box on
+    # fresh installs, while Local requires a ~5 GB Gemma + ~900 MB
+    # mmproj download on first use; (b) Cloud queries are faster
+    # (~1-2s) than Local (~5-30s on consumer hardware). Users who
+    # value privacy / offline flip to Local in Settings → Search & AI.
+    provider: str = "cloud"  # "local" | "cloud"
 
     # Search / retrieval knobs
     top_k: int = Field(default=5, ge=1, le=20)

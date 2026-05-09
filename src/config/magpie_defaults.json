@@ -147,7 +147,7 @@
 
   "_app_settings_comment": "Below: defaults for the user-facing app settings (provider choice, retrieval knobs, theme, etc.). Read by AppDefaults in src/config/settings.py; ignored by MagpieDefaults (indexing-rules side) via Pydantic extra='ignore'. Cloud routing (cloud_provider, per-provider models, API keys) lives in secrets.json next to the credentials, not here.",
 
-  "provider": "local",
+  "provider": "cloud",
   "top_k": 5,
   "rewrite_default": false,
   "temperature": 0.7,

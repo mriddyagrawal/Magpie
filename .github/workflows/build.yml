@@ -140,50 +140,38 @@ jobs:
       # Windows installer" → "Upload" sequence with the standard OSS Tauri
       # release pattern. Handles:
       #   - cross-platform tauri build (same `pnpm tauri build`)
-      #   - macOS code signing (via APPLE_CERTIFICATE etc.)
-      #   - Windows authenticode signing (via WINDOWS_CERTIFICATE etc.)
-      #   - latest.json generation (auto-updater manifest)
+      #   - latest.json generation (auto-updater manifest, when keys exist)
       #   - GitHub Release creation as DRAFT — promote manually when ready
-      # All env vars are silently ignored if their corresponding secret is
-      # not set, so the action degrades gracefully on a fresh repo.
+      #
+      # NO signing env vars are passed here — same reason as the compile-only
+      # step above. GitHub Actions resolves an unset secret to an empty
+      # string (not "absent"), and tauri-action treats "APPLE_CERTIFICATE
+      # is set, value is empty" as "user wants signing", then fails on
+      # `security import` with: "SecKeychainItemImport: One or more
+      # parameters passed to a function were not valid". Same shape on the
+      # updater key path. Beta posture is unsigned across the board (see
+      # Plans/Packaging/Implementation Plan.md §Step 5 and Future Plans
+      # #37). When real certs/keys are procured, re-add the env vars
+      # individually as those secrets get populated:
+      #
+      #   For macOS signing (Plan #37, lane 1):
+      #     APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY,
+      #     APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID
+      #
+      #   For Windows signing (Plan #37, lane 2 — also needs a separate
+      #   pre-tauri-action cert-import step + bundle.windows.signCommand
+      #   in tauri.conf.json; tauri-action does not sign Windows natively):
+      #     WINDOWS_CERTIFICATE, WINDOWS_CERTIFICATE_PASSWORD
+      #
+      #   For auto-updater signing (Plan #39):
+      #     TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+      #     (also requires flipping createUpdaterArtifacts +
+      #     plugins.updater.active back to true in tauri.conf.json)
       - name: Build + sign + draft release (tauri-action)
         if: ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Auto-updater signing — REQUIRED for users to receive updates.
-          # Generate with `pnpm tauri signer generate -- -w ~/.tauri/magpie-updater.key`,
-          # then paste the printed PRIVATE key into Settings → Secrets as
-          # TAURI_SIGNING_PRIVATE_KEY. The matching public key goes in
-          # tauri.conf.json's plugins.updater.pubkey field.
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          # macOS Apple Developer signing + notarization. Skipped automatically
-          # if APPLE_CERTIFICATE secret is not set.
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # Windows EV cert signing — passed through but NOT YET WIRED.
-          # tauri-action does NOT sign Windows builds natively. Per Tauri docs
-          # (https://v2.tauri.app/distribute/sign/windows/), Windows signing
-          # requires EITHER:
-          #   (a) a pre-tauri-action step that imports the cert into the
-          #       Windows cert store + a `bundle.windows.signCommand` block
-          #       in tauri.conf.json that runs signtool during build, OR
-          #   (b) a post-tauri-action step that signs the produced .exe with
-          #       signtool, BUT — the GitHub Release attachment will be the
-          #       UNSIGNED version because tauri-action uploads before the
-          #       post-step runs.
-          # Until the EV cert is procured, leave these env vars passed through
-          # (no harm) and TODO: when the EV cert lands, switch to approach (a).
-          # The previous workflow used approach (b); accepted the
-          # release-uploads-unsigned-bytes trade-off because the cert wasn't
-          # in place yet.
-          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         with:
           projectPath: frontend
           # `__VERSION__` is replaced by tauri-action with the value from
@@ -194,7 +182,10 @@ jobs:
           releaseName: 'Magpie v__VERSION__'
           releaseDraft: true       # nothing publishes automatically
           prerelease: false
-          includeUpdaterJson: true # generates latest.json for the updater
+          # Auto-updater manifest disabled in beta — pairs with
+          # tauri.conf.json's createUpdaterArtifacts: false. Flip back to
+          # true when Plan #39 (updater signing) ships.
+          includeUpdaterJson: false
 
       # ── Smoke-test the bundled sidecar (validates T1+T2 exclude correctness) ──
       # Scope: catches Tier 1 (torch.distributed, torch.onnx, ...) and Tier 2

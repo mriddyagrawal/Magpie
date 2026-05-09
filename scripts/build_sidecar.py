@@ -144,7 +144,18 @@ def main() -> None:
         # Plan #10 PR-E. Tier 2 (torch.fx, torch._dynamo, sympy, mpmath) goes
         # in ONE AT A TIME with smoke tests; Tier 3 (transformers.models.<unused>)
         # is deferred. See `Plans/Packaging/Implementation Plan.md` §5.
-        "--exclude-module", "torch.distributed",       # multi-node training
+        #
+        # NOTE 2026-05-09: `torch.distributed` was originally excluded under the
+        # "multi-node training only" assumption. That assumption is wrong:
+        # sentence-transformers / transformers / colpali-engine all reach into
+        # `torch.distributed.*` (e.g. `torch.distributed.fsdp`, ProcessGroup
+        # symbols imported at module-load time of certain transformer
+        # architectures). Excluding it raises `ModuleNotFoundError: No module
+        # named 'torch.distributed'` on the FIRST query — after retrieval
+        # completes, when the cross-encoder reranker / answer model loads.
+        # CI's /healthz smoke doesn't exercise this path so the regression slips
+        # through. Removed from the exclude list. ~30-50 MB lost vs broken
+        # queries; trivially worth it.
         "--exclude-module", "torch.onnx",              # we don't export
         "--exclude-module", "torch.profiler",          # debug-only
         "--exclude-module", "torch.tensorboard",       # tensorboard logging

@@ -2949,3 +2949,150 @@ trade-off.
    Plan #40 ships or this CI wiring lands.
 
 ---
+
+## 41. App-quit lifecycle — Cmd+Q binding + graceful child shutdown
+
+**Tags:** desktop · ux · process-lifecycle · cleanup · post-beta
+
+**Two related gaps in the macOS Quit flow surfaced during the
+2026-05-09 packaging smoke. Functional today via the orphan-cleanup
+safety net, but worth fixing before the polish bar gets raised.**
+
+### Gap A — Cmd+Q does nothing
+
+The macOS app menu currently has only "Settings…":
+
+```rust
+// frontend/src-tauri/src/lib.rs ~ line 330
+let app_settings_item = MenuItem::with_id(
+    app, "menu_settings", "Settings…", true, Some("Cmd+,"),
+)?;
+let magpie_menu = Submenu::with_items(
+    app, "Magpie", true, &[&app_settings_item],
+)?;
+```
+
+There's no Quit MenuItem registered, so the system Cmd+Q shortcut
+has nothing to bind to and silently does nothing on the macOS side.
+The tray menu's "Quit Magpie" still works (separate widget), but
+users discover Cmd+Q first and report "can't quit."
+
+**Fix (~5 LOC):** add a Quit MenuItem with `Some("Cmd+Q")`
+accelerator to the Magpie submenu, route its menu event id to
+the same `app.exit(0)` path the tray menu uses:
+
+```rust
+let quit_app_item = MenuItem::with_id(
+    app, "menu_quit", "Quit Magpie", true, Some("Cmd+Q"),
+)?;
+let magpie_menu = Submenu::with_items(
+    app, "Magpie", true, &[&app_settings_item, &quit_app_item],
+)?;
+// ... in on_menu_event:
+} else if event.id() == "menu_quit" {
+    app_handle.exit(0);
+}
+```
+
+Cross-platform note: only fires under `#[cfg(target_os = "macos")]`
+(matches the existing app-menu block). Linux/Windows don't have a
+native app menu pattern to mirror; their Quit goes through the tray
+menu, which already works.
+
+### Gap B — Tray Quit kills sidecar via SIGKILL → llama-server orphans
+
+Current shutdown handler at lib.rs:454-464:
+
+```rust
+RunEvent::Exit => {
+    let _ = child.kill();   // sidecar
+    let _ = child.kill();   // qdrant
+}
+```
+
+`child.kill()` on Unix sends SIGKILL — uncatchable, instant
+termination. The Python sidecar dies before its `atexit` /
+signal handlers can clean up its own subprocesses (most notably
+`llama-server`, which it spawned via subprocess.Popen). llama-server
+gets reparented to launchd and lives on.
+
+Empirical evidence (2026-05-09 bootstrap logs across multiple
+launches):
+```
+orphan scan: killing pid=34305: .../llama-server --model gemma-4-...
+orphan scan: killing pid=36843: .../llama-server --model gemma-4-...
+```
+The orphan-cleanup-at-startup catches these, so the system is
+**self-healing across restarts**. But the in-session Quit isn't
+fully clean, and on machines short on RAM the orphaned llama-server
+keeps holding ~2-4 GB until the next Magpie launch.
+
+**Fix:** SIGTERM-then-SIGKILL escalation. Send SIGTERM first, give
+the sidecar ~2-3s to handle it gracefully (which means killing
+llama-server itself), then SIGKILL if it didn't exit. Plus the
+sidecar needs a SIGTERM handler that calls
+`llama_server_pool.shutdown()` to terminate llama-server children.
+
+```rust
+// Rust side — frontend/src-tauri/src/lib.rs:
+RunEvent::Exit => {
+    if let Some(mut child) = ...sidecar... {
+        // Try graceful first.
+        unsafe { libc::kill(child.id() as i32, libc::SIGTERM); }
+        let deadline = std::time::Instant::now() + Duration::from_secs(3);
+        while child.try_wait().ok().flatten().is_none()
+            && std::time::Instant::now() < deadline
+        {
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        let _ = child.kill();   // SIGKILL if still alive
+        let _ = child.wait();
+    }
+    // Same pattern for qdrant.
+}
+```
+
+```python
+# Python side — register before app starts:
+import signal
+from src.inference.llama_server_pool import LlamaServerPool
+
+def _handle_sigterm(signum, frame):
+    LlamaServerPool.instance().shutdown_all()
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, _handle_sigterm)
+```
+
+(The pool's shutdown method already exists at
+[`llama_server_pool.py:197`](../src/inference/llama_server_pool.py#L197);
+just needs the signal binding.)
+
+### Why "post-beta"
+
+Both gaps are functional today via the orphan-cleanup-at-startup
+safety net (5cabf92 / `kill_orphan_subprocesses()`). Beta testers
+won't notice unless they're watching Activity Monitor, and even
+then the reaper catches things on next launch. Worth fixing for
+public release because:
+
+- Power users notice the orphan llama-server (2-4 GB RSS)
+- Cmd+Q is a discoverable expectation; "can't quit" reports look
+  bad even if the tray menu works
+- Cleaner shutdown reduces "took too long" failure modes during
+  rapid Magpie restart cycles
+
+Estimated total: ~half day. Cmd+Q is 15 minutes; SIGTERM
+escalation + Python signal handler is the bigger piece.
+
+### Trigger to start
+
+Any of:
+- First public download or pre-announce demo (Cmd+Q "broken" is a
+  too-easy first impression to give)
+- Beta tester reports "Magpie left a process running" / observes
+  high memory after quit
+- Plan #40 lands (since hosted Cloud users will use Magpie more
+  often → more launches → more orphan accumulation observed)
+
+---

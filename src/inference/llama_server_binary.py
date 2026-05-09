@@ -184,8 +184,70 @@ DEFAULT_MIN_VERSION = "b9049"
 
 def resolve_and_check() -> Path:
     """Find the binary AND verify it's recent enough. Single entrypoint
-    the pool manager calls at startup. Caches nothing — caller does."""
-    binary = find_llama_server()
+    the pool manager calls at startup. Caches nothing — caller does.
+
+    On a fresh install (packaged .app, no `just install-llama-server`
+    ever run), `find_llama_server()` would raise immediately and the
+    user's first Local-provider request would die with a confusing
+    "binary not found" message. To make Local work out of the box,
+    we trigger an auto-install when no binary is found yet — the
+    same install_llama_server.main() flow `just install-llama-server`
+    invokes, just from inside the sidecar process.
+
+    The auto-install downloads ~30 MB and extracts to
+    `APP_DATA_DIR/bin/llama-server` (~120 MB unpacked). Cached after
+    first run; subsequent calls find the binary on path-1 of the
+    candidate list and skip the install branch entirely.
+    """
+    try:
+        binary = find_llama_server()
+    except LlamaServerBinaryError:
+        binary = _auto_install()
     min_version = os.environ.get("LLAMA_SERVER_MIN_VERSION", DEFAULT_MIN_VERSION)
     assert_min_version(binary, min_version)
     return binary
+
+
+def _auto_install() -> Path:
+    """First-launch llama-server install. Mirrors what
+    `just install-llama-server` does, just inline so the packaged
+    .app can self-bootstrap without a terminal step.
+
+    Blocks the calling thread for ~30-60s on a typical broadband
+    connection (download + extract). The pool manager calls
+    `resolve_and_check()` from inside `_ensure_setup()` which is
+    already serialized via lock, so we won't race with concurrent
+    installs.
+
+    Errors propagate as `LlamaServerBinaryError` (the same exception
+    type the not-found path raises) so the Settings UI's existing
+    handling still works.
+    """
+    print(
+        "[llama-server] not found locally — auto-installing for first "
+        "Local-provider use. This downloads ~30 MB + extracts to "
+        f"{APP_DATA_DIR}/bin/.",
+        file=sys.stderr,
+    )
+    try:
+        from src.tools.install_llama_server import (
+            download_and_install as _install,
+            InstallError,
+        )
+    except ImportError as e:
+        raise LlamaServerBinaryError(
+            f"could not import install_llama_server module: {e}. "
+            "This shouldn't happen in a packaged build — please report it."
+        ) from e
+    try:
+        _install()
+    except InstallError as e:
+        raise LlamaServerBinaryError(
+            f"auto-install of llama-server failed: {e}. "
+            "Try running `just install-llama-server` manually, or set "
+            "LLAMA_SERVER_PATH=/abs/path/to/llama-server."
+        ) from e
+    # install_llama_server.main() places the binary at the first
+    # candidate path (`APP_DATA_DIR/bin/llama-server`). Re-run the
+    # discovery so the caller gets a verified Path object.
+    return find_llama_server()

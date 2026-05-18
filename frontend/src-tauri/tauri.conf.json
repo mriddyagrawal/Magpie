@@ -37,14 +37,27 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "dmg"],
+    "targets": "all",
+    "externalBin": ["binaries/magpie-sidecar", "binaries/qdrant"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns"
+      "icons/icon.icns",
+      "icons/icon.ico"
     ],
     "category": "Productivity",
-    "shortDescription": "Semantic search over your local files"
+    "shortDescription": "Semantic search over your local files",
+    "createUpdaterArtifacts": false
+  },
+  "plugins": {
+    "updater": {
+      "active": false,
+      "dialog": false,
+      "endpoints": [
+        "https://github.com/mriddyagrawal/NotAnotherSpotlight/releases/latest/download/latest.json"
+      ],
+      "pubkey": "REPLACE_WITH_PUBLIC_KEY_FROM_TAURI_SIGNER_GENERATE"
+    }
   }
 }

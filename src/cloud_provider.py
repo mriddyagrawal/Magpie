@@ -199,21 +199,41 @@ def _parse_summarize_message(message: list) -> tuple[str, str]:
 # ---------------------------------------------------------------------------
 
 class _CloudAgentBase(Generic[T]):
-    """Common machinery: the cloud client and the output Pydantic class."""
+    """Common machinery: the cloud client and the output Pydantic class.
+
+    `thinking=True` is accepted for protocol compatibility with the local
+    backend but is currently a no-op (warns once via `src.llm`). When the
+    Magpie Cloud server adds a reasoning surface to its `/llm/*` endpoints,
+    we forward the flag in the POST body instead of dropping it. See
+    Plans/Future Plans.md #16.
+    """
 
     def __init__(self, output_type: type[T]) -> None:
         self._output_type = output_type
         self._client = CloudClient()
 
-    def run_sync(self, message: list) -> T:
-        return asyncio.get_event_loop().run_until_complete(self.run(message))
+    def run_sync(self, message: list, *, thinking: bool = False) -> T:
+        return asyncio.get_event_loop().run_until_complete(
+            self.run(message, thinking=thinking)
+        )
 
-    async def run(self, message: list) -> T:
+    async def run(self, message: list, *, thinking: bool = False) -> T:
         raise NotImplementedError
 
 
+def _maybe_warn_thinking(thinking: bool) -> None:
+    """Cloud paths don't yet honor `thinking`; warn once via the shared
+    helper in src.llm so the magpie-cloud / openrouter / moonshot warnings
+    all share a single throttle."""
+    if not thinking:
+        return
+    from src.llm import _warn_cloud_thinking_unsupported
+    _warn_cloud_thinking_unsupported("magpie-cloud")
+
+
 class CloudRewriteAgent(_CloudAgentBase[T]):
-    async def run(self, message: list) -> T:
+    async def run(self, message: list, *, thinking: bool = False) -> T:
+        _maybe_warn_thinking(thinking)
         # The rewrite call is text-only and the message is just the question
         # (plus possibly history lines). For simplicity we forward the joined
         # text as `question`; history threading on cloud-side TBD.
@@ -224,7 +244,8 @@ class CloudRewriteAgent(_CloudAgentBase[T]):
 
 
 class CloudAnswerAgent(_CloudAgentBase[T]):
-    async def run(self, message: list) -> T:
+    async def run(self, message: list, *, thinking: bool = False) -> T:
+        _maybe_warn_thinking(thinking)
         question, snippets = _parse_answer_message(message)
         body = await self._client.post(
             "/llm/answer",
@@ -237,7 +258,8 @@ class CloudAnswerAgent(_CloudAgentBase[T]):
 
 
 class CloudSummarizeAgent(_CloudAgentBase[T]):
-    async def run(self, message: list) -> T:
+    async def run(self, message: list, *, thinking: bool = False) -> T:
+        _maybe_warn_thinking(thinking)
         filename, text = _parse_summarize_message(message)
         body = await self._client.post(
             "/llm/summarize",

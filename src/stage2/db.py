@@ -1,11 +1,26 @@
-"""Qdrant Cloud client setup and collection operations."""
+"""Qdrant client setup and collection operations.
+
+Magpie targets exactly one Qdrant deployment shape: **the real Qdrant Rust
+binary running on localhost.** No remote clusters; no Python embedded shim.
+Both alternatives were dropped 2026-05:
+
+  - The remote-cluster mode broke Magpie's "files never leave your machine"
+    privacy promise. If you want a hosted setup, use Qdrant Cloud directly
+    in your own service — Magpie does not.
+  - The Python embedded shim silently dropped quantization, payload
+    indexes, snapshots, and other features of the real Rust server. It
+    always misled at-scale tests, so we removed the option entirely.
+
+Run Qdrant locally via `just qdrant-install && just qdrant-up`. Default
+endpoint is `http://localhost:6433`. Override with `QDRANT_CLUSTER_ENDPOINT`
+ONLY for changing the port — the host must resolve to loopback.
+"""
 
 from __future__ import annotations
 
 import hashlib
 import os
 import sys
-from pathlib import Path
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
@@ -13,6 +28,7 @@ from qdrant_client.models import (
     Modifier,
     NamedSparseVector,
     NamedVector,
+    PayloadSchemaType,
     PointStruct,
     SparseIndexParams,
     SparseVector,
@@ -20,71 +36,40 @@ from qdrant_client.models import (
     VectorParams,
 )
 
-from src.manifest import APP_DATA_DIR
 from src.stage2.embeddings import DENSE_VECTOR_SIZE, embed_dense, embed_sparse
 from src.stage2.parser import ParsedSummary
 
 COLLECTION_NAME = "summaries"
 
-_DEFAULT_LOCAL_PATH = APP_DATA_DIR / "qdrant_data"
+_LOCALHOST_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+_DEFAULT_ENDPOINT = "http://localhost:6433"
 
 _client: QdrantClient | None = None
 
 
 def get_qdrant_client() -> QdrantClient:
-    """Return a cached Qdrant client.
+    """Return a cached Qdrant client pointing at the local Rust binary.
 
-    Selected by `QDRANT_PROVIDER` env var (default: ``cloud``):
+    Reads `QDRANT_CLUSTER_ENDPOINT` (default: `http://localhost:6433`).
+    Hard-errors if the host isn't loopback — Magpie is local-first by
+    design and remote clusters would silently leak the index off the
+    user's machine.
 
-    - ``cloud``   — Qdrant server reachable over HTTP(S) — either Qdrant Cloud
-                    (paid, remote) or a self-hosted server you spawned locally
-                    (e.g. via `just qdrant-up`, Docker, or systemd).
-                    Required: ``QDRANT_CLUSTER_ENDPOINT``.
-                    Optional: ``QDRANT_API_KEY`` — required for Cloud, ignored
-                    for self-hosted-localhost (auth is off by default there).
-    - ``local``   — embedded Python Qdrant shim persisted to a SQLite DB. No
-                    server, no network. Directory from ``QDRANT_LOCAL_PATH``
-                    (default: ``./qdrant_data``). NOTE: this Python library
-                    silently drops every advanced feature — quantization, fp16,
-                    binary, snapshots — because it is not the real Rust server.
-                    Use ``cloud`` mode pointing at ``http://localhost:6333``
-                    when storage compression matters. See backlog E4.
+    No API key needed: localhost Qdrant has no auth by default and we
+    don't support running it with auth.
     """
     global _client
     if _client is not None:
         return _client
 
-    provider = os.environ.get("QDRANT_PROVIDER", "cloud").strip().lower()
+    url = os.environ.get("QDRANT_CLUSTER_ENDPOINT", "").strip() or _DEFAULT_ENDPOINT
 
-    if provider == "local":
-        path = Path(os.environ.get("QDRANT_LOCAL_PATH") or _DEFAULT_LOCAL_PATH)
-        if not path.is_absolute():
-            path = _REPO_ROOT / path
-        path.mkdir(parents=True, exist_ok=True)
-        _client = QdrantClient(path=str(path))
-        return _client
-
-    if provider != "cloud":
+    if not _is_localhost_url(url):
         sys.exit(
-            f"error: QDRANT_PROVIDER={provider!r} is unknown. "
-            f"Valid values: cloud, local."
-        )
-
-    url = os.environ.get("QDRANT_CLUSTER_ENDPOINT")
-    if not url:
-        sys.exit(
-            "error: QDRANT_CLUSTER_ENDPOINT must be set in .env "
-            "(or set QDRANT_PROVIDER=local to use the embedded Python shim)."
-        )
-
-    # API key is required for Qdrant Cloud (anything not on a private host) but
-    # optional for a self-hosted server reachable on localhost — those default
-    # to no auth. Treat empty/whitespace as "no auth" for the localhost case.
-    api_key = os.environ.get("QDRANT_API_KEY", "").strip() or None
-    if api_key is None and not _is_localhost_url(url):
-        sys.exit(
-            f"error: QDRANT_API_KEY must be set for non-local QDRANT_CLUSTER_ENDPOINT "
-            f"(got {url!r}). Set the key, or point at http://localhost:6333."
+            f"error: QDRANT_CLUSTER_ENDPOINT={url!r} is not a localhost URL. "
+            f"Magpie only supports a Qdrant Rust binary running locally. "
+            f"Run `just qdrant-install && just qdrant-up`, or override the "
+            f"port via QDRANT_CLUSTER_ENDPOINT=http://localhost:<port>."
         )
 
     # The qdrant-client default timeout (5s) is too tight for large
@@ -92,13 +77,10 @@ def get_qdrant_client() -> QdrantClient:
     # so a 32-page batch is ~6 MB plus indexing time. On a busy local server
     # mid-ingest this can occasionally spike past 5s. 60s is generous but
     # only blocks when Qdrant is genuinely slow. Override via env var if
-    # your server / network needs more.
+    # your machine / disk genuinely needs more.
     timeout_s = int(os.environ.get("QDRANT_TIMEOUT_S", "60"))
-    _client = QdrantClient(url=url, api_key=api_key, timeout=timeout_s)
+    _client = QdrantClient(url=url, timeout=timeout_s)
     return _client
-
-
-_LOCALHOST_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
 
 
 def _upsert_with_retry(
@@ -221,17 +203,34 @@ def create_collection(*, recreate: bool = False) -> None:
     that any existing collection's dense dim matches the current model — if
     it doesn't, raises `DenseDimMismatchError` rather than letting cryptic
     Qdrant errors leak through downstream upsert / search.
+
+    Always (re)attempts to install the `source_path` payload index — it's
+    a hot-path filter for delete-by-path / orphan cleanup, and CSV row
+    points multiply `source_path` cardinality enough that a missing
+    index means full-scan deletes on every CSV change. Idempotent: if
+    the index already exists, Qdrant returns a no-op.
     """
     client = get_qdrant_client()
 
     if recreate:
         client.delete_collection(COLLECTION_NAME)
-    elif client.collection_exists(COLLECTION_NAME):
+        _create_summaries_collection(client)
+        _ensure_summaries_payload_indexes(client)
+        return
+    if client.collection_exists(COLLECTION_NAME):
         # Existing collection: enforce dim match before returning. Silent
         # mismatch would corrupt every subsequent upsert / search.
         assert_dense_dim_match(client, COLLECTION_NAME)
+        # Re-run idempotent index creation so existing collections gain
+        # the index without requiring a recreate (added 2026-05).
+        _ensure_summaries_payload_indexes(client)
         return
 
+    _create_summaries_collection(client)
+    _ensure_summaries_payload_indexes(client)
+
+
+def _create_summaries_collection(client: QdrantClient) -> None:
     client.create_collection(
         collection_name=COLLECTION_NAME,
         vectors_config={
@@ -247,6 +246,26 @@ def create_collection(*, recreate: bool = False) -> None:
             ),
         },
     )
+
+
+def _ensure_summaries_payload_indexes(client: QdrantClient) -> None:
+    """Install payload indexes on `summaries`. Idempotent — wraps each
+    create call so an "already exists" response (Qdrant raises rather
+    than no-ops on some versions) doesn't break the caller.
+
+    `source_path` (KEYWORD): hot-path filter for delete-by-path during
+    re-ingestion / orphan cleanup. Without it, every CSV row deletion
+    full-scans the whole `summaries` collection.
+    """
+    try:
+        client.create_payload_index(
+            collection_name=COLLECTION_NAME,
+            field_name="source_path",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+    except Exception:  # pylint: disable=broad-except
+        # "already exists" or similar — safe to ignore.
+        pass
 
 
 def _point_id(key: str) -> str:
@@ -333,7 +352,12 @@ def upsert_summaries(
                         "sparse": SparseVector(indices=sparse_idx, values=sparse_val),
                     },
                     payload={
-                        "summary": s.summary,
+                        # Path-only payload (2026-05). The summary prose
+                        # for display is reconstructed at query time by
+                        # re-reading the markdown at <APP_DATA_DIR>/
+                        # summaries/<hash>_<tier>.md (looked up via
+                        # the manifest entry's `summary_file`). Saves
+                        # significant Qdrant payload bytes at scale.
                         "source_path": s.source_path,
                     },
                 )

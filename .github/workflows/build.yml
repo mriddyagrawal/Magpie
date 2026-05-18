@@ -1,0 +1,277 @@
+name: Build
+
+# Trigger matrix:
+#   - Push to main / front-back / UI: validates build compiles, uploads
+#     artifacts for inspection. NO release created.
+#   - Push of tag matching v* (e.g. v0.1.1): full release flow via
+#     tauri-apps/tauri-action — builds, signs, generates latest.json,
+#     creates a draft GitHub Release with .dmg/.AppImage/.exe attached.
+#   - Pull request: same as branch push (compile validation only).
+#   - Manual workflow_dispatch: also triggers the full release flow,
+#     useful for testing the release pipeline without cutting a tag.
+on:
+  push:
+    # `packaging` is a temporary trigger — Plan #10 validation branch.
+    # Remove from this list once `packaging` merges to main.
+    branches: [main, front-back, UI, packaging]
+    tags: ['v*']
+  pull_request:
+    branches: [main, front-back, UI, packaging]
+  workflow_dispatch:
+
+jobs:
+  build:
+    # `contents: write` is REQUIRED for tauri-action to create the draft
+    # GitHub Release on tag pushes. Without it, the action errors with
+    # "Resource not accessible by integration" — the most common
+    # tauri-action setup mistake. Per
+    # https://v2.tauri.app/distribute/pipelines/github/.
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: frontend/src-tauri/target/release/bundle/nsis/*.exe
+
+          - os: macos-14
+            target: aarch64-apple-darwin
+            artifact: frontend/src-tauri/target/release/bundle/dmg/*.dmg
+
+          - os: macos-13
+            target: x86_64-apple-darwin
+            artifact: frontend/src-tauri/target/release/bundle/dmg/*.dmg
+
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact: |
+              frontend/src-tauri/target/release/bundle/deb/*.deb
+              frontend/src-tauri/target/release/bundle/appimage/*.AppImage
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.target }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Python / uv ────────────────────────────────────────────────────────
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install Python deps (includes pyinstaller)
+        run: uv sync --group dev --group packaging
+
+      - name: Download Qdrant binary
+        run: uv run python scripts/download_qdrant.py
+
+      - name: Build Python sidecar
+        run: uv run python scripts/build_sidecar.py
+
+      # ── Node / pnpm ────────────────────────────────────────────────────────
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: pnpm install
+
+      # ── Rust ───────────────────────────────────────────────────────────────
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: frontend/src-tauri -> target
+
+      # ── Linux system deps (Tauri needs webkit2gtk) ─────────────────────────
+      - name: Install Linux system deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      # ── Branch / PR builds: just compile, no release ──────────────────────
+      # `pnpm tauri build` directly. Validates compilation across all four
+      # platforms in the matrix. Artifacts uploaded below for download.
+      #
+      # NO signing env vars are passed here — the branch path validates
+      # COMPILATION only, never signing. Why this matters: GitHub Actions
+      # resolves an unset secret to an empty string, not to an unset env
+      # var. Passing `APPLE_SIGNING_IDENTITY=""` makes Tauri's macOS
+      # bundler attempt codesign with the literal empty identity, which
+      # fails on a CI runner with an empty keychain ("Signing with
+      # identity '' / The specified item could not be found in the
+      # keychain"). Same shape on Linux/Windows for the updater key.
+      # Beta posture is unsigned (see Plans/Packaging/Implementation
+      # Plan.md §Step 5), so just don't trigger any signing path here.
+      # Once secrets are populated AND tauri.conf.json's
+      # createUpdaterArtifacts / plugins.updater.active are flipped on,
+      # signing happens only on the tag/dispatch path below.
+      - name: Build Tauri app (compile-only)
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
+        working-directory: frontend
+        run: pnpm tauri build
+
+      # ── Tag / dispatch builds: full release flow via tauri-action ─────────
+      # Replaces the previous custom "Import Apple cert" → "Build" → "Sign
+      # Windows installer" → "Upload" sequence with the standard OSS Tauri
+      # release pattern. Handles:
+      #   - cross-platform tauri build (same `pnpm tauri build`)
+      #   - macOS code signing (via APPLE_CERTIFICATE etc.)
+      #   - Windows authenticode signing (via WINDOWS_CERTIFICATE etc.)
+      #   - latest.json generation (auto-updater manifest)
+      #   - GitHub Release creation as DRAFT — promote manually when ready
+      # All env vars are silently ignored if their corresponding secret is
+      # not set, so the action degrades gracefully on a fresh repo.
+      - name: Build + sign + draft release (tauri-action)
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Auto-updater signing — REQUIRED for users to receive updates.
+          # Generate with `pnpm tauri signer generate -- -w ~/.tauri/magpie-updater.key`,
+          # then paste the printed PRIVATE key into Settings → Secrets as
+          # TAURI_SIGNING_PRIVATE_KEY. The matching public key goes in
+          # tauri.conf.json's plugins.updater.pubkey field.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # macOS Apple Developer signing + notarization. Skipped automatically
+          # if APPLE_CERTIFICATE secret is not set.
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Windows EV cert signing — passed through but NOT YET WIRED.
+          # tauri-action does NOT sign Windows builds natively. Per Tauri docs
+          # (https://v2.tauri.app/distribute/sign/windows/), Windows signing
+          # requires EITHER:
+          #   (a) a pre-tauri-action step that imports the cert into the
+          #       Windows cert store + a `bundle.windows.signCommand` block
+          #       in tauri.conf.json that runs signtool during build, OR
+          #   (b) a post-tauri-action step that signs the produced .exe with
+          #       signtool, BUT — the GitHub Release attachment will be the
+          #       UNSIGNED version because tauri-action uploads before the
+          #       post-step runs.
+          # Until the EV cert is procured, leave these env vars passed through
+          # (no harm) and TODO: when the EV cert lands, switch to approach (a).
+          # The previous workflow used approach (b); accepted the
+          # release-uploads-unsigned-bytes trade-off because the cert wasn't
+          # in place yet.
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        with:
+          projectPath: frontend
+          # `__VERSION__` is replaced by tauri-action with the value from
+          # tauri.conf.json. Each matrix job uploads to the SAME release
+          # (deduplicated by tagName), so tagged tag-pushes get one release
+          # with .dmg + .AppImage + .deb + .exe attached + latest.json.
+          tagName: app-v__VERSION__
+          releaseName: 'Magpie v__VERSION__'
+          releaseDraft: true       # nothing publishes automatically
+          prerelease: false
+          includeUpdaterJson: true # generates latest.json for the updater
+
+      # ── Smoke-test the bundled sidecar (validates T1+T2 exclude correctness) ──
+      # Scope: catches Tier 1 (torch.distributed, torch.onnx, ...) and Tier 2
+      # (torch.fx, torch._dynamo, sympy, mpmath) breaks. These excludes break
+      # at MODULE-IMPORT TIME — if PyInstaller cuts something the binary needs
+      # at startup, the process dies in the first second and /healthz never
+      # responds. Launch + poll catches that on every push, every platform.
+      #
+      # Out of scope: Tier 3 (transformers.models.<arch>). Those don't break
+      # bundle import — they ImportError only when AutoModel.from_pretrained
+      # dynamically loads a missing arch at query time. Catching that in CI
+      # would require downloading 5 GB of HF models per matrix job, which is
+      # wasteful and fragile. Decision: Tier 3 is validated manually on each
+      # target platform (macOS arm64/x86_64, Linux, Windows) before tagging
+      # releases, never in CI. See scripts/build_sidecar.py comments around
+      # the Tier 3 block for the per-platform manual validation flow.
+      #
+      # Failure modes caught:
+      #   - the process dies before responding (T1/T2 ImportError on import)
+      #   - /healthz doesn't respond within 60s (server hung)
+      #
+      # Runs on EVERY trigger (PR, push, tag, dispatch). Each platform
+      # validates its own bundle independently — cross-OS exclude regressions
+      # surface as N failed matrix jobs.
+      - name: Smoke-test bundled sidecar
+        shell: bash
+        run: |
+          set -e
+          BIN="frontend/src-tauri/binaries/magpie-sidecar-${{ matrix.target }}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            BIN="${BIN}.exe"
+          fi
+
+          if [ ! -x "$BIN" ]; then
+            echo "::error::binary missing or not executable: $BIN"
+            ls -la frontend/src-tauri/binaries/
+            exit 1
+          fi
+
+          echo "launching sidecar from $BIN on port 18765..."
+          "$BIN" --port 18765 > /tmp/sidecar.stdout 2> /tmp/sidecar.stderr &
+          SIDECAR_PID=$!
+
+          # Wait up to 60 s for /healthz to respond, polling every 1 s.
+          # Bail early if the sidecar process dies (most exclude-related
+          # ImportErrors crash on import, not after a network round-trip).
+          for i in $(seq 1 60); do
+            if ! kill -0 $SIDECAR_PID 2>/dev/null; then
+              echo "::error::sidecar died after $i s. stderr:"
+              tail -50 /tmp/sidecar.stderr
+              echo "::error::stdout:"
+              tail -20 /tmp/sidecar.stdout
+              exit 1
+            fi
+            if curl -fsS http://localhost:18765/healthz > /dev/null 2>&1; then
+              echo "✅ sidecar /healthz responded after $i s"
+              kill $SIDECAR_PID 2>/dev/null || true
+              exit 0
+            fi
+            sleep 1
+          done
+
+          # Timeout. Always dump BOTH streams — the previous version only
+          # tailed stderr, which made debugging harder when the actual
+          # symptom was on stdout (e.g. uvicorn binding messages, route
+          # registration logs).
+          echo "::error::sidecar did not respond within 60 s. stderr:"
+          tail -100 /tmp/sidecar.stderr
+          echo "::error::stdout:"
+          tail -100 /tmp/sidecar.stdout
+          echo "::error::process state:"
+          ps -p $SIDECAR_PID -o pid,stat,etime,command 2>&1 || echo "(process gone)"
+          kill $SIDECAR_PID 2>/dev/null || true
+          exit 1
+
+      # ── Always upload local artifacts (so devs can grab build outputs) ────
+      # Independent of the release flow — uploads as workflow run artifacts
+      # (90-day retention, accessible via the Actions UI). Useful even on
+      # the release path because they include intermediate build state.
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: magpie-${{ matrix.target }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error

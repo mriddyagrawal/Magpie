@@ -35,21 +35,63 @@ if TYPE_CHECKING:
 REPO_ROOT = APP_DATA_DIR
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
+# `_summary_supplement` was designed for T3 LLM summaries (~200-500 words,
+# typically <2 KB). Plan #17 Part A made T1 CSV summaries also LLM-generated
+# (no more raw-content dumps), so the cap can be much higher than the
+# emergency 4 KB band-aid we used to need. 10 KB comfortably fits any real
+# FileSummary while still truncating accidental misuse.
+ANSWER_SUPPLEMENT_MAX_CHARS = 10_000
 
 
 class Answer(BaseModel):
+    # Field order matters: this is the order llama-server's GBNF grammar
+    # forces the model to emit. Putting `not_found` first lets the model
+    # commit to the verdict before generating any content — natural for
+    # the not-found path (answer="", sources_used=[]) and harmless for
+    # the found path. Reverse order (answer first) forces the model to
+    # commit to either real-text or empty-string before it has finished
+    # "deciding" whether the files contain the answer; under grammar
+    # constraint that's a known small-model failure mode (Tam et al.,
+    # "Let me speak freely?", 2024). The flat-vs-discriminated-union
+    # question stays parked at Plan #25 Choice A.
+    not_found: bool = Field(
+        ...,  # required — the schema's `required` list controls what the
+              # GBNF grammar enforces; with a Python default, pydantic
+              # would mark this optional and the model could legally omit it.
+        description=(
+            "Set to true when the provided files do not contain enough information "
+            "to answer the question. When true, leave `answer` empty, leave "
+            "`sources_used` empty, and set `not_found_topic` to a short noun "
+            "phrase summarizing what the user was asking about."
+        ),
+    )
+    not_found_topic: str = Field(
+        ...,  # required: emit "" in found cases, the topic phrase in not-found cases.
+        description=(
+            "Short noun phrase summarizing what the user asked about, used in "
+            "the UI's not-found copy ('I read 5 likely sources but didn't find "
+            "anything about <topic>...'). Only set when `not_found=true`. "
+            "Examples: 'a landlord's emergency phone number', 'the chemistry "
+            "final exam time', 'who chairs the math department'."
+        ),
+    )
     answer: str = Field(
+        ...,  # required: in not-found cases the model emits an empty string,
+              # not a missing field — the strict JSON schema requires presence.
         description=(
             "Natural-language answer grounded strictly in the provided files. "
-            "If the files do not contain the information, say so explicitly."
-        )
+            "Empty string when the question cannot be answered from the provided "
+            "files (set `not_found=true` in that case)."
+        ),
     )
     sources_used: list[str] = Field(
+        ...,  # required: emit an empty list in not-found cases, not a missing field.
         description=(
             "Subset of the input file paths the answer actually depends on. "
             "Copied verbatim from the '--- File N: <path> ---' headers. "
-            "Do not include files you consulted but did not actually use."
-        )
+            "Do not include files you consulted but did not actually use. "
+            "Empty list when `not_found=true`."
+        ),
     )
 
 
@@ -124,6 +166,52 @@ SYSTEM_PROMPT = (
     "the prose using the form 'page N' (book page; the PDF page is in "
     "sources_used). Otherwise keep the prose clean. "
     "\n\n"
+    "\n\n"
+    "{citation_block}"
+    "WHEN YOU CANNOT ANSWER FROM THE PROVIDED FILES. If, after reading the "
+    "files carefully (including the synonym/unit mapping above), none of "
+    "them contain the information needed to answer the question, do NOT "
+    "fabricate. Instead, set the result fields as follows:\n"
+    "  - `not_found`: true\n"
+    "  - `answer`: \"\" (empty string)\n"
+    "  - `sources_used`: [] (empty list)\n"
+    "  - `not_found_topic`: a short noun phrase summarizing what the user "
+    "    asked about. Examples: 'a landlord's emergency phone number', "
+    "    'the chemistry final exam time', 'who chairs the math department'. "
+    "    Keep it short (a few words). Do not restate the full question.\n"
+    "Use this branch ONLY when the files genuinely don't contain the answer. "
+    "If the files contain the answer under a synonym, abbreviation, or "
+    "different unit (per the mapping rules above), DO answer normally — "
+    "that's not a not-found case.\n"
+    "\n\n"
+    "OUTPUT FORMAT — required schema. Respond with a single JSON object that "
+    "has EXACTLY these four keys, named EXACTLY as shown, IN THIS ORDER:\n"
+    "  {\"not_found\": <boolean>, \"not_found_topic\": <string>, "
+    "\"answer\": <string>, \"sources_used\": [<file path>, ...]}\n"
+    "All four keys are required. The order above is load-bearing — emit "
+    "`not_found` first so you commit to the verdict before generating "
+    "content. Do NOT rename `answer` to something descriptive like "
+    "`result` / `summary` / `courses_mentioned` / `findings` — small "
+    "models tend to do this and it breaks downstream parsing. The key "
+    "is literally the four letters `answer` regardless of what the "
+    "question is about. "
+    "If the answer is naturally a list (e.g. 'list every X'), join the "
+    "items into a single string inside the `answer` value (use bullets "
+    "`- ` or newlines), do NOT make `answer` a JSON array.\n"
+    "Example for a successful answer with citations:\n"
+    "  {\"not_found\": false, \"not_found_topic\": \"\", "
+    "\"answer\": \"The chair of the Mathematics department is "
+    "Dr. Elena Marquez[1].\", \"sources_used\": "
+    "[\"path/to/math-dept-2024.pdf\"]}\n"
+    "Example for a list-shaped question:\n"
+    "  {\"not_found\": false, \"not_found_topic\": \"\", "
+    "\"answer\": \"- Item one[1]\\n- Item two[2]\\n- Item three[1]\", "
+    "\"sources_used\": [\"path/to/file-a.md\", \"path/to/file-b.md\"]}\n"
+    "Example for a not-found case:\n"
+    "  {\"not_found\": true, \"not_found_topic\": "
+    "\"a landlord's emergency phone number\", "
+    "\"answer\": \"\", \"sources_used\": []}\n"
+    "\n"
     "Output RAW JSON only — do not wrap the response in markdown code fences "
     "like ```json, and do not include any prose before or after the JSON object."
 )
@@ -132,11 +220,57 @@ SYSTEM_PROMPT = (
 _ANSWER_FALLBACK = Answer(
     answer="(model output could not be parsed into Answer)",
     sources_used=[],
+    not_found=False,
+    not_found_topic="",
 )
 
 
-def build_answer_agent() -> ChatAgent[Answer]:
-    return build_agent(SYSTEM_PROMPT, Answer, _ANSWER_FALLBACK)
+# The inline-citation-marker instructions are factored out so the
+# Settings → Search & AI → Advanced → "Cite sources inline" toggle can
+# remove them at agent-build time when the user prefers plain prose.
+# Cost: ~80 prompt tokens that the small model doesn't have to process
+# when off. The frontend's renderAnswer() handles markerless prose
+# gracefully (no orphan-pill warnings), so toggling at runtime is safe.
+_INLINE_CITATION_BLOCK = (
+    "INLINE CITATION MARKERS. As you write the answer, cite the supporting "
+    "file with a numbered marker in square brackets: `[1]` for the first "
+    "file you cite, `[2]` for the second, and so on. The number is the "
+    "1-based index into your `sources_used` list (the first entry of "
+    "`sources_used` is `[1]`, the second is `[2]`, etc.). Place each "
+    "marker immediately after the claim it supports, with no space "
+    "before the bracket. Re-use the same number whenever you cite the "
+    "same file again. Examples:\n"
+    "  - 'The chair of the Mathematics department is Dr. Elena Marquez[1].'\n"
+    "  - 'CSC-105 has 4 credit hours[1] and is offered every fall[2].'\n"
+    "Do NOT use markers like `[Source 1]`, `[file: foo.pdf]`, or `(1)` — "
+    "the bracketed number alone is the only accepted form. Do NOT invent "
+    "citation numbers that exceed the length of `sources_used`. If you "
+    "have nothing to cite for a claim, omit the marker entirely.\n"
+    "\n\n"
+)
+
+
+def _resolve_system_prompt(cite_inline: bool) -> str:
+    """Final system prompt with the citation block included or stripped
+    based on the user's `cite_sources_inline` setting."""
+    return SYSTEM_PROMPT.replace(
+        "{citation_block}",
+        _INLINE_CITATION_BLOCK if cite_inline else "",
+    )
+
+
+def build_answer_agent(*, cite_inline: bool | None = None) -> ChatAgent[Answer]:
+    """Build the answer agent. `cite_inline` overrides the setting; if
+    None, reads the user's preference from settings.json. Lazy import
+    of the settings layer keeps this module importable in environments
+    where the config layer isn't built yet (e.g., test fixtures)."""
+    if cite_inline is None:
+        try:
+            from src.config.settings import effective_settings
+            cite_inline = effective_settings().cite_sources_inline
+        except Exception:  # noqa: BLE001
+            cite_inline = True  # safe default — match the original behavior
+    return build_agent(_resolve_system_prompt(cite_inline), Answer, _ANSWER_FALLBACK)
 
 
 def _strip_fragment(p: str) -> str:
@@ -168,6 +302,9 @@ async def answer_question(
     file_paths: Sequence[str | Path],
     history: list[tuple[str, str]] | None = None,
     search_query: "SearchQuery | None" = None,
+    csv_row_hits: dict[str, list[int]] | None = None,
+    enumerate_lists: bool = True,
+    temperature: float | None = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
 
@@ -246,11 +383,15 @@ async def answer_question(
         body = body.strip()
         if not body:
             return None
+        # Defensive cap — see ANSWER_SUPPLEMENT_MAX_CHARS for why.
+        truncated = len(body) > ANSWER_SUPPLEMENT_MAX_CHARS
+        body = body[:ANSWER_SUPPLEMENT_MAX_CHARS]
+        suffix = "\n…(supplement truncated)" if truncated else ""
         return (
             "Content type: llm-summary (distilled overview of the file — use "
             "alongside the raw content below, especially when the raw "
             "extraction is thin or the file is large)\n\n---\n"
-            f"{body}"
+            f"{body}{suffix}"
         )
 
     # If the caller did a Kimi rewrite, its `keywords` list is already the
@@ -263,11 +404,75 @@ async def answer_question(
     else:
         rg_query = question
 
+    def _csv_row_indexes_for(display: str, abs_path: Path) -> list[int] | None:
+        """Look up the row indexes for this path in `csv_row_hits`.
+
+        Search by display path (the value `pipeline.ask` passes) first, then
+        absolute path as a fallback. Returns None if no row hits — the path
+        will fall through to the standard file-content path."""
+        if csv_row_hits is None:
+            return None
+        if display in csv_row_hits:
+            return csv_row_hits[display]
+        abs_str = str(abs_path)
+        if abs_str in csv_row_hits:
+            return csv_row_hits[abs_str]
+        return None
+
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
         try:
-            if _is_t0(display):
+            csv_hits = _csv_row_indexes_for(display, abs_path)
+            is_csv = abs_path.suffix.lower() == ".csv"
+
+            if is_csv and csv_hits:
+                # Plan #17 Part B (case B/C): one or more rows of this CSV
+                # were retrieved → row-window block (matched rows + ±2
+                # neighbors, merged across hits). The LLM summary still
+                # gets prepended as supplement.
+                from src.stage2.search import build_csv_row_window_block
+                block = await asyncio.to_thread(
+                    build_csv_row_window_block, display, csv_hits
+                )
+                if block is None:
+                    blocks = [
+                        f"Content type: csv-row-windows\n\n---\n"
+                        f"(could not read {abs_path.name} from disk)"
+                    ]
+                else:
+                    blocks = [
+                        f"Content type: csv-row-windows (the rows that match "
+                        f"the question, with ±2 neighbors for context; "
+                        f"matched rows are tagged inline. Full CSV is "
+                        f"intentionally NOT included — rely on the per-file "
+                        f"summary above for cross-row context or to know "
+                        f"what the CSV is about as a whole)\n\n---\n{block}"
+                    ]
+            elif is_csv:
+                # Plan #17 Part B (case A): the CSV's file-level summary
+                # point hit in retrieval but no specific rows did. The
+                # user asked something the summary matched semantically
+                # ("do we have a faculty directory?"), not something a
+                # row matches verbatim. Surface the first 5 rows as a
+                # representative sample so the model has a concrete
+                # picture of row shape alongside the summary supplement.
+                from src.stage2.search import build_csv_sample_block
+                block = await asyncio.to_thread(build_csv_sample_block, display)
+                if block is None:
+                    blocks = [
+                        f"Content type: csv-sample\n\n---\n"
+                        f"(could not read {abs_path.name} from disk)"
+                    ]
+                else:
+                    blocks = [
+                        f"Content type: csv-sample (first 5 rows of this CSV "
+                        f"— no specific row matched your question; the "
+                        f"per-file summary above explains what the CSV is "
+                        f"overall, the rows below are illustrative of its "
+                        f"shape)\n\n---\n{block}"
+                    ]
+            elif _is_t0(display):
                 # T0 files: skip the whole-file read and lean on ripgrep.
                 hits = await asyncio.to_thread(ripgrep_search, abs_path, rg_query)
                 hits_text = format_hits_block(abs_path, hits)
@@ -343,7 +548,7 @@ async def answer_question(
     # answer stage sees the same class the search layer used. Pure regex,
     # no LLM call, cheap to run.
     from src.stage2.query_classify import QueryClass, classify as _classify_q
-    if _classify_q(question) is QueryClass.LIST_ALL:
+    if enumerate_lists and _classify_q(question) is QueryClass.LIST_ALL:
         intro_parts.append(
             ""
         )
@@ -362,12 +567,49 @@ async def answer_question(
             "headline few."
         )
 
+    # Reverse so the highest-ranked retrieval result lands closest to
+    # generation. Liu et al. (2023, "Lost in the Middle") found that
+    # smaller decoder-only models are heavily recency-biased
+    # (Llama-2 7B is "solely recency-biased"); Gemma 4 E4B sits in the
+    # same size class. Position effect is large — up to 20 points of
+    # accuracy and worse-than-closed-book in the worst case. The
+    # "File N" header is just an identifier — citation numbers
+    # (`[1]`, `[2]`) are 1-based into `sources_used`, which the model
+    # assembles itself, so reversing the prompt order doesn't affect
+    # the citation contract.
+    ordered_blocks = list(reversed(per_file_blocks))
     message: list = ["\n".join(intro_parts)]
-    for i, (display, blocks) in enumerate(per_file_blocks, 1):
+    for i, (display, blocks) in enumerate(ordered_blocks, 1):
         message.append(f"\n--- File {i}: {display} ---")
         message.extend(blocks)
 
-    ans = await agent.run(message)
+    # Echo the question once more at the bottom (query-aware
+    # contextualization). Liu et al. found this had minimal impact on
+    # multi-document QA for 30B+ models, but small recency-biased models
+    # benefit from having the question text in the recency zone right
+    # before generation — otherwise the question can effectively be
+    # "forgotten" after the model reads thousands of tokens of file
+    # content. Cheap (~15-30 tokens) for what could be a real win on the
+    # local Gemma 4 backend.
+    message.append(f"\nNow answer this question: {question}")
+
+    ans = await agent.run(message, temperature=temperature)
+
+    # If the model declared not_found, normalize the rest of the payload so the
+    # downstream consumer doesn't have to think about partial fills. Some small
+    # models set not_found=true but still write a hedging "answer" and pick a
+    # source — that's an inconsistent state, and the UI's not-found card has
+    # no slot for either, so we drop them.
+    if ans.not_found:
+        if ans.answer or ans.sources_used:
+            print(
+                "  note: not_found=true but answer/sources_used were non-empty; "
+                "clearing them to match the not-found contract",
+                file=sys.stderr,
+            )
+        ans.answer = ""
+        ans.sources_used = []
+        return ans
 
     # Defensive: drop any path the model invented that wasn't in our input.
     # Match is whitespace-tolerant — the model sometimes collapses double-spaces

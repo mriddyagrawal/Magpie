@@ -18,9 +18,6 @@ cleans up every page of a file at once when the source is deleted.
 from __future__ import annotations
 
 import hashlib
-import os
-import sys
-from pathlib import Path
 from typing import Sequence
 
 from qdrant_client.models import (
@@ -33,13 +30,15 @@ from qdrant_client.models import (
     MultiVectorConfig,
     PayloadSchemaType,
     PointStruct,
+    QuantizationSearchParams,
     ScalarQuantization,
     ScalarQuantizationConfig,
     ScalarType,
+    SearchParams,
     VectorParams,
 )
 
-from src.stage2.db import get_qdrant_client
+from src.stage2.db import _upsert_with_retry, get_qdrant_client
 
 FAST_COLLECTION_NAME = "fast_tier"
 
@@ -87,11 +86,6 @@ def ensure_fast_collection(*, recreate: bool = False) -> None:
     `delete_path` filter-based delete to work efficiently on the server.
     Process-cached: subsequent calls in the same process return immediately
     (tier4.run invokes this per file).
-
-    On `QDRANT_PROVIDER=local`, the payload-index step is skipped: the
-    embedded Python shim doesn't support payload indexes (it emits a
-    UserWarning and does nothing), and filter-based deletes still work via
-    full scan.
     """
     global _collection_ensured
     if _collection_ensured and not recreate:
@@ -116,18 +110,16 @@ def ensure_fast_collection(*, recreate: bool = False) -> None:
             ),
         )
 
-    is_local = os.environ.get("QDRANT_PROVIDER", "cloud").strip().lower() == "local"
-    if not is_local:
-        try:
-            client.create_payload_index(
-                collection_name=FAST_COLLECTION_NAME,
-                field_name="source_path",
-                field_schema=PayloadSchemaType.KEYWORD,
-            )
-        except Exception:  # pylint: disable=broad-except
-            # Some Qdrant versions/clouds raise on "already exists" rather
-            # than returning a no-op — ignoring is safe here.
-            pass
+    try:
+        client.create_payload_index(
+            collection_name=FAST_COLLECTION_NAME,
+            field_name="source_path",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+    except Exception:  # pylint: disable=broad-except
+        # Some Qdrant versions raise on "already exists" rather than
+        # returning a no-op — ignoring is safe here.
+        pass
 
     _collection_ensured = True
 
@@ -140,27 +132,31 @@ def upsert_page(
     """Upsert a single page. `page_vectors` must be a 2D list/array of
     shape `(n_patches, FAST_VECTOR_DIM)`. Caller is responsible for moving
     off-device + converting to list before calling.
+
+    Wrapped in `_upsert_with_retry` (shared with the summaries collection)
+    so transient timeouts during long ingest runs don't drop pages.
     """
     client = get_qdrant_client()
-    client.upsert(
-        collection_name=FAST_COLLECTION_NAME,
-        points=[
-            PointStruct(
-                id=_page_point_id(source_path, page_num),
-                vector=list(page_vectors),  # pyright: ignore[reportArgumentType]
-                payload={
-                    "source_path": source_path,
-                    "page_num": page_num,
-                },
-            )
-        ],
+    point = PointStruct(
+        id=_page_point_id(source_path, page_num),
+        vector=list(page_vectors),  # pyright: ignore[reportArgumentType]
+        payload={
+            "source_path": source_path,
+            "page_num": page_num,
+        },
     )
+    _upsert_with_retry(client, FAST_COLLECTION_NAME, [point])
 
 
 def upsert_pages_batch(
     pages: list[tuple[str, int, Sequence[Sequence[float]]]],
 ) -> int:
-    """Batch upsert. `pages` items are `(source_path, page_num, vectors)`."""
+    """Batch upsert. `pages` items are `(source_path, page_num, vectors)`.
+
+    Wrapped in `_upsert_with_retry` — ColPali batches are large (~6 MB
+    for 32 pages) and sometimes hit transient timeouts mid-ingest;
+    retrying with exponential backoff prevents partial-batch data loss.
+    """
     if not pages:
         return 0
     client = get_qdrant_client()
@@ -172,8 +168,24 @@ def upsert_pages_batch(
         )
         for src, pg, vecs in pages
     ]
-    client.upsert(collection_name=FAST_COLLECTION_NAME, points=points)
+    _upsert_with_retry(client, FAST_COLLECTION_NAME, points)
     return len(points)
+
+
+# When quantization is enabled, Qdrant compares the query against the
+# quantized vectors first (fast, lossy) and then optionally re-scores the
+# top candidates against the full-precision vectors (accurate). We want
+# both — without rescore, ColPali recall regresses noticeably on
+# discriminator-heavy queries. Pin explicitly so a Qdrant version bump
+# that flips the server default doesn't silently regress recall.
+# `oversampling=2.0` pulls 2× the requested top_k as quantized
+# candidates before the rescore pass; standard practice in RAG papers.
+_RESCORE_PARAMS = SearchParams(
+    quantization=QuantizationSearchParams(
+        rescore=True,
+        oversampling=2.0,
+    ),
+)
 
 
 def search(
@@ -191,6 +203,7 @@ def search(
         query=list(query_vectors),  # pyright: ignore[reportArgumentType]
         limit=limit,
         with_payload=True,
+        search_params=_RESCORE_PARAMS,
     ).points
     return [
         (h.payload["source_path"], h.payload["page_num"], float(h.score))
@@ -222,8 +235,16 @@ def delete_path(source_path: str) -> int:
 
 
 def get_indexed_paths() -> set[str]:
-    """Return the set of distinct source_paths currently in the fast tier."""
+    """Return the set of distinct source_paths currently in the fast tier.
+
+    Empty set when the collection doesn't exist yet (corpus has no T4 files,
+    or `ensure_fast_collection` hasn't fired). Prevents the orphan-cleanup
+    callers in the walker from logging a confusing 404 warning every run on
+    text-only corpora.
+    """
     client = get_qdrant_client()
+    if not client.collection_exists(FAST_COLLECTION_NAME):
+        return set()
     paths: set[str] = set()
     offset = None
     while True:

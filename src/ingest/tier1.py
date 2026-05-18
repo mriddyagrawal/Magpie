@@ -2,42 +2,63 @@
 
 Used for: small `.txt .md .json .yaml .toml`, code files, small CSVs.
 
-No LLM call. We write a summary markdown whose body is the raw file content
-(capped at DEFAULT_BODY_MAX_CHARS, except for CSVs which use a larger limit
-to support row-level indexing). Filename is included in the title so
-BM25 hits filename-like queries. Stage 2's parser then embeds that body
-verbatim — which is the whole point: exact-token matches survive.
+The non-CSV path is a no-LLM dump: we write a summary markdown whose body
+is the raw file content (capped at DEFAULT_BODY_MAX_CHARS). Filename is
+included in the title so BM25 hits filename-like queries. Stage 2's parser
+then embeds that body verbatim — exact-token matches survive.
+
+The **CSV path** (`run_csv_async`) is different: it generates a real
+`FileSummary` via the LLM agent, sampling header + first ~20 rows / ~1000
+chars. The row-level Qdrant points are still produced separately by
+`src.stage2.csv_ingest.ingest_csv_rows` from the original file. So a CSV
+ends up represented twice in different Qdrant collections / shapes:
+  - one summary point (semantic-context-grade summary, for "what is this CSV?")
+  - N row points (one per row, for "find the row that matches X")
+The answer step combines them: row hits trigger row-window content, with
+the file's summary attached as supplement. See Plans/Future Plans.md #17.
 """
 
 from __future__ import annotations
 
+import asyncio
+import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from src.ingest.common import (
     DEFAULT_BODY_MAX_CHARS,
+    SUMMARIES_DIR,
     TierOutcome,
+    hash_file,
     render_summary_markdown,
     summary_output_path,
     summary_rel_path,
     title_from_path,
     write_summary,
 )
-from src.router import CSV_SIZE_T1_MAX
 
+if TYPE_CHECKING:
+    from src.llm import ChatAgent
+    from src.stage1.summarize import FileSummary
+
+
+# ---------------------------------------------------------------------------
+# Non-CSV T1 (no LLM)
+# ---------------------------------------------------------------------------
 
 def run(path: Path, source_rel: str) -> TierOutcome:
-    """Read the file, write a summary-markdown whose body is the raw content."""
+    """Read the file, write a summary-markdown whose body is the raw content.
+
+    Non-CSV path. CSVs go through `run_csv_async` (LLM-summarized).
+    """
     try:
         raw = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         raw = path.read_text(encoding="utf-8", errors="ignore")
 
     ext = path.suffix.lower()
-    is_csv = ext == ".csv"
 
-    # CSVs get a much larger cap to support row-by-row indexing in Stage 2.
-    # Non-CSVs stay at the default 8k cap to avoid drowning retrieval in noise.
-    cap = CSV_SIZE_T1_MAX if is_csv else DEFAULT_BODY_MAX_CHARS
+    cap = DEFAULT_BODY_MAX_CHARS
     body = raw[:cap].strip()
     if not body:
         body = "(empty file)"
@@ -50,7 +71,6 @@ def run(path: Path, source_rel: str) -> TierOutcome:
             ".sh", ".sql",
         }
         else "config" if ext in {".json", ".yaml", ".yml", ".toml"}
-        else "csv" if is_csv
         else "text"
     )
 
@@ -69,4 +89,214 @@ def run(path: Path, source_rel: str) -> TierOutcome:
     return TierOutcome(
         summary_file_rel=summary_rel_path(out),
         body_chars=len(body),
+    )
+
+
+# ---------------------------------------------------------------------------
+# CSV T1 (LLM-summarized)
+# ---------------------------------------------------------------------------
+
+CSV_SAMPLE_MAX_ROWS = 20
+"""How many rows after the header to feed the summarizer LLM. 20 is enough
+for the LLM to recognize the row shape (column names + sample values) on
+catalog/directory CSVs without ballooning the prompt. The full CSV is
+still indexed row-by-row separately — this sample only feeds the
+file-level summary, not the searchable content."""
+
+CSV_SAMPLE_MAX_CHARS = 1000
+"""Cap on total sample text fed to the LLM. Prevents wide CSVs (many
+columns) from sending huge rows. The header is always kept; rows after
+header are truncated to fit."""
+
+
+def _csv_sample(
+    path: Path,
+    max_rows: int = CSV_SAMPLE_MAX_ROWS,
+    max_chars: int = CSV_SAMPLE_MAX_CHARS,
+) -> tuple[str, int]:
+    """Read header + up to `max_rows` rows, capped at `max_chars` total.
+
+    Returns `(text, n_rows_after_header)`. Rows are joined with `\\n`. The
+    header always appears first so the LLM can name the columns regardless
+    of how aggressively the row body is truncated.
+    """
+    lines: list[str] = []
+    char_count = 0
+    n_rows = 0
+    try:
+        with path.open(encoding="utf-8", errors="ignore") as f:
+            for i, raw_line in enumerate(f):
+                line = raw_line.rstrip("\n")
+                if i == 0:
+                    lines.append(line)
+                    char_count += len(line) + 1
+                    continue
+                if n_rows >= max_rows or char_count + len(line) > max_chars:
+                    break
+                lines.append(line)
+                char_count += len(line) + 1
+                n_rows += 1
+    except OSError:
+        return ("", 0)
+    return ("\n".join(lines), n_rows)
+
+
+async def run_csv_async(
+    path: Path,
+    source_rel: str,
+    agent: "ChatAgent[FileSummary]",
+    *,
+    inflight: dict[str, asyncio.Event] | None = None,
+    inflight_lock: asyncio.Lock | None = None,
+) -> TierOutcome:
+    """T1 CSV path: sample, ask LLM for a `FileSummary`, write markdown.
+
+    Phase A content-hash dedup mirrors T3: byte-identical CSVs across paths
+    share one summary. The dedup short-circuits in the same order:
+
+      1. Existing `<digest>_t1.md` on disk → reuse, mark deduped.
+      2. Another worker computing this digest → await its event, then reuse.
+      3. Otherwise, claim the digest, run the LLM, write the summary.
+    """
+    digest = await asyncio.to_thread(hash_file, path)
+    out_path = SUMMARIES_DIR / f"{digest}_t1.md"
+    summary_rel = summary_rel_path(out_path)
+
+    if inflight is not None and inflight_lock is not None:
+        if out_path.exists():
+            return TierOutcome(
+                summary_file_rel=summary_rel,
+                body_chars=out_path.stat().st_size,
+                deduped=True,
+                content_hash=digest,
+            )
+        await inflight_lock.acquire()
+        existing_event = inflight.get(digest)
+        if existing_event is not None:
+            inflight_lock.release()
+            await existing_event.wait()
+            if out_path.exists():
+                return TierOutcome(
+                    summary_file_rel=summary_rel,
+                    body_chars=out_path.stat().st_size,
+                    deduped=True,
+                    content_hash=digest,
+                )
+            # Peer failed and never wrote — fall through and run ourselves.
+        else:
+            event = asyncio.Event()
+            inflight[digest] = event
+            inflight_lock.release()
+            try:
+                return await _do_csv_summarize(
+                    path, source_rel, agent, out_path, summary_rel, digest
+                )
+            finally:
+                event.set()
+
+    # No inflight infrastructure (legacy / standalone): just run.
+    return await _do_csv_summarize(
+        path, source_rel, agent, out_path, summary_rel, digest
+    )
+
+
+async def _do_csv_summarize(
+    path: Path,
+    source_rel: str,
+    agent: "ChatAgent[FileSummary]",
+    out_path: Path,
+    summary_rel: str,
+    digest: str,
+) -> TierOutcome:
+    """The actual LLM-summary work for a CSV. Factored out so the dedup
+    short-circuits don't duplicate the call site."""
+    # Deferred imports keep this module import-cheap for non-CSV walks.
+    from src.llm import JSONParseError
+    from src.stage1.summarize import FileSummary, _run_with_retry, render_markdown
+
+    sample_text, n_rows = await asyncio.to_thread(_csv_sample, path)
+    if not sample_text:
+        # File unreadable — fall back to a minimal summary so we don't break
+        # the manifest. Stage 2 row-ingest will skip it cleanly too.
+        summary = FileSummary(
+            title=f"{path.name} (unreadable CSV)",
+            summary=f"CSV file at {source_rel} could not be read for summarization.",
+            content_type="csv",
+            keywords=[path.name, "csv", "error"],
+            key_entities=[],
+            identifiers=[path.name],
+        )
+    else:
+        message = [
+            f"Filename: {path.name}\n"
+            f"This is a CSV file. Below is the header followed by the first "
+            f"{n_rows} row(s) — a representative sample. Produce a structured "
+            f"FileSummary describing what the CSV contains: what each row "
+            f"represents, what kind of data the columns hold, and any "
+            f"identifiers (column names, dataset name, etc.) that would "
+            f"help someone search for this file by purpose, not just by "
+            f"row contents.",
+            sample_text,
+        ]
+        try:
+            summary = await _run_with_retry(agent, message, path.name)
+        except JSONParseError as e:
+            # Cloud LLMs (OpenRouter Gemma especially) sometimes emit
+            # JSON that even the relaxed FileSummary validators in
+            # src/stage1/summarize.py can't coerce — stray top-level
+            # keys, unrecoverable nesting, etc. Without this fallback,
+            # the bubble-up would skip the manifest update and the file
+            # would silently fall out of the index — including its
+            # row-level Qdrant points, since csv_ingest.ingest_csv_rows
+            # is keyed off manifest entries with T1 in routes. Better
+            # to write a deterministic stub from filename + first row
+            # so the file lands and row-level ingest can proceed; the
+            # downstream stats block (rows / columns / distributions
+            # appended below) does most of the heavy lifting for
+            # aggregation queries anyway. The semantic file-level
+            # summary point is degraded; the row-level points are not.
+            print(
+                f"  warn: CSV summary parse failed for {path.name} ({type(e).__name__}); "
+                f"falling back to a deterministic stub so the file still indexes",
+                file=sys.stderr,
+            )
+            # First non-empty line of `sample_text` is the header; it's
+            # the most valuable discriminator we have without an LLM
+            # call. Limit length so the stub doesn't blow the markdown.
+            first_line = next(
+                (ln for ln in sample_text.splitlines() if ln.strip()), ""
+            )
+            header_preview = first_line[:300]
+            summary = FileSummary(
+                title=f"{path.name} (auto-stub)",
+                summary=(
+                    f"CSV file at {source_rel}. The structured-summary LLM call "
+                    f"failed to return parseable JSON; this is a deterministic "
+                    f"stub so the file is still indexed and its rows are still "
+                    f"searchable via row-level retrieval. Header: {header_preview}"
+                ),
+                content_type="csv",
+                keywords=[path.name, "csv", "auto-stub"],
+                key_entities=[],
+                identifiers=[path.name],
+            )
+
+    body_markdown = render_markdown(summary, source_rel)
+    # Append a deterministic stats block (row count, column names, per-column
+    # distribution / numeric range). The LLM prose above is good for semantic
+    # retrieval ("course catalog", "people directory"); the stats block
+    # answers aggregation questions ("how many SUS courses?", "how many 0-credit
+    # courses across all majors?") that small models otherwise undercount because
+    # they're working from a top-k retrieval window, not the full file. See
+    # benchmarks/course_information/REPORT.md for the failure mode that
+    # motivated this. Compute is deterministic + fast (no LLM call) so we
+    # do it unconditionally for every CSV at ingest time.
+    from src.ingest.csv_stats import compute_csv_stats_markdown
+    body_markdown += await asyncio.to_thread(compute_csv_stats_markdown, path)
+    await asyncio.to_thread(write_summary, out_path, body_markdown)
+    return TierOutcome(
+        summary_file_rel=summary_rel,
+        body_chars=len(body_markdown),
+        deduped=False,
+        content_hash=digest,
     )

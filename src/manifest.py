@@ -105,6 +105,12 @@ class Entry:
     row_count: int | None = None
     fast_indexed_at: str | None = None  # set when the file lands in fast_tier
     fast_pages: int | None = None        # page count indexed into fast_tier
+    # Optional file mtime (seconds since epoch). Captured at ingest time when
+    # MAGPIE_DEV_USE_MTIME=1 is set; used by `needs_summarization` as a
+    # secondary check (size-only is the production default — see
+    # `Plans/Ingestion Rules/Implementation Plan.md` §6 / Future Plan #14).
+    # Always optional + nullable so old manifests load cleanly.
+    mtime: float | None = None
     # Router audit trail (src/router.py + Plans/Indexing Tiers.md). Defaults
     # are backward-compatible: pre-router manifest rows load cleanly.
     routes: list[str] = field(default_factory=list)
@@ -170,12 +176,35 @@ class Manifest:
     def paths(self) -> list[str]:
         return list(self.entries.keys())
 
-    def needs_summarization(self, rel_path: str, current_size: int) -> bool:
-        """True if rel_path is new to us, or its byte size has changed."""
+    def needs_summarization(
+        self,
+        rel_path: str,
+        current_size: int,
+        current_mtime: float | None = None,
+    ) -> bool:
+        """True if rel_path is new to us, or its byte size has changed.
+
+        With MAGPIE_DEV_USE_MTIME=1 set in the environment AND a non-None
+        `current_mtime` provided, ALSO returns True when the on-disk mtime
+        is newer than the recorded `entry.mtime`. This catches "user
+        re-saved with no byte changes" — useful for dev/debug workflows
+        where you want to force re-summarization on touch. Production
+        default (env unset) ignores mtime entirely. See Future Plan #14
+        for graduating this to a user-facing setting.
+        """
         entry = self.entries.get(rel_path)
         if entry is None:
             return True
-        return entry.size != current_size
+        if entry.size != current_size:
+            return True
+        if (
+            current_mtime is not None
+            and entry.mtime is not None
+            and os.environ.get("MAGPIE_DEV_USE_MTIME") == "1"
+            and current_mtime > entry.mtime
+        ):
+            return True
+        return False
 
     def needs_ingestion(self, rel_path: str) -> bool:
         """True if the row has been summarized but not yet ingested (or re-summarized)."""

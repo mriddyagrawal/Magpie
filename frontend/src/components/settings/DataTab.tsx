@@ -2,9 +2,10 @@
  * DataTab — the Settings → Data tab.
  *
  * Layout (per Specs/UI/settings_window.md):
- *   - Title + subtitle ("Files and folders Magpie reads to understand
- *     your work. Nothing leaves your machine.")
- *   - Top-right: ↻ Sync · ⟳ Reindex · + Add folder / file ▾
+ *   - Subtitle ("Files and folders Magpie reads to understand your
+ *     work. Nothing leaves your machine.") — the pane title lives in
+ *     the window header strip.
+ *   - Top-right toolbar: Sync / Reindex / Add folder / file
  *   - Folder rows (delegated to FolderRow)
  *   - Empty state when no folders yet
  *   - Exclusions sub-panel (collapsed by default)
@@ -16,8 +17,19 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  FolderOpen,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  X,
+} from "lucide-react";
+import {
   addFolder,
   addExclusion,
+  friendlyError,
   getExclusions,
   patchFolder,
   pickFile,
@@ -91,7 +103,7 @@ export function DataTab({
       onIngestStarted();
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted, refreshFolders]);
 
@@ -106,7 +118,7 @@ export function DataTab({
       onIngestStarted();
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted, refreshFolders]);
 
@@ -116,7 +128,7 @@ export function DataTab({
       await runSync();
       onIngestStarted();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted]);
 
@@ -127,7 +139,7 @@ export function DataTab({
       await runReindex();
       onIngestStarted();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted]);
 
@@ -137,7 +149,7 @@ export function DataTab({
       await patchFolder({ path, enabled });
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [refreshFolders]);
 
@@ -155,7 +167,7 @@ export function DataTab({
       await removeFolder(path);
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [removeTarget, refreshFolders]);
 
@@ -170,7 +182,7 @@ export function DataTab({
     try {
       await stopIngest();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, []);
 
@@ -186,7 +198,7 @@ export function DataTab({
         const data = await getExclusions();
         setExclusions(data);
       } catch (e) {
-        setError((e as Error).message);
+        setError(friendlyError(e));
       }
     }
   }, [exclusionsOpen, exclusions]);
@@ -207,7 +219,9 @@ export function DataTab({
         />
         {error && <ErrorBanner message={error} />}
         <div className="data-tab__empty">
-          <div className="data-tab__empty-glyph" aria-hidden="true">📁</div>
+          <div className="data-tab__empty-glyph" aria-hidden="true">
+            <FolderOpen size={40} strokeWidth={1.25} />
+          </div>
           <p className="data-tab__empty-headline">
             Magpie hasn't read any of your files yet.
           </p>
@@ -318,15 +332,15 @@ function DataHeader({
   onReindex: () => void;
   syncDisabled: boolean;
 }) {
+  // The pane title lives in the window header strip now; this row is
+  // subtitle + toolbar. flex-wrap in CSS lets the buttons drop to
+  // their own line on narrow windows instead of colliding with text.
   return (
     <header className="data-tab__header">
-      <div className="data-tab__header-text">
-        <h1 className="data-tab__title">Data</h1>
-        <p className="data-tab__subtitle">
-          Files and folders Magpie reads to understand your work. Nothing
-          leaves your machine.
-        </p>
-      </div>
+      <p className="data-tab__subtitle">
+        Files and folders Magpie reads to understand your work. Nothing
+        leaves your machine.
+      </p>
       <div className="data-tab__header-actions">
         <button
           type="button"
@@ -335,7 +349,7 @@ function DataHeader({
           disabled={syncDisabled}
           title="Pick up new files and drop removed ones."
         >
-          ↻ Sync
+          <RefreshCw size={13} aria-hidden="true" /> Sync
         </button>
         <button
           type="button"
@@ -344,7 +358,7 @@ function DataHeader({
           disabled={syncDisabled}
           title="Rebuild from scratch. Slow but thorough."
         >
-          ⟳ Reindex
+          <RotateCcw size={13} aria-hidden="true" /> Reindex
         </button>
         <div className="data-tab__add-menu-wrap" ref={addMenuRef}>
           <button
@@ -352,7 +366,8 @@ function DataHeader({
             className="data-tab__btn data-tab__btn--primary"
             onClick={() => setShowAddMenu(!showAddMenu)}
           >
-            + Add folder / file ▾
+            <Plus size={14} aria-hidden="true" /> Add folder / file{" "}
+            <ChevronDown size={13} aria-hidden="true" />
           </button>
           {showAddMenu && (
             <div className="data-tab__add-menu" role="menu">
@@ -373,7 +388,7 @@ function DataHeader({
 function ErrorBanner({ message }: { message: string }) {
   return (
     <div className="data-tab__error" role="alert">
-      ⚠ {message}
+      <AlertTriangle size={14} aria-hidden="true" /> {message}
     </div>
   );
 }
@@ -432,7 +447,7 @@ function RemoveConfirm({
       title="Stop reading this folder?"
       body={
         <p>
-          {target?.display_name || target?.path.split("/").pop() || target?.path}
+          {target?.display_name || target?.path.split(/[\\/]/).pop() || target?.path}
           {" "}— files inside the folder are not deleted. Magpie will forget
           what's inside it.
         </p>
@@ -481,7 +496,7 @@ function ExclusionsPanel({
         aria-expanded={open}
       >
         <span className="exclusions-panel__chevron" aria-hidden="true">
-          {open ? "▼" : "▶"}
+          {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
         </span>
         Exclusions
         {exclusions && (
@@ -568,7 +583,7 @@ function ExclusionList({
                 onClick={() => onRemove(value)}
                 aria-label={`Remove ${value}`}
               >
-                ✕
+                <X size={12} aria-hidden="true" />
               </button>
             </li>
           ))}
@@ -576,7 +591,7 @@ function ExclusionList({
       )}
       {addInput || (
         <button type="button" className="exclusion-list__add-btn" onClick={onAddClick}>
-          + Add path…
+          <Plus size={12} aria-hidden="true" /> Add path…
         </button>
       )}
     </div>

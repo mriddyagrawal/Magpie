@@ -41,6 +41,7 @@ import type { View } from "./viewState";
 import { extractHighlightTokens } from "./Highlighted";
 
 import { AnswerCard } from "./AnswerCard";
+import { dragState, startDragOnMouseDown } from "./dragWindow";
 import { NotFoundCard } from "./NotFoundCard";
 import { PreviewCard } from "./PreviewCard";
 import { QuestionCard } from "./QuestionCard";
@@ -388,7 +389,14 @@ export function MagpieWindow() {
         // any in-flight question state survive — re-summon brings the
         // user back to a fresh resting bar; the recents panel will
         // show the just-asked question on next type.
+        //
+        // EXCEPT right after a drag starts: on Windows, entering the
+        // native window-move loop fires a blur — hiding then made
+        // every drag attempt vanish the window into the background.
+        // Blurs within a short window of startDragging() are the
+        // drag itself, not the user leaving; ignore them.
         const unBlur = await appWindow.listen("tauri://blur", () => {
+          if (Date.now() - dragState.lastDragStartAt < 800) return;
           hideWindow();
         });
         cleanups.push(unBlur);
@@ -509,6 +517,7 @@ export function MagpieWindow() {
         not_found: isNotFound,
         not_found_topic: notFoundTopic ?? "",
         sources_scanned_count: sourcesScannedCount,
+        sources_used: sourcesUsed,
         recent_id: recentId,
       };
 
@@ -722,9 +731,23 @@ export function MagpieWindow() {
     return () => window.removeEventListener("keydown", onKey);
   }, [view, recents]);
 
+  // Grab-anywhere window dragging (Spotlight behavior): any mousedown
+  // on empty space — gaps between cards, side margins, the status
+  // footer — moves the window. Content cards are excluded so text in
+  // answers/sources/previews stays selectable; the QuestionCard has
+  // its own drag handler for the bar itself.
+  const onWindowMouseDown = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest(".magpie-card")) return;
+    startDragOnMouseDown(e);
+  }, []);
+
   // Active state for QuestionCard's display-as-title-row vs. input.
   return (
-    <div className={`magpie-window magpie-window--${view.kind}`}>
+    <div
+      className={`magpie-window magpie-window--${view.kind}`}
+      onMouseDown={onWindowMouseDown}
+    >
       <div className="magpie-window__top-row">
         <QuestionCard
           ref={inputRef}
@@ -793,6 +816,7 @@ export function MagpieWindow() {
             not_found: false,
             not_found_topic: "",
             sources_scanned_count: 0,
+            sources_used: [],
             recent_id: null,
           }}
           selectedPath={view.selectedPath}
@@ -858,12 +882,28 @@ function AnsweringBody({
   // answer text otherwise.
   loading: boolean;
 }) {
+  // Inline `[N]` markers are 1-based indexes into sources_used (the
+  // ordered list of files the answer drew from) — NOT into the full
+  // retrieval list. Resolving against the wrong list made citation
+  // pills open unrelated files (e.g. [4] = 4th-ranked candidate, a
+  // random shell script, instead of the 4th cited document). If a
+  // cited path is missing from the retrieval list (backend filtered
+  // it), synthesize a stub so the pill still previews the right file.
+  const citedSources: Source[] = result.sources_used.map(
+    (path) =>
+      result.sources.find((s) => s.path === path) ?? {
+        path,
+        summary: "",
+        score: 0,
+        cited: true,
+      },
+  );
   return (
     <div className="magpie-grid">
       <div className="magpie-col-left">
         <AnswerCard
           answer={result.answer}
-          sources={result.sources}
+          sources={citedSources}
           highlights={highlights}
           error={null}
           loading={loading}
@@ -945,6 +985,7 @@ function synthesizeQueryResponse(
     not_found: notFound,
     not_found_topic: entry.result.not_found_topic,
     sources_scanned_count: entry.result.sources_used.length,
+    sources_used: entry.result.sources_used,
     recent_id: entry.id,
   };
 }
@@ -958,6 +999,7 @@ function makeErrorResult(question: string): QueryResponse {
     not_found: true,
     not_found_topic: question.replace(/\?+$/, "").trim(),
     sources_scanned_count: 0,
+    sources_used: [],
     recent_id: null,
   };
 }

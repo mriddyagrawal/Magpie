@@ -7,7 +7,7 @@
  *
  *   - Sidebar (left): Magpie / SETTINGS / nav (Data / Search & AI /
  *     Shortcut & App) / status footer
- *   - Header strip (top): Magpie · Settings · ● <state>
+ *   - Header strip (top): active section name + ● <state> pill
  *   - Main content: tab-specific component
  *
  * State ownership:
@@ -223,7 +223,7 @@ export function SettingsWindow() {
     <div className="settings-window">
       <SettingsSidebar active={tab} onChange={setTab} status={status} />
       <main className="settings-main">
-        <SettingsHeader status={status} ingest={ingest} />
+        <SettingsHeader tab={tab} status={status} ingest={ingest} />
         <div className="settings-main__body">
           {tab === "data" && (
             <DataTab

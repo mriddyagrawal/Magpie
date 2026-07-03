@@ -6,10 +6,8 @@
       "WebFetch(domain:redlib.catsarch.com)",
       "WebFetch(domain:safereddit.com)",
       "WebFetch(domain:api.pullpush.io)",
-
       "Read(//mnt/hardisk/Project-Democratize-Furman-Information/videos/**)",
       "Read(//mnt/hardisk/rememex/**)",
-
       "Bash(ls *)",
       "Bash(pwd)",
       "Bash(cat *)",
@@ -23,12 +21,10 @@
       "Bash(realpath *)",
       "Bash(basename *)",
       "Bash(dirname *)",
-
       "Bash(grep *)",
       "Bash(rg *)",
       "Bash(find *)",
       "Bash(fd *)",
-
       "Bash(sort *)",
       "Bash(uniq *)",
       "Bash(cut *)",
@@ -39,7 +35,6 @@
       "Bash(jq *)",
       "Bash(yq *)",
       "Bash(column *)",
-
       "Bash(echo *)",
       "Bash(date)",
       "Bash(whoami)",
@@ -56,7 +51,6 @@
       "Bash(du *)",
       "Bash(ps *)",
       "Bash(man *)",
-
       "Bash(git status *)",
       "Bash(git log *)",
       "Bash(git diff *)",
@@ -76,7 +70,6 @@
       "Bash(git -C * branch *)",
       "Bash(git -C * blame *)",
       "Bash(git -C * ls-files *)",
-
       "Bash(gh repo *)",
       "Bash(gh api *)",
       "Bash(gh pr list *)",
@@ -86,7 +79,6 @@
       "Bash(gh run view *)",
       "Bash(gh release list *)",
       "Bash(gh release view *)",
-
       "Bash(uv run *)",
       "Bash(npm list *)",
       "Bash(npm view *)",
@@ -95,12 +87,16 @@
       "Bash(pip show *)",
       "Bash(cargo metadata *)",
       "Bash(cargo check *)",
-
       "Bash(* --version)",
       "Bash(* -V)",
       "Bash(* --help)",
       "Bash(* -h)",
       "Bash(strings *)"
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "figma@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
   }
 }

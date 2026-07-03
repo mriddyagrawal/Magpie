@@ -35,14 +35,20 @@
   --blur-card: 40px;
   --shadow-card: 0 18px 50px rgba(0, 0, 0, 0.45);
 
-  /* Type */
-  --font-body: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Type — Spotlight/System Settings look.
+     macOS resolves -apple-system to real SF Pro; other platforms fall
+     through to bundled Inter (SF's open-source metric twin). Never ship
+     SF Pro font files — Apple's license restricts them to Apple OSes. */
+  --font-body: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
   --font-mono: "SUSE Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --font-slab: "Roboto Slab", Georgia, "Times New Roman", serif;
 
+  /* Apple HIG scale: caption 11 / footnote 12 / body 13 / subhead 15 / headline 17 */
   --size-xs: 11px;
-  --size-sm: 13px;
-  --size-md: 14px;
-  --size-lg: 16px;
-  --size-xl: 18px;
+  --size-sm: 12px;
+  --size-md: 13px;
+  --size-lg: 15px;
+  --size-xl: 17px;
+
+  /* SF-style tracking for large titles (SF Display tightens above ~20px) */
+  --tracking-title: -0.02em;
 }

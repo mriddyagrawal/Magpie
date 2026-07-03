@@ -650,6 +650,7 @@ def preview(
     path: str = Query(...),
     page: int = Query(default=0, ge=0),
     max_rows: int = Query(default=500, ge=1, le=5000),
+    mode: str = Query(default="auto", pattern="^(auto|text)$"),
 ):
     abs_path = _resolve(path)
     ext = abs_path.suffix.lower()
@@ -658,6 +659,19 @@ def preview(
         return FileResponse(abs_path, media_type=IMAGE_MIMES[ext])
 
     if ext == ".pdf":
+        # mode=text: extracted text instead of a rendered page image.
+        # Powers the preview pane's "Text" toggle, where the frontend
+        # can highlight the answer's evidence terms — impossible on a
+        # rasterized page.
+        if mode == "text":
+            from src.content import extract_pdf_text, SummarizeError
+
+            try:
+                text = extract_pdf_text(abs_path, max_chars=200_000)
+            except SummarizeError as e:
+                raise HTTPException(status_code=415, detail=str(e)) from e
+            return PlainTextResponse(text)
+
         from src.content import render_pdf_pages_as_png, SummarizeError
 
         mtime = abs_path.stat().st_mtime

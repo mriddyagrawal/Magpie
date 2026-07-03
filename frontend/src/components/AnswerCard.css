@@ -13,13 +13,105 @@
   text-transform: uppercase;
 }
 
+/* Reading typography: answers are prose (often with lists, tables,
+   and math from academic PDFs) — body font, not monospace. Monospace
+   survives only inside code spans/blocks. */
 .answer-card__body {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: var(--size-md);
-  line-height: 1.55;
+  line-height: 1.6;
   color: var(--text-primary);
 }
+
+/* ---------- Markdown element styles ---------- */
+.answer-card__body p { margin: 0 0 10px; }
+.answer-card__body > *:last-child,
+.answer-card__body p:last-child { margin-bottom: 0; }
+
+.answer-card__body ul,
+.answer-card__body ol {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+.answer-card__body li { margin: 3px 0; }
+.answer-card__body li::marker { color: var(--text-dim); }
+
+.answer-card__body h1,
+.answer-card__body h2,
+.answer-card__body h3,
+.answer-card__body h4 {
+  margin: 14px 0 6px;
+  font-size: var(--size-md);
+  font-weight: 600;
+}
+.answer-card__body h1:first-child,
+.answer-card__body h2:first-child,
+.answer-card__body h3:first-child { margin-top: 0; }
+
+.answer-card__body code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: rgba(128, 128, 128, 0.14);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.answer-card__body pre {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  background: var(--bg-card-inner);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.answer-card__body pre code {
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.answer-card__body blockquote {
+  margin: 0 0 10px;
+  padding: 2px 0 2px 12px;
+  border-left: 2px solid var(--border-input);
+  color: var(--text-secondary);
+}
+
+.answer-card__body table {
+  border-collapse: collapse;
+  margin: 0 0 10px;
+  font-size: var(--size-sm);
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.answer-card__body th,
+.answer-card__body td {
+  border: 1px solid var(--border-soft);
+  padding: 4px 10px;
+  text-align: left;
+}
+.answer-card__body th {
+  font-weight: 600;
+  background: var(--bg-card-inner);
+}
+
+.answer-card__body a { color: var(--accent); }
+.answer-card__body hr {
+  border: none;
+  border-top: 1px solid var(--border-soft);
+  margin: 12px 0;
+}
+
+/* KaTeX: display math scrolls horizontally instead of overflowing. */
+.answer-card__body .katex-display {
+  margin: 6px 0 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+.answer-card__body .katex { font-size: 1.05em; }
 
 .answer-card__followup {
   align-self: flex-start;

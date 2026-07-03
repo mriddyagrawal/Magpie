@@ -28,12 +28,12 @@ export function Highlighted({
   );
 }
 
-interface Part {
+export interface Part {
   text: string;
   highlight: boolean;
 }
 
-function splitWithTokens(text: string, tokens: string[]): Part[] {
+export function splitWithTokens(text: string, tokens: string[]): Part[] {
   if (!tokens.length) return [{ text, highlight: false }];
   const sorted = [...new Set(tokens.filter(Boolean))].sort((a, b) => b.length - a.length);
   const escaped = sorted.map(escapeRegex);

@@ -1,0 +1,43 @@
+[package]
+name = "magpie"
+version = "0.1.0"
+description = "Magpie — Spotlight-style UI for NotAnotherSpotlight"
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "magpie_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["macos-private-api", "tray-icon"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri-plugin-single-instance = "2"
+tauri-plugin-autostart = "2"
+# Plan #10 P10-6 — Tauri's built-in updater. Triggered via JS-side
+# check() on app launch (see frontend/src/auto-updater.ts). Endpoint
+# + public key configured in tauri.conf.json's plugins.updater block.
+# Signing keys: TAURI_SIGNING_PRIVATE_KEY env var consumed at build time
+# by `tauri build`; public key is baked into the bundle via tauri.conf.json.
+tauri-plugin-updater = "2"
+# Plan #10 P10-6 — Tauri's process plugin. Required Rust counterpart for
+# JS-side `relaunch()` from @tauri-apps/plugin-process (see auto-updater.ts).
+# Without this, the JS call fails at runtime with "plugin process not found"
+# even though @tauri-apps/plugin-process is installed on the JS side.
+tauri-plugin-process = "2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+window-vibrancy = "0.5"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

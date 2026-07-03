@@ -1,0 +1,48 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+CLAUDE.md
+.claude/scheduled_tasks.lock
+Test Content/
+Test Content Deprecated/
+Test Summaries/
+test_label/
+Test Summaries 2 Deprecated/
+Test Content 2 Deprecated/
+qdrant_data/
+# Qdrant's per-collection working snapshot dir, created in cwd whenever the
+# server runs. Re-populated transiently every `just backup` run.
+snapshots/
+
+# Magpie UI artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.turbo/
+frontend/src-tauri/target/
+frontend/src-tauri/gen/
+notanotherspotlight.egg-info/
+
+# Compiled sidecar binaries — built locally via `just build-sidecar`, never committed
+frontend/src-tauri/binaries/
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# Local debug / scratch artifacts (do not commit)
+# - appzip/ holds Windows debug-build zips (~1 GB+ each)
+# - errors/ holds ad-hoc screenshots / failure captures
+# - conversation-export*.md are local chat-session exports
+appzip/
+errors/
+conversation-export*.md
+
+# Bundled OpenRouter API key — baked into release builds at build time
+# so the Cloud toggle works for end users without any setup. NEVER commit
+# the real key. The .example file is the format contract; the actual key
+# lives only on whoever's machine builds the release. Plan: replace with
+# Magpie Cloud backend (Plan #40) once beta validates the toggle UX.
+src/config/bundled_key.txt

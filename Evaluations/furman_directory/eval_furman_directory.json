@@ -1,0 +1,361 @@
+[
+  {
+    "id": "q01",
+    "question": "Who is the president of Furman University?",
+    "ground_truth": "Elizabeth Davis (Email: elizabeth.davis@furman.edu, Phone: 864.294.2100, Office: ADM 200). Disambiguates from 68 other entries that contain 'president' in their title (FAN club presidents, alumni-affiliated, etc.) by exact-title match: only one row has the bare title 'President'.",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Disambiguation challenge real: 69 rows match 'president' substring; only 1 has exact-title 'President'. Original GT correct on the answer.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q02",
+    "question": "Who is the chair of the Computer Science department?",
+    "ground_truth": "Andrea Tartaro, Daniel Distinguished Professor of Computer Science and Chair (andrea.tartaro@furman.edu, Riley Hall 200-E).",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Filter title contains both 'Computer Science' and 'Chair'. One match.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q03",
+    "question": "What is the email and office of the Furman Farm Manager?",
+    "ground_truth": "Bruce Adams, Furman Farm Manager. Email: bruce.adams@furman.edu, phone: 864.294.3655. Office field is empty for this row.",
+    "reasoning_type": [
+      "single_doc",
+      "filter",
+      "data_absence"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Tests honest report of empty office field rather than hallucinating one.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q04",
+    "question": "Who is the Chief of Police at Furman, and how do I reach them?",
+    "ground_truth": "John Milby, Chief of Police. Email: john.milby@furman.edu, phone: 864.294.3555. Office field is empty.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Single match.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q05",
+    "question": "Who is the Title IX Coordinator at Furman?",
+    "ground_truth": "Melissa Nichols, Title IX and ADA/Section 504 Coordinator (melissa.nichols@furman.edu, phone 864.294.2221). Jeremy Cass also serves as Title IX Deputy Coordinator alongside his Dean of Faculty / Professor of Spanish role (jeremy.cass@furman.edu, ADM 200B).",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation",
+      "multiple_relevant"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Two relevant entries: the principal Coordinator (Nichols) and the Deputy (Cass). A complete answer surfaces both with their distinct roles.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q06",
+    "question": "Who is the Provost at Furman?",
+    "ground_truth": "Beth Pontari, Vice President for Academic Affairs and Provost; Professor of Psychology. Email: beth.pontari@furman.edu, office: Administration Building 200E.",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). 4 entries contain 'Provost' in title (Provost, Associate Provost x2, Executive Assistant). Pontari is the only one with the senior title.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q07",
+    "question": "Who is the Dean of Faculty?",
+    "ground_truth": "Jeremy Cass, Dean of Faculty; Professor of Spanish and Title IX Deputy Coordinator. Email: jeremy.cass@furman.edu, office: ADM 200B.",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). 3 entries contain 'Dean of Faculty' (the dean himself, his director of fiscal operations, his executive assistant). Cass is the dean.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q08",
+    "question": "Who is the Dean of Students?",
+    "ground_truth": "Jason Cassidy, AVP for Student Life / Dean of Students. Email: jason.cassidy@furman.edu (office field empty).",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). 2 entries: Cassidy (the Dean) and Ron Thompson (Associate Dean of Students & Director of Housing).",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q09",
+    "question": "Who is the General Counsel at Furman?",
+    "ground_truth": "Meredith E. Green, General Counsel. Email: ogc@furman.edu (Office of General Counsel shared inbox), phone: 864.294.2100. Don Kaade is Associate General Counsel; Gunner Hedden is Investigations and Compliance Officer in the same office. Note: 'Doug Webb '02' also lists 'General Counsel' but appears to be an alumni listing — disambiguate by phone/email patterns.",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation",
+      "alumni_filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). 5 matches; primary GC is Green. Doug Webb's entry has only the generic 864.294.2000 directory phone and an apostrophed graduation year — likely an alumni listing.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q10",
+    "question": "Who is the University Chaplain?",
+    "ground_truth": "Vaughn CroweTipton, Associate Vice President for Spiritual Life; University Chaplain; Associate Professor of Religion. Email: vaughn.crowetipton@furman.edu, office: Daniel Chapel, University Chaplain Office. Alexis Carter Thomas serves as Associate Chaplain.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Two entries: the principal Chaplain and the Associate.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q11",
+    "question": "Who is the Director of Libraries?",
+    "ground_truth": "Caroline Mills, Director of Libraries. Email: caroline.mills1689@furman.edu, phone: 864.294.2263, office: Duke Library Administrative Suite - 208B. Note: Patricia Sasser is Director of the Maxwell Music Library specifically — a sub-library role, not the principal Director of Libraries.",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). 2 matches; Mills is the system-wide director, Sasser runs one specific library.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q12",
+    "question": "Whose phone number is 864.294.2062?",
+    "ground_truth": "Caro Douglas, Assistant Director of Student Involvement, Fraternity & Sorority Life. Email: caro.douglas1@furman.edu, office: Trone Student Center, 206. Note: this person appears as a DUPLICATE entry in the directory — two identical rows with the same name/title/email/phone/office.",
+    "reasoning_type": [
+      "single_doc",
+      "filter",
+      "data_quality"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Phone-number reverse lookup. The exact-match returns 2 identical rows (duplicate entry — same as Brittany Champion's case in q19's notes). A robust answer mentions only one person but flags the duplicate.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q13",
+    "question": "Who has an office in Riley Hall 200-E?",
+    "ground_truth": "Two CS faculty share office Riley Hall 200-E: Andrea Tartaro (Daniel Distinguished Professor of Computer Science and Chair) and Kevin Treu (Herman N. Hipp Professor of Computer Science). Note string sensitivity: 'Riley Hall 200-E' is exact; close variants exist in the same building (200-C, 200-D, 200-I, 200) for other CS faculty.",
+    "reasoning_type": [
+      "single_doc",
+      "filter",
+      "string_normalization"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Tests exact-string matching on the office field. The directory also has 'Riley 200D', 'Riley Hall, 200-D' (with comma), 'Riley Hall 200-C' — same building, different rooms — so loose matching could over-return.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q14",
+    "question": "List all professors in the Computer Science department.",
+    "ground_truth": "6 current CS faculty: Andrea Tartaro (Daniel Distinguished Professor and Chair), Kevin Treu (Herman N. Hipp Professor), Chris Alvin (Associate Professor), Bryan Catron (Instructor), Rebecca Drucker (Assistant Professor), and Syed Fahad Sultan (Assistant Professor). Plus Ken Abernethy is Emeritus Professor + Visiting Professor (technically still teaching). Excludes Kala Kennemore (Department Assistant — staff, not faculty).",
+    "reasoning_type": [
+      "single_doc",
+      "filter",
+      "category_distinction"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Tests faculty-vs-staff distinction. CSV title-substring 'computer science' returns 7 rows; one is the Department Assistant (Kennemore). Whether to include emeritus/visiting Abernethy is a judgment call — a complete answer flags both.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q15",
+    "question": "Who is the chair of the Mathematics department?",
+    "ground_truth": "Thomas Lewis, Professor, Chair of Mathematics. Email: tom.lewis@furman.edu, phone: 864.294.3640, office: Riley Hall 205J.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Single match.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q16",
+    "question": "Who is the chair of the Physics department?",
+    "ground_truth": "Jeremy R. Gulley, Professor and Chair of Physics. Email: jeremy.gulley@furman.edu, phone: 864.294.3519, office: Townes Science Center, Plyler 218B.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Single match.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q17",
+    "question": "Who chairs the department of Modern Languages and Literatures?",
+    "ground_truth": "Ronald Friis, Professor of Spanish; Chair, Department of Modern Languages and Literatures. Email: ron.friis@furman.edu, phone: 864.294.2227, office: Furman Hall 235M.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Single match. The chair holds dual title — primary academic role (Spanish prof) + administrative chair role.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q18",
+    "question": "Who is the medical director of the Earle Student Health Center, and how do I contact them?",
+    "ground_truth": "Ann (Knowles) Gilchrist, Medical Director, Earle Student Health Center. Email: furmanstudenthealth@prismahealth.org, phone: 864.522.2000. Note that Sarah Hinton is listed as 'Interim Medical Director' (studenthealth@furman.edu, 864.294.2180) — could be a recent transition; both numbers route to student health.",
+    "reasoning_type": [
+      "single_doc",
+      "disambiguation",
+      "temporal_ambiguity"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). 5 entries contain 'medical director' in title; only one is for Earle Student Health Center specifically. The Interim Medical Director also exists — a robust answer surfaces this ambiguity.",
+    "difficulty": "hard"
+  },
+  {
+    "id": "q19",
+    "question": "I'm looking for Bill Aarnes's email — can you find it?",
+    "ground_truth": "William Aarnes, Undergraduate Evening Studies Faculty. Email: bill.aarnes@furman.edu, phone: 864.294.3159 (office field empty).",
+    "reasoning_type": [
+      "single_doc",
+      "name_normalization"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Tests informal-name → formal-name resolution: 'Bill' → 'William', 'bill.aarnes@' email pattern.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q20",
+    "question": "Who is the Center for Engaged Learning Coordinator?",
+    "ground_truth": "Sara Abraham-Oxford, Center for Engaged Learning Coordinator. Email: sara.abraham-oxford@furman.edu, office: Trone 209M.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Single match.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q21",
+    "question": "Who is the Emeritus Professor of Computer Science?",
+    "ground_truth": "Ken Abernethy, Emeritus Professor of CS; Visiting Professor of CS (2019-present); Director of Rushing Center for Teaching and Technology. Email: ken.abernethy@furman.edu, phone: 864.294.3219, office: Riley 200D.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Single match for emeritus + CS. Emeritus AND visiting — still active.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q22",
+    "question": "Who is the chair of the Psychology department?",
+    "ground_truth": "Erin Hahn, Professor and Department Chair of Psychology. Email: erin.hahn@furman.edu, office: JH 206-I (Johns Hall 206-I). Note Onarae Rice is Department Chair of Neuroscience (a separate department, even though Rice's title also mentions Psychology).",
+    "reasoning_type": [
+      "single_doc",
+      "filter",
+      "disambiguation"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Tests department-name disambiguation. Both rows are 'professors of psychology' but only Hahn chairs the Psychology Department; Rice chairs Neuroscience.",
+    "difficulty": "medium"
+  },
+  {
+    "id": "q23",
+    "question": "Who chairs the Department of Anthropology?",
+    "ground_truth": "Lisa Knight, Alva and Beatrice Bradley Professor of Anthropology, Asian Studies, and Religion; Chair, Department of Anthropology. Email: lisa.knight@furman.edu, office: Furman Hall 222 J.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Single match.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q24",
+    "question": "Are there any faculty whose office is in Daniel Chapel?",
+    "ground_truth": "Yes — Vaughn CroweTipton (Associate Vice President for Spiritual Life; University Chaplain; Associate Professor of Religion) is the only person whose office is listed in Daniel Chapel ('Daniel Chapel, University Chaplain Office').",
+    "reasoning_type": [
+      "single_doc",
+      "filter",
+      "negative_check"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Substring search on office field. One match.",
+    "difficulty": "easy"
+  },
+  {
+    "id": "q25",
+    "question": "I need the contact information for whoever handles fraternity and sorority life at Furman.",
+    "ground_truth": "Caro Douglas, Assistant Director of Student Involvement, Fraternity & Sorority Life. Email: caro.douglas1@furman.edu, phone: 864.294.2062, office: Trone Student Center, 206.",
+    "reasoning_type": [
+      "single_doc",
+      "filter"
+    ],
+    "key_files": [
+      "Furman Directory/furman_directory.csv"
+    ],
+    "notes": "key_files in original eval points at people_profiles.json + people_urls.json which do NOT exist in the corpus. Actual source is Furman Directory/furman_directory.csv (1,481 rows; columns: name, title, email, phone, office, profile_url). Same person as q12 (reverse-lookup by phone). Note this row appears as a duplicate in the CSV.",
+    "difficulty": "easy"
+  }
+]

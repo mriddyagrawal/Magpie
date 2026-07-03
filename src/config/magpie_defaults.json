@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "_comment": "Developer-controlled safety rails. Migrated from src/ingest/ignore.py:DEFAULT_IGNORE_PATTERNS. Users do not edit this. Patterns use gitignore syntax. exclude_dirs are bare directory names matched at any depth. exclude_extensions are .ext suffixes matched at end of filename. exclude_globs are full gitignore patterns. Source provenance comments preserved as section headers in arrays where useful — Pydantic strips on load.",
+
+  "exclude_dirs": [
+    ".git", ".hg", ".svn",
+
+    "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox",
+    ".venv", "venv", "env", "site-packages", "pip-cache", "pip_cache", "pip-packages",
+
+    "node_modules", ".next", ".nuxt", ".parcel-cache", ".turbo", ".vercel",
+    ".netlify", ".svelte-kit", ".angular", ".firebase", "bower_components",
+
+    "target", "bin", "obj",
+
+    "build", "dist", "out", ".output", "coverage",
+
+    "CMakeFiles", ".deps", ".libs", "autom4te.cache",
+
+    ".gradle",
+
+    "DerivedData", "xcuserdata", "Pods", ".swiftpm",
+
+    ".stack-work", "dist-newstyle", ".cabal-sandbox",
+
+    "_build", ".elixir_ls",
+
+    ".bloop", ".metals", ".bsp",
+
+    ".bundle",
+
+    ".idea", ".vscode", ".vs",
+
+    "tmp", ".cache",
+
+    "__MACOSX", ".fseventsd", ".Spotlight-V100", ".TemporaryItems",
+    ".Trashes", ".AppleDouble", ".AppleDB", ".AppleDesktop",
+    ".AppleSystemFiles", ".DocumentRevisions-V100", ".PKInstallSandboxManager",
+
+    ".Trash",
+
+    "$RECYCLE.BIN", "$Recycle.Bin", "RECYCLER",
+    "System Volume Information", "Config.Msi", "Recovery",
+    "MSOCache", "PerfLogs", "Documents and Settings",
+    "WindowsApps", "Program Files", "Program Files (x86)", "ProgramData",
+    "$WINDOWS.~BT", "$WINDOWS.~WS", "$Windows.~BT", "$GetCurrent",
+    "$SysReset", "OneDriveTemp",
+
+    "lost+found", ".snapshots",
+
+    "Test Summaries",
+
+    ".ipynb_checkpoints",
+
+    ".dropbox.cache", ".dropbox"
+  ],
+
+  "exclude_globs": [
+    "found.[0-9]*/",
+    "*.chk/",
+
+    "*.rs.bk",
+
+    "CMakeCache.txt", "cmake_install.cmake",
+    "config.log", "config.status", "config.cache",
+    "*.dSYM/",
+
+    "*.suo", "*.user", "*.userosscache", "*.sln.docstates",
+    "*.opendb", "*.opensdf", "*.VC.db", "*.VC.opendb", "*.tlog",
+
+    "*.iml", "*.ipr", "*.iws",
+
+    "cabal.sandbox.config",
+
+    "vendor/bundle/",
+
+    ".swp", ".swo",
+    "*.swp", "*.swo",
+
+    "var/tmp/",
+    "**/Library/Caches/**",
+    "**/AppData/Local/Temp/**",
+    "**/AppData/Local/Cache/**",
+
+    "pytest-of-*/",
+
+    "._*",
+    ".com.apple.timemachine.donotpresent",
+    ".com.apple.timemachine.supported",
+    ".metadata_never_index",
+    ".VolumeIcon.icns",
+    "Network Trash Folder/",
+    "Temporary Items/",
+    "*.sparsebundle/",
+    "Backups.backupdb/",
+    "Library/Containers/",
+    "Library/Logs/",
+    "Library/CrashReporter/",
+
+    ".Trash-*/",
+
+    "pagefile.sys", "hiberfil.sys", "swapfile.sys",
+    "DumpStack.log", "DumpStack.log.tmp",
+    "bootmgr", "BOOTNXT", "BOOTSECT.BAK",
+    "NTUSER.DAT*", "ntuser.dat*",
+    "~$*",
+    "IconCache.db",
+
+    ".zfs/snapshot/",
+    "core",
+    "*~",
+    "\\#*#",
+    ".#*",
+
+    "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "poetry.lock", "uv.lock", "Cargo.lock", "Gemfile.lock", "go.sum",
+
+    "**/*_extracted/ppt/media/**",
+    "**/*_extracted/word/media/**",
+    "**/*_extracted/xl/media/**",
+
+    ".env", ".env.*",
+    ".npmrc", ".netrc", ".pgpass", ".git-credentials",
+    "id_rsa", "id_rsa.*",
+    "id_ed25519", "id_ed25519.*",
+    "id_ecdsa", "id_ecdsa.*",
+    "id_dsa", "id_dsa.*",
+    "*.pfx", "*.p12",
+
+    "*.photoslibrary/",
+    "Photos Library.photoslibrary/",
+
+    "*.pages/", "*.numbers/", "*.key/",
+
+    "OneDrive/.~tmp/",
+
+    "*-conflict-*.{docx,xlsx,pptx,pdf,txt,md}",
+    "*-{Mac,PC,iPhone,iPad,Android}-*-conflict.*"
+  ],
+
+  "exclude_extensions": [
+    ".pyc", ".pyo",
+    ".DS_Store", ".thumbs.db"
+  ],
+
+  "ignore_hidden": true,
+
+  "_app_settings_comment": "Below: defaults for the user-facing app settings (provider choice, retrieval knobs, theme, etc.). Read by AppDefaults in src/config/settings.py; ignored by MagpieDefaults (indexing-rules side) via Pydantic extra='ignore'. Cloud routing (cloud_provider, per-provider models, API keys) lives in secrets.json next to the credentials, not here.",
+
+  "provider": "local",
+  "top_k": 5,
+  "rewrite_default": false,
+  "temperature": 0.7,
+  "cite_sources_inline": true,
+  "enumerate_lists": true,
+  "theme": "system",
+  "accent": "ink",
+  "launch_at_login": false
+}

@@ -1,0 +1,16 @@
+MAGPIE — VISION & PHILOSOPHY
+(For the "1 year from now / wildest dreams" question. Keep this part philosophical; business detail lives in action_plan.txt.)
+
+
+WHAT SUCCESS LOOKS LIKE 1 YEAR FROM NOW
+
+In 12 months, Magpie has 10,000 paying users and ~$3M ARR. We've found our wedge — solopreneurs and freelancers running their entire business out of a folder — and we own it. Our two-layer summary architecture (summarize first, descend into source only on a hit) answers cross-document questions in under 2 seconds and never phones home with the data — private by default, sovereign forever. The benchmark is Cursor: $0 → $100M ARR in year one by being the answer engine for one painful workflow on the developer's own machine. We're doing the same thing for the document chaos every freelancer carries on their laptop — and the freelancer market (76M in the US, 1.57B globally) is 50× the developer market.
+
+
+BEYOND OUR WILDEST DREAMS
+
+In the Second Treatise of Government, John Locke gave the modern world its central principle: what you mix your labor with becomes yours. Every wave of progress since has had the same shape: what the world once shared, it trickels down too individual ownership in final form. The industrial revolution made property personal. The 1950s turned one shared family car (0.8 per US household) into one in every garage (1.5 by 1960). The .com boom turned a few thousand servers into a billion personal websites and personal social media. AI is on the same arc, and we're at year zero of it. Today intelligence is a mainframe, you rent it from OpenAI, Anthropic, Google, and your most private information passes through their hands. That is not ownership. It is rental. And it cannot last.
+
+Magpie is the iPod moment for AI — the thing that lives on your computer that you own. The model learns from your files and never leaves. You don't rent your mind anymore, you own it. Magpie democratizes AI access by privatizing it.
+
+What follows is a family of products on the same line: decentralized, privatized, owned by the user. A phone version that indexes what you carry. Browser extensions that pull the public web into your Magpie. Developer tools that let any website be indexed by the Magpies people already carry. Not one super-app trying to do everything — a toolkit for personal AI ownership across every device and every information surface, made for every type of user. The personal answer engine alone already produces $20–60B companies like Cursor and Perplexity, all under five years old, all under-built for the individual; we're the first to build it on the user's own machine. The principle is the same in every product: your data, your model, your machine, your call. Locke called it lives, liberties, and estates — the three things every human is born to own. In the AI era, the estate is your data, your work, your mind. We're building it.

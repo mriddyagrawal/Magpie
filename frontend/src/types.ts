@@ -24,6 +24,11 @@ export interface QueryResponse {
   not_found: boolean;
   not_found_topic: string;
   sources_scanned_count: number;
+  // ORDERED list of paths the answer actually drew from. Inline `[N]`
+  // citation markers are 1-based indexes into THIS list (per the
+  // src/answer.py prompt contract) — NOT into `sources`, which is the
+  // full retrieval candidate list.
+  sources_used: string[];
   // The recents.json entry id this ask was just persisted to. Lets the
   // frontend update its in-memory recents list without an extra GET.
   recent_id: string | null;

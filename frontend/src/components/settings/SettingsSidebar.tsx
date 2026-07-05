@@ -14,6 +14,8 @@
  * using" indicator.
  */
 
+import { Folder, Keyboard, Sparkles } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { StatusResponse } from "../../types";
 
 export type SettingsTab = "data" | "search-ai" | "shortcut-app";
@@ -27,13 +29,13 @@ interface Props {
 interface NavEntry {
   id: SettingsTab;
   label: string;
-  icon: string; // glyph; designer can swap to SVG later
+  icon: LucideIcon;
 }
 
 const NAV: NavEntry[] = [
-  { id: "data",          label: "Data",            icon: "📁" },
-  { id: "search-ai",     label: "Search & AI",     icon: "≡"  },
-  { id: "shortcut-app",  label: "Shortcut & App",  icon: "⌨"  },
+  { id: "data",          label: "Data",            icon: Folder   },
+  { id: "search-ai",     label: "Search & AI",     icon: Sparkles },
+  { id: "shortcut-app",  label: "Shortcut & App",  icon: Keyboard },
 ];
 
 export function SettingsSidebar({ active, onChange, status }: Props) {
@@ -52,39 +54,28 @@ export function SettingsSidebar({ active, onChange, status }: Props) {
             onClick={() => onChange(entry.id)}
           >
             <span className="settings-sidebar__nav-icon" aria-hidden="true">
-              {entry.icon}
+              <entry.icon size={15} strokeWidth={1.8} />
             </span>
             <span className="settings-sidebar__nav-label">{entry.label}</span>
           </button>
         ))}
       </nav>
+      {/* Plain sentences, not a label:value debug table. Provider only
+          — the model name is intentionally hidden from the user-facing
+          surface (no-tech-leak: internal terms like "Gemma 4" never
+          reach the UI). */}
       <div className="settings-sidebar__footer">
-        <SidebarFooterRow
-          label="understood"
-          value={status?.indexed_count != null ? `${status.indexed_count.toLocaleString()} files` : "—"}
-        />
-        {/* Provider only — the model name is intentionally hidden from
-            the user-facing surface. Internal terms ("Gemma 4",
-            "unsloth/gemma-...") shouldn't leak into the UI per the
-            no-tech-leak product principle. */}
-        <SidebarFooterRow
-          label="provider"
-          value={status?.provider ? capitalize(status.provider) : "—"}
-        />
+        <span className="settings-sidebar__footer-line">
+          {status?.indexed_count != null
+            ? `${status.indexed_count.toLocaleString()} ${status.indexed_count === 1 ? "file" : "files"} understood`
+            : "Connecting…"}
+        </span>
+        {status?.provider && (
+          <span className="settings-sidebar__footer-line">
+            {status.provider === "cloud" ? "Cloud AI" : "On-device AI"}
+          </span>
+        )}
       </div>
     </aside>
   );
-}
-
-function SidebarFooterRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="settings-sidebar__footer-row">
-      <span className="settings-sidebar__footer-label">{label}:</span>
-      <span className="settings-sidebar__footer-value">{value}</span>
-    </div>
-  );
-}
-
-function capitalize(s: string): string {
-  return s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 }

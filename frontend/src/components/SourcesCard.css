@@ -3,9 +3,11 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+  /* Natural content height — the parent column scrolls. (This card
+     used to be flex:1 + overflow:hidden for the old fixed layout;
+     inside a scrolling column that computed to ~zero height whenever
+     the answer was tall, collapsing the list to just its header.) */
+  flex: none;
 }
 
 .sources-card__header {
@@ -38,6 +40,23 @@
   overflow-y: auto;
   min-height: 0;
 }
+
+/* Fold/unfold row for scanned-but-uncited candidates. */
+.sources-card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 2px 0;
+  font-size: var(--size-xs);
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 120ms ease-out;
+}
+.sources-card__more:hover { color: var(--text-primary); }
+.sources-card__more svg { flex-shrink: 0; }
 
 .source-row {
   position: relative;
@@ -95,7 +114,7 @@
 
 .source-row__snippet {
   font-family: var(--font-body);
-  font-weight: 300;
+  font-weight: 400;
   font-size: var(--size-sm);
   color: var(--text-secondary);
   line-height: 1.45;

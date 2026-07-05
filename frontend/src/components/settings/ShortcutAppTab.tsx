@@ -19,6 +19,7 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 import {
   isRegistered as isShortcutRegistered,
@@ -26,6 +27,7 @@ import {
   unregister as unregisterShortcut,
 } from "@tauri-apps/plugin-global-shortcut";
 import {
+  friendlyError,
   getAppSettings,
   getShortcut,
   patchAppSettings,
@@ -68,7 +70,7 @@ export function ShortcutAppTab({
   // Initial fetch.
   useEffect(() => {
     if (app === null) {
-      getAppSettings().then(setApp).catch((e) => setError((e as Error).message));
+      getAppSettings().then(setApp).catch((e) => setError(friendlyError(e)));
     }
     if (shortcut === null) {
       getShortcut().then(setShortcut).catch(() => { /* non-fatal */ });
@@ -130,7 +132,7 @@ export function ShortcutAppTab({
       const updated = await patchAppSettings(p);
       setApp(updated);
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [app, setApp]);
 
@@ -201,12 +203,15 @@ export function ShortcutAppTab({
   return (
     <div className="shortcut-app-tab">
       <header className="shortcut-app-tab__header">
-        <h1 className="shortcut-app-tab__title">Shortcut & App</h1>
         <p className="shortcut-app-tab__subtitle">
           The global summon-key, theme, accent, and launch behavior.
         </p>
       </header>
-      {error && <div className="shortcut-app-tab__error">⚠ {error}</div>}
+      {error && (
+        <div className="shortcut-app-tab__error">
+          <AlertTriangle size={14} aria-hidden="true" /> {error}
+        </div>
+      )}
 
       <Section title="Global shortcut">
         {recording ? (
@@ -262,22 +267,21 @@ export function ShortcutAppTab({
       </Section>
 
       <Section title="Accent color">
+        {/* macOS System Settings-style accent picker: plain color
+            circles, selected one gets an offset ring. Names move to
+            the tooltip + accessible label. */}
         <div className="accent-picker">
           {ACCENTS.map((a) => (
             <button
               key={a}
               type="button"
               className={`accent-swatch ${app.accent === a ? "is-active" : ""}`}
+              style={{ "--swatch": ACCENT_COLORS[a] } as React.CSSProperties}
               onClick={() => patchApp({ accent: a })}
+              title={capitalize(a)}
               aria-label={`Accent color ${a}`}
-            >
-              <span
-                className="accent-swatch__dot"
-                style={{ background: ACCENT_COLORS[a] }}
-                aria-hidden="true"
-              />
-              <span className="accent-swatch__label">{capitalize(a)}</span>
-            </button>
+              aria-pressed={app.accent === a}
+            />
           ))}
         </div>
         <p className="shortcut-app-tab__hint">

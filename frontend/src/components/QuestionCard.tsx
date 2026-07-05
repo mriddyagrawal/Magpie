@@ -40,21 +40,7 @@ interface Props {
   isActive: boolean;
 }
 
-// Explicit drag: call startDragging() on mousedown anywhere on the card that
-// isn't an interactive element. More reliable than data-tauri-drag-region
-// alone when the window has backdrop-filter / vibrancy — on macOS the
-// attribute sometimes fails to pick up events through the blur layer.
-const INTERACTIVE = "input, textarea, button, [role=button], [contenteditable]";
-function startDragOnMouseDown(e: React.MouseEvent) {
-  if (e.button !== 0) return;
-  const target = e.target as HTMLElement;
-  if (target.closest(INTERACTIVE)) return;
-  import("@tauri-apps/api/window")
-    .then(({ getCurrentWindow }) => getCurrentWindow().startDragging())
-    .catch(() => {
-      /* not under Tauri — ignore */
-    });
-}
+import { startDragOnMouseDown } from "./dragWindow";
 
 export const QuestionCard = forwardRef<HTMLInputElement, Props>(
   function QuestionCard(

@@ -334,13 +334,34 @@ pub fn run() {
             // app-menu pattern only applies on macOS.
             #[cfg(target_os = "macos")]
             {
+                use tauri::menu::PredefinedMenuItem;
                 let app_settings_item = MenuItem::with_id(
                     app, "menu_settings", "Settings…", true, Some("Cmd+,"),
                 )?;
                 let magpie_menu = Submenu::with_items(
                     app, "Magpie", true, &[&app_settings_item],
                 )?;
-                let app_menu = Menu::with_items(app, &[&magpie_menu])?;
+                // Edit menu. Without it, the standard Cmd+C / Cmd+V / Cmd+X /
+                // Cmd+A accelerators never reach the webview on macOS, so copy,
+                // cut, paste, and select-all silently do nothing in the ask bar.
+                // These PredefinedMenuItems register the OS-standard accelerators
+                // and route them to the focused text field. Windows/Linux get
+                // these from the webview natively, so this menu is macOS-only.
+                let edit_menu = Submenu::with_items(
+                    app,
+                    "Edit",
+                    true,
+                    &[
+                        &PredefinedMenuItem::undo(app, None)?,
+                        &PredefinedMenuItem::redo(app, None)?,
+                        &PredefinedMenuItem::separator(app)?,
+                        &PredefinedMenuItem::cut(app, None)?,
+                        &PredefinedMenuItem::copy(app, None)?,
+                        &PredefinedMenuItem::paste(app, None)?,
+                        &PredefinedMenuItem::select_all(app, None)?,
+                    ],
+                )?;
+                let app_menu = Menu::with_items(app, &[&magpie_menu, &edit_menu])?;
                 app.set_menu(app_menu)?;
                 let app_handle_for_menu = app.handle().clone();
                 app.on_menu_event(move |_app, event| {
@@ -485,6 +506,17 @@ pub fn run() {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 let _ = window.hide();
+                // macOS: when Settings is dismissed, drop back to Accessory so
+                // Magpie leaves the Dock again (it was promoted to Regular in
+                // open_settings_internal). The spotlight bar ("main") hides the
+                // same way but never touched the policy, so only "settings"
+                // reverts. No-op on Windows/Linux.
+                #[cfg(target_os = "macos")]
+                if window.label() == "settings" {
+                    let _ = window
+                        .app_handle()
+                        .set_activation_policy(tauri::ActivationPolicy::Accessory);
+                }
             }
         })
         .invoke_handler(tauri::generate_handler![
@@ -925,6 +957,17 @@ fn open_settings_internal(app: &tauri::AppHandle, action: Option<&str>) {
         "window.__MAGPIE_PORT__ = {}; window.__MAGPIE_WINDOW_TYPE__ = 'settings'; {}",
         port, action_js
     );
+
+    // macOS: promote to a regular (Dock-visible) app while Settings is
+    // open. The spotlight bar itself runs as `ActivationPolicy::Accessory`
+    // (no Dock icon, Spotlight-style); we flip to `Regular` here so Magpie
+    // appears in the Dock, then revert to `Accessory` when the Settings
+    // window closes (see the on_window_event handler below). Windows shows
+    // the settings window in the taskbar natively — no equivalent flip
+    // needed there.
+    #[cfg(target_os = "macos")]
+    let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
+
     if let Some(win) = app.get_webview_window("settings") {
         // Already open: re-inject the action so the SettingsWindow
         // component picks it up on its next effect tick. Eval is safe
@@ -934,7 +977,34 @@ fn open_settings_internal(app: &tauri::AppHandle, action: Option<&str>) {
         let _ = win.set_focus();
         return;
     }
-    let _ = WebviewWindowBuilder::new(app, "settings", WebviewUrl::default())
+
+    // Build the settings window from a BACKGROUND thread — never the main
+    // thread. On Windows, every caller of this function (the `open_settings`
+    // command, the tray-menu click, the macOS app menu) runs on the main
+    // thread. Creating a webview window there deadlocks (wry#583): the native
+    // window frame gets created, but WebView2 initialization needs the main
+    // thread to pump messages — and the main thread is blocked inside this
+    // very call. Symptom: a permanently white, unclosable "Magpie Settings"
+    // window with no web content. macOS's WKWebView initializes differently
+    // and never hit this, which is why settings worked on Mac and not on
+    // Windows. From a background thread, `.build()` safely dispatches the
+    // work to the (free) main event loop on both platforms.
+    //
+    // Loads the dedicated `settings.html` entry (settings-main.tsx renders
+    // <SettingsWindow> directly) instead of the shared index.html +
+    // `__MAGPIE_WINDOW_TYPE__` global, which removes the init-script/global
+    // race that also white-screened the settings webview on WebView2.
+    // Revert to Accessory (no Dock icon) once Settings closes: handled by the
+    // app-level `on_window_event` CloseRequested handler in `run()`, keyed on
+    // the "settings" window label. (Close is prevented + hidden there, so the
+    // window persists and the branch above re-shows it on next open.)
+    let app = app.clone();
+    std::thread::spawn(move || {
+        let built = WebviewWindowBuilder::new(
+            &app,
+            "settings",
+            WebviewUrl::App("settings.html".into()),
+        )
         .title("Magpie Settings")
         // Sized for the new three-tab layout (Specs/UI/settings_window.md).
         // The mockups assume ~720×640 to comfortably show the sidebar +
@@ -948,6 +1018,10 @@ fn open_settings_internal(app: &tauri::AppHandle, action: Option<&str>) {
         .always_on_top(false)
         .initialization_script(&init)
         .build();
+        if let Err(e) = &built {
+            eprintln!("[magpie] settings window failed to open: {e}");
+        }
+    });
 }
 
 /// Whitelist for action strings injected into JS init scripts. Keeps

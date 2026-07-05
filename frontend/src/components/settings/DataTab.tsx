@@ -2,9 +2,10 @@
  * DataTab — the Settings → Data tab.
  *
  * Layout (per Specs/UI/settings_window.md):
- *   - Title + subtitle ("Files and folders Magpie reads to understand
- *     your work. Nothing leaves your machine.")
- *   - Top-right: ↻ Sync · ⟳ Reindex · + Add folder / file ▾
+ *   - Subtitle ("Files and folders Magpie reads to understand your
+ *     work. Nothing leaves your machine.") — the pane title lives in
+ *     the window header strip.
+ *   - Top-right toolbar: Sync / Reindex / Add folder / file
  *   - Folder rows (delegated to FolderRow)
  *   - Empty state when no folders yet
  *   - Exclusions sub-panel (collapsed by default)
@@ -16,10 +17,20 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  FolderOpen,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  X,
+} from "lucide-react";
+import {
   addFolder,
   addExclusion,
+  friendlyError,
   getExclusions,
-  getIndexPlan,
   patchFolder,
   pickFile,
   pickFolder,
@@ -28,12 +39,12 @@ import {
   revealInFinder,
   runReindex,
   runSync,
+  startIngest,
   stopIngest,
 } from "../../api";
 import type {
   ExclusionsResponse,
   FolderEntry,
-  IndexPlan,
   IngestStatus,
 } from "../../api";
 import { ConfirmModal } from "./ConfirmModal";
@@ -66,7 +77,6 @@ export function DataTab({
   const [exclusionsOpen, setExclusionsOpen] = useState(false);
   const [exclusions, setExclusions] = useState<ExclusionsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [plan, setPlan] = useState<IndexPlan | null>(null);
 
   const addMenuRef = useRef<HTMLDivElement>(null);
 
@@ -82,38 +92,6 @@ export function DataTab({
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [showAddMenu]);
 
-  // Fetch the index plan on mount and whenever folders change. Refresh
-  // again whenever the ingest poll transitions from running → idle, so
-  // the "X files left to index" line follows reality. Server caches for
-  // 10s; spamming this endpoint mid-poll is cheap.
-  const refreshPlan = useCallback(async () => {
-    try {
-      const p = await getIndexPlan();
-      setPlan(p);
-    } catch (e) {
-      // Plan failures are non-fatal — fall back to silent (no grand
-      // total banner); the rest of the tab still works.
-      console.warn("[settings] /index/plan failed:", e);
-    }
-  }, []);
-  useEffect(() => {
-    void refreshPlan();
-  }, [refreshPlan, folders?.length]);
-  // Re-fetch after each ingest job ends. We watch `done` (server flips
-  // it true after the finally block) — the dependency on `running`
-  // alone would miss the transition because by the time the next poll
-  // tick fires, `running` is already false and `done` true.
-  const ingestDone = ingest?.done ?? false;
-  useEffect(() => {
-    if (ingestDone) {
-      void refreshPlan();
-    }
-  }, [ingestDone, refreshPlan]);
-
-  // The backend auto-fires `_do_sync()` from POST /settings/folders now,
-  // so we no longer need a separate POST /ingest call here. We still
-  // notify the parent so it starts polling /ingest/status and surfacing
-  // progress in the UI.
   const handlePickFolder = useCallback(async () => {
     setShowAddMenu(false);
     setError(null);
@@ -121,10 +99,11 @@ export function DataTab({
       const path = await pickFolder();
       if (!path) return;
       await addFolder(path);
+      await startIngest(path);
       onIngestStarted();
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted, refreshFolders]);
 
@@ -135,10 +114,11 @@ export function DataTab({
       const path = await pickFile();
       if (!path) return;
       await addFolder(path);
+      await startIngest(path);
       onIngestStarted();
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted, refreshFolders]);
 
@@ -148,7 +128,7 @@ export function DataTab({
       await runSync();
       onIngestStarted();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted]);
 
@@ -159,7 +139,7 @@ export function DataTab({
       await runReindex();
       onIngestStarted();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [onIngestStarted]);
 
@@ -167,15 +147,11 @@ export function DataTab({
     setError(null);
     try {
       await patchFolder({ path, enabled });
-      // Backend auto-fires sync when `enabled` flips — start polling so
-      // the user sees the orphan-cleanup pass (or the new-files pass)
-      // light up the status pill.
-      onIngestStarted();
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
-  }, [onIngestStarted, refreshFolders]);
+  }, [refreshFolders]);
 
   const handleRemove = useCallback((path: string) => {
     const target = (folders ?? []).find((f) => f.path === path);
@@ -189,15 +165,11 @@ export function DataTab({
     setError(null);
     try {
       await removeFolder(path);
-      // Backend auto-fires sync on remove (orphan cleanup runs at the
-      // end of _do_sync) — start polling so the user sees the count
-      // drop in real time.
-      onIngestStarted();
       refreshFolders();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
-  }, [removeTarget, onIngestStarted, refreshFolders]);
+  }, [removeTarget, refreshFolders]);
 
   const handleResync = useCallback(async (_path: string) => {
     // v1: per-folder Refresh fires the global Sync. When we add
@@ -210,7 +182,7 @@ export function DataTab({
     try {
       await stopIngest();
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, []);
 
@@ -226,7 +198,7 @@ export function DataTab({
         const data = await getExclusions();
         setExclusions(data);
       } catch (e) {
-        setError((e as Error).message);
+        setError(friendlyError(e));
       }
     }
   }, [exclusionsOpen, exclusions]);
@@ -247,7 +219,9 @@ export function DataTab({
         />
         {error && <ErrorBanner message={error} />}
         <div className="data-tab__empty">
-          <div className="data-tab__empty-glyph" aria-hidden="true">📁</div>
+          <div className="data-tab__empty-glyph" aria-hidden="true">
+            <FolderOpen size={40} strokeWidth={1.25} />
+          </div>
           <p className="data-tab__empty-headline">
             Magpie hasn't read any of your files yet.
           </p>
@@ -282,7 +256,6 @@ export function DataTab({
         syncDisabled={pollActive}
       />
       {error && <ErrorBanner message={error} />}
-      <PlanSummary plan={plan} ingest={ingest} />
       <div className="data-tab__list">
         {folders === null ? (
           <SkeletonList />
@@ -359,15 +332,15 @@ function DataHeader({
   onReindex: () => void;
   syncDisabled: boolean;
 }) {
+  // The pane title lives in the window header strip now; this row is
+  // subtitle + toolbar. flex-wrap in CSS lets the buttons drop to
+  // their own line on narrow windows instead of colliding with text.
   return (
     <header className="data-tab__header">
-      <div className="data-tab__header-text">
-        <h1 className="data-tab__title">Data</h1>
-        <p className="data-tab__subtitle">
-          Files and folders Magpie reads to understand your work. Nothing
-          leaves your machine.
-        </p>
-      </div>
+      <p className="data-tab__subtitle">
+        Files and folders Magpie reads to understand your work. Nothing
+        leaves your machine.
+      </p>
       <div className="data-tab__header-actions">
         <button
           type="button"
@@ -376,7 +349,7 @@ function DataHeader({
           disabled={syncDisabled}
           title="Pick up new files and drop removed ones."
         >
-          ↻ Sync
+          <RefreshCw size={13} aria-hidden="true" /> Sync
         </button>
         <button
           type="button"
@@ -385,7 +358,7 @@ function DataHeader({
           disabled={syncDisabled}
           title="Rebuild from scratch. Slow but thorough."
         >
-          ⟳ Reindex
+          <RotateCcw size={13} aria-hidden="true" /> Reindex
         </button>
         <div className="data-tab__add-menu-wrap" ref={addMenuRef}>
           <button
@@ -393,7 +366,8 @@ function DataHeader({
             className="data-tab__btn data-tab__btn--primary"
             onClick={() => setShowAddMenu(!showAddMenu)}
           >
-            + Add folder / file ▾
+            <Plus size={14} aria-hidden="true" /> Add folder / file{" "}
+            <ChevronDown size={13} aria-hidden="true" />
           </button>
           {showAddMenu && (
             <div className="data-tab__add-menu" role="menu">
@@ -414,46 +388,7 @@ function DataHeader({
 function ErrorBanner({ message }: { message: string }) {
   return (
     <div className="data-tab__error" role="alert">
-      ⚠ {message}
-    </div>
-  );
-}
-
-/** Single-line summary above the folder list:
- *   "12,431 files across 4 folders · 1,234 still to index"
- *   "12,431 files across 4 folders · all caught up"
- *   "Scanning your folders…"  (during scan phase, no plan yet)
- *
- * The summary is informational — buttons live in the header, not here.
- * Hidden entirely when the plan endpoint hasn't responded yet AND
- * there's no scan in progress (avoids a flash of empty content). */
-function PlanSummary({
-  plan,
-  ingest,
-}: {
-  plan: IndexPlan | null;
-  ingest: IngestStatus | null;
-}) {
-  const scanning = ingest?.phase === "scanning";
-  if (scanning) {
-    return (
-      <div className="data-tab__plan-summary data-tab__plan-summary--scanning">
-        Scanning your folders…
-      </div>
-    );
-  }
-  if (!plan || plan.folders.length === 0) return null;
-  const enabled = plan.folders.filter((f) => f.enabled).length;
-  const totalLabel = plan.grand_total.toLocaleString();
-  const folderLabel = enabled === 1 ? "1 folder" : `${enabled} folders`;
-  const tail =
-    plan.grand_remaining > 0
-      ? `${plan.grand_remaining.toLocaleString()} still to index`
-      : "all caught up";
-  return (
-    <div className="data-tab__plan-summary">
-      {totalLabel} {plan.grand_total === 1 ? "file" : "files"} across{" "}
-      {folderLabel} · {tail}
+      <AlertTriangle size={14} aria-hidden="true" /> {message}
     </div>
   );
 }
@@ -512,7 +447,7 @@ function RemoveConfirm({
       title="Stop reading this folder?"
       body={
         <p>
-          {target?.display_name || target?.path.split("/").pop() || target?.path}
+          {target?.display_name || target?.path.split(/[\\/]/).pop() || target?.path}
           {" "}— files inside the folder are not deleted. Magpie will forget
           what's inside it.
         </p>
@@ -561,7 +496,7 @@ function ExclusionsPanel({
         aria-expanded={open}
       >
         <span className="exclusions-panel__chevron" aria-hidden="true">
-          {open ? "▼" : "▶"}
+          {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
         </span>
         Exclusions
         {exclusions && (
@@ -648,7 +583,7 @@ function ExclusionList({
                 onClick={() => onRemove(value)}
                 aria-label={`Remove ${value}`}
               >
-                ✕
+                <X size={12} aria-hidden="true" />
               </button>
             </li>
           ))}
@@ -656,7 +591,7 @@ function ExclusionList({
       )}
       {addInput || (
         <button type="button" className="exclusion-list__add-btn" onClick={onAddClick}>
-          + Add path…
+          <Plus size={12} aria-hidden="true" /> Add path…
         </button>
       )}
     </div>

@@ -1,13 +1,14 @@
-import { renderAnswer } from "./citations";
+import { AnswerMarkdown } from "./citations";
 import type { Source } from "../types";
 
 import "./AnswerCard.css";
 
 interface Props {
   answer: string;
-  /** The full sources list — required to resolve `[N]` markers in the
-   *  answer prose to clickable citation pills. The renderer falls back
-   *  to plain-text spans for out-of-range markers (Plan #25). */
+  /** The CITED sources in `sources_used` order — `[N]` markers in the
+   *  answer prose are 1-based indexes into this list (src/answer.py
+   *  contract). Do NOT pass the full retrieval list here. The renderer
+   *  falls back to plain-text spans for out-of-range markers (Plan #25). */
   sources: Source[];
   /** Tokens to highlight in non-citation text (currency, dates, etc.). */
   highlights: string[];
@@ -42,12 +43,12 @@ export function AnswerCard({
             <span className="answer-card__dot" />
           </span>
         ) : (
-          renderAnswer({
-            text: answer,
-            sources,
-            highlightTokens: highlights,
-            onSelectSource,
-          })
+          <AnswerMarkdown
+            text={answer}
+            sources={sources}
+            highlightTokens={highlights}
+            onSelectSource={onSelectSource}
+          />
         )}
       </div>
       {!loading && !error && (

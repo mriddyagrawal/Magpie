@@ -20,7 +20,15 @@
  * etc.) might want to re-use it.
  */
 
-import { Highlighted } from "./Highlighted";
+import { useMemo } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { visit, SKIP } from "unist-util-visit";
+import "katex/dist/katex.min.css";
+
+import { splitWithTokens } from "./Highlighted";
 import type { Source } from "../types";
 
 export interface CitationProps {
@@ -39,7 +47,8 @@ export interface CitationProps {
  * fires `onSelect` so the parent can update the source list / preview.
  */
 export function CitationPill({ n, source, onSelect }: CitationProps) {
-  const filename = source.path.split("/").pop() ?? source.path;
+  // Both separators — Windows paths use `\`.
+  const filename = source.path.split(/[\\/]/).pop() ?? source.path;
   return (
     <button
       type="button"
@@ -60,55 +69,112 @@ export interface RenderAnswerOptions {
   onSelectSource?: (path: string) => void;
 }
 
+// ---------------------------------------------------------------------------
+// Markdown answer renderer (the primary path)
+// ---------------------------------------------------------------------------
+
 /**
- * Parse `text` into an array of React-renderable nodes, replacing
- * `[N]` markers with CitationPill components. Non-citation text is
- * routed through `<Highlighted>` for token highlighting.
+ * Rehype plugin: walk every text node in the rendered markdown tree and
+ *   1. replace `[N]` citation markers with an <answer-cite data-n>
+ *      element (mapped to <CitationPill> below), and
+ *   2. wrap highlight-token matches in <mark class="magpie-highlight">.
  *
- * Returns an array (not JSX) so consumers can splat it into their own
- * containers without nesting fragments.
+ * Skipped inside code blocks (a `[1]` in a shell snippet is an array
+ * index, not a citation) and inside math nodes (KaTeX consumes its own
+ * source text; this plugin runs BEFORE rehype-katex in the pipeline).
  */
-export function renderAnswer({
+function rehypeCiteAndHighlight(tokens: string[]) {
+  return () => (tree: unknown) => {
+    visit(tree as never, "text", (node: never, index: number | undefined, parent: never) => {
+      const p = parent as { tagName?: string; properties?: { className?: unknown }; children: unknown[] } | undefined;
+      const n = node as { value: string };
+      if (index === undefined || !p) return;
+      if (p.tagName === "code" || p.tagName === "pre") return;
+      const cls = p.properties?.className;
+      if (Array.isArray(cls) && cls.some((c) => String(c).startsWith("math"))) return;
+
+      const pieces = n.value.split(/(\[\d+\])/g).filter((s) => s !== "");
+      const out: unknown[] = [];
+      for (const piece of pieces) {
+        const m = piece.match(/^\[(\d+)\]$/);
+        if (m) {
+          out.push({
+            type: "element",
+            tagName: "answer-cite",
+            properties: { dataN: m[1] },
+            children: [],
+          });
+        } else {
+          for (const part of splitWithTokens(piece, tokens)) {
+            out.push(
+              part.highlight
+                ? {
+                    type: "element",
+                    tagName: "mark",
+                    properties: { className: ["magpie-highlight"] },
+                    children: [{ type: "text", value: part.text }],
+                  }
+                : { type: "text", value: part.text },
+            );
+          }
+        }
+      }
+      // Nothing to change — leave the node untouched.
+      if (out.length === 1 && (out[0] as { type: string }).type === "text") return;
+      p.children.splice(index, 1, ...out);
+      return [SKIP, index + out.length];
+    });
+  };
+}
+
+/**
+ * The answer body: GitHub-flavored markdown + LaTeX math (KaTeX) with
+ * clickable `[N]` citation pills and token highlighting preserved.
+ * Replaces the old flat-text renderAnswer as AnswerCard's renderer —
+ * answers citing academic PDFs routinely contain lists, tables, and
+ * `$...$` math, which flat text rendered as unreadable soup.
+ */
+export function AnswerMarkdown({
   text,
   sources,
   highlightTokens = [],
   onSelectSource,
-}: RenderAnswerOptions): React.ReactNode[] {
-  // Split on the citation markers, keeping the markers as separate
-  // parts. The capture group inside split() emits the markers as their
-  // own array entries.
-  const parts = text.split(/(\[\d+\])/g);
+}: RenderAnswerOptions) {
+  const citePlugin = useMemo(
+    () => rehypeCiteAndHighlight(highlightTokens),
+    [highlightTokens],
+  );
+  const components = useMemo(
+    () => ({
+      "answer-cite": (props: { node?: { properties?: { dataN?: string } } }) => {
+        const n = Number(props.node?.properties?.dataN);
+        if (!Number.isFinite(n) || n < 1 || n > sources.length) {
+          // Out-of-range: same bug-tolerant fallback as before.
+          console.warn(
+            `citation [${n}] out of range (1..${sources.length || 0}); rendering as plain text.`,
+          );
+          return (
+            <span className="citation-orphan" title="Unresolved citation">
+              [{Number.isFinite(n) ? n : "?"}]
+            </span>
+          );
+        }
+        return <CitationPill n={n} source={sources[n - 1]} onSelect={onSelectSource} />;
+      },
+    }),
+    [sources, onSelectSource],
+  );
 
-  return parts.map((part, i) => {
-    const m = part.match(/^\[(\d+)\]$/);
-    if (!m) {
-      // Non-citation chunk — route through highlighting.
-      if (!part) return null;
-      return (
-        <Highlighted key={i} text={part} tokens={highlightTokens} />
-      );
-    }
-    const n = Number(m[1]);
-    if (!Number.isFinite(n) || n < 1 || n > sources.length) {
-      // Out-of-range or non-numeric: bug-tolerant fallback.
-      // eslint-disable-next-line no-console
-      console.warn(
-        `citation ${part} out of range (1..${sources.length || 0}); ` +
-          `rendering as plain text. The answer prompt may have drifted.`
-      );
-      return (
-        <span key={i} className="citation-orphan" title="Unresolved citation">
-          {part}
-        </span>
-      );
-    }
-    return (
-      <CitationPill
-        key={i}
-        n={n}
-        source={sources[n - 1]}
-        onSelect={onSelectSource}
-      />
-    );
-  }).filter(Boolean);
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[citePlugin, rehypeKatex]}
+      // Custom element mapping — cast because react-markdown's types
+      // only know standard HTML tag names.
+      components={components as never}
+    >
+      {text}
+    </ReactMarkdown>
+  );
 }
+

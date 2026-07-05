@@ -3,10 +3,13 @@
  * state per Specs/UI/ask_bar.md.
  *
  * Format:
- *   ● Ready · Local · Gemma 4 · 4,408 documents understood    Esc to dismiss
+ *   ● Ready   Local   4,408 documents understood    Esc to dismiss
  *
- * Left side: status dot + health label + provider + model + document
- * count. Right side: state-specific keyboard hints.
+ * Left side: status dot + health label + provider + document count,
+ * separated by whitespace (no "·" glyphs — Spotlight style). Right
+ * side: state-specific keyboard hints. The model name is deliberately
+ * NOT shown (no-tech-leak product principle — internal names like
+ * "Gemma 4" never reach the user-facing surface).
  *
  * The footer is the user's persistent "is Magpie healthy?" indicator
  * and Magpie's only chrome — no header bar, no toolbar.
@@ -33,6 +36,8 @@ interface Props {
 interface FooterStatus {
   ready: boolean;
   indexed_count: number;
+  /** "local" | "cloud" | "" (unknown until first /status lands). */
+  provider: string;
   /** Friendly health label. Computed from `ready` + `indexedCount`. */
   health: string;
   /** "ready" | "booting" | "reconnecting" | "indexing" — drives dot color. */
@@ -51,6 +56,7 @@ export function StatusFooter({
   const [status, setStatus] = useState<FooterStatus>({
     ready: false,
     indexed_count: 0,
+    provider: "",
     health: "Starting Magpie…",
     dot: "booting",
   });
@@ -65,17 +71,23 @@ export function StatusFooter({
       try {
         const s = await getStatus();
         if (cancelled) return;
+        // Two distinct unhealthy states, named for the user:
+        //  - engine answered but isn't ready → its search database is
+        //    still coming up ("Starting search engine…")
+        //  - engine didn't answer at all → we're retrying the
+        //    connection ("Can't reach engine — retrying…")
         setStatus({
           ready: s.ready,
           indexed_count: s.indexed_count,
-          health: s.ready ? "Ready" : "Reconnecting…",
-          dot: s.ready ? "ready" : "reconnecting",
+          provider: s.provider ?? "",
+          health: s.ready ? "Ready" : "Starting search engine…",
+          dot: s.ready ? "ready" : "booting",
         });
       } catch {
         if (cancelled) return;
         setStatus((prev) => ({
           ...prev,
-          health: "Reconnecting…",
+          health: "Can't reach engine — retrying…",
           dot: "reconnecting",
         }));
       }
@@ -100,33 +112,31 @@ export function StatusFooter({
         : "Understanding…";
   }
 
-  // Provider + model are surfaced from /status when wired; for v1 the
-  // backend doesn't yet return them, so we lean on a static label.
-  // (Will route through /settings/search in PR 5 once the frontend
-  // settings tab consumes that endpoint.)
-  const providerLabel = "Local";
-  const modelLabel = "Gemma 4";
+  // Live provider from /status — same wording as the Settings sidebar
+  // so the vocabulary stays consistent. The model name is intentionally
+  // never rendered (no-tech-leak).
+  const providerLabel =
+    status.provider === "" ? "" :
+    status.provider === "cloud" ? "Cloud AI" : "On-device AI";
   const docCount = status.indexed_count.toLocaleString();
 
   return (
     <footer className="status-footer">
       <div className="status-footer__left">
-        <span
-          className={`status-footer__dot status-footer__dot--${dot}`}
-          aria-hidden="true"
-        />
-        <span className="status-footer__label">{label}</span>
-        <Sep />
-        <span className="status-footer__meta">{providerLabel}</span>
-        <Sep />
-        <span className="status-footer__meta">{modelLabel}</span>
+        <span className="status-footer__state">
+          <span
+            className={`status-footer__dot status-footer__dot--${dot}`}
+            aria-hidden="true"
+          />
+          <span className="status-footer__label">{label}</span>
+        </span>
+        {providerLabel && (
+          <span className="status-footer__meta">{providerLabel}</span>
+        )}
         {!booting && (
-          <>
-            <Sep />
-            <span className="status-footer__meta">
-              {docCount} documents understood
-            </span>
-          </>
+          <span className="status-footer__meta">
+            {docCount} documents understood
+          </span>
         )}
       </div>
       <div className="status-footer__right">
@@ -136,10 +146,14 @@ export function StatusFooter({
   );
 }
 
-function Sep() {
+// Platform-correct modifier key: ⌘ is meaningless on Windows/Linux.
+const IS_MAC =
+  typeof navigator !== "undefined" && /Mac/i.test(navigator.platform);
+
+function Hint({ keys, label }: { keys: string; label: string }) {
   return (
-    <span className="status-footer__sep" aria-hidden="true">
-      ·
+    <span className="status-footer__hint">
+      <kbd className="status-footer__kbd">{keys}</kbd> {label}
     </span>
   );
 }
@@ -147,27 +161,25 @@ function Sep() {
 function KeyboardHints({ view }: { view: ViewKind }) {
   switch (view) {
     case "resting":
-      return <span><Kbd>Esc</Kbd> to dismiss</span>;
+      return <Hint keys="Esc" label="to dismiss" />;
     case "typing":
       return (
-        <span>
-          <Kbd>↑↓</Kbd> navigate <Sep /> <Kbd>⏎</Kbd> open <Sep />{" "}
-          <Kbd>Esc</Kbd> close
-        </span>
+        <>
+          <Hint keys="↑↓" label="navigate" />
+          <Hint keys="⏎" label="open" />
+          <Hint keys="Esc" label="close" />
+        </>
       );
     case "retrieving":
-      return <span><Kbd>Esc</Kbd> cancel</span>;
+      return <Hint keys="Esc" label="cancel" />;
     case "answering":
       return (
-        <span>
-          <Kbd>⌘C</Kbd> copy <Sep /> <Kbd>Esc</Kbd> stop
-        </span>
+        <>
+          <Hint keys={IS_MAC ? "⌘C" : "Ctrl+C"} label="copy" />
+          <Hint keys="Esc" label="stop" />
+        </>
       );
     case "not_found":
-      return <span><Kbd>Esc</Kbd> close</span>;
+      return <Hint keys="Esc" label="close" />;
   }
-}
-
-function Kbd({ children }: { children: React.ReactNode }) {
-  return <kbd className="status-footer__kbd">{children}</kbd>;
 }

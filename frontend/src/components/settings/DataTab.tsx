@@ -30,6 +30,7 @@ import {
   addFolder,
   addExclusion,
   friendlyError,
+  isAlreadyIndexingError,
   getExclusions,
   patchFolder,
   pickFile,
@@ -128,6 +129,13 @@ export function DataTab({
       await runSync();
       onIngestStarted();
     } catch (e) {
+      // Clicking Sync while a sync is already running returns a benign 409 —
+      // indexing is already happening, which is what the user wanted, so just
+      // make sure the poll is active and don't alarm them with an error banner.
+      if (isAlreadyIndexingError(e)) {
+        onIngestStarted();
+        return;
+      }
       setError(friendlyError(e));
     }
   }, [onIngestStarted]);

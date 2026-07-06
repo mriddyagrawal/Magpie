@@ -263,6 +263,10 @@ export function MagpieWindow() {
           : (visibleRecentsCount > 0 ? HEIGHT_RESTING_WITH_RECENTS : HEIGHT_RESTING_EMPTY))
       : retrievingWithSources
       ? HEIGHTS.answering
+      : (view.kind === "typing" && view.prior)
+      // Composing a follow-up with the previous answer pinned — needs the
+      // full answering-height so the pinned answer isn't clipped.
+      ? HEIGHTS.answering
       : HEIGHTS[view.kind];
   // Mirror targetHeight into a ref so the tauri://focus listener
   // (registered once on mount) can read the latest value without
@@ -307,9 +311,15 @@ export function MagpieWindow() {
           break;
         case "answering":
         case "not_found":
-          // Return to typing with the question pre-filled so the
-          // user can refine and re-submit.
-          setView({ kind: "typing", query: view.question, selected: null });
+          // Return to typing with the question pre-filled so the user can
+          // refine and re-submit. Keep the answer pinned (dimmed) above the
+          // bar while they edit — same as the follow-up path.
+          setView({
+            kind: "typing",
+            query: view.question,
+            selected: null,
+            prior: view.kind === "answering" ? view.result : undefined,
+          });
           requestAnimationFrame(() => inputRef.current?.focus());
           break;
       }
@@ -681,8 +691,15 @@ export function MagpieWindow() {
     if (view.kind !== "typing" && view.kind !== "resting") {
       queryGenRef.current++;
     }
+    // Keep the answer the user was reading pinned above the ask bar while they
+    // compose a follow-up: carry it from `answering`, and preserve it across
+    // successive keystrokes once we're already in `typing`.
+    const prior =
+      view.kind === "answering" ? view.result :
+      view.kind === "typing" ? view.prior :
+      undefined;
     if (q === "") setView({ kind: "resting" });
-    else setView({ kind: "typing", query: q, selected: null });
+    else setView({ kind: "typing", query: q, selected: null, prior });
   };
 
   const onInputSubmit = () => {
@@ -776,7 +793,23 @@ export function MagpieWindow() {
           when the WelcomeCard is showing (resting + empty corpus);
           typing-with-empty-corpus still renders RecentsPanel which
           will simply be empty — that path is rare and harmless. */}
-      {(view.kind === "resting" || view.kind === "typing") && !showWelcomeCard && (
+      {/* Follow-up composition: keep the answer the user was reading pinned
+          (dimmed, read-only) above the ask bar so they can refer to it while
+          typing the next question. Replaces the recents panel in this state. */}
+      {view.kind === "typing" && view.prior && (
+        <div className="magpie-window__pinned-prior" aria-label="Previous answer">
+          <AnsweringBody
+            result={view.prior}
+            selectedPath={null}
+            onSelect={() => { /* read-only while composing a follow-up */ }}
+            onFollowUp={focusAndSelectInput}
+            highlights={[]}
+            loading={false}
+          />
+        </div>
+      )}
+
+      {(view.kind === "resting" || (view.kind === "typing" && !view.prior)) && !showWelcomeCard && (
         <RecentsPanel
           selected={view.kind === "typing" ? view.selected : null}
           onSelectIndex={(i) => {
@@ -882,22 +915,29 @@ function AnsweringBody({
   // answer text otherwise.
   loading: boolean;
 }) {
-  // Inline `[N]` markers are 1-based indexes into sources_used (the
-  // ordered list of files the answer drew from) — NOT into the full
-  // retrieval list. Resolving against the wrong list made citation
-  // pills open unrelated files (e.g. [4] = 4th-ranked candidate, a
-  // random shell script, instead of the 4th cited document). If a
-  // cited path is missing from the retrieval list (backend filtered
-  // it), synthesize a stub so the pill still previews the right file.
-  const citedSources: Source[] = result.sources_used.map(
-    (path) =>
-      result.sources.find((s) => s.path === path) ?? {
-        path,
-        summary: "",
-        score: 0,
-        cited: true,
-      },
-  );
+  // Inline `[N]` markers are 1-based indexes into sources_used (the ordered
+  // list of files the answer drew from) — NOT the full retrieval list. If a
+  // cited path is missing from retrieval (backend filtered it), synthesize a
+  // stub so the pill still previews the right file.
+  //
+  // GRACEFUL FALLBACK: weaker models (e.g. the free-tier LLM) frequently emit
+  // `[N]` markers in the prose but leave `sources_used` EMPTY — which made
+  // every citation render as a dead, unresolvable `[N]`. In that case the
+  // model is numbering by the "--- File N ---" order it saw in the prompt,
+  // which IS the retrieval order, so fall back to the full retrieval list so
+  // the markers resolve to the files the model actually meant.
+  const citedSources: Source[] =
+    result.sources_used.length > 0
+      ? result.sources_used.map(
+          (path) =>
+            result.sources.find((s) => s.path === path) ?? {
+              path,
+              summary: "",
+              score: 0,
+              cited: true,
+            },
+        )
+      : result.sources;
   return (
     <div className="magpie-grid">
       <div className="magpie-col-left">

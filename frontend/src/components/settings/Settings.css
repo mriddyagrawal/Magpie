@@ -231,7 +231,7 @@
   height: 8px;
   border-radius: 50%;
 }
-.settings-header__pill-dot--ready        { background: var(--score-green); }
+.settings-header__pill-dot--ready        { background: rgba(127, 191, 142, 0.55); }
 .settings-header__pill-dot--booting      { background: var(--score-amber); }
 .settings-header__pill-dot--reconnecting { background: #d35858; }
 .settings-header__pill-dot--indexing     { background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
@@ -473,7 +473,12 @@
   height: 6px;
   border-radius: 50%;
 }
-.folder-row__pill--ready .folder-row__pill-dot { background: var(--score-green); }
+/* "Ready" is the calm resting state — a muted green that recedes, so the
+   screen isn't a wall of saturated dots. Colors that need action (amber
+   "Not read", blue "Magpieing", red error) stay fully saturated and pop. */
+.folder-row__pill--ready .folder-row__pill-dot { background: rgba(127, 191, 142, 0.55); }
+.folder-row__pill--unread { color: var(--score-amber); }
+.folder-row__pill--unread .folder-row__pill-dot { background: var(--score-amber); }
 .folder-row__pill--understanding { color: var(--accent); }
 .folder-row__pill--understanding .folder-row__pill-dot { background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
 .folder-row__pill--paused .folder-row__pill-dot { background: var(--text-dim); }
@@ -502,6 +507,13 @@
 }
 .folder-row__progress-counts { color: var(--text-dim); }
 .folder-row__progress-pct { color: var(--accent); font-variant-numeric: tabular-nums; }
+.folder-row__progress-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--size-xs);
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
 .folder-row__progress-bar {
   height: 4px;
   background: rgba(128, 128, 128, 0.12);

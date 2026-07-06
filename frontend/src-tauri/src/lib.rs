@@ -926,6 +926,16 @@ fn spawn_sidecar(
         c
     };
 
+    // Force Python into UTF-8 mode. On Windows, Python defaults stdout/stderr
+    // AND open() to the legacy cp1252 ("charmap") codec, which raises
+    // UnicodeEncodeError the instant the walker prints a filename or writes a
+    // summary containing a non-Latin1 char (e.g. "≥"). That killed the entire
+    // sync mid-walk on any folder with such files — the #1 reason indexing
+    // "worked in dev but not in the build". UTF-8 mode fixes stdout, stderr,
+    // and the default file encoding in one shot. Harmless on macOS/Linux,
+    // which already use UTF-8. Applies to both the dev (uv) and bundled paths.
+    cmd.env("PYTHONUTF8", "1").env("PYTHONIOENCODING", "utf-8");
+
     // Pipe stdout AND stderr into bootstrap.log. Sidecar's own per-session
     // LLM log lives in APP_DATA_DIR/logs/llm-*.log; this catches everything
     // that comes out before the logger initializes (PyInstaller bootstrap,
@@ -973,6 +983,12 @@ fn open_settings_internal(app: &tauri::AppHandle, action: Option<&str>) {
         // component picks it up on its next effect tick. Eval is safe
         // since `action` is whitelisted at the command boundary.
         let _ = win.eval(&init);
+        // unminimize() FIRST — on Windows a minimized window ignores
+        // show()/set_focus() and stays parked in the taskbar, so clicking
+        // "Settings…" again looked like nothing happened. Restoring it
+        // before showing/focusing brings it to the foreground on all
+        // three platforms.
+        let _ = win.unminimize();
         let _ = win.show();
         let _ = win.set_focus();
         return;

@@ -1,26 +1,14 @@
 # NotAnotherSpotlight — command runner
 
-# Auto-load .env into every recipe's environment. Without this, recipes
-# that shell out to `python -c "..."` snippets (reset-index, qdrant-counts,
-# recover-fast-tier, disk-usage, manifest-stats, fast-tier-files, etc.)
-# never see HF_TOKEN / OPENROUTER_API_KEY / other LLM keys, because they
-# bypass the CLI entrypoints that call `load_dotenv()` themselves. `just
-# sync` etc. work without this because they invoke `python -m src.ingest`,
-# which loads dotenv from inside main(). Once the app is packaged
-# (Plan #10), `.env` goes away — see Plans/Future Plans.md #19 for the
-# JSON-config + keychain-secrets replacement.
+# Auto-load .env into every recipe's environment (HF_TOKEN, LLM keys, etc.).
 set dotenv-load
 
-# Install all dependencies (Python venv + CLI tool). Renamed from `sync`
-# in 2026-05 — `sync` now means "ingest everything in indexing_rules.json".
-# See Plans/Ingestion Rules/Implementation Plan.md.
+# Install all dependencies (Python venv + CLI tool).
 sync-environment:
     uv sync
     uv pip install -e cli
 
-# Cheat-sheet for the dependency-group system (PR-F of Bundle Trim).
-# Prints the available groups + when to use each. Pairs with `just --list`,
-# which auto-shows every recipe in this file with its first comment line.
+# Cheat-sheet for the dependency-group system. Prints groups + when to use each.
 deps:
     @echo "==============================================================="
     @echo " Magpie dependency-groups"
@@ -47,41 +35,15 @@ deps:
     @echo "   just --list"
     @echo "==============================================================="
 
-# Download the llama-server binary for this platform from llama.cpp's
-# GitHub releases. Run this AFTER `just sync-environment`. The actual
-# install logic lives in src/tools/install_llama_server.py — pure
-# Python (stdlib only) so it works on macOS, Linux, AND native Windows
-# (PowerShell, cmd, Git Bash). See Specs/llama_server_migration.md
-# PR 4 for why we moved off bash.
-#
-# Stages the binary + its runtime libs at <APP_DATA_DIR>/bin/.
-# Strips the macOS quarantine attribute automatically so users don't
-# see the "cannot verify developer" Gatekeeper dialog on first launch.
-# Eagerly downloads the Gemma 4 mmproj projector (~946 MB) so the first
-# vision-bearing summary doesn't pause for several minutes.
-#
-# Env knobs:
-#   LLAMA_SERVER_VERSION=b9049   release tag (must support the gemma4 arch)
-#   LLAMA_SERVER_GPU=cpu|vulkan|cuda-12.4|cuda-13.1|metal
-#                                GPU variant; default per-platform safe pick
-#   SKIP_MMPROJ_DOWNLOAD=1       skip the projector download (lazy fetch on
-#                                first vision call instead)
+# Download the llama-server binary for this platform. Run AFTER sync-environment.
+# Env knobs: LLAMA_SERVER_VERSION, LLAMA_SERVER_GPU (cpu|vulkan|cuda-*|metal),
+# SKIP_MMPROJ_DOWNLOAD=1.
 install-llama-server:
     uv run python -m src.tools.install_llama_server
 
-# Walk every enabled include_paths entry in indexing_rules.json. This is
-# the "do everything" command — replaces running `just walk <path>` once
-# per directory. Reads from $MAGPIE_DATA_DIR/indexing_rules.json (default
-# ~/.local/share/Magpie on Linux, ~/Library/Application Support/Magpie on
-# macOS). If no include_paths are configured, prints a hint and exits 0.
-#
-# Any extra args pass through to `python -m src.ingest`. So:
-#   just sync                  → default walk
-#   just sync --include-data   → also index .json/.csv/.dat (data category)
-#   just sync --force          → re-summarize even unchanged files
-#   just sync -v               → verbose per-file routing decisions
-# A single failed walk doesn't abort the rest — each include_path runs
-# independently, mirroring the prior `subprocess.run(check=False)` behavior.
+# Walk every enabled include_paths entry in indexing_rules.json ("do everything").
+# Extra args pass through to `python -m src.ingest` (--include-data, --force, -v).
+# Each include_path runs independently; one failure doesn't abort the rest.
 sync *args:
     #!/usr/bin/env bash
     set -uo pipefail
@@ -95,9 +57,7 @@ sync *args:
         echo "No included folders configured. Add one with: just walk <folder>"
         exit 0
     fi
-    # Track whether any walk exited nonzero. We can't trust `set -e`
-    # because `|| true` is what lets the loop finish — so capture exit
-    # codes ourselves and gate the auto-backup on the result.
+    # Capture exit codes ourselves to gate the auto-backup on success.
     all_walks_ok=1
     while IFS= read -r path; do
         echo "== walking $path =="
@@ -106,14 +66,8 @@ sync *args:
             echo "  warn: walk failed for '$path' (continuing with remaining paths)"
         fi
     done <<< "$paths"
-    # Auto-backup the resulting state so the next reset-index can restore in
-    # ~30s instead of forcing a 15-minute re-summarize. Single backup slot
-    # under <APP_DATA_DIR>/backup/. Skip the backup entirely if any walk
-    # failed — a partial-success state could still pass create_backup's
-    # in-process empty-overwrite guard yet be a regression vs the prior
-    # backup. Belt-and-suspenders with the guard inside src/backup.py.
-    # Wrapped in `|| ...` so a backup failure doesn't make sync exit nonzero;
-    # the warning + manual `just backup` is the recovery path.
+    # Auto-backup on success so the next reset-index restores fast. Skipped
+    # if any walk failed. A backup failure doesn't make sync exit nonzero.
     if [ "$all_walks_ok" = "1" ]; then
         echo
         echo "== auto-backup =="
@@ -124,19 +78,12 @@ sync *args:
         echo "Fix the failing path(s), then run 'just backup' manually."
     fi
 
-# Check whether a single file or folder will be indexed under the current
-# rules. Prints the (allowed/skipped) decision and the reason that fired
-# (which rule layer rejected/accepted it). Useful for debugging "why isn't
-# this file showing up in search?" without running a real walk.
-#
+# Check whether a file/folder will be indexed under current rules, with reason.
 # Example: just check ~/Documents/secret.pdf
 check path:
     @uv run python -m scripts.check_indexing "{{path}}"
 
-# Walk a directory and print the (allow/skip + reason) decision for every
-# file inside, without running any LLM/embedding/Qdrant work. The dry-run
-# explainer — answers "if I ran sync now, exactly what would happen?"
-#
+# Dry-run: print the (allow/skip + reason) decision for every file under <path>.
 # Example: just check-dir ~/Documents
 check-dir path:
     @uv run python -m scripts.check_indexing --recursive "{{path}}"
@@ -165,20 +112,9 @@ walk-force path:
 walk-rebuild path:
     uv run python -m src.ingest "{{path}}" --rebuild
 
-# Full reset: drop ALL Qdrant collections (summaries + fast_tier), clear
-# the manifest, delete every summary markdown. Use when the manifest has
-# drifted (test pollution, schema changes like the 2026-05 row_index →
-# chunk_index rename) and you want a clean slate.
-#
-# DOES NOT touch:
-#   - indexing_rules.json (your include_paths / exclude_paths stay)
-#   - the GGUF / HF model cache (no re-download)
-#   - source files on disk
-#
-# Different from `just sync --force`, which re-summarizes existing files
-# but doesn't drop collections, clear the manifest, or delete markdowns.
-#
-# After running, your next `just sync --include-data` rebuilds everything.
+# Full reset: drop ALL Qdrant collections, clear the manifest, delete every
+# summary markdown. Leaves indexing_rules.json, the model cache, and source
+# files untouched. Next `just sync --include-data` rebuilds everything.
 reset-index: qdrant-up
     @uv run python -c "\
     from src.pipeline import reset; \
@@ -192,22 +128,13 @@ reset-index: qdrant-up
     print('indexing_rules.json untouched. Next: just sync --include-data')\
     "
 
-# Snapshot the entire indexed state (manifest + summary markdowns + every
-# Qdrant collection via the native snapshot API) to <APP_DATA_DIR>/backup/.
-# Single backup slot — overwrites the previous one atomically. Auto-fired
-# by `just sync` at the end of every walk so reset-index has something to
-# restore from. Refuses to overwrite a non-empty backup with an empty one
-# (safety guard against failed-sync clobber). Implementation: src/backup.py.
+# Snapshot the entire indexed state (manifest + summaries + Qdrant) to
+# <APP_DATA_DIR>/backup/. Single slot, atomic overwrite. Auto-fired by `just sync`.
 backup: qdrant-up
     @uv run python -m src.backup
 
 # Restore the entire indexed state from <APP_DATA_DIR>/backup/. DESTRUCTIVE:
-# drops current Qdrant collections, replaces manifest + summary markdowns on
-# disk. Use after a `reset-index` you regret, after a corrupted index, or
-# when porting state to a fresh machine. Fast — no LLM, no embedding,
-# no network — restores in seconds for our scale because Qdrant snapshots
-# preserve segment binaries directly. Pair with the auto-backup that
-# `just sync` writes at the end of every walk.
+# drops current Qdrant collections, replaces manifest + summaries on disk.
 restore: qdrant-up
     @uv run python -m src.backup restore
 
@@ -314,27 +241,15 @@ serve:
 serve-dev:
     uv run uvicorn src.server:app --port 8765 --reload
 
-# One-shot: launch the Magpie window. Tauri auto-spawns its own Python
-# sidecar internally (see frontend/src-tauri/src/lib.rs), so this is a
-# single process / single terminal. Logs from both Tauri and the
-# sidecar interleave in this same window. ⌥Space summons the window
-# (or hides it). Ctrl-C kills everything cleanly.
-#
-# Want hot-reload of Python code? That needs `just serve-dev` in a
-# separate terminal AND a small lib.rs change to make Tauri skip its
-# auto-spawn. See the note in the recipe — ask if you want it.
+# Launch the Magpie window (dev). Tauri auto-spawns the Python sidecar;
+# single terminal, interleaved logs. ⌥Space summons/hides; Ctrl-C quits.
 run-magpie: _stub-sidecar-binaries
     cd frontend && pnpm tauri dev
 
-# Internal helper: create empty stub files at the externalBin paths
-# `tauri.conf.json` declares (binaries/magpie-sidecar +
-# binaries/qdrant). Tauri's build script validates these exist even in
-# dev mode, but lib.rs's spawn_sidecar uses `uv run python -m src.server`
-# directly under cfg!(debug_assertions) — so the stubs are never
-# actually executed. They're only present to satisfy build validation.
-# Folder is .gitignore'd; nothing committed.
-# Production builds replace the stubs with real PyInstaller / Qdrant
-# binaries via `just build-sidecar` and `just download-qdrant`.
+# Internal: create empty stub files at the externalBin paths tauri.conf.json
+# declares, to satisfy Tauri's build validation in dev (never executed — lib.rs
+# runs the sidecar via `uv run` in debug). Production replaces them with real
+# binaries via `build-sidecar` + `download-qdrant`.
 _stub-sidecar-binaries:
     #!/usr/bin/env bash
     set -e
@@ -360,17 +275,12 @@ _stub-sidecar-binaries:
         fi
     done
 
-# Start Magpie Cloud (the LLM-orchestration backend that holds prompts
-# and proxies LLM calls). Different process from `just serve` — that
-# one is the LOCAL desktop sidecar; this one is the REMOTE server the
-# desktop app talks to. See server/README.md for what each is for.
+# Start Magpie Cloud — the remote LLM-orchestration backend (vs `serve`, the
+# local desktop sidecar). See server/README.md.
 cloud-serve:
     cd server && uv run uvicorn magpie_server.main:app --port 8000 --reload
 
-# Run the desktop CLI through the local Magpie Cloud (instead of
-# direct-to-OpenRouter). Pair with `just cloud-serve` running in
-# another terminal. Useful for verifying the full cloud-mode flow
-# end-to-end on a single laptop.
+# Run the desktop CLI through the local Magpie Cloud (pair with `just cloud-serve`).
 chat-cloud:
     LLM_PROVIDER=magpie-cloud \
     MAGPIE_CLOUD_URL=http://127.0.0.1:8000 \
@@ -387,11 +297,8 @@ uninstall:
     uv tool uninstall notspotlight
 
 # ----------------------------------------------------------------------------
-# Qdrant standalone server (lives on /mnt/hardisk to avoid filling the root drive)
-# Same Rust binary as Qdrant Cloud — supports int8/fp16/binary quantization,
-# unlike the embedded Python local mode. Spawned as a background process; no
-# Docker. The same subprocess pattern is what we'll bundle for end-user
-# distribution later (see backlog E5).
+# Qdrant standalone server — same Rust binary as Qdrant Cloud, run as a
+# background process (no Docker).
 # ----------------------------------------------------------------------------
 
 # Resolve the app's data directory once.
@@ -407,11 +314,8 @@ QDRANT_DATA      := env_var_or_default("QDRANT_DATA", QDRANT_HOME / "storage")
 QDRANT_LOGS      := QDRANT_HOME / "qdrant.log"
 QDRANT_PIDFILE   := QDRANT_HOME / "qdrant.pid"
 QDRANT_VERSION   := "v1.17.1"
-# 6433/6434 instead of Qdrant's default 6333/6334. OpenWhispr ships its own
-# bundled Qdrant on the default ports; co-existing on the same machine on
-# defaults caused Magpie to silently write into OpenWhispr's storage tree.
-# These ports are Magpie-only. See Plans/Future Plans.md #18 for the
-# layer-2 auth follow-up.
+# 6433/6434 instead of Qdrant's default 6333/6334 to avoid colliding with
+# other apps that bundle Qdrant on the defaults.
 QDRANT_PORT      := "6433"
 QDRANT_GRPC_PORT := "6434"
 
@@ -541,10 +445,8 @@ fast-tier-config:
     print('  ', qc.model_dump() if qc else 'None');\
     "
 
-# Rebuild manifest fast_indexed_at + fast_pages from Qdrant fast_tier — recovers
-# from the pre-2026-04-25 mark_summarized bug that silently wiped fast-tier
-# fields when a file was re-summarized. Vectors stayed in Qdrant; only the
-# manifest forgot. This re-stamps the manifest from the surviving Qdrant data.
+# Rebuild manifest fast_indexed_at + fast_pages from Qdrant fast_tier (recovers
+# from the pre-2026-04-25 mark_summarized bug that wiped those fields).
 recover-fast-tier:
     @uv run python -c "\
     from src.manifest import Manifest;\
@@ -555,11 +457,8 @@ recover-fast-tier:
     print(f'qdrant points without manifest row: {stats[\"missing_in_manifest\"]} (manual cleanup if nonzero)');\
     "
 
-# Drop manifest rows whose source files no longer exist on disk + delete the
-# orphaned summary markdowns. Run this after deleting source files outside an
-# `python -m src.ingest <root>` walk (e.g. when stale `/tmp/pytest-of-*` entries
-# linger from earlier test runs). Qdrant orphans are cleaned automatically on
-# the next `python -m src.stage2 ingest` run.
+# Drop manifest rows whose source files no longer exist + delete orphaned
+# summary markdowns. Qdrant orphans clear on the next stage2 ingest.
 clean-stale-manifest:
     @uv run python -c "\
     from src.manifest import Manifest;\
@@ -570,13 +469,9 @@ clean-stale-manifest:
     print('run \'python -m src.stage2 ingest\' to also clean orphan Qdrant points (or do it on next ingest)');\
     "
 
-# Inverse of clean-stale-manifest: clear `summary_file` pointers when the
-# on-disk markdown is gone but the source file is still present. Symptom:
-# Stage 2 ingest spams `warn: summary missing, skipping: ...` for files
-# whose Test Summaries/<hash>_t1.md disappeared (manual cleanup, partial
-# --rebuild, backup software treating Test Summaries/ as cache, etc.).
-# Cleared rows are re-summarized on the next `python -m src.ingest <root>`.
-# If the source ALSO vanished, the row is dropped entirely.
+# Inverse of clean-stale-manifest: clear summary_file pointers when the markdown
+# is gone but the source remains (re-summarized on next ingest). Drops the row
+# if the source also vanished.
 clean-stale-summaries:
     @uv run python -c "\
     from src.manifest import Manifest;\
@@ -593,10 +488,7 @@ clean-stale-summaries:
 clean-stale: clean-stale-manifest clean-stale-summaries
 
 # Show how many manifest entries live under each top-level directory.
-# `depth` controls grouping: 2 = /home/astavak (mount-level), 3 = /home/astavak/sem6
-# (where actual content lives, default), 4 = one deeper.
-# Useful for confirming which corpus roots are indexed and spotting accidental
-# inclusions (test fixtures, cache dirs, etc.).
+# `depth` controls grouping (default 3).
 manifest-roots depth='3':
     @uv run python -c "\
     from collections import Counter;\
@@ -610,9 +502,7 @@ manifest-roots depth='3':
     [print(f'{v:>6}  {k}') for k, v in c.most_common()];\
     "
 
-# Manifest summary: total entries, by tier-of-routing, by ingestion status.
-# Use to quickly check what state the manifest is in (how many pending push,
-# how many fast-tier-only, how many router-skipped, etc.).
+# Manifest summary: total entries, by routing tier, by ingestion status.
 manifest-stats:
     @uv run python -c "\
     from collections import Counter;\
@@ -671,15 +561,7 @@ disk-usage:
     print(f'  Avg fast-tier page:  {ft_bytes / 1024 / max(fast_pages,1):.0f} KB')\
     "
 
-# Pretty-print the latest LLM session log. Pages through `less -R` so
-# you can scroll. The on-disk format stays JSONL (one record per line)
-# for tooling — `tail -f`, `jq -c`, line-based grep all keep working.
-# This recipe is just a convenient viewer for "I want to read it in
-# my editor / terminal." Path resolution goes through Python's
-# APP_DATA_DIR helper so it works on macOS / Linux / Windows without
-# hard-coding `~/Library/Application Support` (which has spaces that
-# trip up shell word-splitting).
-
+# Pretty-print the latest LLM session log through `less -R` (on-disk stays JSONL).
 llm-log:
     #!/usr/bin/env bash
     set -euo pipefail

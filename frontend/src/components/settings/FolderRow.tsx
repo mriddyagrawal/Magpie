@@ -51,9 +51,16 @@ export function FolderRow({
 }: Props) {
   const displayName = folder.display_name?.trim() || basenameOf(folder.path);
   const tildePath = tildify(folder.path);
-  const status: "ready" | "understanding" | "paused" | "error" =
+  // "Read" means content actually landed in the search DB — i.e. last_read_at
+  // (max ingested_at across the folder) is set. NOT just "files > 0": a folder
+  // can have summarized files sitting in the manifest that never flushed to
+  // Qdrant (e.g. Qdrant was down mid-sync), and those are NOT searchable yet.
+  // Green "Ready" must mean genuinely searchable; everything else is "Not read".
+  const isRead = Boolean(folder.last_read_at);
+  const status: "ready" | "understanding" | "paused" | "error" | "unread" =
     isIngesting ? "understanding" :
     !folder.enabled ? "paused" :
+    !isRead ? "unread" :
     "ready";
 
   const pct = isIngesting && ingest && ingest.files_total > 0
@@ -100,11 +107,12 @@ export function FolderRow({
   );
 }
 
-function StatusPill({ status }: { status: "ready" | "understanding" | "paused" | "error" }) {
+function StatusPill({ status }: { status: "ready" | "understanding" | "paused" | "error" | "unread" }) {
   const label =
     status === "ready" ? "Ready" :
-    status === "understanding" ? "Understanding" :
+    status === "understanding" ? "Magpieing" :
     status === "paused" ? "Paused" :
+    status === "unread" ? "Not read" :
     "Error";
   return (
     <span className={`folder-row__pill folder-row__pill--${status}`}>
@@ -142,6 +150,15 @@ function InProgressBlock({
   pct: number;
   onStop: () => void;
 }) {
+  const elapsed = ingest?.elapsed_s ?? null;
+  // ETA = time-so-far projected across the remaining fraction. Only shown
+  // once we have real per-file progress (pct > 0), otherwise it would swing
+  // wildly during the initial scan.
+  const etaSeconds =
+    elapsed !== null && pct > 0 && pct < 100
+      ? Math.max(0, Math.round((elapsed / pct) * (100 - pct)))
+      : null;
+
   return (
     <div className="folder-row__progress">
       <div className="folder-row__progress-line">
@@ -163,6 +180,12 @@ function InProgressBlock({
       <div className="folder-row__progress-bar">
         <div className="folder-row__progress-fill" style={{ width: `${pct}%` }} />
       </div>
+      {elapsed !== null && (
+        <div className="folder-row__progress-time">
+          <span>{formatDuration(elapsed)} elapsed</span>
+          {etaSeconds !== null && <span>~{formatDuration(etaSeconds)} left</span>}
+        </div>
+      )}
       <div className="folder-row__progress-buttons">
         <button type="button" className="folder-row__progress-btn" onClick={onStop}>
           <Pause size={12} aria-hidden="true" /> Pause
@@ -273,6 +296,16 @@ function formatRelative(iso: string): string {
   if (days === 1) return "Yesterday";
   if (days < 30) return `${days} days ago`;
   return new Date(iso).toLocaleDateString();
+}
+
+function formatDuration(totalSeconds: number): string {
+  const s = Math.max(0, Math.round(totalSeconds));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  if (m < 60) return `${m}m ${rem}s`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}m`;
 }
 
 function truncatePath(p: string): string {

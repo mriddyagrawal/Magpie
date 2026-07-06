@@ -53,6 +53,19 @@ from typing import Any
 # https://pyinstaller.org/en/stable/common-issues-and-pitfalls.html
 multiprocessing.freeze_support()
 
+# Force UTF-8 on stdout/stderr. On Windows these default to the legacy cp1252
+# ("charmap") codec, so printing a path or summary containing a non-Latin1
+# char (e.g. "≥") raises UnicodeEncodeError and kills the whole sync mid-walk.
+# Tauri also sets PYTHONUTF8=1 on the sidecar, but this covers every other
+# launch path (`just serve`, the CLI, direct `python -m src.server`). Guarded
+# because a --noconsole PyInstaller build can hand us None or non-reconfigurable
+# streams.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+    except (AttributeError, ValueError, OSError):
+        pass
+
 # Suppress library noise BEFORE importing torch / transformers / qdrant_client.
 # These show up as scary-looking warnings and progress bars in dev terminals,
 # but say nothing useful to the user. Set defaults so .env / env can override
@@ -1261,14 +1274,18 @@ def _do_sync() -> None:
         from src.stage2.__main__ import ingest_from_manifest
 
         rules = load_user_rules()
-        roots: list[Path] = []
+        # Keep the raw configured path next to the resolved one. The raw path
+        # is what /settings/folders returns as `folder.path`, so pointing
+        # `_ingest_state["path"]` at it lets the matching folder row in the
+        # Settings UI light up its OWN progress bar as each root is walked.
+        roots: list[tuple[str, Path]] = []
         for ip in rules.include_paths:
             if not ip.enabled:
                 continue
             p = Path(ip.path).expanduser()
             if p.exists():
-                roots.append(p)
-        enabled_prefixes = [str(r.resolve()) for r in roots]
+                roots.append((ip.path, p))
+        enabled_prefixes = [str(p.resolve()) for _, p in roots]
 
         # Honor `global_rules.categories_enabled.data` for the walker's
         # `_DATA_EXTS_DEFAULT_OFF` filter (.json / .csv / .dat). Without
@@ -1296,9 +1313,18 @@ def _do_sync() -> None:
         # callback per-walk; we reset files_done/files_total per root
         # so progress is observable, even if the global "files_total"
         # only reflects the current root mid-run.
-        for root in roots:
+        for raw_path, root in roots:
             if _stop_event.is_set():
                 break
+            # Point the shared ingest state at THIS folder so its row (and only
+            # its row) shows the live progress bar in Settings. Reset counters
+            # so the bar restarts per folder instead of carrying the previous
+            # root's totals.
+            _ingest_state["path"] = raw_path
+            _ingest_state["files_done"] = 0
+            _ingest_state["files_total"] = 0
+            _ingest_state["current_file"] = None
+            _ingest_state["phase"] = "scanning"
             asyncio.run(run_batch(
                 root,
                 push_to_qdrant=True,
@@ -1630,7 +1656,14 @@ def _compute_folder_stats() -> dict[str, dict[str, Any]]:
     for rel, entry in manifest.entries.items():
         absolute = rel if Path(rel).is_absolute() else str(REPO_ROOT / rel)
         for raw, prefix in roots:
-            if absolute == prefix or absolute.startswith(prefix + "/"):
+            # Use os.sep, NOT a hardcoded "/". On Windows both `absolute`
+            # (manifest path) and `prefix` (resolved include_path) come back
+            # with backslashes, so `prefix + "/"` never matched a file living
+            # in a subfolder — every real folder showed "Not read yet" even
+            # after it was fully summarized, while a single-file include_path
+            # still matched via the `==` branch. os.sep is "\\" on Windows and
+            # "/" on macOS/Linux, so this is correct on all three.
+            if absolute == prefix or absolute.startswith(prefix + os.sep):
                 stats = out[raw]
                 stats["files"] += 1
                 stats["size_bytes"] += int(entry.size or 0)

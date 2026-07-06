@@ -161,6 +161,21 @@
   flex: 1 1 auto;
 }
 
+/* Previous answer pinned above the ask bar while composing a follow-up.
+   Dimmed + slightly desaturated so it reads as "context you were reading",
+   not the live answer. Still scrollable/readable; the input above stays the
+   focus. Restored to full opacity on hover so the user can re-read closely. */
+.magpie-window__pinned-prior {
+  opacity: 0.55;
+  filter: saturate(0.85);
+  transition: opacity 120ms ease;
+  min-height: 0;
+  overflow: hidden;
+}
+.magpie-window__pinned-prior:hover {
+  opacity: 0.9;
+}
+
 /* ---------- Settings blob ---------- */
 
 .settings-blob {

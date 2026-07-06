@@ -48,7 +48,12 @@
     ],
     "category": "Productivity",
     "shortDescription": "Semantic search over your local files",
-    "createUpdaterArtifacts": false
+    "createUpdaterArtifacts": false,
+    "windows": {
+      "nsis": {
+        "installerHooks": "./windows/hooks.nsh"
+      }
+    }
   },
   "plugins": {
     "updater": {

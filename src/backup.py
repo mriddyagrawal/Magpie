@@ -53,7 +53,9 @@ def _qdrant_base_url() -> str:
     where the server stores its data — just where it listens.
     """
     return os.environ.get(
-        "QDRANT_CLUSTER_ENDPOINT", "http://localhost:6433"
+        # 127.0.0.1, not "localhost" — on Windows "localhost" resolves to IPv6
+        # ::1 first and the IPv4-only Qdrant refuses it. See src/stage2/db.py.
+        "QDRANT_CLUSTER_ENDPOINT", "http://127.0.0.1:6433"
     ).rstrip("/")
 
 

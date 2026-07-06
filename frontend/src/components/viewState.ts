@@ -22,7 +22,10 @@ export type ViewKind =
 
 export type View =
   | { kind: "resting" }
-  | { kind: "typing"; query: string; selected: number | null }
+  // `prior` carries the answer the user was reading when they started a
+  // follow-up, so it can stay pinned (dimmed) above the ask bar while they
+  // compose the next question. Undefined for a fresh query typed from rest.
+  | { kind: "typing"; query: string; selected: number | null; prior?: QueryResponse }
   | {
       kind: "retrieving";
       question: string;

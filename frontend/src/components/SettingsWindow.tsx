@@ -78,25 +78,41 @@ export function SettingsWindow() {
   const handleDeepLinkAddFolderRef = useRef<(() => void) | null>(null);
 
   // ----------- Initial parallel fetch on mount -----------
+  // Each load RETRIES with a short backoff. On the packaged app's first
+  // launch the sidecar is still booting (models load ~3-5s), so a single
+  // fetch fails and — with no retry — left `folders` null forever, i.e. the
+  // Data tab stuck on its loading skeletons (users hit Reindex just to
+  // unstick it). Retrying until the sidecar answers fixes that without any
+  // user action.
   useEffect(() => {
     let cancelled = false;
+    const MAX_RETRIES = 6;
+    const RETRY_DELAY_MS = 1500;
+    async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T | undefined> {
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        if (cancelled) return undefined;
+        try {
+          return await fn();
+        } catch (e) {
+          if (attempt === MAX_RETRIES) {
+            console.warn(`${label} load failed after ${MAX_RETRIES + 1} attempts:`, e);
+            return undefined;
+          }
+          await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+        }
+      }
+      return undefined;
+    }
     (async () => {
       const tasks = [
-        getFolders().then((r) => !cancelled && setFolders(r.folders))
-          .catch((e) => console.warn("folders load failed:", e)),
-        getSearchSettings().then((r) => !cancelled && setSearch(r))
-          .catch((e) => console.warn("search-settings load failed:", e)),
-        getProviders().then((r) => !cancelled && setProviders(r))
-          .catch((e) => console.warn("providers load failed:", e)),
-        getAppSettings().then((r) => !cancelled && setApp(r))
-          .catch((e) => console.warn("app-settings load failed:", e)),
-        getShortcut().then((r) => !cancelled && setShortcut(r))
-          .catch((e) => console.warn("shortcut load failed:", e)),
-        getStatus().then((r) => {
-          if (cancelled) return;
-          setStatus(r);
-          setAppVersion(r.version);
-        }).catch((e) => console.warn("status load failed:", e)),
+        withRetry(getFolders, "folders").then((r) => { if (r && !cancelled) setFolders(r.folders); }),
+        withRetry(getSearchSettings, "search-settings").then((r) => { if (r && !cancelled) setSearch(r); }),
+        withRetry(getProviders, "providers").then((r) => { if (r && !cancelled) setProviders(r); }),
+        withRetry(getAppSettings, "app-settings").then((r) => { if (r && !cancelled) setApp(r); }),
+        withRetry(getShortcut, "shortcut").then((r) => { if (r && !cancelled) setShortcut(r); }),
+        withRetry(getStatus, "status").then((r) => {
+          if (r && !cancelled) { setStatus(r); setAppVersion(r.version); }
+        }),
       ];
       await Promise.allSettled(tasks);
     })();

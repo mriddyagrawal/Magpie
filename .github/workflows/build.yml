@@ -68,8 +68,29 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.target }}
 
+    # Windows finishes in ~20 min and macOS in ~10 on a cold cache, so an
+    # hour is generous. Without this, a stalled job runs until GitHub's 6h
+    # ceiling: the Linux leg once sat silent for 4h50m mid-cargo-build with
+    # no error, having last logged the compile of a trivial proc-macro
+    # crate. Fail fast instead of holding a release draft hostage.
+    timeout-minutes: 60
+
     steps:
       - uses: actions/checkout@v7
+
+      # Ubuntu runners ship ~14 GB free, and this job wants far more than a
+      # normal Tauri build: a PyInstaller sidecar carrying all of torch,
+      # a 91 MB qdrant binary, a full Rust target dir, and AppImage tooling.
+      # Exhausting the disk mid-link is a known cause of exactly the silent
+      # stall seen above — no ENOSPC in the log, the job just stops making
+      # progress. Reclaim ~10 GB of preinstalled SDKs we never touch.
+      - name: Free disk space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          echo "before:"; df -h / | tail -1
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          echo "after:"; df -h / | tail -1
 
       # ── Python / uv ────────────────────────────────────────────────────────
       - name: Setup uv
@@ -317,9 +338,24 @@ jobs:
       # Independent of the release flow — uploads as workflow run artifacts
       # (90-day retention, accessible via the Actions UI). Useful even on
       # the release path because they include intermediate build state.
+      # Non-fatal on purpose. This step is a convenience — it is not how
+      # releases ship (the tag path attaches installers to a GitHub Release,
+      # which is separate storage). Letting it fail the job meant a build
+      # that compiled, bundled and smoke-tested clean still reported red,
+      # purely because Actions artifact storage was full. Worse, GitHub
+      # recalculates that quota only every 6-12 hours, so freeing space did
+      # not unblock the next run. The compile is the signal; a failed upload
+      # still shows as a red step in the UI without sinking the job.
+      #
+      # `if-no-files-found: error` stays, so a genuinely missing installer is
+      # still surfaced rather than passing silently.
       - name: Upload build artifacts
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: magpie-${{ matrix.target }}
           path: ${{ matrix.artifact }}
           if-no-files-found: error
+          # These are multi-hundred-MB bundles rebuilt on every push. The
+          # 90-day default is what filled the quota in the first place.
+          retention-days: 14

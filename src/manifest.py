@@ -30,6 +30,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import tempfile
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -85,6 +87,50 @@ _MODEL_CACHE_DIR = APP_DATA_DIR / "cache"
 os.environ.setdefault("HF_HOME", str(_MODEL_CACHE_DIR))
 os.environ.setdefault("HF_HUB_CACHE", str(_MODEL_CACHE_DIR / "hub"))
 os.environ.setdefault("TRANSFORMERS_CACHE", str(_MODEL_CACHE_DIR))
+
+# fastembed does NOT honor HF_HOME. It resolves its own cache root from
+# `FASTEMBED_CACHE_PATH`, falling back to `<tempdir>/fastembed_cache`
+# (fastembed/common/utils.py::define_cache_dir), and we never pass an
+# explicit `cache_dir=` at the call sites in `src/stage2/embeddings.py`.
+# That left the two models loaded on *every* query and *every* ingest —
+# MiniLM dense (~90 MB) + BM25 sparse — outside the redirect above, in a
+# directory the OS is free to delete underneath us: macOS sweeps
+# /var/folders, Linux clears /tmp on reboot, Windows Storage Sense empties
+# %TEMP%. A purge means a silent re-download on next launch, and a hard
+# failure if the machine happens to be offline. Pin them next to the other
+# model weights so they inherit the same lifetime as the rest of the index.
+_FASTEMBED_CACHE_DIR = _MODEL_CACHE_DIR / "fastembed"
+os.environ.setdefault("FASTEMBED_CACHE_PATH", str(_FASTEMBED_CACHE_DIR))
+
+
+def _migrate_legacy_fastembed_cache(dest: Path) -> None:
+    """One-time move of a pre-fix `<tempdir>/fastembed_cache` into `dest`.
+
+    Saves existing installs a ~90 MB re-download and clears the stray copy
+    out of the temp dir. Best-effort and idempotent — it no-ops when the
+    user pinned `FASTEMBED_CACHE_PATH` themselves, when `dest` already
+    exists, or when there's nothing in the temp dir to move.
+
+    Never raises. This module is imported on every startup path, so a
+    failure here (permissions, a cross-device rename, another process
+    racing us) must not take the app down — fastembed just re-downloads,
+    which is slow but correct.
+    """
+    try:
+        if os.environ.get("FASTEMBED_CACHE_PATH") != str(dest):
+            return  # user pinned their own location; don't touch it
+        if dest.exists():
+            return  # already migrated, or a fresh download beat us here
+        legacy = Path(tempfile.gettempdir()) / "fastembed_cache"
+        if not legacy.is_dir() or legacy.resolve() == dest.resolve():
+            return
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(legacy), str(dest))
+    except Exception:  # noqa: BLE001 — best-effort; see docstring
+        pass
+
+
+_migrate_legacy_fastembed_cache(_FASTEMBED_CACHE_DIR)
 
 # Backward-compat alias. Existing imports of `REPO_ROOT` for data-path
 # resolution (manifest entries store summary paths relative to this) keep

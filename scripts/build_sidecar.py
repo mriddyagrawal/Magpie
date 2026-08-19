@@ -62,14 +62,21 @@ def _warn_if_bundled_key_missing() -> None:
     Plan #40 tracks the post-beta migration to a hosted backend that
     replaces this bundled-key approach.
     """
+    # Stick to ASCII in print() — Windows runners default to a cp1252 stdout
+    # encoding, and any non-ASCII (emoji, em-dash, arrows) raises
+    # UnicodeEncodeError that crashes the build before PyInstaller even
+    # starts. This bit only the MISSING branch, so it never reproduced on a
+    # dev box that had the key file: the `present` line's em-dash happens to
+    # be cp1252-encodable while `⚠` is not. Net effect was that Windows CI
+    # had never once produced a build. Keep every print() here 7-bit clean.
     key_path = ROOT / "src" / "config" / "bundled_key.txt"
     if key_path.exists() and key_path.read_text(encoding="utf-8").strip():
-        print(f"  bundled_key.txt present — Cloud toggle will work in this build")
+        print("  bundled_key.txt present - Cloud toggle will work in this build")
     else:
-        print(f"  ⚠  bundled_key.txt MISSING — Cloud toggle will 401 in this build")
-        print(f"  ⚠  copy src/config/bundled_key.txt.example → bundled_key.txt and")
-        print(f"  ⚠  paste the OpenRouter key. Acceptable for dev builds; release")
-        print(f"  ⚠  builds need this populated before tagging.")
+        print("  WARNING: bundled_key.txt MISSING - Cloud toggle will 401 in this build")
+        print("  WARNING: copy src/config/bundled_key.txt.example -> bundled_key.txt")
+        print("  WARNING: and paste the OpenRouter key. Acceptable for dev builds;")
+        print("  WARNING: release builds need this populated before tagging.")
 
 
 def main() -> None:

@@ -72,6 +72,39 @@ jobs:
       - name: Download Qdrant binary
         run: uv run python scripts/download_qdrant.py
 
+      # Seed the bundled OpenRouter key so the shipped app's Cloud toggle
+      # works out of the box. `src/config/bundled_key.txt` is gitignored, so
+      # CI has never had one — every binary this workflow produced had a
+      # Cloud path that 401'd, and there is no in-app way to supply a key
+      # (Plan #26 is unbuilt). Combined with llama-server not being bundled,
+      # that left released builds unable to answer anything at all.
+      #
+      # MUST run before `build_sidecar.py`: the file is pulled into the
+      # bundle by its `--add-data src:src`, so writing it afterwards is a
+      # no-op. `shell: bash` because the Windows runner defaults to
+      # PowerShell, where this syntax is not valid.
+      #
+      # Absent secret is NOT fatal — fork PRs cannot read secrets, and a
+      # keyless build is still worth compiling. build_sidecar.py already
+      # prints its own warning in that case.
+      #
+      # SECURITY: this key is baked into a distributed binary and is
+      # extractable with `strings` by anyone who downloads the app. It is
+      # deliberately a throwaway on a spend cap, pointed at a free-tier
+      # model. Rotate it freely; never put a metered key here. Plan #40
+      # (hosted backend, key stays server-side) is the real fix.
+      - name: Seed bundled OpenRouter key
+        shell: bash
+        env:
+          OPENROUTER_BUNDLED_KEY: ${{ secrets.OPENROUTER_BUNDLED_KEY }}
+        run: |
+          if [ -n "$OPENROUTER_BUNDLED_KEY" ]; then
+            printf '%s' "$OPENROUTER_BUNDLED_KEY" > src/config/bundled_key.txt
+            echo "bundled_key.txt written ($(wc -c < src/config/bundled_key.txt) bytes)"
+          else
+            echo "OPENROUTER_BUNDLED_KEY not set - Cloud toggle will 401 in this build"
+          fi
+
       - name: Build Python sidecar
         run: uv run python scripts/build_sidecar.py
 

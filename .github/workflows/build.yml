@@ -40,9 +40,13 @@ jobs:
             target: aarch64-apple-darwin
             artifact: frontend/src-tauri/target/release/bundle/dmg/*.dmg
 
-          - os: macos-13
-            target: x86_64-apple-darwin
-            artifact: frontend/src-tauri/target/release/bundle/dmg/*.dmg
+          # NOTE: the Intel-mac target (`macos-13` / x86_64-apple-darwin) is
+          # intentionally absent. GitHub retired that runner image, so the job
+          # never got scheduled — it sat in "awaiting a runner" for the full
+          # 24h job ceiling and then failed, which is what made every run on
+          # this workflow show up red even when the other three targets built
+          # clean. Restore an Intel lane only against a runner label that
+          # actually exists; Apple-silicon DMGs plus Rosetta cover the beta.
 
           - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
@@ -54,11 +58,11 @@ jobs:
     name: Build ${{ matrix.target }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # ── Python / uv ────────────────────────────────────────────────────────
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
 
@@ -73,12 +77,12 @@ jobs:
 
       # ── Node / pnpm ────────────────────────────────────────────────────────
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: latest
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -270,7 +274,7 @@ jobs:
       # (90-day retention, accessible via the Actions UI). Useful even on
       # the release path because they include intermediate build state.
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: magpie-${{ matrix.target }}
           path: ${{ matrix.artifact }}

@@ -1,20 +1,32 @@
 /**
- * SettingsHeader — top strip across the main content area showing
- * `Magpie · Settings · ● <state>`. The status pill mirrors the
- * sidebar footer's health (Ready / Understanding / Reconnecting …)
- * so the user has a live indicator regardless of which tab they're
- * looking at.
+ * SettingsHeader — top strip across the main content area. Shows the
+ * ACTIVE SECTION name (like macOS System Settings' title bar shows the
+ * pane you're in) plus a live status pill. The app name already lives
+ * in the sidebar brand, so repeating "Magpie · Settings" here read as
+ * clutter — the section name is the information that actually changes.
+ *
+ * The status pill mirrors the sidebar footer's health (Ready /
+ * Understanding / Reconnecting …) so the user has a live indicator
+ * regardless of which tab they're looking at.
  */
 
 import type { IngestStatus } from "../../api";
 import type { StatusResponse } from "../../types";
+import type { SettingsTab } from "./SettingsSidebar";
 
 interface Props {
+  tab: SettingsTab;
   status: StatusResponse | null;
   ingest: IngestStatus | null;
 }
 
-export function SettingsHeader({ status, ingest }: Props) {
+const TAB_LABELS: Record<SettingsTab, string> = {
+  "data": "Data",
+  "search-ai": "Search & AI",
+  "shortcut-app": "Shortcut & App",
+};
+
+export function SettingsHeader({ tab, status, ingest }: Props) {
   // Determine the dot state + label. Same priority as the ask bar's
   // StatusFooter: indexing > reconnecting > ready > booting.
   let dot: "ready" | "indexing" | "reconnecting" | "booting" = "booting";
@@ -35,11 +47,7 @@ export function SettingsHeader({ status, ingest }: Props) {
 
   return (
     <header className="settings-header">
-      <div className="settings-header__title">
-        <span className="settings-header__title-app">Magpie</span>
-        <span className="settings-header__title-sep">·</span>
-        <span className="settings-header__title-section">Settings</span>
-      </div>
+      <h1 className="settings-header__section">{TAB_LABELS[tab]}</h1>
       <div className="settings-header__pill">
         <span
           className={`settings-header__pill-dot settings-header__pill-dot--${dot}`}

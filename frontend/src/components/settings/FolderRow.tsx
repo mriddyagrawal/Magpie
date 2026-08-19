@@ -14,6 +14,17 @@
  * job at a time, so per-folder pause = global pause.
  */
 
+import {
+  FileSpreadsheet,
+  FileText,
+  Folder,
+  FolderOpen,
+  Pause,
+  RefreshCw,
+  Trash2,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { FolderEntry, IngestStatus } from "../../api";
 
 interface Props {
@@ -40,9 +51,16 @@ export function FolderRow({
 }: Props) {
   const displayName = folder.display_name?.trim() || basenameOf(folder.path);
   const tildePath = tildify(folder.path);
-  const status: "ready" | "understanding" | "paused" | "error" =
+  // "Read" means content actually landed in the search DB — i.e. last_read_at
+  // (max ingested_at across the folder) is set. NOT just "files > 0": a folder
+  // can have summarized files sitting in the manifest that never flushed to
+  // Qdrant (e.g. Qdrant was down mid-sync), and those are NOT searchable yet.
+  // Green "Ready" must mean genuinely searchable; everything else is "Not read".
+  const isRead = Boolean(folder.last_read_at);
+  const status: "ready" | "understanding" | "paused" | "error" | "unread" =
     isIngesting ? "understanding" :
     !folder.enabled ? "paused" :
+    !isRead ? "unread" :
     "ready";
 
   const pct = isIngesting && ingest && ingest.files_total > 0
@@ -53,7 +71,7 @@ export function FolderRow({
     <article className={`folder-row folder-row--${status}`}>
       <div className="folder-row__main">
         <div className="folder-row__icon" aria-hidden="true">
-          {fileIconFor(folder)}
+          <EntryIcon path={folder.path} />
         </div>
         <div className="folder-row__body">
           <div className="folder-row__name-line">
@@ -74,14 +92,14 @@ export function FolderRow({
             onChange={(v) => onToggle(folder.path, v)}
             label={`${folder.enabled ? "Pause" : "Resume"} indexing of ${displayName}`}
           />
-          <IconButton title="Reveal in Finder" onClick={() => onReveal(folder.path)}>
-            📂
+          <IconButton title="Show in folder" onClick={() => onReveal(folder.path)}>
+            <FolderOpen size={14} aria-hidden="true" />
           </IconButton>
           <IconButton title="Re-sync this folder" onClick={() => onResync(folder.path)}>
-            ↻
+            <RefreshCw size={14} aria-hidden="true" />
           </IconButton>
           <IconButton title="Remove" onClick={() => onRemove(folder.path)}>
-            …
+            <Trash2 size={14} aria-hidden="true" />
           </IconButton>
         </div>
       </div>
@@ -89,12 +107,13 @@ export function FolderRow({
   );
 }
 
-function StatusPill({ status }: { status: "ready" | "understanding" | "paused" | "error" }) {
+function StatusPill({ status }: { status: "ready" | "understanding" | "paused" | "error" | "unread" }) {
   const label =
-    status === "ready" ? "ready" :
-    status === "understanding" ? "understanding" :
-    status === "paused" ? "paused" :
-    "error";
+    status === "ready" ? "Ready" :
+    status === "understanding" ? "Magpieing" :
+    status === "paused" ? "Paused" :
+    status === "unread" ? "Not read" :
+    "Error";
   return (
     <span className={`folder-row__pill folder-row__pill--${status}`}>
       <span className="folder-row__pill-dot" aria-hidden="true" />
@@ -104,15 +123,22 @@ function StatusPill({ status }: { status: "ready" | "understanding" | "paused" |
 }
 
 function StatsLine({ folder }: { folder: FolderEntry }) {
-  const parts: string[] = [];
-  parts.push(`${folder.files.toLocaleString()} ${folder.files === 1 ? "file" : "files"}`);
-  parts.push(formatSize(folder.size_bytes));
-  if (folder.last_read_at) {
-    parts.push(`read ${formatRelative(folder.last_read_at)}`);
-  } else {
-    parts.push("not yet read");
+  // Never render placeholder junk ("0 files · — · not yet read").
+  // Unread folders get one plain sentence; read folders get only the
+  // facts that exist.
+  if (!folder.last_read_at && folder.files === 0) {
+    return <div className="folder-row__stats">Not read yet</div>;
   }
-  return <div className="folder-row__stats">{parts.join(" · ")}</div>;
+  const parts: string[] = [
+    `${folder.files.toLocaleString()} ${folder.files === 1 ? "file" : "files"}`,
+  ];
+  if (folder.size_bytes > 0) parts.push(formatSize(folder.size_bytes));
+  parts.push(
+    folder.last_read_at
+      ? `read ${formatRelative(folder.last_read_at)}`
+      : "not read yet",
+  );
+  return <div className="folder-row__stats">{parts.join(", ")}</div>;
 }
 
 function InProgressBlock({
@@ -124,6 +150,15 @@ function InProgressBlock({
   pct: number;
   onStop: () => void;
 }) {
+  const elapsed = ingest?.elapsed_s ?? null;
+  // ETA = time-so-far projected across the remaining fraction. Only shown
+  // once we have real per-file progress (pct > 0), otherwise it would swing
+  // wildly during the initial scan.
+  const etaSeconds =
+    elapsed !== null && pct > 0 && pct < 100
+      ? Math.max(0, Math.round((elapsed / pct) * (100 - pct)))
+      : null;
+
   return (
     <div className="folder-row__progress">
       <div className="folder-row__progress-line">
@@ -145,12 +180,18 @@ function InProgressBlock({
       <div className="folder-row__progress-bar">
         <div className="folder-row__progress-fill" style={{ width: `${pct}%` }} />
       </div>
+      {elapsed !== null && (
+        <div className="folder-row__progress-time">
+          <span>{formatDuration(elapsed)} elapsed</span>
+          {etaSeconds !== null && <span>~{formatDuration(etaSeconds)} left</span>}
+        </div>
+      )}
       <div className="folder-row__progress-buttons">
         <button type="button" className="folder-row__progress-btn" onClick={onStop}>
-          ⏸ Pause
+          <Pause size={12} aria-hidden="true" /> Pause
         </button>
         <button type="button" className="folder-row__progress-btn" onClick={onStop}>
-          ✕ Cancel
+          <X size={12} aria-hidden="true" /> Cancel
         </button>
       </div>
     </div>
@@ -210,22 +251,27 @@ function IconButton({
 // ---------------------------------------------------------------------------
 
 function basenameOf(path: string): string {
-  return path.replace(/\/+$/, "").split("/").pop() || path;
+  // Split on both separators — folders can come back as Windows
+  // (`C:\Users\…`) or POSIX (`/Users/…`) paths depending on the OS.
+  return path.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || path;
 }
 
 function tildify(path: string): string {
-  // Best-effort: replace `/Users/<name>/` with `~/`. Won't catch
-  // every shell expansion but covers the common case.
-  return path.replace(/^\/Users\/[^/]+\//, "~/");
+  // Best-effort home-folder shortening per platform: macOS `/Users/x/`,
+  // Linux `/home/x/`, Windows `C:\Users\x\`. Won't catch every shell
+  // expansion but covers the common cases.
+  return path
+    .replace(/^\/(Users|home)\/[^/]+\//, "~/")
+    .replace(/^[A-Za-z]:[\\/]Users[\\/][^\\/]+[\\/]/, "~\\");
 }
 
-function fileIconFor(folder: FolderEntry): string {
-  // Folders → 📁; single .pdf / .csv / etc → matching glyph.
-  const lower = folder.path.toLowerCase();
-  if (lower.endsWith(".pdf")) return "📄";
-  if (lower.endsWith(".csv") || lower.endsWith(".tsv")) return "📊";
-  if (lower.endsWith(".md") || lower.endsWith(".txt")) return "📝";
-  return "📁";
+function EntryIcon({ path }: { path: string }) {
+  const lower = path.toLowerCase();
+  const Icon: LucideIcon =
+    lower.endsWith(".csv") || lower.endsWith(".tsv") ? FileSpreadsheet :
+    /\.(pdf|md|txt|docx?)$/.test(lower) ? FileText :
+    Folder;
+  return <Icon size={20} strokeWidth={1.75} />;
 }
 
 function formatSize(bytes: number): string {
@@ -250,6 +296,16 @@ function formatRelative(iso: string): string {
   if (days === 1) return "Yesterday";
   if (days < 30) return `${days} days ago`;
   return new Date(iso).toLocaleDateString();
+}
+
+function formatDuration(totalSeconds: number): string {
+  const s = Math.max(0, Math.round(totalSeconds));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  if (m < 60) return `${m}m ${rem}s`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}m`;
 }
 
 function truncatePath(p: string): string {

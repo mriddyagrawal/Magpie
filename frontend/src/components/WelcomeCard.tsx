@@ -21,6 +21,7 @@
  */
 
 import { useCallback } from "react";
+import { ChevronRight, Plus } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 
 export function WelcomeCard() {
@@ -36,9 +37,6 @@ export function WelcomeCard() {
   return (
     <section className="not-found-card magpie-card" aria-live="polite">
       <header className="not-found-card__header">
-        <span className="not-found-card__icon" aria-hidden="true">
-          ✦
-        </span>
         <h2 className="not-found-card__title">Welcome to Magpie</h2>
       </header>
       <p className="not-found-card__body">
@@ -51,11 +49,15 @@ export function WelcomeCard() {
         className="not-found-card__cta"
         onClick={onAddFolder}
       >
-        <span className="not-found-card__cta-icon" aria-hidden="true">＋</span>
+        <span className="not-found-card__cta-icon" aria-hidden="true">
+          <Plus size={14} />
+        </span>
         <span className="not-found-card__cta-label">
           Add a folder to get started
         </span>
-        <span className="not-found-card__cta-chevron" aria-hidden="true">›</span>
+        <span className="not-found-card__cta-chevron" aria-hidden="true">
+          <ChevronRight size={14} />
+        </span>
       </button>
     </section>
   );

@@ -19,6 +19,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  AlertTriangle,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Cloud,
+  Cpu,
+} from "lucide-react";
+import {
+  friendlyError,
   getProviders,
   getSearchSettings,
   patchSearchSettings,
@@ -41,7 +50,7 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
   // Initial fetch (only if parent didn't already populate).
   useEffect(() => {
     if (search === null) {
-      getSearchSettings().then(setSearch).catch((e) => setError((e as Error).message));
+      getSearchSettings().then(setSearch).catch((e) => setError(friendlyError(e)));
     }
     if (providers === null) {
       getProviders().then(setProviders).catch(() => { /* non-fatal */ });
@@ -63,7 +72,7 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
         const updated = await patchSearchSettings(body);
         setSearch(updated);
       } catch (e) {
-        setError((e as Error).message);
+        setError(friendlyError(e));
       }
     }, DEBOUNCE_MS);
   }, [setSearch]);
@@ -76,7 +85,7 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
       const updated = await patchSearchSettings(p);
       setSearch(updated);
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendlyError(e));
     }
   }, [setSearch]);
 
@@ -105,12 +114,15 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
   return (
     <div className="search-ai-tab">
       <header className="search-ai-tab__header">
-        <h1 className="search-ai-tab__title">Search & AI</h1>
         <p className="search-ai-tab__subtitle">
           Pick the brain that answers your questions. Switch any time.
         </p>
       </header>
-      {error && <div className="search-ai-tab__error">⚠ {error}</div>}
+      {error && (
+        <div className="search-ai-tab__error">
+          <AlertTriangle size={14} aria-hidden="true" /> {error}
+        </div>
+      )}
 
       <section className="search-ai-tab__providers">
         <h2 className="search-ai-tab__section-title">Provider</h2>
@@ -158,7 +170,7 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
             aria-expanded={advancedOpen}
           >
             <span className="advanced-panel__chevron" aria-hidden="true">
-              {advancedOpen ? "▼" : "▶"}
+              {advancedOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
             </span>
             <span className="advanced-panel__title">Advanced</span>
             <span className="advanced-panel__hint">
@@ -253,19 +265,24 @@ function ProviderCard({
       onClick={() => !disabled && onSelect()}
       disabled={disabled}
     >
+      {/* Badge lives inline after the name; the check owns the right
+          edge. (They used to fight over the top-right corner — the
+          absolutely-positioned badge sat under the flexed check.) */}
       <div className="provider-card__header">
         <span className="provider-card__icon" aria-hidden="true">
-          {label === "Local" ? "◐" : "☁"}
+          {label === "Local" ? <Cpu size={16} /> : <Cloud size={16} />}
         </span>
         <span className="provider-card__label">{label}</span>
+        <span className={`provider-card__badge provider-card__badge--${badgeTone}`}>
+          {badge}
+        </span>
         {selected && (
-          <span className="provider-card__check" aria-hidden="true">✓</span>
+          <span className="provider-card__check" aria-hidden="true">
+            <Check size={14} />
+          </span>
         )}
       </div>
       <div className="provider-card__description">{description}</div>
-      <div className={`provider-card__badge provider-card__badge--${badgeTone}`}>
-        {badge}
-      </div>
     </button>
   );
 }

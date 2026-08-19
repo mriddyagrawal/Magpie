@@ -16,6 +16,7 @@
  */
 
 import { useCallback } from "react";
+import { ChevronRight, Plus, SearchX } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 
 interface Props {
@@ -50,8 +51,7 @@ export function NotFoundCard({ scannedCount, topic }: Props) {
     <section className="not-found-card magpie-card" aria-live="polite">
       <header className="not-found-card__header">
         <span className="not-found-card__icon" aria-hidden="true">
-          {/* Spinning "○" → static at this point. Designer can swap glyph. */}
-          ○
+          <SearchX size={15} />
         </span>
         <h2 className="not-found-card__title">Answer not found</h2>
       </header>
@@ -61,11 +61,15 @@ export function NotFoundCard({ scannedCount, topic }: Props) {
         className="not-found-card__cta"
         onClick={onAddFolder}
       >
-        <span className="not-found-card__cta-icon" aria-hidden="true">＋</span>
+        <span className="not-found-card__cta-icon" aria-hidden="true">
+          <Plus size={14} />
+        </span>
         <span className="not-found-card__cta-label">
           Add the folder where this knowledge might live
         </span>
-        <span className="not-found-card__cta-chevron" aria-hidden="true">›</span>
+        <span className="not-found-card__cta-chevron" aria-hidden="true">
+          <ChevronRight size={14} />
+        </span>
       </button>
     </section>
   );

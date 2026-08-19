@@ -25,6 +25,16 @@ import sys
 
 from dotenv import load_dotenv
 
+# Force UTF-8 on stdout/stderr. Windows defaults these to cp1252, so printing a
+# summary containing a non-Latin1 char (e.g. "→") raises UnicodeEncodeError and
+# crashes the CLI. Same fix as src/server.py; applied here for the `python -m
+# src.stage2` entry point. Guarded for non-reconfigurable streams.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+    except (AttributeError, ValueError, OSError):
+        pass
+
 
 def _expected_point_ids(manifest) -> set[str]:
     """Compute every Qdrant point ID we expect to find in the `summaries`

@@ -339,6 +339,28 @@ def _user_facing_error(exc: Exception) -> tuple[int, str]:
     print(f"[server] internal error {name}: {text}", file=sys.stderr)
     traceback.print_exc(file=sys.stderr)
 
+    # Local-inference failures. Matched on exception TYPE, deliberately
+    # ahead of the substring heuristics below: the binary-not-found message
+    # embeds filesystem paths, and a user whose home directory happens to
+    # contain "rate" or "collection" would otherwise be told the service is
+    # busy or that search is starting up. Type matching can't misfire that
+    # way. Matched by name rather than by importing the classes so this
+    # stays cheap and free of an import cycle through src.inference.
+    #
+    # Without this, all three fell through to the 500 default and the user
+    # got "Something went wrong. Please try again." on every query, forever,
+    # with no hint that the fix is a Settings toggle. The remediation detail
+    # ("run `just install-llama-server`") stays in the stderr log above —
+    # it's a developer instruction, not something to show an end user.
+    #
+    # Wording tracks the Settings UI's own vocabulary ("Local" / "Cloud")
+    # rather than naming llama-server, per the no-tech-leak principle in
+    # IO/IO - Repo Structure.md.
+    if name == "LlamaServerBinaryError":
+        return 503, "The local model isn't set up on this machine. Switch to Cloud in Settings."
+    if name in ("LlamaServerSpawnError", "LlamaServerCrashError"):
+        return 503, "The local model couldn't start. Switch to Cloud in Settings."
+
     # 429 rate-limit / quota-exhausted from any LLM provider
     if "429" in text or "rate" in text.lower() or "quota" in text.lower():
         return 503, "Service is busy right now. Try again in a few seconds."

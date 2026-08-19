@@ -19,6 +19,17 @@ on:
     branches: [main, front-back, UI, packaging]
   workflow_dispatch:
 
+# Only ever build the newest commit on a given ref. Each leg of this matrix
+# is a full Rust + PyInstaller build, so three superseded pushes meant three
+# obsolete builds competing for runners with the one anybody cared about.
+#
+# `cancel-in-progress` is deliberately FALSE for tags: a tag build is a
+# release (it runs tauri-action and drafts the GitHub Release), and killing
+# one halfway would leave a partial draft with only some platforms attached.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
 jobs:
   build:
     # `contents: write` is REQUIRED for tauri-action to create the draft

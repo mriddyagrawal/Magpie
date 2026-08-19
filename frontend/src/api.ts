@@ -22,6 +22,37 @@ function baseUrl(): string {
   return `http://127.0.0.1:${port}`;
 }
 
+/** Translate opaque fetch failures ("Failed to fetch") into copy the
+ *  user can act on. Settings tabs pass every caught error through this
+ *  before showing it in an error banner, so a dead engine produces a
+ *  loud, honest message instead of silence or jargon. */
+export function friendlyError(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/failed to fetch|load failed|networkerror/i.test(msg)) {
+    return "Couldn't reach Magpie's engine — your change was not saved. It usually comes back within a few seconds; then try again.";
+  }
+  // API failures arrive as `"<label> failed: <status> {\"detail\":\"...\"}"`.
+  // Surface only the human-readable `detail`, never the raw JSON + status noise
+  // that was leaking into the UI (e.g. `{"detail":"Indexing already in progress"}`).
+  const brace = msg.indexOf("{");
+  if (brace !== -1) {
+    try {
+      const parsed = JSON.parse(msg.slice(brace));
+      if (parsed && typeof parsed.detail === "string") return parsed.detail;
+    } catch {
+      /* not JSON — fall through to the raw message */
+    }
+  }
+  return msg;
+}
+
+/** True for the benign "a sync is already running" 409 — clicking Sync while
+ *  indexing is in flight isn't an error worth alarming the user about. */
+export function isAlreadyIndexingError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  return /already in progress/i.test(msg);
+}
+
 export interface HistoryTurn {
   question: string;
   answer: string;
@@ -282,8 +313,9 @@ export async function fetchCsvPreview(path: string): Promise<CsvPreview> {
   return res.json();
 }
 
-export async function fetchTextPreview(path: string): Promise<string> {
-  const res = await fetch(`${baseUrl()}/preview?path=${encodeURIComponent(path)}`);
+export async function fetchTextPreview(path: string, mode?: "text"): Promise<string> {
+  const modeParam = mode ? `&mode=${mode}` : "";
+  const res = await fetch(`${baseUrl()}/preview?path=${encodeURIComponent(path)}${modeParam}`);
   if (!res.ok) throw new Error(`text preview failed: ${res.status}`);
   return res.text();
 }

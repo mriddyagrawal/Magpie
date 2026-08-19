@@ -11,9 +11,12 @@ Both alternatives were dropped 2026-05:
     indexes, snapshots, and other features of the real Rust server. It
     always misled at-scale tests, so we removed the option entirely.
 
-Run Qdrant locally via `just qdrant-install && just qdrant-up`. Default
-endpoint is `http://localhost:6433`. Override with `QDRANT_CLUSTER_ENDPOINT`
-ONLY for changing the port — the host must resolve to loopback.
+Run Qdrant locally via `just qdrant-install && just qdrant-up` (or, on
+Windows, `uv run python scripts/qdrant_up.py`). Default endpoint is
+`http://127.0.0.1:6433` (IPv4 loopback — NOT "localhost", which resolves to
+IPv6 ::1 first on Windows and would be refused). Override with
+`QDRANT_CLUSTER_ENDPOINT` ONLY for changing the port — the host must resolve
+to loopback.
 """
 
 from __future__ import annotations
@@ -42,7 +45,13 @@ from src.stage2.parser import ParsedSummary
 COLLECTION_NAME = "summaries"
 
 _LOCALHOST_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
-_DEFAULT_ENDPOINT = "http://localhost:6433"
+# 127.0.0.1, NOT "localhost". On Windows, "localhost" resolves to IPv6 "::1"
+# FIRST; the bundled Qdrant binds IPv4 127.0.0.1 only, so a "localhost" client
+# hits ::1 and gets [WinError 10061] connection refused — every flush fails and
+# nothing ever lands in Qdrant. The release path already uses 127.0.0.1
+# explicitly (lib.rs); this makes dev / CLI match. Loopback IPv4 works on all
+# three OSes.
+_DEFAULT_ENDPOINT = "http://127.0.0.1:6433"
 
 _client: QdrantClient | None = None
 
@@ -50,7 +59,7 @@ _client: QdrantClient | None = None
 def get_qdrant_client() -> QdrantClient:
     """Return a cached Qdrant client pointing at the local Rust binary.
 
-    Reads `QDRANT_CLUSTER_ENDPOINT` (default: `http://localhost:6433`).
+    Reads `QDRANT_CLUSTER_ENDPOINT` (default: `http://127.0.0.1:6433`).
     Hard-errors if the host isn't loopback — Magpie is local-first by
     design and remote clusters would silently leak the index off the
     user's machine.

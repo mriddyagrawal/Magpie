@@ -1,11 +1,15 @@
 .magpie-window {
-  min-height: 100vh;
+  /* Exactly the window height — the body has overflow:hidden, so any
+     taller content was silently clipped with no way to scroll. Fixed
+     height + min-height:0 children lets the columns scroll instead. */
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--gap-card);
   padding: var(--gap-card);
   color: var(--text-primary);
+  overflow: hidden;
 }
 
 .magpie-window.is-resting {
@@ -30,6 +34,13 @@
   flex-direction: column;
   gap: var(--gap-card);
   min-height: 0;
+  /* Answer + sources scroll together as one column when they exceed
+     the window height (the "can never scroll to the sources" fix). */
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.magpie-col-left > * {
+  flex-shrink: 0;
 }
 
 .magpie-col-right {
@@ -61,7 +72,7 @@
   background: rgba(255, 255, 255, 0.07);
   color: var(--text-primary);
   font-size: var(--size-sm);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   cursor: pointer;
   transition: background 120ms;
 }
@@ -150,6 +161,21 @@
   flex: 1 1 auto;
 }
 
+/* Previous answer pinned above the ask bar while composing a follow-up.
+   Dimmed + slightly desaturated so it reads as "context you were reading",
+   not the live answer. Still scrollable/readable; the input above stays the
+   focus. Restored to full opacity on hover so the user can re-read closely. */
+.magpie-window__pinned-prior {
+  opacity: 0.55;
+  filter: saturate(0.85);
+  transition: opacity 120ms ease;
+  min-height: 0;
+  overflow: hidden;
+}
+.magpie-window__pinned-prior:hover {
+  opacity: 0.9;
+}
+
 /* ---------- Settings blob ---------- */
 
 .settings-blob {
@@ -190,33 +216,51 @@
   justify-content: space-between;
   width: 100%;
   padding: 8px 14px;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--size-xs);
   color: var(--text-secondary);
+  /* Footer doubles as a drag handle for the window — suppress text
+     selection so grabbing it never highlights the status text. */
+  user-select: none;
+  -webkit-user-select: none;
   user-select: none;
 }
+/* Items separate by whitespace, Spotlight style — no "·" glyphs. */
 .status-footer__left,
 .status-footer__right {
   display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.status-footer__state {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 .status-footer__dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 .status-footer__dot--ready     { background: var(--score-green); }
 .status-footer__dot--booting   { background: var(--score-amber); }
 .status-footer__dot--reconnecting { background: #d35858; }
 .status-footer__dot--indexing  { background: var(--accent); }
-.status-footer__sep {
-  color: var(--text-dim);
-  margin: 0 2px;
-}
-.status-footer__meta,
 .status-footer__label {
+  white-space: nowrap;
+  font-weight: 500;
+}
+.status-footer__meta {
+  white-space: nowrap;
+  color: var(--text-dim);
+}
+.status-footer__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   white-space: nowrap;
 }
 .status-footer__kbd {
@@ -224,8 +268,9 @@
   border: 1px solid var(--border-input);
   border-radius: 4px;
   padding: 1px 6px;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 10px;
+  font-weight: 500;
   color: var(--text-secondary);
 }
 

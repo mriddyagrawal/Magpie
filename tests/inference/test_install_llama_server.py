@@ -92,7 +92,7 @@ def test_default_gpu_windows_is_cpu():
         ("windows", "x86_64", "cpu", "win-cpu-x64.zip", "zip", "llama-server.exe"),
         ("windows", "amd64", "vulkan", "win-vulkan-x64.zip", "zip", "llama-server.exe"),
         ("windows", "x86_64", "cuda-12.4", "win-cuda-12.4-x64.zip", "zip", "llama-server.exe"),
-        ("windows", "x86_64", "cuda-13.1", "win-cuda-13.1-x64.zip", "zip", "llama-server.exe"),
+        ("windows", "x86_64", "cuda-13.3", "win-cuda-13.3-x64.zip", "zip", "llama-server.exe"),
         # Windows arm64
         ("windows", "arm64", "cpu", "win-cpu-arm64.zip", "zip", "llama-server.exe"),
     ],

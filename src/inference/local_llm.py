@@ -12,21 +12,22 @@ URL — this class is a thin OpenAI-compatible client on top.
 
 Vision (PR 2): when `complete(...)` is called with `images=[...]`, the
 client transparently switches to the registered vision profile (default
-`gemma-4-e4b-vision`) for that call only — the pool handles spawn /
-LRU eviction. Image bytes are base64-encoded and sent as OpenAI-style
+`lfm25-vl-vision`) for that call only — the pool handles spawn /
+LRU eviction. With the shipped single-profile setup the instance is
+already vision-bound, so no switch actually occurs. Image bytes are base64-encoded and sent as OpenAI-style
 `image_url` content blocks attached to the last user message. With
 `MAX_LOADED_MODELS=1`, switching between text and vision profiles
 incurs a model-reload cost; raise the cap if both are hot.
 
 Construction is lazy through `get_local_llm()` (singleton). The first
 call that triggers `pool.get_url_for(profile)` causes the subprocess
-to spawn and the model to load (~10–20s for a 5–7 GB GGUF on Apple
+to spawn and the model to load (a few seconds for the 2.2 GB GGUF on Apple
 Silicon). All subsequent calls reuse the running instance — that's
 the whole point of the pool.
 
 Configuration via env vars (also documented in `.env.example`):
-  LOCAL_MODEL                  HF repo id (e.g. unsloth/gemma-4-E4B-it-GGUF)
-  LOCAL_QUANT                  GGUF quant name (e.g. Q5_K_XL)
+  LOCAL_MODEL                  HF repo id (e.g. LiquidAI/LFM2.5-VL-3B-GGUF)
+  LOCAL_QUANT                  GGUF quant name (e.g. Q6_K)
   LOCAL_N_CTX                  context window
   LOCAL_TEMPERATURE            sampling temp
   LLAMA_SERVER_PATH            override binary path

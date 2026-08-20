@@ -1533,6 +1533,64 @@ def index_reindex() -> IndexJobResponse:
     return IndexJobResponse(status="started", kind="reindex")
 
 
+# ---------------------------------------------------------------------------
+# Local-model install — the Settings card's download flow.
+#
+# All logic lives in src.local_install; these are thin HTTP shims following
+# the /ingest + /ingest/status polling pattern. Lazy imports keep the module
+# (and its transitive profiles/device imports) off the sidecar's cold-start
+# path — the first status poll pays it instead.
+# ---------------------------------------------------------------------------
+
+
+@app.get("/local/status")
+def local_status() -> dict[str, Any]:
+    """Install state for both halves of Local: the LLM (binary + weights +
+    projector — what the provider toggle needs) and the visual tier (what T4
+    indexing uses regardless of provider). Poll while `running`."""
+    from src import local_install
+
+    return local_install.status()
+
+
+@app.post("/local/install", status_code=202)
+def local_install_start() -> dict[str, str]:
+    """Download every missing local artifact, in a background worker.
+    202 on start; 409 when a download is already running. Progress via
+    GET /local/status. Partial downloads resume — cancelling loses nothing."""
+    from src import local_install
+
+    started, msg = local_install.start_install()
+    if not started:
+        raise HTTPException(status_code=409, detail=msg)
+    return {"status": msg}
+
+
+@app.post("/local/install/cancel")
+def local_install_cancel() -> dict[str, str]:
+    from src import local_install
+
+    ok, msg = local_install.cancel_install()
+    if not ok:
+        raise HTTPException(status_code=409, detail=msg)
+    return {"status": msg}
+
+
+@app.delete("/local/model")
+def local_model_delete(component: str = Query(default="all")) -> dict[str, Any]:
+    """Reclaim downloaded model disk. component: llm | visual | all.
+    Refuses (409) while a download runs. The llama-server binary stays —
+    it is 40 MB and platform-specific; deleting it buys nothing."""
+    from src import local_install
+
+    if component not in ("llm", "visual", "all"):
+        raise HTTPException(status_code=422, detail="component must be llm, visual or all")
+    result = local_install.delete_models(component)
+    if result["error"]:
+        raise HTTPException(status_code=409, detail=result["error"])
+    return result
+
+
 # Plan endpoint cache. /index/plan does a real filesystem walk per enabled
 # root via find_candidates — cheap-ish (~30s on a 50K-file root) but the
 # Settings UI polls /ingest/status on a tick and would otherwise hammer
@@ -2013,9 +2071,19 @@ def settings_get_providers() -> ProvidersInfo:
     in secrets.json is non-empty."""
     from src.config.secrets import load_secrets
 
-    # Local: report the configured model. The binary's presence check
-    # is parked for PR 5 — see the model-download flow in the spec.
-    local_model = os.environ.get("LOCAL_MODEL", "Gemma 4")
+    # Local: real readiness, not the old hardcoded stub. `downloaded` means
+    # binary + weights + projector are all on disk (src.local_install PR 5);
+    # the visual tier is deliberately excluded — T4 indexing uses it
+    # regardless of provider, and /local/status reports it separately.
+    from src import local_install
+
+    try:
+        _llm = local_install._llm_spec()
+        local_model = f"{_llm['repo'].rsplit('/', 1)[-1]} ({_llm['quant']})"
+        local_downloaded = local_install.is_llm_ready()
+    except Exception:  # noqa: BLE001 — never let the settings tab 500 on this
+        local_model = "local model"
+        local_downloaded = False
 
     # Cloud: introspect the active provider's per-provider key. If the
     # user has cloud_provider="openrouter" but only has a moonshot key,
@@ -2038,9 +2106,9 @@ def settings_get_providers() -> ProvidersInfo:
 
     return ProvidersInfo(
         local={
-            "available": True,
+            "available": local_downloaded,
             "model": local_model,
-            "downloaded": True,  # v1 assumption; PR 5 wires the real check
+            "downloaded": local_downloaded,
         },
         cloud={
             "available": cloud_configured,

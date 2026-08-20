@@ -18,35 +18,75 @@ from src.inference.profiles import (
 # Registry
 # ---------------------------------------------------------------------------
 
-def test_both_text_and_vision_profiles_registered_at_import():
-    """Both built-in profiles register when the module loads. The
-    text-only profile is kept around as an opt-in memory-saver
-    (`LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text`); the vision profile
-    is the default for everything since 2026-05-07."""
+def test_only_the_vision_profile_is_registered():
+    """Exactly one profile ships. A text-only variant was removed rather
+    than merely un-defaulted: `--mmproj` is a spawn-time flag, so the
+    projector cannot be attached to or detached from a live process, and
+    an idle projector costs no inference time. The only thing a text-only
+    profile could buy is 0.54 GB resident, paid for with a full cold
+    reload on every text<->image transition."""
     profiles = all_profiles()
-    assert "gemma-4-e4b-text" in profiles
-    assert "gemma-4-e4b-vision" in profiles
+    assert list(profiles) == ["lfm25-vl-vision"]
 
 
 def test_default_text_profile_is_vision_capable():
     """Default points at the vision profile so the same subprocess serves
-    text and image requests with no LRU swap. The mmproj costs ~946 MB
+    text and image requests with no LRU swap. The projector costs 0.54 GB
     resident but zero inference cost on text-only calls."""
     profile = get_profile(default_text_profile())
-    assert profile.args.repo_id.startswith("unsloth/gemma-4")
-    assert profile.args.jinja is True  # Gemma 4 chat template requires it
+    assert profile.args.repo_id == "LiquidAI/LFM2.5-VL-3B-GGUF"
+    assert profile.args.jinja is True  # the LFM2.5 chat template requires it
     assert profile.has_vision is True
     assert profile.args.mmproj_repo_id is not None  # mmproj is loaded
 
 
-def test_text_only_profile_kept_for_opt_in():
-    """Users on tight memory budgets can opt out of the projector by
-    setting LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text in .env. Verifies
-    the text-only profile is still registered and still has no mmproj."""
-    profile = get_profile("gemma-4-e4b-text")
-    assert profile.args.mmproj is None
-    assert profile.args.mmproj_repo_id is None
-    assert profile.has_vision is False
+def test_default_quant_and_projector_variant_exist_upstream():
+    """Guards the two values that silently 404 if mistyped.
+
+    The projector ships a NARROWER quant set than the model (Q8_0/F16/BF16
+    versus the model's seven), so a variant that is valid for the weights
+    can still be invalid for the projector. Both names are formatted into
+    download URLs, and a typo surfaces only as a 404 at first inference —
+    long after the mistake."""
+    from src.inference.model_downloader import _filename_for, _mmproj_filename_for
+
+    args = get_profile(default_text_profile()).args
+    assert _filename_for(args.repo_id, args.quant) == "LFM2.5-VL-3B-Q6_K.gguf"
+    assert (
+        _mmproj_filename_for(args.mmproj_repo_id, args.mmproj_variant)
+        == "mmproj-LFM2.5-VL-3B-Q8_0.gguf"
+    )
+
+
+def test_legacy_gemma_repo_still_resolves():
+    """A user with LOCAL_MODEL pointed at the old Gemma repo should keep
+    working rather than hitting a hard 'unknown repo' error. Gemma is no
+    longer a registered profile, but its filename convention stays in the
+    downloader registry."""
+    from src.inference.model_downloader import _filename_for
+
+    assert (
+        _filename_for("unsloth/gemma-4-E4B-it-GGUF", "Q5_K_XL")
+        == "gemma-4-E4B-it-UD-Q5_K_XL.gguf"
+    )
+
+
+def test_stale_env_override_falls_back_instead_of_crashing(monkeypatch):
+    """A profile name that no longer exists must degrade, not raise.
+
+    The pre-LFM2.5 README instructed users to put
+    `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-vision` in .env, and load_dotenv()
+    restores it on every start — so a hard KeyError here would break local
+    inference for exactly the people who followed the docs, and would do it
+    at first inference rather than at startup."""
+    import src.inference.profiles as profiles_mod
+
+    monkeypatch.setattr(profiles_mod, "_WARNED_OVERRIDES", set())
+    monkeypatch.setenv("LLAMA_SERVER_TEXT_MODEL", "gemma-4-e4b-vision")
+
+    name = default_text_profile()
+    assert name == "lfm25-vl-vision"
+    get_profile(name)  # must not raise
 
 
 def test_unknown_profile_raises_with_helpful_message():
@@ -56,7 +96,7 @@ def test_unknown_profile_raises_with_helpful_message():
         get_profile("does-not-exist")
     assert "does-not-exist" in str(exc.value)
     assert "Registered profiles" in str(exc.value)
-    assert "gemma-4-e4b-text" in str(exc.value)
+    assert "lfm25-vl-vision" in str(exc.value)
 
 
 def test_register_is_idempotent():
@@ -103,4 +143,4 @@ def test_env_override_propagates_to_default_text_profile(monkeypatch):
     monkeypatch.delenv("LLAMA_SERVER_TEXT_MODEL")
     # Default fallback is the vision-capable profile (post-2026-05-07
     # decision: load mmproj once, idle for text-only).
-    assert default_text_profile() == "gemma-4-e4b-vision"
+    assert default_text_profile() == "lfm25-vl-vision"

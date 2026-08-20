@@ -32,6 +32,26 @@ from src.inference.profiles import (
 )
 
 
+def _register_temp_text_profile(name: str) -> None:
+    """Register a text-only profile for the duration of the test session.
+
+    No text-only profile ships any more (see profiles.py), but
+    `_select_profile`'s text->vision branch is still reachable by anyone
+    registering a custom one, so it still needs coverage. Cheap and
+    idempotent; the registry is a plain dict."""
+    from src.inference.profiles import LaunchArgs, ModelProfile, register
+
+    register(
+        ModelProfile(
+            name=name,
+            description="throwaway text-only profile for tests",
+            has_vision=False,
+            args=LaunchArgs(mmproj=None, mmproj_repo_id=None),
+        )
+    )
+
+
+
 # ---------------------------------------------------------------------------
 # _detect_image_media_type
 # ---------------------------------------------------------------------------
@@ -128,20 +148,20 @@ def test_select_profile_default_is_vision_so_no_swap_needed():
     `test_select_profile_text_instance_switches_to_vision_when_images_present`
     below."""
     llm = LlamaServerLLM()
-    assert llm.profile_name == "gemma-4-e4b-vision"
+    assert llm.profile_name == "lfm25-vl-vision"
     assert llm._select_profile(None) == llm.profile_name
     assert llm._select_profile([b"\x89PNG\r\n\x1a\n"]) == llm.profile_name
 
 
 def test_select_profile_text_instance_switches_to_vision_when_images_present():
-    """The legacy / opt-in path: users who explicitly set
-    `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text` to save the projector's
-    ~946 MB. With a text-bound instance, image-bearing calls still
-    route to the vision profile — incurring an LRU swap with
-    MAX_LOADED_MODELS=1, hence why this isn't the default anymore."""
-    llm = LlamaServerLLM(profile_name="gemma-4-e4b-text")
+    """A text-bound instance must still route image calls to the vision
+    profile. No text-only profile ships any more, so register a throwaway
+    one — the switch logic still needs coverage for anyone who registers a
+    custom text profile via `profiles.register(...)`."""
+    _register_temp_text_profile("tmp-text-profile")
+    llm = LlamaServerLLM(profile_name="tmp-text-profile")
     chosen = llm._select_profile([b"\x89PNG\r\n\x1a\n"])
-    assert chosen == "gemma-4-e4b-vision"
+    assert chosen == "lfm25-vl-vision"
     assert chosen != llm.profile_name  # explicit text → vision switch
 
 
@@ -161,12 +181,12 @@ def test_select_profile_vision_instance_does_not_double_switch():
 def test_select_profile_no_vision_registered_raises():
     """If a text-bound instance hits an image-bearing call AND no vision
     profile is registered, callers need a loud error so they can either
-    install the mmproj or fall back. Constructed via the opt-in
-    text profile because the default instance is now vision-bound and
-    wouldn't take this code path."""
+    install the mmproj or fall back. Uses a throwaway text profile because
+    the shipped instance is vision-bound and wouldn't take this path."""
     from src.inference import llama_server_pool
 
-    llm = LlamaServerLLM(profile_name="gemma-4-e4b-text")
+    _register_temp_text_profile("tmp-text-profile-2")
+    llm = LlamaServerLLM(profile_name="tmp-text-profile-2")
     with patch(
         "src.inference.local_llm.default_vision_profile",
         return_value=None,

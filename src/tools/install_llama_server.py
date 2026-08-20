@@ -14,10 +14,10 @@ Public surface:
 
 Env vars (read by main):
   LLAMA_SERVER_VERSION       release tag (default: DEFAULT_VERSION)
-  LLAMA_SERVER_GPU           gpu hint (cpu / vulkan / cuda-12.4 / cuda-13.1)
+  LLAMA_SERVER_GPU           gpu hint (cpu / vulkan / cuda-12.4 / cuda-13.3)
                              default: per-platform safe pick (Metal on
                              macOS, CPU elsewhere)
-  SKIP_MMPROJ_DOWNLOAD       set to 1 to skip the ~946 MB projector download
+  SKIP_MMPROJ_DOWNLOAD       set to 1 to skip the weights + projector download
 """
 
 from __future__ import annotations
@@ -36,15 +36,31 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional
 
-# The pinned llama.cpp release. Must support the `gemma4` model
-# architecture — b5400 (mid-2024) does NOT, b9049 (2026-05-06) does.
-# See Specs/llama_server_migration.md "Post-validation deviations log".
-DEFAULT_VERSION = "b9049"
+# The pinned llama.cpp release.
+#
+# Must be >= b10000-era (2026-06-10). The `lfm2` architecture itself has
+# been supported since 2025-07 (PR #14620) with vision via PR #15347, so
+# the previous pin b9049 (2026-05-06) LOADS LFM2.5-VL fine — which is the
+# trap. Three later fixes are what force the bump:
+#
+#   #24178  2026-06-05  unify and fix LFM2/LFM2.5 tool parser
+#   #24234  2026-06-06  fix LFM2/LFM2.5 reasoning round-trip and <think> leak
+#   #24377  2026-06-10  chat: fix LFM2/LFM2.5 ignoring json_schema   <-- critical
+#
+# On a pre-#24377 build, llama-server silently IGNORES the `json_schema`
+# response_format for this model family. Structured output would appear to
+# work while the GBNF grammar was never applied, leaving parse_json_with_repair
+# to carry every summarize call — degraded extraction, no error anywhere.
+# That is precisely the "model swap that doesn't honor the parameter" case
+# `src.llm.LocalAgent` warns about.
+DEFAULT_VERSION = "b10502"
 
-# The Hugging Face repo we pull the projector from (Unsloth's Gemma 4
-# E4B GGUF + paired BF16 mmproj live there). Centralized so the future
-# `--mmproj-repo` CLI flag only needs to override one place.
-DEFAULT_MMPROJ_REPO = "unsloth/gemma-4-E4B-it-GGUF"
+# NOTE: there is deliberately no DEFAULT_MMPROJ_REPO / default-quant constant
+# here any more. Those duplicated what src/inference/profiles.py already
+# declares, and the copies drifted: this module defaulted the projector to
+# BF16 while the profile asked for Q8_0, so `just install-llama-server`
+# fetched an 822 MB file the runtime ignored and then re-fetched the right
+# one at first spawn. `_ensure_mmproj` now reads the active profile.
 
 
 class InstallError(RuntimeError):
@@ -111,15 +127,24 @@ _TABLE: dict[tuple[str, str, str], AssetSpec] = {
         "llama-server.exe",
         extra=("cudart-llama-bin-win-cuda-12.4-x64.zip",),
     ),
-    ("windows", "x86_64", "cuda-13.1"): AssetSpec(
-        "llama-{version}-bin-win-cuda-13.1-x64.zip",
+    # CUDA 13.1 was renamed 13.3 upstream somewhere between b9049 and
+    # b10502 — the 13.1 asset no longer exists on current releases, so the
+    # old entry 404s on any recent pin. Verified against b10502's asset list.
+    ("windows", "x86_64", "cuda-13.3"): AssetSpec(
+        "llama-{version}-bin-win-cuda-13.3-x64.zip",
         "zip",
         "llama-server.exe",
-        extra=("cudart-llama-bin-win-cuda-13.1-x64.zip",),
+        extra=("cudart-llama-bin-win-cuda-13.3-x64.zip",),
     ),
     # --- Windows arm64 ---
     ("windows", "arm64", "cpu"): AssetSpec(
         "llama-{version}-bin-win-cpu-arm64.zip", "zip", "llama-server.exe"
+    ),
+    ("windows", "arm64", "cuda-13.4"): AssetSpec(
+        "llama-{version}-bin-win-cuda-13.4-arm64.zip",
+        "zip",
+        "llama-server.exe",
+        extra=("cudart-llama-bin-win-cuda-13.4-arm64.zip",),
     ),
 }
 
@@ -438,27 +463,54 @@ def download_and_install(
 
 
 def _ensure_mmproj() -> None:
-    """Pre-download the Gemma 4 vision projector (~946 MB) so the first
-    image-bearing inference doesn't pause for several minutes on a slow
-    connection. Imported lazily so this module is testable without
-    huggingface_hub installed."""
-    print(
-        "==> Pre-downloading the Gemma 4 E4B vision projector (~946 MB)",
-        file=sys.stderr,
-    )
-    print(
-        "    First-time only; cached under $APP_DATA_DIR/cache/hub/.",
-        file=sys.stderr,
-    )
+    """Pre-download the model weights AND the vision projector so the first
+    local inference doesn't stall on a multi-GB fetch.
+
+    Everything is read off the ACTIVE PROFILE rather than re-declared here.
+    That matters: this function used to hardcode `BF16` as the projector
+    fallback while the profile asked for `Q8_0`, so `just install-llama-server`
+    would happily fetch an 822 MB projector the runtime then ignored, and
+    re-fetch the right one at first spawn. Two sources of truth, ~300 MB
+    wasted, no error.
+
+    It also only ever fetched the projector, despite the projector being the
+    SMALLER of the two files — the weights are what actually make a first
+    query hang, and they were left to download lazily mid-inference.
+
+    Imported lazily so the module stays testable without huggingface_hub.
+    """
     try:
-        from src.inference.model_downloader import ensure_mmproj
+        from src.inference.model_downloader import ensure_mmproj, ensure_model
+        from src.inference.profiles import default_text_profile, get_profile
     except ImportError as e:
         raise InstallError(
-            f"cannot import ensure_mmproj: {e}. Run `just sync-environment` first."
+            f"cannot import the inference layer: {e}. "
+            "Run `just sync-environment` first."
         ) from e
-    repo = os.environ.get("LOCAL_MMPROJ_REPO", DEFAULT_MMPROJ_REPO)
-    variant = os.environ.get("LOCAL_MMPROJ_VARIANT", "BF16")
-    p = ensure_mmproj(repo, variant)
+
+    args = get_profile(default_text_profile()).args
+
+    # Read straight off the profile. Do NOT re-read LOCAL_MODEL/LOCAL_QUANT
+    # here: profiles.py already resolves them at import, so `args` has any
+    # override baked in. Re-reading was a second chance to disagree, and it
+    # did — it also meant this module honored a stale env value that the
+    # profile-name path (right above) had already warned about and refused.
+    repo, quant = args.repo_id, args.quant
+    print(f"==> Pre-downloading model weights: {repo} :: {quant}", file=sys.stderr)
+    print("    First-time only; cached under $APP_DATA_DIR/cache/hub/.", file=sys.stderr)
+    p = ensure_model(repo, quant)
+    print(f"    cached at {p}", file=sys.stderr)
+
+    if not args.mmproj_repo_id:
+        print("==> Profile is text-only; no projector to fetch.", file=sys.stderr)
+        return
+
+    mm_repo, mm_variant = args.mmproj_repo_id, args.mmproj_variant
+    print(
+        f"==> Pre-downloading vision projector: {mm_repo} :: {mm_variant}",
+        file=sys.stderr,
+    )
+    p = ensure_mmproj(mm_repo, mm_variant)
     print(f"    cached at {p}", file=sys.stderr)
 
 

@@ -543,6 +543,76 @@ export async function getProviders(): Promise<ProvidersInfo> {
 }
 
 // ---------------------------------------------------------------------------
+// Local-model install (/local/*) — backend in src/local_install.py.
+// Poll getLocalStatus() while `running`, same rhythm as getIngestStatus().
+// ---------------------------------------------------------------------------
+
+export interface LocalArtifact {
+  file: string | null;
+  present: boolean;
+  bytes_total: number | null; // null = size unknown (offline); render "~"
+}
+
+export interface LocalInstallStatus {
+  state: "ready" | "downloading" | "not_installed" | "error";
+  running: boolean;
+  phase: string | null; // binary | llm_weights | mmproj | visual_adapter | visual_base
+  error: string | null;
+  cancelled: boolean;
+  llm: {
+    ready: boolean;
+    binary: { present: boolean; version: number | null };
+    repo: string;
+    quant: string;
+    weights: LocalArtifact;
+    mmproj: LocalArtifact;
+    bytes_done: number;
+    bytes_total: number | null;
+  };
+  visual: {
+    ready: boolean;
+    adapter: string;
+    base: string;
+    bytes_done: number;
+    bytes_total: number;
+  };
+}
+
+export async function getLocalStatus(): Promise<LocalInstallStatus> {
+  const res = await fetch(`${baseUrl()}/local/status`);
+  if (!res.ok) throw new Error(`local/status failed: ${res.status}`);
+  return res.json();
+}
+
+export async function startLocalInstall(): Promise<void> {
+  const res = await fetch(`${baseUrl()}/local/install`, { method: "POST" });
+  // 409 = already downloading — for a download button that is success, not
+  // an error worth a banner.
+  if (!res.ok && res.status !== 409) {
+    throw new Error(`local/install failed: ${res.status} ${await res.text()}`);
+  }
+}
+
+export async function cancelLocalInstall(): Promise<void> {
+  const res = await fetch(`${baseUrl()}/local/install/cancel`, { method: "POST" });
+  if (!res.ok && res.status !== 409) {
+    throw new Error(`local/install/cancel failed: ${res.status} ${await res.text()}`);
+  }
+}
+
+export async function deleteLocalModels(
+  component: "llm" | "visual" | "all",
+): Promise<void> {
+  const res = await fetch(
+    `${baseUrl()}/local/model?component=${component}`,
+    { method: "DELETE" },
+  );
+  if (!res.ok) {
+    throw new Error(`local/model delete failed: ${res.status} ${await res.text()}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Settings — Shortcut & App tab
 // ---------------------------------------------------------------------------
 

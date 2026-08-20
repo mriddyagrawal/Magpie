@@ -67,6 +67,33 @@ DEFAULT_NGL = 999
 _WARNED_OVERRIDES: set[str] = set()
 
 
+def _env_model_repo() -> str:
+    """Resolve LOCAL_MODEL, announcing it when it is not the shipped default.
+
+    Pointing LOCAL_MODEL somewhere else is a legitimate escape hatch, so this
+    honors it. It does NOT do so silently. The pre-LFM2.5 README told users
+    to write `LOCAL_MODEL=unsloth/gemma-4-E4B-it-GGUF` into .env, and
+    load_dotenv() restores it every start — so on upgrade that stale line
+    quietly pins the whole app to the old 6.66 GB model. Someone would
+    "install LFM2.5", watch Gemma download instead, and have no way to tell
+    why. Print the divergence so it is visible in the first ten lines of any
+    install or spawn.
+    """
+    repo = os.environ.get("LOCAL_MODEL", "").strip()
+    if not repo:
+        return DEFAULT_REPO
+    if repo != DEFAULT_REPO and repo not in _WARNED_OVERRIDES:
+        _WARNED_OVERRIDES.add(repo)
+        print(
+            f"  note: LOCAL_MODEL={repo!r} overrides the shipped default "
+            f"({DEFAULT_REPO!r}). If you did not set this deliberately it is "
+            f"probably a stale .env line from before the LFM2.5 migration — "
+            f"remove it to use the shipped model.",
+            file=sys.stderr,
+        )
+    return repo
+
+
 # ---------------------------------------------------------------------------
 # Profile dataclasses
 # ---------------------------------------------------------------------------
@@ -213,9 +240,9 @@ register(
         ),
         has_vision=True,
         args=LaunchArgs(
-            repo_id=os.environ.get("LOCAL_MODEL", DEFAULT_REPO),
+            repo_id=_env_model_repo(),
             quant=os.environ.get("LOCAL_QUANT", DEFAULT_QUANT),
-            mmproj_repo_id=os.environ.get("LOCAL_MMPROJ_REPO", DEFAULT_REPO),
+            mmproj_repo_id=os.environ.get("LOCAL_MMPROJ_REPO", _env_model_repo()),
             mmproj_variant=os.environ.get("LOCAL_MMPROJ_VARIANT", "Q8_0"),
             ngl=DEFAULT_NGL,
             ctx_size=int(os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)),

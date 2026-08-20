@@ -37,15 +37,23 @@ _BIN_NAME = "llama-server" + (".exe" if sys.platform == "win32" else "")
 # llama.cpp release tags look like `b5400` or `b5400-12-gabc123` (build
 # number + commits-since + sha when built from a non-tag commit). We
 # only care about the numeric part for comparisons.
-# llama-server's `--version` ships in two shapes depending on the release
-# vintage. Older builds emit the bare release-tag form `b5400`. Newer
-# builds (b5400+ on macOS, observed 2026-05) emit `version: 5400 (sha)`
-# with no `b` prefix — bare digits. We accept both, plus the embedded-tag
-# form `b5400-12-gabc123` from local builds. Anchored to either a `b`
-# preceded by a word boundary OR `version:` to avoid latching onto random
-# 3-6 digit numbers in the surrounding text (commit hashes contain digits).
+# llama-server's `--version` ships in three shapes depending on vintage:
+#
+#   b5400-era tags   : `b5400` (bare) or `b5400-12-gabc123` (local builds)
+#   2026-05 macOS    : `version: 5400 (sha)` — bare digits after `version:`
+#   b10502 (2026-08) : `version: 0.1.2-dev (build 10502, commit 0adcc3bb5)`
+#                       — a semver after `version:` and the build number
+#                       behind the word `build`
+#
+# The third form silently defeated the previous regex: `version:` was
+# followed by `0.1.2-dev` (not 3-6 digits) and nothing matched `build NNNNN`,
+# so parse_build_number returned None and get_binary_version warned and
+# PROCEEDED. That reduces the MIN_VERSION guard to advisory — and that guard
+# is what stands between us and pre-#24377 builds that silently ignore
+# json_schema for the LFM2/2.5 family. Anchored to `build`, a digit-adjacent
+# `b`, or `version:` so stray 3-6 digit runs (commit hashes) don't match.
 _VERSION_RE = re.compile(
-    r"(?:\bb|version:\s*)(\d{3,6})\b",
+    r"(?:\bbuild\s+|\bb(?=\d)|version:\s*)(\d{3,6})\b",
     re.IGNORECASE,
 )
 

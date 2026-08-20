@@ -59,11 +59,24 @@ jobs:
           # clean. Restore an Intel lane only against a runner label that
           # actually exists; Apple-silicon DMGs plus Rosetta cover the beta.
 
-          - os: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
-            artifact: |
-              frontend/src-tauri/target/release/bundle/deb/*.deb
-              frontend/src-tauri/target/release/bundle/appimage/*.AppImage
+          # Linux is parked for the beta, not abandoned. The cargo build
+          # stalls silently on the runner: no error, no ENOSPC, no OOM kill
+          # — it logged the compile of a trivial proc-macro crate and then
+          # stopped making progress for 4h50m. Reclaiming ~10 GB of
+          # preinstalled SDKs did not help; with timeout-minutes in place it
+          # now dies at exactly 60m instead, which confirms a stall rather
+          # than a slow build. Keeping it in the matrix bought a guaranteed
+          # red leg and an hour added to every release.
+          #
+          # To restore, uncomment and investigate on a branch — likely
+          # suspects are webkit2gtk/glib linking on ubuntu-22.04 or an
+          # AppImage tooling hang, neither of which blocks macOS/Windows.
+          #
+          # - os: ubuntu-22.04
+          #   target: x86_64-unknown-linux-gnu
+          #   artifact: |
+          #     frontend/src-tauri/target/release/bundle/deb/*.deb
+          #     frontend/src-tauri/target/release/bundle/appimage/*.AppImage
 
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.target }}
@@ -250,15 +263,25 @@ jobs:
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         with:
           projectPath: frontend
-          # `__VERSION__` is replaced by tauri-action with the value from
-          # tauri.conf.json. Each matrix job uploads to the SAME release
-          # (deduplicated by tagName), so tagged tag-pushes get one release
-          # with .dmg + .AppImage + .deb + .exe attached + latest.json.
-          tagName: app-v__VERSION__
-          releaseName: 'Magpie v__VERSION__'
+          # Use the tag actually pushed. `app-v__VERSION__` expanded from
+          # tauri.conf.json's version field (0.1.0), so pushing a tag like
+          # `v0.1.0-beta.1` would have cut a SECOND, differently-named
+          # release at `app-v0.1.0` — two tags for one build, with the
+          # pre-release suffix silently dropped. Each matrix job still
+          # uploads to the same release, deduplicated by this tag name.
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Magpie ${{ github.ref_name }}'
           releaseDraft: true       # nothing publishes automatically
-          prerelease: false
-          includeUpdaterJson: true # generates latest.json for the updater
+          # Beta tags must be flagged pre-release so GitHub doesn't serve
+          # them as the current stable download.
+          prerelease: true
+          # OFF deliberately. tauri.conf.json sets createUpdaterArtifacts
+          # and plugins.updater.active both false, and there is no
+          # TAURI_SIGNING_PRIVATE_KEY secret, so asking for latest.json
+          # means generating an updater manifest from signed artifacts this
+          # build never produces. Re-enable together with the updater config
+          # and a signing key, not before.
+          includeUpdaterJson: false
 
       # ── Smoke-test the bundled sidecar (validates T1+T2 exclude correctness) ──
       # Scope: catches Tier 1 (torch.distributed, torch.onnx, ...) and Tier 2

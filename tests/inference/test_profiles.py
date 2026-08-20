@@ -18,14 +18,15 @@ from src.inference.profiles import (
 # Registry
 # ---------------------------------------------------------------------------
 
-def test_both_text_and_vision_profiles_registered_at_import():
-    """Both built-in profiles register when the module loads. The
-    text-only profile is kept around as an opt-in memory-saver
-    (`LLAMA_SERVER_TEXT_MODEL=lfm25-vl-text`); the vision profile
-    is the default for everything since 2026-05-07."""
+def test_only_the_vision_profile_is_registered():
+    """Exactly one profile ships. A text-only variant was removed rather
+    than merely un-defaulted: `--mmproj` is a spawn-time flag, so the
+    projector cannot be attached to or detached from a live process, and
+    an idle projector costs no inference time. The only thing a text-only
+    profile could buy is 0.54 GB resident, paid for with a full cold
+    reload on every text<->image transition."""
     profiles = all_profiles()
-    assert "lfm25-vl-text" in profiles
-    assert "lfm25-vl-vision" in profiles
+    assert list(profiles) == ["lfm25-vl-vision"]
 
 
 def test_default_text_profile_is_vision_capable():
@@ -70,14 +71,22 @@ def test_legacy_gemma_repo_still_resolves():
     )
 
 
-def test_text_only_profile_kept_for_opt_in():
-    """Users on tight memory budgets can opt out of the projector by
-    setting LLAMA_SERVER_TEXT_MODEL=lfm25-vl-text in .env. Verifies
-    the text-only profile is still registered and still has no mmproj."""
-    profile = get_profile("lfm25-vl-text")
-    assert profile.args.mmproj is None
-    assert profile.args.mmproj_repo_id is None
-    assert profile.has_vision is False
+def test_stale_env_override_falls_back_instead_of_crashing(monkeypatch):
+    """A profile name that no longer exists must degrade, not raise.
+
+    The pre-LFM2.5 README instructed users to put
+    `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-vision` in .env, and load_dotenv()
+    restores it on every start — so a hard KeyError here would break local
+    inference for exactly the people who followed the docs, and would do it
+    at first inference rather than at startup."""
+    import src.inference.profiles as profiles_mod
+
+    monkeypatch.setattr(profiles_mod, "_WARNED_OVERRIDES", set())
+    monkeypatch.setenv("LLAMA_SERVER_TEXT_MODEL", "gemma-4-e4b-vision")
+
+    name = default_text_profile()
+    assert name == "lfm25-vl-vision"
+    get_profile(name)  # must not raise
 
 
 def test_unknown_profile_raises_with_helpful_message():
@@ -87,7 +96,7 @@ def test_unknown_profile_raises_with_helpful_message():
         get_profile("does-not-exist")
     assert "does-not-exist" in str(exc.value)
     assert "Registered profiles" in str(exc.value)
-    assert "lfm25-vl-text" in str(exc.value)
+    assert "lfm25-vl-vision" in str(exc.value)
 
 
 def test_register_is_idempotent():

@@ -32,7 +32,12 @@ def _load_model(cfg: DeviceConfig) -> tuple[Any, Any]:
     if cfg.model_family == "colqwen2_5":
         from colpali_engine.models import ColQwen2_5, ColQwen2_5_Processor
         model_cls, proc_cls = ColQwen2_5, ColQwen2_5_Processor
+    elif cfg.model_family == "colmodernvbert":
+        from colpali_engine.models import ColModernVBert, ColModernVBertProcessor
+        model_cls, proc_cls = ColModernVBert, ColModernVBertProcessor
     elif cfg.model_family == "colidefics3":
+        # ColSmol. No longer selected by device.py, kept so a device.json
+        # cached before the 2026-08 switch still loads instead of raising.
         from colpali_engine.models import ColIdefics3, ColIdefics3Processor
         model_cls, proc_cls = ColIdefics3, ColIdefics3Processor
     else:

@@ -183,14 +183,16 @@ just install-llama-server
 ```
 
 Downloads the right binary for your platform into `<APP_DATA_DIR>/bin/`, strips
-macOS quarantine, verifies the version, and pre-fetches the vision projector.
-Skip the projector with `SKIP_MMPROJ_DOWNLOAD=1`.
+macOS quarantine, verifies the version, then pre-fetches the model weights AND
+the vision projector (both read off the active profile). Skip the weight
+downloads with `SKIP_MMPROJ_DOWNLOAD=1`.
 
 | OS | Arch | GPU variants |
 |---|---|---|
 | macOS | arm64, x86_64 | `metal` (built into every macOS build) |
 | Linux | x86_64, arm64 | `cpu`, `vulkan` |
-| Windows | x86_64 | `cpu`, `vulkan`, `cuda-12.4`, `cuda-13.1` |
+| Windows | x86_64 | `cpu`, `vulkan`, `cuda-12.4`, `cuda-13.3` |
+| Windows | arm64 | `cpu`, `cuda-13.4` |
 
 Defaults are `metal` on macOS and `cpu` elsewhere. Override with
 `LLAMA_SERVER_GPU=vulkan` (etc.).
@@ -201,32 +203,58 @@ Defaults are `metal` on macOS and `cpu` elsewhere. Override with
 
 ### Model and tunables
 
-Default `unsloth/gemma-4-E4B-it-GGUF` at `Q5_K_XL` (~6.7 GB), downloaded to
-`<APP_DATA_DIR>/cache/hub/` on first inference.
+Default **`LiquidAI/LFM2.5-VL-3B-GGUF`** at `Q6_K` (2.22 GB) plus the
+`mmproj-…-Q8_0` vision projector (0.56 GB), downloaded to
+`<APP_DATA_DIR>/cache/hub/` on first inference (or up front by the installer).
+One profile, `lfm25-vl-vision`, serves both text and image requests from a
+single subprocess — there is deliberately no text-only profile, because
+`--mmproj` is a spawn-time flag (a "later" projector means a full cold reload)
+and an idle projector costs no inference time.
 
 ```bash
-LOCAL_MODEL=unsloth/gemma-4-E4B-it-GGUF   # HF GGUF repo
-LOCAL_QUANT=Q5_K_XL                       # Q4_K_XL ~5.1G / Q5_K_XL ~6.7G / Q6_K_XL ~7.5G / Q8_K_XL ~8.7G
-LOCAL_N_CTX=8192
+LOCAL_MODEL=LiquidAI/LFM2.5-VL-3B-GGUF    # HF GGUF repo
+LOCAL_QUANT=Q6_K                          # Q4_0 1.59G / Q4_K_M 1.67G / Q5_K_M 1.94G / Q6_K 2.22G / Q8_0 2.87G
+LOCAL_N_CTX=16384                         # GGUF allows 128K; KV-cache grows linearly, 16K is the default
 LOCAL_TEMPERATURE=0.7
 
 LLAMA_SERVER_PATH=                        # empty = auto-discover
-LLAMA_SERVER_MIN_VERSION=b9049            # hard-fail if older — must support gemma4
+LLAMA_SERVER_MIN_VERSION=b10502           # hard-fail if older — pre-2026-06-10 builds silently
+                                          # IGNORE json_schema for the LFM2/2.5 family (llama.cpp
+                                          # #24377), so grammar-constrained output never applies
 LLAMA_SERVER_BASE_PORT=9100               # NOT 8765 (that's the sidecar)
 LLAMA_SERVER_MAX_LOADED_MODELS=1          # 1 = sequential, LRU eviction
 LLAMA_SERVER_IDLE_TIMEOUT_S=600
-LOCAL_MMPROJ_VARIANT=BF16
+LOCAL_MMPROJ_VARIANT=Q8_0                 # projector ships Q8_0/F16/BF16 only — narrower than the model's quants
 ```
 
-**Changing model family** also requires a filename pattern in
-`src/inference/model_downloader.py` (`_filename_for` / `_mmproj_filename_for`),
-which currently hard-raises for any repo other than Unsloth's Gemma 4.
+**Changing model repo** requires a filename convention in
+`src/inference/model_downloader.py` (`_REPO_PATTERNS`) — conventions cannot be
+derived, they're read off each repo's file listing. LFM2.5-VL and the legacy
+Gemma 4 repo are registered; anything else raises with instructions. A stale
+`LOCAL_MODEL` / `LLAMA_SERVER_TEXT_MODEL` left in `.env` from before the
+LFM2.5 migration is detected and warned about rather than silently honored.
 
-Gemma 4 E4B is natively multi-modal: one set of weights plus `mmproj-BF16.gguf`
-(~946 MB) as image encoder. Both load into one subprocess — text-only calls run at
-full speed since the projector isn't in the forward pass. Set
-`LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text` to split them and save the projector's
-RAM, at the cost of a ~25–30 s swap when alternating workloads.
+Do **not** point this at LFM2.5-2.6B or LFM2.5-1.2B-Thinking: both are
+reasoning models whose chat template opens every assistant turn with
+`<think>`, which wrecks time-to-first-token and fights the GBNF grammar.
+
+### Visual-tier (ColPali) model selection
+
+`src/stage1_fast/device.py` picks exactly one retriever per machine; nothing
+downstream offers a choice, because the two produce incompatible vectors and
+switching would invalidate the whole `fast_tier` collection.
+
+| hardware | model | real download |
+|---|---|---|
+| CUDA ≥ 8 GB VRAM | ColQwen2.5 | 7.25 GB |
+| Apple silicon ≥ 24 GB unified | ColQwen2.5 | 7.25 GB |
+| everything else (incl. CPU) | ColModernVBERT | 0.97 GB |
+
+Both are PEFT LoRA adapters whose base model is resolved transitively at load
+time — the `model_id` alone understates ColQwen's download by ~30×. The
+selection is cached at `~/.cache/notspotlight/device.json` with a
+`selector_version`; bumping the version in `device.py` invalidates old caches
+when the matrix changes.
 
 ---
 

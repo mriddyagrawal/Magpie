@@ -93,7 +93,7 @@ PROVIDERS: dict[str, ProviderConfig] = {
     # In-process llama-cpp-python (cross-platform: Metal on macOS, CUDA on
     # Linux/Windows, CPU fallback). See Plans/Local LLM Plan.md. The
     # `model_env`/`default_model` here is the HF GGUF *repo*; the specific
-    # quant is selected by `LOCAL_QUANT` (default Q5_K_XL). Runtime knobs
+    # quant is selected by `LOCAL_QUANT` (default Q6_K). Runtime knobs
     # (`LOCAL_N_CTX`, `LOCAL_N_GPU_LAYERS`, `LOCAL_TEMPERATURE`) are read
     # by `src.inference.local_llm`.
     "local": ProviderConfig(

@@ -14,10 +14,10 @@ Public surface:
 
 Env vars (read by main):
   LLAMA_SERVER_VERSION       release tag (default: DEFAULT_VERSION)
-  LLAMA_SERVER_GPU           gpu hint (cpu / vulkan / cuda-12.4 / cuda-13.1)
+  LLAMA_SERVER_GPU           gpu hint (cpu / vulkan / cuda-12.4 / cuda-13.3)
                              default: per-platform safe pick (Metal on
                              macOS, CPU elsewhere)
-  SKIP_MMPROJ_DOWNLOAD       set to 1 to skip the ~946 MB projector download
+  SKIP_MMPROJ_DOWNLOAD       set to 1 to skip the weights + projector download
 """
 
 from __future__ import annotations
@@ -55,10 +55,12 @@ from typing import Iterable, Optional
 # `src.llm.LocalAgent` warns about.
 DEFAULT_VERSION = "b10502"
 
-# The Hugging Face repo we pull weights + projector from. LFM2.5-VL-3B
-# ships both the GGUF and its paired mmproj in one repo. Centralized so a
-# future `--mmproj-repo` flag only needs to override one place.
-DEFAULT_MMPROJ_REPO = "LiquidAI/LFM2.5-VL-3B-GGUF"
+# NOTE: there is deliberately no DEFAULT_MMPROJ_REPO / default-quant constant
+# here any more. Those duplicated what src/inference/profiles.py already
+# declares, and the copies drifted: this module defaulted the projector to
+# BF16 while the profile asked for Q8_0, so `just install-llama-server`
+# fetched an 822 MB file the runtime ignored and then re-fetched the right
+# one at first spawn. `_ensure_mmproj` now reads the active profile.
 
 
 class InstallError(RuntimeError):
@@ -461,27 +463,53 @@ def download_and_install(
 
 
 def _ensure_mmproj() -> None:
-    """Pre-download the Gemma 4 vision projector (~946 MB) so the first
-    image-bearing inference doesn't pause for several minutes on a slow
-    connection. Imported lazily so this module is testable without
-    huggingface_hub installed."""
-    print(
-        "==> Pre-downloading the Gemma 4 E4B vision projector (~946 MB)",
-        file=sys.stderr,
-    )
-    print(
-        "    First-time only; cached under $APP_DATA_DIR/cache/hub/.",
-        file=sys.stderr,
-    )
+    """Pre-download the model weights AND the vision projector so the first
+    local inference doesn't stall on a multi-GB fetch.
+
+    Everything is read off the ACTIVE PROFILE rather than re-declared here.
+    That matters: this function used to hardcode `BF16` as the projector
+    fallback while the profile asked for `Q8_0`, so `just install-llama-server`
+    would happily fetch an 822 MB projector the runtime then ignored, and
+    re-fetch the right one at first spawn. Two sources of truth, ~300 MB
+    wasted, no error.
+
+    It also only ever fetched the projector, despite the projector being the
+    SMALLER of the two files — the weights are what actually make a first
+    query hang, and they were left to download lazily mid-inference.
+
+    Imported lazily so the module stays testable without huggingface_hub.
+    """
     try:
-        from src.inference.model_downloader import ensure_mmproj
+        from src.inference.model_downloader import ensure_mmproj, ensure_model
+        from src.inference.profiles import default_text_profile, get_profile
     except ImportError as e:
         raise InstallError(
-            f"cannot import ensure_mmproj: {e}. Run `just sync-environment` first."
+            f"cannot import the inference layer: {e}. "
+            "Run `just sync-environment` first."
         ) from e
-    repo = os.environ.get("LOCAL_MMPROJ_REPO", DEFAULT_MMPROJ_REPO)
-    variant = os.environ.get("LOCAL_MMPROJ_VARIANT", "BF16")
-    p = ensure_mmproj(repo, variant)
+
+    args = get_profile(default_text_profile()).args
+
+    # Weights. Env still wins so an explicit LOCAL_MODEL/LOCAL_QUANT override
+    # is honored — but the DEFAULT now comes from the profile, not a copy.
+    repo = os.environ.get("LOCAL_MODEL", args.repo_id)
+    quant = os.environ.get("LOCAL_QUANT", args.quant)
+    print(f"==> Pre-downloading model weights: {repo} :: {quant}", file=sys.stderr)
+    print("    First-time only; cached under $APP_DATA_DIR/cache/hub/.", file=sys.stderr)
+    p = ensure_model(repo, quant)
+    print(f"    cached at {p}", file=sys.stderr)
+
+    if not args.mmproj_repo_id:
+        print("==> Profile is text-only; no projector to fetch.", file=sys.stderr)
+        return
+
+    mm_repo = os.environ.get("LOCAL_MMPROJ_REPO", args.mmproj_repo_id)
+    mm_variant = os.environ.get("LOCAL_MMPROJ_VARIANT", args.mmproj_variant)
+    print(
+        f"==> Pre-downloading vision projector: {mm_repo} :: {mm_variant}",
+        file=sys.stderr,
+    )
+    p = ensure_mmproj(mm_repo, mm_variant)
     print(f"    cached at {p}", file=sys.stderr)
 
 

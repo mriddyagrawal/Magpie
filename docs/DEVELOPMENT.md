@@ -248,7 +248,15 @@ switching would invalidate the whole `fast_tier` collection.
 |---|---|---|
 | CUDA ≥ 8 GB VRAM | ColQwen2.5 | 7.25 GB |
 | Apple silicon ≥ 24 GB unified | ColQwen2.5 | 7.25 GB |
-| everything else (incl. CPU) | ColModernVBERT | 0.97 GB |
+| everything else (incl. CPU) | ColSmol-500M, batch_size=1 | 0.93 GB |
+
+The small slot is ColSmol-500M and not ColModernVBERT on the strength of the
+DistilVDR third-party reproduction (arXiv 2608.10636): under one evaluation
+harness across ViDoRe v1+v2+v3, colSmol-500M averages 53.0 nDCG@5 — the
+strongest reproduced sub-1B baseline — while ColModernVBERT averages 42.5 and
+falls to 17.5 on v3. Self-reported v1-only numbers flatter models that
+overfit the saturated v1 suite; trust cross-model reproductions over vendor
+tables when picking defaults.
 
 Both are PEFT LoRA adapters whose base model is resolved transitively at load
 time — the `model_id` alone understates ColQwen's download by ~30×. The

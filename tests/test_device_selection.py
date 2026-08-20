@@ -1,6 +1,6 @@
 """Visual-tier model selection (`src/stage1_fast/device.py`).
 
-The selection matrix decides a 7.25 GB download versus a 0.97 GB one, and
+The selection matrix decides a 7.25 GB download versus a 0.93 GB one, and
 gets it wrong in a way users cannot see: the wrong pick on a small machine
 does not error, it downloads 7 GB and then thrashes. These tests pin the
 matrix so that stays deliberate.
@@ -56,7 +56,8 @@ def test_cuda_with_ample_vram_gets_colqwen(patched):
 def test_cuda_below_threshold_falls_back(patched):
     cfg = patched(cuda=True, vram_gb=6.0)
     assert cfg.device == "cuda"
-    assert cfg.model_id == dev.COLMODERNVBERT_MODEL_ID
+    assert cfg.model_id == dev.COLSMOL_MODEL_ID
+    assert cfg.batch_size == 1, "small slot = constrained machine; 2 was too much"
 
 
 # ---------------------------------------------------------------------------
@@ -79,7 +80,8 @@ def test_mps_on_a_small_mac_does_not_get_the_7gb_model(patched):
     this; MPS just never got it."""
     cfg = patched(mps=True, ram_gb=8.0)
     assert cfg.device == "mps"
-    assert cfg.model_id == dev.COLMODERNVBERT_MODEL_ID
+    assert cfg.model_id == dev.COLSMOL_MODEL_ID
+    assert cfg.batch_size == 1
 
 
 def test_mps_16gb_is_still_below_the_bar(patched):
@@ -88,7 +90,7 @@ def test_mps_16gb_is_still_below_the_bar(patched):
     both models ARE resident together whenever the walker indexes images
     while a T3 summarize runs."""
     cfg = patched(mps=True, ram_gb=16.0)
-    assert cfg.model_id == dev.COLMODERNVBERT_MODEL_ID
+    assert cfg.model_id == dev.COLSMOL_MODEL_ID
 
 
 def test_mps_unmeasurable_ram_prefers_the_capable_model(patched):
@@ -106,18 +108,22 @@ def test_mps_unmeasurable_ram_prefers_the_capable_model(patched):
 def test_cpu_gets_the_small_model(patched):
     cfg = patched()
     assert cfg.device == "cpu"
-    assert cfg.model_id == dev.COLMODERNVBERT_MODEL_ID
+    assert cfg.model_id == dev.COLSMOL_MODEL_ID
     assert cfg.dtype == "float32"
     assert cfg.batch_size == 1
 
 
-def test_colsmol_is_no_longer_selectable(patched):
-    """ColSmol was replaced, not merely un-defaulted. Its family stays wired
-    in model.py only so a device.json cached before the switch still loads."""
+def test_colmodernvbert_is_no_longer_selectable(patched):
+    """ColModernVBERT held the small slot for ~2 commits before the DistilVDR
+    reproduction (arXiv 2608.10636) showed it is the WEAKEST sub-1B option
+    out-of-domain (42.5 avg vs colSmol-500M's 53.0 on ViDoRe v1-v3), not the
+    strongest — its own paper's numbers were v1-only and v1 is saturated.
+    Its family stays loadable in model.py for experiments, but nothing
+    selects it."""
     for kwargs in ({"cuda": True, "vram_gb": 4.0},
                    {"mps": True, "ram_gb": 8.0},
                    {}):
-        assert patched(**kwargs).model_family != "colidefics3"
+        assert patched(**kwargs).model_family != "colmodernvbert"
 
 
 def test_every_selectable_family_can_be_loaded():
@@ -138,8 +144,8 @@ def test_recorded_sizes_are_the_adapter_plus_its_base():
     from_pretrained, so `model_id` alone understates the download by ~30x for
     ColQwen. Guard the pairing so the base cannot be dropped."""
     assert dev.COLQWEN_BASE_ID and dev.COLQWEN_BASE_ID != dev.COLQWEN_MODEL_ID
-    assert dev.COLMODERNVBERT_BASE_ID != dev.COLMODERNVBERT_MODEL_ID
-    assert dev.COLQWEN_TOTAL_GB > dev.COLMODERNVBERT_TOTAL_GB * 5
+    assert dev.COLSMOL_BASE_ID != dev.COLSMOL_MODEL_ID
+    assert dev.COLQWEN_TOTAL_GB > dev.COLSMOL_TOTAL_GB * 5
 
 
 # ---------------------------------------------------------------------------
@@ -164,8 +170,8 @@ def test_cache_written_before_the_matrix_changed_is_discarded(tmp_path, monkeypa
 def test_current_cache_round_trips(tmp_path, monkeypatch):
     p = tmp_path / "device.json"
     monkeypatch.setattr(dev, "_CACHE_PATH", p)
-    cfg = dev.DeviceConfig(device="cpu", model_id=dev.COLMODERNVBERT_MODEL_ID,
-                           model_family="colmodernvbert", dtype="float32",
+    cfg = dev.DeviceConfig(device="cpu", model_id=dev.COLSMOL_MODEL_ID,
+                           model_family="colidefics3", dtype="float32",
                            batch_size=1)
     dev._write_cache(cfg)
     assert dev._read_cache() == cfg

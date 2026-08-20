@@ -2,8 +2,8 @@
 
 Fallback chain: CUDA → Apple MPS → CPU. ColQwen2.5 (7.25 GB) is used only
 where there is memory for it — >=8 GB dedicated VRAM on CUDA, or >=24 GB
-unified on Apple silicon. Everything else gets ColModernVBERT (0.97 GB),
-which lands within ~0.6 nDCG of ColPali at 12x fewer parameters.
+unified on Apple silicon. Everything else gets ColSmol-500M (0.93 GB) — the strongest sub-1B retriever
+in the DistilVDR third-party reproduction (arXiv 2608.10636).
 
 Exactly one model is usable per machine: this picks it, and nothing
 downstream offers a choice. Switching would invalidate the whole `fast_tier`
@@ -35,16 +35,23 @@ COLQWEN_MODEL_ID = "vidore/colqwen2.5-v0.2"
 COLQWEN_BASE_ID = "vidore/colqwen2.5-base"
 COLQWEN_TOTAL_GB = 7.25
 
-# ColModernVBERT replaced ColSmol-500M in 2026-08. A 250M-parameter encoder
-# purpose-built for document retrieval rather than a chat VLM finetuned into
-# the job, which is why it wins on size so decisively. Per arXiv 2510.01149
-# Table 3 (ViDoRe nDCG@5, avg of v1+v2): ColModernVBERT 68.6 at 0.25B vs
-# ColPali 69.2 at 2.92B — within 0.6 points of a model 12x its size, at 7x
-# lower query latency (0.032s vs 0.222s CPU). ColSmol published no ViDoRe
-# numbers at all and is strictly dominated on size, speed and quality.
-COLMODERNVBERT_MODEL_ID = "ModernVBERT/colmodernvbert"
-COLMODERNVBERT_BASE_ID = "ModernVBERT/colmodernvbert-base"
-COLMODERNVBERT_TOTAL_GB = 0.97
+# ColSmol-500M is the small-slot model. It briefly lost this slot to
+# ColModernVBERT (2026-08-20, for about two commits) on the strength of
+# ModernVBERT's own Table 3, which put it 0.6 nDCG behind ColPali on ViDoRe
+# v1+v2. A third-party reproduction with a single evaluation harness
+# (DistilVDR, arXiv 2608.10636) inverted that conclusion: on v1+v2+v3,
+# colSmol-500M averages 53.0 — "the strongest reproduced sub-1B baseline",
+# the paper's words — while ColModernVBERT averages 42.5, collapsing to 17.5
+# on v3 (the 26K-page multilingual industrial benchmark). v1 is saturated;
+# self-reported v1-heavy numbers flatter small models that overfit it.
+# ColModernVBERT's celebrated latency edge is also CPU-only — on GPU it is
+# the SLOWEST sub-1B encoder in the reproduction (61.8ms vs colSmol's 22.6).
+#
+# Lesson recorded so it is not re-learned: a vendor's own table plus the
+# incumbent's absent numbers is not evidence enough to swap a default.
+COLSMOL_MODEL_ID = "vidore/colSmol-500M"
+COLSMOL_BASE_ID = "vidore/ColSmolVLM-Instruct-500M-base"
+COLSMOL_TOTAL_GB = 0.93
 
 _CACHE_PATH = Path.home() / ".cache" / "notspotlight" / "device.json"
 
@@ -57,7 +64,9 @@ _CACHE_PATH = Path.home() / ".cache" / "notspotlight" / "device.json"
 #
 #   1  pre-2026-08: ColQwen/ColSmol, no MPS memory guard
 #   2  ColModernVBERT replaces ColSmol; MPS gated on >=24 GB unified
-_SELECTOR_VERSION = 2
+#   3  ColSmol restored (third-party repro: best sub-1B on ViDoRe v1-v3);
+#      small-slot batch_size dropped to 1 for constrained machines
+_SELECTOR_VERSION = 3
 
 # ColQwen2.5 is ~3.75B params; fp16 weights plus activations land around
 # 7-8 GB resident. Below this we use ColModernVBERT instead.
@@ -80,7 +89,7 @@ class DeviceConfig:
 
     device: str           # "cuda" | "mps" | "cpu"
     model_id: str         # HuggingFace model repo
-    model_family: str     # "colqwen2_5" | "colmodernvbert" | "colidefics3" (legacy ColSmol)
+    model_family: str     # "colqwen2_5" | "colidefics3" (ColSmol) | "colmodernvbert" (unselected)
     dtype: str            # "bfloat16" | "float16" | "float32"
     batch_size: int       # pages per forward pass
 
@@ -148,15 +157,17 @@ def _detect_device_uncached() -> DeviceConfig:
                 dtype="bfloat16",
                 batch_size=4,
             )
-        # GPU too small for ColQwen; run ColModernVBERT on CUDA instead —
-        # still far faster than CPU, and within ~7 nDCG of ColQwen at 1/6 the
-        # download.
+        # GPU too small for ColQwen; run ColSmol on CUDA instead — still far
+        # faster than CPU, just a smaller model. batch_size=1: the small slot
+        # exists precisely because the machine is constrained, and the
+        # Idefics3 image splitter emits 10+ sub-images per page, so per-page
+        # activation cost is much larger than the 500M weight count suggests.
         return DeviceConfig(
             device="cuda",
-            model_id=COLMODERNVBERT_MODEL_ID,
-            model_family="colmodernvbert",
+            model_id=COLSMOL_MODEL_ID,
+            model_family="colidefics3",
             dtype="float16",
-            batch_size=2,
+            batch_size=1,
         )
 
     if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
@@ -181,16 +192,16 @@ def _detect_device_uncached() -> DeviceConfig:
             )
         return DeviceConfig(
             device="mps",
-            model_id=COLMODERNVBERT_MODEL_ID,
-            model_family="colmodernvbert",
+            model_id=COLSMOL_MODEL_ID,
+            model_family="colidefics3",
             dtype="float16",
-            batch_size=2,
+            batch_size=1,
         )
 
     return DeviceConfig(
         device="cpu",
-        model_id=COLMODERNVBERT_MODEL_ID,
-        model_family="colmodernvbert",
+        model_id=COLSMOL_MODEL_ID,
+        model_family="colidefics3",
         dtype="float32",
         batch_size=1,
     )

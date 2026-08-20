@@ -350,7 +350,16 @@ export interface IngestStatus {
   running: boolean;
   done: boolean;
   error: string | null;
+  /** What the walker is chewing on RIGHT NOW. Moves from root to root during
+   *  a sync, and holds a human label like "<sync: all enabled folders>" before
+   *  the first root and during end-of-run cleanup. Do not use it to decide a
+   *  job's scope — use `roots`. */
   path: string | null;
+  /** Every configured root this job covers, in the same string form
+   *  /settings/folders returns as `folder.path`. Absent on older sidecars. */
+  roots?: string[];
+  /** What started the job. Absent on older sidecars. */
+  kind?: "folder" | "sync" | "reindex" | "auto" | "idle";
   files_total: number;
   files_done: number;
   current_file: string | null;
@@ -360,6 +369,20 @@ export interface IngestStatus {
   // status pill differently during the scan phase (no per-file
   // progress yet). Backwards-compat: missing field → "idle".
   phase?: "idle" | "scanning" | "indexing";
+}
+
+/** Does the running job cover this folder? Prefers the job's declared scope
+ *  (`roots`); falls back to the legacy current-path match so a new frontend
+ *  against an older sidecar still lights up the row being walked. */
+export function jobCoversFolder(
+  ingest: IngestStatus | null,
+  folderPath: string,
+): boolean {
+  if (!ingest?.running) return false;
+  if (ingest.roots && ingest.roots.length > 0) {
+    return ingest.roots.includes(folderPath);
+  }
+  return ingest.path === folderPath;
 }
 
 export interface IndexPlanFolder {

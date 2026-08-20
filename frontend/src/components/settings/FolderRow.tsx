@@ -19,18 +19,26 @@ import {
   FileText,
   Folder,
   FolderOpen,
-  Pause,
   RefreshCw,
   Trash2,
-  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { FolderEntry, IngestStatus } from "../../api";
+// The progress body lives in IngestPanel so the global banner and these rows
+// render byte-identical progress. formatDuration/truncatePath came along with
+// it rather than being duplicated here.
+import { IngestProgressBody } from "./IngestPanel";
 
 interface Props {
   folder: FolderEntry;
-  /** True iff the running ingest job's path matches this folder. */
+  /** True iff this folder is the root the walker is on RIGHT NOW. Only this
+   *  row gets the detailed bar — `_ingest_state` carries one set of
+   *  done/total counters scoped to the current root, so painting it on every
+   *  in-scope row would show the same numbers N times and mean nothing. */
   isIngesting: boolean;
+  /** True iff this folder is part of the running job but not (yet) the
+   *  current root. Shows the "Magpieing" pill without a bogus bar. */
+  inJobScope?: boolean;
   ingest: IngestStatus | null;
   onToggle: (path: string, enabled: boolean) => void;
   onRemove: (path: string) => void;
@@ -42,6 +50,7 @@ interface Props {
 export function FolderRow({
   folder,
   isIngesting,
+  inJobScope = false,
   ingest,
   onToggle,
   onRemove,
@@ -58,7 +67,7 @@ export function FolderRow({
   // Green "Ready" must mean genuinely searchable; everything else is "Not read".
   const isRead = Boolean(folder.last_read_at);
   const status: "ready" | "understanding" | "paused" | "error" | "unread" =
-    isIngesting ? "understanding" :
+    isIngesting || inJobScope ? "understanding" :
     !folder.enabled ? "paused" :
     !isRead ? "unread" :
     "ready";
@@ -80,7 +89,7 @@ export function FolderRow({
           </div>
           <div className="folder-row__path">{tildePath}</div>
           {isIngesting ? (
-            <InProgressBlock ingest={ingest} pct={pct} onStop={onStop} />
+            <IngestProgressBody ingest={ingest} pct={pct} onStop={onStop} />
           ) : (
             <StatsLine folder={folder} />
           )}
@@ -139,63 +148,6 @@ function StatsLine({ folder }: { folder: FolderEntry }) {
       : "not read yet",
   );
   return <div className="folder-row__stats">{parts.join(", ")}</div>;
-}
-
-function InProgressBlock({
-  ingest,
-  pct,
-  onStop,
-}: {
-  ingest: IngestStatus | null;
-  pct: number;
-  onStop: () => void;
-}) {
-  const elapsed = ingest?.elapsed_s ?? null;
-  // ETA = time-so-far projected across the remaining fraction. Only shown
-  // once we have real per-file progress (pct > 0), otherwise it would swing
-  // wildly during the initial scan.
-  const etaSeconds =
-    elapsed !== null && pct > 0 && pct < 100
-      ? Math.max(0, Math.round((elapsed / pct) * (100 - pct)))
-      : null;
-
-  return (
-    <div className="folder-row__progress">
-      <div className="folder-row__progress-line">
-        <span className="folder-row__progress-current">
-          {ingest?.current_file
-            ? truncatePath(ingest.current_file)
-            : "Scanning…"}
-        </span>
-        <span className="folder-row__progress-counts">
-          {ingest && ingest.files_total > 0 ? (
-            <>
-              {ingest.files_done.toLocaleString()} of{" "}
-              {ingest.files_total.toLocaleString()} files
-            </>
-          ) : null}
-        </span>
-        <span className="folder-row__progress-pct">{pct}%</span>
-      </div>
-      <div className="folder-row__progress-bar">
-        <div className="folder-row__progress-fill" style={{ width: `${pct}%` }} />
-      </div>
-      {elapsed !== null && (
-        <div className="folder-row__progress-time">
-          <span>{formatDuration(elapsed)} elapsed</span>
-          {etaSeconds !== null && <span>~{formatDuration(etaSeconds)} left</span>}
-        </div>
-      )}
-      <div className="folder-row__progress-buttons">
-        <button type="button" className="folder-row__progress-btn" onClick={onStop}>
-          <Pause size={12} aria-hidden="true" /> Pause
-        </button>
-        <button type="button" className="folder-row__progress-btn" onClick={onStop}>
-          <X size={12} aria-hidden="true" /> Cancel
-        </button>
-      </div>
-    </div>
-  );
 }
 
 function Toggle({
@@ -298,17 +250,4 @@ function formatRelative(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-function formatDuration(totalSeconds: number): string {
-  const s = Math.max(0, Math.round(totalSeconds));
-  if (s < 60) return `${s}s`;
-  const m = Math.floor(s / 60);
-  const rem = s % 60;
-  if (m < 60) return `${m}m ${rem}s`;
-  const h = Math.floor(m / 60);
-  return `${h}h ${m % 60}m`;
-}
 
-function truncatePath(p: string): string {
-  if (p.length <= 44) return p;
-  return `…${p.slice(-42)}`;
-}

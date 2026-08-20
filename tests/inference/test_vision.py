@@ -128,20 +128,20 @@ def test_select_profile_default_is_vision_so_no_swap_needed():
     `test_select_profile_text_instance_switches_to_vision_when_images_present`
     below."""
     llm = LlamaServerLLM()
-    assert llm.profile_name == "gemma-4-e4b-vision"
+    assert llm.profile_name == "lfm25-vl-vision"
     assert llm._select_profile(None) == llm.profile_name
     assert llm._select_profile([b"\x89PNG\r\n\x1a\n"]) == llm.profile_name
 
 
 def test_select_profile_text_instance_switches_to_vision_when_images_present():
     """The legacy / opt-in path: users who explicitly set
-    `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text` to save the projector's
+    `LLAMA_SERVER_TEXT_MODEL=lfm25-vl-text` to save the projector's
     ~946 MB. With a text-bound instance, image-bearing calls still
     route to the vision profile — incurring an LRU swap with
     MAX_LOADED_MODELS=1, hence why this isn't the default anymore."""
-    llm = LlamaServerLLM(profile_name="gemma-4-e4b-text")
+    llm = LlamaServerLLM(profile_name="lfm25-vl-text")
     chosen = llm._select_profile([b"\x89PNG\r\n\x1a\n"])
-    assert chosen == "gemma-4-e4b-vision"
+    assert chosen == "lfm25-vl-vision"
     assert chosen != llm.profile_name  # explicit text → vision switch
 
 
@@ -166,7 +166,7 @@ def test_select_profile_no_vision_registered_raises():
     wouldn't take this code path."""
     from src.inference import llama_server_pool
 
-    llm = LlamaServerLLM(profile_name="gemma-4-e4b-text")
+    llm = LlamaServerLLM(profile_name="lfm25-vl-text")
     with patch(
         "src.inference.local_llm.default_vision_profile",
         return_value=None,

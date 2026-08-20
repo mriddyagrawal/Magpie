@@ -36,15 +36,29 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional
 
-# The pinned llama.cpp release. Must support the `gemma4` model
-# architecture — b5400 (mid-2024) does NOT, b9049 (2026-05-06) does.
-# See Specs/llama_server_migration.md "Post-validation deviations log".
-DEFAULT_VERSION = "b9049"
+# The pinned llama.cpp release.
+#
+# Must be >= b10000-era (2026-06-10). The `lfm2` architecture itself has
+# been supported since 2025-07 (PR #14620) with vision via PR #15347, so
+# the previous pin b9049 (2026-05-06) LOADS LFM2.5-VL fine — which is the
+# trap. Three later fixes are what force the bump:
+#
+#   #24178  2026-06-05  unify and fix LFM2/LFM2.5 tool parser
+#   #24234  2026-06-06  fix LFM2/LFM2.5 reasoning round-trip and <think> leak
+#   #24377  2026-06-10  chat: fix LFM2/LFM2.5 ignoring json_schema   <-- critical
+#
+# On a pre-#24377 build, llama-server silently IGNORES the `json_schema`
+# response_format for this model family. Structured output would appear to
+# work while the GBNF grammar was never applied, leaving parse_json_with_repair
+# to carry every summarize call — degraded extraction, no error anywhere.
+# That is precisely the "model swap that doesn't honor the parameter" case
+# `src.llm.LocalAgent` warns about.
+DEFAULT_VERSION = "b10502"
 
-# The Hugging Face repo we pull the projector from (Unsloth's Gemma 4
-# E4B GGUF + paired BF16 mmproj live there). Centralized so the future
-# `--mmproj-repo` CLI flag only needs to override one place.
-DEFAULT_MMPROJ_REPO = "unsloth/gemma-4-E4B-it-GGUF"
+# The Hugging Face repo we pull weights + projector from. LFM2.5-VL-3B
+# ships both the GGUF and its paired mmproj in one repo. Centralized so a
+# future `--mmproj-repo` flag only needs to override one place.
+DEFAULT_MMPROJ_REPO = "LiquidAI/LFM2.5-VL-3B-GGUF"
 
 
 class InstallError(RuntimeError):
@@ -111,15 +125,24 @@ _TABLE: dict[tuple[str, str, str], AssetSpec] = {
         "llama-server.exe",
         extra=("cudart-llama-bin-win-cuda-12.4-x64.zip",),
     ),
-    ("windows", "x86_64", "cuda-13.1"): AssetSpec(
-        "llama-{version}-bin-win-cuda-13.1-x64.zip",
+    # CUDA 13.1 was renamed 13.3 upstream somewhere between b9049 and
+    # b10502 — the 13.1 asset no longer exists on current releases, so the
+    # old entry 404s on any recent pin. Verified against b10502's asset list.
+    ("windows", "x86_64", "cuda-13.3"): AssetSpec(
+        "llama-{version}-bin-win-cuda-13.3-x64.zip",
         "zip",
         "llama-server.exe",
-        extra=("cudart-llama-bin-win-cuda-13.1-x64.zip",),
+        extra=("cudart-llama-bin-win-cuda-13.3-x64.zip",),
     ),
     # --- Windows arm64 ---
     ("windows", "arm64", "cpu"): AssetSpec(
         "llama-{version}-bin-win-cpu-arm64.zip", "zip", "llama-server.exe"
+    ),
+    ("windows", "arm64", "cuda-13.4"): AssetSpec(
+        "llama-{version}-bin-win-cuda-13.4-arm64.zip",
+        "zip",
+        "llama-server.exe",
+        extra=("cudart-llama-bin-win-cuda-13.4-arm64.zip",),
     ),
 }
 

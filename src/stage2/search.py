@@ -634,16 +634,23 @@ def run_search(
         # case where caller didn't customize.
         if klass is QueryClass.LIST_ALL and cfg.top_k > top_k:
             widened = cfg.top_k
-            # Local backend has a much smaller context window than cloud
-            # (Gemma 4 E4B: 32-131K vs Claude/GPT: 200K+). The adaptive
-            # widening's default of 30 paths × ~29 KB/file = ~870 KB easily
-            # blows past any local model's context. Cap at 8 for local —
-            # still gives a meaningful breadth bump over the default 5
-            # without overflowing the answer-step prompt. See
-            # Plans/Local LLM Plan.md / Plans/Future Plans.md #17.
+            # The local backend still gets a narrower fan-out than cloud, but
+            # the old cap of 8 was sized for Gemma 4 E4B at an 8K default
+            # context: 30 paths × ~29 KB/file is ~870 KB and blew straight
+            # past it. LFM2.5-VL-3B declares a 128K context and we open 16K
+            # of it (see DEFAULT_N_CTX), so 8 was leaving real recall on the
+            # table for enumeration queries.
+            #
+            # 12 rather than the full 30: the ceiling here is no longer the
+            # context window but the model's ability to actually use it.
+            # Liquid explicitly does not recommend LFM2.5-VL for
+            # long-context, reasoning-heavy work, and a 3B model degrades on
+            # wide multi-document synthesis well before it runs out of
+            # tokens. Treat this as a starting point to benchmark, not a
+            # derived constant — raise it with eval numbers, not vibes.
             from src.llm import active_provider
             if active_provider().name == "local":
-                local_cap = int(os.environ.get("LOCAL_MAX_TOP_K", "8"))
+                local_cap = int(os.environ.get("LOCAL_MAX_TOP_K", "12"))
                 if widened > local_cap:
                     print(
                         f"  query_class={klass.value}  top_k {top_k}→{local_cap}  "

@@ -4,13 +4,16 @@ Each profile is a recipe for spawning a `llama-server` subprocess with a
 specific GGUF + mmproj + flags combo. Adding a new model = adding a new
 entry here. Spec: `Specs/llama_server_migration.md`.
 
-The profile registry is intentionally small in PR 1:
+Two profiles are registered, both LFM2.5-VL-3B:
 
-  - `gemma-4-e4b-text` — text-only Gemma 4 E4B, the path that today's
-    `LlamaCppLLM` already serves. PR 1's parity target.
+  - `lfm25-vl-vision` — GGUF + mmproj projector. **The default**, and it
+    serves text requests too; see `default_text_profile()`.
+  - `lfm25-vl-text`   — same GGUF, no projector. For tight-RAM machines.
 
-PR 2 adds `gemma-4-e4b-vision` (same GGUF + mmproj-BF16.gguf projector).
-PR 3 wires the vision profile into the answer step.
+Gemma 4 E4B was the previous default and was removed in 2026-08. Its
+filename convention is still registered in `model_downloader._REPO_PATTERNS`
+so an existing `LOCAL_MODEL=unsloth/gemma-4-E4B-it-GGUF` override keeps
+resolving rather than hard-failing.
 
 Profile field meanings track llama-server's CLI flags closely so the
 mapping is obvious — each `LaunchArgs` field maps to one llama-server
@@ -20,6 +23,7 @@ argument. `extra_args` is the escape hatch for one-off flags.
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -29,15 +33,39 @@ from typing import Optional
 # Defaults — env-var overridable, mirror existing LOCAL_* knobs
 # ---------------------------------------------------------------------------
 
-DEFAULT_REPO = "unsloth/gemma-4-E4B-it-GGUF"
-DEFAULT_QUANT = "Q5_K_XL"
-DEFAULT_N_CTX = 8192
+# LFM2.5-VL-3B — the shipped local model (replaced Gemma 4 E4B, 2026-08).
+#
+# Chosen over Gemma on three counts: ~2.8 GB total download against ~7.6 GB,
+# a 128K context window against Gemma's 8K default, and — per Liquid's own
+# model card — it "answers directly instead of reasoning," which is the right
+# behavior for a search bar. (Do not substitute LFM2.5-2.6B or
+# LFM2.5-1.2B-Thinking here; both are reasoning models that always emit
+# <think> blocks, which would wreck first-token latency.)
+#
+# Requires llama.cpp >= b10502-era — see DEFAULT_VERSION in
+# src/tools/install_llama_server.py for why an older build silently breaks
+# grammar-constrained output for this family.
+DEFAULT_REPO = "LiquidAI/LFM2.5-VL-3B-GGUF"
+
+# Q6_K: 2.22 GB, effectively lossless against Q8_0 (2.87 GB) at 3B.
+DEFAULT_QUANT = "Q6_K"
+
+# The GGUF declares lfm2.context_length = 128000. We do not open it that far
+# by default: KV-cache grows linearly with context, and a 3B model does not
+# reason well across 128K anyway (Liquid explicitly does not recommend it for
+# long-context work). 16K comfortably fits the answer step's top-k file
+# payload while keeping the cache small. Raise via LOCAL_N_CTX.
+DEFAULT_N_CTX = 16384
 DEFAULT_TEMPERATURE = 0.7
 
 # llama-server uses `-ngl` (number of GPU layers). 999 = "offload all,"
 # the standard idiom across llama.cpp documentation. Equivalent to
 # llama-cpp-python's n_gpu_layers=-1.
 DEFAULT_NGL = 999
+
+# Profile-override names already warned about, so a stale .env value logs
+# once per process rather than on every spawn.
+_WARNED_OVERRIDES: set[str] = set()
 
 
 # ---------------------------------------------------------------------------
@@ -152,16 +180,16 @@ def all_profiles() -> dict[str, ModelProfile]:
 # Built-in profiles (PR 1 scope)
 # ---------------------------------------------------------------------------
 
-# `gemma-4-e4b-text` — the parity target for PR 1. Same GGUF the
-# existing `LlamaCppLLM` loads. Reads model + quant + ctx + temperature
-# from env so users keep their current `.env` knobs working.
+# `lfm25-vl-text` — text-only. Registered but NOT the default; see
+# `default_text_profile()` for why the vision profile serves text too.
+# Useful on tight-RAM machines where 0.54 GB of resident projector matters.
 register(
     ModelProfile(
-        name="gemma-4-e4b-text",
+        name="lfm25-vl-text",
         description=(
-            "Gemma 4 E4B (text-only). Parity target for the "
-            "llama-cpp-python → llama-server migration. Matches what "
-            "Magpie shipped 2026-05 via LlamaCppLLM."
+            "LFM2.5-VL-3B, text-only (no projector loaded). Saves ~0.54 GB "
+            "resident memory versus the vision profile, at the cost of a "
+            "profile swap the first time an image shows up."
         ),
         has_vision=False,
         args=LaunchArgs(
@@ -177,25 +205,27 @@ register(
 )
 
 
-# `gemma-4-e4b-vision` — same GGUF as the text profile + the BF16 mmproj
-# projector. Registered at import; the projector itself is only
-# downloaded when this profile is first spawned (via ensure_mmproj in
-# the pool's argv builder), or pre-downloaded by `just install-llama-server`
-# so first-inference latency stays low.
+# `lfm25-vl-vision` — the default. Same GGUF plus the Q8_0 projector.
+# The projector downloads on first spawn via `ensure_mmproj` in the pool's
+# argv builder, or ahead of time via `just install-llama-server`.
+#
+# mmproj variant is Q8_0, not BF16: LFM2.5-VL ships Q8_0 / F16 / BF16, and
+# Q8_0 is 0.54 GB against 0.80 GB for the other two with no measurable
+# vision-quality cost at this size. Note the projector's quant set is
+# narrower than the model's — LOCAL_MMPROJ_VARIANT=Q6_K would 404.
 register(
     ModelProfile(
-        name="gemma-4-e4b-vision",
+        name="lfm25-vl-vision",
         description=(
-            "Gemma 4 E4B + mmproj-BF16 projector for vision. Pairs the "
-            "same GGUF as the text profile with the multi-modal "
-            "projector Unsloth ships in the same repo (~946 MB BF16)."
+            "LFM2.5-VL-3B + mmproj-Q8_0 projector. Default profile: serves "
+            "both text and image requests from one loaded subprocess."
         ),
         has_vision=True,
         args=LaunchArgs(
             repo_id=os.environ.get("LOCAL_MODEL", DEFAULT_REPO),
             quant=os.environ.get("LOCAL_QUANT", DEFAULT_QUANT),
             mmproj_repo_id=os.environ.get("LOCAL_MMPROJ_REPO", DEFAULT_REPO),
-            mmproj_variant=os.environ.get("LOCAL_MMPROJ_VARIANT", "BF16"),
+            mmproj_variant=os.environ.get("LOCAL_MMPROJ_VARIANT", "Q8_0"),
             ngl=DEFAULT_NGL,
             ctx_size=int(os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)),
             temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
@@ -218,28 +248,58 @@ def default_text_profile() -> str:
     is one set of weights with an optional image-encoder bolted on. When
     the projector is loaded but the request has no `image_url` blocks,
     the projector tensors sit idle — zero inference cost. The only cost
-    is the projector's resident memory (~946 MB for Gemma 4 BF16).
+    is the projector's resident memory (0.54 GB for LFM2.5-VL mmproj-Q8_0).
 
-    Avoiding the LRU swap between a text-only and a text+vision profile
-    is worth far more than the 946 MB on a laptop-class machine — a
-    single swap is ~25-30s on cold load, and a mixed walker corpus can
-    swap several times. Empirically verified against Gemma 4 E4B +
-    b9049 (2026-05-07): text-only `complete()` against a vision-loaded
-    subprocess returns identical results at full speed.
+    Avoiding the LRU swap between a text-only and a text+vision profile is
+    worth far more than that memory on a laptop-class machine — a single
+    swap is a full cold load, and a mixed walker corpus can swap several
+    times. This held for Gemma 4 E4B + b9049 (verified 2026-05-07:
+    text-only `complete()` against a vision-loaded subprocess returned
+    identical results at full speed) and is a stronger argument for
+    LFM2.5-VL, whose projector is a third the size.
 
-    The text-only profile (`gemma-4-e4b-text`) is still registered for
-    users on tight memory budgets — set `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-text`
-    in `.env` to opt into the swap-y behavior and save ~946 MB.
+    The text-only profile (`lfm25-vl-text`) stays registered for tight-RAM
+    machines — set `LLAMA_SERVER_TEXT_MODEL=lfm25-vl-text` in `.env` to opt
+    into the swap-y behavior and save the 0.54 GB.
     """
-    return os.environ.get("LLAMA_SERVER_TEXT_MODEL", "gemma-4-e4b-vision")
+    return _resolve_override("LLAMA_SERVER_TEXT_MODEL", "lfm25-vl-vision")
+
+
+def _resolve_override(env_var: str, fallback: str) -> str:
+    """Return the profile named by `env_var`, or `fallback` if it is unset
+    or names a profile that no longer exists.
+
+    An unresolvable override MUST NOT raise. The profile names changed when
+    Gemma 4 was replaced by LFM2.5-VL (2026-08), and the previous README
+    actively instructed users to put `LLAMA_SERVER_TEXT_MODEL=gemma-4-e4b-vision`
+    in their `.env`. `load_dotenv()` puts that stale value back into the
+    environment on every start, so treating a dead override as fatal would
+    turn a routine upgrade into a hard KeyError on the first local
+    inference — for exactly the users who followed the documentation.
+
+    Warn once and carry on with the current default instead.
+    """
+    name = os.environ.get(env_var, "").strip()
+    if not name:
+        return fallback
+    if name in _PROFILES:
+        return name
+    if name not in _WARNED_OVERRIDES:
+        _WARNED_OVERRIDES.add(name)
+        print(
+            f"  warning: {env_var}={name!r} names a profile that is not "
+            f"registered (known: {sorted(_PROFILES)}). This usually means an "
+            f"old value left in .env from before the LFM2.5 migration. "
+            f"Falling back to {fallback!r}.",
+            file=sys.stderr,
+        )
+    return fallback
 
 
 def default_vision_profile() -> Optional[str]:
-    """Profile name for vision inference. Defaults to `gemma-4-e4b-vision`
+    """Profile name for vision inference. Defaults to `lfm25-vl-vision`
     when registered; env-overridable via `LLAMA_SERVER_VISION_MODEL`.
-    Returns None if neither the env override nor the default is in the
-    registry, so callers can fall back gracefully (text-only summary)."""
-    name = os.environ.get("LLAMA_SERVER_VISION_MODEL", "gemma-4-e4b-vision")
-    if name and name in _PROFILES:
-        return name
-    return None
+    Returns None if neither the override nor the default is in the registry,
+    so callers can degrade gracefully to a text-only summary."""
+    name = _resolve_override("LLAMA_SERVER_VISION_MODEL", "lfm25-vl-vision")
+    return name if name in _PROFILES else None

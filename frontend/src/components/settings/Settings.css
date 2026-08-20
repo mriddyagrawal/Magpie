@@ -1103,3 +1103,66 @@
   color: rgba(20, 22, 28, 0.95);
 }
 .confirm-modal__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* --------------------------------------------------------------------------
+   Ingest panel — the live "Magpie is reading right now" banner at the top of
+   the Data tab. Deliberately card-styled like a folder row (same background,
+   radius and border tokens) so it reads as part of the list rather than as an
+   alert, but tinted with the accent so it is obviously transient.
+   -------------------------------------------------------------------------- */
+.ingest-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+  padding: 12px 16px 14px;
+  margin-bottom: 12px;
+}
+
+.ingest-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ingest-panel__title {
+  margin: 0;
+  font-size: var(--size-sm, 13px);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ingest-panel__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+/* Scanning has no measurable progress, so the dot pulses to signal liveness —
+   it is the only moving thing on screen during a long enumerate. */
+.ingest-panel__dot--scanning { animation: ingest-pulse 1.4s ease-in-out infinite; }
+
+@keyframes ingest-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+/* Indeterminate bar for the scan phase: a sliding sliver, because there is no
+   denominator yet and a 0%-wide fill looks identical to "stuck". */
+.folder-row__progress-fill--indeterminate {
+  width: 35%;
+  transition: none;
+  animation: ingest-sweep 1.5s ease-in-out infinite;
+}
+
+@keyframes ingest-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ingest-panel__dot--scanning,
+  .folder-row__progress-fill--indeterminate { animation: none; }
+  .folder-row__progress-fill--indeterminate { width: 100%; opacity: 0.4; }
+}

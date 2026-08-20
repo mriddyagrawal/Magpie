@@ -38,6 +38,22 @@ from src.inference.llama_server_binary import (
             "version: 5400 (c6a2c9e7)\nbuilt with Apple clang version 15.0.0",
             5400,
         ),
+        # Regression: b10502 (2026-08) moved to a semver line with the build
+        # number behind the word `build`:
+        #   `version: 0.1.2-dev (build 10502, commit 0adcc3bb5)`
+        # The old regex matched neither (`version:` is followed by the semver,
+        # not digits), so parse_build_number returned None and the MIN_VERSION
+        # guard warned-and-proceeded — reducing to advisory exactly the check
+        # that keeps pre-#24377 binaries (which silently ignore json_schema
+        # for LFM2/2.5) from being used. Caught live during the first LFM2.5
+        # inference test.
+        (
+            "version: 0.1.2-dev (build 10502, commit 0adcc3bb5)\n"
+            "built with AppleClang 21.0.0.21000101 for Darwin arm64",
+            10502,
+        ),
+        # The commit sha next to `build NNNNN` must not be latched onto.
+        ("(build 10502, commit 0adcc3bb5)", 10502),
         ("commit abc123 (no tag)", None),
         ("", None),
         ("just some text", None),

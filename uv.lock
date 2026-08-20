@@ -408,7 +408,7 @@ wheels = [
 
 [[package]]
 name = "colpali-engine"
-version = "0.3.15"
+version = "0.3.17"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
@@ -421,9 +421,9 @@ dependencies = [
     { name = "torchvision" },
     { name = "transformers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9e/91/d34fe4dbc8d72217e9f8cd361cf523f36c90e191713ccd2d229f21dc4f72/colpali_engine-0.3.15.tar.gz", hash = "sha256:8a5d1e87ebdf36e9adadc8e6d2f9c85b847ca47c086ca4392c5f3e79749ab9dc", size = 192384, upload-time = "2026-03-31T14:33:51.623Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c1/b6/2346706c984456fa78110edd5c24ade2aba03853152a68b7fbde82b00197/colpali_engine-0.3.17.tar.gz", hash = "sha256:bffebf23a04d1bf081e7420cfe7d5f6e356bd03e3ae8438282fa4da1bbb5bb6c", size = 204054, upload-time = "2026-06-08T14:11:09.136Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3f/27/49071c1ca46b76f052fb1a644318edc5f04dd8c7f27d4c9e9bb8d255ad7c/colpali_engine-0.3.15-py3-none-any.whl", hash = "sha256:05e48f4d9ad83f27af03a52f5d0ef235ec640fe152bcc8c6494b64848ccc2488", size = 108839, upload-time = "2026-03-31T14:33:49.948Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/2e/d703c21fe64ed562a8f163f73774f0fec684fedcefb0d8b73b4394eff68c/colpali_engine-0.3.17-py3-none-any.whl", hash = "sha256:362784700c532449c29424890e8ebe6b329307e9e9ea4906b0834d5b331c6dfd", size = 112292, upload-time = "2026-06-08T14:11:07.841Z" },
 ]
 
 [[package]]
@@ -1580,6 +1580,7 @@ dependencies = [
     { name = "huggingface-hub" },
     { name = "openpyxl" },
     { name = "pathspec" },
+    { name = "peft" },
     { name = "platformdirs" },
     { name = "psutil" },
     { name = "pydantic" },
@@ -1616,13 +1617,14 @@ packaging = [
 
 [package.metadata]
 requires-dist = [
-    { name = "colpali-engine", specifier = ">=0.3" },
+    { name = "colpali-engine", specifier = ">=0.3.17" },
     { name = "fastapi", specifier = ">=0.110" },
     { name = "fastembed", specifier = ">=0.4" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "huggingface-hub", specifier = ">=0.24" },
     { name = "openpyxl", specifier = ">=3.1" },
     { name = "pathspec", specifier = ">=0.12" },
+    { name = "peft", specifier = ">=0.19" },
     { name = "platformdirs", specifier = ">=4.0" },
     { name = "psutil", specifier = ">=5.9" },
     { name = "pydantic", specifier = ">=2.8" },
@@ -2241,7 +2243,7 @@ wheels = [
 
 [[package]]
 name = "peft"
-version = "0.18.1"
+version = "0.19.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "accelerate" },
@@ -2257,9 +2259,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "transformers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d8/48/147b3ea999560b40a34fd78724c7777aa9d18409c2250bdcaf9c4f2db7fc/peft-0.18.1.tar.gz", hash = "sha256:2dd0d6bfce936d1850e48aaddbd250941c5c02fc8ef3237cd8fd5aac35e0bae2", size = 635030, upload-time = "2026-01-09T13:08:01.136Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/86/cf/037f1e3d5186496c05513a6754639e2dab3038a05f384284d49a9bd06a2d/peft-0.19.1.tar.gz", hash = "sha256:0d97542fe96dcdaa20d3b81c06f26f988618f416a73544ab23c3618ccb674a40", size = 763738, upload-time = "2026-04-16T15:46:45.105Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/14/b4e3f574acf349ae6f61f9c000a77f97a3b315b4bb6ad03791e79ae4a568/peft-0.18.1-py3-none-any.whl", hash = "sha256:0bf06847a3551e3019fc58c440cffc9a6b73e6e2962c95b52e224f77bbdb50f1", size = 556960, upload-time = "2026-01-09T13:07:55.865Z" },
+    { url = "https://files.pythonhosted.org/packages/e8/b6/f54d676ed93cc2dd2234c3b172ea9c8c3d7d29361e66b1b23dec57a67465/peft-0.19.1-py3-none-any.whl", hash = "sha256:2113f72a81621b5913ef28f9022204c742df111890c5f49d812716a4a301e356", size = 680692, upload-time = "2026-04-16T15:46:42.886Z" },
 ]
 
 [[package]]

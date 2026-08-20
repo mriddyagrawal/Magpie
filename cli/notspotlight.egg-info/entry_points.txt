@@ -1,4 +1,0 @@
-[console_scripts]
-nas = notspotlight.repl:main
-notspotlight = notspotlight.repl:main
-ns = notspotlight.repl:main

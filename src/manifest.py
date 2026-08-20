@@ -79,7 +79,7 @@ DEFAULT_MANIFEST_PATH = APP_DATA_DIR / "manifest.json"
 # Redirect HuggingFace's model cache into APP_DATA_DIR/cache/ so embedding
 # and visual-tier model files don't leak into the user's shared cache
 # (~/.cache/huggingface/hub/) where directory names like
-# `models--vidore--colSmol-500M` directly identify our stack to anyone
+# `models--vidore--colqwen2.5-base` directly identify our stack to anyone
 # browsing. This must be set BEFORE any transformers / sentence-transformers
 # / colpali-engine import — putting it here guarantees that, since
 # APP_DATA_DIR is required by every code path that loads a model.

@@ -36,14 +36,13 @@
 ---
 
 <p align="center">
-  <b>📹 Demo video goes here</b><br />
-  <sub>a 15-second capture of the real app — recording shortly</sub>
+  <img src="docs/assets/demo.gif" width="760" alt="Magpie answering a question about a local PDF, with the source cited" />
 </p>
 
-<!-- When the capture exists, replace the block above with:
-     <p align="center"><img src="docs/assets/demo.gif" width="700" /></p>
-     Produce it with: uv run python scripts/record_demo.py
-     Do NOT use Specs/UI/*.png here — those are design mockups, not the shipped build. -->
+<p align="center">
+  <sub>Real capture — 282 indexed documents, a real question, a real cited answer.<br />
+  Higher quality: <a href="docs/assets/demo.mp4">docs/assets/demo.mp4</a></sub>
+</p>
 
 ---
 

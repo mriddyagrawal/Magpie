@@ -47,6 +47,7 @@
       "icons/icon.ico"
     ],
     "category": "Productivity",
+    "licenseFile": "../../LICENSE",
     "shortDescription": "Semantic search over your local files",
     "createUpdaterArtifacts": false,
     "windows": {

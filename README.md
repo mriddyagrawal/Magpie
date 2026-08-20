@@ -1,17 +1,45 @@
-# Magpie
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo/Magpie_Logo_Transparent_DarkMode.png" />
+    <img src="logo/Magpie_Logo_Transparent.png" width="240" alt="Magpie" />
+  </picture>
+</p>
 
-**Ask questions about your own files. Get answers, with the sources cited.**
+<h1 align="center">Magpie</h1>
 
-Magpie is a Spotlight-style window that sits on top of your filesystem. Hit `⌥Space`, ask something in plain English, and get an answer grounded in your actual documents — receipts, contracts, course catalogs, meeting notes, scanned PDFs — with clickable links to the files it used.
+<p align="center">
+  <a href="https://github.com/mriddyagrawal/Magpie/releases/latest"><img src="https://img.shields.io/github/v/release/mriddyagrawal/Magpie?style=flat-square" alt="Latest release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue?style=flat-square" alt="License: AGPL-3.0" /></a>
+  <a href="https://github.com/mriddyagrawal/Magpie/releases/latest"><img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-000000?style=flat-square" alt="Platform: macOS and Windows" /></a>
+  <a href="https://github.com/mriddyagrawal/Magpie/stargazers"><img src="https://img.shields.io/github/stars/mriddyagrawal/Magpie?style=flat-square" alt="GitHub stars" /></a>
+  <a href="#privacy"><img src="https://img.shields.io/badge/your%20files-never%20uploaded-brightgreen?style=flat-square" alt="Your files never leave your machine" /></a>
+</p>
 
-Your files never leave your machine.
+<p align="center">
+  <b>Ask questions about your own files. Get answers, with the sources cited.</b>
+</p>
 
-<!-- TODO: replace with a real screenshot of the running app.
-     Specs/UI/*.png are design mockups, not captures of the shipped build. -->
+<p align="center">
+  Hit <code>⌥Space</code>, ask something in plain English, and get an answer grounded in your actual<br />
+  documents — receipts, contracts, course catalogs, meeting notes, scanned PDFs — with clickable<br />
+  links to the files it used. Your files never leave your machine.
+</p>
+
+<p align="center">
+  <em>named after the bird that caches thousands of finds across scattered hiding places —<br />and remembers where every one of them is.</em>
+</p>
 
 ---
 
-## The problem
+<p align="center"><b>macOS (Apple silicon) and Windows 10/11.</b> Linux isn't in this beta (<a href="docs/DEVELOPMENT.md#linux">why</a>).</p>
+
+<!-- TODO: demo capture goes here, once we have a recording of the shipped build.
+     <p align="center"><img src="docs/assets/demo.gif" width="700" /></p>
+     Specs/UI/*.png are design mockups, NOT captures of the real app — do not use them here. -->
+
+---
+
+## the problem
 
 Every desktop search tool works the same way: you type keywords, it matches filenames and maybe some content. That's fine when you remember the exact word. It falls apart the moment you ask a real question.
 
@@ -25,7 +53,73 @@ Magpie is the "chat with your documents" experience — but pointed at your own 
 
 ---
 
-## Download
+## why magpie?
+
+| | Magpie | Spotlight / Windows Search | [ripgrep](https://github.com/BurntSushi/ripgrep) | NotebookLM / ChatGPT |
+|---|---|---|---|---|
+| **what you type** | a question | keywords | a regex | a question |
+| **what you get back** | an answer, citing the files it used | a list of files | matching lines | an answer over what you uploaded |
+| **understands meaning** | ✅ | ❌ | ❌ | ✅ |
+| **works on files where they already are** | ✅ indexed in place, never copied | ✅ | ✅ | ❌ you upload copies |
+| **scanned PDFs and photos** | ✅ a visual model embeds the rendered page | partial — OCR on some platforms | ❌ | ✅ if you upload them |
+| **exact identifiers** (`PHY-312`, `$143.50`) | ✅ BM25 running alongside the vectors | ✅ | ✅ | ⚠️ depends how it chunked the file |
+| **what leaves your machine** | nothing in Local mode; only the retrieved text in Cloud mode | nothing | nothing | everything you upload |
+| **price** | free, open source | comes with the OS | free, open source | subscription, at real volume |
+
+The short version: **grep needs the exact word. Spotlight needs the filename. Magpie needs the idea.**
+
+---
+
+## what it does
+
+- **Answers, not hit lists.** Every answer names the files it relied on, as clickable paths you can open or reveal in the file manager.
+- **Reads what other tools skip.** Text, PDF, DOCX, XLSX, CSV, code, Markdown — plus scanned pages and photos, through a visual model that embeds the rendered page instead of giving up on it.
+- **Two embeddings, because one isn't enough.** A dense vector so "pay the landlord" finds "rent payment," and a sparse BM25 vector so `PHY-312` and `$143.50` stay findable literally. Both are fused at query time.
+- **Tables stay row-addressable.** A 3-sentence summary indexes a receipt well; a 1,700-row course catalog is indexed *per row*, so individual courses stay findable.
+- **Incremental by default.** A manifest tracks every file. Adding one file to a folder of thousands re-processes exactly one file.
+- **The filesystem stays the source of truth.** Nothing is copied into a second store. Delete a file and the next sync drops its summary and index entry.
+- **Spotlight-style, out of your way.** Global `⌥Space` to summon, hides the moment it loses focus.
+
+---
+
+## architecture
+
+**Indexing** — every file is routed to the cheapest tier that can actually understand it:
+
+```mermaid
+graph LR
+    W["watched folders"] --> R{"router:<br/>which tier?"}
+    R -->|"plain text, code"| E["embed directly"]
+    R -->|"PDF, DOCX, XLSX"| X["extract text"]
+    R -->|"receipts, contracts"| S["LLM structured summary"]
+    R -->|"scans, images"| V["visual model<br/>embeds the page"]
+    R -->|huge files| G["register only,<br/>ripgrep on demand"]
+    X --> E
+    S --> E
+    E --> D[("Qdrant<br/>dense + BM25")]
+    V --> D
+```
+
+**Search** — retrieval is hybrid, and the answer is written from the real files, not from the summaries:
+
+```mermaid
+graph LR
+    Q["your question"] --> RW["optional<br/>query rewrite"]
+    RW --> EM["embed"]
+    EM --> DS["dense vector search"]
+    EM --> SP["BM25 sparse search"]
+    DS --> F["fuse"]
+    SP --> F
+    F --> RR["cross-encoder<br/>rerank"]
+    RR --> RD["read the actual<br/>source files"]
+    RD --> A["answer + citations"]
+```
+
+Four models run inside the app — MiniLM for dense embeddings, BM25 for sparse, ColPali for visual pages, and a cross-encoder for reranking. None of them ever call out.
+
+---
+
+## download
 
 **[Latest release →](https://github.com/mriddyagrawal/Magpie/releases/latest)**
 
@@ -52,7 +146,7 @@ SmartScreen will warn you. Click **More info → Run anyway**.
 
 ---
 
-## First run
+## first run
 
 1. Press **`⌥Space`** to summon the window (`Alt+Space` on Windows).
 2. Open **Settings → Data → Add folder** and point it at something real.
@@ -61,7 +155,7 @@ SmartScreen will warn you. Click **More info → Run anyway**.
 
 **The first question needs an internet connection.** Magpie downloads ~90 MB of embedding models on first use, then works from cache. Indexing large folders also downloads a visual model (500 MB–2 GB) the first time it meets a scanned PDF or image.
 
-### Shortcuts
+### shortcuts
 
 | Key | Action |
 |---|---|
@@ -76,7 +170,7 @@ Magpie hides whenever it loses focus, like Spotlight. `⌥Space` brings it back.
 
 ---
 
-## What works in this beta
+## what works in this beta
 
 | | Status |
 |---|---|
@@ -94,13 +188,13 @@ Magpie hides whenever it loses focus, like Spotlight. `⌥Space` brings it back.
 
 ---
 
-## Privacy
+## privacy
 
 What stays local, always:
 
 - **Your files.** Never uploaded, never copied into another store.
 - **The index.** Qdrant runs as a local binary on loopback. Magpie *hard-errors* if pointed at a remote cluster — this is enforced in code, not policy.
-- **All embedding and ranking.** Four models run inside the app: MiniLM (dense), BM25 (sparse), ColPali (visual), and a cross-encoder (reranking). None of them ever call out.
+- **All embedding and ranking.** The four models above run inside the app and never call out.
 
 What leaves the machine, in Cloud mode only:
 
@@ -113,29 +207,7 @@ That second one is the real boundary — worth knowing before you point Magpie a
 
 ---
 
-## How it works
-
-**1 · Understand each file.** Files are routed through five tiers by cost. Small text and code are embedded directly. PDFs, DOCX and XLSX get their text extracted. Only files that genuinely need it — receipts, contracts, scanned documents — get an LLM-generated structured summary. Scanned pages and images go to a visual model that embeds the rendered page. Huge files are registered and searched on demand with ripgrep instead of being embedded.
-
-**2 · Make it searchable.** Everything gets two representations: a **dense embedding** for meaning, so "pay the landlord" finds "rent payment"; and a **sparse BM25 vector** for exact tokens, so `PHY-312` and `$143.50` stay findable literally. Both are fused at query time.
-
-**3 · Answer.** Your question is optionally rewritten into a keyword-rich query, embedded, and searched against both tiers. Results are merged, reranked, and the *actual source files* are read and sent to a model, which answers and cites what it used.
-
-### Design principles
-
-**The filesystem is the source of truth.** Files are indexed, never copied. Delete a file and the next sync removes its summary and index entry.
-
-**Incremental by default.** A manifest tracks every file. Adding one file to a folder of thousands re-processes exactly one file.
-
-**Two embeddings beat one.** Dense handles synonyms; BM25 handles identifiers. Each alone has blind spots.
-
-**Summaries for prose, rows for tables.** A 3-sentence summary indexes a receipt well. A 1,700-row course catalog is indexed per row, so individual courses stay findable.
-
-**Cite everything.** Every answer names the files it relied on, as clickable paths.
-
----
-
-## Build from source
+## build from source
 
 ```bash
 git clone https://github.com/mriddyagrawal/Magpie.git
@@ -153,29 +225,44 @@ uv run uvicorn src.server:app --port 8765 --reload    # terminal 2
 cd frontend && pnpm tauri dev                         # terminal 3
 ```
 
-Full setup, LLM provider configuration, local inference, packaging, and the release process are documented in **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**.
+## stack
+
+Python (FastAPI) · Tauri 2 (Rust shell) · React/TS · [Qdrant](https://qdrant.tech/) · MiniLM · BM25 · [ColPali](https://huggingface.co/vidore/colpali) · cross-encoder reranking
+
+## docs
+
+| doc | what |
+|-----|------|
+| [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | full setup, LLM provider config, local inference, packaging, releases |
 
 ---
 
-## Project layout
-
-```
-src/                 Python backend
-  server.py          FastAPI app — the entire HTTP surface
-  ingest/            Five-tier indexing pipeline + walker
-  router.py          Which tier does a given file deserve?
-  stage2/            Embeddings, Qdrant, hybrid search, reranking
-  answer.py          Grounded answer synthesis with citations
-  inference/         Local llama-server subprocess pool
-  config/            Settings, secrets, indexing rules
-frontend/            Tauri (Rust shell) + React UI
-  src-tauri/         Process supervision, global shortcut, windows
-server/              Optional hosted LLM proxy (Fly.io)
-cli/                 Legacy terminal REPL — see DEVELOPMENT.md
-```
-
----
-
-## Status
+## status
 
 Magpie is a **beta**. It has been installed and run by a handful of people; expect rough edges, and please open an issue when you find one.
+
+---
+
+## license
+
+Magpie is licensed under the **GNU Affero General Public License, version 3** ([`AGPL-3.0-only`](LICENSE)).
+
+    Copyright (C) 2026 Rahul Ranjan Sah and Mridul Agrawal
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, version 3.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+    General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+In plain words: anyone may run, read, modify and redistribute Magpie, but a modified version has to carry the same license — and under **section 13** that holds even if the modification is only ever run as a *network service*. Standing up a fork of `server/` for other people counts; its users are entitled to the source.
+
+**Why AGPL and not MIT.** Partly strategy, partly arithmetic: Magpie links [PyMuPDF](https://pymupdf.readthedocs.io/), which Artifex dual-licenses as *AGPL-3.0 or a paid commercial license*. A permissive license for the combined work was never actually on the table without buying that dependency out.
+
+**Commercial use.** The AGPL doesn't stop you selling Magpie or running it inside a business; it requires the source to travel with the software. Copyright is held by the two authors, so the same code can also be offered to a customer under a separate commercial license. Contributors sending non-trivial patches should expect to sign a CLA to keep that option open.

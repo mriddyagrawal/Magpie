@@ -3,6 +3,8 @@ name = "magpie"
 version = "0.1.0"
 description = "RAG-style semantic search over the local file system."
 readme = "README.md"
+license = "AGPL-3.0-only"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 dependencies = [
     # `pydantic-ai` (the metapackage) pulls in `pydantic-ai-slim` with ~20
@@ -48,7 +50,7 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]  # >=77 for PEP 639 SPDX `license` + `license-files`
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]

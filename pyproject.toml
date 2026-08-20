@@ -1,5 +1,5 @@
 [project]
-name = "notanotherspotlight"
+name = "magpie"
 version = "0.1.0"
 description = "RAG-style semantic search over the local file system."
 readme = "README.md"

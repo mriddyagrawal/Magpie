@@ -33,9 +33,17 @@
 
 <p align="center"><b>macOS (Apple silicon) and Windows 10/11.</b> Linux isn't in this beta (<a href="docs/DEVELOPMENT.md#linux">why</a>).</p>
 
-<!-- TODO: demo capture goes here, once we have a recording of the shipped build.
+---
+
+<p align="center">
+  <b>📹 Demo video goes here</b><br />
+  <sub>a 15-second capture of the real app — recording shortly</sub>
+</p>
+
+<!-- When the capture exists, replace the block above with:
      <p align="center"><img src="docs/assets/demo.gif" width="700" /></p>
-     Specs/UI/*.png are design mockups, NOT captures of the real app — do not use them here. -->
+     Produce it with: uv run python scripts/record_demo.py
+     Do NOT use Specs/UI/*.png here — those are design mockups, not the shipped build. -->
 
 ---
 
@@ -116,6 +124,35 @@ graph LR
 ```
 
 Four models run inside the app — MiniLM for dense embeddings, BM25 for sparse, ColPali for visual pages, and a cross-encoder for reranking. None of them ever call out.
+
+---
+
+## how it holds up
+
+Magpie is developed against three corpora, each picked to break a different part of the pipeline:
+
+- **ReceiptQA** — receipt images paired with Q&A. Tests image understanding and identifier extraction: amounts, dates, merchant names.
+- **A university course catalog** — 1,724 courses across 61 departments, split into CSVs by department and by general-education category. Tests row-level CSV retrieval and whether the router sends the right kind of query at the right kind of file.
+- **A student organization directory** — 236 clubs with descriptions and categories, plus each club's uploaded PDFs and Word documents (constitutions, by-laws). Tests mixed-media ingestion at scale.
+
+The answer stage is scored on a hand-written question set with known-correct source files, so a wrong-but-plausible answer still fails:
+
+| setting | value |
+|---|---|
+| run | 2026-04-12 |
+| answer model | kimi-k2.5 via Moonshot |
+| questions | 35, hand-written against the internal test corpus |
+| top-k from Qdrant | 5 |
+| metric | did the answer cite *every* expected source, and no distractors? |
+
+| difficulty | questions | perfect source recall | distractors cited |
+|---|---|---|---|
+| easy | 12 | 12 / 12 | 0 |
+| medium | 12 | 12 / 12 | 0 |
+| hard | 11 | 10 / 11 | 1 |
+| **total** | **35** | **34 / 35** | **1** |
+
+**Read those numbers honestly.** This is our own question set on our own corpus, not an external benchmark — we wrote the questions, so treat it as a regression test we haven't gamed rather than proof we beat anyone. It ran on kimi-k2.5, which is *not* the model the beta ships with. And 35 questions is a small N. The harness is in [`tests/`](tests/) and the raw per-question output is in [`tests/test results/`](tests/test%20results/) if you want to check our work or run it on your own files.
 
 ---
 
@@ -229,17 +266,50 @@ cd frontend && pnpm tauri dev                         # terminal 3
 
 Python (FastAPI) · Tauri 2 (Rust shell) · React/TS · [Qdrant](https://qdrant.tech/) · MiniLM · BM25 · [ColPali](https://huggingface.co/vidore/colpali) · cross-encoder reranking
 
+---
+
+## roadmap
+
+Nearest first — the ❌ rows above are the honest backlog:
+
+- **Bundle the local model.** On-device inference already works from source; it needs the runtime in the installer and an in-app downloader.
+- **Sign the builds.** An Apple Developer ID and a Windows cert remove both scary launch dialogs.
+- **Bring your own key.** Settings → Advanced → API Keys, so nobody depends on the shared beta key.
+- **Ship Linux.** The build exists; it's parked for the beta.
+- **Token-by-token answer streaming**, and cancelling in-flight queries when you retype.
+- **Auto-update**, currently switched off.
+
+Everything we've considered and deliberately deferred — with the reasoning, so we can tell later whether it still holds — lives in [`Plans/Future Plans.md`](Plans/Future%20Plans.md).
+
 ## docs
 
 | doc | what |
 |-----|------|
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | full setup, LLM provider config, local inference, packaging, releases |
+| [Plans/Future Plans.md](Plans/Future%20Plans.md) | every deferred idea, numbered, with the reasoning behind the deferral |
+| [tests/](tests/) | the retrieval and answer eval harness, plus raw per-question results |
 
 ---
 
 ## status
 
 Magpie is a **beta**. It has been installed and run by a handful of people; expect rough edges, and please open an issue when you find one.
+
+## contributors
+
+<a href="https://github.com/mriddyagrawal/Magpie/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=mriddyagrawal/Magpie" alt="Contributors" />
+</a>
+
+## star history
+
+<a href="https://star-history.com/#mriddyagrawal/Magpie&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mriddyagrawal/Magpie&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=mriddyagrawal/Magpie&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mriddyagrawal/Magpie&type=Date" />
+  </picture>
+</a>
 
 ---
 

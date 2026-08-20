@@ -69,7 +69,7 @@ _CACHE_PATH = Path.home() / ".cache" / "notspotlight" / "device.json"
 _SELECTOR_VERSION = 3
 
 # ColQwen2.5 is ~3.75B params; fp16 weights plus activations land around
-# 7-8 GB resident. Below this we use ColModernVBERT instead.
+# 7-8 GB resident. Below this we use ColSmol-500M instead.
 #
 # CUDA and MPS need DIFFERENT thresholds because the numbers mean different
 # things. CUDA VRAM is dedicated — nothing else competes for it. Apple's
@@ -89,7 +89,7 @@ class DeviceConfig:
 
     device: str           # "cuda" | "mps" | "cpu"
     model_id: str         # HuggingFace model repo
-    model_family: str     # "colqwen2_5" | "colidefics3" (ColSmol) | "colmodernvbert" (unselected)
+    model_family: str     # "colqwen2_5" | "colidefics3" (ColSmol)
     dtype: str            # "bfloat16" | "float16" | "float32"
     batch_size: int       # pages per forward pass
 

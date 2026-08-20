@@ -1166,3 +1166,95 @@
   .folder-row__progress-fill--indeterminate { animation: none; }
   .folder-row__progress-fill--indeterminate { width: 100%; opacity: 0.4; }
 }
+
+/* ── Local model files panel (Search & AI) ─────────────────────────────── */
+.local-model-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+.local-model-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-secondary);
+}
+.local-model-panel__title {
+  font-size: var(--size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.local-model-panel__body { margin-top: 10px; display: grid; gap: 10px; }
+.local-model-panel__body--ready { gap: 6px; }
+.local-model-panel__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: var(--size-xs);
+  color: var(--danger, #d66);
+}
+.local-model-panel__pitch,
+.local-model-panel__phase {
+  margin: 0;
+  font-size: var(--size-xs);
+  color: var(--text-secondary);
+}
+.local-model-panel__phase-hint { color: var(--text-dim); }
+.local-model-panel__ready-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--size-xs);
+  color: var(--text-secondary);
+}
+.local-model-panel__half { display: grid; gap: 4px; }
+.local-model-panel__half-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: var(--size-xs);
+}
+.local-model-panel__half-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-primary);
+}
+.local-model-panel__half-bytes {
+  margin-left: auto;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+.local-model-panel__actions { display: flex; gap: 8px; }
+.local-model-panel__download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg-card);
+  font-size: var(--size-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+.local-model-panel__download:hover { filter: brightness(1.08); }
+.local-model-panel__remove {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: var(--size-xs);
+  cursor: pointer;
+}
+.local-model-panel__remove:hover { color: var(--text-secondary); border-color: var(--border-input); }
+.local-model-panel__remove.is-armed {
+  color: var(--danger, #d66);
+  border-color: var(--danger, #d66);
+}

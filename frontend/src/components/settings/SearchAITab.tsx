@@ -32,6 +32,7 @@ import {
   getSearchSettings,
   patchSearchSettings,
 } from "../../api";
+import { LocalModelPanel } from "./LocalModelPanel";
 import type { ProvidersInfo, SearchSettings, SearchSettingsPatch } from "../../api";
 
 interface Props {
@@ -93,6 +94,12 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
     immediatePatch({ provider: p });
   }, [immediatePatch]);
 
+  // The download panel calls this when an install settles, so the Local
+  // card's disabled state flips without reopening the tab.
+  const refreshProviders = useCallback(() => {
+    getProviders().then(setProviders).catch(() => { /* non-fatal */ });
+  }, [setProviders]);
+
   const handleResetDefaults = useCallback(async () => {
     immediatePatch({
       top_k: 5,
@@ -132,9 +139,18 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
             badge="private"
             badgeTone="neutral"
             // Don't surface the underlying model name (no-tech-leak).
-            description="Runs on your machine"
+            description={
+              providers?.local?.downloaded === false
+                ? "Needs a download first — see below"
+                : "Runs on your machine"
+            }
             selected={search.provider === "local"}
             onSelect={() => handleProvider("local")}
+            // Mirror the Cloud card's unconfigured treatment: switching TO a
+            // provider that cannot answer is never useful. If the user is
+            // already on Local (stale settings, deleted models) the selected
+            // state still renders, so the broken combination stays visible.
+            disabled={providers?.local?.downloaded === false}
           />
           <ProviderCard
             label="Cloud"
@@ -156,6 +172,8 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
           search index stay local either way.
         </p>
       </section>
+
+      <LocalModelPanel refreshProviders={refreshProviders} />
 
       <section
         className={`advanced-panel ${advancedOpen ? "is-open" : ""}`}

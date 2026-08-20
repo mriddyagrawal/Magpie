@@ -31,6 +31,7 @@ import {
   addExclusion,
   friendlyError,
   isAlreadyIndexingError,
+  jobCoversFolder,
   getExclusions,
   patchFolder,
   pickFile,
@@ -48,6 +49,19 @@ import type {
   FolderEntry,
   IngestStatus,
 } from "../../api";
+import { IngestPanel } from "./IngestPanel";
+
+/** `startIngest`, but a 409 ("already indexing") resolves instead of throwing.
+ *  Every caller has already persisted the rule change by this point, so the
+ *  in-flight job's coalesced rerun will cover it — the 409 carries no
+ *  information the user needs to act on. */
+async function startIngestIgnoringConflict(path: string): Promise<void> {
+  try {
+    await startIngest(path);
+  } catch (e) {
+    if (!isAlreadyIndexingError(e)) throw e;
+  }
+}
 import { ConfirmModal } from "./ConfirmModal";
 import { FolderRow } from "./FolderRow";
 
@@ -100,11 +114,18 @@ export function DataTab({
       const path = await pickFolder();
       if (!path) return;
       await addFolder(path);
-      await startIngest(path);
+      // The folder is already saved at this point. A 409 here just means the
+      // startup auto-sync is still in flight — the rule change we just made
+      // gets picked up by its coalesced rerun, so the folder WILL be read.
+      // Letting that throw used to skip refreshFolders() below, which is why
+      // adding a first folder during boot showed an error banner over an
+      // empty list even though the add had succeeded.
+      await startIngestIgnoringConflict(path);
       onIngestStarted();
-      refreshFolders();
     } catch (e) {
       setError(friendlyError(e));
+    } finally {
+      refreshFolders();
     }
   }, [onIngestStarted, refreshFolders]);
 
@@ -115,11 +136,12 @@ export function DataTab({
       const path = await pickFile();
       if (!path) return;
       await addFolder(path);
-      await startIngest(path);
+      await startIngestIgnoringConflict(path);   // see handlePickFolder
       onIngestStarted();
-      refreshFolders();
     } catch (e) {
       setError(friendlyError(e));
+    } finally {
+      refreshFolders();
     }
   }, [onIngestStarted, refreshFolders]);
 
@@ -263,6 +285,7 @@ export function DataTab({
         onReindex={() => setShowReindexConfirm(true)}
         syncDisabled={pollActive}
       />
+      <IngestPanel ingest={ingest} onStop={handleStop} />
       {error && <ErrorBanner message={error} />}
       <div className="data-tab__list">
         {folders === null ? (
@@ -276,6 +299,7 @@ export function DataTab({
                 Boolean(ingest?.running) &&
                 ingest?.path === f.path
               }
+              inJobScope={jobCoversFolder(ingest, f.path)}
               ingest={ingest}
               onToggle={handleToggle}
               onRemove={handleRemove}

@@ -1039,7 +1039,21 @@ _ingest_state: dict[str, Any] = {
     "running": False,
     "done": False,
     "error": None,
+    # NOTE: `path` moves DURING a sync — `_do_sync` repoints it at each raw
+    # root as it walks so that root's Settings row shows its own bar. Between
+    # job start and the first root (and during end-of-run cleanup) it holds a
+    # human label like "<sync: all enabled folders>" instead, which matches no
+    # folder row. Use `roots` when you need the job's scope; `path` is the
+    # "what is it working on right now" pointer.
     "path": None,
+    # Every raw configured root this job covers, in the same string form
+    # /settings/folders returns as `folder.path`. Lets the UI mark all covered
+    # rows as part of the run even before the walker reaches them, and lets the
+    # global progress panel exist independently of which root is current.
+    "roots": [],
+    # What kicked this off: "folder" (Add folder/file) | "sync" | "reindex" |
+    # "auto" (startup resume / rule change). Drives the panel's title.
+    "kind": "idle",
     "files_total": 0,
     "files_done": 0,
     "current_file": None,
@@ -1052,6 +1066,18 @@ _ingest_state: dict[str, Any] = {
     # 50K-file root the scan alone can take ~30s.
     "phase": "idle",
 }
+
+
+def _enabled_root_paths() -> list[str]:
+    """Raw configured paths of every enabled include_path, in the exact string
+    form `/settings/folders` hands the UI. Kept raw (not resolved) so the
+    frontend can match them against `folder.path` without normalising."""
+    try:
+        from src.config.indexing_rules import load_user_rules
+
+        return [ip.path for ip in load_user_rules().include_paths if ip.enabled]
+    except Exception:  # noqa: BLE001 — scope reporting must never sink a job
+        return []
 
 _stop_event = threading.Event()
 
@@ -1080,8 +1106,10 @@ async def start_ingest(req: IngestRequest) -> dict[str, Any]:
     _stop_event.clear()
     _ingest_state.update(
         running=True, done=False, error=None, path=req.path,
+        roots=[req.path], kind="folder",
         files_total=0, files_done=0, current_file=None,
         started_at=time.time(), stopped=False,
+        phase="scanning",
     )
     if folder.is_file():
         threading.Thread(target=_do_ingest_file, args=(folder,), daemon=True).start()
@@ -1091,12 +1119,10 @@ async def start_ingest(req: IngestRequest) -> dict[str, Any]:
 
 
 def _do_ingest(folder: Path) -> None:
-    def _on_progress(done: int, total: int, current: str | None = None) -> None:
-        _ingest_state["files_done"] = done
-        _ingest_state["files_total"] = total
-        if current is not None:
-            _ingest_state["current_file"] = current
-
+    # Uses the shared callback (defined further down; resolved at call time,
+    # and this only ever runs on a worker thread). The inline copy this
+    # replaced never flipped `phase` off "scanning", so a single-folder ingest
+    # showed the indeterminate scanning bar for its whole run.
     try:
         from src.ingest.walker import run_batch
         from src.stage2.__main__ import ingest_from_manifest
@@ -1104,7 +1130,7 @@ def _do_ingest(folder: Path) -> None:
             folder,
             push_to_qdrant=True,
             concurrency=4,
-            progress_callback=_on_progress,
+            progress_callback=_on_progress_update,
             stop_event=_stop_event,
         ))
         if _stop_event.is_set():
@@ -1127,13 +1153,10 @@ def _do_ingest(folder: Path) -> None:
 
 
 def _do_ingest_file(file_path: Path) -> None:
-    def _on_progress(done: int, total: int, current: str | None = None) -> None:
-        _ingest_state["files_done"] = done
-        _ingest_state["files_total"] = total
-        if current is not None:
-            _ingest_state["current_file"] = current
-
-    _on_progress(0, 1, file_path.name)
+    # Same shared callback as _do_ingest. total=1 here, so the first call
+    # immediately flips phase to "indexing" — a single file has no scan phase
+    # worth showing.
+    _on_progress_update(0, 1, file_path.name)
     try:
         from src.ingest.walker import ingest_one, _gpu_available
         from src.manifest import Manifest
@@ -1158,7 +1181,7 @@ def _do_ingest_file(file_path: Path) -> None:
 
         asyncio.run(_run())
         manifest.save()
-        _on_progress(1, 1, None)
+        _on_progress_update(1, 1, None)
         ingest_from_manifest(force=False, verbose=False)
         _ingest_state["done"] = True
     except Exception as exc:
@@ -1191,7 +1214,12 @@ def ingest_status() -> dict[str, Any]:
         "running": _ingest_state["running"],
         "done": _ingest_state["done"],
         "error": _ingest_state["error"],
+        # `path` is "what is being walked right now" and moves during a sync.
+        # `roots` is the job's full scope and is stable for its lifetime — use
+        # that to decide which folder rows belong to this run.
         "path": _ingest_state["path"],
+        "roots": _ingest_state.get("roots", []),
+        "kind": _ingest_state.get("kind", "idle"),
         "files_total": _ingest_state["files_total"],
         "files_done": _ingest_state["files_done"],
         "current_file": _ingest_state["current_file"],
@@ -1221,14 +1249,19 @@ class IndexJobResponse(BaseModel):
     kind: str    # "sync" | "reindex"
 
 
-def _init_ingest_state(*, path_label: str) -> None:
+def _init_ingest_state(*, path_label: str, kind: str) -> None:
     """Bootstrap _ingest_state for a new job. Caller must already have
     confirmed `_ingest_state["running"] is False` and held that contract
-    through to setting running=True."""
+    through to setting running=True.
+
+    `roots` is snapshotted here rather than passed in: every caller of this
+    helper is a whole-index job, so the scope is always "the enabled roots".
+    """
     _stop_event.clear()
     _ingest_state.update(
         running=True, done=False, error=None,
         path=path_label,
+        roots=_enabled_root_paths(), kind=kind,
         files_total=0, files_done=0, current_file=None,
         started_at=time.time(), stopped=False,
         # Jobs always start in scanning phase — find_candidates runs before
@@ -1393,7 +1426,7 @@ def _do_sync() -> None:
                 "[server] sync coalesce: rule changed mid-run, respawning",
                 file=sys.stderr,
             )
-            _init_ingest_state(path_label="<sync: coalesced rerun>")
+            _init_ingest_state(path_label="<sync: coalesced rerun>", kind="sync")
             threading.Thread(target=_do_sync, daemon=True).start()
 
 
@@ -1441,7 +1474,7 @@ def _spawn_sync_or_coalesce(*, reason: str) -> str:
             _rerun_pending = True
         print(f"[server] auto-sync deferred (running): {reason}", file=sys.stderr)
         return "coalesced"
-    _init_ingest_state(path_label=f"<auto-sync: {reason}>")
+    _init_ingest_state(path_label=f"<auto-sync: {reason}>", kind="auto")
     threading.Thread(target=_do_sync, daemon=True).start()
     print(f"[server] auto-sync started: {reason}", file=sys.stderr)
     return "started"
@@ -1482,7 +1515,7 @@ def index_sync() -> IndexJobResponse:
     409 if any indexing job is already running."""
     if _ingest_state["running"]:
         raise HTTPException(status_code=409, detail="Indexing already in progress")
-    _init_ingest_state(path_label="<sync: all enabled folders>")
+    _init_ingest_state(path_label="<sync: all enabled folders>", kind="sync")
     threading.Thread(target=_do_sync, daemon=True).start()
     return IndexJobResponse(status="started", kind="sync")
 
@@ -1495,7 +1528,7 @@ def index_reindex() -> IndexJobResponse:
     before calling this."""
     if _ingest_state["running"]:
         raise HTTPException(status_code=409, detail="Indexing already in progress")
-    _init_ingest_state(path_label="<reindex: all enabled folders>")
+    _init_ingest_state(path_label="<reindex: all enabled folders>", kind="reindex")
     threading.Thread(target=_do_reindex, daemon=True).start()
     return IndexJobResponse(status="started", kind="reindex")
 
@@ -1916,9 +1949,17 @@ def _resolved_model_name(provider: str) -> str:
             return s.openrouter_model or "OpenRouter"
         except Exception:  # noqa: BLE001
             return "Cloud"
-    # Local: prefer the LOCAL_MODEL env (matches active_model_name's resolution
-    # for the local provider). Defaults to "Gemma 4" as a friendly fallback.
-    return os.environ.get("LOCAL_MODEL", "Gemma 4")
+    # Local: name the launch profile the pool will actually spawn, so the
+    # pill tracks `LLAMA_SERVER_TEXT_MODEL` instead of always reading
+    # "Gemma 4" during an LFM2.5 run. Falls back to the env var if the
+    # profile registry can't answer (unknown profile name in env).
+    try:
+        from src.inference.profiles import active_profile, short_model_name
+
+        profile = active_profile()
+        return f"{short_model_name(profile)} ({profile.args.quant})"
+    except Exception:  # noqa: BLE001
+        return os.environ.get("LOCAL_MODEL", "Gemma 4")
 
 
 @app.get("/settings/search")

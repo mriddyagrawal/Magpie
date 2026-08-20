@@ -490,10 +490,12 @@ def _ensure_mmproj() -> None:
 
     args = get_profile(default_text_profile()).args
 
-    # Weights. Env still wins so an explicit LOCAL_MODEL/LOCAL_QUANT override
-    # is honored — but the DEFAULT now comes from the profile, not a copy.
-    repo = os.environ.get("LOCAL_MODEL", args.repo_id)
-    quant = os.environ.get("LOCAL_QUANT", args.quant)
+    # Read straight off the profile. Do NOT re-read LOCAL_MODEL/LOCAL_QUANT
+    # here: profiles.py already resolves them at import, so `args` has any
+    # override baked in. Re-reading was a second chance to disagree, and it
+    # did — it also meant this module honored a stale env value that the
+    # profile-name path (right above) had already warned about and refused.
+    repo, quant = args.repo_id, args.quant
     print(f"==> Pre-downloading model weights: {repo} :: {quant}", file=sys.stderr)
     print("    First-time only; cached under $APP_DATA_DIR/cache/hub/.", file=sys.stderr)
     p = ensure_model(repo, quant)
@@ -503,8 +505,7 @@ def _ensure_mmproj() -> None:
         print("==> Profile is text-only; no projector to fetch.", file=sys.stderr)
         return
 
-    mm_repo = os.environ.get("LOCAL_MMPROJ_REPO", args.mmproj_repo_id)
-    mm_variant = os.environ.get("LOCAL_MMPROJ_VARIANT", args.mmproj_variant)
+    mm_repo, mm_variant = args.mmproj_repo_id, args.mmproj_variant
     print(
         f"==> Pre-downloading vision projector: {mm_repo} :: {mm_variant}",
         file=sys.stderr,

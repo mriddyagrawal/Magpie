@@ -118,8 +118,9 @@ def test_colmodernvbert_is_no_longer_selectable(patched):
     reproduction (arXiv 2608.10636) showed it is the WEAKEST sub-1B option
     out-of-domain (42.5 avg vs colSmol-500M's 53.0 on ViDoRe v1-v3), not the
     strongest — its own paper's numbers were v1-only and v1 is saturated.
-    Its family stays loadable in model.py for experiments, but nothing
-    selects it."""
+    The family was then removed outright — a device.json naming it now hits
+    model.py's unknown-family ValueError rather than loading a model we have
+    no evidence for."""
     for kwargs in ({"cuda": True, "vram_gb": 4.0},
                    {"mps": True, "ram_gb": 8.0},
                    {}):
@@ -132,7 +133,6 @@ def test_every_selectable_family_can_be_loaded():
     from colpali_engine import models as cm
 
     for family, cls in (("colqwen2_5", "ColQwen2_5"),
-                        ("colmodernvbert", "ColModernVBert"),
                         ("colidefics3", "ColIdefics3")):
         assert hasattr(cm, cls), f"{family} -> {cls} missing from colpali_engine"
 

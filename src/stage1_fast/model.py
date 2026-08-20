@@ -36,13 +36,6 @@ def _load_model(cfg: DeviceConfig) -> tuple[Any, Any]:
         # ColSmol — the small-slot model.
         from colpali_engine.models import ColIdefics3, ColIdefics3Processor
         model_cls, proc_cls = ColIdefics3, ColIdefics3Processor
-    elif cfg.model_family == "colmodernvbert":
-        # Not selected by device.py (held the small slot for ~2 commits in
-        # 2026-08 before a third-party reproduction showed it collapsing
-        # out-of-domain — see device.py). Kept loadable for experiments via a
-        # hand-edited device.json.
-        from colpali_engine.models import ColModernVBert, ColModernVBertProcessor
-        model_cls, proc_cls = ColModernVBert, ColModernVBertProcessor
     else:
         raise ValueError(f"unknown model family: {cfg.model_family}")
 

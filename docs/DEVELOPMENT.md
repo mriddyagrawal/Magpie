@@ -238,6 +238,32 @@ Do **not** point this at LFM2.5-2.6B or LFM2.5-1.2B-Thinking: both are
 reasoning models whose chat template opens every assistant turn with
 `<think>`, which wrecks time-to-first-token and fights the GBNF grammar.
 
+### The /local/* install API
+
+Backend for the Settings download card (`src/local_install.py`; endpoints in
+`server.py`). Mirrors the `/ingest` + `/ingest/status` polling pattern.
+
+```
+GET    /local/status            state, per-artifact presence, byte progress
+POST   /local/install           202; downloads every missing artifact
+POST   /local/install/cancel    kills the current download subprocess
+DELETE /local/model?component=  llm | visual | all — reclaims disk
+```
+
+Covers both halves of "local": the LLM (binary + weights + projector — what
+the Local provider toggle needs; ~2.8 GB) and the visual tier (what T4
+indexing uses regardless of provider; 7.25 or 0.93 GB per the matrix below).
+`providers.local.downloaded` in `/settings/search/providers` now reports the
+real LLM half instead of the old hardcoded `True`.
+
+Mechanics worth knowing: each artifact downloads in a killable
+**subprocess** (`hf_hub_download` has no cancel hook, and a terminated child
+leaves HuggingFace `*.incomplete` blobs that resume for free — cancel loses
+nothing); progress is computed read-side by statting cache blobs, so the
+worker pushes nothing; the binary installs first because it is the artifact
+that fails for structural reasons and should fail in seconds, not twenty
+minutes into a 2 GB fetch; disk is preflighted with 10% headroom.
+
 ### Visual-tier (ColPali) model selection
 
 `src/stage1_fast/device.py` picks exactly one retriever per machine; nothing

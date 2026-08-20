@@ -235,14 +235,36 @@ jobs:
           # tauri.conf.json's plugins.updater.pubkey field.
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          # macOS Apple Developer signing + notarization. Skipped automatically
-          # if APPLE_CERTIFICATE secret is not set.
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # macOS signing vars are DELIBERATELY NOT SET while no Apple
+          # Developer certificate exists.
+          #
+          # The claim they were "skipped automatically if APPLE_CERTIFICATE is
+          # not set" was wrong, and the branch-path comment ~100 lines above
+          # already explains why: Actions resolves an unset secret to an empty
+          # STRING, not to an absent variable. So `APPLE_CERTIFICATE: ""` made
+          # Tauri run `security import` against an empty certificate and the
+          # macOS leg died with:
+          #
+          #   security: SecKeychainItemImport: One or more parameters passed
+          #   to a function were not valid.
+          #   failed to bundle project failed codesign application
+          #
+          # That is precisely the failure the branch path guards against by
+          # passing no signing vars at all; the tag path did the very thing
+          # that comment warns about, which is why macOS never produced a DMG
+          # while Windows did (tauri-action does not sign Windows natively, so
+          # its empty cert vars are inert).
+          #
+          # To enable signing: create the six secrets, then uncomment. Do NOT
+          # uncomment them earlier — a partially-populated set fails the same
+          # way. Everything else about the release path already works.
+          #
+          # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # Windows EV cert signing — passed through but NOT YET WIRED.
           # tauri-action does NOT sign Windows builds natively. Per Tauri docs
           # (https://v2.tauri.app/distribute/sign/windows/), Windows signing

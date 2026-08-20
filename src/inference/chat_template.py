@@ -17,6 +17,22 @@ that would mean wiring in per-model knowledge and stays brittle. Instead:
 
 When other thinking-capable model families need first-class support,
 add their token convention here and switch on model-id prefix.
+
+STATUS (2026-08): the shipped local model is LFM2.5-VL-3B, which takes the
+no-op branch, and that is the correct behavior rather than a gap. Liquid's
+model card is explicit that this model "answers directly instead of
+reasoning" — there is no thinking mode to enable, which is exactly what a
+latency-sensitive search bar wants. Its chat template does understand
+`<think>` blocks (it strips them from prior assistant turns unless
+`preserve_thinking` is set), but that is history hygiene handled by
+`--jinja`, not a switch we drive.
+
+So `thinking=True` currently does nothing on any local model. Do NOT
+"fix" that by reaching for a Liquid reasoning model — LFM2.5-2.6B and
+LFM2.5-1.2B-Thinking always emit `<think>`, which would wreck time-to-first
+-token. If a thinking model is ever wanted it belongs behind its own
+profile, and it needs llama.cpp >= the #24234 fix (2026-06-06) or the tags
+leak into output.
 """
 
 from __future__ import annotations

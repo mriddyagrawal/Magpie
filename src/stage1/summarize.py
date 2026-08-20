@@ -209,9 +209,22 @@ Now analyze the file below. Return ONLY the JSON object - no markdown fences, no
 
 def build_agent() -> ChatAgent[FileSummary]:
     # No fallback — hard-fail on parse errors so the file is skipped cleanly
-    # (matches cloud behavior). The next `ns --sync` will retry it.
-    # Cloud providers use PydanticAI's NativeOutput which enforces the schema
-    # natively; local Gemma 3n needs a few-shot example to stay in JSON mode.
+    # (matches cloud behavior). The walker's next pass will retry it.
+    #
+    # Why two prompts. The original reason recorded here was that "cloud
+    # providers use PydanticAI's NativeOutput which enforces the schema
+    # natively; local needs a few-shot example to stay in JSON mode." That
+    # is now backwards on both halves: cloud's response_format was disabled
+    # in 2026-05 because OpenRouter's Google AI Studio route rejects it, and
+    # local gained real GBNF grammar enforcement, which no cloud provider
+    # here has.
+    #
+    # The split survives for a different and better reason: the few-shot
+    # example teaches the model WHAT to extract — identifiers verbatim,
+    # dates in their original format, category words the user would actually
+    # search for. Grammar constrains shape, never content, so a 3B model
+    # still benefits from being shown a worked example. Keep both prompts;
+    # just don't believe the old rationale.
     prompt = LOCAL_SYSTEM_PROMPT if active_provider().name == "local" else SYSTEM_PROMPT
     return _build_chat_agent(prompt, FileSummary, None)
 

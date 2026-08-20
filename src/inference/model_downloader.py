@@ -37,53 +37,70 @@ from pathlib import Path
 from src.manifest import APP_DATA_DIR  # noqa: F401  (side-effect import)
 
 
-# Unsloth's GGUF filename pattern for Gemma 4 E4B. Verified 2026-05 on
-# https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF.
-_UNSLOTH_GEMMA4_E4B_PATTERN = "gemma-4-E4B-it-UD-{quant}.gguf"
+# Per-repo filename conventions. Every GGUF publisher names files
+# differently, and there is no metadata endpoint that tells you the
+# convention — you read the repo's file list once and record it here.
+#
+# `gguf` is formatted with `quant=`, `mmproj` with `variant=`. A repo with
+# no `mmproj` entry is text-only and `ensure_mmproj` will refuse it.
+_REPO_PATTERNS: dict[str, dict[str, str]] = {
+    # LFM2.5-VL-3B — the shipped local model. Weights and projector live in
+    # the same repo. Verified 2026-08 against the repo file listing:
+    #   LFM2.5-VL-3B-{Q4_0,Q4_K_M,Q5_K_M,Q6_K,Q8_0,BF16,F16}.gguf
+    #   mmproj-LFM2.5-VL-3B-{Q8_0,F16,BF16}.gguf
+    # Note the projector's quant set is NARROWER than the model's — asking
+    # for mmproj Q6_K would 404, which is why the two are validated apart.
+    "LiquidAI/LFM2.5-VL-3B-GGUF": {
+        "gguf": "LFM2.5-VL-3B-{quant}.gguf",
+        "mmproj": "mmproj-LFM2.5-VL-3B-{variant}.gguf",
+    },
+    # Unsloth's Gemma 4 E4B. No longer the default — kept because a user
+    # may still have it cached and pointed at via LOCAL_MODEL, and because
+    # deleting it would turn a working override into a hard error.
+    "unsloth/gemma-4-E4B-it-GGUF": {
+        "gguf": "gemma-4-E4B-it-UD-{quant}.gguf",
+        "mmproj": "mmproj-{variant}.gguf",
+    },
+}
 
-# Multi-modal projector pattern (same Unsloth repo as the GGUF). The
-# projector is a single ~946 MB file; BF16 is the highest-fidelity
-# variant Unsloth ships and matches the spec target. F16 / Q8_0 are
-# valid alternatives for tighter RAM budgets.
-_UNSLOTH_GEMMA4_E4B_MMPROJ_PATTERN = "mmproj-{variant}.gguf"
+
+def _known_repos() -> str:
+    return ", ".join(sorted(_REPO_PATTERNS))
 
 
 def _filename_for(repo_id: str, quant: str) -> str:
-    """Resolve the GGUF filename for a (repo_id, quant) pair.
+    """Resolve the GGUF filename for a (repo_id, quant) pair."""
 
-    Today there's exactly one pattern (Unsloth's UD-prefixed Gemma 4 E4B).
-    When other repos / families come online, branch here or accept an
-    explicit override kwarg. Keeping the dispatch simple until that
-    expansion is forced.
-    """
-
-    if repo_id == "unsloth/gemma-4-E4B-it-GGUF":
-        return _UNSLOTH_GEMMA4_E4B_PATTERN.format(quant=quant)
-    raise ValueError(
-        f"unknown GGUF repo {repo_id!r}; "
-        "the model_downloader has only been wired for unsloth/gemma-4-E4B-it-GGUF. "
-        "Add a filename pattern in src/inference/model_downloader.py:_filename_for "
-        "before pointing LOCAL_MODEL at a different repo."
-    )
+    entry = _REPO_PATTERNS.get(repo_id)
+    if entry is None:
+        raise ValueError(
+            f"unknown GGUF repo {repo_id!r}. Known repos: {_known_repos()}. "
+            "Add its filename convention to _REPO_PATTERNS in "
+            "src/inference/model_downloader.py before pointing LOCAL_MODEL at it "
+            "— the convention cannot be derived, it has to be read off the "
+            "repo's file listing."
+        )
+    return entry["gguf"].format(quant=quant)
 
 
 def _mmproj_filename_for(repo_id: str, variant: str) -> str:
-    """Resolve the mmproj filename for a (repo_id, variant) pair.
+    """Resolve the mmproj (vision projector) filename for a repo."""
 
-    Same dispatch shape as `_filename_for`. New vision-capable repos
-    branch here.
-    """
-
-    if repo_id == "unsloth/gemma-4-E4B-it-GGUF":
-        return _UNSLOTH_GEMMA4_E4B_MMPROJ_PATTERN.format(variant=variant)
-    raise ValueError(
-        f"unknown mmproj repo {repo_id!r}; "
-        "the model_downloader has only been wired for "
-        "unsloth/gemma-4-E4B-it-GGUF's projector. "
-        "Add an mmproj pattern in src/inference/model_downloader.py:"
-        "_mmproj_filename_for before pointing a vision profile at a "
-        "different repo."
-    )
+    entry = _REPO_PATTERNS.get(repo_id)
+    if entry is None:
+        raise ValueError(
+            f"unknown mmproj repo {repo_id!r}. Known repos: {_known_repos()}. "
+            "Add its filename convention to _REPO_PATTERNS in "
+            "src/inference/model_downloader.py."
+        )
+    pattern = entry.get("mmproj")
+    if not pattern:
+        raise ValueError(
+            f"repo {repo_id!r} is text-only — it ships no mmproj projector. "
+            "Point the vision profile at a vision-capable repo, or register "
+            "only a text profile for this model."
+        )
+    return pattern.format(variant=variant)
 
 
 def ensure_model(repo_id: str, quant: str) -> Path:

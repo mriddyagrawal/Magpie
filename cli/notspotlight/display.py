@@ -91,7 +91,7 @@ def print_banner() -> None:
     model = active_model_name()
     console.print(
         Panel(
-            "[bold]NotAnotherSpotlight[/bold]  v0.1.0\n"
+            "[bold]Magpie[/bold]  v0.1.0\n"
             f"[dim]Answer model:[/dim] [cyan]{model}[/cyan] [dim](via {provider})[/dim]\n"
             f"{_fast_tier_line()}\n"
             "Type your question and press Enter. Type [bold].help[/bold] for commands.\n\n"

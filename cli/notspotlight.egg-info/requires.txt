@@ -1,3 +1,3 @@
-notanotherspotlight
+magpie
 prompt-toolkit>=3.0
 rich>=13.0

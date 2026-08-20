@@ -2,6 +2,7 @@
 name = "notspotlight"
 version = "0.1.0"
 description = "Interactive CLI for Magpie."
+license = "AGPL-3.0-only"
 requires-python = ">=3.11"
 dependencies = [
     "magpie",
@@ -18,5 +19,5 @@ nas = "notspotlight.repl:main"
 magpie = { workspace = true }
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]  # >=77 for the PEP 639 SPDX `license` field
 build-backend = "setuptools.build_meta"

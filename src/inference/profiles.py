@@ -4,11 +4,10 @@ Each profile is a recipe for spawning a `llama-server` subprocess with a
 specific GGUF + mmproj + flags combo. Adding a new model = adding a new
 entry here. Spec: `Specs/llama_server_migration.md`.
 
-Two profiles are registered, both LFM2.5-VL-3B:
-
-  - `lfm25-vl-vision` — GGUF + mmproj projector. **The default**, and it
-    serves text requests too; see `default_text_profile()`.
-  - `lfm25-vl-text`   — same GGUF, no projector. For tight-RAM machines.
+One profile is registered: `lfm25-vl-vision` — LFM2.5-VL-3B plus its
+mmproj projector. It serves BOTH text and image requests from a single
+loaded subprocess; see `default_text_profile()` for why there is no
+text-only variant.
 
 Gemma 4 E4B was the previous default and was removed in 2026-08. Its
 filename convention is still registered in `model_downloader._REPO_PATTERNS`
@@ -180,32 +179,24 @@ def all_profiles() -> dict[str, ModelProfile]:
 # Built-in profiles (PR 1 scope)
 # ---------------------------------------------------------------------------
 
-# `lfm25-vl-text` — text-only. Registered but NOT the default; see
-# `default_text_profile()` for why the vision profile serves text too.
-# Useful on tight-RAM machines where 0.54 GB of resident projector matters.
-register(
-    ModelProfile(
-        name="lfm25-vl-text",
-        description=(
-            "LFM2.5-VL-3B, text-only (no projector loaded). Saves ~0.54 GB "
-            "resident memory versus the vision profile, at the cost of a "
-            "profile swap the first time an image shows up."
-        ),
-        has_vision=False,
-        args=LaunchArgs(
-            repo_id=os.environ.get("LOCAL_MODEL", DEFAULT_REPO),
-            quant=os.environ.get("LOCAL_QUANT", DEFAULT_QUANT),
-            mmproj=None,
-            ngl=DEFAULT_NGL,
-            ctx_size=int(os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)),
-            temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
-            jinja=True,
-        ),
-    )
-)
+# A text-only variant is deliberately NOT registered.
+#
+# There is no such thing as attaching a projector to a running llama-server:
+# `--mmproj` is a spawn-time argv flag, so "text-only now, vision later"
+# is really "kill the process and cold-load a second one". The projector
+# also costs nothing while idle — its tensors are not in the forward pass
+# when no image is attached, so a text call against a vision-loaded process
+# runs at full speed.
+#
+# That leaves 0.54 GB of resident memory as the entire upside of a
+# text-only profile, against a full process restart every time a mixed
+# corpus alternates between a PDF and a scanned receipt. The trade was
+# arguable at Gemma's 946 MB projector; at LFM2.5's 0.54 GB it isn't, so
+# the option is gone rather than merely non-default. One profile, one
+# process, one load.
 
 
-# `lfm25-vl-vision` — the default. Same GGUF plus the Q8_0 projector.
+# `lfm25-vl-vision` — the only profile. GGUF plus the Q8_0 projector.
 # The projector downloads on first spawn via `ensure_mmproj` in the pool's
 # argv builder, or ahead of time via `just install-llama-server`.
 #
@@ -258,9 +249,10 @@ def default_text_profile() -> str:
     identical results at full speed) and is a stronger argument for
     LFM2.5-VL, whose projector is a third the size.
 
-    The text-only profile (`lfm25-vl-text`) stays registered for tight-RAM
-    machines — set `LLAMA_SERVER_TEXT_MODEL=lfm25-vl-text` in `.env` to opt
-    into the swap-y behavior and save the 0.54 GB.
+    There is no text-only profile to fall back to, by design. `--mmproj`
+    is a spawn-time flag, so the projector cannot be attached to or
+    detached from a live process — the only way to "save" its 0.54 GB is
+    to cold-load a second subprocess on every text<->image transition.
     """
     return _resolve_override("LLAMA_SERVER_TEXT_MODEL", "lfm25-vl-vision")
 

@@ -60,7 +60,7 @@
       "active": false,
       "dialog": false,
       "endpoints": [
-        "https://github.com/mriddyagrawal/NotAnotherSpotlight/releases/latest/download/latest.json"
+        "https://github.com/mriddyagrawal/Magpie/releases/latest/download/latest.json"
       ],
       "pubkey": "REPLACE_WITH_PUBLIC_KEY_FROM_TAURI_SIGNER_GENERATE"
     }

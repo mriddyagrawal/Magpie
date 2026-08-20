@@ -1,7 +1,7 @@
 [package]
 name = "magpie"
 version = "0.1.0"
-description = "Magpie — Spotlight-style UI for NotAnotherSpotlight"
+description = "Magpie — Spotlight-style semantic search over your local files"
 edition = "2021"
 rust-version = "1.77"
 

@@ -1,7 +1,7 @@
 [project]
 name = "notspotlight"
 version = "0.1.0"
-description = "Interactive CLI for NotAnotherSpotlight."
+description = "Interactive CLI for Magpie."
 requires-python = ">=3.11"
 dependencies = [
     "notanotherspotlight",

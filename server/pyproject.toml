@@ -3,6 +3,7 @@ name = "magpie-server"
 version = "0.1.0"
 description = "Magpie Cloud — LLM orchestration backend for the Magpie desktop app."
 readme = "README.md"
+license = "AGPL-3.0-only"
 requires-python = ">=3.11"
 
 # Deliberately minimal. The cloud server holds prompts and proxies LLM
@@ -26,7 +27,7 @@ dependencies = [
 ]
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]  # >=77 for the PEP 639 SPDX `license` field
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]

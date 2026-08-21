@@ -289,3 +289,20 @@ def test_strip_quarantine_is_noop_on_non_macos(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "platform", "linux")
     # No exception even though /tmp/fake doesn't exist; doesn't shell out.
     _strip_macos_quarantine(Path("/tmp/does-not-exist"))
+
+
+# ---------------------------------------------------------------------------
+# _ssl_context — the frozen-app CA fix
+# ---------------------------------------------------------------------------
+
+def test_ssl_context_carries_cas_even_when_openssl_defaults_are_dead(monkeypatch):
+    """The first packaged-app user to press Download hit CERTIFICATE_VERIFY_FAILED:
+    raw urllib verifies against OpenSSL's build-time CA paths, which exist in a
+    dev venv and not inside a PyInstaller sidecar. The context must therefore
+    carry certifi's bundle even when the default paths point nowhere — that is
+    exactly the frozen environment, simulated here."""
+    monkeypatch.setenv("SSL_CERT_FILE", "/nonexistent")
+    monkeypatch.setenv("SSL_CERT_DIR", "/nonexistent")
+    from src.tools.install_llama_server import _ssl_context
+
+    assert _ssl_context().cert_store_stats()["x509_ca"] > 0

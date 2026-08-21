@@ -225,13 +225,42 @@ _RELEASE_URL = (
 )
 
 
+def _ssl_context():
+    """TLS context that verifies against certifi's CA bundle when available.
+
+    Raw `urllib` verifies against OpenSSL's default CA paths, which are baked
+    into the Python BUILD — they exist in a dev venv and do not exist inside
+    a PyInstaller-frozen sidecar on an end user's machine. The very first
+    packaged-app user to press the Local Download button got:
+
+        ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED]
+        certificate verify failed: unable to get local issuer certificate
+
+    while every HuggingFace download in the same app worked fine, because
+    those go through httpx/requests -> certifi, whose cacert.pem PyInstaller
+    bundles. Use the same bundle here. certifi is effectively guaranteed
+    (httpx and huggingface_hub both require it); the fallback keeps this
+    module usable in a bare environment, where the default paths work.
+    """
+    import ssl
+
+    try:
+        import certifi
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
 def _download(url: str, dest: Path, *, label: str) -> None:
     """Stream `url` to `dest` with a coarse-grained progress indicator
     (one dot per ~MB). stdlib `urllib` instead of curl because we want
     zero shell dependencies on Windows."""
     print(f"==> Downloading {label} from {url}", file=sys.stderr)
     try:
-        with urllib.request.urlopen(url) as resp:  # noqa: S310 (controlled URL)
+        with urllib.request.urlopen(  # noqa: S310 (controlled URL)
+            url, context=_ssl_context()
+        ) as resp:
             total = resp.getheader("Content-Length")
             total_mb = int(total) / 1e6 if total else None
             written = 0

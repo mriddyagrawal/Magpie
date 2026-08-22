@@ -1,0 +1,112 @@
+.preview-card {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.preview-card--empty {
+  align-items: center;
+  justify-content: center;
+  padding: var(--card-pad);
+}
+
+.preview-card__empty-text {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--size-sm);
+  text-align: center;
+}
+
+.preview-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-soft);
+  flex-shrink: 0;
+}
+
+.preview-card__filename {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.preview-card__icon {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.preview-card__name {
+  font-family: var(--font-mono);
+  font-size: var(--size-sm);
+  color: var(--text-primary);
+  /* Never allowed to overflow the action buttons: shrinks with
+     ellipsis. The dir span (min-width: 0) collapses first. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 6ch;
+}
+
+.preview-card__dir {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.preview-card__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.preview-card__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  font-size: var(--size-xs);
+  color: var(--text-secondary);
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 120ms, color 120ms;
+}
+.preview-card__btn svg { flex-shrink: 0; }
+
+.preview-card__btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: var(--text-primary);
+}
+
+.preview-card__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 18px;
+}
+
+.preview-card__unsupported {
+  color: var(--text-dim);
+  font-size: var(--size-sm);
+  padding: 32px 0;
+  text-align: center;
+}

@@ -1,0 +1,406 @@
+name: Build
+
+# Trigger matrix:
+#   - Push to main / front-back / UI: validates build compiles, uploads
+#     artifacts for inspection. NO release created.
+#   - Push of tag matching v* (e.g. v0.1.1): full release flow via
+#     tauri-apps/tauri-action — builds, signs, generates latest.json,
+#     creates a draft GitHub Release with .dmg/.AppImage/.exe attached.
+#   - Pull request: same as branch push (compile validation only).
+#   - Manual workflow_dispatch: also triggers the full release flow,
+#     useful for testing the release pipeline without cutting a tag.
+on:
+  push:
+    # `packaging` is a temporary trigger — Plan #10 validation branch.
+    # Remove from this list once `packaging` merges to main.
+    branches: [main, front-back, UI, packaging]
+    tags: ['v*']
+  pull_request:
+    branches: [main, front-back, UI, packaging]
+  workflow_dispatch:
+
+# Only ever build the newest commit on a given ref. Each leg of this matrix
+# is a full Rust + PyInstaller build, so three superseded pushes meant three
+# obsolete builds competing for runners with the one anybody cared about.
+#
+# `cancel-in-progress` is deliberately FALSE for tags: a tag build is a
+# release (it runs tauri-action and drafts the GitHub Release), and killing
+# one halfway would leave a partial draft with only some platforms attached.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    # `contents: write` is REQUIRED for tauri-action to create the draft
+    # GitHub Release on tag pushes. Without it, the action errors with
+    # "Resource not accessible by integration" — the most common
+    # tauri-action setup mistake. Per
+    # https://v2.tauri.app/distribute/pipelines/github/.
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: frontend/src-tauri/target/release/bundle/nsis/*.exe
+
+          - os: macos-14
+            target: aarch64-apple-darwin
+            artifact: frontend/src-tauri/target/release/bundle/dmg/*.dmg
+
+          # NOTE: the Intel-mac target (`macos-13` / x86_64-apple-darwin) is
+          # intentionally absent. GitHub retired that runner image, so the job
+          # never got scheduled — it sat in "awaiting a runner" for the full
+          # 24h job ceiling and then failed, which is what made every run on
+          # this workflow show up red even when the other three targets built
+          # clean. Restore an Intel lane only against a runner label that
+          # actually exists; Apple-silicon DMGs plus Rosetta cover the beta.
+
+          # Linux is parked for the beta, not abandoned. The cargo build
+          # stalls silently on the runner: no error, no ENOSPC, no OOM kill
+          # — it logged the compile of a trivial proc-macro crate and then
+          # stopped making progress for 4h50m. Reclaiming ~10 GB of
+          # preinstalled SDKs did not help; with timeout-minutes in place it
+          # now dies at exactly 60m instead, which confirms a stall rather
+          # than a slow build. Keeping it in the matrix bought a guaranteed
+          # red leg and an hour added to every release.
+          #
+          # To restore, uncomment and investigate on a branch — likely
+          # suspects are webkit2gtk/glib linking on ubuntu-22.04 or an
+          # AppImage tooling hang, neither of which blocks macOS/Windows.
+          #
+          # - os: ubuntu-22.04
+          #   target: x86_64-unknown-linux-gnu
+          #   artifact: |
+          #     frontend/src-tauri/target/release/bundle/deb/*.deb
+          #     frontend/src-tauri/target/release/bundle/appimage/*.AppImage
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.target }}
+
+    # Windows finishes in ~20 min and macOS in ~10 on a cold cache, so an
+    # hour is generous. Without this, a stalled job runs until GitHub's 6h
+    # ceiling: the Linux leg once sat silent for 4h50m mid-cargo-build with
+    # no error, having last logged the compile of a trivial proc-macro
+    # crate. Fail fast instead of holding a release draft hostage.
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Ubuntu runners ship ~14 GB free, and this job wants far more than a
+      # normal Tauri build: a PyInstaller sidecar carrying all of torch,
+      # a 91 MB qdrant binary, a full Rust target dir, and AppImage tooling.
+      # Exhausting the disk mid-link is a known cause of exactly the silent
+      # stall seen above — no ENOSPC in the log, the job just stops making
+      # progress. Reclaim ~10 GB of preinstalled SDKs we never touch.
+      - name: Free disk space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          echo "before:"; df -h / | tail -1
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          echo "after:"; df -h / | tail -1
+
+      # ── Python / uv ────────────────────────────────────────────────────────
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Install Python deps (includes pyinstaller)
+        run: uv sync --group dev --group packaging
+
+      - name: Download Qdrant binary
+        run: uv run python scripts/download_qdrant.py
+
+      # Seed the bundled OpenRouter key so the shipped app's Cloud toggle
+      # works out of the box. `src/config/bundled_key.txt` is gitignored, so
+      # CI has never had one — every binary this workflow produced had a
+      # Cloud path that 401'd, and there is no in-app way to supply a key
+      # (Plan #26 is unbuilt). Combined with llama-server not being bundled,
+      # that left released builds unable to answer anything at all.
+      #
+      # MUST run before `build_sidecar.py`: the file is pulled into the
+      # bundle by its `--add-data src:src`, so writing it afterwards is a
+      # no-op. `shell: bash` because the Windows runner defaults to
+      # PowerShell, where this syntax is not valid.
+      #
+      # Absent secret is NOT fatal — fork PRs cannot read secrets, and a
+      # keyless build is still worth compiling. build_sidecar.py already
+      # prints its own warning in that case.
+      #
+      # SECURITY: this key is baked into a distributed binary and is
+      # extractable with `strings` by anyone who downloads the app. It is
+      # deliberately a throwaway on a spend cap, pointed at a free-tier
+      # model. Rotate it freely; never put a metered key here. Plan #40
+      # (hosted backend, key stays server-side) is the real fix.
+      - name: Seed bundled OpenRouter key
+        shell: bash
+        env:
+          OPENROUTER_BUNDLED_KEY: ${{ secrets.OPENROUTER_BUNDLED_KEY }}
+        run: |
+          if [ -n "$OPENROUTER_BUNDLED_KEY" ]; then
+            printf '%s' "$OPENROUTER_BUNDLED_KEY" > src/config/bundled_key.txt
+            echo "bundled_key.txt written ($(wc -c < src/config/bundled_key.txt) bytes)"
+          else
+            echo "OPENROUTER_BUNDLED_KEY not set - Cloud toggle will 401 in this build"
+          fi
+
+      - name: Build Python sidecar
+        run: uv run python scripts/build_sidecar.py
+
+      # ── Node / pnpm ────────────────────────────────────────────────────────
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: pnpm install
+
+      # ── Rust ───────────────────────────────────────────────────────────────
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: frontend/src-tauri -> target
+
+      # ── Linux system deps (Tauri needs webkit2gtk) ─────────────────────────
+      - name: Install Linux system deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      # ── Branch / PR builds: just compile, no release ──────────────────────
+      # `pnpm tauri build` directly. Validates compilation across all four
+      # platforms in the matrix. Artifacts uploaded below for download.
+      #
+      # NO signing env vars are passed here — the branch path validates
+      # COMPILATION only, never signing. Why this matters: GitHub Actions
+      # resolves an unset secret to an empty string, not to an unset env
+      # var. Passing `APPLE_SIGNING_IDENTITY=""` makes Tauri's macOS
+      # bundler attempt codesign with the literal empty identity, which
+      # fails on a CI runner with an empty keychain ("Signing with
+      # identity '' / The specified item could not be found in the
+      # keychain"). Same shape on Linux/Windows for the updater key.
+      # Beta posture is unsigned (see Plans/Packaging/Implementation
+      # Plan.md §Step 5), so just don't trigger any signing path here.
+      # Once secrets are populated AND tauri.conf.json's
+      # createUpdaterArtifacts / plugins.updater.active are flipped on,
+      # signing happens only on the tag/dispatch path below.
+      - name: Build Tauri app (compile-only)
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
+        working-directory: frontend
+        run: pnpm tauri build
+
+      # ── Tag / dispatch builds: full release flow via tauri-action ─────────
+      # Replaces the previous custom "Import Apple cert" → "Build" → "Sign
+      # Windows installer" → "Upload" sequence with the standard OSS Tauri
+      # release pattern. Handles:
+      #   - cross-platform tauri build (same `pnpm tauri build`)
+      #   - macOS code signing (via APPLE_CERTIFICATE etc.)
+      #   - Windows authenticode signing (via WINDOWS_CERTIFICATE etc.)
+      #   - latest.json generation (auto-updater manifest)
+      #   - GitHub Release creation as DRAFT — promote manually when ready
+      # All env vars are silently ignored if their corresponding secret is
+      # not set, so the action degrades gracefully on a fresh repo.
+      - name: Build + sign + draft release (tauri-action)
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' }}
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Auto-updater signing — REQUIRED for users to receive updates.
+          # Generate with `pnpm tauri signer generate -- -w ~/.tauri/magpie-updater.key`,
+          # then paste the printed PRIVATE key into Settings → Secrets as
+          # TAURI_SIGNING_PRIVATE_KEY. The matching public key goes in
+          # tauri.conf.json's plugins.updater.pubkey field.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # macOS signing vars are DELIBERATELY NOT SET while no Apple
+          # Developer certificate exists.
+          #
+          # The claim they were "skipped automatically if APPLE_CERTIFICATE is
+          # not set" was wrong, and the branch-path comment ~100 lines above
+          # already explains why: Actions resolves an unset secret to an empty
+          # STRING, not to an absent variable. So `APPLE_CERTIFICATE: ""` made
+          # Tauri run `security import` against an empty certificate and the
+          # macOS leg died with:
+          #
+          #   security: SecKeychainItemImport: One or more parameters passed
+          #   to a function were not valid.
+          #   failed to bundle project failed codesign application
+          #
+          # That is precisely the failure the branch path guards against by
+          # passing no signing vars at all; the tag path did the very thing
+          # that comment warns about, which is why macOS never produced a DMG
+          # while Windows did (tauri-action does not sign Windows natively, so
+          # its empty cert vars are inert).
+          #
+          # To enable signing: create the six secrets, then uncomment. Do NOT
+          # uncomment them earlier — a partially-populated set fails the same
+          # way. Everything else about the release path already works.
+          #
+          # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Windows EV cert signing — passed through but NOT YET WIRED.
+          # tauri-action does NOT sign Windows builds natively. Per Tauri docs
+          # (https://v2.tauri.app/distribute/sign/windows/), Windows signing
+          # requires EITHER:
+          #   (a) a pre-tauri-action step that imports the cert into the
+          #       Windows cert store + a `bundle.windows.signCommand` block
+          #       in tauri.conf.json that runs signtool during build, OR
+          #   (b) a post-tauri-action step that signs the produced .exe with
+          #       signtool, BUT — the GitHub Release attachment will be the
+          #       UNSIGNED version because tauri-action uploads before the
+          #       post-step runs.
+          # Until the EV cert is procured, leave these env vars passed through
+          # (no harm) and TODO: when the EV cert lands, switch to approach (a).
+          # The previous workflow used approach (b); accepted the
+          # release-uploads-unsigned-bytes trade-off because the cert wasn't
+          # in place yet.
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        with:
+          projectPath: frontend
+          # Use the tag actually pushed. `app-v__VERSION__` expanded from
+          # tauri.conf.json's version field (0.1.0), so pushing a tag like
+          # `v0.1.0-beta.1` would have cut a SECOND, differently-named
+          # release at `app-v0.1.0` — two tags for one build, with the
+          # pre-release suffix silently dropped. Each matrix job still
+          # uploads to the same release, deduplicated by this tag name.
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Magpie ${{ github.ref_name }}'
+          releaseDraft: true       # nothing publishes automatically
+          # Beta tags must be flagged pre-release so GitHub doesn't serve
+          # them as the current stable download.
+          prerelease: true
+          # OFF deliberately. tauri.conf.json sets createUpdaterArtifacts
+          # and plugins.updater.active both false, and there is no
+          # TAURI_SIGNING_PRIVATE_KEY secret, so asking for latest.json
+          # means generating an updater manifest from signed artifacts this
+          # build never produces. Re-enable together with the updater config
+          # and a signing key, not before.
+          includeUpdaterJson: false
+
+      # ── Smoke-test the bundled sidecar (validates T1+T2 exclude correctness) ──
+      # Scope: catches Tier 1 (torch.distributed, torch.onnx, ...) and Tier 2
+      # (torch.fx, torch._dynamo, sympy, mpmath) breaks. These excludes break
+      # at MODULE-IMPORT TIME — if PyInstaller cuts something the binary needs
+      # at startup, the process dies in the first second and /healthz never
+      # responds. Launch + poll catches that on every push, every platform.
+      #
+      # Out of scope: Tier 3 (transformers.models.<arch>). Those don't break
+      # bundle import — they ImportError only when AutoModel.from_pretrained
+      # dynamically loads a missing arch at query time. Catching that in CI
+      # would require downloading 5 GB of HF models per matrix job, which is
+      # wasteful and fragile. Decision: Tier 3 is validated manually on each
+      # target platform (macOS arm64/x86_64, Linux, Windows) before tagging
+      # releases, never in CI. See scripts/build_sidecar.py comments around
+      # the Tier 3 block for the per-platform manual validation flow.
+      #
+      # Failure modes caught:
+      #   - the process dies before responding (T1/T2 ImportError on import)
+      #   - /healthz doesn't respond within 60s (server hung)
+      #
+      # Runs on EVERY trigger (PR, push, tag, dispatch). Each platform
+      # validates its own bundle independently — cross-OS exclude regressions
+      # surface as N failed matrix jobs.
+      - name: Smoke-test bundled sidecar
+        shell: bash
+        run: |
+          set -e
+          BIN="frontend/src-tauri/binaries/magpie-sidecar-${{ matrix.target }}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            BIN="${BIN}.exe"
+          fi
+
+          if [ ! -x "$BIN" ]; then
+            echo "::error::binary missing or not executable: $BIN"
+            ls -la frontend/src-tauri/binaries/
+            exit 1
+          fi
+
+          echo "launching sidecar from $BIN on port 18765..."
+          "$BIN" --port 18765 > /tmp/sidecar.stdout 2> /tmp/sidecar.stderr &
+          SIDECAR_PID=$!
+
+          # Wait up to 60 s for /healthz to respond, polling every 1 s.
+          # Bail early if the sidecar process dies (most exclude-related
+          # ImportErrors crash on import, not after a network round-trip).
+          for i in $(seq 1 60); do
+            if ! kill -0 $SIDECAR_PID 2>/dev/null; then
+              echo "::error::sidecar died after $i s. stderr:"
+              tail -50 /tmp/sidecar.stderr
+              echo "::error::stdout:"
+              tail -20 /tmp/sidecar.stdout
+              exit 1
+            fi
+            if curl -fsS http://localhost:18765/healthz > /dev/null 2>&1; then
+              echo "✅ sidecar /healthz responded after $i s"
+              kill $SIDECAR_PID 2>/dev/null || true
+              exit 0
+            fi
+            sleep 1
+          done
+
+          # Timeout. Always dump BOTH streams — the previous version only
+          # tailed stderr, which made debugging harder when the actual
+          # symptom was on stdout (e.g. uvicorn binding messages, route
+          # registration logs).
+          echo "::error::sidecar did not respond within 60 s. stderr:"
+          tail -100 /tmp/sidecar.stderr
+          echo "::error::stdout:"
+          tail -100 /tmp/sidecar.stdout
+          echo "::error::process state:"
+          ps -p $SIDECAR_PID -o pid,stat,etime,command 2>&1 || echo "(process gone)"
+          kill $SIDECAR_PID 2>/dev/null || true
+          exit 1
+
+      # ── Always upload local artifacts (so devs can grab build outputs) ────
+      # Independent of the release flow — uploads as workflow run artifacts
+      # (90-day retention, accessible via the Actions UI). Useful even on
+      # the release path because they include intermediate build state.
+      # Non-fatal on purpose. This step is a convenience — it is not how
+      # releases ship (the tag path attaches installers to a GitHub Release,
+      # which is separate storage). Letting it fail the job meant a build
+      # that compiled, bundled and smoke-tested clean still reported red,
+      # purely because Actions artifact storage was full. Worse, GitHub
+      # recalculates that quota only every 6-12 hours, so freeing space did
+      # not unblock the next run. The compile is the signal; a failed upload
+      # still shows as a red step in the UI without sinking the job.
+      #
+      # `if-no-files-found: error` stays, so a genuinely missing installer is
+      # still surfaced rather than passing silently.
+      - name: Upload build artifacts
+        continue-on-error: true
+        uses: actions/upload-artifact@v7
+        with:
+          name: magpie-${{ matrix.target }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error
+          # These are multi-hundred-MB bundles rebuilt on every push. The
+          # 90-day default is what filled the quota in the first place.
+          retention-days: 14

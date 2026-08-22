@@ -1,0 +1,102 @@
+[
+  {
+    "question": "What was the total on my Breadfast order from 25 May 2022 that had fresh cheese, cold cuts, candies and yogurt?",
+    "expected_receipt_id": 30,
+    "answer": "EGP 107.90"
+  },
+  {
+    "question": "On the Breadfast order delivered to New Cairo on 25 May 2022, what was the delivery fee?",
+    "expected_receipt_id": 30,
+    "answer": "EGP 10.00"
+  },
+  {
+    "question": "How much did I pay at Emarat Misr for L&M Light Box and Marlboro Gold on 5 April 2023?",
+    "expected_receipt_id": 31,
+    "answer": "LE 186.00"
+  },
+  {
+    "question": "What was the transaction number for my Emarat Misr cigarette purchase on 05/04/23?",
+    "expected_receipt_id": 31,
+    "answer": "177444"
+  },
+  {
+    "question": "On the Breadfast receipt with Rich Basturma, Islandoy Cheese, 12 Brown Eggs and Chewy Farming Hot Lemon, what was the subtotal?",
+    "expected_receipt_id": 32,
+    "answer": "EGP 235.34 (subtotal before delivery/discount; total EGP 270.25)"
+  },
+  {
+    "question": "What was the final total at Men's Club Collection / Carrefour on 3/24/2022 after a 301 EGP discount?",
+    "expected_receipt_id": 33,
+    "answer": "249.00"
+  },
+  {
+    "question": "Which cashier rang up the Men's Club Carrefour receipt on 3/24/2022?",
+    "expected_receipt_id": 33,
+    "answer": "180ahmed"
+  },
+  {
+    "question": "What was the grand total for my Decathlon Egypt purchase at City Centre Almaza Mall on 07/09/21 that included a foldable fitness bag and backpack?",
+    "expected_receipt_id": 34,
+    "answer": "EE 795.00"
+  },
+  {
+    "question": "On the Decathlon Almaza Mall receipt from September 2021, how many items were sold in total?",
+    "expected_receipt_id": 34,
+    "answer": "5 items"
+  },
+  {
+    "question": "What was the total on the Breadfast order delivered to Al Rehab City on 31 January 2022 for ahmed samaha?",
+    "expected_receipt_id": 35,
+    "answer": "EGP 165.30"
+  },
+  {
+    "question": "On the Breadfast order #108-14006842 delivered to New Cairo with Flat White, Latte and Cafe Con Leche, what was the final total?",
+    "expected_receipt_id": 36,
+    "answer": "EGP 317.50"
+  },
+  {
+    "question": "How much was the Cafe Con Leche on the Breadfast receipt delivered 10 December 2023?",
+    "expected_receipt_id": 36,
+    "answer": "EGP 75.00"
+  },
+  {
+    "question": "What was the total at Gourmet Food Stores City Stars Naser City for transaction 1089939?",
+    "expected_receipt_id": 37,
+    "answer": "LE 437.21"
+  },
+  {
+    "question": "Which cashier handled my Gourmet Food Stores Cairo receipt on 11/2/2021?",
+    "expected_receipt_id": 37,
+    "answer": "m.kara"
+  },
+  {
+    "question": "On the Breadfast order #121-5145529 for aya ali in Mohandiseen, what was the previous due amount carried over?",
+    "expected_receipt_id": 38,
+    "answer": "EGP 1.34"
+  },
+  {
+    "question": "What was the final total for the Breadfast delivery to Mohandiseen on 12 August 2022 that included Temry Chicken Fresh Chicken Fillet?",
+    "expected_receipt_id": 38,
+    "answer": "EGP 243.34"
+  },
+  {
+    "question": "What did I pay at LC WAIKIKI TEMA Retail 6th of October on 05-Jan-21 for a men's blue long-sleeved shirt?",
+    "expected_receipt_id": 39,
+    "answer": "LE 200.00 cash (item LE 169.00 after discount)"
+  },
+  {
+    "question": "What was the change given back on the LC WAIKIKI 6th of October receipt from January 2021?",
+    "expected_receipt_id": 39,
+    "answer": "LE 31.00"
+  },
+  {
+    "question": "On the Breadfast order #8319-5828179 delivered to Ranal in Heliopolis on 3 October 2022, what was the total?",
+    "expected_receipt_id": 40,
+    "answer": "EGP 76.99"
+  },
+  {
+    "question": "How much was the Wonderville Vanilla Cup Ice Cream on my Heliopolis Breadfast receipt from 3 October 2022?",
+    "expected_receipt_id": 40,
+    "answer": "EGP 13.50 each, 2 qty, total EGP 27.00"
+  }
+]

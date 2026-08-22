@@ -1,0 +1,282 @@
+[
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 133.90",
+        "source": "Human"
+    },
+    {
+        "question": "How many Tabali Foul with Olive Oil were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one brown baladi bread?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the Breadfast Hibiscus Juice?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does Tabali Foul with Olive Oil cost?",
+        "answer": "33.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 139.55",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Juhayna Rayeb Light\n(440ml)\nGreek Yogurt",
+            "Juhayna Greek Yogurt\n0.2% Fat Free (180g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "How many Juhayna Rayeb Light were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Juhayna Greek Yogurt?",
+        "answer": "35.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 139.55",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 139.55",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 133.90",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Breadfast Hibiscus Juice were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the business?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1219-3380086",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 7.84 is already included in\nthe total amount.",
+            "Tabali Foul With Olive Oil\n1 33.80 33.80\n(500g)\nRamadan Beverages",
+            "Breadfast Hibiscus Juice\n1 30.00 30.00\n(1L)\nRayeb",
+            "Juhayna Rayeb Light\n3 9.70\n29.10\n(440ml)\nGreek Yogurt",
+            "Juhayna Greek Yogurt\n2 17.50\n35.00\n0.2% Fat Free (180g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "12 April, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does one Juhayna Greek Yogurt cost?",
+        "answer": "17.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 7.84",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Breadfast Hibiscus Juice\n(1L)\nRayeb",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1219-3380086",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 29.1,
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Juhayna Rayeb Light cost?",
+        "answer": "9.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Tabali Foul With Olive Oil\n(500g)\nRamadan Beverages",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Juhayna Rayeb Light\n(440ml)\nGreek Yogurt",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much does Breadfast Hibiscus Juice cost?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the brown baladi bread?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 33.8,
+        "source": "Human"
+    },
+    {
+        "question": "How many Juhayna Greek Yogurt were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Brown Baladi Bread\nSuhoor",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Juhayna Rayeb Light?",
+        "answer": "29.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost after discount and delivery?",
+        "answer": "EGP 139.55",
+        "source": "GPT"
+    },
+    {
+        "question": "How many brown baladi bread were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Brown Baladi Bread\nSuhoor",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Tabali Foul With Olive Oil\n(500g)\nRamadan Beverages",
+                "quantity": "1",
+                "total_price": "33.80"
+            },
+            {
+                "item": "Breadfast Hibiscus Juice\n(1L)\nRayeb",
+                "quantity": "1",
+                "total_price": "30.00"
+            },
+            {
+                "item": "Juhayna Rayeb Light\n(440ml)\nGreek Yogurt",
+                "quantity": "3",
+                "total_price": "29.10"
+            },
+            {
+                "item": "Juhayna Greek Yogurt\n0.2% Fat Free (180g)",
+                "quantity": "2",
+                "total_price": "35.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Tabali Foul with Olive Oil?",
+        "answer": "33.80",
+        "source": "GPT"
+    }
+]

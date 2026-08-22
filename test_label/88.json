@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "١٠٥،٠٠",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "92.11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 105.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the White Mocha Grande?",
+        "answer": "55.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many days do you have to return or replace a non-defective item?",
+        "answer": "14 days",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the check closing date and time?",
+        "answer": "22/10/19 13:33",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Al-Shaya Egypt L.L.C.",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the CR Number?",
+        "answer": "18522",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 55.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "٩٢،١١",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Master Card",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Starbucks Arkan Plaza",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Wht Mocha Grande",
+                "quantity": "1",
+                "total_price": "55.00"
+            },
+            {
+                "item": "Latte Grande",
+                "quantity": "1",
+                "total_price": "50.00"
+            },
+            {
+                "item": "Master Card",
+                "quantity": "1",
+                "total_price": "105.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 50.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the Tax Card Number?",
+        "answer": "212719599",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the telephone number?",
+        "answer": "+202 24803802",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the coffee shop?",
+        "answer": "Starbucks Coffee",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "١٠٥،٠٠",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "٩٢،١١",
+            "1\nLatte Grande\n50.00\nلاتيه وسط",
+            "Master Card\n105.00\nماستر كارد"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the consumer protection hotline number?",
+        "answer": "19588",
+        "source": "GPT"
+    },
+    {
+        "question": "How many White Mocha Grande were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Wht Mocha Grande",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "13:33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment amount?",
+        "answer": "105.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time of the order?",
+        "answer": "19 Oct'22 13:32",
+        "source": "GPT"
+    },
+    {
+        "question": "How many days do you have to return or replace an item with a manufacturing defect?",
+        "answer": "30 days",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "١٠٥،٠٠",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Starbucks Coffee",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Latte Grande",
+        "source": "Human"
+    },
+    {
+        "question": "How many Latte Grande were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "19Oct'22",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "92.11",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Master Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "13:33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "8349",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Latte Grande?",
+        "answer": "50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What must be attached with the returned items?",
+        "answer": "The original receipt",
+        "source": "GPT"
+    }
+]

@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Short Slee",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "*228,00",
+        "source": "Human"
+    },
+    {
+        "question": "How many days is the return/exchange period?",
+        "answer": "30",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "8682863746381\nR1366AZ\nSweat Shir\n%14\n*199,00",
+            "8681816907763\nK1507AZ\nShort Slee\n%14\n*29,00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "DEFACTO EGYPT LTD",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "10.09.2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Sweat Shir",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:19",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Short Slee",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "10.09.2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "+20237713493",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sale number?",
+        "answer": "0040 0339 0573 1836",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:19",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount paid in EGP?",
+        "answer": "228,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "20.19",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax rate on the purchase?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "DEFACTO EGYPT LTD",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 2900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the short sleeve?",
+        "answer": "29.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the seller?",
+        "answer": "eslam mohamed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of tax?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What day of the week was the purchase made?",
+        "answer": "Fri",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the sweat shirt?",
+        "answer": "199.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total before tax?",
+        "answer": "228.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "*28, 00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "*228,00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales slip number?",
+        "answer": "12004/003/30000305/000239",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "46 HARAM MAIN STREET GIZA-HARAM / EGYPT",
+        "source": "GPT"
+    },
+    {
+        "question": "What items are excluded from returns/exchanges?",
+        "answer": "underwears and socks",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Sweat Shir",
+                "quantity": "1",
+                "total_price": "*199,00"
+            },
+            {
+                "item": "Short Slee",
+                "quantity": "1",
+                "total_price": "*29,00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Sweat Shir",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 19900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the store location id?",
+        "answer": "1, Giza Haram",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "*228,00",
+        "source": "Human"
+    }
+]

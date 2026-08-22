@@ -1,0 +1,271 @@
+[
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 414.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of one Helwa Mixed Oil?",
+        "answer": "160.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 9.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Helwa Mixed Oils were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "404.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "09:00 PM - 10:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total due?",
+        "answer": "253.91",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Helwa Mixed Oils?",
+        "answer": "321.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 321.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Helwa Mixed Oil\n(4.5L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 1.11 is already\ninduded in the",
+            "Helwa Mixed Oil\n2 160.50 321.00\n(4.5L)",
+            "Hedeya Mixed Oil\n2 37.00\n74.00\n(1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Pepsi Bottle\n(250ml)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "22 July, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 74.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Pepsi Bottles?",
+        "answer": "9.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 404.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2218-4833644",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 414.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of Hedeya Mixed Oils?",
+        "answer": "74.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Hedeya Mixed Oil\n(1L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2218-4833644",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-160.09",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one Hedeya Mixed Oil?",
+        "answer": "37.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost before the current balance?",
+        "answer": "414.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 414.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Pepsi Bottle\n(250ml)",
+                "quantity": "3",
+                "total_price": "9.00"
+            },
+            {
+                "item": "Helwa Mixed Oil\n(4.5L)",
+                "quantity": "2",
+                "total_price": "321.00"
+            },
+            {
+                "item": "Hedeya Mixed Oil\n(1L)",
+                "quantity": "2",
+                "total_price": "74.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Pepsi Bottle\n(250ml)",
+            "Helwa Mixed Oil\n(4.5L)",
+            "Hedeya Mixed Oil\n(1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT value?",
+        "answer": "1.11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 1.11",
+        "source": "Human"
+    },
+    {
+        "question": "How many Hedeya Mixed Oils were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Pepsi Bottles were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of one Pepsi Bottle?",
+        "answer": "3.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the total amount of VAT?",
+        "answer": "0.61",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "5.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the slogan of the store?",
+        "answer": "there's more to nuts",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Instant coffee 2º1 Piece",
+                "quantity": "2.000@2.50",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2.000@2.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "412174",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "4,39",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:51:35 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How much of the item was purchased?",
+        "answer": "2.000",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n0.61"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was purchased?",
+        "answer": "instant coffee 2*1 Piece",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the total tendered?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-08-25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "0.61",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-08-25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the change due?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Where is this store located?",
+        "answer": "Mall of Tanta",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "5.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:51:35 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "Default",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of the item per piece?",
+        "answer": "2.50 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount paid by cash?",
+        "answer": "5.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu Auf\n®",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "5.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "08:51:15 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Eslam Ismael",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount of the purchase?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "412174",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Instant coffee 2º1 Piece",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

@@ -1,0 +1,261 @@
+[
+    {
+        "question": "How long is the return window for other items?",
+        "answer": "30 days",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How long is the return window for fresh food?",
+        "answer": "1 day",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "+201275898394",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the barcode number at the bottom of the receipt?",
+        "answer": "663912001058252020230901203328",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "LuLu Hypermarket",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of this item was purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.luluhypermarket.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the EFT transaction number?",
+        "answer": "582520",
+        "source": "GPT"
+    },
+    {
+        "question": "What was purchased?",
+        "answer": "Col.Me EDT Gold 90ml 2s",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the coupon type?",
+        "answer": "PARKING FREE COUPON",
+        "source": "GPT"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "The Park Mall, 5th Settlement, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "670.75",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "0025929132151\n2 من900 عطر تواليت جولد\n1 x\n670.75\nV6\nCol.Me EDT Gold 90ml 2s P/0\n670.75",
+            "10000666\nPARKING FREE COUPON_\n150.00) Coup."
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price?",
+        "answer": "670.75 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "PARKING FREE COUPON_",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Col.Me EDT Gold 90ml 2s P/0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the business registration number?",
+        "answer": "447599798",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the commercial registration number?",
+        "answer": "66533",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store POS number?",
+        "answer": "3912",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the card number?",
+        "answer": "005216**********",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "670.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:34",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "01.09.2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:34",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "582520",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the employee who served the customer?",
+        "answer": "Mohamed Hany Emam Morsey",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Lulu Hypermarket,",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 670.75,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "01.09.2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "670.75",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Col.Me EDT Gold 90ml 2s P/0",
+                "quantity": "1",
+                "total_price": "670.75"
+            },
+            {
+                "item": "PARKING FREE COUPON_",
+                "quantity": "1",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the receipt?",
+        "answer": "20:34",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the coupon",
+        "answer": "150.00 EGP",
+        "source": "GPT"
+    }
+]

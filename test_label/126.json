@@ -1,0 +1,273 @@
+[
+    {
+        "question": "What was the method of payment?",
+        "answer": "Credit Card (NBE )",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 8.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What kind of coffee was purchased?",
+        "answer": "Turkish Coffee Special Single Cup",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:35:08 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.000@8.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "1.84",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount of the transaction?",
+        "answer": "31.00 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.abu-auf.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Turkish Coffee Special Single Cup",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 8.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Turkish Coffee Special Single Cup",
+                "quantity": "1.000@10.00",
+                "total_price": "10"
+            },
+            {
+                "item": "Water 600 ml",
+                "quantity": "1.000@5.00",
+                "total_price": "5 L.E"
+            },
+            {
+                "item": "Wafer 5&5 Gold (piece)",
+                "quantity": "1.000@8.00",
+                "total_price": "8 L.E"
+            },
+            {
+                "item": "Wafer 585 Gold (piece)",
+                "quantity": "1.000@8.00",
+                "total_price": "8 L.E"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal before VAT?",
+        "answer": "29.16",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the instagram account name?",
+        "answer": "abuauf",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n1.84",
+            "Water 600 ml\n1.000@5.00 L.E\n5 L.E",
+            "Wafer 5&5 Gold (piece)\n1.000@8.00 L.E\n8 L.E",
+            "Wafer 585 Gold (piece)\n1.000@8.00 L.E\n8 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store address?",
+        "answer": "Default, Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "11:35:08 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "1.84",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the hotline number?",
+        "answer": "19969",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.000@10.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-04-17",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@8.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "How much did the Turkish coffee cost?",
+        "answer": "10 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were sold in total?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the facebook page name?",
+        "answer": "abuauf",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did each Wafer 585 Gold cost?",
+        "answer": "8 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Wafer 585 Gold items were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "31.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:35:08 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Wafer 585 Gold (piece)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "31.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Water 600 ml",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2023-04-17",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "0000000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "29.16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Samira Ahmed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Wafer 5&5 Gold (piece)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.000@5.00",
+        "source": "Human"
+    },
+    {
+        "question": "What size water was purchased?",
+        "answer": "600 ml",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "31.00",
+        "source": "Human"
+    }
+]

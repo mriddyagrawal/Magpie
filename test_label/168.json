@@ -1,0 +1,275 @@
+[
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Vanilla Muffin",
+        "source": "Human"
+    },
+    {
+        "question": "How many Vanilla Muffins were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Peanut Butter Brownies were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 26.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Cheese Croissant",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Nutella Donut?",
+        "answer": "EGP 44.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Nutella Donuts were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 44.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Peanut Butter Brownies",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 110.53",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "EGP 15.47",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time of the transaction?",
+        "answer": "2022/01/10 03:07:31 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Nutella Donuts",
+        "source": "Human"
+    },
+    {
+        "question": "How many Cheese Croissants were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 110.53",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "148826",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the coffee shop?",
+        "answer": "Breadfast Coffee",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 126.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Visa",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 15.47",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time the receipt was printed?",
+        "answer": "2022/01/10 03:09:15 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Vanilla Muffin?",
+        "answer": "EGP 22.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 126.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 34.0,
+        "source": "Human"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Official Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 126.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Cheese Croissant?",
+        "answer": "EGP 26.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the location of the coffee shop?",
+        "answer": "Chill-Out Rehab",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 22.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Nutella Donuts"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022/01/10",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "Who is the creator of the order?",
+        "answer": "Rehab AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the order?",
+        "answer": "EGP 126.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Peanut Butter Brownie?",
+        "answer": "EGP 34.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "148826",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the closer of the order?",
+        "answer": "Rehab AM",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT(14,0%)\nEGP 15.47",
+            "1\nCheese Croissant\nEGP 26.00",
+            "1\nVanilla Muffin\nEGP 22.00",
+            "1\nPeanut Butter Brownies\nEGP 34.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "03:07:31 PM",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Nutella Donuts",
+                "quantity": "2",
+                "total_price": "44.00"
+            },
+            {
+                "item": "Cheese Croissant",
+                "quantity": "1",
+                "total_price": "26.00"
+            },
+            {
+                "item": "Vanilla Muffin",
+                "quantity": "1",
+                "total_price": "EGP 22.00"
+            },
+            {
+                "item": "Peanut Butter Brownies",
+                "quantity": "1",
+                "total_price": "34.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast Coffee - Chill-Out Rehab",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "03:07:31 PM",
+        "source": "Human"
+    }
+]

@@ -1,0 +1,365 @@
+[
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Mini Burger Buns",
+        "source": "Human"
+    },
+    {
+        "question": "How many Pico Strawberries were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2411-2681467",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Donuts\nCream Pastry\nDonut\nSoft Bread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Petits Pains\nBaladi & Shaml",
+        "source": "Human"
+    },
+    {
+        "question": "How many 5 Mini Burger Buns were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many 5 Mini Shami Bread were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the Tomatoes?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the White Onions?",
+        "answer": "9.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many 5 Petits Pains were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cream Pastry donuts were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many White Onions were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the Cream Pastry?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Mini Baladi\nBread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the 5 Mini Shami Bread?",
+        "answer": "4.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2411-2681467",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Pico Strawberries?",
+        "answer": "33.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Tomatoes (1Kg)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many Tomatoes were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the 5 Mini Burger Buns?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Donuts\nCream Pastry\nDonut\nSoft Bread",
+                "quantity": "1",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Mini Burger Buns",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Petits Pains\nBaladi & Shaml",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Mini Baladi\nBread",
+                "quantity": "1",
+                "total_price": "3.50"
+            },
+            {
+                "item": "Mini Shami\nBread\nFruits",
+                "quantity": "1",
+                "total_price": "4.00"
+            },
+            {
+                "item": "Navel Orange\n(1Kg)",
+                "quantity": "1",
+                "total_price": "9.50"
+            },
+            {
+                "item": "Pico Strawberry\n(750g)\nVegetables",
+                "quantity": "1",
+                "total_price": "33.50"
+            },
+            {
+                "item": "White Onions\n(1Kg)",
+                "quantity": "1",
+                "total_price": "9.00"
+            },
+            {
+                "item": "Tomatoes (1Kg)",
+                "quantity": "2",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Cherry Tomatoes\n(250g)",
+                "quantity": "1",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Cucumbers (1Kg)",
+                "quantity": "1",
+                "total_price": "14.00"
+            },
+            {
+                "item": "Potatoes (1Kg)",
+                "quantity": "1",
+                "total_price": "9.50"
+            },
+            {
+                "item": "Arugula (100g)\nPoultry",
+                "quantity": "1",
+                "total_price": "2.75"
+            },
+            {
+                "item": "Mafaza Chicken\nFresh Whole\nChicken",
+                "quantity": "1",
+                "total_price": "75.00"
+            },
+            {
+                "item": "V-Licious Meat\nBalls (250g)",
+                "quantity": "1",
+                "total_price": "63.00"
+            },
+            {
+                "item": "Atyab Chicken",
+                "quantity": "1",
+                "total_price": "149.00"
+            },
+            {
+                "item": "Basma Frozen\nOkra Excellent\n(400g)",
+                "quantity": "1",
+                "total_price": "10.50"
+            },
+            {
+                "item": "Basma Green",
+                "quantity": "1",
+                "total_price": "9.50"
+            },
+            {
+                "item": "Molokheya\nChopped",
+                "quantity": "1",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "19",
+        "source": "Human"
+    },
+    {
+        "question": "How many 5 Mini Baladi Bread were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 3.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "How many Navel Oranges were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Navel Oranges?",
+        "answer": "9.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the  Atyab Chicken Shish Grilled?",
+        "answer": "149.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the 5 Petits Pains?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "19",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the 5 Mini Baladi Bread?",
+        "answer": "3.50",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Donuts\nCream Pastry\n20.00\nDonut\n1 20.00\nSoft Bread",
+            "5 Mini Burger Buns\n1 6.00\n6.00",
+            "5 Petits Pains\n1 6.00\n6.00\nBaladi & Shaml",
+            "5 Mini Baladi\n1 3.50\n3.50\nBread",
+            "5 Mini Shami\n1 4.00\n4.00\nBread\nFruits",
+            "Navel Orange\n1 9.50\n9.50\n(1Kg)",
+            "Pico Strawberry\n1 33.50\n33.50\n(750g)\nVegetables",
+            "White Onions\n1 9.00\n9.00\n(1Kg)",
+            "Tomatoes (1Kg)\n2 10.00\n20.00",
+            "Cherry Tomatoes\n10.00\n10.00\n(250g)",
+            "Cucumbers (1Kg)\n1 14.00\n14.00",
+            "Potatoes (1Kg)\n1 9.50\n9.50",
+            "Arugula (100g)\n1 2.75\n2.75\nPoultry",
+            "Mafaza Chicken\n1 75.00\n75.00\nFresh Whole\nChicken\n(1200/1300g)\nFrozen Meals",
+            "V-Licious Meat\n1 63.00\n63.00\nBalls (250g)",
+            "Atyab Chicken\n1 149.00 149.00\nShish Grilled (1kg)\nFrozen Vegetables",
+            "Basma Frozen\n1 10.50\n10.50\nOkra Excellent\n(400g)",
+            "Basma Green\n1 9.50\n9.50",
+            "Molokheya\nChopped (400g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 19,
+        "source": "Human"
+    }
+]

@@ -1,0 +1,263 @@
+[
+    {
+        "question": "What is the item number for Marlboro Gold?",
+        "answer": "373",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the net amount before tax?",
+        "answer": "11.4C",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "6:58",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "131.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "TROPICANA FRUTZ LEM pos",
+        "source": "Human"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000204-P1000107636",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the mode of payment?",
+        "answer": "Cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction ID?",
+        "answer": "107200",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 13.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Marlboro Gold purchased?",
+        "answer": "2 pcs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item number for Tropicana Frutz LEM?",
+        "answer": "14282",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "131.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount paid in cash?",
+        "answer": "-131.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "08/29/23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount before tax?",
+        "answer": "131.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "131.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "08/29/23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 118.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:58",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the staff member?",
+        "answer": "Mostafa hany",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount for the Marlboro Gold purchase?",
+        "answer": "118.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount for the Tropicana Frutz LEM purchase?",
+        "answer": "13.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "MARLBORO GOLD",
+                "quantity": "2",
+                "total_price": "118.00"
+            },
+            {
+                "item": "TROPICANA FRUTZ LEM pos",
+                "quantity": "1",
+                "total_price": "13.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Emarat Miss",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "1.60",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "MARLBORO GOLD",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT percentage?",
+        "answer": "14",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased in total?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the description of the item with the item number 373?",
+        "answer": "MARLBORO GOLD",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Marlboro Gold?",
+        "answer": "59 00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "MARLBORO GOLD"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "14\n11.4C\n1.60\n13.00",
+            "Item No .:\n14282\nTROPICANA FRUTZ LEM pos\n13.00 A"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:58",
+        "source": "Human"
+    },
+    {
+        "question": "What is the description of the item with the item number 14282?",
+        "answer": "TROPICANA FRUTZ LEM pos",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

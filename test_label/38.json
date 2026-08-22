@@ -1,0 +1,281 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the subtotal amount?",
+        "answer": "EGP 235.34",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Temry Chicken - Fresh\nChicken Fillet (1Kg)\nHealthy Snacks",
+                "quantity": "1",
+                "total_price": "135.00"
+            },
+            {
+                "item": "Breadfast BYLD Keto\nChocolate Bar (60g)\nLabneh",
+                "quantity": "2",
+                "total_price": "66.00"
+            },
+            {
+                "item": "Sara's Jar Labneh With\nPalestinian Zaatar (250g)",
+                "quantity": "1",
+                "total_price": "43.00"
+            },
+            {
+                "item": "Other",
+                "quantity": "1",
+                "total_price": "1.34"
+            },
+            {
+                "item": "amount",
+                "quantity": "1",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 43.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT value?",
+        "answer": "EGP 6.88",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "03:00 AM - 04:00 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 1.34,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 6.88 is already included in\nthe total amount.",
+            "Breadfast BYLD Keto\n2 28.00\n66.00\nChocolate Bar (60g)\nLabneh",
+            "Sara's Jar Labneh With\n1\n43.00\n43.00\nPalestinian Zaatar (250g)",
+            "Other\n1\n1.34\n1.34",
+            "due amount"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 66.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Other",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#121-5145529",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of one Temry Chicken - Fresh Chicken Fillet (1Kg)?",
+        "answer": "135.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the quantity of Sara's Jar Labnah With Palestinian Zaatar (250g) ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What was the quantity of Breadfast BYLD Keto Chocolate Bar (60g) ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 235.34",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the Breadfast BYLD Keto Chocolate Bar (60g)?",
+        "answer": "56.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Breadfast BYLD Keto\nChocolate Bar (60g)\nLabneh"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#121-5145529",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total cost of the Temry Chicken - Fresh Chicken Fillet (1Kg)?",
+        "answer": "135.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one Breadfast BYLD Keto Chocolate Bar (60g)?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Breadfast BYLD Keto\nChocolate Bar (60g)\nLabneh",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the quantity of Temry Chicken - Fresh Chicken Fillet (1Kg) ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Sara's Jar Labneh With\nPalestinian Zaatar (250g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 243.34",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 135.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 243.34",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the Sara's Jar Labnah With Palestinian Zaatar (250g)?",
+        "answer": "43.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the discount amount?",
+        "answer": "-EGP 12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 243.34",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the previous due amount?",
+        "answer": "1.34",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Temry Chicken - Fresh\nChicken Fillet (1Kg)\nHealthy Snacks",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of one Sara's Jar Labnah With Palestinian Zaatar (250g)?",
+        "answer": "43.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 243.34",
+        "source": "Human"
+    },
+    {
+        "question": "What was the delivery amount?",
+        "answer": "EGP 20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "12 August, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 6.88",
+        "source": "Human"
+    }
+]

@@ -1,0 +1,276 @@
+[
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 226.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 11.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Cadbury Moro Bite Caramel Chocolate were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount for the ElRashidy ElMizan Plain Halawa?",
+        "answer": "52.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 8.01 is already induded in\nthe total amount.",
+            "Cadbury Dairy Milk\n7 7.75\n54.25\nChocolate Hazelnut\n(22g)",
+            "Cadbury Moro Bite\n2 5.50\n11.00\nCaramel Chocolate\n(20g)",
+            "ElRashidy ElMizan\n1 52.00\n52.00\nPlain Halawa (525g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Cadbury Moro Bite\nCaramel Chocolate\n(20g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 8.01",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount for the 24 Brown Eggs?",
+        "answer": "109.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the subtotal of the order?",
+        "answer": "EGP 226.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Cadbury Dairy Milk\nChocolate Hazelnut\n(22g)",
+            "Cadbury Moro Bite\nCaramel Chocolate\n(20g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 52.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount for the Cadbury Moro Bite Caramel Chocolate?",
+        "answer": "11.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#418-7163277",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one ElRashidy ElMizan Plain Halawa?",
+        "answer": "52.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "How many 24 Brown Eggs were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one pack of 24 Brown Eggs?",
+        "answer": "109.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 246.25",
+        "source": "Human"
+    },
+    {
+        "question": "What was the delivery date?",
+        "answer": "4 January, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#418-7163277",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "24 Brown Eggs",
+                "quantity": "1",
+                "total_price": "109.00"
+            },
+            {
+                "item": "Cadbury Dairy Milk\nChocolate Hazelnut\n(22g)",
+                "quantity": "7",
+                "total_price": "54.25"
+            },
+            {
+                "item": "Cadbury Moro Bite\nCaramel Chocolate\n(20g)",
+                "quantity": "2",
+                "total_price": "11.00"
+            },
+            {
+                "item": "ElRashidy ElMizan\nPlain Halawa (525g)",
+                "quantity": "1",
+                "total_price": "52.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 109.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Cadbury Dairy Milk\nChocolate Hazelnut\n(22g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 246.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "EGP 20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount of the order?",
+        "answer": "EGP 246.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one Cadbury Dairy Milk Chocolate Hazelnut?",
+        "answer": "7.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 246.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "ElRashidy ElMizan\nPlain Halawa (525g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "24 Brown Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of one Cadbury Moro Bite Caramel Chocolate?",
+        "answer": "5.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 54.25,
+        "source": "Human"
+    },
+    {
+        "question": "How many ElRashidy ElMizan Plain Halawa were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cadbury Dairy Milk Chocolate Hazelnut were ordered?",
+        "answer": "7",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery time?",
+        "answer": "08:00 PM - 09:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount for the Cadbury Dairy Milk Chocolate Hazelnut?",
+        "answer": "54.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    }
+]

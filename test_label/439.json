@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "SUN TOP MANGO 250ML pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "João Üllol",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "2.46",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the second item?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "T2082000066706",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:32",
+        "source": "Human"
+    },
+    {
+        "question": "What time is the transaction?",
+        "answer": "9:32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "17-12-22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "65.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "65.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "17-12-22",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "HEETS NOOR '20 pcs",
+                "quantity": "1",
+                "total_price": "45.00"
+            },
+            {
+                "item": "SUN TOP MANGO 250ML pcs",
+                "quantity": "1",
+                "total_price": "10.00"
+            },
+            {
+                "item": "SUN TOP ORANGE 250ML pcs",
+                "quantity": "1",
+                "total_price": "10.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the cash amount?",
+        "answer": "-65.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 45.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "A\n14\n17.54\n2.46\n20.00",
+            "Item No .:\n13011\nSUN TOP MANGO 250ML pcs\n10.00 A",
+            "Item No .:\n13010\nSUN TOP ORANGE 250ML pcs\n10.00 A"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the net amount?",
+        "answer": "17.54",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the code at the bottom of the receipt?",
+        "answer": "T2082000066706",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount in LE?",
+        "answer": "65.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "HEETS NOOR '20 pcs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000208-P2000066356",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the staff member?",
+        "answer": "Ahmed A Fathi",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "HEETS NOOR '20 pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the station?",
+        "answer": "El Tagamoa station",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "65.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "SUN TOP MANGO 250ML pcs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "66706",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "SUN TOP ORANGE 250ML pcs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "SUN TOP ORANGE 250ML pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT percentage?",
+        "answer": "14",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the third item?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount including VAT?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the first item?",
+        "answer": "45.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "2.46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

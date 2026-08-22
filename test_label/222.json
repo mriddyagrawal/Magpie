@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "LE200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE0.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the message at the bottom?",
+        "answer": "Thanks You We hope you'll come back soon!",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "3:57:23 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE200.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "MONGINI MULTI BOX\n950 GM",
+                "quantity": "1",
+                "total_price": "LE200.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:57:23 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item code?",
+        "answer": "19393",
+        "source": "GPT"
+    },
+    {
+        "question": "What was purchased?",
+        "answer": "MONGINI MULTI BOX",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Elwahat",
+        "source": "Human"
+    },
+    {
+        "question": "In which city is the store located?",
+        "answer": "6th Of October City",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT\nLE0.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much change was due?",
+        "answer": "LE0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "LE0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "13-Apr-22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE200.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "MONGINI MULTI BOX\n950 GM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "In which governorate is the store located?",
+        "answer": "Giza",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 200.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "2257795",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "3:57:23 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "karem2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the full name of the store?",
+        "answer": "امارات مصر Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item description?",
+        "answer": "MONGINI MULTI BOX 950 GM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "13-Apr-22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE200.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the location called?",
+        "answer": "Elwahat",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the weight of the product?",
+        "answer": "950 GM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "LE200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "2257795",
+        "source": "GPT"
+    }
+]

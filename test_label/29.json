@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What shift was the transaction during?",
+        "answer": "Morning",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total discount?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total for the tea?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the description of the item?",
+        "answer": "Tea",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What company produced this receipt?",
+        "answer": "APEX SYSTEM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number?",
+        "answer": "30",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Tea",
+                "quantity": "1.0",
+                "total_price": "20.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many units were purchased?",
+        "answer": "1.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:05:40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "K-Lounge",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "20.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:05:40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the reminder amount?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1.0\nTea\n20.00 20.00\nDisc :\n0.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "16/06/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the discount amount?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.0",
+        "source": "Human"
+    },
+    {
+        "question": "What year was this receipt created? (Based on the copyright)",
+        "answer": "Between 1998 and 2014",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "20.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the deposit amount?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the establishment?",
+        "answer": "K-Lounge",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "16/06/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of payment was used?",
+        "answer": "Cash",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price per unit?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What amount was paid?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "20.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Tea",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of deposit?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "11:05:40",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "20.00",
+        "source": "Human"
+    }
+]

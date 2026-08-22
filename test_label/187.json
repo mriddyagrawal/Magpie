@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the unit price of the product?",
+        "answer": "69.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 77.65",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 69.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "24 Brown Eggs",
+                "quantity": "1",
+                "total_price": "69.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "11:00 AM-12:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Mahmoud Marzouk",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the product?",
+        "answer": "69.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "24 Brown Eggs\n1 69.00 69.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 77.65",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What product was ordered?",
+        "answer": "24 Brown Eggs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#199-4776140",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total due?",
+        "answer": "EGP 77.65",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the current balance deduction?",
+        "answer": "-EGP 1.35",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many units of the product were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "19 July, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "24 Brown Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 69.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 77.65",
+        "source": "Human"
+    },
+    {
+        "question": "Is VAT included in the total?",
+        "answer": "Yes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 69.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the website address?",
+        "answer": "www.breadfast.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's city?",
+        "answer": "6th of October City",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#199-4776140",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer experience email?",
+        "answer": "cx@breadfast.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount before discount?",
+        "answer": "EGP 79.00",
+        "source": "GPT"
+    }
+]

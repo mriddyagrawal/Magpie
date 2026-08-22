@@ -1,0 +1,297 @@
+[
+    {
+        "question": "What is the name of item 1?",
+        "answer": "HELLO PRINTED TROUSERS",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the first pair of dark clean athletic skinny jeans?",
+        "answer": "176.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1857.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22:11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the Tax Card number?",
+        "answer": "212719599",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "DARK CLEAN ATHLETIC SKINNY:936-MEDIUM\nWASH:W31 L32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "25/11/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the garment dye graphic hoodie?",
+        "answer": "1300.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22:11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the CR number?",
+        "answer": "18522",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 0.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What color is the garment dye graphic hoodie?",
+        "answer": "PINK",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was purchased after the hoodie?",
+        "answer": "SWEAT PANT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Alshaya Egypt L.L.C",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "DARK CLEAN ATHLETIC SKINNY:936-\nMEDIUM WASH:W31 L32",
+        "source": "Human"
+    },
+    {
+        "question": "What is the wash size for the first dark clean athletic skinny jeans?",
+        "answer": "W31 L32",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "HELLO PRINTED TROUSERS",
+                "quantity": "1.0",
+                "total_price": "176.00"
+            },
+            {
+                "item": "DARK CLEAN ATHLETIC SKINNY:936-MEDIUM\nWASH:W31 L32",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "DARK CLEAN ATHLETIC SKINNY:936-\nMEDIUM WASH:W31 L32",
+                "quantity": "1.0",
+                "total_price": "0.00"
+            },
+            {
+                "item": "GARMENT DYE GRAPHIC HOODIE 615 PINK",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "GARMENT DYE GRAPHIC\nHOODIE:615-PINK:SMALL",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "HOODIE",
+                "quantity": "1.0",
+                "total_price": "1300.00"
+            },
+            {
+                "item": "IRON 6\nSWEAT PANT",
+                "quantity": "1.0",
+                "total_price": "206.50"
+            },
+            {
+                "item": "MUSTARD 6",
+                "quantity": "1.0",
+                "total_price": "175.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1857.50",
+        "source": "Human"
+    },
+    {
+        "question": "How many sweat pants were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "GARMENT DYE GRAPHIC HOODIE 615 PINK",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 176.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "02-24803837",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the sweat pant?",
+        "answer": "206.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the medium wash size for the second pair of dark clean athletic skinny jeans?",
+        "answer": "W31 L32",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the color and number of the last item in the invoice?",
+        "answer": "MUSTARD 6",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "HELLO PRINTED TROUSERS\nأصناف عامة\n*( EGY.CONC_BF_DEGZ_%off )\n(14% VAT)\nGZ2222126606\n1.0\n176.00",
+            "DARK CLEAN ATHLETIC SKINNY:936-MEDIUM\nWASH:W31 L32",
+            "DARK CLEAN ATHLETIC SKINNY:936-\nMEDIUM WASH:W31 L32\n*( B1G1F )\n(14% VAT)\n129577250\n1.0\n0.00",
+            "1914 GARMENT DYE GRAPHIC HOODIE 615 PINK\nSMALL",
+            "1914 GARMENT DYE GRAPHIC\nHOODIE:615-PINK:SMALL\n*( B1G1F )\n(14% VAT)",
+            "129506666\n1.0\n1300.00\nHOODIE\nأصناف عامة\n*( EGY.CONC_BF_DEGZ_%off )\n(14% VAT)",
+            "GZ222111311 IRON 6\n1.0\n206.50\nSWEAT PANT\nأصناف عامة\n*( EGY.CONC_BF_DEGZ_%off )\n(14% VAT)",
+            "GZ222111431 MUSTARD 6\n1.0\n175.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Debenhams Cairo Festival City",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the color and number of the sweat pant item?",
+        "answer": "IRON 6",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How many dark clean athletic skinny jeans were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the transaction?",
+        "answer": "1857.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date and time of the transaction?",
+        "answer": "25/11/2022 22:11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item number of the garment dye graphic hoodie?",
+        "answer": "129577250",
+        "source": "GPT"
+    },
+    {
+        "question": "What size is the garment dye graphic hoodie?",
+        "answer": "SMALL",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item in the invoice?",
+        "answer": "HELLO PRINTED TROUSERS",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1857.50",
+        "source": "Human"
+    }
+]

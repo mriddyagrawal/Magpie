@@ -1,0 +1,269 @@
+[
+    {
+        "question": "What is the name of item 2?",
+        "answer": "L35.Sesame chicken",
+        "source": "Human"
+    },
+    {
+        "question": "What are the two phone numbers listed?",
+        "answer": "(718)369-2577 and (718)309-8897",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:37PM",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of L35.Sesame chicken?",
+        "answer": "13.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "L35.Sesame chicken"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of (L)Veg Spare Ribs .BBS?",
+        "answer": "7.65",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 0.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "23.46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "RED & HOT II",
+        "source": "Human"
+    },
+    {
+        "question": "What is the tab number?",
+        "answer": "C2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 13.9,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "1.91",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "23.46",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "23.46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "21.55",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the tax rate?",
+        "answer": "8.875%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many vegetable rolls were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "Is this order for dine in or takeout?",
+        "answer": "Dine In",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 7.65,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "(L)Veg Spare Ribs .BBS",
+        "source": "Human"
+    },
+    {
+        "question": "How many orders of (L)Veg Spare Ribs .BBS were there?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the order?",
+        "answer": "12:37PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "21.55",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "18",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "10-20-2018",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the server?",
+        "answer": "WAITER1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Vegetable Roll",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "RED & HOT II",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:37PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the order?",
+        "answer": "10-20-2018",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "TAX(8.875%) :\n1.91",
+            "2 L35.Sesame chicken\n13.90\n1 W/R\n1 F/R",
+            "1 (L)Veg Spare Ribs .BBS\n7.65\nW/R\nAmount :"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many orders of L35.Sesame chicken were there?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the tax amount?",
+        "answer": "1.91",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address of the restaurant?",
+        "answer": "349 7 AVE. (CORNER OF 10ST.), BROOKLYN, NY 11215",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "23.46",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Vegetable Roll",
+                "quantity": "1",
+                "total_price": "0.00"
+            },
+            {
+                "item": "L35.Sesame chicken",
+                "quantity": "2",
+                "total_price": "13.90"
+            },
+            {
+                "item": "(L)Veg Spare Ribs .BBS",
+                "quantity": "1",
+                "total_price": "7.65"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of the vegetable roll?",
+        "answer": "0.00",
+        "source": "GPT"
+    }
+]

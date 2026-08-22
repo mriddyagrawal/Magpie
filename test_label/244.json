@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the price of the Short Slee?",
+        "answer": "159,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "10.08.2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first product code?",
+        "answer": "8682863695443",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "*248.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "8682863695443\nT7437A6\nKnitted Sk\n%14\n*89,00",
+            "8682863234888\nT7352A6\nShort Slee\n%14\n*159,00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 8900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of tax?",
+        "answer": "30,46",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the return/exchange period?",
+        "answer": "30 days",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount percentage?",
+        "answer": "14",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What day was the sale?",
+        "answer": "Tue",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Knitted Sk",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost before tax?",
+        "answer": "248,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of the purchase?",
+        "answer": "22.29",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Defacto",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "*248.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time of the sale slip?",
+        "answer": "10/08/21 22:29",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Short Slee",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22:29",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Knitted Sk",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Knitted Sk",
+                "quantity": "1",
+                "total_price": "*89,00"
+            },
+            {
+                "item": "Short Slee",
+                "quantity": "1",
+                "total_price": "*159,00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "Mall Of Tanta, Tanta - Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Defacto",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the second product code?",
+        "answer": "8682863234888",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22:29",
+        "source": "Human"
+    },
+    {
+        "question": "What items are excluded from return/exchange?",
+        "answer": "underwears and socks",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sales number?",
+        "answer": "0170 0338 7480 9921",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "*248.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the barcode number?",
+        "answer": "0170033874809921",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Knitted Sk?",
+        "answer": "89,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "*30, 46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Short Slee",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount paid in Egyptian Pound?",
+        "answer": "248,00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 15900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "10/08/21",
+        "source": "Human"
+    }
+]

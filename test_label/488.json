@@ -1,0 +1,293 @@
+[
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cucumbers (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 440.03",
+        "source": "Human"
+    },
+    {
+        "question": "How much is one kilogram of tomatoes?",
+        "answer": "36.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal of the items?",
+        "answer": "427.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Tomatoes (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of one Almarai Full Cream Milk?",
+        "answer": "39.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Almarai Full Cream Milk were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one kilogram of cucumbers?",
+        "answer": "29.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "11846707-164",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "16 September, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Breadsticks with Sesame?",
+        "answer": "40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost before subtracting the current balance?",
+        "answer": "440.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "08:00 AM - 09:00 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the cucumbers?",
+        "answer": "29.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cost of 24 brown eggs?",
+        "answer": "138.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is one kilogram of Sedra White Sugar?",
+        "answer": "30.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the current balance?",
+        "answer": "-0.22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "24 Brown Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 37.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much is one kilogram of red onions?",
+        "answer": "37.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cucumbers (1Kg)",
+                "quantity": "1",
+                "total_price": "29.00"
+            },
+            {
+                "item": "Tomatoes (1Kg)",
+                "quantity": "1",
+                "total_price": "36.00"
+            },
+            {
+                "item": "Red Onions (1Kg)",
+                "quantity": "1",
+                "total_price": "37.00"
+            },
+            {
+                "item": "24 Brown Eggs",
+                "quantity": "1",
+                "total_price": "138.00"
+            },
+            {
+                "item": "Almarai Full Cream Milk (1L)",
+                "quantity": "3",
+                "total_price": "117.00"
+            },
+            {
+                "item": "Breadsticks with Sesame (300g)",
+                "quantity": "1",
+                "total_price": "40.00"
+            },
+            {
+                "item": "Sedra White Sugar (1kg)",
+                "quantity": "1",
+                "total_price": "30.75"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 440.03",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 138.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Red Onions (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 36.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the final total?",
+        "answer": "440.03",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Almarai Full Cream Milk (1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "16 September, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 440.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 440.03",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Almarai Full Cream Milk?",
+        "answer": "117.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the shipping cost?",
+        "answer": "12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 29.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Cucumbers (1Kg)\n1 29.00\n29.00",
+            "Tomatoes (1Kg)\n1 36.00\n36.00",
+            "Red Onions (1Kg)\n1 37.00\n37.00",
+            "24 Brown Eggs\n1 138.00\n138.00",
+            "Almarai Full Cream Milk (1L)\n3 39.00\n117.00",
+            "Breadsticks with Sesame (300g)\n1 40.00\n40.00",
+            "Sedra White Sugar (1kg)\n1 30.75\n30.75"
+        ],
+        "source": "Human"
+    }
+]

@@ -1,0 +1,263 @@
+[
+    {
+        "question": "What is the initial price of the purchased item?",
+        "answer": "499.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 499.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the item purchased?",
+        "answer": "RESIST WATERPROOF JR",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "Mall Of Arabia",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "DECATHLON",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "524.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "RESIST WATERPROOF JR",
+                "quantity": "4000218",
+                "total_price": "E£\n499.00"
+            },
+            {
+                "item": "Miscellanous",
+                "quantity": "1",
+                "total_price": "Ef\n25.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.decathlon.eg",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the method of payment?",
+        "answer": "Cash & D",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the product code?",
+        "answer": "4000218",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the contact email?",
+        "answer": "Contact@decathlon.eg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "E£\n524.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the return policy?",
+        "answer": "30 Days For Return And Exchange With RECEIPT",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the amount of VAT?",
+        "answer": "64.35",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Miscellanous",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased in total?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the item was purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 25.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "4000218",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of purchase?",
+        "answer": "05/09/21",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store number?",
+        "answer": "702395",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "4000218",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT number?",
+        "answer": "528-245-120",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "E£\n524.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "E£\n524.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "RESIST WATERPROOF JR"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "05/09/21",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "14%\nES\n64.35\nE£ 459.65",
+            "Miscellanous\n1\nEf\n25.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What time was the purchase?",
+        "answer": "20:23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "RESIST WATERPROOF JR",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "ES\n64.35",
+        "source": "Human"
+    },
+    {
+        "question": "In which country is the store located?",
+        "answer": "Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the amount excluding VAT?",
+        "answer": "459.65",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "DECATHLON",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What was the additional cost?",
+        "answer": "25.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

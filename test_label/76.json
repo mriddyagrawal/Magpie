@@ -1,0 +1,285 @@
+[
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Plate",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "196812",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What type of extra entree was ordered?",
+        "answer": "GRILL TERIYAKI CKN",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the city and state of the restaurant?",
+        "answer": "Brooklyn, NY",
+        "source": "GPT"
+    },
+    {
+        "question": "How many pepsi's were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1 Plate\nCHOW MEIN-1/2\n9.10\nCHOW MEIN-1/2\nBROCCOLI BEEF\nBEIJING BEEF",
+            "1 Plate\nCHOW MEIN-1/2\n9.10\nCHOW MEIN-1/2\nCKN EGG ROLL\nKUNG PAO CKN",
+            "1 XTRA ENTREE\n1.50\nGRILL TERIYAKI CKN",
+            "1 XTRA ENTREE\nGRILL TERIYAKI CKN\n1.50",
+            "1 PEPSI 20 0Z\n2.00",
+            "1 PEPSI 20 OZ\n2.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 1.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the store number?",
+        "answer": "#2614",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "25.20",
+        "source": "GPT"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Visa",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Plate",
+                "quantity": "1",
+                "total_price": "9.10"
+            },
+            {
+                "item": "Plate",
+                "quantity": "1",
+                "total_price": "9.10"
+            },
+            {
+                "item": "XTRA ENTREE",
+                "quantity": "1",
+                "total_price": "1.50"
+            },
+            {
+                "item": "XTRA ENTREE",
+                "quantity": "1",
+                "total_price": "1.50"
+            },
+            {
+                "item": "PEPSI 20 0Z",
+                "quantity": "1",
+                "total_price": "2.00"
+            },
+            {
+                "item": "PEPSI 20 OZ",
+                "quantity": "1",
+                "total_price": "2.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Panda Express",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the order?",
+        "answer": "12/22/2017",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the order placed?",
+        "answer": "4:58:01 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "27.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "4:58:01 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the restaurant?",
+        "answer": "(718)246-3898",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "27.44",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the server?",
+        "answer": "Cheryfia M",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "25.20",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "27.44",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "2.24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Plate",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "XTRA ENTREE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "4:58:01 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What items were included in the second plate?",
+        "answer": "CHOW MEIN-1/2, CHOW MEIN-1/2, CKN EGG ROLL, KUNG PAO CKN",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 1.5,
+        "source": "Human"
+    },
+    {
+        "question": "What was the promotion mentioned?",
+        "answer": "FREE ENTREE ITEM!",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Panda Express",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 9.1,
+        "source": "Human"
+    },
+    {
+        "question": "How many extra entrees were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What items were included in the first plate?",
+        "answer": "CHOW MEIN-1/2, CHOW MEIN-1/2, BROCCOLI BEEF, BEIJING BEEF",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "27.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 9.1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the tax amount?",
+        "answer": "2.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "XTRA ENTREE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the size of the Pepsi?",
+        "answer": "20 OZ",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many plates were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "12/22/2017",
+        "source": "Human"
+    }
+]

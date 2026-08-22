@@ -1,0 +1,247 @@
+[
+    {
+        "question": "What is the AID?",
+        "answer": "A0000000031010",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the approval code?",
+        "answer": "B39001",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "173.07",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "KOBE JAPANESE STEAK",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "173.07",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the tip amount?",
+        "answer": "15.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "173.07",
+        "source": "Human"
+    },
+    {
+        "question": "What is the invoice number?",
+        "answer": "000000061",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "20:31:12",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "02/22/19",
+        "source": "Human"
+    },
+    {
+        "question": "What type of card was used?",
+        "answer": "VISA",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the city and state of the restaurant?",
+        "answer": "RANCHO MIRAGE, CA.",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What type of transaction is this?",
+        "answer": "Sale",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the last four digits of the card number used?",
+        "answer": "4757",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the approval method?",
+        "answer": "Online",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the street address of the restaurant?",
+        "answer": "69838 HIGHWAY 111",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "02/22/19",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:31:12",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "KOBE JAPANESE STEAK",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the zip code of the restaurant?",
+        "answer": "92270-2837",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of card was used?",
+        "answer": "VISA DEBIT",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the amount of the purchase?",
+        "answer": "158.07",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the entry method?",
+        "answer": "Chip",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the restaurant?",
+        "answer": "760-324-1717",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the server ID?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "20:31:12",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "173.07",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

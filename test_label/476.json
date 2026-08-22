@@ -1,0 +1,266 @@
+[
+    {
+        "question": "What is the size of the first item?",
+        "answer": "L",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "10:16:20 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "620.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the product code for the second item?",
+        "answer": "032/W22/1761",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the S.MAN number?",
+        "answer": "1 3587Amr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "620.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "سويت شيرت هوود",
+                "quantity": "1",
+                "total_price": "620.00"
+            },
+            {
+                "item": "بنطلون جبردين",
+                "quantity": "1",
+                "total_price": "0.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the size of the second item?",
+        "answer": "34",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "12/31/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's ID?",
+        "answer": "3831Ali",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 620.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Mokattam",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "MEN'S CLUB COLLECTION",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 0.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:16:20 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the description of the first item?",
+        "answer": "سويت شيرت هوود",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of the first item?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "1170.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "abal abal",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total discount?",
+        "answer": "550.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:16:20 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount paid?",
+        "answer": "620.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "بنطلون جبردين",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "MEN'S CLUB",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "12/31/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer number?",
+        "answer": "01150700077",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal of the items?",
+        "answer": "1170.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "620.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the first item?",
+        "answer": "620.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the description of the second item?",
+        "answer": "بنطلون جبردين",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the second item?",
+        "answer": "550.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "003/W22/4304\nسويت شيرت هوود\n000000\n595620\n1\nL\n620.00\n620.00",
+            "032/W22/1761\nبنطلون جبردين\n000000\n606073\n1\n34\n550.00\n550.00\n0.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "سويت شيرت هوود",
+        "source": "Human"
+    },
+    {
+        "question": "What is the product code for the first item?",
+        "answer": "003//22/4304",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of the second item?",
+        "answer": "1",
+        "source": "GPT"
+    }
+]

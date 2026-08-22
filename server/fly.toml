@@ -1,0 +1,51 @@
+# fly.io config for Magpie Cloud.
+#
+# Edit `app = "magpie-cloud"` to whatever app name you registered.
+# Most other knobs are sensible defaults; adjust per beta load.
+#
+# First-time deploy:
+#   cd server
+#   fly launch --no-deploy --copy-config    # creates the app, keeps this fly.toml
+#   fly secrets set OPENROUTER_API_KEY=sk-or-v1-...
+#   fly secrets set INVITE_CODES=alice-abc123,bob-xyz456
+#   fly deploy
+#
+# Subsequent deploys:
+#   cd server && fly deploy
+
+app = "magpie-cloud"
+primary_region = "iad"   # us-east; pick closest to your beta users
+
+[build]
+  dockerfile = "Dockerfile"
+  # Build context is the server/ dir (this file's directory)
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  # Auto-stop when idle: free tier benefit. fly.io spins the machine
+  # back up on the next request (~3-5 sec cold-start). Acceptable for
+  # beta — power users won't be hammering the server 24/7.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  # /health is unauthenticated and cheap; fly.io uses it to decide
+  # if the machine is alive.
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+
+[env]
+  # Non-secret defaults. Override via `fly secrets set` if needed.
+  HOST = "0.0.0.0"
+  PORT = "8000"
+
+# Smallest VM: 256 MB RAM, 1 shared CPU. The server has no ML models,
+# so this is plenty. If beta growth pushes us into OOM, bump to 512 MB.
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

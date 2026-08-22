@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the website of the company?",
+        "answer": "www.breadfast.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 272.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "The Milkman Lactose Free Fresh Milk (850ml)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Lamar Cooking Cream (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the size of the milk?",
+        "answer": "850ml",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the previous due amount?",
+        "answer": "58.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 35.75,
+        "source": "Human"
+    },
+    {
+        "question": "What time is the delivery expected?",
+        "answer": "02:00 PM - 03:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "3 January, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "January, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the Tax ID?",
+        "answer": "538-096-330",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "A 5 Petits Pains\n1 9.00\n9.00",
+            "The Milkman Lactose Free Fresh Milk (850ml)\n1 40.00\n40.00",
+            "Sedra White Rice (1kg) + Sedra Yellow lentils (350g)\n1 35.75\n35.75",
+            "Lamar Cooking Cream (1L)\n1 110.00\n110.00",
+            "Previous due amount\n1 58.24\n58.24"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "A 5 Petits Pains",
+                "quantity": "1",
+                "total_price": "9.00"
+            },
+            {
+                "item": "The Milkman Lactose Free Fresh Milk (850ml)",
+                "quantity": "1",
+                "total_price": "40.00"
+            },
+            {
+                "item": "Sedra White Rice (1kg) + Sedra Yellow lentils (350g)",
+                "quantity": "1",
+                "total_price": "35.75"
+            },
+            {
+                "item": "Lamar Cooking Cream (1L)",
+                "quantity": "1",
+                "total_price": "110.00"
+            },
+            {
+                "item": "Previous due amount",
+                "quantity": "1",
+                "total_price": "58.24"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Sedra White Rice (1kg) + Sedra Yellow lentils (350g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of 5 Petits Pains?",
+        "answer": "9.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 252.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#311-7145473",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 110.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "A 5 Petits Pains",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of Lamar Cooking Cream?",
+        "answer": "110.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for the order?",
+        "answer": "EGP 272.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#311-7145473",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 272.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 272.99",
+        "source": "Human"
+    },
+    {
+        "question": "How much does The Milkman Lactose Free Fresh Milk cost?",
+        "answer": "40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 9.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the Commercial Register number?",
+        "answer": "101472",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much does Sedra White Rice and Sedra Yellow lentils cost?",
+        "answer": "35.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the volume of Lamar Cooking Cream?",
+        "answer": "1L",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "EGP 20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Sedra White Rice and Sedra Yellow lentils?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 252.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the value of the VAT?",
+        "answer": "EGP 0.43",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    }
+]

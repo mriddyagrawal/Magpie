@@ -1,0 +1,300 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "23:05",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "11.250",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price for the chocolate item described as 'Chocolate Astd'?",
+        "answer": "0.890",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "S2\n5\n10.715\n0.535\n11.250",
+            "5926501008905\n1\n0.890",
+            "Chocolate Astd.\nشوكولاتة متنوعة\n9926504008308\n1\nS2\n0.830",
+            "شوكولاتة كوانتا تيفاني\nTiffany Quanta Brk 2Fngr 15.5g\n6291003205187\n2 x\n1.050\nS2\n2.100",
+            "بسكويت تيفاني بالفسدق\nTiff Bite Pistachio 81g 8s\n6291003009662\nS2\n1 x\n1.010\n1.010",
+            "كوكيز بقطع الشوكولاتة تيفاني\nTif.Delght ChocoChp Cooki90g4s\n6291003010675\n1 x\nS2\n1.000\n1.000",
+            "مكسرات الكاجو المحمصة\nCashew Nuts Roasted\n9920647009758\nS2\n1\n0.975",
+            "مكسرات الكاجو المحمصة\nCashew Nuts Roasted\n9920649009954\nS2\n1\n0.995"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of 'Tif.Delght ChocoChp Cooki90g4s'?",
+        "answer": "1.010",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Lulu Muscat Hypermarket LLC",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Chocolate Astd.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of 'Cashew Nuts Roasted'?",
+        "answer": "0.975 and 0.995",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "11.250",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Tiffany Quanta Brk 2Fngr 15.5g",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the VAT?",
+        "answer": "0.535",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price for the 'Tiffany Quanta Brk 2Fngr 15.5g' chocolate?",
+        "answer": "0.830",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "23:05",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "LuLu Muscat Hypermarket LLC",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 0.89,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the website for the store?",
+        "answer": "www.luluhypermarket.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 0.83,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "02.06.2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "23:05",
+        "source": "Human"
+    },
+    {
+        "question": "What is the branch name?",
+        "answer": "Salalah",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of one 'Tiff Bite Pistachio 81g 8s'?",
+        "answer": "1.050",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Voss Sparkling Water 800ml\nhocolate Antd.",
+                "quantity": "3",
+                "total_price": "3.450"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "0.890"
+            },
+            {
+                "item": "Chocolate Astd.",
+                "quantity": "1",
+                "total_price": "0.830"
+            },
+            {
+                "item": "Tiffany Quanta Brk 2Fngr 15.5g",
+                "quantity": "2",
+                "total_price": "2.100"
+            },
+            {
+                "item": "Tiff Bite Pistachio 81g 8s",
+                "quantity": "1",
+                "total_price": "1.010"
+            },
+            {
+                "item": "Tif.Delght ChocoChp Cooki90g4s",
+                "quantity": "1",
+                "total_price": "1.000"
+            },
+            {
+                "item": "Cashew Nuts Roasted",
+                "quantity": "1",
+                "total_price": "0.975"
+            },
+            {
+                "item": "Cashew Nuts Roasted",
+                "quantity": "1",
+                "total_price": "0.995"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Voss Sparkling Water 800ml?",
+        "answer": "3.450",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased in total?",
+        "answer": "11",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Voss Sparkling Water 800ml\nhocolate Antd.",
+            "Tiffany Quanta Brk 2Fngr 15.5g"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Voss Sparkling Water 800ml\nhocolate Antd.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "11.250",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "11.250",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "02.06.2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 3.45,
+        "source": "Human"
+    },
+    {
+        "question": "How many units of 'Tiff Bite Pistachio 81g 8s' were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "353930",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "353930",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VATIN number?",
+        "answer": "OM1100000300",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "0.535",
+        "source": "Human"
+    },
+    {
+        "question": "What type of card was used to pay?",
+        "answer": "MASTER",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "11.250",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the tax card number?",
+        "answer": "8062505",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Cashew Nuts Roasted did they buy?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 2.1,
+        "source": "Human"
+    }
+]

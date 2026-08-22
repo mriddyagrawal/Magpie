@@ -1,0 +1,291 @@
+[
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "How many Woodford Reserve were ordered and what was the price?",
+        "answer": "2 @ 12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:53 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "(2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Makers Mark",
+        "source": "Human"
+    },
+    {
+        "question": "What was the area?",
+        "answer": "Dining",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the NY Strip 8oz?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address of the restaurant?",
+        "answer": "3739 West Chester Pike, Newtown Square, PA 19013",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "137.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "142.93",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Firepoint Grill",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#90024",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Frisee Salad?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Makers Mark (2 @11. 50)\n23.00\nAs Old Fashioned",
+            "Side Caesar\n6.00",
+            "Chicken & Rib Combo\n29.00",
+            "Woodford Reserve (2 @12.00)\n24.00\nOn the Rocks",
+            "Frisee Salad\n10.00",
+            "Poached Shrimp Cocktail\n17.50",
+            "NY Stip 8oz\n28.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Makers Mark",
+                "quantity": "(2",
+                "total_price": "23.00"
+            },
+            {
+                "item": "Side Caesar",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Chicken & Rib Combo",
+                "quantity": "1",
+                "total_price": "29.00"
+            },
+            {
+                "item": "Woodford Reserve",
+                "quantity": "(2",
+                "total_price": "24.00"
+            },
+            {
+                "item": "Frisee Salad",
+                "quantity": "1",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Poached Shrimp Cocktail",
+                "quantity": "1",
+                "total_price": "17.50"
+            },
+            {
+                "item": "NY Stip 8oz",
+                "quantity": "1",
+                "total_price": "28.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the server's name?",
+        "answer": "Will",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the reprint number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Poached Shrimp Cocktail?",
+        "answer": "17.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:53 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost for the Woodford Reserve?",
+        "answer": "24.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "142.93",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "5.43",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Side Caesar?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the time of the order?",
+        "answer": "6:53 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Chicken & Rib Combo",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 23.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Firepoint Grill",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost for the Makers Mark?",
+        "answer": "23.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "(2",
+        "source": "Human"
+    },
+    {
+        "question": "What was the date of the order?",
+        "answer": "12/07/2016",
+        "source": "GPT"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Woodford Reserve",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Chicken & Rib Combo?",
+        "answer": "29.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "12/07/2016",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "142.93",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 29.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the order type?",
+        "answer": "Send",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 24.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Makers Mark were ordered and what was the price?",
+        "answer": "2 @ 11.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number of the restaurant?",
+        "answer": "484-428-3093",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Side Caesar",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the price of the peanut butter?",
+        "answer": "90 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 90.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the slogan of the store?",
+        "answer": "there's more to ruts",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "126407",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.500@370.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2023-12-16",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Abdulrahman ?Mohamed",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 185.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "11.05",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the weight of the coffee purchased?",
+        "answer": "0.500",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "126407",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "275.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:47:53 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Abu Auf Peanut Butter Creamy 300 Gram",
+                "quantity": "1.000@90.00",
+                "total_price": "90"
+            },
+            {
+                "item": "Coffee Brazilian Medium KG",
+                "quantity": "0.500@370.00",
+                "total_price": "185 L.E"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer address?",
+        "answer": "Abu auf, Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the coffee?",
+        "answer": "185 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the first item were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "11.05",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:47:53 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Coffee Brazilian Medium KG",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Mansoura Wekala Store",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "275.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-12-16",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What was the method of payment?",
+        "answer": "Credit Card (ALEX)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "01008413138",
+        "source": "GPT"
+    },
+    {
+        "question": "How many total items were sold?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Abu Auf Peanut Butter Creamy 300 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n11.05",
+            "Coffee Brazilian Medium KG\n0.500@370.00\nL.E\n185 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Coffee Brazilian Medium KG",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction made?",
+        "answer": "10:47:53 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "263.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "275.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.000@90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "275.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Abu Auf Peanut Butter Creamy 300 Gram",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    }
+]

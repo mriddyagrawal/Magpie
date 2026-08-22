@@ -1,0 +1,395 @@
+[
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "05/11/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "Ahmed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 5.5,
+        "source": "Human"
+    },
+    {
+        "question": "How much is an Egyptian Koshary?",
+        "answer": "LE42.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is Wheat-Bran Veal Liver 60?",
+        "answer": "LE85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of Fresh Orange Juice 750?",
+        "answer": "LE56.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 160.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "4:48:11 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE2,029.70",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE85.84",
+            "Raw KettlePotatoeBalsa\nLE5.50\n1\nLE5.50",
+            "Pomegranate Seeds 180\nLE40.0\n6\nLE240.0\n0\n0",
+            "Gourmet Woven Insulate\nLE160.\n00\n1\nLE160.0\n0",
+            "Chicken Stock 430ml\nLE80.0\n1\nLE80.00\n0",
+            "Fresh Orange Juice 750\nLE56.0\n1\nLE56.00\n0\nK",
+            "Fresh Orange Juice 750\nLE56.0\n1\nLE56.00\n0",
+            "GourmetRos.&S.SaltGris\nLE37-8\n1\nLE37.00",
+            "Wheat-Bran Veal Liver 60\nLE85.0\n1\nLE85.00\n0",
+            "Frozen Vine Leaves w.M\nLE145.\n1\nLE145.0\n00 ..\n0",
+            "Frozen Vine Leaves w.M\nLE145\n1\nLE145.0\n00\n0",
+            "Frozen Cooked Hawaws\nLE65.9\n1 LE65.00",
+            "Whole wheat Feta fatayer\nLE95.0\n1\nLE95.00\n0",
+            "Fresh Coleslaw Salad 30\nLE40.0\n1\nLE40.00\n0",
+            "Egyptian Koshary\nLE42.0\n1\nLE42.00\n0",
+            "Beef Hot Dog\nLE230.\n0.29\nLE66.70\n00",
+            "Molokhia with chicken 50\nLE75.0\n1\nLE75.00\n0",
+            "Entremont Comte Chees\nLE189.\n1\nLE189.0\n00\n0",
+            "Bolognese Pasta Sauce\nLE110.\n1\nLE110.0\n00\n0",
+            "Bolognese Pasta Sauce\nLE110.\n1\nLE110.0",
+            "GourmetS.Salt&CumGris\nLE37.0\n1\nLE37.00\n0",
+            "Garam Masala Spice 90g\nLE90.0\n1\nLE90.00\n0",
+            "Spicy Egyptian Dukkah 9\nLE50.0\n1\nLE50.00\n0",
+            "Lebanese 7 spices 80g\nLE45.0\n1\nLE45.00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "4:48:11 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Pomegranate Seeds 180 were purchased?",
+        "answer": "6",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Raw KettlePotatoeBalsa",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Whole wheat Feta fatayer?",
+        "answer": "LE95.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "880000013633",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Pomegranate Seeds 180"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "397908",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much does Molokhia with chicken 50 cost?",
+        "answer": "LE75.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the sales tax?",
+        "answer": "LE85.84",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the net amount?",
+        "answer": "LE2,029.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Gourmet Woven Insulate",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "24",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 5.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the account number?",
+        "answer": "880000013633",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the due date?",
+        "answer": "12:00:00 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Raw KettlePotatoeBalsa",
+                "quantity": "1",
+                "total_price": "LE5.50"
+            },
+            {
+                "item": "Raw KettlePotatoeBalsa",
+                "quantity": "1",
+                "total_price": "LE5.50"
+            },
+            {
+                "item": "Pomegranate Seeds 180",
+                "quantity": "6",
+                "total_price": "LE240.0"
+            },
+            {
+                "item": "Gourmet Woven Insulate",
+                "quantity": "1",
+                "total_price": "LE160.0"
+            },
+            {
+                "item": "Chicken Stock 430ml",
+                "quantity": "1",
+                "total_price": "LE80.00"
+            },
+            {
+                "item": "Fresh Orange Juice 750",
+                "quantity": "1",
+                "total_price": "LE56.00"
+            },
+            {
+                "item": "Fresh Orange Juice 750",
+                "quantity": "1",
+                "total_price": "LE56.00"
+            },
+            {
+                "item": "GourmetRos.&S.SaltGris",
+                "quantity": "1",
+                "total_price": "LE37.00"
+            },
+            {
+                "item": "Wheat-Bran Veal Liver 60",
+                "quantity": "1",
+                "total_price": "LE85.00"
+            },
+            {
+                "item": "Frozen Vine Leaves w.M",
+                "quantity": "1",
+                "total_price": "LE145.0"
+            },
+            {
+                "item": "Frozen Vine Leaves w.M",
+                "quantity": "1",
+                "total_price": "LE145.0"
+            },
+            {
+                "item": "Frozen Cooked Hawaws",
+                "quantity": "1",
+                "total_price": "LE65.00"
+            },
+            {
+                "item": "Whole wheat Feta fatayer",
+                "quantity": "1",
+                "total_price": "LE95.00"
+            },
+            {
+                "item": "Fresh Coleslaw Salad 30",
+                "quantity": "1",
+                "total_price": "LE40.00"
+            },
+            {
+                "item": "Egyptian Koshary",
+                "quantity": "1",
+                "total_price": "LE42.00"
+            },
+            {
+                "item": "Beef Hot Dog",
+                "quantity": "0.29",
+                "total_price": "LE66.70"
+            },
+            {
+                "item": "Molokhia with chicken 50",
+                "quantity": "1",
+                "total_price": "LE75.00"
+            },
+            {
+                "item": "Entremont Comte Chees",
+                "quantity": "1",
+                "total_price": "LE189.0"
+            },
+            {
+                "item": "Bolognese Pasta Sauce",
+                "quantity": "1",
+                "total_price": "LE110.0"
+            },
+            {
+                "item": "Bolognese Pasta Sauce",
+                "quantity": "1",
+                "total_price": "LE110.0"
+            },
+            {
+                "item": "GourmetS.Salt&CumGris",
+                "quantity": "1",
+                "total_price": "LE37.00"
+            },
+            {
+                "item": "Garam Masala Spice 90g",
+                "quantity": "1",
+                "total_price": "LE90.00"
+            },
+            {
+                "item": "Spicy Egyptian Dukkah 9",
+                "quantity": "1",
+                "total_price": "LE50.00"
+            },
+            {
+                "item": "Lebanese 7 spices 80g",
+                "quantity": "1",
+                "total_price": "LE45.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Beef Hot Dog?",
+        "answer": "LE66.70",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE2,029.70",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE85.84",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Fresh Coleslaw Salad 30?",
+        "answer": "LE40.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does one Chicken Stock 430ml cost?",
+        "answer": "LE80.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 240.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "05/11/2021",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 20,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Gourmet Woven Insulate?",
+        "answer": "LE160.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE2,029.70",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "4:48:11 P",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "24",
+        "source": "Human"
+    },
+    {
+        "question": "How much does Frozen Vine Leaves w.M cost?",
+        "answer": "LE145.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Pomegranate Seeds 180",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Raw KettlePotatoeBalsa",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the Raw KettlePotatoeBalsa cost?",
+        "answer": "LE5.50",
+        "source": "GPT"
+    }
+]

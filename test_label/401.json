@@ -1,0 +1,255 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number for the store?",
+        "answer": "20 105 009 2630",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Le Voile",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Which branch was this purchase made at?",
+        "answer": "MOE Branch",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Can accessories be returned or exchanged?",
+        "answer": "No",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Healthy Hair Cap",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "85.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "SALMA",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was paid?",
+        "answer": "85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the grand total?",
+        "answer": "85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the product code?",
+        "answer": "[10022323800100]",
+        "source": "GPT"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "MOE Branch",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the change amount?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the product were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What product was purchased?",
+        "answer": "Healthy Hair Cap",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:38:49",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What type of items does the store sell?",
+        "answer": "Hijab",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "85.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "17:38:49",
+        "source": "Human"
+    },
+    {
+        "question": "Within how many days can products be returned or exchanged?",
+        "answer": "Returned within 3 days and exchanged within 14 days.",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "85.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Healthy Hair Cap\n[10022323800100]\n1 × 85.00\n85.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Ie. VONle",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's website?",
+        "answer": "Levoilescarts.Com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "17:38:49",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of this transaction?",
+        "answer": "2023-06-05",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 85.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the unit price of the product?",
+        "answer": "85.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Healthy Hair Cap",
+                "quantity": "1",
+                "total_price": "85.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-06-05",
+        "source": "Human"
+    }
+]

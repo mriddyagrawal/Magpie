@@ -1,0 +1,257 @@
+[
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store number?",
+        "answer": "2112",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "DAVIDOFF GOLD\n40306445\n2\n46.00\n92.00\n0%"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "On the Run",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT registration number?",
+        "answer": "479-405-530",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price per item?",
+        "answer": "46.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "13:20:21",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "13:20:21",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "DAVIDOFF GOLD"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "03/09/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item's code?",
+        "answer": "40306445",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "On the Run",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "DAVIDOFF GOLD",
+                "quantity": "2",
+                "total_price": "92.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT percentage?",
+        "answer": "0%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "92.00",
+        "source": "Human"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "DAVIDOFF GOLD",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "92.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were bought?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's tagline?",
+        "answer": "FAST..FRESH..FRIENDLY..24 HRS",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "03/09/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 92.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Battal",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "13:20:21",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "92.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the balance due?",
+        "answer": "92.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "92.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the user number?",
+        "answer": "1796",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "DAVIDOFF GOLD",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total value of items?",
+        "answer": "92.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "48",
+        "source": "GPT"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "C.Card-Master",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the POS number?",
+        "answer": "2",
+        "source": "GPT"
+    }
+]

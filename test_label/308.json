@@ -1,0 +1,273 @@
+[
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Roasted Cashew 275 Gm Offer",
+                "quantity": "1",
+                "total_price": "EGP 185.00"
+            },
+            {
+                "item": "Salted Egyptian Toasted Corn 100 Gm",
+                "quantity": "1",
+                "total_price": "EGP 33.00"
+            },
+            {
+                "item": "Chinese Crackers 100 Gm",
+                "quantity": "2",
+                "total_price": "EGP 62.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1 x Roasted Cashew 275 Gm Offer\nEGP 185.00",
+            "1 x Salted Egyptian Toasted Corn 100 Gm\nEGP 33.00",
+            "2 x Chinese Crackers 100 Gm\nEGP 62.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 266.74",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 185.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Chinese Crackers items were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 266.74",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What was the discount amount?",
+        "answer": "EGP 50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Debit/Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What items were ordered?",
+        "answer": [
+            "Roasted Cashew 275 Gm Offer",
+            "Salted Egyptian Toasted Corn 100 Gm",
+            "Chinese Crackers 100 Gm"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What is the mobile number?",
+        "answer": "+201001555584",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery fee?",
+        "answer": "EGP 12.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Salted Egyptian Toasted Corn 100 Gm",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the order delivered?",
+        "answer": "21:56",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 266.74",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery address?",
+        "answer": "El Rehab City 1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Salted Egyptian Toasted Corn items were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the subtotal of the order?",
+        "answer": "EGP 280.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the status of the order?",
+        "answer": "Delivered",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order ID?",
+        "answer": "1386311955",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "21:56",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 266.74",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 62.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "11/12/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 280.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "11/12/2023",
+        "source": "Human"
+    },
+    {
+        "question": "Who is the order recipient?",
+        "answer": "Seif Ezzeldin",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu Auf",
+        "source": "Human"
+    },
+    {
+        "question": "What was the service fee?",
+        "answer": "EGP 18.75",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Roasted Cashew items were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What was the delivery time?",
+        "answer": "33 mins",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 33.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "21:56",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Roasted Cashew 275 Gm Offer",
+        "source": "Human"
+    },
+    {
+        "question": "What was the rider tip?",
+        "answer": "EGP 5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Chinese Crackers 100 Gm"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1386311955",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Chinese Crackers 100 Gm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

@@ -1,0 +1,294 @@
+[
+    {
+        "question": "What is the customer's address?",
+        "answer": "New Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "5 Baladi Bread",
+                "quantity": "2",
+                "total_price": "24.00"
+            },
+            {
+                "item": "Cucumbers (1Kg)",
+                "quantity": "1",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Tomatoes (1Kg)",
+                "quantity": "2",
+                "total_price": "48.00"
+            },
+            {
+                "item": "Bell Peppers (set of 3)",
+                "quantity": "1",
+                "total_price": "31.00"
+            },
+            {
+                "item": "Baladi Garlic (500g)",
+                "quantity": "1",
+                "total_price": "19.00"
+            },
+            {
+                "item": "Freshly Amazing - Cherry Tomatoes (500g)",
+                "quantity": "1",
+                "total_price": "52.50"
+            },
+            {
+                "item": "Balady Lettuce (1 Piece)",
+                "quantity": "1",
+                "total_price": "7.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much does one cucumber cost?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does 500g of Baladi Garlic cost?",
+        "answer": "19.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Tomatoes (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 48.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery fee?",
+        "answer": "EGP 20.00 via Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "03:00 PM - 04:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does 5 Baladi Bread cost?",
+        "answer": "24.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 24.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does one kg of Tomatoes cost?",
+        "answer": "48.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "5 Baladi Bread",
+            "Tomatoes (1Kg)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Cucumbers (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 201.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "11 April, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "5 Baladi Bread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 203.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "How much does 500g of Freshly Amazing Cherry Tomatoes cost?",
+        "answer": "52.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total due?",
+        "answer": "EGP 89.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 201.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "89.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount before the current balance?",
+        "answer": "EGP 203.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "11 April, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-EGP 18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Mohamed Goda",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-EGP 113.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "8793920-1112",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 201.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Bell Peppers (set of 3)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 31.0,
+        "source": "Human"
+    },
+    {
+        "question": "How much does a piece of Balady Lettuce cost?",
+        "answer": "7.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "5 Baladi Bread\n2 12.00\n24.00",
+            "Cucumbers (1Kg)\n1 20.00\n20.00",
+            "Tomatoes (1Kg)\n2 24.00\n48.00",
+            "Bell Peppers (set of 3)\n1 31.00\n31.00",
+            "Baladi Garlic (500g)\n1 19.00\n19.00",
+            "Freshly Amazing - Cherry Tomatoes (500g)\n1 52.50\n52.50",
+            "Balady Lettuce (1 Piece)\n1 7.00\n7.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price before discounts and delivery?",
+        "answer": "EGP 201.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does a set of 3 Bell Peppers cost?",
+        "answer": "31.00",
+        "source": "GPT"
+    }
+]

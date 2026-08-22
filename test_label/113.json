@@ -1,0 +1,294 @@
+[
+    {
+        "question": "What is the amount given?",
+        "answer": "-800.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the items?",
+        "answer": "772.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 315.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the net amount?",
+        "answer": "677.19",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "14\n677 19\n772.00\nA\n94.81",
+            "Item No .:\n234\nREDBULL ENERGY DRINK pcs\n30.00 A",
+            "Item No .:\n15704\nFERRERO COLLEACTION pcs\n245.00 A",
+            "Item No .:\n19526\nCADBURY MINIATUR SEA pcs\n315.00 A",
+            "Item No .:\n827\nBOUNTY MINTURE 150 G pcs\n65.00 A",
+            "Item No .:\n11628\nBEBETO PEACH RINGS \\ pcs\n35.00 A",
+            "Item No .:\n10641\nGIFT BAG 2418\n2 pcs @ 27.00\n54.00 A"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "PEPSI PET LTR",
+            "GIFT BAG 2418"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the third item purchased?",
+        "answer": "245.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "CADBURY MINIATUR SEA pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the change amount?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the first item were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "PEPSI PET LTR",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "71986",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "FERRERO COLLEACTION pcs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "FERRERO COLLEACTION pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000401-P1000071985",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "PEPSI PET LTR",
+                "quantity": "2",
+                "total_price": "28.00"
+            },
+            {
+                "item": "REDBULL ENERGY DRINK pcs",
+                "quantity": "1",
+                "total_price": "30.00"
+            },
+            {
+                "item": "FERRERO COLLEACTION pcs",
+                "quantity": "1",
+                "total_price": "245.00"
+            },
+            {
+                "item": "CADBURY MINIATUR SEA pcs",
+                "quantity": "1",
+                "total_price": "315.00"
+            },
+            {
+                "item": "BOUNTY MINTURE 150 G pcs",
+                "quantity": "1",
+                "total_price": "65.00"
+            },
+            {
+                "item": "BEBETO PEACH RINGS \\ pcs",
+                "quantity": "1",
+                "total_price": "35.00"
+            },
+            {
+                "item": "GIFT BAG 2418",
+                "quantity": "2",
+                "total_price": "54.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "8:56",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "772.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "9",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 245.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "0000401-P1000071985\n71986",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date?",
+        "answer": "06-11-22",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "772.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "772.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the amount of the second item purchased?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax amount?",
+        "answer": "94.41",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one unit of the first item?",
+        "answer": "4.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 28.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "8:56",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "06-11-22",
+        "source": "Human"
+    },
+    {
+        "question": "What is the welcome message?",
+        "answer": "Welcome to Omarastation",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "94.81",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "REDBULL ENERGY DRINK pcs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "PEPSI PET -LTR",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "REDBULL ENERGY DRINK pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the staff name?",
+        "answer": "Ahmed Bassem",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time?",
+        "answer": "8:56",
+        "source": "GPT"
+    }
+]

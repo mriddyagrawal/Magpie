@@ -1,0 +1,279 @@
+[
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1.00\nQuattro Formaggi Regular 130.00\n130.00",
+            "1.00\nIced Caramel Macchiato\n50.00\n50.00",
+            "1.00\nLatte\n70.00\n70.00",
+            "1.00\nMojito Raspberry\n65.00\n65.00",
+            "1.00\nOrange Juice\n50.00\n50.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "429.53",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "365.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Iced Caramel Macchiato",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "18/11/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Orange Juice?",
+        "answer": "50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "365.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Quattro Formaggi Regular",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Basilico",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Basilico",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 50.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Latte?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of Orange Juice?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.00",
+        "source": "Human"
+    },
+    {
+        "question": "What time did the customer leave?",
+        "answer": "06:39:33 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Quattro Formaggi Regular?",
+        "answer": "130.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Mojito Raspberry?",
+        "answer": "65.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the grand total?",
+        "answer": "429.53",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Latte?",
+        "answer": "70.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "18/11/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "429.53",
+        "source": "Human"
+    },
+    {
+        "question": "What time did the customer arrive?",
+        "answer": "04:23:16 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Quattro Formaggi Regular",
+                "quantity": "1.00",
+                "total_price": "130.00"
+            },
+            {
+                "item": "Iced Caramel Macchiato",
+                "quantity": "1.00",
+                "total_price": "50.00"
+            },
+            {
+                "item": "Latte",
+                "quantity": "1.00",
+                "total_price": "70.00"
+            },
+            {
+                "item": "Mojito Raspberry",
+                "quantity": "1.00",
+                "total_price": "65.00"
+            },
+            {
+                "item": "Orange Juice",
+                "quantity": "1.00",
+                "total_price": "50.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Latte",
+        "source": "Human"
+    },
+    {
+        "question": "What is the table number?",
+        "answer": "F1-O-03",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "57.23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "429.53",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the service charge?",
+        "answer": "43.80",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the discount?",
+        "answer": "36.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 130.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Mojito Raspberry?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 70.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Mojito Raspberry",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "04:23:16 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Quattro Formaggi Regular?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 65.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "04:23:16 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Iced Caramel Macchiato?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the tax?",
+        "answer": "57.23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "51394",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Iced Caramel Macchiato?",
+        "answer": "50.00",
+        "source": "GPT"
+    }
+]

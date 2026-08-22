@@ -1,0 +1,273 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 176.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the discount?",
+        "answer": "-14.05",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery fee?",
+        "answer": "10.00 via Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 176.95",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What type of toothpaste was ordered?",
+        "answer": "Sensodyne Toothpaste M+W (100ml)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Durex Condom Extra\nSafe (3 Pieces)\nMuffins",
+        "source": "Human"
+    },
+    {
+        "question": "How many units of muffins were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Dasani Natural Water\n1 51.00 51.00\nCarton (600ml*20)\nOral Care",
+            "Sensodyne\n1 55.00 55.00\nToothpaste M+W\n(100ml)",
+            "Durex Condom Extra\n1 45.00 45.00\nSafe (3 Pieces)\nMuffins",
+            "5 Mini Plain Muffins\n1\n30.00 30.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the final total?",
+        "answer": "176.95",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the muffins cost?",
+        "answer": "30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of water was ordered?",
+        "answer": "Dasani Natural Water Carton (600ml*20)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1614-3817281",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 176.95",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "181.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Dasani Natural Water\nCarton (600ml*20)\nOral Care",
+        "source": "Human"
+    },
+    {
+        "question": "How many units of toothpaste were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery date?",
+        "answer": "16 May, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 181.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many units of birth control were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the toothpaste cost?",
+        "answer": "55.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the birth control cost?",
+        "answer": "45.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1614-3817281",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "5 Mini Plain Muffins",
+        "source": "Human"
+    },
+    {
+        "question": "What type of birth control was ordered?",
+        "answer": "Durex Condom Extra Safe (3 Pieces)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 55.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 51.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Dasani Natural Water\nCarton (600ml*20)\nOral Care",
+                "quantity": "1",
+                "total_price": "51.00"
+            },
+            {
+                "item": "Sensodyne\nToothpaste M+W\n(100ml)",
+                "quantity": "1",
+                "total_price": "55.00"
+            },
+            {
+                "item": "Durex Condom Extra\nSafe (3 Pieces)\nMuffins",
+                "quantity": "1",
+                "total_price": "45.00"
+            },
+            {
+                "item": "5 Mini Plain Muffins",
+                "quantity": "1",
+                "total_price": "30.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What type of muffins were ordered?",
+        "answer": "5 Mini Plain Muffins",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the water cost?",
+        "answer": "51.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 45.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Sensodyne\nToothpaste M+W\n(100ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How many units of water were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    }
+]

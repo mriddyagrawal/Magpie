@@ -1,0 +1,291 @@
+[
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE280.25",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE280.25",
+        "source": "Human"
+    },
+    {
+        "question": "What item was bought for 48.50 LE?",
+        "answer": "LUFF Oval Loofah Large 17x",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was bought for 47.00 LE?",
+        "answer": "LUFF Row Loofah 12x12cm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:00:00 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Coca Cola Zero 950ml",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "LUFF Oval Loofah Large 17x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "17/1/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change given?",
+        "answer": "119.75 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the cashier?",
+        "answer": "Mohame",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "17/1/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 47.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the cash tendered?",
+        "answer": "400.00 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 11.75,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "LUFF Row Loofah 12x12cm",
+        "source": "Human"
+    },
+    {
+        "question": "What item was bought for 34.00 LE?",
+        "answer": "Lurpak Unsalted Butter 100",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "6:41:43 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "280.25 LE",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was bought for 30.00 LE?",
+        "answer": "Lettuce Gr & Rd Batavia, Na",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE14.83",
+            "Coca Cola Zero 950ml\nLE11.7\n1\nLE11.75",
+            "LUFF Oval Loofah Large 17x\nLE48.3\n1\nLE48.50\n0",
+            "LUFF Row Loofah 12x12cm\nLE47.0\n1\nLE47.00\n0",
+            "Dasani Water 600ml\nLE4.00\n1\nLE4.00*",
+            "Lurpak Unsalted Butter 100\nLE34.0\n1\nLE34.00",
+            "Belgian Dark Choc.Buttons,\n0\nLE105.\n1\nLE105.0\n00\n0+"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:00:00 AM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE14.83",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What item was bought for 4.00 LE?",
+        "answer": "Dasani Water 600ml",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was bought for 105.00 LE?",
+        "answer": "Belgian Dark Choc.Buttons,",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE280.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 48.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the account number?",
+        "answer": "880000020443",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the deliver to address?",
+        "answer": "47 ش الزهة عمارة كيا موتورز\nالدورة\nYes مصر الجديدة",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Lettuce Gr & Rd Batavia, Na",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1337604",
+        "source": "Human"
+    },
+    {
+        "question": "What item was bought for 11.75 LE?",
+        "answer": "Coca Cola Zero 950ml",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "مریان مروز",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sales tax?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Lettuce Gr & Rd Batavia, Na",
+                "quantity": "1",
+                "total_price": "LE30.00"
+            },
+            {
+                "item": "Coca Cola Zero 950ml",
+                "quantity": "1",
+                "total_price": "LE11.75"
+            },
+            {
+                "item": "LUFF Oval Loofah Large 17x",
+                "quantity": "1",
+                "total_price": "LE48.50"
+            },
+            {
+                "item": "LUFF Row Loofah 12x12cm",
+                "quantity": "1",
+                "total_price": "LE47.00"
+            },
+            {
+                "item": "Dasani Water 600ml",
+                "quantity": "1",
+                "total_price": "LE4.00*"
+            },
+            {
+                "item": "Lurpak Unsalted Butter 100",
+                "quantity": "1",
+                "total_price": "LE34.00"
+            },
+            {
+                "item": "Belgian Dark Choc.Buttons,",
+                "quantity": "1",
+                "total_price": "LE105.0"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1337604",
+        "source": "GPT"
+    }
+]

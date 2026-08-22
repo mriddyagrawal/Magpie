@@ -1,0 +1,285 @@
+[
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 190.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the branch location?",
+        "answer": "City Stars",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change due?",
+        "answer": "0.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item listed on the invoice?",
+        "answer": "BASIC JOGGER",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "| oniino | eroin ril\nBASIC JOGGER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "BASIC JOGGER",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the invoice created?",
+        "answer": "08:57",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "BASIC JOGGER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for the items?",
+        "answer": "830.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax card number?",
+        "answer": "278-900-437",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "830.000",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22-06-22/08:57/7414/60320/102/107",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "BASIC JOGGER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number?",
+        "answer": "0224800770",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the unit price excluding VAT for the BASIC JOGGER?",
+        "answer": "166.668",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "22-06-22/08:57/7414/60320/102/107",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 190000.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the authorization number?",
+        "answer": "820348",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 190000.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the invoice?",
+        "answer": "22-06-22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "22-06-22/08:57/7414/60320/102/107",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Orient International Trading LTD",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "١٠١٫٩٢٤",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "١",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "١",
+        "source": "Human"
+    },
+    {
+        "question": "What type of payment was used?",
+        "answer": "Credit",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total quantity of items on the invoice?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "شركة الشرق الدولية للتجارة",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "١٠١٫٩٢٤\n٧٢٨ ضريبة",
+            "101.924\n728.076\nV14",
+            "١٩٠٫٠٠٠\n١٩٠,٠٠٠\n190.000\n190.000\n١ X\n١٦٣٦٠٧١٧٤\n1 X\n163607174\nBASIC JOGGER\nضريبة القيمة المضافة . غير شامل = Excl. VAT Unit Price\n166.668 =سعر وحدة\nكفرباء ر\nغير شامل ضريبة القيمة المضافة\n١٦٦٫٦٦٨ = سعر الوحدة",
+            "١٩٠,٠٠٠\n١٩٠,٠٠٠\n١٦٣٦٠٧١٧٣\n190.000\n190.000\n١ X\n1 X\n163607173\nBASIC JOGGER",
+            "mas.noirtestxem\nضريبة القيمة المضافة . غير شامل = Excl. VAT Unit Price\n166.668=سعر وحدة\nHOX3\nAl\nغير شامل ضريبة القيمة المضافة\n١٦٦٫٦٦٨ = سعر الوحدة\n٧٠,٠٠٠\n٧٠٫٠٠٠ mola\n١ X\n١٦٤٤٩٥٨٠٣",
+            "70.000\nvibal\n70.000\n1 X\n164495803\nneckles\nضريبة القيمة المضافة . غير شامل = Excl. VAT Unit Price\n61.404=سعر وحدة\nغير شامل ضريبة القيمة المضافة\n٦١,٤٠٤ = سعر الوحدة"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier number?",
+        "answer": "222094",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Visa",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the first item?",
+        "answer": "190.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website address?",
+        "answer": "www.maxfashionretail.com",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the commercial registration number?",
+        "answer": "31136",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "830.000",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "١",
+        "source": "Human"
+    },
+    {
+        "question": "What is the email address?",
+        "answer": "mx.cst@landmarkgroup.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "830.000",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "١",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 190.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the entry type?",
+        "answer": "Manual",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "| oniino | eroin ril\nBASIC JOGGER",
+                "quantity": "١",
+                "total_price": "١٩٠,٠٠٠"
+            },
+            {
+                "item": "BASIC JOGGER",
+                "quantity": "١",
+                "total_price": "190.000"
+            },
+            {
+                "item": "BASIC JOGGER",
+                "quantity": "١",
+                "total_price": "١٩٠٫٠٠٠"
+            },
+            {
+                "item": "BASIC JOGGER",
+                "quantity": "١",
+                "total_price": "190.000"
+            },
+            {
+                "item": "mas.noirtestxem",
+                "quantity": "١",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "neckles",
+                "quantity": "1",
+                "total_price": "70.000"
+            }
+        ],
+        "source": "Human"
+    }
+]

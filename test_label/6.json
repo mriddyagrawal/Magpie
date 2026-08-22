@@ -1,0 +1,257 @@
+[
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "MERIT YELLOW LOCAL",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the user ID?",
+        "answer": "163",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax file number?",
+        "answer": "5-00173-214-00-00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "MERIT YELLOW LOCAL"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "98.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total value of the items?",
+        "answer": "98.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT percentage?",
+        "answer": "0%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "98.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of each item?",
+        "answer": "49.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "98.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "MERIT YELLOW LOCAL",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "On the Run",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "MERIT YELLOW LOCAL\n2\n49.00\n98.00\n0%\n62211581"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Retail Pro S.A.E",
+        "source": "Human"
+    },
+    {
+        "question": "What is the commerce registration number?",
+        "answer": "75413",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What does the receipt say about the store?",
+        "answer": "FAST..FRESH..FRIENDLY..24 HRS",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the time of the transaction?",
+        "answer": "08:47:01",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the date of the transaction?",
+        "answer": "22/06/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:47:01",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the POS number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "98.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the cash amount?",
+        "answer": "200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT registration number?",
+        "answer": "479-405-530",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "MERIT YELLOW LOCAL",
+                "quantity": "2",
+                "total_price": "98.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "69",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the item were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the store number?",
+        "answer": "2109",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Oberoi",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "08:47:01",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 98.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "22/06/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What was the change?",
+        "answer": "102.00",
+        "source": "GPT"
+    }
+]

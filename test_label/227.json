@@ -1,0 +1,293 @@
+[
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 308.40",
+        "source": "GPT"
+    },
+    {
+        "question": "What kind of cheese was ordered?",
+        "answer": "Mainz Cheddar Cheese",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#510-3673698",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 316.40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Mainz Cheddar\nCheese (200g)\nCold Cuts",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the milk cost?",
+        "answer": "48.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the peaches?",
+        "answer": "34.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "5 May. 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the water cost?",
+        "answer": "51.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the cold cuts cost?",
+        "answer": "78.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What cold cut was ordered?",
+        "answer": "Rich Smoked Turkey Lobes With Hot Pepper",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total due?",
+        "answer": "EGP 215.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Local Bananas (5\nPieces)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#510-3673696",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 308.40",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 34.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the bananas?",
+        "answer": "18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the cheese cost?",
+        "answer": "39.95",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 6,02 is already\ninduded in the total amount.",
+            "Local Bananas (5\n7\n18.00\n18.00\nPieces)",
+            "Freshly Amazing\n1 34.95 34.95\nPeach Grade A\n(500g)\nFresh Cheese",
+            "Mainz Cheddar\n1 39.95 39.95\nCheese (200g)\nCold Cuts",
+            "Rich Smoked Turkey\n1 78.00 78.00\nLobes With Hot\nPepper (250g)\nWater",
+            "Dasani Natural Water\n1 51,00 51.00\nCarton (1.5L*12)\nPlant Based Milk",
+            "Juhayna Milk Lactose\n1 48.50 48.50\nFree & Skimmed (1L)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many local bananas were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Local Bananas (5\nPieces)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "12:00 PM-01:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Freshly Amazing\nPeach Grade A\n(500g)\nFresh Cheese",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 39.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "May. 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 316.40",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Avocado (2 pieces)",
+                "quantity": "1",
+                "total_price": "38.00"
+            },
+            {
+                "item": "Local Bananas (5\nPieces)",
+                "quantity": "7",
+                "total_price": "18.00"
+            },
+            {
+                "item": "Freshly Amazing\nPeach Grade A\n(500g)\nFresh Cheese",
+                "quantity": "1",
+                "total_price": "34.95"
+            },
+            {
+                "item": "Mainz Cheddar\nCheese (200g)\nCold Cuts",
+                "quantity": "1",
+                "total_price": "39.95"
+            },
+            {
+                "item": "Rich Smoked Turkey\nLobes With Hot\nPepper (250g)\nWater",
+                "quantity": "1",
+                "total_price": "78.00"
+            },
+            {
+                "item": "Dasani Natural Water\nCarton (1.5L*12)\nPlant Based Milk",
+                "quantity": "1",
+                "total_price": "51.00"
+            },
+            {
+                "item": "Juhayna Milk Lactose\nFree & Skimmed (1L)",
+                "quantity": "1",
+                "total_price": "48.50"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 18.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 316.40",
+        "source": "Human"
+    },
+    {
+        "question": "How many avocados were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the avocados?",
+        "answer": "38.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 6,02",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the peaches?",
+        "answer": "Freshly Amazing Peach Grade A",
+        "source": "GPT"
+    },
+    {
+        "question": "What plant based milk was ordered?",
+        "answer": "Juhayna Milk Lactose Free & Skimmed",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 38.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Avocado (2 pieces)",
+        "source": "Human"
+    },
+    {
+        "question": "What brand of water was ordered?",
+        "answer": "Dasani Natural Water",
+        "source": "GPT"
+    }
+]

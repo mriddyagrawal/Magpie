@@ -1,0 +1,387 @@
+[
+    {
+        "question": "What is the name of the pharmacy?",
+        "answer": "wafik heshmat PH",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "THIOTACID\nCOMPOUND 600 MG 20",
+        "source": "Human"
+    },
+    {
+        "question": "How many Magnesium Plus Tab were bought?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Myogrel 30TAB?",
+        "answer": "120.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 336.0,
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Stimulan 400mg Cap cost?",
+        "answer": "24.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What kind of unit of measure is 'شر يط'?",
+        "answer": "FLECTOR 50 mg 30 CAP and PANADOL COLD&FLU DAY CAP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Tritace Comp LS 14 TAB were purchased?",
+        "answer": "2.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "336.00\n1.00\nعلبة\nJANUMET 50 MG /1000\nMG 56 TAB",
+            "64.80\n2.00\nعلبة\nTRITACE COMP LS 14\nTAB",
+            "91.00\n1.00\nعلبة\nTHIOTACID\nCOMPOUND 600 MG 20",
+            "24.00\n1.00\nعلبة\nSTIMULAN 400MG CAP",
+            "158.00\n2.00\nعلبة\nVASTAREL MR 30TAB",
+            "21.00\n1.00\nعلبة\nMAGNESIUM PLUS TAB",
+            "63.00\n2.00\nعلبة\nASPIRIN PROTECT 100\n30 TAB",
+            "84.00\n1.00\nعلبة\nPRAXILENE 200MG\n30TAB",
+            "150.00\n2.00\nعلبة\nATOREZA 10MG/20MG\n21 TAB",
+            "120.00\n1.00\nعلبة\nMYOGREL 30TAB",
+            "195.00\n1.00\nعلبة\nLACTO-APEX 30TAB",
+            "210.00\n1.00\nبخاخ\nSERETIDE DISKUS 500",
+            "12.75\n1.00\nشريط\nFLECTOR 50 mg 30\nCAP",
+            "125 50\n2.00\nعلية\nFOSAMAX 70MG TAB",
+            "16.00\n1.00\nعلبة\nPANADOL ADVANCED\nTAB",
+            "9.00\n1.00\nزجاجة\nTANTUM VERDE\nMOUTH WASH",
+            "40.00\n2.00\nعلبة\nGINGER TAB",
+            "24.00\n2.00\nعلبة\nVITACID C EFF 12\nSACHETS",
+            "32.00\n2.00\nعلبة\nMULTI TREAT TAB",
+            "132.00\n1.00\nعلبة\nORLY 30 CAP",
+            "30.00\n1.00\nعلبة\nPANADOL MIGRAINE 30\nTAB",
+            "27.00\n1.00\nعلبة\nPANADOL COLD&FLU\nDAY CAP",
+            "27.00\n2.00\nشريط\nPANADOL COLD&FLU\nDAY CAP"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the item that comes in a 'بخاخ'?",
+        "answer": "SERETIDE DISKUS 500",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "JANUMET 50 MG /1000\nMG 56",
+                "quantity": "1.00",
+                "total_price": "336.00"
+            },
+            {
+                "item": "TRITACE COMP LS 14",
+                "quantity": "2.00",
+                "total_price": "64.80"
+            },
+            {
+                "item": "THIOTACID\nCOMPOUND 600 MG 20",
+                "quantity": "1.00",
+                "total_price": "91.00"
+            },
+            {
+                "item": "STIMULAN 400MG CAP",
+                "quantity": "1.00",
+                "total_price": "24.00"
+            },
+            {
+                "item": "VASTAREL MR 30TAB",
+                "quantity": "2.00",
+                "total_price": "158.00"
+            },
+            {
+                "item": "MAGNESIUM PLUS TAB",
+                "quantity": "1.00",
+                "total_price": "21.00"
+            },
+            {
+                "item": "ASPIRIN PROTECT 100\n30",
+                "quantity": "2.00",
+                "total_price": "63.00"
+            },
+            {
+                "item": "PRAXILENE 200MG\n30TAB",
+                "quantity": "1.00",
+                "total_price": "84.00"
+            },
+            {
+                "item": "ATOREZA 10MG/20MG\n21",
+                "quantity": "2.00",
+                "total_price": "150.00"
+            },
+            {
+                "item": "MYOGREL 30TAB",
+                "quantity": "1.00",
+                "total_price": "120.00"
+            },
+            {
+                "item": "LACTO-APEX 30TAB",
+                "quantity": "1.00",
+                "total_price": "195.00"
+            },
+            {
+                "item": "SERETIDE DISKUS 500",
+                "quantity": "1.00",
+                "total_price": "210.00"
+            },
+            {
+                "item": "FLECTOR 50 mg 30",
+                "quantity": "1.00",
+                "total_price": "12.75"
+            },
+            {
+                "item": "FOSAMAX 70MG",
+                "quantity": "2.00",
+                "total_price": "125 50"
+            },
+            {
+                "item": "PANADOL ADVANCED",
+                "quantity": "1.00",
+                "total_price": "16.00"
+            },
+            {
+                "item": "TANTUM VERDE\nMOUTH WASH",
+                "quantity": "1.00",
+                "total_price": "9.00"
+            },
+            {
+                "item": "GINGER",
+                "quantity": "2.00",
+                "total_price": "40.00"
+            },
+            {
+                "item": "VITACID C EFF 12\nSACHETS",
+                "quantity": "2.00",
+                "total_price": "24.00"
+            },
+            {
+                "item": "MULTI TREAT",
+                "quantity": "2.00",
+                "total_price": "32.00"
+            },
+            {
+                "item": "ORLY 30",
+                "quantity": "1.00",
+                "total_price": "132.00"
+            },
+            {
+                "item": "PANADOL MIGRAINE 30",
+                "quantity": "1.00",
+                "total_price": "30.00"
+            },
+            {
+                "item": "PANADOL COLD&FLU\nDAY",
+                "quantity": "1.00",
+                "total_price": "27.00"
+            },
+            {
+                "item": "PANADOL COLD&FLU\nDAY",
+                "quantity": "2.00",
+                "total_price": "27.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Vastarel MR 30TAB?",
+        "answer": "2.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Lacto-Apex 30TAB were bought?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of Praxilene 200MG 30TAB?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 91.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Janumet 50 MG/1000 MG 56 TAB?",
+        "answer": "336.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is one Aspirin Protect 100 30 TAB?",
+        "answer": "63.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "wafik heshmat PH",
+        "source": "Human"
+    },
+    {
+        "question": "What is the unit of measure for Thiocacid compound 600 MG 20?",
+        "answer": "علية",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "JANUMET 50 MG /1000\nMG 56",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 64.8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 22,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price for 2 Vitamin C eff 12 sachets?",
+        "answer": "24.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "TRITACE COMP LS 14",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "STIMULAN 400MG CAP",
+        "source": "Human"
+    },
+    {
+        "question": "How many Atoreza 10MG/20MG 21 TAB were purchased?",
+        "answer": "2.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Janumet 50 MG/1000 MG 56 TAB?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "23",
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Panadol Advanced Tab cost?",
+        "answer": "16.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 24.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the pharmacy?",
+        "answer": "26336050 or 26335040",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the invoice number?",
+        "answer": "178612",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price for 2 Tritace Comp LS 14 TAB?",
+        "answer": "64.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

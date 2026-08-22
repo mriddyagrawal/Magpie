@@ -1,0 +1,278 @@
+[
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount of the invitation discount?",
+        "answer": "-EGP 25.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "25 May, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 128.90",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Rich Beef Luncheon?",
+        "answer": "61.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "09:00 PM - 10:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Almarai Natural\nYogurt Lite (105g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 61.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 8.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 107.90",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the customer?",
+        "answer": "Youssef amer",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Roumi - Batarekh\n(200g)",
+            "Rich Beef Luncheon\nPlain (250g)\nCandies",
+            "Halls Candies Frosh\nMint (9 Pcs)\nYogurt",
+            "Almarai Natural\nYogurt Lite (105g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Roumi - Batarekh\n2 24.95 49.90\n(200g)\nCold Cuts",
+            "Rich Beef Luncheon\n2 30.50 61.00\nPlain (250g)\nCandies",
+            "Halls Candies Frosh\n2 5.00\n10.00\nMint (9 Pcs)\nYogurt",
+            "Almarai Natural\n2 4.00\n8.00\nYogurt Lite (105g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 49.9,
+        "source": "Human"
+    },
+    {
+        "question": "How many Roumi - Batarekh were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2519-3958703",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 128.90",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Almarai Natural Yogurt Lite were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the order?",
+        "answer": "EGP 107.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Halls Candies Frosh\nMint (9 Pcs)\nYogurt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2519-3958703",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Halls Candies Fresh Mint?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the Almarai Natural Yogurt Lite?",
+        "answer": "8.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Rich Beef Luncheon were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Roumi - Batarekh\n(200g)",
+                "quantity": "2",
+                "total_price": "49.90"
+            },
+            {
+                "item": "Rich Beef Luncheon\nPlain (250g)\nCandies",
+                "quantity": "2",
+                "total_price": "61.00"
+            },
+            {
+                "item": "Halls Candies Frosh\nMint (9 Pcs)\nYogurt",
+                "quantity": "2",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Almarai Natural\nYogurt Lite (105g)",
+                "quantity": "2",
+                "total_price": "8.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Roumi - Batarekh?",
+        "answer": "49.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Roumi - Batarekh?",
+        "answer": "24.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 107.90",
+        "source": "Human"
+    },
+    {
+        "question": "What is the city of the customer?",
+        "answer": "New Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 107.90",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Roumi - Batarekh\n(200g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount of the discount?",
+        "answer": "-EGP 6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Rich Beef Luncheon\nPlain (250g)\nCandies",
+        "source": "Human"
+    }
+]

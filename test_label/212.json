@@ -1,0 +1,300 @@
+[
+    {
+        "question": "What is the website?",
+        "answer": "www.breadfast.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 161.75",
+        "source": "Human"
+    },
+    {
+        "question": "How many Pepsi Bottles were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the yogurt?",
+        "answer": "Almarai Natural Yogurt Lite",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Soft Bread items were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 1.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of Brown Eggs ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Almarai Natural Yogurt Lite?",
+        "answer": "4.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Almarai Natural Yogurt Lite\n(105g)",
+            "Danette Chocolate Pudding\n(100g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 171.75",
+        "source": "Human"
+    },
+    {
+        "question": "How many Almarai Natural Yogurt Lite items were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery charge?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "5 Soft Bread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 69.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "24 June, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "5 Petits Pains",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 171.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 40.75,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "02:00 PM - 03:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "24 Brown Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Mainz Cheddar Cheese?",
+        "answer": "40.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2412-4402233",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Mainz Cheddar Cheese\n(200g)\nEggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2412-4402233",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 171.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 10.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of Brown Eggs?",
+        "answer": "69.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "5 Petits Pains",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "5 Soft Bread",
+                "quantity": "1",
+                "total_price": "10.00"
+            },
+            {
+                "item": "Mainz Cheddar Cheese\n(200g)\nEggs",
+                "quantity": "1",
+                "total_price": "40.75"
+            },
+            {
+                "item": "24 Brown Eggs",
+                "quantity": "1",
+                "total_price": "69.00"
+            },
+            {
+                "item": "Pepsi Bottle (300ml)",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Schweppes Pomegranate\n(250ml)\nYogurt",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Almarai Natural Yogurt Lite\n(105g)",
+                "quantity": "2",
+                "total_price": "8.00"
+            },
+            {
+                "item": "Danette Chocolate Pudding\n(100g)",
+                "quantity": "4",
+                "total_price": "18.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one Pepsi Bottle?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Danette Chocolate Pudding?",
+        "answer": "4.50",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 1.99 is already included in the\ntotal amount.",
+            "5 Soft Bread\n1 10.00\n10.00\nFresh Cheese",
+            "Mainz Cheddar Cheese\n1 40.75 40.75\n(200g)\nEggs",
+            "24 Brown Eggs\n1 69.00 69.00",
+            "Pepsi Bottle (300ml)\n1 5.00\n5.00",
+            "Schweppes Pomegranate\n1 5.00\n5.00\n(250ml)\nYogurt",
+            "Almarai Natural Yogurt Lite\n2 4.00\n8.00\n(105g)\nFlavored Yogurt & Pudding",
+            "Danette Chocolate Pudding\n4 4.50\n18.00\n(100g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 161.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the order?",
+        "answer": "EGP 171.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "EGP 1.99",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Danette Chocolate Puddings were ordered?",
+        "answer": "4",
+        "source": "GPT"
+    }
+]

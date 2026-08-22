@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the code for the Turkish clips?",
+        "answer": "0002-01",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 70.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the plain chiffon basic scarf were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the card reference number?",
+        "answer": "6843539648",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "voile",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Le volle",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2022-12-07",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Plain Chiffon Basic Scarf\n(Small) [0380-01]\n1 × 70.00\n70.00",
+            "Turkish Clips [0002-01]\n1 × 20.00\n20.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Plain Chiffon Basic Scarf\n(Small)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Turkish Clips",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's slogan?",
+        "answer": "In Love of Hijab",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the branch location?",
+        "answer": "Galleria Mall",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "Turkish Clips",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "14:53:12",
+        "source": "Human"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Turkish clips?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2022-12-07",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the reference number for this transaction?",
+        "answer": "Ga-Ex-20221207-025312",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the plain chiffon basic scarf?",
+        "answer": "70.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the code for the plain chiffon basic scarf?",
+        "answer": "0380-01",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the cashier for this transaction?",
+        "answer": "Gallerla Cashier",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "14:53:12",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "90.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "14:53:12",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many of the Turkish clips were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Ga-Ex-20221207-025312",
+        "source": "Human"
+    },
+    {
+        "question": "What is the grand total of the transaction?",
+        "answer": "333.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Farehan",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "Plain Chiffon Basic Scarf",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Plain Chiffon Basic Scarf\n(Small)",
+                "quantity": "1",
+                "total_price": "70.00"
+            },
+            {
+                "item": "Turkish Clips",
+                "quantity": "1",
+                "total_price": "20.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What are the last 4 digits of the card used?",
+        "answer": "4892",
+        "source": "GPT"
+    }
+]

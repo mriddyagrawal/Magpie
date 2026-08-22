@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 91.45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Own Cranberry And\nNuts Bar (55g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 9.27",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the delivery fee?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2314-4388373",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "How many Fitness Toasties were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What product is under the water category?",
+        "answer": "Nestle Natural Water Carton (600ml*20)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "How many Nestle Natural Water Cartons were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 91.45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2314-4388373",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is listed under the Healthy Snacks category?",
+        "answer": "Own Cranberry And Nuts Bar (55g) and Fitness Toasties Tomato & Herbs 80% Less Fat (36g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal for this order?",
+        "answer": "81.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total price of the Fitness Toasties?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "23 June, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Own Cranberry And Nuts Bars were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total due?",
+        "answer": "91.45",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 9.27 is already\nincluded in the total amount.",
+            "Own Cranberry And\n1\n20.00 20.00\nNuts Bar (55g)",
+            "Fitness Toasties\n1 6.00\n6.00\nTomato & Herbs 80%\nLess Fat (36g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 91.45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Nestle Natural Water\nCarton (600ml*20)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "04:00 PM - 05:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Fitness Toasties",
+        "source": "Human"
+    },
+    {
+        "question": "What was the current balance?",
+        "answer": "-0.05",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price for one Fitness Toasties?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total price of the Nestle Natural Water Carton order?",
+        "answer": "55.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total price for Own Cranberry And Nuts Bars?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of one Nestle Natural Water Carton?",
+        "answer": "55.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price of one Own Cranberry And Nuts Bar?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 81.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 55.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Nestle Natural Water\nCarton (600ml*20)",
+                "quantity": "1",
+                "total_price": "55.50"
+            },
+            {
+                "item": "Own Cranberry And\nNuts Bar (55g)",
+                "quantity": "1",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Fitness Toasties",
+                "quantity": "1",
+                "total_price": "6.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the total cost of the order before balance?",
+        "answer": "91.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

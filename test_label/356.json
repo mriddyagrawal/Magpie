@@ -1,0 +1,273 @@
+[
+    {
+        "question": "What is the item number of 'Perfetti MENTOS STRA'?",
+        "answer": "16267",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of 'Chipsy F/ Salt&Vineg'?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of 'Perfetti MENTOS STRA'?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the staff member?",
+        "answer": "Ibrahim A Abde",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "44.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Perfetti MENTOS STRA pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the station?",
+        "answer": "El Sadat station",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 7.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the slip number?",
+        "answer": "0000202-P1000084675",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "118299",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "44.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "MANDOLIN 50GM pcs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the change given?",
+        "answer": "156.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "GREEN APPLE pos",
+                "quantity": "1",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Chipsy F/ Salt&Vineg pcs",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "MANDOLIN 50GM pcs",
+                "quantity": "1",
+                "total_price": "7.00"
+            },
+            {
+                "item": "Perfetti MENTOS STRA pcs",
+                "quantity": "1",
+                "total_price": "12.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the item number of 'MANDOLIN 50GM'?",
+        "answer": "15593",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of 'GREEN APPLE'?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "44.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of 'MANDOLIN 50GM'?",
+        "answer": "7.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item number of 'GREEN APPLE'?",
+        "answer": "5967",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was given?",
+        "answer": "-200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the net amount?",
+        "answer": "10.53",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:13",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "GREEN APPLE pos",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "22-01-23",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "10:13",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Chipsy F/ Salt&Vineg pcs",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "A\n14\n10.53\n1.47\n12.00",
+            "Item No.\n15046\nChipsy F/ Salt&Vineg pcs\n5.00",
+            "Item No .:\n15593\nMANDOLIN 50GM pcs\n7.00",
+            "Item No .:\n16267\nPerfetti MENTOS STRA pcs\n12.00 A"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "1.47",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "44.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 12.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "10:13",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "1.47",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "22-01-23",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item number of 'Chipsy F/ Salt&Vineg'?",
+        "answer": "15046",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "4",
+        "source": "GPT"
+    }
+]

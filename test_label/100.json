@@ -1,0 +1,291 @@
+[
+    {
+        "question": "What is the transaction date?",
+        "answer": "06/22/22",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 4.97,
+        "source": "Human"
+    },
+    {
+        "question": "What is the survey website?",
+        "answer": "www.homedepot.com/survey",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier number?",
+        "answer": "CAIO",
+        "source": "GPT"
+    },
+    {
+        "question": "How was the payment made?",
+        "answer": "DEBIT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "GLADE PISO CLEAN LINEN STARTER KIT",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total?",
+        "answer": "65.84",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "06/22/22",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "HS FF ANT, ROACH, SPDR 20 OZ",
+                "quantity": "1",
+                "total_price": "4.47"
+            },
+            {
+                "item": "GLADE PISO CLEAN LINEN STARTER KIT",
+                "quantity": "1",
+                "total_price": "4.97"
+            },
+            {
+                "item": "FIRM GRIP UMBRELLAS- BLACK",
+                "quantity": "1",
+                "total_price": "5.97"
+            },
+            {
+                "item": "GORILLA SUPER GLUE GEL .70 OZ",
+                "quantity": "1",
+                "total_price": "6.97"
+            },
+            {
+                "item": "WEIMAN SS CLEANER TRIGGER 22 OZ",
+                "quantity": "1",
+                "total_price": "6.37"
+            },
+            {
+                "item": "A&H LIQ FRESH SCENT PLUS OXI 201.60Z",
+                "quantity": "1",
+                "total_price": "14.47"
+            },
+            {
+                "item": "66 KEY KWIKSET",
+                "quantity": "6@2.98",
+                "total_price": "17.88"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the item description for 033200035015?",
+        "answer": "A&H LIQ FRESH SCENT PLUS OXI 201.60Z",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "4.74",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "HS FF RAS AO",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 6.97,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of GLADEPKITCL?",
+        "answer": "4.97",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of GORILLA SUPER GLUE GEL.70 OZ?",
+        "answer": "6.37",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "01:00 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales tax?",
+        "answer": "4.74",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "7",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "$65.84",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "$65.84",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store phone number?",
+        "answer": "(858)653-6761",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the return policy in days?",
+        "answer": "90",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 7,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 5.97,
+        "source": "Human"
+    },
+    {
+        "question": "What is the store name?",
+        "answer": "THE HOME DEPOT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "61.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "FIRM GRIP UMBRELLAS- BLACK",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "GORILLA SUPER GLUE GEL .70 OZ",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "$65.84",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time?",
+        "answer": "01:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store's slogan?",
+        "answer": "How doers get more done.",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item description for 731919381231?",
+        "answer": "FIRM GRIP UMBRELLAS- BLACK",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "THE\nHOME\nHow\nDEPOT\n®",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SALES TAX\n4.74",
+            "046500775147 GLADEPKITCL <A>\n4.97\nGLADE PISO CLEAN LINEN STARTER KIT",
+            "731919381231 FGUMBRELBK <A>\n5.97\nFIRM GRIP UMBRELLAS- BLACK",
+            "052427770011 20G SG GEL <A>\n6.97\nGORILLA SUPER GLUE GEL .70 OZ",
+            "041598001086 SS CLEANER <A>\n6.37\nWEIMAN SS CLEANER TRIGGER 22 OZ",
+            "033200035015 201.6 OZ. FR <A,U>\nA&H LIQ FRESH SCENT PLUS OXI 201.60Z\n14.47",
+            "736511500660 66KWIKSETKEY <A>\n66 KEY KWIKSET\n6@2.98\n17.88"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "61.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of HS FF RAS AO?",
+        "answer": "4.47",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store address?",
+        "answer": "10604 WESTVIEW PARKWAY MIRA MESA CA 92126",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "HS FF ANT, ROACH, SPDR 20 OZ",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 4.47,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of  FIRM GRIP UMBRELLAS- BLACK?",
+        "answer": "6.97",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "01:00 PM",
+        "source": "Human"
+    }
+]

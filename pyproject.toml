@@ -1,0 +1,118 @@
+[project]
+name = "magpie"
+version = "0.1.0"
+description = "RAG-style semantic search over the local file system."
+readme = "README.md"
+license = "AGPL-3.0-only"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = [
+    # `pydantic-ai` (the metapackage) pulls in `pydantic-ai-slim` with ~20
+    # extras (bedrock→boto3, temporal→temporalio, google, cohere, anthropic,
+    # vertex, xai, ...). We only use OpenAI-compatible chat (OpenRouter +
+    # Moonshot are both OpenAI-shape). Depend on `pydantic-ai-slim` directly
+    # with the narrow extras we actually call. Saves ~70 MB of dead code +
+    # a much faster fresh install. See `Plans/Bundle Trim/Implementation Plan.md` PR-B.
+    "pydantic-ai-slim[openai,retries]>=1.0",
+    "pydantic>=2.8",
+    "psutil>=5.9",            # cross-platform memory/cpu probes; used by daemon backpressure (PR2). Harmless ~3MB add.
+    "pypdf>=4.3",
+    "python-dotenv>=1.0",
+    "python-docx>=1.1",
+    "openpyxl>=3.1",
+    "tqdm>=4.66",
+    "qdrant-client>=1.9",
+    "sentence-transformers>=3.0",
+    "pymupdf>=1.24",
+    "fastembed>=0.4",
+    # >=0.3.17 is load-bearing, not cosmetic. colpali-engine caps peft, and
+    # 0.3.15 capped it at <0.19.0 while transformers 5.7 calls
+    # `peft.utils.save_and_load._maybe_shard_state_dict_for_tp`, which does not
+    # exist before peft 0.19. transformers declares no peft pin at all, so the
+    # resolver had nothing to stop it picking an incompatible pair: every
+    # visual-tier (T4) file died with ImportError at model load, leaving
+    # `fast_tier` permanently empty while indexing otherwise reported success.
+    # 0.3.17 raises the cap to <0.20.0, which lets peft 0.19.x in.
+    "colpali-engine>=0.3.17",
+    # peft is transitive (via colpali-engine) but pinned here on purpose:
+    # raising colpali's ceiling only *permits* a newer peft, it does not
+    # require one, so the resolver happily kept 0.18.1 and the visual tier
+    # stayed broken. transformers declares no peft dependency at all, so this
+    # is the only place the real floor can be stated. Same rationale as the
+    # explicit torch pin below.
+    "peft>=0.19",
+    "pathspec>=0.12",
+    "pyyaml>=6.0",
+    "python-pptx>=1.0",
+    "trafilatura>=1.12",
+    "huggingface-hub>=0.24",
+    "httpx>=0.27",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.30",
+    "platformdirs>=4.0",
+    # torch is transitively required by colpali-engine + sentence-transformers,
+    # but PyPI's default wheel ships ~2.7 GB of CUDA libs (nvidia-*, triton,
+    # cuda-bindings) on every platform — useless on Mac (MPS) and CPU-only
+    # Linux. Pin explicitly so [tool.uv.sources] can route this through the
+    # pytorch-cpu index. Mac users still get MPS via the same wheel — "cpu"
+    # here means "no bundled CUDA libs," NOT "no GPU." Linux+NVIDIA users
+    # who genuinely want CUDA acceleration should override the index at
+    # install time:
+    #     UV_TORCH_BACKEND=cu121 uv sync
+    # (or directly: `uv pip install torch --index-url https://download.pytorch.org/whl/cu121 --reinstall`)
+    # See `Plans/Bundle Trim/Implementation Plan.md` PR-C.
+    "torch>=2.4",
+]
+
+[build-system]
+requires = ["setuptools>=77"]  # >=77 for PEP 639 SPDX `license` + `license-files`
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[dependency-groups]
+# Three groups, ordered by who needs them:
+#
+#   - `dev` (default, ~10 MB)        : every contributor — pytest + workspace CLI
+#   - `packaging` (opt-in, ~30 MB)   : whoever runs the .dmg/.exe/.AppImage build pipeline
+#   - `notebooks` (opt-in, ~200 MB)  : whoever opens notebooks/*.ipynb in Jupyter
+#
+# Default `uv sync` only installs `dev`. Opt into the others as needed:
+#     uv sync                        # project + dev
+#     uv sync --group packaging      # + PyInstaller for distribution builds
+#     uv sync --group notebooks      # + Jupyter web server for .ipynb work
+#     uv sync --no-dev               # production (used by CI build pipeline)
+#
+# `just deps` prints this same cheat-sheet at runtime.
+# See `Plans/Bundle Trim/Implementation Plan.md` PR-F.
+
+dev = [
+    "pytest>=8.0",
+    "notspotlight",
+]
+
+packaging = [
+    "pyinstaller>=6.0",     # used by Plan #10 packaging pipeline (PR-E excludes go in the .spec)
+]
+
+notebooks = [
+    "ipykernel",     # Jupyter Python kernel
+    "jupyter",       # Notebook server (web UI)
+    "notebook",      # Classic notebook frontend
+]
+
+[tool.uv]
+workspace = { members = ["cli"] }
+
+[tool.uv.sources]
+notspotlight = { workspace = true }
+# Route torch through the pytorch-cpu index by default. Saves ~2.7 GB of
+# bundled CUDA libs that nobody on Mac/Windows/CPU-Linux uses. CUDA users
+# override at install time per the comment in the `dependencies` block above.
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

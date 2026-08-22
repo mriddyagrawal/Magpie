@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the total amount before discount?",
+        "answer": "L.E 72.5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "1081034",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the cashier?",
+        "answer": "Moham",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Almond&PistachioCroiss?",
+        "answer": "LE30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": "Linah Medjool on the Go and Almond&PistachioCroiss",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE42.50",
+        "source": "Human"
+    },
+    {
+        "question": "How much did they save?",
+        "answer": "LE30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "5:47:12 P",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "LE50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Linah Medjool on the Go\nLE12.5\n1\nLE12.50\n0",
+            "Almond&PistachioCroiss\nLE30.0\n1\nLE30.00\n0"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Linah Medjool on the Go",
+                "quantity": "1",
+                "total_price": "LE12.50"
+            },
+            {
+                "item": "Almond&PistachioCroiss",
+                "quantity": "1",
+                "total_price": "LE30.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Linah Medjool on the Go",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 12.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Almond&PistachioCroiss were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the change?",
+        "answer": "LE7.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "8/5/2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What currency was used?",
+        "answer": "Egyptian Pound (LE)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the Linah Medjool on the Go?",
+        "answer": "LE12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "8/5/2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "5:47:12 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "3GOURMET\nFOOD STORES",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "1081034",
+        "source": "Human"
+    },
+    {
+        "question": "How many Linah Medjool on the Go were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 30.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "Arkan Sheikh Zayed, Giza 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "5:47:12 P",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE42.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE42.50",
+        "source": "Human"
+    },
+    {
+        "question": "What was the discount amount?",
+        "answer": "LE30.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Almond&PistachioCroiss",
+        "source": "Human"
+    },
+    {
+        "question": "What was the net amount?",
+        "answer": "LE42.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of document is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    }
+]

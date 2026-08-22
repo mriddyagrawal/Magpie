@@ -1,0 +1,289 @@
+[
+    {
+        "question": "What is the total cost of the Fine Smart Jumbo Toilet Paper?",
+        "answer": "65.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Fine Smart Jumbo Toilet Paper were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "5 Brown Baladi Bread\nPoultry",
+                "quantity": "2",
+                "total_price": "12.00"
+            },
+            {
+                "item": "Temry Chicken - Fresh\nChicken Legs (1kg)\nTea",
+                "quantity": "2",
+                "total_price": "130.00"
+            },
+            {
+                "item": "Mazaq Tea Karak With\nMilk (1 Sachet)\nToilet Rolls",
+                "quantity": "1",
+                "total_price": "5.00"
+            },
+            {
+                "item": "Fine Smart Jumbo Toilet\nPaper Compressed Rolls\nOffer 2 Extra (10+2 Rolis)\nShampoo",
+                "quantity": "1",
+                "total_price": "65.00"
+            },
+            {
+                "item": "Dove Hair Fall Shampoo\n25% Off (400ml)\nRayeb",
+                "quantity": "2",
+                "total_price": "72.00"
+            },
+            {
+                "item": "Juhayna Rayab Milk (1L)",
+                "quantity": "1",
+                "total_price": "19.45"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "16 April. 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 195.80",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Brown Baladi Bread?",
+        "answer": "12.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Mazaq Tea Karak With Milk?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "5 Brown Baladi Bread\nPoultry",
+            "Temry Chicken - Fresh\nChicken Legs (1kg)\nTea",
+            "Dove Hair Fall Shampoo\n25% Off (400ml)\nRayeb"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery cost?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the Dove Hair Fall Shampoo?",
+        "answer": "72.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 195.80",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 195.80",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery discount?",
+        "answer": "-2.95",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Brown Baladi Bread were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many Chicken Legs were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#169-3414392",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 130.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Fine Smart Jumbo Toilet\nPaper Compressed Rolls\nOffer 2 Extra (10+2 Rolis)\nShampoo",
+        "source": "Human"
+    },
+    {
+        "question": "How many Mazaq Tea Karak With Milk were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "How many Juhayna Rayeb Milk were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 12.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 5.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 303.45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 65.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "15 April, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Brown Baladi Bread?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Mazaq Tea Karak With\nMilk (1 Sachet)\nToilet Rolls",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of the Chicken Legs?",
+        "answer": "130.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total cost of the Juhayna Rayeb Milk?",
+        "answer": "19.45",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Dove Hair Fall Shampoo were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#1569-3414392",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Temry Chicken - Fresh\nChicken Legs (1kg)\nTea",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "195.80",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 17.44",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "303.45",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 17.44 is already included in\nthe total amount.",
+            "Temry Chicken - Fresh\n2 65.00\n130.00\nChicken Legs (1kg)\nTea",
+            "Mazaq Tea Karak With\n1 5.00\n5.00\nMilk (1 Sachet)\nToilet Rolls",
+            "Fine Smart Jumbo Toilet\n1 65.00\n65.00\nPaper Compressed Rolls\nOffer 2 Extra (10+2 Rolis)\nShampoo",
+            "Dove Hair Fall Shampoo\n2 36.00\n72.00\n25% Off (400ml)\nRayeb",
+            "Juhayna Rayab Milk (1L)\n1 19.45\n19.45"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "5 Brown Baladi Bread\nPoultry",
+        "source": "Human"
+    }
+]

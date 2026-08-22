@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "12/11/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "158.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Shbra - بنزايون",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "01026228377",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item code for the first item?",
+        "answer": "APP/VARIOU/981LOTUS",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "158.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "158.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "79.00\n79.00\nAPP/VARIOU/981LOTUS\n019100\n009738",
+            "79 00\n79.00\nAPP/M&SIBL52018-1\n0\n018113\n000053"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of items purchased?",
+        "answer": "2 unit(s)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "158.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the change?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What are the names of items purchased?",
+        "answer": "S.MAN 1 Shb-cash, S.MAN 2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:03:48 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date?",
+        "answer": "12/11/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer ID?",
+        "answer": "52922",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "ACTIV",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 79.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "158.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 79.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:03:48 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "APP/M&SIBL52018-1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "APP/VARIOU/981LOTUS",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of second item?",
+        "answer": "79.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price for first item?",
+        "answer": "79.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax number?",
+        "answer": "584-789-289",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item code for the second item?",
+        "answer": "APP/M&S/BL52018-1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the time?",
+        "answer": "6:03:48 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "شبرا - بنزايون",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "263300",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "263300",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier?",
+        "answer": "Shb-cash",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "APP/VARIOU/981LOTUS",
+                "quantity": "1",
+                "total_price": "79.00"
+            },
+            {
+                "item": "APP/M&SIBL52018-1",
+                "quantity": "1",
+                "total_price": "79.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer number?",
+        "answer": "02",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total?",
+        "answer": "158.00",
+        "source": "GPT"
+    }
+]

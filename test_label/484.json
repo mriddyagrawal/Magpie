@@ -1,0 +1,263 @@
+[
+    {
+        "question": "What is the total due?",
+        "answer": "262.50 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "1510-4707944",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "262.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Mary Safwat",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "312.50 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Temry Chicken - Fresh\nChicken Fillet (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Roumi - Batarekh\n(200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "15 July, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price of each unit of the first product?",
+        "answer": "300.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the discount amount?",
+        "answer": "24.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "01:00 PM - 02:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What was the name of the first product ordered?",
+        "answer": "Temry Chicken - Fresh Chicken Fillet (1Kg)",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was charged for delivery?",
+        "answer": "10.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-50.00 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Temry Chicken - Fresh\nChicken Fillet (1Kg)",
+                "quantity": "2",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Roumi - Batarekh\n(200g)",
+                "quantity": "1",
+                "total_price": "Not Available"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's phone number?",
+        "answer": "+201002546622",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 326.50",
+        "source": "Human"
+    },
+    {
+        "question": "What was the second product ordered?",
+        "answer": "Roumi - Batarekh (200g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the quantity of the first product?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:45",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "262.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the second product?",
+        "answer": "26.50 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "262.50",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Temry Chicken - Fresh\nChicken Fillet (1Kg)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "326.50 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Temry Chicken - Fresh\nChicken Fillet (1Kg)\n2\nEGP 300.00",
+            "Roumi - Batarekh\n1\nEGP 26.50\nGrand\n(200g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the quantity of the second product?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's address?",
+        "answer": "6th of October City, Grand Heights",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    }
+]

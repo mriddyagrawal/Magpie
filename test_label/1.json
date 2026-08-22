@@ -1,0 +1,264 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE 41.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "TEMA RETAIL EG",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "19:05",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "020500000000032769",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the return policy timeframe?",
+        "answer": "30 days from purchase date",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the POS ID?",
+        "answer": "EG02POS05",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount spent on sandals?",
+        "answer": "169.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount including VAT?",
+        "answer": "338.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "020500000000032769",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "19:05",
+        "source": "Human"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "SAN STEFANO, ALEXANDRIA, EGY",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales VAT (14%)\nLE 41.50",
+            "WOVEN DENIM TROUSERS\n8683108598413\n1\n169.00\n169.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "41.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "LE 296.50",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "ACCESSORIES SANDALS",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cashier's ID?",
+        "answer": "3253",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 169.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "WOVEN DENIM TROUSERS",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What items were purchased?",
+        "answer": [
+            "ACCESSORIES SANDALS",
+            "WOVEN DENIM TROUSERS"
+        ],
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "19:05",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "0000106199",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount spent on trousers?",
+        "answer": "169.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 169.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "3/30/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE 338.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "ACCESSORIES SANDALS",
+                "quantity": "1",
+                "total_price": "169.00"
+            },
+            {
+                "item": "WOVEN DENIM TROUSERS",
+                "quantity": "1",
+                "total_price": "169.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE 338.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number listed on the receipt?",
+        "answer": "379-456-249",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the currency used in the receipt?",
+        "answer": "EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "3/30/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier's name?",
+        "answer": "MAHMOUD ALI",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was saved?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "TEMA RETAIL EG",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE 338.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount without VAT?",
+        "answer": "296.50",
+        "source": "GPT"
+    }
+]

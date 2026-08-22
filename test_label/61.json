@@ -1,0 +1,281 @@
+[
+    {
+        "question": "How many empanadas were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "EMPANADA",
+        "source": "Human"
+    },
+    {
+        "question": "Was this a to-go order?",
+        "answer": "Yes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Date:02/11/19",
+        "source": "Human"
+    },
+    {
+        "question": "What was the tax amount?",
+        "answer": "$3.44",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 17.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Guaca Chicharron",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the 'MAR Y CHICKEN' cost?",
+        "answer": "$17.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the restaurant's phone number?",
+        "answer": "(201) 840-8428",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 19.95,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": ":832869",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Time:07:46pm",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the void amount?",
+        "answer": "-$17.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the check?",
+        "answer": "02/11/19",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the 'GUACA CHICHARRON' cost?",
+        "answer": "$13.95",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Guaca Chicharron",
+                "quantity": "1",
+                "total_price": "$13.95"
+            },
+            {
+                "item": "EMPANADA",
+                "quantity": "2",
+                "total_price": "$3.00"
+            },
+            {
+                "item": "PARGO FRITO",
+                "quantity": "1",
+                "total_price": "$19.95"
+            },
+            {
+                "item": "MAR Y CHICKEN",
+                "quantity": "1",
+                "total_price": "$17.00"
+            },
+            {
+                "item": "SALMON A LA PLANCHA",
+                "quantity": "1",
+                "total_price": "$16.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many guests were there?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the order taken?",
+        "answer": "07:46pm",
+        "source": "GPT"
+    },
+    {
+        "question": "What sides were on the side of the 'SALMON A LA PLANCHA'?",
+        "answer": "Ensalada",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Time:07:46pm",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 13.95,
+        "source": "Human"
+    },
+    {
+        "question": "What are the 2 customizations on the 'PARGO FRITO'?",
+        "answer": "No Cebolla, No Cebolla Roja",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1 Guaca Chicharron\n$13.95",
+            "2 EMPANADA\n$3.00",
+            "1 PARGO FRITO\n$19.95\nEnsalada\nAguacate\nNo Cebolla\nNo Cebolla Roja",
+            "1 MAR Y CHICKEN\n$17.00\nTostones\nTostones\n«« ToGo 2 >>>>>>>>»»»",
+            "1 SALMON A LA PLANCHA\n$16.00\nEnsalada\nEnsalada"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "EMPANADA"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the check number?",
+        "answer": "832869",
+        "source": "GPT"
+    },
+    {
+        "question": "What were the two sides that came with the 'MAR Y CHICKEN'?",
+        "answer": "Tostones",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the 'PARGO FRITO' cost?",
+        "answer": "$19.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "$3.44",
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "$69.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What was the final amount due?",
+        "answer": "$55.39",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "PARGO FRITO",
+        "source": "Human"
+    },
+    {
+        "question": "What kind of salad is under 'PARGO FRITO'?",
+        "answer": "Ensalada",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "$55.39",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 3.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "$69.90",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "$55.39",
+        "source": "Human"
+    },
+    {
+        "question": "What was the server's name?",
+        "answer": "DANIELA",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "MAR Y CHICKEN",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "$55.39",
+        "source": "Human"
+    },
+    {
+        "question": "How much did the 'SALMON A LA PLANCHA' cost?",
+        "answer": "$16.00",
+        "source": "GPT"
+    }
+]

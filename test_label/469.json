@@ -1,0 +1,300 @@
+[
+    {
+        "question": "How much does one Almarai Treats Banana Milk (200ml) cost?",
+        "answer": "5.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2915-4486581",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 514.00",
+        "source": "Human"
+    },
+    {
+        "question": "How much does Linah Farms Medjual On The Go Master Pack of 24 (50g) cost?",
+        "answer": "225.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the delivery cost?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 0 is already included in the\ntotal amount.",
+            "Pastirma Baladi (200g)\n47.00\n47.00",
+            "Rich Beet Luncheon With\n1 30.50\n30.50\nBlack Pepper (250g)\nLong-Life Milk",
+            "Lamar Semi Skimnied\n1 126.00 126.00\nMilk Pack Of 6 (1L)\n[B] Lamar Semi Skimmed\n6\nMilk (1L)\nDates",
+            "Linah Farms Medjool On\n1\n225.00 225.00",
+            "The Go Master Pack of\n24 (50g)\nFlavored Milk",
+            "Almaral Treats Banana\n5 5.00\n25.00\nMilk (200ml)\nYogurt",
+            "Almarai Natural Yogurt\n3 6.00\n18.00\n(170g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 514.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many grams of Pastirma Baladi were ordered?",
+        "answer": "200g",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 514.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 513.66",
+        "source": "GPT"
+    },
+    {
+        "question": "What cold cut was ordered?",
+        "answer": "Pastirma Baladi",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 126.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 47.0,
+        "source": "Human"
+    },
+    {
+        "question": "What was the subtotal?",
+        "answer": "EGP 512.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Mainz Cheddar Cheese\n(200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 40.75,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Lamar Semi Skimnied\nMilk Pack Of 6 (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Almarai Natural Yogurt (170g) cost?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Pastirma Baladi (200g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Rich Beef Luncheon With Black Pepper?",
+        "answer": "30.50",
+        "source": "GPT"
+    },
+    {
+        "question": "How many grams of Mainz Cheddar Cheese were ordered?",
+        "answer": "200g",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Mainz Cheddar Cheese\n(200g)",
+                "quantity": "1",
+                "total_price": "40.75"
+            },
+            {
+                "item": "Pastirma Baladi (200g)",
+                "quantity": "1",
+                "total_price": "47.00"
+            },
+            {
+                "item": "Rich Beet Luncheon With\nBlack Pepper (250g)\nLong-Life Milk",
+                "quantity": "1",
+                "total_price": "30.50"
+            },
+            {
+                "item": "Lamar Semi Skimnied\nMilk Pack Of 6 (1L)",
+                "quantity": "1",
+                "total_price": "126.00"
+            },
+            {
+                "item": "Linah Farms Medjool On",
+                "quantity": "1",
+                "total_price": "225.00"
+            },
+            {
+                "item": "The Go Master Pack of\n24 (50g)",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Almaral Treats Banana\nMilk (200ml)\nYogurt",
+                "quantity": "5",
+                "total_price": "25.00"
+            },
+            {
+                "item": "Almarai Natural Yogurt\n(170g)",
+                "quantity": "3",
+                "total_price": "18.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many bags were ordered?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 512.25",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many packs of Lamar Semi Skimmed Milk (1L) were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "June, 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much does one pack of Lamar Semi Skimmed Milk cost?",
+        "answer": "126.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Almarai Natural Yogurt (170g) were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 30.5,
+        "source": "Human"
+    },
+    {
+        "question": "How much does Pastirma Baladi cost?",
+        "answer": "47.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Almaral Treats Banana\nMilk (200ml)\nYogurt",
+            "Almarai Natural Yogurt\n(170g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Rich Beet Luncheon With\nBlack Pepper (250g)\nLong-Life Milk",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "How much does the Mainz Cheddar Cheese cost?",
+        "answer": "40.75",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Almarai Treats Banana Milk (200ml) were ordered?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2915-4486581",
+        "source": "GPT"
+    },
+    {
+        "question": "How many grams of Rich Beef Luncheon With Black Pepper were ordered?",
+        "answer": "250g",
+        "source": "GPT"
+    }
+]

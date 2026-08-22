@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the total amount before VAT?",
+        "answer": "681.58",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "UNDERWEAR KEY KNICKER-VEST",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "240400000000040485",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "JERSEY BODY - T-SHIRT LONG-SLEEVED",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "KNITWEAR PULLOVER",
+                "quantity": "1",
+                "total_price": "299.00"
+            },
+            {
+                "item": "UNDERWEAR KEY KNICKER-VEST",
+                "quantity": "1",
+                "total_price": "249.00"
+            },
+            {
+                "item": "JERSEY BODY - T-SHIRT LONG-SLEEVED",
+                "quantity": "T",
+                "total_price": "229.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the Sales VAT (14%) amount?",
+        "answer": "95.42",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "0000051485",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "LC WAIKIKI",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the second item purchased?",
+        "answer": "UNDERWEAR KEY KNICKER-VEST",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the Cashier ID?",
+        "answer": "4118",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 229.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 299.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE 95.42",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of UNDERWEAR KEY KNICKER-VEST?",
+        "answer": "249.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of purchase?",
+        "answer": "21:15",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the Cashier's name?",
+        "answer": "KAREEM SAYED",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "240400000000040485",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of KNITWEAR PULLOVER?",
+        "answer": "299.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the third item purchased?",
+        "answer": "JERSEY BODY - T-SHIRT LONG-SLEEVED",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of receipt is this?",
+        "answer": "SALES RECEIPT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "777.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE 777.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of JERSEY BODY - T-SHIRT LONG-SLEEVED?",
+        "answer": "229.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE 777.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT number?",
+        "answer": "379-458-249",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of purchase?",
+        "answer": "10/21/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "T",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "KNITWEAR PULLOVER",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "21:15",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "21:15",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE 777.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 249.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "10/21/2021",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Sales VAT (14%)\nLE 95.42",
+            "UNDERWEAR KEY KNICKER-VEST\n8683108758420\n1\n249.00\n249.00",
+            "JERSEY BODY - T-SHIRT LONG-SLEEVED\n8663108094830\nT\n229.00\n229.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the POS ID?",
+        "answer": "EG24POS04",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "LC WAIKIKI",
+        "source": "Human"
+    },
+    {
+        "question": "What was the first item purchased?",
+        "answer": "KNITWEAR PULLOVER",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "LE 681.58",
+        "source": "Human"
+    }
+]

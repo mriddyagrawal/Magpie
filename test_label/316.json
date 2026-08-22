@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Fresh Carrot & Orange Juice\nLE35.0",
+                "quantity": "1",
+                "total_price": "LE35.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the item?",
+        "answer": "LE35.0",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the net amount?",
+        "answer": "LE35.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the item?",
+        "answer": "LE35.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "LE35.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "LE35.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change amount?",
+        "answer": "LE15.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "Who is the cashier?",
+        "answer": "M.Abdel",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "31/1/2023",
+        "source": "Human"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "Arkan Sheikh Zayed, Giza, 19339",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "GOURMET FOOD STORES",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "SalesTax 14%\nLE4.30"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was purchased?",
+        "answer": "Fresh Carrot & Orange Juice",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What amount of cash was tendered?",
+        "answer": "LE 50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales tax amount?",
+        "answer": "LE4.30",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the item was purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "962773",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 35.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "11:47:17 A",
+        "source": "GPT"
+    },
+    {
+        "question": "What kind of receipt is this?",
+        "answer": "Sales Receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "962773",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:47:17 A",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "LE4.30",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sales tax percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number at the bottom of the receipt?",
+        "answer": "228-097-517",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Gourmet Egypt",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "LE35.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Fresh Carrot & Orange Juice\nLE35.0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:47:17 A",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "LE35.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the message below the phone number?",
+        "answer": "Thank you for shopping Gourmet Egypt We hope you'll come back soon!",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "31/1/2023",
+        "source": "GPT"
+    }
+]

@@ -1,0 +1,300 @@
+[
+    {
+        "question": "How many bottles of Harvest White Vinegar were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 8,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "299.78 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cucumbers (1Kg)",
+                "quantity": "1",
+                "total_price": "22.00"
+            },
+            {
+                "item": "Tomatoes (1Kg)",
+                "quantity": "1",
+                "total_price": "15.00"
+            },
+            {
+                "item": "C\nRed Onions (1Kg)",
+                "quantity": "1",
+                "total_price": "28.00"
+            },
+            {
+                "item": "Nescafe Classic Pouch (18g)",
+                "quantity": "2",
+                "total_price": "35.00"
+            },
+            {
+                "item": "Al Doha White Sugar (1kg)",
+                "quantity": "1",
+                "total_price": "28.00"
+            },
+            {
+                "item": "Daria Pomegranate Molasses (350ml)",
+                "quantity": "1",
+                "total_price": "46.25"
+            },
+            {
+                "item": "Harvest White Vinegar (1L)",
+                "quantity": "1",
+                "total_price": "17.25"
+            },
+            {
+                "item": "Sedra White Rice (1kg)",
+                "quantity": "3",
+                "total_price": "98.25"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How much does 1 kg of cucumbers cost?",
+        "answer": "22.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 299.78",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "11072574-97",
+        "source": "GPT"
+    },
+    {
+        "question": "How many kilograms of red onions were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal of the items?",
+        "answer": "289.75 EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does one Nescafe Classic Pouch cost?",
+        "answer": "17.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 11.85",
+        "source": "Human"
+    },
+    {
+        "question": "How many kilograms of Sedra White Rice were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Nescafe Classic Pouches were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 289.75",
+        "source": "Human"
+    },
+    {
+        "question": "How much does 1 kg of tomatoes cost?",
+        "answer": "15.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much does one kilogram of Sedra White Rice cost?",
+        "answer": "32.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cucumbers (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Tomatoes (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Al Doha white sugar cost?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "How many Al Doha White Sugars were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 15.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "9 August, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "How much does one bottle of Harvest White Vinegar cost?",
+        "answer": "17.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 35.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "C\nRed Onions (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many kilograms of tomatoes were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 299.78",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Nescafe Classic Pouch (18g)",
+            "Sedra White Rice (1kg)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#97-11072574",
+        "source": "Human"
+    },
+    {
+        "question": "How much does 1 kg of red onions cost?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 28.0,
+        "source": "Human"
+    },
+    {
+        "question": "How much does one Daria Pomegranate Molasses cost?",
+        "answer": "46.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 299.78",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "value of EGP 11.85 is already included in the total amount.",
+            "Tomatoes (1Kg)\n1 15.00\n15.00",
+            "C\nRed Onions (1Kg)\n1 28.00\n28.00",
+            "Nescafe Classic Pouch (18g)\n2 17.50\n35.00",
+            "Al Doha White Sugar (1kg)\n1 28.00\n28.00",
+            "Daria Pomegranate Molasses (350ml)\n1 46.25\n46.25",
+            "Harvest White Vinegar (1L)\n1 17.25\n17.25",
+            "Sedra White Rice (1kg)\n3 32.75\n98.25"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many bottles of Daria Pomegranate Molasses were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many kilograms of cucumbers were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Nescafe Classic Pouch (18g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "8",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 22.0,
+        "source": "Human"
+    }
+]

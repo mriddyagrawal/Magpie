@@ -1,0 +1,287 @@
+[
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "27 March, 2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Rehana Sugar (1Kg)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount after discount and shipping?",
+        "answer": "EGP 282.57",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Rehana Sugar (1Kg)",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 279.82",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 30.25,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of Rehana Sugar per kg?",
+        "answer": "24.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 49.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "8526268-2719",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "24 Brown Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 282.57",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 67.5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the current balance deduction?",
+        "answer": "-EGP 2.75",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Pastirma Baladi (200g)\n1 67.50\n67.50",
+            "24 Brown Eggs\n1 118.00\n118.00",
+            "Rehana Sugar (1Kg)\n2 24.75\n49.50",
+            "Juhayna Full Cream Milk (1L)\n1 30.25\n30.25",
+            "Dettol Soap Nourish 4 Pcs Offer 2LE (115g)\n1 60.99\n60.99",
+            "Americana Fava Beans w Oil, Lemon And Cumin 20% Off Pack Of 2 (400g)\n1 38.05\n38.05"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 279.82",
+        "source": "Human"
+    },
+    {
+        "question": "What is the shipping method?",
+        "answer": "via Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "10:00 PM - 11:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's location?",
+        "answer": "Heliopolis",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Juhayna Full Cream Milk (1L)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 279.82",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Pastirma Baladi (200g)",
+        "source": "Human"
+    },
+    {
+        "question": "How many brown eggs were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the shipping fee?",
+        "answer": "EGP 12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 118.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 279.82",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "How many units of Juhayna Full Cream Milk were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the customer?",
+        "answer": "محمد عريشه",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Pastirma Baladi (200g)",
+                "quantity": "1",
+                "total_price": "67.50"
+            },
+            {
+                "item": "24 Brown Eggs",
+                "quantity": "1",
+                "total_price": "118.00"
+            },
+            {
+                "item": "Rehana Sugar (1Kg)",
+                "quantity": "2",
+                "total_price": "49.50"
+            },
+            {
+                "item": "Juhayna Full Cream Milk (1L)",
+                "quantity": "1",
+                "total_price": "30.25"
+            },
+            {
+                "item": "Dettol Soap Nourish 4 Pcs Offer 2LE (115g)",
+                "quantity": "1",
+                "total_price": "60.99"
+            },
+            {
+                "item": "Americana Fava Beans w Oil, Lemon And Cumin 20% Off Pack Of 2 (400g)",
+                "quantity": "1",
+                "total_price": "38.05"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "27 March, 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal before discounts and shipping?",
+        "answer": "EGP 364.29",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-EGP 94.22",
+        "source": "GPT"
+    },
+    {
+        "question": "What discount was given on Americana Fava Beans?",
+        "answer": "20% Off Pack Of 2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2719-8526268",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item listed?",
+        "answer": "Pastirma Baladi (200g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the soap?",
+        "answer": "Dettol Soap Nourish 4 Pcs Offer 2LE (115g)",
+        "source": "GPT"
+    }
+]

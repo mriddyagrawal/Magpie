@@ -1,0 +1,257 @@
+[
+    {
+        "question": "What is the change amount?",
+        "answer": "1.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "10.02.2023",
+        "source": "Human"
+    },
+    {
+        "question": "What is the fax number of the store?",
+        "answer": "0225983556",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "316341",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Al Amir Egyptian Rice 1kg"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the location of the store?",
+        "answer": "Emerald - Twin Plaza, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "14:42",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "Al Amir Egyptian Rice 1kg",
+        "source": "GPT"
+    },
+    {
+        "question": "Who served the customer?",
+        "answer": "Muhammed Mustafa Darwish Musta",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 54.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.luluhypermarket.com",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Al Amir Egyptian Rice 1kg",
+                "quantity": "3",
+                "total_price": "54.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "6224000214494",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Al Amir Egyptian Rice 1kg",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "54.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Lulu Hypermarket , Emerald - Twin Plaza",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store POS number?",
+        "answer": "3920",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "54.00",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "6224000214494\n3 x\n18.00\nأرز مصري الأمير\nAl Amir Egyptian Rice 1kg\n54.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "316341",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax card number?",
+        "answer": "447-599-798",
+        "source": "GPT"
+    },
+    {
+        "question": "How many units of the item were purchased?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the CR number?",
+        "answer": "66533",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "54.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the cost of 1 Al Amir Egyptian Rice 1kg?",
+        "answer": "18.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "54.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "10.02.2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Lulu Hypermarket",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the telephone number of the store?",
+        "answer": "0225983555",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "14:42",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "14:42",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount paid?",
+        "answer": "55.00",
+        "source": "GPT"
+    }
+]

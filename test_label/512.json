@@ -1,0 +1,260 @@
+[
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "9945288089563\n1\nVO\nبقر كبدة\nBrazil Beef Liver\nبرازيلى\n89.56",
+            "10005767",
+            "9997434141410\n1\nVo\nمفروم لحم بقري بلدي بالحسم\nBaladi Beef Mince W/Fat\n141.41\n10005767",
+            "9997297280844\n1\nVo\nمكعبات لحم بقري بلدي بالحسم\nBaladi Beef Cubes W/Fat\n280.84\n10005767",
+            "9994405458003\n1\nVo\nروبيان مذاب الأنتاج\nDefrosted Shrimps 60/70\n10000017\n458.00",
+            "9997200000002\n1 x\n99.95\nVo\nفيلية سمك باسا أحمر\nBasa Fillet Red\n99.95\n10000626"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the purchase of 'Baladi Beef Mince W/Fat'?",
+        "answer": "141.41",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "13:26",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Brazil Beef Liver",
+        "source": "Human"
+    },
+    {
+        "question": "What is the old balance?",
+        "answer": "950.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the purchase of 'Basa Fillet Red'?",
+        "answer": "99.95",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "341946",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "LuLu Hypermarket",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the new balance?",
+        "answer": "0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1069.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Baladi Beef Cubes W/Fat",
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number of the store?",
+        "answer": "0222686274",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the purchase made?",
+        "answer": "13:26",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was paid in cash?",
+        "answer": "200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Baladi Beef Mince W/Fat",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "341946",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the purchase of 'Defrosted Shrimps 60/70'?",
+        "answer": "458.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1069.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What was the purchase of 'Baladi Beef Cubes W/Fat'?",
+        "answer": "280.84",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the fax number of the store?",
+        "answer": "0222686275",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the change?",
+        "answer": "80.24",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the refund/exchange policy?",
+        "answer": "1 day for fresh food, 30 days others",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "CuCu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "13:26",
+        "source": "Human"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "THE DISTRICT-Wadi Degla Sheraton, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 89.56,
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Brazil Beef Liver",
+                "quantity": "1",
+                "total_price": "89.56"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 280.84,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "27.09.2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 141.41,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1069.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.luluhypermarket.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the purchase of the 'Brazil Beef Liver'?",
+        "answer": "89.56",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "1069.76",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "27.09.2023",
+        "source": "Human"
+    }
+]

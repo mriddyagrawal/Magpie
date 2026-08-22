@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Bio Grnt.Cook.Pot9387 24c\nPARKING",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the card number?",
+        "answer": "200200**********",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the currency?",
+        "answer": "EGP",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "18.03.2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "234226",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "379.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "6223005019387",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What was the value of the parking coupon?",
+        "answer": "150.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "طقم أواني طهي غرانيت كوكن أبود (C/A Bio Grnt.Cook.Pot9387 24c)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Lulu Hypermarket,",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "379.00",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Bio Grnt.Cook.Pot9387 24c\nPARKING",
+                "quantity": "1",
+                "total_price": "379.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the EFT transaction number?",
+        "answer": "234226",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store's phone number?",
+        "answer": "+201275898394",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the purchase?",
+        "answer": "379.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who served the customer?",
+        "answer": "Maged Anwar Abdelrahman Muhamm",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the purchase?",
+        "answer": "18.03.2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "16:04",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Lulu Hypermarket",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "6223005019387\n1 x\n379.00\nV6\nطقم أواني طهي غرانيت كوكن أبود\nC/A Bio Grnt.Cook.Pot9387 24c\n379.00\nPARKING FREE COUPON\n(\n150.00) Coup."
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the store POS number?",
+        "answer": "3912",
+        "source": "GPT"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "The Park Mall, 5th Settlement, New Cairo, Egypt",
+        "source": "GPT"
+    },
+    {
+        "question": "How many of the item were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "Was there a parking coupon?",
+        "answer": "Yes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.luluhypermarket.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the purchase made?",
+        "answer": "16:04",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "16:04",
+        "source": "Human"
+    },
+    {
+        "question": "How long is the refund period for fresh food?",
+        "answer": "1 day",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 379.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "234226",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "379.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item's price?",
+        "answer": "379.00",
+        "source": "GPT"
+    }
+]

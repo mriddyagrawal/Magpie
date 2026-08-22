@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the name of the first item ordered?",
+        "answer": "Todo Brownie Chocolate Cake (1 Pcs)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Lavazza Mattino\nGround Coffee\n(250g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How long until the order is delivered?",
+        "answer": "in 60 mins",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were ordered?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the restaurant?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the order delivered?",
+        "answer": "12:43 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of card was used to pay?",
+        "answer": "VISA",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Todo Brownie Chocolate\nCake (1 Pcs)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 189.2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1x",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the order?",
+        "answer": "Sat, 10 Jun 2023",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the order?",
+        "answer": "EGP 189.2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 189.2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Todo Brownie Chocolate\nCake (1 Pcs)",
+                "quantity": "1x",
+                "total_price": "7"
+            },
+            {
+                "item": "Lavazza Mattino\nGround Coffee\n(250g)",
+                "quantity": "1x",
+                "total_price": "159"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Lavazza Mattino Ground Coffee?",
+        "answer": "EGP 159",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 7.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:43 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1x\nTodo Brownie Chocolate EGP 7\nCake (1 Pcs)",
+            "1x\nLavazza Mattino\nEGP 159\nGround Coffee\n(250g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery address?",
+        "answer": "منزل ٤١ ش محمد شعبان متفرع من شارع خزان المياه امام مسجد النصر ش, Mokattam",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 189.2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Is this order considered breakfast now?",
+        "answer": "Yes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What are the last four digits of the card?",
+        "answer": "6962",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 159.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many stars were given in rating",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What type of food does the restaurant serve?",
+        "answer": "Breakfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "12:43 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the Todo Brownie Chocolate Cake?",
+        "answer": "EGP 7",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "10 Jun 2023",
+        "source": "Human"
+    },
+    {
+        "question": "Is there a Reorder button?",
+        "answer": "Yes",
+        "source": "GPT"
+    },
+    {
+        "question": "How many points is the user eligible for?",
+        "answer": "250 points",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#109-9917667",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What time is it now?",
+        "answer": "10:36",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the second item ordered?",
+        "answer": "Lavazza Mattino Ground Coffee (250g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    }
+]

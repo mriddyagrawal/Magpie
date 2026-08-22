@@ -1,0 +1,309 @@
+[
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What sizes of item CXQ/SS21/006 were bought?",
+        "answer": "38 and 36",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1295.00",
+        "source": "Human"
+    },
+    {
+        "question": "Who is the customer?",
+        "answer": "Noha mohsen",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What color was item WAH/SS21/008?",
+        "answer": "BLACK",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "4:21:02 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price before discount?",
+        "answer": "1535.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's number?",
+        "answer": "01099976766",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier number?",
+        "answer": "1401",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "114244",
+        "source": "Human"
+    },
+    {
+        "question": "What was the net price of items?",
+        "answer": "1135.96",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the card number?",
+        "answer": "8162",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 299.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "27/08/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "CXQ/SS21/006",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total discount?",
+        "answer": "240.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 339.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "159.04",
+        "source": "Human"
+    },
+    {
+        "question": "What is S.MAN number?",
+        "answer": "2475",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount paid?",
+        "answer": "1295.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many units were purchased?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "dejAyl",
+        "source": "Human"
+    },
+    {
+        "question": "What time did the transaction occur?",
+        "answer": "4:21:02 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1295.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 339.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total VAT amount?",
+        "answer": "159.04",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store name?",
+        "answer": "Maadi",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the bank that issued the card?",
+        "answer": "QNB",
+        "source": "GPT"
+    },
+    {
+        "question": "What type of card was used?",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "27/08/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "1535.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "114244",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "10",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "CXQ/SS21/007",
+                "quantity": "1",
+                "total_price": "339.00"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "299.00"
+            },
+            {
+                "item": "CXQ/SS21/006",
+                "quantity": "1",
+                "total_price": "339.00"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "299.00"
+            },
+            {
+                "item": "CXQ/SS21/006",
+                "quantity": "1",
+                "total_price": "339.00"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "299.00"
+            },
+            {
+                "item": "KND/SS21/006",
+                "quantity": "1",
+                "total_price": "269.00"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "199.00"
+            },
+            {
+                "item": "WAH/SS21/008",
+                "quantity": "1",
+                "total_price": "249.00"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "199.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "1135.96\n159.04",
+            "1\nSALE\n339.00\n40.00\n299.00",
+            "CXQ/SS21/006\n38\nBLACK\n339.00\n0\n013100\n006469",
+            "1\nSALE\n339.00\n40.00\n299.00",
+            "CXQ/SS21/006\n36\nBLACK\n339.00\n0\n013645\n000090",
+            "1\nSALE\n339.00\n40.00\n299.00",
+            "KND/SS21/006\n36\nWHT-MLT 269.00\n0\n013892\n000058",
+            "1\nSALE\n269.00\n70.00\n199.00",
+            "WAH/SS21/008\n36\nBLACK\n249.00\n0\n014002\n00009B",
+            "1\nSALE\n249.00\n50.00\n199.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 4,
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 299.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "4:21:02 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1295.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "CXQ/SS21/007",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "CXQ/SS21/007",
+        "source": "Human"
+    }
+]

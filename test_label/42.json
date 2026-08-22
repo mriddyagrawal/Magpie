@@ -1,0 +1,325 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "12",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How many white toasts were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#2014-6051063",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 75.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Marble Pound Cakes were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the first product on the list?",
+        "answer": "Cinnamon & Ginger Pound Cake",
+        "source": "GPT"
+    },
+    {
+        "question": "How many brown eggs were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Cinnamon & Ginger Pound\nCake",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Soft Bread",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Soft Bread",
+            "6 Brown Eggs",
+            "Lurpak Butter Unsalted (100g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Marble Pound Cake",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT value?",
+        "answer": "17.08",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "470.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many mini plain muffins were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Almarai Natural Yogurt Offer?",
+        "answer": "41.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery charge?",
+        "answer": "12.50",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 75.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 17.08 is already induded in the\ntotal amount.",
+            "Marble Pound Cake\n1 75.00 75.00",
+            "5 Soft Bread\n2 10.00 20.00",
+            "Breadsticks with Sesame\n1 35.00 35.00\n(400g)",
+            "Roumi - Medium (200g)\n1 31.00 31.00",
+            ".\n6 Brown Eggs\n2 262\n52.00",
+            "Lychee Granola Dried Fruits\n(300g)\n1 65.00 65.00",
+            "White Toast\n1 25.00 25.00",
+            "5 Mini Plain Muffins\n1 32.00\n32.00",
+            "Lurpak Butter Unsalted (100g)\n2 31.00\n62.00",
+            "Almarai Natural Yogurt Offer\n1 41.50\n41.50\n9+3 Free (105g)",
+            "Almarai Labneh (180g)\n1 35.25 35.25"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many Lurpak Butter Unsalted were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 470.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one unit of Lychee Granola Dried Fruits?",
+        "answer": "65.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 12,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 17.08",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of one soft bread?",
+        "answer": "10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Breadsticks with Sesame\n(400g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "20 October, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 470.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-91.25",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "How many Almarai Labneh were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one unit of Roumi - Medium?",
+        "answer": "31.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 20.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#2014-6051063",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Breadsticks with Sesame were ordered?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "548.75",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "12",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 470.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Cinnamon & Ginger Pound\nCake",
+                "quantity": "1",
+                "total_price": "75.00"
+            },
+            {
+                "item": "Marble Pound Cake",
+                "quantity": "1",
+                "total_price": "75.00"
+            },
+            {
+                "item": "Soft Bread",
+                "quantity": "2",
+                "total_price": "20.00"
+            },
+            {
+                "item": "Breadsticks with Sesame\n(400g)",
+                "quantity": "1",
+                "total_price": "35.00"
+            },
+            {
+                "item": "Roumi - Medium (200g)",
+                "quantity": "1",
+                "total_price": "31.00"
+            },
+            {
+                "item": "6 Brown Eggs",
+                "quantity": "2",
+                "total_price": "52.00"
+            },
+            {
+                "item": "Lychee Granola Dried Fruits\n(300g)",
+                "quantity": "1",
+                "total_price": "65.00"
+            },
+            {
+                "item": "White Toast",
+                "quantity": "1",
+                "total_price": "25.00"
+            },
+            {
+                "item": "Mini Plain Muffins",
+                "quantity": "1",
+                "total_price": "32.00"
+            },
+            {
+                "item": "Lurpak Butter Unsalted (100g)",
+                "quantity": "2",
+                "total_price": "62.00"
+            },
+            {
+                "item": "Almarai Natural Yogurt Offer\n9+3 Free (105g)",
+                "quantity": "1",
+                "total_price": "41.50"
+            },
+            {
+                "item": "Almarai Labneh (180g)",
+                "quantity": "1",
+                "total_price": "35.25"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 548.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 35.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    }
+]

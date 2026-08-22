@@ -1,0 +1,270 @@
+[
+    {
+        "question": "What is the price of one Pepsi bottle?",
+        "answer": "3.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "15 February, 2022",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "How many bags were used?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the delivery fee?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal of the order?",
+        "answer": "EGP 59.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What soft drink was ordered?",
+        "answer": "Pepsi Bottle (250ml)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the Nestle Carnavalita ice creams?",
+        "answer": "50.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 59.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 50.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many Nestle Carnavalita ice creams were ordered?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Nestle Carnavalita",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Nestle Carnavalita",
+                "quantity": "2",
+                "total_price": "50.00"
+            },
+            {
+                "item": "Chocolate (850ml)\nSoft Drinks",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "Pepsi Bottle (250ml)",
+                "quantity": "3",
+                "total_price": "9.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "1518-2571345",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery time window?",
+        "answer": "07:00 PM - 08:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Pepsi Bottle (250ml)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount applied to the order?",
+        "answer": "EGP 8.85",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 9.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#1518-2571345",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "Ice Cream\nNestle Carnavalita\n2 25.00 50.00\nIce Cream Vanilla",
+            "Chocolate (850ml)\nSoft Drinks",
+            "Pepsi Bottle (250ml)\n3 3.00\n9.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 60.15",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the Pepsi bottles?",
+        "answer": "9.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Nestle Carnavalita",
+            "Pepsi Bottle (250ml)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method for the order?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the customer?",
+        "answer": "Passant Hossam",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of one Nestle Carnavalita ice cream?",
+        "answer": "25.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Chocolate (850ml)\nSoft Drinks",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the company?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "How many Pepsi bottles were ordered?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 60.15",
+        "source": "Human"
+    },
+    {
+        "question": "What type of products did the customer order?",
+        "answer": "Ice Cream and Soft Drinks",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "15 February, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 60.15",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery address?",
+        "answer": "Hadayek Al-Ahram",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 60.15",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

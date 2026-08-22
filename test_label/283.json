@@ -1,0 +1,255 @@
+[
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "42.99",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "350.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "429759",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "42.99"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "429759",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:39:29 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "nesrein",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the commercial register number?",
+        "answer": "7376",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "307.11",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 389.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the original price of the item?",
+        "answer": "389.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time of the transaction?",
+        "answer": "21/07/2021 6:39:29 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "JejAvı\nC",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price after discount?",
+        "answer": "350.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "42.99",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the item description?",
+        "answer": "LID/SS21/075",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the shop online website?",
+        "answer": "www.dejavu.shoes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the discount on the item?",
+        "answer": "38.90",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "350.10",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "21/07/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the bank?",
+        "answer": "QNB",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "LUCKY",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "6:39:29 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer service number?",
+        "answer": "01149990142-01162296556",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How was the payment method",
+        "answer": "Credit Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "01066625660",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the card number?",
+        "answer": "1723",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the net price?",
+        "answer": "307.11",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "LUCKY",
+                "quantity": "1",
+                "total_price": "389.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of the transaction?",
+        "answer": "350.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store name?",
+        "answer": "MOHYE ALDEEN",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the color of the item?",
+        "answer": "FUSHIA",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax registration number?",
+        "answer": "200-218-727",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "350.10",
+        "source": "Human"
+    }
+]

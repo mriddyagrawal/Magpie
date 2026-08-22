@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the first item?",
+        "answer": "Roasted Pistachios 50 Gram",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Mixed Nuts 50g",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total order amount?",
+        "answer": "350.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the Black Forest Dried Fruits?",
+        "answer": "40 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 5,
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number?",
+        "answer": "01111927044",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1.000@)65.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1.000@40.00",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the roasted pistachios?",
+        "answer": "40 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is the cashier?",
+        "answer": "Belal Mohamed",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the Dates & Almonds?",
+        "answer": "65 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "289.47",
+        "source": "Human"
+    },
+    {
+        "question": "What is the street name?",
+        "answer": "شارع الشهيد ابراهيم سالم",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 145.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "350.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "350.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Abu",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "2023-41-16",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Abu Auf",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the prunes?",
+        "answer": "145 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:37:46 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "289.47",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the VAT?",
+        "answer": "40.53",
+        "source": "GPT"
+    },
+    {
+        "question": "How much is the mixed nuts?",
+        "answer": "40 L.E",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Roasted Pistachios 50 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Roasted Pistachios 50 Gram",
+                "quantity": "1.000@40.00",
+                "total_price": "40"
+            },
+            {
+                "item": "Prunes without pits",
+                "quantity": "0.250@580.00",
+                "total_price": "145"
+            },
+            {
+                "item": "Mixed Nuts 50g",
+                "quantity": "1.000@40.00",
+                "total_price": "40"
+            },
+            {
+                "item": "Dates & Almonds 200 Gram",
+                "quantity": "1.000@)65.00",
+                "total_price": "65"
+            },
+            {
+                "item": "Black Forest Dried Fruits 3:5 gm",
+                "quantity": "1.000@)40,00",
+                "total_price": "40"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "350.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:37:46 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Prunes without pits",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "Dr Ola Elmofty",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "0.250@580.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 65.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "77720",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were sold?",
+        "answer": "5",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1.000@40.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Dates & Almonds 200 Gram",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 40.0,
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT:\n40.53",
+            "Prunes without pits\n0.250@580.00\nL.E\n145 L.E",
+            "Mixed Nuts 50g\n1.000@40.00 L.E\n40 L.E",
+            "Dates & Almonds 200 Gram\n1.000@)65.00 L.E\n65 L.E",
+            "Black Forest Dried Fruits 3:5 gm\n1.000@)40,00 L.E\n40 L.E"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "2023-11-16",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "40.53",
+        "source": "Human"
+    },
+    {
+        "question": "What time was the transaction completed?",
+        "answer": "06:37:46 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the shipping cost?",
+        "answer": "20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "77720",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website of the store?",
+        "answer": "www.abu-auf.com",
+        "source": "GPT"
+    }
+]

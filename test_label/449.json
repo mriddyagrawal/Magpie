@@ -1,0 +1,263 @@
+[
+    {
+        "question": "What is the Facebook account for the store?",
+        "answer": "mensclub.egypt.official",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 166.67,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the first item?",
+        "answer": "316.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:09:08 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer ID?",
+        "answer": "01030249171",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "001/W22/5306/2ND\nقميص قم",
+                "quantity": "1",
+                "total_price": "166.66"
+            },
+            {
+                "item": "001/W22/5306/2ND\nقميص قم",
+                "quantity": "1",
+                "total_price": "166.67"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the size of the first item?",
+        "answer": "NS",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "852.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the store number?",
+        "answer": "068",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "500.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "852.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier ID?",
+        "answer": "159amr",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What payment method was used?",
+        "answer": "Cash",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the phone number for complaints and suggestions?",
+        "answer": "01015888341",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 166.67,
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "12/9/2021",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item description?",
+        "answer": "قميص قم",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "06:09:08 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Men's Club",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the first item style number?",
+        "answer": "001//22/5306/2ND",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Mataria",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "001/W22/5306/2ND\nقميص قم\n627024\n000000\n1\n166.66\nNS\n149.34",
+            "001/W22/5306/2ND\n316.00\nقميص قم\n627924\n000000\n1\nNS\n166.67\n149.33",
+            "316.00",
+            "001/W22/5337/2ND\nقميص كم كرود\n620102\n600000\n1\n166.67\nNS\n220.00\n53.33"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 166.66,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the third item description?",
+        "answer": "قميص كم قروه",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "001/W22/5337/2ND\nقميص كم كرود",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "001/W22/5306/2ND\nقميص قم",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "500.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total discount?",
+        "answer": "352.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "12/9/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "MEN'S CLUB",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount on the first item?",
+        "answer": "149.34",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "500.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "500.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "001/W22/5306/2ND\nقميص قم",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the second item description?",
+        "answer": "قميص قم",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the transaction?",
+        "answer": "06:09:08 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

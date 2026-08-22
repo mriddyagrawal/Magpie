@@ -1,0 +1,273 @@
+[
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "L.E.61.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the transaction?",
+        "answer": "27/01/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the KITKAT CHUNKY WHITE 40GM cost?",
+        "answer": "L.E.15.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "665910",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much change was given?",
+        "answer": "L.E.9.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total cost of two TWIX TWIN 50 GM?",
+        "answer": "L.E.26.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "L.E.61.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Emarat Misr",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:39:31 PM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "L.E.61.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "L.E.0.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Emarat Misr",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the time of the transaction?",
+        "answer": "11:39:31 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "MONDELEZ STICK",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What was the amount of VAT?",
+        "answer": "L.E.0.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "TWIX TWIN 50 GM",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "MONDELEZ STICK",
+                "quantity": "1",
+                "total_price": "L.E.20.00"
+            },
+            {
+                "item": "TWIX TWIN 50 GM",
+                "quantity": "1",
+                "total_price": "L.E. 13.00"
+            },
+            {
+                "item": "TWIX TWIN 50 GM",
+                "quantity": "1",
+                "total_price": "L.E. 13.00"
+            },
+            {
+                "item": "KITKAT CHUNKY\nWHITE 40GM",
+                "quantity": "1",
+                "total_price": "L.E. 15.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "665910",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "27/01/2022",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT\nL.E.0.00",
+            "850\nTWIX TWIN 50 GM\nL.E. 13.00",
+            "850\nTWIX TWIN 50 GM\nL.E. 13.00",
+            "8712\nKITKAT CHUNKY\nL.E. 15.00\nWHITE 40GM"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What does the receipt say at the bottom?",
+        "answer": "Thanks You-- We hope you'll come back soon!",
+        "source": "GPT"
+    },
+    {
+        "question": "In what city is this store located?",
+        "answer": "Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the MONDELEZ STICK cost?",
+        "answer": "L.E.20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the total amount of the purchase?",
+        "answer": "L.E.61.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many TWIX TWIN 50 GM were purchased?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "How much cash was tendered?",
+        "answer": "L.E.70.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "KITKAT CHUNKY\nWHITE 40GM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:39:31 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "Who was the cashier?",
+        "answer": "M.SAFY",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did the OREO 100ML cost?",
+        "answer": "13.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What currency is the cost in?",
+        "answer": "L.E.",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "TWIX TWIN 50 GM",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "How much did one TWIX TWIN 50 GM cost?",
+        "answer": "L.E.13.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the register number?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the first item purchased?",
+        "answer": "MONDELEZ STICK",
+        "source": "GPT"
+    }
+]

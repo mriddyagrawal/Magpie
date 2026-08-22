@@ -1,0 +1,267 @@
+[
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:10:11 PM",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "025/W22/1604",
+                "quantity": "1",
+                "total_price": "820.00"
+            },
+            {
+                "item": "003/W22/4312",
+                "quantity": "1",
+                "total_price": "460.00"
+            },
+            {
+                "item": "025/W22/1648",
+                "quantity": "1",
+                "total_price": "480.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "1/27/2022",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price after discount for one item of size 3XL with code 025/VW22/1604?",
+        "answer": "820.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the S.MAN number?",
+        "answer": "1:4501Alsa",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did one item of size 3XL with code 025/W22/1648 cost originally?",
+        "answer": "1200.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 820.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "003/W22/4312",
+        "source": "Human"
+    },
+    {
+        "question": "How many items of size 3XL with code 003/W22/4312 were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number?",
+        "answer": "5525",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the discount for one item of size 3XL with code 025/VW22/1604?",
+        "answer": "1230.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "1760.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "1760.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "4400.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "1760.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer's number?",
+        "answer": "01118640444",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "025/W22/1604",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "025/W22/1648",
+        "source": "Human"
+    },
+    {
+        "question": "How many items of size 3XL with code 025/VW22/1604 were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "1/27/2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 460.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "MEN'S CLUB",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "025/W22/1604\n0\n000000\n636131\n1\n3XL\n2050.00\n1230.00\n820.00",
+            "003/W22/4312\n0\n000000\n593885\n1\n3XL\n1150.00\n690.00\n460.00",
+            "025/W22/1648\n0\n000000\n621053\n1\n3XL\n1200.00\n720.00\n480.00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount after discounts?",
+        "answer": "1760.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 480.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "9:10:11 PM",
+        "source": "Human"
+    },
+    {
+        "question": "How much did one item of size 3XL with code 003/W22/4312 cost originally?",
+        "answer": "1150.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items of size 3XL with code 025/W22/1648 were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the purchase made?",
+        "answer": "9:10:11 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the customer's name?",
+        "answer": "محمد ابراهيم",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "5525",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Diarb Negm",
+        "source": "GPT"
+    },
+    {
+        "question": "How much did one item of size 3XL with code 025/VW22/1604 cost originally?",
+        "answer": "2050.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "3",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the discount for one item of size 3XL with code 003/W22/4312?",
+        "answer": "690.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the price after discount for one item of size 3XL with code 025/W22/1648?",
+        "answer": "480.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How much was the discount for one item of size 3XL with code 025/W22/1648?",
+        "answer": "720.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What was the price after discount for one item of size 3XL with code 003/W22/4312?",
+        "answer": "460.00",
+        "source": "GPT"
+    }
+]

@@ -1,0 +1,257 @@
+[
+    {
+        "question": "What kind of snacks are listed on the receipt?",
+        "answer": "Healthy Snacks",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 132.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 132.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 112.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the chocolate bars?",
+        "answer": "112.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 132.00",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What product was ordered?",
+        "answer": "Breadfast BYLD Keto Chocolate Bar (80g)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the current balance?",
+        "answer": "-EGP 56.66",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT amount?",
+        "answer": "EGP 13.75",
+        "source": "GPT"
+    },
+    {
+        "question": "Who is 'aya ali'?",
+        "answer": "It's not specified in the receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How much is the delivery fee?",
+        "answer": "EGP 20.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "VAT value of EGP 13.76 is already included in\nthe total"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What does it say above the item description?",
+        "answer": "Product",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "Who is 'Mohandiseen'?",
+        "answer": "It's not specified in the receipt",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "26 September, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "EGP 13.76",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast,",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 132.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "What company is this order from?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "Breadfast BYLD Keto\nChocolate Bar (60g)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "4",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "Breadfast BYLD Keto\nChocolate Bar (60g)",
+                "quantity": "4",
+                "total_price": "112.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Cash On Delivery",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": [
+            "Breadfast BYLD Keto\nChocolate Bar (60g)"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 112.00",
+        "source": "Human"
+    },
+    {
+        "question": "What time is the delivery?",
+        "answer": "12:00 PM - 01:00 PM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 112.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the price per chocolate bar?",
+        "answer": "28.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many chocolate bars were ordered?",
+        "answer": "4",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#289-5752240",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#289-5752240",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount due?",
+        "answer": "EGP 75.34",
+        "source": "GPT"
+    },
+    {
+        "question": "What does OOB stand for?",
+        "answer": "It's not specified in the receipt",
+        "source": "GPT"
+    }
+]

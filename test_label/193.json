@@ -1,0 +1,285 @@
+[
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "EGP 147.65",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "EGP 147.65",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery amount?",
+        "answer": "EGP 10.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Dasanı Natural Water\nCarton (600ml*20)",
+        "source": "Human"
+    },
+    {
+        "question": "What is the discount amount?",
+        "answer": "-EGP 7.10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 56.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of the second item?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the third item purchased?",
+        "answer": "Dasani Natural Water Carton (600ml*20)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the second item purchased?",
+        "answer": "24 Brown Eggs",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal?",
+        "answer": "EGP 144.75",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 6,
+        "source": "Human"
+    },
+    {
+        "question": "How many bags?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of the third item?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the DDB number?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Breadfast",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "24 Brown Eggs\nWater",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 51.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the order number?",
+        "answer": "#218-2309583",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery time?",
+        "answer": "09:00 AM - 10:00 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the second item?",
+        "answer": "56.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "6",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "5 Petits Pains",
+                "quantity": "1",
+                "total_price": "6.00"
+            },
+            {
+                "item": "Eggs",
+                "quantity": "1",
+                "total_price": "Not Available"
+            },
+            {
+                "item": "24 Brown Eggs\nWater",
+                "quantity": "1",
+                "total_price": "56.00"
+            },
+            {
+                "item": "Dasanı Natural Water\nCarton (600ml*20)",
+                "quantity": "1",
+                "total_price": "51.00"
+            },
+            {
+                "item": "Bic Glue Stick Small\n(8g)",
+                "quantity": "1",
+                "total_price": "11.50"
+            },
+            {
+                "item": "Close Up Menthol\n(100ml)",
+                "quantity": "1",
+                "total_price": "20.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount?",
+        "answer": "EGP 147.65",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Breadfast.",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "EGP 144.75",
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the first item?",
+        "answer": "6.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of the first item?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the third item?",
+        "answer": "51.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the delivery date?",
+        "answer": "21 January, 2022",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "#218-2309583",
+        "source": "Human"
+    },
+    {
+        "question": "What is the first item purchased?",
+        "answer": "5 Petits Pains",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "5 Petits Pains",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 6.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Eggs",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "EGP 147.65",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "5 Petits Pains\n1 6.00\n6.00",
+            "Eggs",
+            "24 Brown Eggs\n1 56.00 56.00\nWater",
+            "Dasanı Natural Water\n1 51.00 51.00\nCarton (600ml*20)",
+            "Bic Glue Stick Small\n1 11.50\n11.50\n(8g)",
+            "Close Up Menthol\n1 20.00 20.00\nFresh (100ml)\nOther\n1 0.25\n0.25"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the payment method?",
+        "answer": "Credit/Debit Card",
+        "source": "GPT"
+    }
+]

@@ -1,0 +1,255 @@
+[
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "DECATHLON",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "SKATE MID 5 WOLF GRE",
+                "quantity": "1",
+                "total_price": "E£ 1249.00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "0",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What item was purchased?",
+        "answer": "SKATE MID 5 WOLF GRE",
+        "source": "GPT"
+    },
+    {
+        "question": "Where is the store located?",
+        "answer": "Cairo Festival City Mall",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT rate?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "19:33",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "153.39",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 1249.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the return and exchange policy?",
+        "answer": "30 Days For Return And Exchange With RECEIPT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "E£ 1249.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "E£ 1249.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT number?",
+        "answer": "528-245-120",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the website?",
+        "answer": "www.decathlon.eg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "SKATE MID 5 WOLF GRE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What are the working hours?",
+        "answer": "Everyday From 10:00 : 22:00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the item code?",
+        "answer": "2121808",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the date and time of purchase?",
+        "answer": "24/08/21 19:33",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the VAT amount?",
+        "answer": "E£ 153.39",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "DECATHLON",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "E£ 1249.00",
+        "source": "Human"
+    },
+    {
+        "question": "What was the total amount?",
+        "answer": "E£ 1249.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "24/08/21",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the RFID number?",
+        "answer": "8588955064",
+        "source": "GPT"
+    },
+    {
+        "question": "What was the payment method?",
+        "answer": "Card",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the operator?",
+        "answer": "SMT",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the amount excluding VAT?",
+        "answer": "E£1095.61",
+        "source": "GPT"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 1,
+        "source": "Human"
+    },
+    {
+        "question": "What is the contact email address?",
+        "answer": "Contact@decathlon.eg",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction number?",
+        "answer": "7709",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "19:33",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "14%\nE£ 153.39\nE£1095.61"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the store number?",
+        "answer": "701908",
+        "source": "GPT"
+    }
+]

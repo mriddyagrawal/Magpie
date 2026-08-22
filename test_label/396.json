@@ -1,0 +1,279 @@
+[
+    {
+        "question": "What is the receipt number?",
+        "answer": "430650",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 24900.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "79.46",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "deJAVI",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer phone number?",
+        "answer": "01159746008",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "UN GREY",
+                "quantity": "1",
+                "total_price": "449.00"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "249 00"
+            },
+            {
+                "item": "UN WHITE",
+                "quantity": "1",
+                "total_price": "349.00"
+            },
+            {
+                "item": "37\nGREEN",
+                "quantity": "1",
+                "total_price": "199.00"
+            },
+            {
+                "item": "Not Available",
+                "quantity": "1",
+                "total_price": "149 00"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price after the discount?",
+        "answer": "647.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What time was the purchase made?",
+        "answer": "11:32:54 AM",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "647.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "430650",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 449.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the white item?",
+        "answer": "249.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "997.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the customer name?",
+        "answer": "aliaa",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the cashier number?",
+        "answer": "1655",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store location?",
+        "answer": "Maadi City Center",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total item price before discounts?",
+        "answer": "997.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "647.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "647.00",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount of discounts applied?",
+        "answer": "350.00",
+        "source": "GPT"
+    },
+    {
+        "question": "How many units were purchased in total?",
+        "answer": "3",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:32:54 AM",
+        "source": "Human"
+    },
+    {
+        "question": "How many grey items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "567.54\n79.46",
+            "1\nSALE\n449 00\n200 00\n249 00",
+            "LID/SS21/076\nUN WHITE\n349.00\n0\n014000\n000783\n1\nSALE\n349.00\n100 00\n249.00",
+            "WAH/SS21/001\n37\nGREEN\n199.00\n0\n013985\n000095",
+            "1\nSALE\n199.00\n50 00\n149 00"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of the grey item?",
+        "answer": "249.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of the green item?",
+        "answer": "149.00",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "11:32:54 AM",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "37\nGREEN",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 3?",
+        "answer": "UN WHITE",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "23/08/2021",
+        "source": "Human"
+    },
+    {
+        "question": "How many white items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the card number used?",
+        "answer": "3591",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": 199.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the date of the receipt?",
+        "answer": "23/08/2021",
+        "source": "GPT"
+    },
+    {
+        "question": "How many green items were purchased?",
+        "answer": "1",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the color of the third item?",
+        "answer": "GREEN",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the store name?",
+        "answer": "dejavu",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "5",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "UN GREY",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": 349.0,
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 3,
+        "source": "Human"
+    }
+]

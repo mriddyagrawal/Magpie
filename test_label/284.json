@@ -1,0 +1,261 @@
+[
+    {
+        "question": "What is the name of item 3?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the website?",
+        "answer": "www.maxfashion.com",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "21-10-21/09:10/3271/60392/104/121",
+        "source": "Human"
+    },
+    {
+        "question": "What is the subtotal for this receipt?",
+        "answer": "192.984",
+        "source": "Human"
+    },
+    {
+        "question": "How many items were purchased in total?",
+        "answer": "2",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the name of item 4?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total card amount paid in this receipt?",
+        "answer": "220.000",
+        "source": "Human"
+    },
+    {
+        "question": "How many unique items are listed in this receipt?",
+        "answer": 2,
+        "source": "Human"
+    },
+    {
+        "question": "What is the return policy for garments?",
+        "answer": "refund and exchange garments with in good condition within 14 days from date of purchase with original invoice, defective items within 30 days from date of purchase with original invoice",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total amount for this receipt?",
+        "answer": "220.000",
+        "source": "Human"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the TransactionDate for this receipt?",
+        "answer": "21-10-21/09:10/3271/60392/104/121",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of the store?",
+        "answer": "Max",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the tax card number?",
+        "answer": "278-900-437",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 3 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the sum of all item prices in this receipt?",
+        "answer": "220.000",
+        "source": "Human"
+    },
+    {
+        "question": "What is the quantity of item 2 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "What are the two items purchased?",
+        "answer": "ALWAYS STUNNING AOP TABLE TEE LSL and MULTICOLOUR POLKA AOP LEGGING",
+        "source": "GPT"
+    },
+    {
+        "question": "List all items and their respective quantities from this receipt.?",
+        "answer": [
+            {
+                "item": "ALWAYS STUNNING AOP TABLE TEE LSL",
+                "quantity": "1",
+                "total_price": "110.000"
+            },
+            {
+                "item": "MULTICOLOUR POLKA AOP LEGGING",
+                "quantity": "1",
+                "total_price": "110.000"
+            }
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the phone number?",
+        "answer": "25168449",
+        "source": "GPT"
+    },
+    {
+        "question": "What items are non-refundable or exchangeable?",
+        "answer": "lingerie, mens under wear, Acc and perfumes",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the price of the ALWAYS STUNNING AOP TABLE TEE LSL?",
+        "answer": "110.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the receipt number for this receipt?",
+        "answer": "Not Available",
+        "source": "Human"
+    },
+    {
+        "question": "What is the email address?",
+        "answer": "MX.MAD@landmarkgroup.com",
+        "source": "GPT"
+    },
+    {
+        "question": "How many items are in this receipt?",
+        "answer": "2",
+        "source": "Human"
+    },
+    {
+        "question": "What is the merchant's name on this receipt?",
+        "answer": "Max\nOrient International Trading",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total number of items with a quantity of more than 1?",
+        "answer": "Not valid",
+        "source": "Human"
+    },
+    {
+        "question": "What is the total price of item 1 ?",
+        "answer": 110.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 2?",
+        "answer": "MULTICOLOUR POLKA AOP LEGGING",
+        "source": "Human"
+    },
+    {
+        "question": "What is the commercial registration number?",
+        "answer": "31136",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the largest quantity of a single item on this receipt?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "How much was the change due?",
+        "answer": "(30.000)",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the Excl. VAT Unit Price for each item?",
+        "answer": "96.492",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the full name of the company?",
+        "answer": "Orient International Trading",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the transaction time for this receipt?",
+        "answer": "21-10-21/09:10/3271/60392/104/121",
+        "source": "Human"
+    },
+    {
+        "question": "What is the name of item 1?",
+        "answer": "ALWAYS STUNNING AOP TABLE TEE LSL",
+        "source": "Human"
+    },
+    {
+        "question": "What is the VAT percentage?",
+        "answer": "14%",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 2 ?",
+        "answer": 110.0,
+        "source": "Human"
+    },
+    {
+        "question": "What is the total amount before tax?",
+        "answer": "220.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the quantity of item 1 ?",
+        "answer": "1",
+        "source": "Human"
+    },
+    {
+        "question": "List all items in the receipt.?",
+        "answer": [
+            "V14\n192.984\n27.016\n220.000",
+            "163689567\n1 X\n110.000\n110.000\nMULTICOLOUR POLKA AOP LEGGING\nExcl. VAT Unit Price = 96.492"
+        ],
+        "source": "Human"
+    },
+    {
+        "question": "What is the price of the MULTICOLOUR POLKA AOP LEGGING?",
+        "answer": "110.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the date and time of the transaction?",
+        "answer": "21-10-21/09:10",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total tax for this receipt?",
+        "answer": "27.016",
+        "source": "Human"
+    },
+    {
+        "question": "How much was paid in cash?",
+        "answer": "250.000",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the address of the store?",
+        "answer": "255 Degla ElMaadi Mirag Mall 5th Settlement-New Cairo",
+        "source": "GPT"
+    },
+    {
+        "question": "What is the total price of item 4 ?",
+        "answer": "Not Available",
+        "source": "Human"
+    }
+]

@@ -29,6 +29,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from src.subproc import no_window_kwargs
+
 from src.manifest import APP_DATA_DIR
 
 
@@ -131,6 +133,8 @@ def get_binary_version(binary: Path) -> tuple[str, int | None]:
             [str(binary), "--version"],
             capture_output=True,
             text=True,
+            # Windows: suppress the flashing console window on this probe.
+            **no_window_kwargs(),
             # Modern macOS builds (b9000+) load the Metal library on
             # `--version`, which can take 12-15s on first invocation
             # because it compiles and caches shaders. 30s leaves

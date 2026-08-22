@@ -36,6 +36,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional
 
+from src.subproc import no_window_kwargs
+
 # The pinned llama.cpp release.
 #
 # Must be >= b10000-era (2026-06-10). The `lfm2` architecture itself has
@@ -374,6 +376,8 @@ def _verify_version(binary: Path) -> None:
             text=True,
             timeout=60,
             check=False,
+            # Windows: suppress the flashing console window on this probe.
+            **no_window_kwargs(),
         )
     except (subprocess.TimeoutExpired, OSError) as e:
         raise InstallError(

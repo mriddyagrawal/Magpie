@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(Get-ChildItem -Path \"D:\\\\ns\\\\NotAnotherSpotlight\\\\frontend\" -Recurse -Force | Where-Object {$_.Name -match \"\\(main|index|app\\)\\\\.\\(js|ts|jsx|tsx\\)$\"} | Select-Object FullName)",
-      "PowerShell(Get-ChildItem -Path \"D:\\\\ns\\\\NotAnotherSpotlight\\\\frontend\\\\src-tauri\" -Recurse -Force | Where-Object {-not $_.PSIsContainer} | Select-Object FullName)",
-      "Bash(cargo add *)"
-    ]
-  }
-}

@@ -38,6 +38,7 @@ from typing import Optional
 
 from src.inference.llama_server_binary import resolve_and_check
 from src.inference.profiles import ModelProfile, get_profile
+from src.subproc import no_window_kwargs
 
 
 # ---------------------------------------------------------------------------
@@ -252,6 +253,8 @@ class LlamaServerPool:
             stderr=subprocess.PIPE,
             text=True,
             bufsize=1,  # line-buffered
+            # Windows: don't flash a console window for the server process.
+            **no_window_kwargs(),
         )
         base_url = f"http://127.0.0.1:{port}"
         inst = _LoadedInstance(

@@ -21,6 +21,8 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from src.subproc import no_window_kwargs
+
 
 RIPGREP_DEFAULT_MAX_HITS = 30
 RIPGREP_BIN = shutil.which("rg")
@@ -78,6 +80,8 @@ def _rg_hits(path: Path, pattern: str, max_hits: int) -> list[RipgrepHit]:
             text=True,
             timeout=15,
             check=False,
+            # Windows: suppress the flashing console window on this probe.
+            **no_window_kwargs(),
         )
     except (OSError, subprocess.TimeoutExpired):
         return []

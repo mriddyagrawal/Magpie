@@ -335,6 +335,18 @@ class LlamaServerPool:
             "-ngl", str(profile.args.ngl),
             "-c", str(profile.args.ctx_size),
             "--temp", str(profile.args.temperature),
+            # One slot, full context. Without an explicit -np, llama-server
+            # splits ctx_size across its default parallel slots (~4K each at
+            # 16K) — too small to decode an image, which produced the
+            # "failed to find free space in the KV cache" → "failed to
+            # decode image" crashes on vision requests whenever the walker's
+            # 4 concurrent workers piled on (2026-08-23, 8 files). With one
+            # slot, concurrent requests queue server-side (its scheduler
+            # handles this; the 600s client timeout absorbs the wait) and
+            # CPU throughput is unchanged — the cores were saturated either
+            # way. Override per-profile via extra_args if a GPU box wants
+            # real parallelism with a proportionally larger -c.
+            "-np", "1",
         ]
         # mmproj resolution: explicit path wins (test fixtures), else
         # download from the repo when mmproj_repo_id is set.

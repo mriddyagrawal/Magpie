@@ -439,7 +439,19 @@ async def ingest_one(
     already_done = existing is not None and (
         bool(existing.summary_file) or existing.fast_indexed_at is not None
     )
-    if not force and existing is not None and existing.size == size and already_done:
+    # A file that FAILED at this exact size is also "done" for sync purposes:
+    # retrying it every walk re-burns the full LLM/vision attempt (30-70s
+    # each) and fails identically — ~29 such files turned every no-change
+    # sync into ~45 minutes (2026-08-23). A size change retries it
+    # automatically; `--force` / Reindex retries everything.
+    already_failed = (
+        existing is not None
+        and (existing.skip_reason or "").startswith("error: ")
+        and not already_done
+    )
+    if not force and existing is not None and existing.size == size and (
+        already_done or already_failed
+    ):
         return (
             RouteDecision(
                 routes=list(existing.routes) or [],
@@ -449,8 +461,12 @@ async def ingest_one(
                 t4_cost_s=existing.t4_cost_s,
                 criticality=existing.criticality,
                 criticality_source=existing.criticality_source,
-                skip_reason="unchanged",
-                notes=["manifest hit, size match"],
+                skip_reason="unchanged" if already_done else existing.skip_reason,
+                notes=(
+                    ["manifest hit, size match"]
+                    if already_done
+                    else ["failed previously at this size — Reindex retries it"]
+                ),
             ),
             0.0,
             None,
@@ -704,6 +720,20 @@ async def run_batch(
 
     bar = tqdm(total=len(files), desc="indexing", unit="file")
 
+    async def _record_failure(path: Path, rel: str, reason: str) -> None:
+        """Persist a failed attempt so the next sync skips this file at this
+        size instead of silently retrying it forever (see Manifest.mark_error).
+        Never raises — failure bookkeeping must not kill the walk."""
+        try:
+            fsize = path.stat().st_size
+        except OSError:
+            fsize = 0
+        try:
+            async with manifest_lock:
+                manifest.mark_error(rel, fsize, reason)
+        except Exception:  # pylint: disable=broad-except
+            pass
+
     async def worker(path: Path):
         nonlocal t4_used_mb, last_save_t
         if stop_event is not None and stop_event.is_set():
@@ -717,6 +747,15 @@ async def run_batch(
             progress_callback(bar.n, len(files), path.name)
         try:
             async with sem:
+                # Re-check AFTER acquiring a slot. All worker coroutines start
+                # (and pass the check above) within milliseconds of the chunk
+                # beginning — long before a human can click Cancel — and then
+                # park on the semaphore. Without this second check a stop
+                # request only skipped files whose coroutines hadn't started,
+                # i.e. none: the Cancel button looked completely dead.
+                if stop_event is not None and stop_event.is_set():
+                    stats["skipped"] += 1
+                    return
                 bar.set_postfix_str(path.name[:40])
                 async with manifest_lock:
                     current_budget = t4_used_mb
@@ -754,9 +793,11 @@ async def run_batch(
         except SummarizeError as e:
             stats["errors"] += 1
             tqdm.write(f"  skip: {rel}: {e}")
+            await _record_failure(path, rel, str(e))
         except Exception as e:  # pylint: disable=broad-except
             stats["errors"] += 1
             tqdm.write(f"  error: {rel}: {type(e).__name__}: {e}")
+            await _record_failure(path, rel, f"{type(e).__name__}: {e}")
         finally:
             bar.update(1)
             if progress_callback:
@@ -789,10 +830,42 @@ async def run_batch(
                 f"({type(e).__name__}: {e}); will retry at end of walk"
             )
 
+    async def _gather_cancellable(coros) -> None:
+        """gather() that ABORTS in-flight workers the moment stop_event is
+        set, instead of draining them. A worker can be minutes into a vision
+        call on a scanned PDF — "Pause" must not mean "wait for it" (user
+        spec, 2026-08-24). Cancelled files are NOT marked done or failed, so
+        the next sync re-runs exactly those files: pause/resume is lossless
+        at file granularity."""
+        tasks = [asyncio.create_task(c) for c in coros]
+
+        async def _watch() -> None:
+            while not (stop_event is not None and stop_event.is_set()):
+                if all(t.done() for t in tasks):
+                    return
+                await asyncio.sleep(0.25)
+            for t in tasks:
+                if not t.done():
+                    t.cancel()
+
+        watcher = asyncio.create_task(_watch())
+        # return_exceptions=True: cancelled workers resolve to CancelledError
+        # here instead of blowing up the walk.
+        await asyncio.gather(*tasks, return_exceptions=True)
+        watcher.cancel()
+        try:
+            await watcher
+        except asyncio.CancelledError:
+            pass
+
     try:
         for i in range(0, len(files), chunk_size):
+            if stop_event is not None and stop_event.is_set():
+                break
             chunk = files[i : i + chunk_size]
-            await asyncio.gather(*(worker(p) for p in chunk))
+            await _gather_cancellable(worker(p) for p in chunk)
+            # Flush even on a stopped chunk — it persists the files that DID
+            # finish, so a cancelled run loses nothing it already paid for.
             _flush_chunk(i // chunk_size)
     finally:
         bar.close()

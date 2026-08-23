@@ -88,7 +88,9 @@ PROVIDERS: dict[str, ProviderConfig] = {
         model_env="OLLAMA_MODEL",
         base_url_env="OLLAMA_BASE_URL",
         default_model="qwen2.5vl:3b",
-        default_base_url="http://localhost:11434/v1",
+        # 127.0.0.1, not localhost — Windows resolves localhost to ::1 first
+        # and Ollama binds IPv4 only (same trap as stage2/db.py's Qdrant note).
+        default_base_url="http://127.0.0.1:11434/v1",
     ),
     # In-process llama-cpp-python (cross-platform: Metal on macOS, CUDA on
     # Linux/Windows, CPU fallback). See Plans/Local LLM Plan.md. The

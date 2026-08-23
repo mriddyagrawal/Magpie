@@ -43,7 +43,8 @@ interface Props {
   onToggle: (path: string, enabled: boolean) => void;
   onRemove: (path: string) => void;
   onResync: (path: string) => void;
-  onStop: () => void;
+  onPause: () => void;
+  onCancel: () => void;
   onReveal: (path: string) => void;
 }
 
@@ -55,7 +56,8 @@ export function FolderRow({
   onToggle,
   onRemove,
   onResync,
-  onStop,
+  onPause,
+  onCancel,
   onReveal,
 }: Props) {
   const displayName = folder.display_name?.trim() || basenameOf(folder.path);
@@ -89,7 +91,7 @@ export function FolderRow({
           </div>
           <div className="folder-row__path">{tildePath}</div>
           {isIngesting ? (
-            <IngestProgressBody ingest={ingest} pct={pct} onStop={onStop} />
+            <IngestProgressBody ingest={ingest} pct={pct} onPause={onPause} onCancel={onCancel} />
           ) : (
             <StatsLine folder={folder} />
           )}
@@ -147,7 +149,18 @@ function StatsLine({ folder }: { folder: FolderEntry }) {
       ? `read ${formatRelative(folder.last_read_at)}`
       : "not read yet",
   );
-  return <div className="folder-row__stats">{parts.join(", ")}</div>;
+  return (
+    <div className="folder-row__stats">
+      {parts.join(", ")}
+      {/* Failures were invisible before — the folder just looked smaller.
+          Details live in the "couldn't be read" panel below the list. */}
+      {(folder.failed ?? 0) > 0 && (
+        <span className="folder-row__stats-failed">
+          {" "}· {folder.failed} couldn&rsquo;t be read
+        </span>
+      )}
+    </div>
+  );
 }
 
 function Toggle({

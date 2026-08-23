@@ -18,6 +18,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   FolderOpen,
@@ -33,6 +34,7 @@ import {
   isAlreadyIndexingError,
   jobCoversFolder,
   getExclusions,
+  getIndexFailures,
   patchFolder,
   pickFile,
   pickFolder,
@@ -47,9 +49,10 @@ import {
 import type {
   ExclusionsResponse,
   FolderEntry,
+  IndexFailure,
   IngestStatus,
 } from "../../api";
-import { IngestPanel } from "./IngestPanel";
+import { IngestPanel, PausedPanel } from "./IngestPanel";
 
 /** `startIngest`, but a 409 ("already indexing") resolves instead of throwing.
  *  Every caller has already persisted the rule change by this point, so the
@@ -61,6 +64,40 @@ async function startIngestIgnoringConflict(path: string): Promise<void> {
   } catch (e) {
     if (!isAlreadyIndexingError(e)) throw e;
   }
+}
+
+/** If `path` sits inside an already-read enabled root, return that root.
+ *  Used at add time: such an add needs no indexing run — its files are in
+ *  the search database already — and the UI should say "already read"
+ *  instead of kicking a walk that ends back at the same answer.
+ *  Case-insensitive compare: correct on Windows/macOS, and on Linux a
+ *  false positive is harmless (the user can still press Sync). */
+function alreadyReadParent(
+  folders: FolderEntry[] | null,
+  path: string,
+): FolderEntry | null {
+  if (!folders) return null;
+  const norm = (p: string) => p.replace(/[\\/]+$/, "").toLowerCase();
+  const target = norm(path);
+  for (const f of folders) {
+    if (!f.enabled || !f.last_read_at) continue;
+    const root = norm(f.path);
+    if (
+      target === root ||
+      target.startsWith(root + "\\") ||
+      target.startsWith(root + "/")
+    ) {
+      return f;
+    }
+  }
+  return null;
+}
+
+function folderLabel(f: FolderEntry): string {
+  const name = f.display_name?.trim();
+  if (name) return name;
+  const parts = f.path.split(/[\\/]/).filter(Boolean);
+  return parts[parts.length - 1] ?? f.path;
 }
 import { ConfirmModal } from "./ConfirmModal";
 import { FolderRow } from "./FolderRow";
@@ -91,7 +128,13 @@ export function DataTab({
   const [removeTarget, setRemoveTarget] = useState<FolderEntry | null>(null);
   const [exclusionsOpen, setExclusionsOpen] = useState(false);
   const [exclusions, setExclusions] = useState<ExclusionsResponse | null>(null);
+  const [failuresOpen, setFailuresOpen] = useState(false);
+  const [failures, setFailures] = useState<IndexFailure[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Calm informational message (green) — e.g. "already read" on adding a
+  // path whose files are covered by an existing read folder. Cleared on the
+  // next action, same discipline as `error`.
+  const [notice, setNotice] = useState<string | null>(null);
 
   const addMenuRef = useRef<HTMLDivElement>(null);
 
@@ -110,10 +153,22 @@ export function DataTab({
   const handlePickFolder = useCallback(async () => {
     setShowAddMenu(false);
     setError(null);
+    setNotice(null);
     try {
       const path = await pickFolder();
       if (!path) return;
       await addFolder(path);
+      // Inside an already-read folder? Its files are in the search database
+      // right now — say so and skip the redundant indexing run, instead of
+      // flashing a progress bar that ends where it started.
+      const parent = alreadyReadParent(folders, path);
+      if (parent) {
+        setNotice(
+          `Already read — this is inside "${folderLabel(parent)}", which ` +
+          `Magpie has read. It's searchable right now.`,
+        );
+        return;
+      }
       // The folder is already saved at this point. A 409 here just means the
       // startup auto-sync is still in flight — the rule change we just made
       // gets picked up by its coalesced rerun, so the folder WILL be read.
@@ -127,23 +182,32 @@ export function DataTab({
     } finally {
       refreshFolders();
     }
-  }, [onIngestStarted, refreshFolders]);
+  }, [folders, onIngestStarted, refreshFolders]);
 
   const handlePickFile = useCallback(async () => {
     setShowAddMenu(false);
     setError(null);
+    setNotice(null);
     try {
       const path = await pickFile();
       if (!path) return;
       await addFolder(path);
-      await startIngestIgnoringConflict(path);   // see handlePickFolder
+      const parent = alreadyReadParent(folders, path);   // see handlePickFolder
+      if (parent) {
+        setNotice(
+          `Already read — this file is inside "${folderLabel(parent)}", which ` +
+          `Magpie has read. It's searchable right now.`,
+        );
+        return;
+      }
+      await startIngestIgnoringConflict(path);
       onIngestStarted();
     } catch (e) {
       setError(friendlyError(e));
     } finally {
       refreshFolders();
     }
-  }, [onIngestStarted, refreshFolders]);
+  }, [folders, onIngestStarted, refreshFolders]);
 
   const handleSync = useCallback(async () => {
     setError(null);
@@ -208,9 +272,19 @@ export function DataTab({
     await handleSync();
   }, [handleSync]);
 
-  const handleStop = useCallback(async () => {
+  // Pause keeps the run resumable (Resume = plain sync, continues from the
+  // manifest); Cancel just ends it. Both drain in-flight files first.
+  const handlePause = useCallback(async () => {
     try {
-      await stopIngest();
+      await stopIngest("pause");
+    } catch (e) {
+      setError(friendlyError(e));
+    }
+  }, []);
+
+  const handleCancel = useCallback(async () => {
+    try {
+      await stopIngest("cancel");
     } catch (e) {
       setError(friendlyError(e));
     }
@@ -219,6 +293,21 @@ export function DataTab({
   const handleReveal = useCallback(async (path: string) => {
     try { await revealInFinder(path); } catch { /* ignore */ }
   }, []);
+
+  // Fetch fresh on every open — failures change with each sync and the
+  // endpoint is a cheap manifest scan.
+  const handleToggleFailures = useCallback(async () => {
+    const next = !failuresOpen;
+    setFailuresOpen(next);
+    if (next) {
+      try {
+        const data = await getIndexFailures();
+        setFailures(data.failures);
+      } catch (e) {
+        setError(friendlyError(e));
+      }
+    }
+  }, [failuresOpen]);
 
   const handleToggleExclusions = useCallback(async () => {
     const next = !exclusionsOpen;
@@ -285,8 +374,17 @@ export function DataTab({
         onReindex={() => setShowReindexConfirm(true)}
         syncDisabled={pollActive}
       />
-      <IngestPanel ingest={ingest} onStop={handleStop} />
+      <IngestPanel ingest={ingest} onPause={handlePause} onCancel={handleCancel} />
+      <PausedPanel ingest={ingest} onResume={handleSync} />
       {error && <ErrorBanner message={error} />}
+      {notice && <NoticeBanner message={notice} />}
+      {/* A job that died mid-run (database down, crash) reports through the
+          status poll, not a button click — without this banner those runs
+          fail silently and the folder just stays "Not read" with no
+          explanation (the 2026-08-23 two-lost-syncs incident). */}
+      {!ingest?.running && ingest?.error && (
+        <ErrorBanner message={describeIngestError(ingest.error)} />
+      )}
       <div className="data-tab__list">
         {folders === null ? (
           <SkeletonList />
@@ -304,12 +402,20 @@ export function DataTab({
               onToggle={handleToggle}
               onRemove={handleRemove}
               onResync={handleResync}
-              onStop={handleStop}
+              onPause={handlePause}
+              onCancel={handleCancel}
               onReveal={handleReveal}
             />
           ))
         )}
       </div>
+
+      <FailuresPanel
+        totalFailed={(folders ?? []).reduce((n, f) => n + (f.failed ?? 0), 0)}
+        open={failuresOpen}
+        onToggle={handleToggleFailures}
+        failures={failures}
+      />
 
       <ExclusionsPanel
         open={exclusionsOpen}
@@ -417,10 +523,35 @@ function DataHeader({
   );
 }
 
+/** Turn a raw backend error from the status poll into something a person
+ *  can act on. The database-unreachable case gets a specific message because
+ *  it's the one users actually hit (and the fix is one action away). */
+function describeIngestError(raw: string): string {
+  if (/10061|refused|not (running|reachable)|unreachable/i.test(raw)) {
+    return (
+      "Indexing stopped: the search database isn't running, so results " +
+      "couldn't be saved. Start it, then press Sync — files already read " +
+      "are reused, not re-read."
+    );
+  }
+  return `Last indexing run failed: ${raw} — press Sync to retry; finished work is reused.`;
+}
+
 function ErrorBanner({ message }: { message: string }) {
   return (
     <div className="data-tab__error" role="alert">
       <AlertTriangle size={14} aria-hidden="true" /> {message}
+    </div>
+  );
+}
+
+/** Green sibling of ErrorBanner for nothing-is-wrong information —
+ *  "already read", etc. `role=status` so screen readers announce it
+ *  without the urgency of an alert. */
+function NoticeBanner({ message }: { message: string }) {
+  return (
+    <div className="data-tab__notice" role="status">
+      <CheckCircle2 size={14} aria-hidden="true" /> {message}
     </div>
   );
 }
@@ -489,6 +620,64 @@ function RemoveConfirm({
       onCancel={onCancel}
       onConfirm={onConfirm}
     />
+  );
+}
+
+/** Collapsible list of files whose last read attempt failed, with reasons.
+ *  Rendered only when at least one folder reports failures. Reuses the
+ *  exclusions-panel styling — same collapsed-row-below-the-list pattern. */
+function FailuresPanel({
+  totalFailed,
+  open,
+  onToggle,
+  failures,
+}: {
+  totalFailed: number;
+  open: boolean;
+  onToggle: () => void;
+  failures: IndexFailure[] | null;
+}) {
+  if (totalFailed === 0) return null;
+  return (
+    <section className={`exclusions-panel ${open ? "is-open" : ""}`}>
+      <button
+        type="button"
+        className="exclusions-panel__toggle"
+        onClick={onToggle}
+        aria-expanded={open}
+      >
+        <span className="exclusions-panel__chevron" aria-hidden="true">
+          {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+        </span>
+        Files that couldn&rsquo;t be read
+        <span className="exclusions-panel__count">{totalFailed}</span>
+      </button>
+      {open && (
+        <div className="exclusions-panel__body">
+          {failures === null ? (
+            <p className="exclusions-panel__loading">Loading…</p>
+          ) : (
+            <>
+              <ul className="failures-panel__list">
+                {failures.map((f) => (
+                  <li key={f.path} className="failures-panel__item" title={f.path}>
+                    <span className="failures-panel__name">
+                      {f.path.split(/[\\/]/).filter(Boolean).pop()}
+                    </span>
+                    <span className="failures-panel__reason">{f.reason}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="failures-panel__hint">
+                These are skipped on Sync so it stays fast. Fix what&rsquo;s
+                fixable (e.g. remove a PDF&rsquo;s password), then Reindex —
+                it retries every file here. Editing a file also retries it.
+              </p>
+            </>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
 

@@ -91,8 +91,14 @@ def test_get_settings_search_returns_defaults(client: TestClient) -> None:
     r = client.get("/settings/search")
     assert r.status_code == 200
     body = r.json()
-    # Default provider in magpie_defaults.json is "local".
-    assert body["provider"] == "local"
+    # Default provider ships in magpie_defaults.json ("cloud" since the
+    # free-tier default flip); assert against the file so this can't go
+    # stale again when the default changes.
+    defaults_path = (
+        Path(__file__).resolve().parents[1] / "src" / "config" / "magpie_defaults.json"
+    )
+    shipped_default = json.loads(defaults_path.read_text(encoding="utf-8"))["provider"]
+    assert body["provider"] == shipped_default
     assert 1 <= body["top_k"] <= 20
     assert isinstance(body["rewrite"], bool)
     assert isinstance(body["temperature"], float)
@@ -251,7 +257,10 @@ def test_providers_reports_cloud_unconfigured_when_no_key(
     client: TestClient,
 ) -> None:
     body = client.get("/settings/search/providers").json()
-    assert body["local"]["available"] is True
+    # `local.available` tracks whether the model is really on THIS
+    # machine — asserted with patched presence checks in
+    # test_local_install_endpoints.py, not against real dev-box state.
+    assert isinstance(body["local"]["available"], bool)
     # No key bootstrapped (env stubbed, no .env in tmp dir).
     assert body["cloud"]["configured"] is False
     assert body["cloud"]["available"] is False
@@ -288,6 +297,23 @@ def test_providers_reports_unconfigured_when_only_other_provider_has_key(
 
     body = client.get("/settings/search/providers").json()
     assert body["cloud"]["configured"] is False
+
+
+def test_providers_heals_stale_empty_key_from_env(
+    client: TestClient, isolated_app_data: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression for the 'Not configured yet' bug: a secrets.json
+    bootstrapped with an empty key (first launch ran before .env had
+    the key) must not stick. The endpoint's load_secrets() heals the
+    empty field from env and reports Cloud configured."""
+    import src.config.secrets as secrets_mod
+    secrets_mod.save_secrets(secrets_mod.Secrets())  # stale: empty keys
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-late-arrival")
+    body = client.get("/settings/search/providers").json()
+
+    assert body["cloud"]["configured"] is True
+    assert body["cloud"]["available"] is True
 
 
 def test_providers_reports_moonshot_when_active(

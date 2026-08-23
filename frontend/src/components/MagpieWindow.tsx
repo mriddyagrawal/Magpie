@@ -778,9 +778,12 @@ export function MagpieWindow() {
         <SettingsBlob port={port} />
       </div>
 
-      {/* Background indexing card — only shown when not actively asking. */}
+      {/* Background indexing card — only shown when not actively asking.
+          Its button PAUSES (not cancels): the user opened the ask bar
+          mid-index, so they want answers now — pause frees the machine,
+          keeps the run's progress, and Settings offers Resume. */}
       {ingest?.running && (view.kind === "resting" || view.kind === "typing") && (
-        <IndexingOverlay ingest={ingest} onStop={stopIngest} />
+        <IndexingOverlay ingest={ingest} onStop={() => stopIngest("pause")} />
       )}
 
       {/* First-launch / empty-corpus onboarding. Takes priority over the
@@ -994,7 +997,7 @@ function IndexingOverlay({
         </p>
       )}
       <button className="indexing-overlay__stop" onClick={onStop}>
-        Stop indexing
+        Pause to ask now
       </button>
     </div>
   );

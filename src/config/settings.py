@@ -64,7 +64,7 @@ class AppDefaults(BaseModel):
 
     # Search / retrieval knobs
     top_k: int = Field(default=5, ge=1, le=20)
-    rewrite_default: bool = False
+    rewrite_default: bool = True
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     # When True, the answer LLM emits inline [N] citation markers that
     # the frontend renders as numbered green pills linked to sources.

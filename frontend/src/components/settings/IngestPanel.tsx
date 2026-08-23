@@ -16,7 +16,7 @@
  * and honest copy instead.
  */
 
-import { Pause, X } from "lucide-react";
+import { Pause, Play, X } from "lucide-react";
 import type { IngestStatus } from "../../api";
 
 /** True while the walker is still enumerating candidates and has no totals.
@@ -34,7 +34,24 @@ export function ingestPct(ingest: IngestStatus | null): number {
   return Math.min(100, Math.round((ingest.files_done / ingest.files_total) * 100));
 }
 
+/** True in the brief window after the user pressed Pause/Cancel while
+ *  in-flight file attempts are aborted (sub-second to a few seconds). */
+export function isStopping(ingest: IngestStatus | null): boolean {
+  return ingest?.phase === "stopping";
+}
+
+/** True when a paused run has fully drained: progress is preserved and
+ *  Resume (= a plain sync) continues from where it stopped. */
+export function isPaused(ingest: IngestStatus | null): boolean {
+  return Boolean(
+    ingest && !ingest.running && ingest.stopped && ingest.stop_kind === "pause",
+  );
+}
+
 function headline(ingest: IngestStatus): string {
+  if (isStopping(ingest)) {
+    return ingest.stop_kind === "pause" ? "Pausing…" : "Stopping…";
+  }
   if (isScanning(ingest)) return "Looking for files to read…";
   return ingest.kind === "reindex"
     ? "Rebuilding your index"
@@ -50,12 +67,17 @@ function headline(ingest: IngestStatus): string {
 export function IngestProgressBody({
   ingest,
   pct,
-  onStop,
+  onPause,
+  onCancel,
   showCurrentFile = true,
 }: {
   ingest: IngestStatus | null;
   pct: number;
-  onStop: () => void;
+  /** Pause: drain in-flight files, keep progress, offer Resume. Frees the
+   *  machine so the user can ask questions mid-index. */
+  onPause: () => void;
+  /** Cancel: drain in-flight files and end the run. */
+  onCancel: () => void;
   showCurrentFile?: boolean;
 }) {
   const scanning = isScanning(ingest);
@@ -107,12 +129,24 @@ export function IngestProgressBody({
         </div>
       )}
       <div className="folder-row__progress-buttons">
-        <button type="button" className="folder-row__progress-btn" onClick={onStop}>
-          <Pause size={12} aria-hidden="true" /> Pause
-        </button>
-        <button type="button" className="folder-row__progress-btn" onClick={onStop}>
-          <X size={12} aria-hidden="true" /> Cancel
-        </button>
+        {isStopping(ingest) ? (
+          <button type="button" className="folder-row__progress-btn" disabled>
+            {ingest?.stop_kind === "pause" ? (
+              <><Pause size={12} aria-hidden="true" /> Pausing…</>
+            ) : (
+              <><X size={12} aria-hidden="true" /> Stopping…</>
+            )}
+          </button>
+        ) : (
+          <>
+            <button type="button" className="folder-row__progress-btn" onClick={onPause}>
+              <Pause size={12} aria-hidden="true" /> Pause
+            </button>
+            <button type="button" className="folder-row__progress-btn" onClick={onCancel}>
+              <X size={12} aria-hidden="true" /> Cancel
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -121,10 +155,12 @@ export function IngestProgressBody({
 /** Global panel. Render only while `ingest.running`. */
 export function IngestPanel({
   ingest,
-  onStop,
+  onPause,
+  onCancel,
 }: {
   ingest: IngestStatus | null;
-  onStop: () => void;
+  onPause: () => void;
+  onCancel: () => void;
 }) {
   if (!ingest?.running) return null;
   const scanning = isScanning(ingest);
@@ -142,7 +178,51 @@ export function IngestPanel({
         />
         <h2 className="ingest-panel__title">{headline(ingest)}</h2>
       </div>
-      <IngestProgressBody ingest={ingest} pct={ingestPct(ingest)} onStop={onStop} />
+      <IngestProgressBody
+        ingest={ingest}
+        pct={ingestPct(ingest)}
+        onPause={onPause}
+        onCancel={onCancel}
+      />
+    </section>
+  );
+}
+
+/** Shown after a paused run has drained: progress is kept, questions work
+ *  (that's the point of pausing), and Resume finishes the remaining files.
+ *  Render when `isPaused(ingest)`. */
+export function PausedPanel({
+  ingest,
+  onResume,
+}: {
+  ingest: IngestStatus | null;
+  onResume: () => void;
+}) {
+  if (!isPaused(ingest)) return null;
+  const counts =
+    ingest && ingest.files_total > 0
+      ? `${ingest.files_done.toLocaleString()} of ${ingest.files_total.toLocaleString()} files read so far`
+      : "Progress saved";
+
+  return (
+    <section className="ingest-panel" aria-live="polite">
+      <div className="ingest-panel__head">
+        <span className="ingest-panel__dot ingest-panel__dot--scanning" aria-hidden="true" />
+        <h2 className="ingest-panel__title">Indexing paused</h2>
+      </div>
+      <div className="folder-row__progress">
+        <div className="folder-row__progress-line">
+          <span className="folder-row__progress-current">
+            {counts} — everything read so far is searchable. Resume anytime to
+            finish the rest.
+          </span>
+        </div>
+        <div className="folder-row__progress-buttons">
+          <button type="button" className="folder-row__progress-btn" onClick={onResume}>
+            <Play size={12} aria-hidden="true" /> Resume
+          </button>
+        </div>
+      </div>
     </section>
   );
 }

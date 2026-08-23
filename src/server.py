@@ -70,6 +70,13 @@ for _stream in (sys.stdout, sys.stderr):
 # These show up as scary-looking warnings and progress bars in dev terminals,
 # but say nothing useful to the user. Set defaults so .env / env can override
 # (e.g. TRANSFORMERS_VERBOSITY=info during model debugging).
+#
+# For the .env half of that promise to hold, .env must be in os.environ before
+# the setdefault calls — setdefault-then-load_dotenv silently discards the
+# .env value (python-dotenv never overrides existing vars). Hence dotenv loads
+# here, first thing.
+from dotenv import load_dotenv
+load_dotenv()
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
@@ -151,7 +158,6 @@ if getattr(sys, "frozen", False):
 warnings.filterwarnings("ignore", category=UserWarning, module="qdrant_client")
 warnings.filterwarnings("ignore", category=UserWarning, module="torch.cuda")
 
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import (
@@ -169,8 +175,6 @@ from src.manifest import APP_DATA_DIR
 # `REPO_ROOT` here is the data root used to resolve manifest-relative paths.
 # Portable across Linux / Windows / macOS via `platformdirs`.
 REPO_ROOT = APP_DATA_DIR
-
-load_dotenv()
 
 # Eager-bootstrap the layered config files so they exist on disk for
 # the user to inspect. Both are lazy-bootstrapped on first call by the
@@ -1059,6 +1063,12 @@ _ingest_state: dict[str, Any] = {
     "current_file": None,
     "started_at": None,
     "stopped": False,
+    # How the stop was requested: "pause" (user intends to resume — the UI
+    # shows a Resume affordance and the run's partial progress) | "cancel"
+    # (just end it) | None (no stop requested this job). Pause and cancel
+    # share the same drain mechanics; resume is simply the next sync, which
+    # picks up from the manifest.
+    "stop_kind": None,
     # "idle" before any job; "scanning" while find_candidates is enumerating
     # files (no per-file progress yet); "indexing" once the worker pool has
     # started chewing through the candidate list. The Settings UI's status
@@ -1093,10 +1103,45 @@ class IngestRequest(BaseModel):
     path: str
 
 
+def _require_qdrant() -> None:
+    """Fail fast (503) when the search database is down, instead of letting
+    an indexing job run for an hour and silently lose every Qdrant write —
+    the 2026-08-23 incident cost two full sync runs exactly this way. Guards
+    the three button-driven endpoints; the workers re-check for auto-fired
+    jobs (startup resume, rule changes), which bypass the endpoints."""
+    from src.stage2.db import qdrant_reachable
+
+    ok, url = qdrant_reachable()
+    if not ok:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                f"The search database (Qdrant) is not running at {url}, so "
+                "indexing can't save results. Start it and try again — "
+                "already-indexed files are reused, not re-read. "
+                "(Dev: `uv run python scripts/qdrant_up.py`.)"
+            ),
+        )
+
+
+def _raise_if_qdrant_down() -> None:
+    """Worker-side twin of _require_qdrant: raises RuntimeError so the job's
+    except-block records it in _ingest_state['error'] for the Settings UI."""
+    from src.stage2.db import qdrant_reachable
+
+    ok, url = qdrant_reachable()
+    if not ok:
+        raise RuntimeError(
+            f"The search database (Qdrant) is not running at {url} — nothing "
+            "was indexed. Start it and press Sync; finished work is reused."
+        )
+
+
 @app.post("/ingest")
 async def start_ingest(req: IngestRequest) -> dict[str, Any]:
     if _ingest_state["running"]:
         raise HTTPException(status_code=409, detail="Indexing already in progress")
+    _require_qdrant()
     folder = Path(req.path)
     if not folder.exists():
         raise HTTPException(status_code=400, detail=f"Path does not exist: {req.path}")
@@ -1108,7 +1153,7 @@ async def start_ingest(req: IngestRequest) -> dict[str, Any]:
         running=True, done=False, error=None, path=req.path,
         roots=[req.path], kind="folder",
         files_total=0, files_done=0, current_file=None,
-        started_at=time.time(), stopped=False,
+        started_at=time.time(), stopped=False, stop_kind=None,
         phase="scanning",
     )
     if folder.is_file():
@@ -1124,6 +1169,7 @@ def _do_ingest(folder: Path) -> None:
     # replaced never flipped `phase` off "scanning", so a single-folder ingest
     # showed the indeterminate scanning bar for its whole run.
     try:
+        _raise_if_qdrant_down()
         from src.ingest.walker import run_batch
         from src.stage2.__main__ import ingest_from_manifest
         asyncio.run(run_batch(
@@ -1134,8 +1180,13 @@ def _do_ingest(folder: Path) -> None:
             stop_event=_stop_event,
         ))
         if _stop_event.is_set():
+            # Cancelled — same contract as _do_sync: keep what finished,
+            # skip the multi-minute end-of-run pass, let the next sync
+            # catch up.
             _ingest_state["stopped"] = True
-        ingest_from_manifest(force=False, verbose=False)
+            print("[server] ingest cancelled — skipping end-of-run cleanup", file=sys.stderr)
+        else:
+            ingest_from_manifest(force=False, verbose=False)
         _ingest_state["done"] = True
     except Exception as exc:
         _ingest_state["error"] = str(exc)
@@ -1158,6 +1209,7 @@ def _do_ingest_file(file_path: Path) -> None:
     # worth showing.
     _on_progress_update(0, 1, file_path.name)
     try:
+        _raise_if_qdrant_down()
         from src.ingest.walker import ingest_one, _gpu_available
         from src.manifest import Manifest
         from src.stage2.__main__ import ingest_from_manifest
@@ -1200,9 +1252,27 @@ def _do_ingest_file(file_path: Path) -> None:
 
 
 @app.post("/ingest/stop")
-def stop_ingest() -> dict[str, str]:
+def stop_ingest(mode: str = "cancel") -> dict[str, str]:
+    """Stop the in-flight job. `mode` is a query param:
+
+    - "pause"  — the user wants the machine back to ask questions; the UI
+                 keeps the run's progress visible with a Resume button.
+                 Resume = POST /index/sync (manifest-driven, loses nothing).
+    - "cancel" — just end it (default; also what pre-mode clients get).
+
+    Both ABORT in-flight file attempts (walker cancels the worker tasks
+    within ~0.25s); an aborted file is neither done nor failed, so the next
+    sync re-runs exactly those files. Near-instant from the user's side.
+    """
+    if mode not in ("pause", "cancel"):
+        mode = "cancel"
     _stop_event.set()
-    return {"status": "stopping"}
+    # The brief abort window still deserves acknowledgment in the UI —
+    # flip the phase so the buttons show "Pausing…/Stopping…" immediately.
+    if _ingest_state["running"]:
+        _ingest_state["phase"] = "stopping"
+        _ingest_state["stop_kind"] = mode
+    return {"status": "stopping", "mode": mode}
 
 
 @app.get("/ingest/status")
@@ -1225,6 +1295,9 @@ def ingest_status() -> dict[str, Any]:
         "current_file": _ingest_state["current_file"],
         "elapsed_s": elapsed,
         "stopped": _ingest_state["stopped"],
+        # "pause" | "cancel" | None — how the stop (if any) was requested.
+        # Drives whether the UI offers Resume after the run drains.
+        "stop_kind": _ingest_state.get("stop_kind"),
         # "scanning" before find_candidates returns; "indexing" once the
         # worker pool starts processing files; "idle" between jobs.
         # Frontend uses this to label the status pill differently during
@@ -1263,7 +1336,7 @@ def _init_ingest_state(*, path_label: str, kind: str) -> None:
         path=path_label,
         roots=_enabled_root_paths(), kind=kind,
         files_total=0, files_done=0, current_file=None,
-        started_at=time.time(), stopped=False,
+        started_at=time.time(), stopped=False, stop_kind=None,
         # Jobs always start in scanning phase — find_candidates runs before
         # any file work. _on_progress_update flips to "indexing" once the
         # walker reports a non-zero total.
@@ -1282,7 +1355,9 @@ def _on_progress_update(done: int, total: int, current: str | None = None) -> No
     # First progress callback with a known total marks the transition from
     # scan to ingest. Stay in "scanning" until run_batch tells us how many
     # files it found; from then on this is the worker pool churning.
-    if total > 0 and _ingest_state.get("phase") != "indexing":
+    # "stopping" is sticky — a progress tick from an in-flight worker must
+    # not flip the pill back to "indexing" after the user pressed Cancel.
+    if total > 0 and _ingest_state.get("phase") not in ("indexing", "stopping"):
         _ingest_state["phase"] = "indexing"
 
 
@@ -1324,6 +1399,7 @@ def _do_sync() -> None:
     4. End-of-run `ingest_from_manifest` for orphan Qdrant cleanup.
     """
     try:
+        _raise_if_qdrant_down()
         from src.config.indexing_rules import load_user_rules
         from src.ingest.walker import run_batch
         from src.stage2.__main__ import ingest_from_manifest
@@ -1390,10 +1466,15 @@ def _do_sync() -> None:
             ))
 
         if _stop_event.is_set():
+            # Cancelled: skip the end-of-run Qdrant pass — it can run for
+            # minutes, which reads as "Cancel didn't work". Chunk flushes
+            # already persisted completed files; the next sync catches up.
             _ingest_state["stopped"] = True
-        # End-of-run orphan cleanup (this is what drops Qdrant points
-        # whose source_path is no longer in the manifest).
-        ingest_from_manifest(force=False, verbose=False)
+            print("[server] sync cancelled — skipping end-of-run cleanup", file=sys.stderr)
+        else:
+            # End-of-run orphan cleanup (this is what drops Qdrant points
+            # whose source_path is no longer in the manifest).
+            ingest_from_manifest(force=False, verbose=False)
         _ingest_state["done"] = True
     except Exception as exc:  # noqa: BLE001 — fail-safe: surface to UI, don't crash sidecar
         _ingest_state["error"] = str(exc)
@@ -1515,6 +1596,7 @@ def index_sync() -> IndexJobResponse:
     409 if any indexing job is already running."""
     if _ingest_state["running"]:
         raise HTTPException(status_code=409, detail="Indexing already in progress")
+    _require_qdrant()
     _init_ingest_state(path_label="<sync: all enabled folders>", kind="sync")
     threading.Thread(target=_do_sync, daemon=True).start()
     return IndexJobResponse(status="started", kind="sync")
@@ -1528,6 +1610,7 @@ def index_reindex() -> IndexJobResponse:
     before calling this."""
     if _ingest_state["running"]:
         raise HTTPException(status_code=409, detail="Indexing already in progress")
+    _require_qdrant()
     _init_ingest_state(path_label="<reindex: all enabled folders>", kind="reindex")
     threading.Thread(target=_do_reindex, daemon=True).start()
     return IndexJobResponse(status="started", kind="reindex")
@@ -1762,7 +1845,7 @@ def _compute_folder_stats() -> dict[str, dict[str, Any]]:
         roots.append((ip.path, resolved))
 
     out: dict[str, dict[str, Any]] = {
-        raw: {"files": 0, "size_bytes": 0, "last_read_at": None}
+        raw: {"files": 0, "size_bytes": 0, "last_read_at": None, "failed": 0}
         for raw, _ in roots
     }
 
@@ -1780,11 +1863,22 @@ def _compute_folder_stats() -> dict[str, dict[str, Any]]:
                 stats = out[raw]
                 stats["files"] += 1
                 stats["size_bytes"] += int(entry.size or 0)
+                # Files whose last attempt failed (walker's mark_error) —
+                # surfaced per-row so failures stop being invisible.
+                if (entry.skip_reason or "").startswith("error: "):
+                    stats["failed"] += 1
                 if entry.ingested_at:
                     prev = stats["last_read_at"]
                     if prev is None or entry.ingested_at > prev:
                         stats["last_read_at"] = entry.ingested_at
-                break  # one root per file
+                # NO break: credit the file to EVERY root whose subtree holds
+                # it. With nested roots (a folder row plus a row for one of
+                # its subfolders), the old first-match-wins break let the
+                # parent claim every file, so the subfolder row aggregated
+                # zero and showed "Not read yet" forever — however many times
+                # its files were actually indexed. Each row now reports its
+                # own subtree honestly; a file under nested roots appears in
+                # both rows' counts, which is the truthful per-row answer.
 
     return out
 
@@ -1826,11 +1920,36 @@ def settings_get_folders() -> dict[str, Any]:
             "files": s["files"],
             "size_bytes": s["size_bytes"],
             "last_read_at": s["last_read_at"],  # ISO string or None
+            # Files under this root whose last read attempt failed —
+            # drives the amber "N couldn't be read" note in the row.
+            "failed": s.get("failed", 0),
         })
     return {
         "folders": folders,
         "ingest_running": _ingest_state["running"],
     }
+
+
+@app.get("/index/failures")
+def index_failures() -> dict[str, Any]:
+    """Every file whose last read attempt failed, with the recorded reason.
+
+    Backs the Data tab's "files that couldn't be read" panel — before this,
+    failures lived only in logs and the folder just looked mysteriously
+    smaller (2026-08-24). Reasons come from Manifest.mark_error; the
+    "error: " prefix is stripped for display. Reindex (or editing the
+    file) retries them.
+    """
+    from src.manifest import Manifest
+
+    failures = []
+    for rel, entry in Manifest().entries.items():
+        reason = entry.skip_reason or ""
+        if reason.startswith("error: "):
+            failures.append({"path": rel, "reason": reason[len("error: "):]})
+        if len(failures) >= 500:  # sanity cap; nobody scrolls further
+            break
+    return {"failures": failures}
 
 
 class FolderAddRequest(BaseModel):

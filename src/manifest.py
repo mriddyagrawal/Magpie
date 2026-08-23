@@ -36,6 +36,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
+from dotenv import load_dotenv
 from platformdirs import user_data_dir
 
 
@@ -48,7 +49,17 @@ from platformdirs import user_data_dir
 #
 # Override for dev/CI by setting `MAGPIE_DATA_DIR` — useful for tests that
 # want isolated, throwaway data dirs without touching the user's real one.
+#
+# .env is loaded HERE, before APP_DATA_DIR resolves below, because a dozen
+# entrypoints (walker, pipeline, answer, stage CLIs, scripts/) import this
+# module before their own load_dotenv() call runs — each of those froze a
+# pre-.env data dir and split the app across two storage roots (the 2026-08-22
+# Windows local-AI incident: the installer wrote where the status check never
+# looked). Loading at the choke point makes every process resolve identically.
+# No-op when no .env exists (packaged builds), never overrides real env vars.
 # ---------------------------------------------------------------------------
+
+load_dotenv()
 
 _APP_NAME = "Magpie"
 _APP_AUTHOR = "magpie"
@@ -320,6 +331,24 @@ class Manifest:
         entry.criticality = criticality
         entry.criticality_source = criticality_source
         entry.skip_reason = skip_reason
+
+    def mark_error(self, rel_path: str, size: int, reason: str) -> None:
+        """Record a failed processing attempt so the next walk can skip the
+        file instead of re-burning the full LLM/vision attempt on it.
+        (2026-08-23: ~29 files failing identically re-ran on every sync,
+        turning a should-be-seconds no-change sync into ~45 minutes.)
+
+        The recorded size is the retry key: an edited file (size change)
+        is retried automatically, and `--force` / Reindex retries
+        everything. Preserves summary/fast-tier state from earlier
+        successful runs — a file can have a good summary AND a failed
+        fast-tier attempt, and the summary must survive."""
+        entry = self.entries.get(rel_path)
+        if entry is None:
+            entry = Entry(size=size)
+            self.entries[rel_path] = entry
+        entry.size = size
+        entry.skip_reason = f"error: {reason[:160]}"
 
     # ---- fast-tier helpers ---------------------------------------------
 

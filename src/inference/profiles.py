@@ -53,8 +53,35 @@ DEFAULT_QUANT = "Q6_K"
 # by default: KV-cache grows linearly with context, and a 3B model does not
 # reason well across 128K anyway (Liquid explicitly does not recommend it for
 # long-context work). 16K comfortably fits the answer step's top-k file
-# payload while keeping the cache small. Raise via LOCAL_N_CTX.
+# payload while keeping the cache small. Pin via LOCAL_N_CTX.
 DEFAULT_N_CTX = 16384
+
+
+def _auto_n_ctx() -> int:
+    """Context window sized to this machine's RAM (2026-08-24, see
+    IO/IO - context-window.md). An explicit LOCAL_N_CTX always wins.
+
+    Keyed off TOTAL RAM, not free RAM — free flaps run-to-run and a window
+    that changes between launches would make answer quality feel random.
+    Tiers are deliberately conservative: the KV cache is reserved up front
+    at model spawn, and on CPU a genuinely full window also means minutes
+    of prompt-reading before the first generated token. Boundaries sit
+    slightly under the nominal sizes (15/30 GB) because the OS reports
+    total RAM minus hardware reservations (a "16 GB" machine reports ~15.4).
+    """
+    try:
+        import psutil
+
+        total_gb = psutil.virtual_memory().total / (1024**3)
+    except Exception:  # noqa: BLE001 — sizing must never break a spawn
+        return DEFAULT_N_CTX
+    if total_gb >= 30:
+        return 49152
+    if total_gb >= 15:
+        return 32768
+    if total_gb >= 7.5:
+        return 16384
+    return 8192
 DEFAULT_TEMPERATURE = 0.7
 
 # llama-server uses `-ngl` (number of GPU layers). 999 = "offload all,"
@@ -245,7 +272,9 @@ register(
             mmproj_repo_id=os.environ.get("LOCAL_MMPROJ_REPO", _env_model_repo()),
             mmproj_variant=os.environ.get("LOCAL_MMPROJ_VARIANT", "Q8_0"),
             ngl=DEFAULT_NGL,
-            ctx_size=int(os.environ.get("LOCAL_N_CTX", DEFAULT_N_CTX)),
+            # Explicit LOCAL_N_CTX (even in .env) pins the window; blank or
+            # unset lets _auto_n_ctx() size it to this machine's RAM.
+            ctx_size=int(os.environ.get("LOCAL_N_CTX", "").strip() or _auto_n_ctx()),
             temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
             jinja=True,
         ),

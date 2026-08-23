@@ -149,7 +149,7 @@
 
   "provider": "cloud",
   "top_k": 5,
-  "rewrite_default": false,
+  "rewrite_default": true,
   "temperature": 0.7,
   "cite_sources_inline": true,
   "enumerate_lists": true,

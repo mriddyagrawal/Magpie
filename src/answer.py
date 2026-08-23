@@ -35,6 +35,104 @@ if TYPE_CHECKING:
 REPO_ROOT = APP_DATA_DIR
 ANSWER_MAX_CHARS_PER_FILE = 25_000
 ANSWER_MAX_PDF_PAGES = 5
+
+# ---------------------------------------------------------------------------
+# Context budget — local models only.
+#
+# The per-file caps alone allow 5 files × (25K content + 10K supplement)
+# ≈ 175K chars ≈ 45K tokens. Cloud windows (128K+) swallow that; the local
+# llama-server hard-REJECTS any request over its context window (16K
+# default) — the model never sees the question and the user reads "answer
+# not found" (2026-08-23: every multi-source local answer failed this way,
+# requests of 24-52K tokens against the 16,384-token window).
+# ---------------------------------------------------------------------------
+
+# Rough chars-per-token for English prose + markdown. Deliberately LOW —
+# overestimating tokens keeps us safely under the window; the failure mode
+# of guessing high is a slightly shorter prompt, not a rejected request.
+_CHARS_PER_TOKEN = 3.2
+# Tokens held back for everything that isn't file blocks: system prompt,
+# JSON-schema grammar, question, history, and the generated answer itself.
+_ANSWER_RESERVE_TOKENS = 3_000
+
+
+def _context_budget_chars() -> int | None:
+    """Char budget for the file blocks, or None when no budget applies
+    (cloud providers — their windows dwarf the per-file caps)."""
+    try:
+        from src.llm import active_provider
+
+        if active_provider().name != "local":
+            return None
+        from src.inference.profiles import default_text_profile, get_profile
+
+        ctx = get_profile(default_text_profile()).args.ctx_size
+    except Exception:  # noqa: BLE001 — the budget is protective, never fatal
+        ctx = 16_384
+    usable_tokens = max(2_000, ctx - _ANSWER_RESERVE_TOKENS)
+    return int(usable_tokens * _CHARS_PER_TOKEN)
+
+
+def _block_cost_chars(block: object) -> int:
+    """Budget cost of one message block. Non-text blocks (images on the
+    vision path) get a flat cost — an image is ~1-2K tokens once encoded."""
+    if isinstance(block, str):
+        return len(block)
+    return 6_000
+
+
+def _trim_blocks_to_budget(
+    per_file_blocks: list[tuple[str, list]], budget_chars: int
+) -> list[tuple[str, list]]:
+    """Fit the per-file blocks into `budget_chars`, best-ranked first.
+
+    `per_file_blocks` arrives in retrieval rank order (best first). Files
+    are kept whole until the budget runs out; the first block that crosses
+    the line is truncated (text blocks only), everything after is dropped,
+    and a note naming the dropped files is appended so the model can say
+    they exist instead of hallucinating or denying them.
+    """
+    kept: list[tuple[str, list]] = []
+    dropped: list[str] = []
+    spent = 0
+    for display, blocks in per_file_blocks:
+        if spent >= budget_chars:
+            dropped.append(display)
+            continue
+        out_blocks: list = []
+        for block in blocks:
+            cost = _block_cost_chars(block)
+            if spent + cost <= budget_chars:
+                out_blocks.append(block)
+                spent += cost
+                continue
+            remaining = budget_chars - spent
+            if isinstance(block, str) and remaining > 500:
+                out_blocks.append(
+                    block[:remaining]
+                    + "\n…(truncated to fit the local model's context window)"
+                )
+            spent = budget_chars
+            break
+        if out_blocks:
+            kept.append((display, out_blocks))
+        else:
+            dropped.append(display)
+    if dropped and kept:
+        last_display, last_blocks = kept[-1]
+        kept[-1] = (
+            last_display,
+            [
+                *last_blocks,
+                "(Context note: "
+                f"{len(dropped)} lower-ranked source file(s) were omitted to "
+                "fit the local model's context window: "
+                + ", ".join(dropped)
+                + ". If the answer isn't in the files above, say these files "
+                "exist but were not read — do not claim they don't exist.)",
+            ],
+        )
+    return kept
 # `_summary_supplement` was designed for T3 LLM summaries (~200-500 words,
 # typically <2 KB). Plan #17 Part A made T1 CSV summaries also LLM-generated
 # (no more raw-content dumps), so the cap can be much higher than the
@@ -517,6 +615,13 @@ async def answer_question(
 
     if not per_file_blocks:
         raise SummarizeError("no files could be read (all were unsupported or empty)")
+
+    # Fit the blocks to the active model's context window (local only —
+    # see _context_budget_chars). Must run BEFORE the recency reversal
+    # below so it keeps the best-ranked files, not the worst.
+    _budget = _context_budget_chars()
+    if _budget is not None:
+        per_file_blocks = _trim_blocks_to_budget(per_file_blocks, _budget)
 
     # Assemble the chat message
     intro_parts: list[str] = []

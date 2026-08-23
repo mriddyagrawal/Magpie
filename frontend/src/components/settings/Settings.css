@@ -363,6 +363,57 @@
 }
 .data-tab__error svg { flex-shrink: 0; }
 
+/* Calm informational sibling of __error — used for "already read" and other
+   nothing-is-wrong notices. Same layout, teal-ish instead of alarm red. */
+.data-tab__notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(94, 200, 173, 0.10);
+  border: 1px solid rgba(94, 200, 173, 0.35);
+  border-radius: 8px;
+  color: rgba(94, 200, 173, 0.95);
+  font-size: var(--size-sm);
+}
+.data-tab__notice svg { flex-shrink: 0; }
+
+/* Amber "N couldn't be read" note on folder rows — a warning, not an error:
+   the folder still works, some files inside it don't. */
+.folder-row__stats-failed { color: rgba(228, 179, 99, 0.95); }
+
+/* Failed-files panel (shares the exclusions-panel shell). */
+.failures-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.failures-panel__item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: var(--size-sm);
+  min-width: 0;
+}
+.failures-panel__name {
+  flex-shrink: 0;
+  color: rgba(228, 179, 99, 0.95);
+}
+.failures-panel__reason {
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.45));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.failures-panel__hint {
+  margin: 10px 0 0;
+  font-size: var(--size-sm);
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.45));
+}
+
 .data-tab__list {
   display: flex;
   flex-direction: column;

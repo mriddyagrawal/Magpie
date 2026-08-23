@@ -48,15 +48,20 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initial fetch (only if parent didn't already populate).
+  // On every tab open: fetch search settings if the parent didn't
+  // already populate them, and ALWAYS refresh providers — availability
+  // (key configured, model downloaded) changes behind our back, and a
+  // stale snapshot leaves a card disabled ("Not configured yet") that
+  // the backend would happily serve, blocking the Local/Cloud switch.
+  // Mount-only on purpose: this component remounts on each tab switch,
+  // and putting `providers` in the deps would refetch in a loop.
   useEffect(() => {
     if (search === null) {
       getSearchSettings().then(setSearch).catch((e) => setError(friendlyError(e)));
     }
-    if (providers === null) {
-      getProviders().then(setProviders).catch(() => { /* non-fatal */ });
-    }
-  }, [search, providers, setSearch, setProviders]);
+    getProviders().then(setProviders).catch(() => { /* non-fatal */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Debounced patch helper. The slider's onChange fires up to 60Hz
   // while dragging; we batch into a single PATCH 250ms after the
@@ -103,7 +108,7 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
   const handleResetDefaults = useCallback(async () => {
     immediatePatch({
       top_k: 5,
-      rewrite: false,
+      rewrite: true,
       temperature: 0.7,
       cite_sources_inline: true,
       enumerate_lists: true,

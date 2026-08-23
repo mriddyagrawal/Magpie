@@ -28,10 +28,15 @@ Bootstrap on first load:
      production builds.
   4. Always write the result so subsequent loads skip bootstrap.
 
-After bootstrap, `.env` is dead to runtime — `secrets.json` is the
-authoritative store. Env vars still WIN at the dispatch site
-(`src/llm.py`); secrets is the second-chance lookup. To re-bootstrap,
-delete `secrets.json`.
+After bootstrap, `.env` is dead to runtime for any NON-EMPTY field —
+`secrets.json` is the authoritative store, and an env change never
+mutates a persisted key. EMPTY credential fields are the exception:
+every load gives `.env` / the bundled key a second chance to fill
+them (`_heal_empty_credentials`), so a first launch that ran before
+the key existed can't permanently report Cloud as unconfigured.
+Env vars still WIN at the dispatch site (`src/llm.py`); secrets is
+the second-chance lookup. To fully re-bootstrap (provider choice,
+models), delete `secrets.json`.
 """
 
 from __future__ import annotations
@@ -110,14 +115,20 @@ def _secrets_path() -> Path:
 
 
 def load_secrets(path: Optional[Path] = None) -> Secrets:
-    """Read `secrets.json`. If missing, run the bootstrap flow.
-    Always returns a valid Secrets — never raises for missing files."""
+    """Read `secrets.json`. If missing, run the bootstrap flow; if
+    present but a credential field is empty, try to heal it from
+    `.env` / the bundle. Always returns a valid Secrets — never
+    raises for missing files."""
     p = path or _secrets_path()
     if not p.exists():
         return _bootstrap_secrets(p)
-    with p.open(encoding="utf-8") as f:
+    # utf-8-sig: accepts files with AND without a BOM. Windows Notepad
+    # historically saves UTF-8 with one; plain utf-8 made json.load
+    # raise on the very first byte, which callers swallow as
+    # "unconfigured" — a hand-edited secrets.json silently killed Cloud.
+    with p.open(encoding="utf-8-sig") as f:
         raw = json.load(f)
-    return Secrets.model_validate(raw)
+    return _heal_empty_credentials(Secrets.model_validate(raw), p)
 
 
 def save_secrets(secrets: Secrets, path: Optional[Path] = None) -> None:
@@ -201,6 +212,58 @@ def _bootstrap_secrets(path: Optional[Path] = None) -> Secrets:
     return s
 
 
+def _heal_empty_credentials(s: Secrets, path: Path) -> Secrets:
+    """Fill EMPTY credential fields from env / `.env` / the bundle and
+    persist the result.
+
+    An empty key means "unconfigured" — there is nothing authoritative
+    to protect, so `.env` gets a second chance on every load. This is
+    the self-heal for a stale first-launch bootstrap: a `secrets.json`
+    written before the key landed in `.env` (dev) or before a bundled
+    key shipped (production update) must not permanently disable Cloud.
+    Non-empty values are never touched — for those, `secrets.json`
+    stays authoritative (see module docstring + the subsequent-loads
+    test).
+    """
+    if s.openrouter_api_key.strip() and s.moonshot_api_key.strip():
+        return s  # fully configured — skip the dotenv file I/O
+
+    try:
+        from dotenv import load_dotenv
+
+        load_dotenv()
+    except ImportError:
+        pass
+
+    healed: list[str] = []
+    if not s.openrouter_api_key.strip():
+        found = os.environ.get("OPENROUTER_API_KEY", "").strip() or _bundled_key().strip()
+        if found:
+            s.openrouter_api_key = found
+            healed.append("openrouter_api_key")
+    if not s.moonshot_api_key.strip():
+        if found_ms := os.environ.get("MOONSHOT_API_KEY", "").strip():
+            s.moonshot_api_key = found_ms
+            healed.append("moonshot_api_key")
+
+    if healed:
+        try:
+            save_secrets(s, path)
+        except OSError as e:
+            # Healed in memory either way; persistence just retries on
+            # the next load. Loud so a broken data dir is observable.
+            print(
+                f"[secrets] healed {', '.join(healed)} but could not persist: {e}",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"[secrets] filled empty {', '.join(healed)} from .env/bundle",
+                file=sys.stderr,
+            )
+    return s
+
+
 def _bundled_key() -> str:
     """Read the build-time-baked OpenRouter key from
     `src/config/bundled_key.txt` if present, empty otherwise.
@@ -214,7 +277,9 @@ def _bundled_key() -> str:
     if not p.exists():
         return ""
     try:
-        return p.read_text(encoding="utf-8").strip()
+        # utf-8-sig: strip() does NOT remove a BOM, and a BOM-prefixed
+        # key would 401 on every request with no visible cause.
+        return p.read_text(encoding="utf-8-sig").strip()
     except OSError:
         return ""
 

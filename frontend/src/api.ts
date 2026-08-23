@@ -367,8 +367,13 @@ export interface IngestStatus {
   stopped: boolean;
   // "idle" | "scanning" | "indexing". Frontend uses this to label the
   // status pill differently during the scan phase (no per-file
-  // progress yet). Backwards-compat: missing field → "idle".
-  phase?: "idle" | "scanning" | "indexing";
+  // progress yet). "stopping" = user pressed Pause/Cancel and in-flight
+  // files are draining — the buttons must reflect the click immediately.
+  // Backwards-compat: missing field → "idle".
+  phase?: "idle" | "scanning" | "indexing" | "stopping";
+  /** How the stop (if any) was requested: "pause" keeps a Resume affordance
+   *  after the run drains; "cancel" just ends it. Absent on older sidecars. */
+  stop_kind?: "pause" | "cancel" | null;
 }
 
 /** Does the running job cover this folder? Prefers the job's declared scope
@@ -421,8 +426,13 @@ export async function getIngestStatus(): Promise<IngestStatus> {
   return res.json();
 }
 
-export async function stopIngest(): Promise<void> {
-  await fetch(`${baseUrl()}/ingest/stop`, { method: "POST" });
+/** Stop the in-flight indexing job.
+ *  "pause"  — user wants the machine back for questions; the Data tab keeps
+ *             the run's progress and offers Resume (which is just runSync —
+ *             the manifest continues where the run left off).
+ *  "cancel" — just end it. Default matches the old no-arg behavior. */
+export async function stopIngest(mode: "pause" | "cancel" = "cancel"): Promise<void> {
+  await fetch(`${baseUrl()}/ingest/stop?mode=${mode}`, { method: "POST" });
 }
 
 export interface FolderEntry {
@@ -433,6 +443,22 @@ export interface FolderEntry {
   files: number;                     // count from manifest
   size_bytes: number;                // sum of entry.size for files under this root
   last_read_at: string | null;       // ISO; max ingested_at across the folder
+  /** Files under this root whose last read attempt failed (password-protected
+   *  PDFs, model errors…). Absent on older sidecars. */
+  failed?: number;
+}
+
+export interface IndexFailure {
+  path: string;
+  reason: string;
+}
+
+/** Every file whose last read attempt failed, with the recorded reason.
+ *  Reindex (or editing the file) retries them. */
+export async function getIndexFailures(): Promise<{ failures: IndexFailure[] }> {
+  const res = await fetch(`${baseUrl()}/index/failures`);
+  if (!res.ok) throw new Error(`index/failures failed: ${res.status}`);
+  return res.json();
 }
 
 export async function getFolders(): Promise<{ folders: FolderEntry[]; ingest_running: boolean }> {

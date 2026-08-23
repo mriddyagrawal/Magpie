@@ -56,6 +56,35 @@ _DEFAULT_ENDPOINT = "http://127.0.0.1:6433"
 _client: QdrantClient | None = None
 
 
+def resolve_endpoint() -> str:
+    """The Qdrant URL every client in this process uses (env override or
+    the loopback default). Single source of truth — keep get_qdrant_client
+    and the reachability probe agreeing on where Qdrant is."""
+    return os.environ.get("QDRANT_CLUSTER_ENDPOINT", "").strip() or _DEFAULT_ENDPOINT
+
+
+def qdrant_reachable(timeout_s: float = 2.0) -> tuple[bool, str]:
+    """Cheap liveness probe of the local Qdrant HTTP port. Returns (ok, url).
+
+    Exists so indexing can fail fast with a clear error instead of walking
+    for an hour and losing every flush — the 2026-08-23 incident: two full
+    sync runs completed their file work and dropped all of it because
+    nothing checked the database was up before starting.
+    """
+    url = resolve_endpoint()
+    try:
+        import httpx
+
+        r = httpx.get(f"{url}/readyz", timeout=timeout_s)
+        if r.status_code == 200:
+            return True, url
+        # Older Qdrant builds without /readyz: the root endpoint returns
+        # 200 with version info on any live server.
+        return httpx.get(url, timeout=timeout_s).status_code == 200, url
+    except Exception:  # noqa: BLE001 — any transport failure means "down"
+        return False, url
+
+
 def get_qdrant_client() -> QdrantClient:
     """Return a cached Qdrant client pointing at the local Rust binary.
 
@@ -71,14 +100,14 @@ def get_qdrant_client() -> QdrantClient:
     if _client is not None:
         return _client
 
-    url = os.environ.get("QDRANT_CLUSTER_ENDPOINT", "").strip() or _DEFAULT_ENDPOINT
+    url = resolve_endpoint()
 
     if not _is_localhost_url(url):
         sys.exit(
             f"error: QDRANT_CLUSTER_ENDPOINT={url!r} is not a localhost URL. "
             f"Magpie only supports a Qdrant Rust binary running locally. "
             f"Run `just qdrant-install && just qdrant-up`, or override the "
-            f"port via QDRANT_CLUSTER_ENDPOINT=http://localhost:<port>."
+            f"port via QDRANT_CLUSTER_ENDPOINT=http://127.0.0.1:<port>."
         )
 
     # The qdrant-client default timeout (5s) is too tight for large

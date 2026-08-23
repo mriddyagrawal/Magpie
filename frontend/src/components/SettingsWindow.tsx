@@ -235,6 +235,47 @@ export function SettingsWindow() {
     }
   }, []);
 
+  // ----------- Re-show refresh -----------
+  // Closing Settings only HIDES the window (lib.rs prevents close and
+  // open_settings_internal re-shows it), so this component stays mounted
+  // for the whole app session and the mount-time fetch above runs once.
+  // Every later open would render state frozen at first-open time — the
+  // "Cloud still says Not configured yet after the key was fixed" bug,
+  // and a stale disabled card blocks switching provider at all. Refetch
+  // the cheap settings state whenever the window regains focus or
+  // becomes visible again, and re-read the deep-link action global,
+  // which open_settings_internal re-injects on reopen but only a
+  // mount-time effect used to read.
+  useEffect(() => {
+    let lastRefresh = 0;
+    const refresh = () => {
+      const w = window as Window & { __MAGPIE_SETTINGS_ACTION__?: string };
+      if (w.__MAGPIE_SETTINGS_ACTION__ === "add-folder") {
+        w.__MAGPIE_SETTINGS_ACTION__ = undefined;
+        handleDeepLinkAddFolderRef.current?.();
+      }
+      // focus + visibilitychange fire together on a re-show; one
+      // round of fetches is plenty.
+      const now = Date.now();
+      if (now - lastRefresh < 1000) return;
+      lastRefresh = now;
+      getProviders().then(setProviders).catch(() => {});
+      getSearchSettings().then(setSearch).catch(() => {});
+      getAppSettings().then(setApp).catch(() => {});
+      getShortcut().then(setShortcut).catch(() => {});
+      getFolders().then((r) => setFolders(r.folders)).catch(() => {});
+    };
+    const onVisibility = () => {
+      if (!document.hidden) refresh();
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+
   return (
     <div className="settings-window">
       <SettingsSidebar active={tab} onChange={setTab} status={status} />

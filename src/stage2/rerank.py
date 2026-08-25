@@ -102,8 +102,24 @@ def rerank(
     scored: list[tuple["SearchResult", float]] = list(zip(candidates, scores))
     scored.sort(key=lambda kv: kv[1], reverse=True)
 
-    out: list["SearchResult"] = []
-    for cand, score in scored[:top_k]:
-        cand.score = float(score)
-        out.append(cand)
-    return out
+    kept: list["SearchResult"] = [cand for cand, _ in scored[:top_k]]
+
+    # Retrieval-anchor guarantee (2026-08-24). The full re-sort + top-k
+    # truncation above CAN silently drop the fusion top-1 — the very hit the
+    # user's words matched hardest — which violates this module's own
+    # "never silently drop results" rule one step later. Observed live:
+    # "who are the professors I wrote to in Cornell university?" put
+    # WHYUS_Cornell_essay.docx at fusion #1 (0.70), the ms-marco
+    # cross-encoder demoted it below five CSS-Profile forms, the answer
+    # stage never saw the essay, and the user got "answer not found" for a
+    # question their own files answered. The anchor keeps its cross-encoder
+    # score for display, so the audit trail stays honest about what the
+    # reranker thought of it.
+    anchor = candidates[0]
+    if kept and anchor not in kept:
+        kept[-1] = anchor
+
+    cross_score = {id(c): float(s) for c, s in scored}
+    for cand in kept:
+        cand.score = cross_score[id(cand)]
+    return kept

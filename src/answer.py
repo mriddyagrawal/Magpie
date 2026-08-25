@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Sequence
@@ -70,6 +71,18 @@ def _context_budget_chars() -> int | None:
     except Exception:  # noqa: BLE001 — the budget is protective, never fatal
         ctx = 16_384
     usable_tokens = max(2_000, ctx - _ANSWER_RESERVE_TOKENS)
+    # Prefill-speed cap — the window is not the only ceiling. On CPU,
+    # llama-server reads ~50-100 tokens/s before the first output token, so
+    # a 32K window packed full is 5-9 MINUTES of silence (observed
+    # 2026-08-24: a 10-minute no-answer hang colliding with the 600s request
+    # timeout). Cap the document budget so time-to-first-token stays humane;
+    # GPU backends (metal/vulkan/cuda) prefill 10-100x faster and get the
+    # full window. Fewer-but-sharper sources also suits a 3B model — see the
+    # Lost-in-the-Middle note at the prompt assembly below.
+    gpu_default = "metal" if sys.platform == "darwin" else "cpu"
+    if os.environ.get("LLAMA_SERVER_GPU", gpu_default).lower() == "cpu":
+        prefill_cap = int(os.environ.get("LOCAL_PREFILL_BUDGET_TOKENS", "8000"))
+        usable_tokens = min(usable_tokens, max(2_000, prefill_cap))
     return int(usable_tokens * _CHARS_PER_TOKEN)
 
 
@@ -652,6 +665,36 @@ async def answer_question(
     # B1's classifier is the existing mechanism — re-run it here so the
     # answer stage sees the same class the search layer used. Pure regex,
     # no LLM call, cheap to run.
+    # SYNTHESIS MODE — targeted, not global (2026-08-24). A first attempt
+    # put a "multi-file answers are normal" permission into the SYSTEM
+    # prompt; cross-doc refusals improved (two first-ever wins) but
+    # single-doc questions started overthinking themselves into refusals —
+    # the previously-perfect q01 sentinel regressed on BOTH providers
+    # (Evaluations/college_data/REPORT.md). Injecting per-question, exactly
+    # like ENUMERATION MODE below, scopes the permission to the questions
+    # shaped like comparisons and leaves single-doc questions untouched.
+    import re as _re
+    _COMPARATIVE_RE = _re.compile(
+        r"\b(compare|versus|vs\.?|difference between|connects?|links?|"
+        r"in common|both .{0,40}\b(essays?|files?|documents?|letters?)|"
+        r"same (file|document|content)|are (these|those|they) .{0,20}same)\b",
+        _re.IGNORECASE,
+    )
+    if _COMPARATIVE_RE.search(question):
+        intro_parts.append("")
+        intro_parts.append(
+            "SYNTHESIS MODE: this question compares or connects things that "
+            "may live in DIFFERENT files. Assembling the answer from several "
+            "of the provided files is expected and correct: take fact A from "
+            "one file, fact B from another, state the comparison plainly, "
+            "and cite every file used in `sources_used`. Structure the "
+            "answer as one short labeled part per side (e.g. 'Rochester: … "
+            "Swarthmore: …'). The absence of a single file containing the "
+            "whole comparison is NOT a not-found case — declare not_found "
+            "only if a needed side is missing from EVERY provided file, and "
+            "name that missing side in `not_found_topic`."
+        )
+
     from src.stage2.query_classify import QueryClass, classify as _classify_q
     if enumerate_lists and _classify_q(question) is QueryClass.LIST_ALL:
         intro_parts.append(

@@ -411,8 +411,8 @@ async def query(req: QueryRequest) -> QueryResponse:
     # we did for `LLM_PROVIDER` on 2026-05-08, since env was silently
     # shadowing the UI toggle. To force a per-query override, pass
     # `rewrite` in the request body.
-    eff = _effective_settings()
-    rewrite = req.rewrite if req.rewrite is not None else eff.rewrite_default
+    eff = _effective_settings()  # noqa — see _rewrite_for_provider below
+    rewrite = req.rewrite if req.rewrite is not None else _rewrite_for_provider(eff)
     top_k = req.top_k if req.top_k is not None else eff.top_k
 
     # Convert the history Pydantic models to the (q, a) tuples answer.py
@@ -546,7 +546,7 @@ async def query_stream(req: QueryRequest):
     from src.stage2.search import raw_query, rewrite_query, run_search
 
     eff = _effective_settings()
-    rewrite = req.rewrite if req.rewrite is not None else eff.rewrite_default
+    rewrite = req.rewrite if req.rewrite is not None else _rewrite_for_provider(eff)
     top_k = req.top_k if req.top_k is not None else eff.top_k
     history_pairs: list[tuple[str, str]] = [
         (turn.question, turn.answer) for turn in req.history
@@ -579,6 +579,11 @@ async def query_stream(req: QueryRequest):
                 question=req.question, skip_fast=not req.fast, rerank=True,
                 enumerate_lists=enumerate_lists,
             )
+            # Confident-retrieval solo gate (local only) — see
+            # search.gate_to_solo. Keeps the streaming path and
+            # pipeline.ask() behaviorally identical.
+            from src.stage2.search import gate_to_solo
+            retrieved = gate_to_solo(retrieved, question=req.question)
         except Exception as e:  # pylint: disable=broad-except
             _, detail = _user_facing_error(e)
             yield _frame("error", {"detail": detail, "phase": "retrieval"})
@@ -1101,6 +1106,33 @@ _rerun_lock = threading.Lock()
 
 class IngestRequest(BaseModel):
     path: str
+
+
+def _rewrite_for_provider(eff) -> bool:
+    """Provider-aware default for the query-rewrite step.
+
+    The rewriter is the ACTIVE provider's model, so its value tracks who is
+    doing the rewriting (measured, Evaluations/college_data/REPORT.md
+    "Rewrite A/B", 2026-08-24):
+
+      - cloud (26B): rewrite helps — recall@k 80% vs 60% without it.
+        Honors the user's settings toggle as before.
+      - local (3B): rewrite is net harmful — it REPLACES questions
+        (typo'd bank query became a "landlord's emergency phone number"
+        question) and raw beats it on every register: clean (MRR .628 vs
+        .572), typos (recall 100% vs 80%), vague (100% vs 67%). Forced
+        off; hybrid dense+BM25 search absorbs typos natively.
+
+    An explicit per-request `rewrite` in the body still overrides both.
+    """
+    try:
+        from src.llm import active_provider
+
+        if active_provider().name == "local":
+            return False
+    except Exception:  # noqa: BLE001 — never let routing sink a query
+        pass
+    return eff.rewrite_default
 
 
 def _require_qdrant() -> None:

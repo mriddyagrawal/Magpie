@@ -556,6 +556,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     """`python -m src.tools.install_llama_server`. Reads env vars; no flags
     today (keeping CLI surface minimal — env is the same plumbing the
     runtime already uses)."""
+    # Load .env BEFORE resolving LLAMA_SERVER_GPU/VERSION. This entrypoint
+    # imports src.manifest (whose import loads .env) only lazily inside
+    # download_and_install — after the GPU variant is already chosen — so a
+    # LLAMA_SERVER_GPU set only in .env was silently ignored and the CPU
+    # build installed (observed 2026-08-24 installing the CUDA build).
+    from dotenv import load_dotenv
+    load_dotenv()
     try:
         download_and_install()
     except InstallError as e:

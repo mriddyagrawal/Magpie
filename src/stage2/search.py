@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import csv
 import os
+import re
+import sys
 from dataclasses import dataclass
 
 from pydantic import BaseModel, Field
@@ -713,6 +715,64 @@ def run_search(
         return cross_encoder_rerank(rerank_text, fused, top_k)
 
     return fused[:top_k]
+
+
+# Comparison-shaped questions need MULTIPLE files by definition — solo-gating
+# one away breaks them (observed 2026-08-24: the Rochester-vs-Swarthmore
+# question got only the Rochester file and honestly answered half). Mirror of
+# answer.py's SYNTHESIS MODE detector; keep the two in sync.
+_COMPARATIVE_Q_RE = re.compile(
+    r"\b(compare|versus|vs\.?|difference between|connects?|links?|"
+    r"in common|both .{0,40}\b(essays?|files?|documents?|letters?)|"
+    r"same (file|document|content)|are (these|those|they) .{0,20}same)\b",
+    re.IGNORECASE,
+)
+
+
+def gate_to_solo(
+    retrieved: list[SearchResult], question: str | None = None
+) -> list[SearchResult]:
+    """Adaptive context gating (2026-08-24): when the top hit's rerank score
+    DOMINATES #2 by a margin, hand the answer stage that file ALONE.
+
+    Why: the reading-isolation ladder showed the local 3B model answers
+    near-perfectly from a single correct file and collapses to ~13% with 4
+    distractors stacked around it. A replay of 121 saved retrieval traces
+    showed the top hit is the right file only 45% of the time overall — but
+    93% of the time when its margin over #2 is >= 2.0 (fires on ~24% of
+    questions). So: confident retrieval -> solo file -> ladder conditions;
+    uncertain retrieval -> unchanged multi-file behavior.
+
+    Local provider only — cloud's 26B reads through distractor stacks fine
+    (47% strict with the crowd) and loses enumeration coverage if starved.
+    Tune/disable via LOCAL_SOLO_MARGIN (0 disables).
+    """
+    if len(retrieved) < 2:
+        return retrieved
+    if question is not None and _COMPARATIVE_Q_RE.search(question):
+        return retrieved
+    try:
+        from src.llm import active_provider
+
+        if active_provider().name != "local":
+            return retrieved
+    except Exception:  # noqa: BLE001 — gating must never sink a query
+        return retrieved
+    try:
+        threshold = float(os.environ.get("LOCAL_SOLO_MARGIN", "2.0"))
+    except ValueError:
+        threshold = 2.0
+    if threshold <= 0:
+        return retrieved
+    margin = float(retrieved[0].score) - float(retrieved[1].score)
+    if margin >= threshold:
+        print(
+            f"  solo-gate: top hit dominates (margin {margin:.2f} >= "
+            f"{threshold}) — sending 1 file instead of {len(retrieved)}",
+            file=sys.stderr,
+        )
+        return retrieved[:1]
+    return retrieved
 
 
 def raw_query(question: str) -> SearchQuery:

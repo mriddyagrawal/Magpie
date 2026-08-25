@@ -146,6 +146,23 @@ def active_provider() -> ProviderConfig:
     no longer routes via env; toggle Settings → Cloud or edit
     settings.json directly to test that path.
     """
+    # MAGPIE_FORCE_PROVIDER: explicit programmatic override that beats even
+    # settings.json. For evaluation harnesses and tests ONLY — never set it
+    # in .env. Exists because Evaluations/run_eval.py's --provider flag
+    # silently did nothing after the 2026-05-08 precedence flip below: it
+    # set LLM_PROVIDER (a settings-unavailable fallback), settings.json
+    # always exists, so a "cloud" eval run actually answered with the local
+    # model under a cloud label (caught 2026-08-24, first eval run).
+    forced = os.environ.get("MAGPIE_FORCE_PROVIDER", "").strip().lower()
+    if forced:
+        cfg = PROVIDERS.get(forced)
+        if cfg is None:
+            sys.exit(
+                f"error: MAGPIE_FORCE_PROVIDER={forced!r} is unknown. "
+                f"Valid: {sorted(PROVIDERS)}."
+            )
+        return cfg
+
     # Settings.json is the source of truth. Lazy import to avoid a
     # cold cycle on `from src.llm import ...` and to keep this module
     # importable in environments where the config layer isn't built yet.

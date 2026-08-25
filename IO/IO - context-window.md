@@ -52,6 +52,18 @@ indexing.
    long-context reasoning, KV RAM is reserved up front at spawn, and a full
    window on CPU means minutes of prompt-reading before the first token.
 
+## Addendum 2026-08-24: prefill-speed cap (CPU)
+
+The window is not the only ceiling. First live test with the 32K window
+packed ~27K tokens into the prompt; CPU prefill reads ~50-100 tok/s, so the
+model sat silent for ~9 minutes and collided with the 600s request timeout —
+the user saw "thinking" dots for 10 minutes and no answer. On CPU
+(`LLAMA_SERVER_GPU` unset/cpu) the DOCUMENT budget is now additionally
+capped at `LOCAL_PREFILL_BUDGET_TOKENS` (default 8000 ≈ 25.6K chars ≈ ~3 min
+worst-case to first token). GPU backends (metal/vulkan/cuda) keep the full
+window. Raise the cap on faster CPUs; the real unlock is
+`LLAMA_SERVER_GPU=vulkan` where supported.
+
 ## Rollback
 
 - **Pin the window on one machine:** set `LOCAL_N_CTX=16384` in `.env`

@@ -196,7 +196,8 @@ def load_magpie_defaults(path: Optional[Path] = None) -> MagpieDefaults:
             file=sys.stderr,
         )
         return MagpieDefaults()
-    with p.open(encoding="utf-8") as f:
+    # utf-8-sig: tolerate a BOM from hand-edits (Notepad, PowerShell).
+    with p.open(encoding="utf-8-sig") as f:
         raw = json.load(f)
     # Strip our own annotation fields ("_comment", etc.) before validation.
     raw = {k: v for k, v in raw.items() if not k.startswith("_")}
@@ -215,7 +216,7 @@ def load_user_rules(path: Optional[Path] = None) -> UserRules:
         rules = UserRules()
         save_user_rules(rules, p)
         return rules
-    with p.open(encoding="utf-8") as f:
+    with p.open(encoding="utf-8-sig") as f:
         raw = json.load(f)
     return UserRules.model_validate(raw)
 
@@ -267,7 +268,7 @@ def _read_inline_rule_file(path: Path) -> list[str]:
     """
 
     try:
-        text = path.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8-sig")
     except OSError:
         return []
     lines = []

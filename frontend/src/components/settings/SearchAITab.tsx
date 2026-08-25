@@ -116,9 +116,18 @@ export function SearchAITab({ search, setSearch, providers, setProviders }: Prop
   }, [immediatePatch]);
 
   if (search === null) {
+    // A failed GET /settings/search used to render as an infinite
+    // "Loading…" — the error state was set but the early return never
+    // showed it. Surface the banner so a broken backend is loud.
     return (
       <div className="search-ai-tab">
-        <p className="search-ai-tab__loading">Loading…</p>
+        {error ? (
+          <div className="search-ai-tab__error">
+            <AlertTriangle size={14} aria-hidden="true" /> {error}
+          </div>
+        ) : (
+          <p className="search-ai-tab__loading">Loading…</p>
+        )}
       </div>
     );
   }

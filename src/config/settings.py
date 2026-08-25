@@ -164,7 +164,10 @@ def load_app_defaults(path: Optional[Path] = None) -> AppDefaults:
             file=sys.stderr,
         )
         return AppDefaults()
-    with p.open(encoding="utf-8") as f:
+    # utf-8-sig: hand-edits from Notepad / PowerShell `Out-File` prepend a
+    # BOM, and strict utf-8 turns that into a JSONDecodeError that 500s
+    # every settings endpoint. Same hardening as secrets.py.
+    with p.open(encoding="utf-8-sig") as f:
         raw = json.load(f)
     raw = {k: v for k, v in raw.items() if not k.startswith("_")}
     return AppDefaults.model_validate(raw)
@@ -208,7 +211,7 @@ def load_user_settings(
         )
         save_user_settings(s, p)
         return s
-    with p.open(encoding="utf-8") as f:
+    with p.open(encoding="utf-8-sig") as f:
         raw = json.load(f)
     return UserSettings.model_validate(raw)
 

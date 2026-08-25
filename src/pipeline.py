@@ -116,6 +116,9 @@ async def ask(
         question=question, skip_fast=not fast, rerank=True,
         enumerate_lists=enumerate_lists,
     )
+    # Confident-retrieval solo gate (local only) — see search.gate_to_solo.
+    from src.stage2.search import gate_to_solo
+    retrieved = gate_to_solo(retrieved, question=question)
     print(f"[query] retrieval ({time.monotonic()-t:.2f}s): {len(retrieved)} hits",
           file=sys.stderr, flush=True)
     for i, r in enumerate(retrieved, 1):

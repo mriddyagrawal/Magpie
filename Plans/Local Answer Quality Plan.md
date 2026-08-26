@@ -16,6 +16,7 @@ only the change under test varies). Baseline as of 2026-08-24: local
 | 4 | doc2query, productized | Question-space index points generated at index time | Partial+ 27→47% measured (spike v1) | Real pipeline work (Mridul) | ADOPTION CONDITIONS BELOW — two spike failures documented |
 | 5 | Query router | Easy single-doc → local; synthesis/comparative → cloud (user-permitting) | Product-level: eval showed ZERO overlap in the two providers' failure modes; combined ceiling ~80% partial+ | Design needed | Privacy UX: must be explicit that routed questions go to cloud |
 | 6 | Rewrite-as-retry | If local raw answer comes back not-found, one retry with rewrite | Marginal (+1?) — local's not-found rate is ~7% | ~1h | 3B rewriter demonstrably invents intent; last-resort only |
+| 7 | Mechanical reduce for enumerations | Map-reduce spike (2026-08-26, routed v1+v2, both 14/40 — CLOSED) proved the maps extract good facts and the 3B REDUCE is the bottleneck (dilution, out-of-scope leaks, worse with more findings). Replace the LLM reduce with CODE: drop NOT_HERE, scope-filter by source file, dedup/merge bullets; LLM only phrases the final list | The 8 breadth questions are all baseline-wrong; near-misses (q40 2/4 dates, q14 forms found but dropped) suggest +2-4 within reach | ~half day | Scope-filter heuristics are corpus-sensitive; needs its own gated run |
 
 ## doc2query adoption conditions (from spikes v1 + v2)
 

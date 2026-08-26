@@ -9,7 +9,14 @@ import sys
 from dataclasses import dataclass
 
 from pydantic import BaseModel, Field
-from qdrant_client.models import FusionQuery, Prefetch, SparseVector
+from qdrant_client.models import (
+    FieldCondition,
+    Filter,
+    FusionQuery,
+    MatchValue,
+    Prefetch,
+    SparseVector,
+)
 
 from src.llm import ChatAgent, build_agent
 from src.manifest import REPO_ROOT
@@ -362,14 +369,24 @@ def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
     dense_vec = embed_dense_query(dense_text)
     sparse_idx, sparse_val = embed_sparse_query(dense_text)
 
+    # doc2query experiment points (hype:true) NEVER compete in the main
+    # tier — measured 2026-08-26: letting them vote in the same RRF pool
+    # cost recall@5 33→29 and eroded solo-gate margins (q20 6.63→0).
+    # They are fetched by _search_hype_tier and blended with a reduced
+    # weight in run_search (MAGPIE_HYPE_WEIGHT). No-op when no hype
+    # points exist (production).
+    no_hype = Filter(
+        must_not=[FieldCondition(key="hype", match=MatchValue(value=True))]
+    )
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         prefetch=[
-            Prefetch(query=dense_vec, using="dense", limit=limit),
+            Prefetch(query=dense_vec, using="dense", limit=limit, filter=no_hype),
             Prefetch(
                 query=SparseVector(indices=sparse_idx, values=sparse_val),
                 using="sparse",
                 limit=limit,
+                filter=no_hype,
             ),
         ],
         query=FusionQuery(fusion="rrf"),
@@ -594,6 +611,83 @@ down to top 5". Per-pair cost on the default ms-marco-MiniLM-L-6-v2 is
 ~200-400 ms total — well under the answer-step's multi-second LLM cost."""
 
 
+def _search_hype_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
+    """Hybrid search restricted to doc2query question points (hype:true).
+
+    Experiment tier (2026-08-26): only queried when MAGPIE_HYPE_WEIGHT
+    is set > 0. Empty list when the collection has no hype points.
+    """
+    client = get_qdrant_client()
+    if not client.collection_exists(COLLECTION_NAME):
+        return []
+    dense_text = sq.query + " " + " ".join(sq.keywords)
+    dense_vec = embed_dense_query(dense_text)
+    sparse_idx, sparse_val = embed_sparse_query(dense_text)
+    only_hype = Filter(
+        must=[FieldCondition(key="hype", match=MatchValue(value=True))]
+    )
+    results = client.query_points(
+        collection_name=COLLECTION_NAME,
+        prefetch=[
+            Prefetch(query=dense_vec, using="dense", limit=limit, filter=only_hype),
+            Prefetch(
+                query=SparseVector(indices=sparse_idx, values=sparse_val),
+                using="sparse",
+                limit=limit,
+                filter=only_hype,
+            ),
+        ],
+        query=FusionQuery(fusion="rrf"),
+        limit=limit,
+        with_payload=["source_path"],
+    )
+    out: list[SearchResult] = []
+    for p in results.points:
+        payload = p.payload or {}
+        source_path = payload.get("source_path", "")
+        out.append(SearchResult(
+            summary=_summary_for_result(source_path, None),
+            path=source_path,
+            score=p.score,
+            tier="summary",
+            chunk_index=None,
+        ))
+    return out
+
+
+def _blend_hype(
+    fused: list[SearchResult],
+    hype_hits: list[SearchResult],
+    weight: float,
+    limit: int,
+) -> list[SearchResult]:
+    """Blend doc2query question hits into the fused pool as a NOMINATING
+    tier: each file's best hype rank contributes `weight / (RRF_K + rank)`
+    — added to the file's existing fused score, or introducing the file
+    with just that bonus if the main tiers missed it entirely. With
+    weight < 1 a hype hit can surface a candidate but cannot outvote a
+    summary consensus. Best-rank-only per file so a file with many
+    generated questions is not over-boosted."""
+    best_rank: dict[str, int] = {}
+    for rank, h in enumerate(hype_hits):
+        if h.path not in best_rank:
+            best_rank[h.path] = rank
+    seen_paths: set[str] = set()
+    out = list(fused)
+    for r in out:
+        if r.path in best_rank and r.path not in seen_paths:
+            r.score += weight / (RRF_K + best_rank[r.path])
+            seen_paths.add(r.path)
+    for h in hype_hits:
+        if h.path in seen_paths or h.path not in best_rank:
+            continue
+        seen_paths.add(h.path)
+        h.score = weight / (RRF_K + best_rank[h.path])
+        out.append(h)
+    out.sort(key=lambda r: r.score, reverse=True)
+    return out[:limit]
+
+
 def run_search(
     sq: SearchQuery,
     top_k: int = 5,
@@ -704,6 +798,20 @@ def run_search(
         query_text = (sq.query + " " + " ".join(sq.keywords)).strip()
         fast_hits = _search_fast_tier(query_text, fetch_k * 2)
     fused = _rrf_merge(summary_hits, fast_hits, fetch_k)
+
+    # doc2query experiment (2026-08-26): question points blend in as a
+    # nominating tier — but ONLY when the cross-encoder will re-judge the
+    # pool (rerank on). Measured same day: with rerank suppressed
+    # (list_all queries) any hype bonus reorders the FINAL ranking
+    # unchecked and displaced key files (recall@5 33→31 at weight 0.4);
+    # with rerank on, a nominated file still has to win the cross-encoder
+    # on its own summary, so nomination is safe at full weight. Off
+    # unless MAGPIE_HYPE_WEIGHT is set AND hype points exist.
+    hype_weight = float(os.environ.get("MAGPIE_HYPE_WEIGHT", "0") or 0)
+    if hype_weight > 0 and rerank:
+        hype_hits = _search_hype_tier(sq, fetch_k * 2)
+        if hype_hits:
+            fused = _blend_hype(fused, hype_hits, hype_weight, fetch_k)
 
     if rerank and len(fused) > 1:
         from src.stage2.rerank import rerank as cross_encoder_rerank

@@ -56,4 +56,11 @@ src/config/bundled_key.txt
 # the ground-truth answers embedded 42 real email addresses and 30+ phone
 # numbers (university directory staff, plus receipts and personal documents).
 # Regenerate locally with the run-evaluation skill; do not re-commit.
-Evaluations/
+# 2026-08-26: narrowed from all of Evaluations/ — the harness SCRIPTS are
+# shareable engineering (audited: no personal data); every question set,
+# answer file, judged verdict, REPORT.md, and cache stays in college_data/
+# and remains ignored.
+Evaluations/college_data/
+Evaluations/__pycache__/
+
+.venv.broken/

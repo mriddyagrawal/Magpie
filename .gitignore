@@ -52,11 +52,17 @@ conversation-export*.md
 # Magpie Cloud backend (Plan #40) once beta validates the toggle UX.
 src/config/bundled_key.txt
 
-# Evaluation corpora + reports. Removed 2026-08 before the repo went public:
+# Evaluation CORPORA + reports. Removed 2026-08 before the repo went public:
 # the ground-truth answers embedded 42 real email addresses and 30+ phone
 # numbers (university directory staff, plus receipts and personal documents).
 # Regenerate locally with the run-evaluation skill; do not re-commit.
-Evaluations/
+#
+# Subdirectories only — every corpus lives in one (college_data/,
+# furman_directory/, course_information/, student_notes/). The harness
+# scripts at the top level (run_eval.py, transcribe_index.py, metrics.py …)
+# are ordinary code with no personal data in them, and CONTINUE.md's resume
+# commands call them by path, so they stay trackable.
+Evaluations/*/
 
 # Eval question sets built from real personal documents. `Test Content/`
 # (the source receipts/PDFs) was never committed, but the ground-truth

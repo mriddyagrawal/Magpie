@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Magpie — Ask your files anything</title>
+<title>Magpie — Get answers from anything</title>
 <meta name="description" content="Magpie reads the files on your computer and answers questions about them, with sources cited. Free, open source, and fully local.">
 <link rel="icon" type="image/png" href="favicon.png">
 <meta property="og:title" content="Magpie">
-<meta property="og:description" content="Ask your files anything. Local, open source, sources cited.">
+<meta property="og:description" content="Get answers from anything on your computer. Local, open source, sources cited.">
 <meta property="og:image" content="https://mriddyagrawal.github.io/Magpie/og-image.png">
 <meta property="og:url" content="https://mriddyagrawal.github.io/Magpie/">
 <meta property="og:type" content="website">
@@ -144,15 +144,15 @@
   h1 {
     font-family: "Andada Pro", Georgia, serif;
     font-weight: 500;
-    font-size: clamp(44px, 6.8vw, 84px);
-    line-height: 1.06;
+    font-size: clamp(38px, 5.8vw, 72px);
+    line-height: 1.08;
     letter-spacing: -0.01em;
     margin: 0 0 22px;
-    text-wrap: balance;
   }
   h1 em {
     font-style: italic;
     color: var(--sheen);
+    display: inline-block; /* transformable for the word rotation */
   }
   /* Magpie-feather iridescence: petrol, green, violet sliding slowly
      through the word. Falls back to solid sheen where clip is missing. */
@@ -329,7 +329,7 @@
   <main class="hero">
     <div class="hero-content">
       <p class="eyebrow">Open source beta</p>
-      <h1>Ask your files <em>anything.</em></h1>
+      <h1>Get answers from<br><em id="rotator">anything.</em></h1>
       <p class="lede">
         Magpie reads the files on your computer and answers questions about
         them, with sources cited.
@@ -604,6 +604,31 @@
   var card = document.getElementById("mac-firstrun");
   if (card && !/Mac/.test(navigator.platform + " " + navigator.userAgent)) {
     card.style.display = "none";
+  }
+
+  /* Rotating headline word: out through the top, in from below.
+     Sits still for reduced-motion users. */
+  var rotator = document.getElementById("rotator");
+  if (rotator && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var words = ["anything", "lecture notes", "receipts", "books",
+                 "policies", "spreadsheets"];
+    var wi = 0;
+    var EASE = "opacity 220ms ease, transform 220ms ease";
+    rotator.style.transition = EASE;
+    setInterval(function () {
+      rotator.style.opacity = "0";
+      rotator.style.transform = "translateY(-0.35em)";
+      setTimeout(function () {
+        wi = (wi + 1) % words.length;
+        rotator.textContent = words[wi] + ".";
+        rotator.style.transition = "none";
+        rotator.style.transform = "translateY(0.35em)";
+        void rotator.offsetWidth; /* commit the jump before easing back */
+        rotator.style.transition = EASE;
+        rotator.style.opacity = "1";
+        rotator.style.transform = "none";
+      }, 230);
+    }, 2300);
   }
   /* Live star count. Fails silently anywhere the GitHub API is
      unreachable and the baked number stands. */

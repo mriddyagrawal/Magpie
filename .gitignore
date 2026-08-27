@@ -73,3 +73,5 @@ Evaluations/*/
 # tracked — ignoring never untracks — so they shipped to the public repo
 # anyway. Regenerate against synthetic documents; do not re-commit.
 Test Questions/
+
+.venv.broken/

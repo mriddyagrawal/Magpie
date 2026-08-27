@@ -23,6 +23,38 @@ from pathlib import Path
 
 IMAGE_EXTS = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
               ".webp": "image/webp", ".gif": "image/gif"}
+
+
+# ---------------------------------------------------------------------------
+# Index-time vision transcripts for scanned documents (2026-08-25 spike).
+#
+# The vision-isolation ladder showed the local VL model reads a SINGLE
+# scanned page near-perfectly (GPAs, handwritten forms, a bilingual tax
+# certificate) while the answer-time pixel path converted ~1/12 of scanned
+# eval questions — same crowd/format story as text. So: transcribe pages
+# ONCE at index time (Evaluations/transcribe_index.py writes
+# <APP_DATA_DIR>/transcripts/<key>.md), and at answer time read the
+# transcript as TEXT — which also makes scanned docs answerable in cloud
+# mode without pixels ever leaving the machine. No transcript → the pixel
+# path below is unchanged.
+# ---------------------------------------------------------------------------
+
+def transcript_path_for(path: Path) -> Path:
+    import hashlib
+
+    from src.manifest import APP_DATA_DIR
+
+    key = hashlib.sha256(str(path.resolve()).lower().encode("utf-8")).hexdigest()[:16]
+    return APP_DATA_DIR / "transcripts" / f"{key}.md"
+
+
+def transcript_for(path: Path) -> str | None:
+    """The stored vision transcript for `path`, or None."""
+    try:
+        text = transcript_path_for(path).read_text(encoding="utf-8").strip()
+        return text or None
+    except OSError:
+        return None
 CODE_EXTS = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
              ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
              ".sh", ".sql", ".json", ".yaml", ".yml", ".toml"}
@@ -71,7 +103,23 @@ def extract_pdf_text(path: Path, max_chars: int) -> str:
         raise SummarizeError(f"could not open PDF {path}: {e}") from e
 
     if reader.is_encrypted:
-        raise SummarizeError(f"PDF is password-protected: {path}")
+        # Bank/government portal PDFs are routinely "encrypted" with an
+        # EMPTY password — openable by anyone (pymupdf's needs_pass is
+        # False for them). Treating is_encrypted as password-protected
+        # made six corpus files invisible to indexing (visa-fee receipt,
+        # Gettysburg ISFAAs — found 2026-08-26). Try the empty password;
+        # only a PDF that actually refuses it is password-protected.
+        try:
+            decrypted = int(reader.decrypt(""))
+        except Exception as e:  # noqa: BLE001 — any failure = truly locked
+            raise SummarizeError(f"PDF is password-protected: {path}") from e
+        if decrypted == 0:  # PasswordType.NOT_DECRYPTED
+            raise SummarizeError(f"PDF is password-protected: {path}")
+        # pypdf's AES content decryption needs the optional `cryptography`
+        # backend we don't ship; pymupdf decrypts natively. Read
+        # encrypted-but-open PDFs through pymupdf instead of adding a
+        # dependency.
+        return _extract_pdf_text_pymupdf(path, max_chars)
 
     chunks: list[str] = []
     total = 0
@@ -94,6 +142,34 @@ def extract_pdf_text(path: Path, max_chars: int) -> str:
             total += len(t)
     except PdfReadError as e:
         raise SummarizeError(f"PDF parse error while reading pages: {path}: {e}") from e
+    return "\n\n".join(chunks)
+
+
+def _extract_pdf_text_pymupdf(path: Path, max_chars: int) -> str:
+    """Text extraction via pymupdf, for PDFs pypdf cannot fully read
+    (empty-password AES encryption). Same join format as the pypdf path;
+    an empty result still means "scanned" to the caller."""
+    try:
+        import pymupdf
+    except ImportError as e:
+        raise SummarizeError(f"could not open PDF {path}: {e}") from e
+    try:
+        doc = pymupdf.open(str(path))
+    except Exception as e:  # noqa: BLE001
+        raise SummarizeError(f"could not open PDF {path}: {e}") from e
+    try:
+        if doc.needs_pass:
+            raise SummarizeError(f"PDF is password-protected: {path}")
+        chunks: list[str] = []
+        total = 0
+        for page in doc:
+            if total >= max_chars:
+                break
+            t = page.get_text() or ""
+            chunks.append(t)
+            total += len(t)
+    finally:
+        doc.close()
     return "\n\n".join(chunks)
 
 
@@ -475,7 +551,16 @@ def build_content_blocks(
                 # No keyword matched — fall through to front-of-file.
             return [f"Content type: pdf\n\n---\n{full_text[:max_chars]}"]
 
-        # Empty extract → scanned/image-only PDF: render pages as images.
+        # Empty extract → scanned/image-only PDF. Prefer an index-time
+        # vision transcript (see transcript_for above): text path, cheaper,
+        # measured far more accurate than answer-time pixel reading.
+        transcript = transcript_for(path)
+        if transcript:
+            return [
+                "Content type: pdf (scanned — reading the index-time vision "
+                f"transcript)\n\n---\n{transcript[:max_chars]}"
+            ]
+        # No transcript yet: render pages as images (unchanged fallback).
         pages = render_pdf_pages_as_png(path, max_pdf_pages)
         if not pages:
             raise SummarizeError(f"PDF has no pages: {path}")

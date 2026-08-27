@@ -1,9 +1,58 @@
-# CONTINUE.md — session handoff (written 2026-08-25)
+# CONTINUE.md — session handoff (updated 2026-08-26)
 
 For the next assistant/instance continuing Magpie's answer-quality work.
 Read this top to bottom before doing anything. The prior session's full
 measured trail is in `Evaluations/college_data/REPORT.md` (LOCAL-ONLY,
 gitignored — see "machine-bound data" below).
+
+## RESUME HERE (2026-08-26): doc2query v3, mid-generation
+
+Owner has a standing iterate-and-report mandate: pre-register a gate,
+run, judge strictly, report, move to the next goal. Sequence state:
+
+1. **DONE — routed map-reduce v1–v5 all 14/40 strict (= baseline).**
+   Five configurations (LLM reduce top-5 / full-coverage / pure-code
+   reduce / filter call / question-sandwich) — the 3B cannot assemble
+   or filter multi-file findings; maps extract fine. Closed. Details +
+   verdicts: REPORT.md "Routed answering" + `eval_answer_40__routed*`.
+2. **DONE — transcripts: owner ruled KEEP** (cloud 0→7/12 on scanned).
+3. **DONE — doc2query v3: gate FAILED on all three legs; removed.**
+   686 questions generated and CACHED
+   (`Evaluations/college_data/hype_questions_cache.json` — reuse it,
+   generation never needs to re-run); global dedup 686→448; upserted;
+   snapshot diff vs baseline: recall@5 33→29 (regression), rank-1 +0,
+   sentinels still absent, and solo-gate margins eroded (q20 6.63→0).
+   `--remove` executed (verified 0 hype points). Full table in
+   REPORT.md. Conclusion: even deduped question points OUTVOTE summary
+   points in RRF.
+4. **DONE — doc2query v4 (weight 0.4) and v4.1 (rerank-only, weight
+   1.0): both FAILED the gate; the doc2query line is CLOSED (3
+   strikes).** Root cause: 3B question-generation quality — good
+   questions are outnumbered by noise that embeds near everything.
+   Search-side code stays (env-gated `MAGPIE_HYPE_WEIGHT`, default 0 =
+   inert; main tier always excludes hype points), cache stays; revival
+   path = stronger on-device generator (8B). Points removed.
+5. **DONE — transcript index points (BM25-only, zero dense vector):
+   FAILED the gate** (recall@5 33→32, Duke still absent for q40).
+   Structural lesson, confirmed twice: the summaries pool is ZERO-SUM —
+   additive points eat finite prefetch slots and displace real hits.
+   Additive content needs its own collection/tier to be safe. Removed;
+   `Evaluations/transcript_points.py` stays for a separate-tier design.
+6. **IN FLIGHT — full-corpus transcription sweep** (58/248 at last
+   check, resume-safe). After it completes: (a) grep transcripts for
+   the MRV receipt (Everest/21,600 — q23/q24 diagnostic), (b) re-run
+   the scanned-block (12q) local + cloud evals, and a full-40 LOCAL
+   answer eval — measurement runs; transcripts are KEPT regardless.
+   q20's FRB poster and the financial forms now have transcripts —
+   expect reading-side gains where retrieval already lands (q20).
+7. Retrieval iteration is EXHAUSTED for this index design; the
+   measured big levers left: 8B model trial (owner-gated), separate
+   transcript tier, margin-0.0 duplicate-file artifact card.
+8. Lesson: NEVER run two llama-server jobs at once — 600s ReadTimeouts
+   invalidated v5's first run and poisoned 15 cache entries (purged).
+   Qdrant restart: run `<APP_DATA>\qdrant\qdrant.exe` from ITS OWN dir
+   (default ./storage) — the repo binaries are 0-byte; the
+   `qdrant_storage` env path is a DIFFERENT, empty store.
 
 ## Where the project stands
 
@@ -38,13 +87,14 @@ gitignored — see "machine-bound data" below).
   existing transcripts; `--remove` deletes all). ~26 of an estimated
   60-100 scanned files were transcribed before cancellation, saved to
   `<APP_DATA_DIR>/transcripts/` on the ORIGINAL machine.
-- **Pre-registered gate (do not renegotiate after seeing results):**
-  re-run the 12-question scanned block
-  (`Evaluations/college_data/eval_college_data_scanned.json`) on local
-  + cloud AFTER transcription covers `second chance/`, `supplements/`,
-  `advance personal statement/`. KEEP if local ≥ 5/12 (baseline was
-  1/12) with no text-question regression; else `--remove`.
-- Registered predictions (score them): local 6-8/12, cloud 5-8/12.
+- **RESOLVED (2026-08-26): owner ruled KEEP.** The measured result:
+  local 1/12 → 2/12 (pre-registered gate ≥5 FAILED), cloud 0/12 →
+  **7/12** (transcripts are cloud's only sight into scanned docs; no
+  image leaves the machine). Gate was mis-specified (never anticipated
+  cloud being the win); escalated per house rules, owner chose keep.
+  Remaining work: finish the full-corpus sweep (resume-safe, below),
+  then consider indexing transcript text (retrieval margin raiser) and
+  a digit-verification v2 pass (garbles cost cloud ~3 strict points).
 - Resume command (repo root, all resume-safe):
   ```
   uv run python Evaluations/transcribe_index.py --corpus "<corpus>/second chance"

@@ -160,18 +160,19 @@
     h1 em {
       background: linear-gradient(100deg,
         #00B3D6, #16C784, #4F6BFF, #9B5CFF, #F0399B, #00B3D6);
-      background-size: 320% 100%;
+      background-size: 200% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       -webkit-text-fill-color: transparent;
-      animation: sheen-shift 4s ease-in-out infinite;
+      animation: sheen-shift 4s linear infinite;
     }
   }
+  /* One direction, seamless: the gradient ends on its first color and a
+     200% offset at 200% size is exactly one tile, so the loop never jumps. */
   @keyframes sheen-shift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    from { background-position: 0% 50%; }
+    to   { background-position: 200% 50%; }
   }
   @media (prefers-reduced-motion: reduce) {
     h1 em { animation: none; }

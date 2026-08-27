@@ -138,8 +138,8 @@
     font-weight: 400;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 18px;
+    color: #3F423F; /* darker than --muted, softer than ink */
+    margin: 0 0 10px;
   }
   h1 {
     font-family: "Andada Pro", Georgia, serif;
@@ -152,6 +152,29 @@
   }
   h1 em {
     font-style: italic;
+    color: var(--sheen);
+  }
+  /* Magpie-feather iridescence: petrol, green, violet sliding slowly
+     through the word. Falls back to solid sheen where clip is missing. */
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    h1 em {
+      background: linear-gradient(100deg,
+        #0E5A68, #128A66, #6B5AC4, #B04A8C, #0E5A68);
+      background-size: 320% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      animation: sheen-shift 9s ease-in-out infinite;
+    }
+  }
+  @keyframes sheen-shift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    h1 em { animation: none; }
   }
   .lede {
     max-width: 46ch;

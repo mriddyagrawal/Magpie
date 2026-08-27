@@ -32,7 +32,12 @@
   }
 
   * { box-sizing: border-box; }
-  html, body { height: 100%; }
+  html, body {
+    height: 100%;
+    max-width: 100%;
+    /* iOS Safari ignores overflow-x on body alone; clamp both. */
+    overflow-x: hidden;
+  }
   body {
     margin: 0;
     background: var(--paper);
@@ -40,7 +45,6 @@
     font-family: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
     font-size: 16px;
     line-height: 1.55;
-    overflow-x: hidden;
   }
 
   /* ---------- the flock ---------- */

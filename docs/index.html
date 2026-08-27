@@ -37,6 +37,9 @@
     max-width: 100%;
     /* iOS Safari ignores overflow-x on body alone; clamp both. */
     overflow-x: hidden;
+    /* Stop iOS Safari from auto-inflating small text (the footer meta). */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
     margin: 0;

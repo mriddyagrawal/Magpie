@@ -57,3 +57,13 @@ src/config/bundled_key.txt
 # numbers (university directory staff, plus receipts and personal documents).
 # Regenerate locally with the run-evaluation skill; do not re-commit.
 Evaluations/
+
+# Eval question sets built from real personal documents. `Test Content/`
+# (the source receipts/PDFs) was never committed, but the ground-truth
+# ANSWERS in `Test Questions/` embed the same data: a personal email, a
+# hotel booking number, two airline reference codes, an itinerary and a
+# per-item cost breakdown. `test_label/` is ReceiptQA-derived and carries
+# third-party addresses in its answers. Both were listed here while still
+# tracked — ignoring never untracks — so they shipped to the public repo
+# anyway. Regenerate against synthetic documents; do not re-commit.
+Test Questions/

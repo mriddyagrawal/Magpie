@@ -760,6 +760,36 @@ export async function getRecent(id: string): Promise<RecentEntry | null> {
   return res.json();
 }
 
+// ---------------------------------------------------------------------------
+// Feedback — the post-answer feedback box (src/feedback.py)
+// ---------------------------------------------------------------------------
+
+export interface FeedbackResult {
+  /** true → reached the team's webhook right now. */
+  delivered: boolean;
+  /** true → saved to the on-disk outbox; retried on next launch/submit. */
+  queued: boolean;
+}
+
+export async function postFeedback(
+  message: string,
+  /** Pass ONLY when the user ticked "include my question and answer" —
+   *  by default nothing but the typed text (+ app version/OS) is sent. */
+  context?: { question: string; answer: string }
+): Promise<FeedbackResult> {
+  const body: Record<string, unknown> = { message };
+  if (context) {
+    body.context = context;
+  }
+  const res = await fetch(`${baseUrl()}/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`feedback failed: ${res.status} ${await res.text()}`);
+  return res.json();
+}
+
 /** File-extension router — drives which preview component is rendered. */
 export type PreviewKind = "image" | "pdf" | "csv" | "text" | "unsupported";
 

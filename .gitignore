@@ -51,6 +51,7 @@ conversation-export*.md
 # lives only on whoever's machine builds the release. Plan: replace with
 # Magpie Cloud backend (Plan #40) once beta validates the toggle UX.
 src/config/bundled_key.txt
+src/config/bundled_webhook.txt
 
 # Evaluation CORPORA + reports. Removed 2026-08 before the repo went public:
 # the ground-truth answers embedded 42 real email addresses and 30+ phone

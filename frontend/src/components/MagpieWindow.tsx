@@ -49,6 +49,7 @@ import { RecentsPanel } from "./RecentsPanel";
 import { RetrievingPanel } from "./RetrievingPanel";
 import { SettingsBlob } from "./SettingsBlob";
 import { SourcesCard } from "./SourcesCard";
+import { FeedbackBox } from "./FeedbackBox";
 import { StatusFooter } from "./StatusFooter";
 import { WelcomeCard } from "./WelcomeCard";
 
@@ -959,6 +960,16 @@ function AnsweringBody({
           onSelect={onSelect}
           highlights={highlights}
         />
+        {/* Keyed by question: a fresh answer gets a fresh box instead of
+            inheriting the previous one's "sent" state. Hidden while the
+            answer is still generating. */}
+        {!loading && (
+          <FeedbackBox
+            key={result.question}
+            question={result.question}
+            answer={result.answer}
+          />
+        )}
       </div>
       <div className="magpie-col-right">
         <PreviewCard path={selectedPath} highlights={highlights} />

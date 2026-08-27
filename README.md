@@ -157,7 +157,10 @@ The answer stage is scored on a hand-written question set with known-correct sou
 
 ## download
 
-**[Latest release →](https://github.com/mriddyagrawal/Magpie/releases/latest)**
+**[Latest release →](https://github.com/mriddyagrawal/Magpie/releases)**
+<!-- Deliberately the /releases list, not /releases/latest: GitHub's `latest`
+     endpoint ignores prereleases, and every beta is marked prerelease, so
+     /latest 404s until the first non-beta ships. -->
 
 | Platform | File |
 |---|---|

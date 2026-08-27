@@ -145,13 +145,59 @@ def _hf_file_present(repo: str, filename: str) -> bool:
         return False
 
 
-def _hf_repo_present(repo: str) -> bool:
-    try:
-        from huggingface_hub import snapshot_download
+_WEIGHT_SUFFIXES = (".safetensors", ".bin", ".gguf")
 
-        snapshot_download(repo_id=repo, local_files_only=True)
-        return True
-    except Exception:  # noqa: BLE001
+
+def _hf_repo_present(repo: str) -> bool:
+    """Strict offline completeness check for a whole-repo download (#16).
+
+    The old implementation asked `snapshot_download(local_files_only=True)`,
+    which offline just returns the snapshot folder IF IT EXISTS — and hub
+    downloads create that folder within seconds, as soon as the first small
+    file (config/tokenizer) lands. An interrupted 7 GB pull therefore
+    passed as "installed" forever: Settings said ready, the install plan
+    skipped the repo, and the visual tier died at load time. Bit both
+    clean-machine beta tests in a row (2026-08-21, 2026-08-27).
+
+    Offline, "complete" has to be read from the cache structure itself.
+    Present means ALL of:
+      1. no `*.incomplete` blobs — in-flight/interrupted transfers always
+         leave them;
+      2. every entry in the snapshot that `refs/main` names resolves — no
+         dangling symlinks to never-finalized blobs;
+      3. the snapshot holds at least one real weight file — the first
+         seconds of a download produce a configs-only snapshot that would
+         pass checks 1-2.
+    Deliberately biased strict: a stale `.incomplete` from a superseded
+    revision reads as "not installed", and the cost is one quick no-op
+    Download pass (hub blob resume is free). The old bias cost a silently
+    broken visual tier.
+    """
+    d = _repo_cache_dir(repo)
+    try:
+        ref = d / "refs" / "main"
+        if not ref.is_file():
+            return False
+        snap = d / "snapshots" / ref.read_text(encoding="utf-8").strip()
+        if not snap.is_dir():
+            return False
+        blobs = d / "blobs"
+        if blobs.is_dir() and any(
+            b.name.endswith(".incomplete") for b in blobs.iterdir()
+        ):
+            return False
+        has_weight = False
+        for f in snap.rglob("*"):
+            # On platforms where hub symlinks are disabled (Windows without
+            # dev mode) entries are real files and exists() is trivially
+            # true; with symlinks, exists() follows the link and catches
+            # dangling ones.
+            if not f.exists():
+                return False
+            if f.is_file() and f.suffix in _WEIGHT_SUFFIXES:
+                has_weight = True
+        return has_weight
+    except OSError:  # unreadable cache == not present
         return False
 
 

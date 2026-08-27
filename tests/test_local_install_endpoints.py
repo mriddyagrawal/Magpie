@@ -255,6 +255,76 @@ def test_bytes_on_disk_counts_partials(isolated):
 
 
 # ---------------------------------------------------------------------------
+# _hf_repo_present — the strict completeness check (#16)
+# ---------------------------------------------------------------------------
+
+REPO = "vidore/colqwen2.5-base"
+
+
+def _fabricate_repo(
+    li,
+    *,
+    weights: bool = True,
+    incomplete: bool = False,
+    dangling: bool = False,
+):
+    """Lay down a hub-shaped cache dir for REPO: refs/main → snapshot of
+    symlinks → blobs. Flags recreate the states an interrupted download
+    leaves behind."""
+    d = li._repo_cache_dir(REPO)
+    commit = "0123456789abcdef0123456789abcdef01234567"
+    (d / "blobs").mkdir(parents=True)
+    snap = d / "snapshots" / commit
+    snap.mkdir(parents=True)
+    (d / "refs").mkdir()
+    (d / "refs" / "main").write_text(commit)
+    cfg = d / "blobs" / "cfgblob"
+    cfg.write_text("{}")
+    (snap / "config.json").symlink_to(cfg)
+    if weights:
+        w = d / "blobs" / "weightblob"
+        w.write_bytes(b"w" * 64)
+        (snap / "adapter_model.safetensors").symlink_to(w)
+    if incomplete:
+        (d / "blobs" / "bigshard.incomplete").write_bytes(b"x" * 32)
+    if dangling:
+        gone = d / "blobs" / "goneblob"
+        gone.write_bytes(b"y")
+        (snap / "model.safetensors").symlink_to(gone)
+        gone.unlink()
+
+
+def test_repo_present_when_snapshot_complete(isolated):
+    _fabricate_repo(isolated)
+    assert isolated._hf_repo_present(REPO) is True
+
+
+def test_repo_absent_when_never_downloaded(isolated):
+    assert isolated._hf_repo_present("nobody/nothing") is False
+
+
+def test_repo_absent_while_a_shard_is_incomplete(isolated):
+    """The exact #16 repro: interrupt a multi-GB pull mid-shard, relaunch.
+    The snapshot exists (small files landed in the first seconds) but a
+    *.incomplete blob remains — must read as NOT installed so the install
+    plan re-runs and hub resumes the partial blob."""
+    _fabricate_repo(isolated, incomplete=True)
+    assert isolated._hf_repo_present(REPO) is False
+
+
+def test_repo_absent_when_snapshot_has_configs_only(isolated):
+    """First seconds of a download: configs linked, no weight file yet, and
+    (if interrupted exactly between files) no .incomplete either."""
+    _fabricate_repo(isolated, weights=False)
+    assert isolated._hf_repo_present(REPO) is False
+
+
+def test_repo_absent_when_a_snapshot_link_dangles(isolated):
+    _fabricate_repo(isolated, dangling=True)
+    assert isolated._hf_repo_present(REPO) is False
+
+
+# ---------------------------------------------------------------------------
 # HTTP surface
 # ---------------------------------------------------------------------------
 

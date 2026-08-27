@@ -630,8 +630,13 @@
 (function () {
   "use strict";
   var ua = navigator.platform + " " + navigator.userAgent;
-  var isMac = /Mac/.test(ua);
-  var isWin = /Win/.test(ua);
+  /* iPhones say "like Mac OS X" and desktop-mode iPads say "MacIntel",
+     so phones must be carved out BEFORE the Mac test. */
+  var isIOS = /iPhone|iPad|iPod/.test(ua) ||
+    (/Mac/.test(ua) && navigator.maxTouchPoints > 1);
+  var isMobile = isIOS || /Android/.test(ua);
+  var isMac = !isMobile && /Mac/.test(ua);
+  var isWin = !isMobile && /Win/.test(ua);
 
   /* The quarantine note is macOS homework — hide it from everyone else.
      Default is visible, so a Mac user with broken JS still sees it. */
@@ -647,6 +652,7 @@
   var dlLabel = document.getElementById("download-label");
   if (dl && dlLabel) {
     if (isWin) dlLabel.textContent = "Download for Windows";
+    else if (isMobile) dlLabel.textContent = "Download for desktop";
     else if (!isMac) dlLabel.textContent = "Download";
     if (isMac || isWin) {
       try {

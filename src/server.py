@@ -2459,6 +2459,50 @@ def recents_get(entry_id: str) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Feedback — the post-answer "Feedback" box (src/feedback.py).
+# ---------------------------------------------------------------------------
+
+class FeedbackContext(BaseModel):
+    question: str = ""
+    answer: str = ""
+
+
+class FeedbackRequest(BaseModel):
+    message: str
+    # Present ONLY when the user ticked "include my question and answer" —
+    # the privacy contract lives in src/feedback.py's module docstring.
+    context: FeedbackContext | None = None
+
+
+@app.post("/feedback")
+async def post_feedback(req: FeedbackRequest):
+    from src import feedback
+
+    if not feedback.webhook_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="This build has no feedback destination configured — "
+            "you can open a GitHub issue instead.",
+        )
+    message = req.message.strip()
+    if not message:
+        raise HTTPException(status_code=422, detail="Feedback message is empty.")
+    context = req.context.model_dump() if req.context else None
+    # to_thread: delivery is a blocking HTTP POST with a 10s timeout.
+    return await asyncio.to_thread(feedback.submit, message, context)
+
+
+@app.on_event("startup")
+def _flush_feedback_outbox() -> None:
+    """Feedback typed offline gets retried on the next launch — in a
+    daemon thread so a slow webhook can't delay the port announcement."""
+    from src import feedback
+
+    if feedback.webhook_configured():
+        threading.Thread(target=feedback.flush_outbox, daemon=True).start()
+
+
+# ---------------------------------------------------------------------------
 # Sidecar entrypoint: pick a free port, print it, serve.
 # ---------------------------------------------------------------------------
 

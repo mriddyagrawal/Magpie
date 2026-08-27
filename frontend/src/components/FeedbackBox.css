@@ -1,0 +1,120 @@
+/* FeedbackBox — sits under the SourcesCard in the answered view.
+   Closed state borrows the answer-card follow-up button's quiet look;
+   open state is a regular magpie-card. */
+
+.feedback-box__opener {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--text-dim);
+  padding: 4px 0;
+  letter-spacing: 0.5px;
+  transition: color 120ms;
+}
+
+.feedback-box__opener:hover {
+  color: var(--accent);
+}
+
+.feedback-box {
+  padding: var(--card-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedback-box__label {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.feedback-box__input {
+  font-family: var(--font-body);
+  font-size: var(--size-sm);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--text-dim);
+  border-radius: 6px;
+  padding: 8px 10px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.feedback-box__input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.feedback-box__context {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.feedback-box__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.feedback-box__hint {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--text-dim);
+}
+
+.feedback-box__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.feedback-box__cancel,
+.feedback-box__send {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  letter-spacing: 0.5px;
+  padding: 4px 2px;
+  transition: color 120ms;
+}
+
+.feedback-box__cancel {
+  color: var(--text-dim);
+}
+
+.feedback-box__cancel:hover {
+  color: var(--text-primary);
+}
+
+.feedback-box__send {
+  color: var(--accent);
+}
+
+.feedback-box__send:disabled {
+  color: var(--text-dim);
+  opacity: 0.6;
+  cursor: default;
+}
+
+.feedback-box__error {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: #ff8e8e;
+}
+
+.feedback-box--done {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--text-dim);
+  padding: 4px 0;
+}

@@ -138,16 +138,26 @@ jobs:
       # deliberately a throwaway on a spend cap, pointed at a free-tier
       # model. Rotate it freely; never put a metered key here. Plan #40
       # (hosted backend, key stays server-side) is the real fix.
-      - name: Seed bundled OpenRouter key
+      # FEEDBACK_BUNDLED_WEBHOOK: same threat model as the key above — a
+      # revocable Discord/Slack webhook URL for the in-app feedback box
+      # (src/feedback.py). Rotate on abuse; absence just disables the box.
+      - name: Seed bundled secrets
         shell: bash
         env:
           OPENROUTER_BUNDLED_KEY: ${{ secrets.OPENROUTER_BUNDLED_KEY }}
+          FEEDBACK_BUNDLED_WEBHOOK: ${{ secrets.FEEDBACK_BUNDLED_WEBHOOK }}
         run: |
           if [ -n "$OPENROUTER_BUNDLED_KEY" ]; then
             printf '%s' "$OPENROUTER_BUNDLED_KEY" > src/config/bundled_key.txt
             echo "bundled_key.txt written ($(wc -c < src/config/bundled_key.txt) bytes)"
           else
             echo "OPENROUTER_BUNDLED_KEY not set - Cloud toggle will 401 in this build"
+          fi
+          if [ -n "$FEEDBACK_BUNDLED_WEBHOOK" ]; then
+            printf '%s' "$FEEDBACK_BUNDLED_WEBHOOK" > src/config/bundled_webhook.txt
+            echo "bundled_webhook.txt written ($(wc -c < src/config/bundled_webhook.txt) bytes)"
+          else
+            echo "FEEDBACK_BUNDLED_WEBHOOK not set - in-app feedback box will be disabled in this build"
           fi
 
       - name: Build Python sidecar

@@ -292,6 +292,31 @@ when the matrix changes.
 
 ---
 
+## In-app feedback
+
+The post-answer "send feedback" box (`frontend/src/components/FeedbackBox.tsx`
+→ `POST /feedback` → `src/feedback.py`) forwards the typed text to a team
+webhook. The URL comes from `FEEDBACK_WEBHOOK_URL` (dev) or
+`src/config/bundled_webhook.txt`, baked in by CI from the
+`FEEDBACK_BUNDLED_WEBHOOK` secret — the same mechanism as the bundled
+OpenRouter key, same threat model (revocable, rotate on abuse). Discord and
+Slack payload shapes are auto-detected from the URL; any other URL gets raw
+JSON `{"message": ...}`.
+
+Privacy contract: nothing sends except on the user's explicit Submit. The
+payload is the typed text plus app version / OS / provider name — and the
+question+answer pair only when the user ticks the include-context box. Never
+file contents or paths.
+
+Failed deliveries append to `<APP_DATA_DIR>/feedback_outbox.jsonl` and are
+retried on the next submit and on sidecar startup (store-and-forward), so
+feedback typed offline still arrives. Dev test: set `FEEDBACK_WEBHOOK_URL`
+in `.env`, ask a question, use the box — the message lands in the channel
+within seconds. No secret configured → the endpoint returns 503 and the UI
+says feedback isn't available in this build.
+
+---
+
 ## Where Magpie writes
 
 ```

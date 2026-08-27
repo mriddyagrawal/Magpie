@@ -303,14 +303,14 @@ Magpie is a **beta**. It has been installed and run by a handful of people; expe
   <img src="https://contrib.rocks/image?repo=mriddyagrawal/Magpie" alt="Contributors" />
 </a>
 
-## star history
+## Star History
 
-<a href="https://star-history.com/#mriddyagrawal/Magpie&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mriddyagrawal/Magpie&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=mriddyagrawal/Magpie&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mriddyagrawal/Magpie&type=Date" />
-  </picture>
+<a href="https://www.star-history.com/?type=date&repos=mriddyagrawal%2FMagpie">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=mriddyagrawal/Magpie&type=date&theme=dark&legend=top-left&sealed_token=HIu-fCs0VFvSFMhBydQH6k5gJpzoIS0EXbiYkVFkw0T3-lQgKJXUVf6MziHW-zrwnn9T8N6tZVhDoCT45bzlKu6zjB7ecreXGRQ8KnhH_hhEXujjHDdZCxulJGzc3Pnkz5K6xfaVksIDWm2rOAgHSpUvoiE9CsYMu-AM4Hznpor5L-_QeLbOsDe44Yea" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=mriddyagrawal/Magpie&type=date&legend=top-left&sealed_token=HIu-fCs0VFvSFMhBydQH6k5gJpzoIS0EXbiYkVFkw0T3-lQgKJXUVf6MziHW-zrwnn9T8N6tZVhDoCT45bzlKu6zjB7ecreXGRQ8KnhH_hhEXujjHDdZCxulJGzc3Pnkz5K6xfaVksIDWm2rOAgHSpUvoiE9CsYMu-AM4Hznpor5L-_QeLbOsDe44Yea" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=mriddyagrawal/Magpie&type=date&legend=top-left&sealed_token=HIu-fCs0VFvSFMhBydQH6k5gJpzoIS0EXbiYkVFkw0T3-lQgKJXUVf6MziHW-zrwnn9T8N6tZVhDoCT45bzlKu6zjB7ecreXGRQ8KnhH_hhEXujjHDdZCxulJGzc3Pnkz5K6xfaVksIDWm2rOAgHSpUvoiE9CsYMu-AM4Hznpor5L-_QeLbOsDe44Yea" />
+ </picture>
 </a>
 
 ---

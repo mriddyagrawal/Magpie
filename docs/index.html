@@ -307,9 +307,21 @@
   .meta a:hover { color: var(--sheen); }
 
   @media (max-width: 640px) {
+    .topbar {
+      flex-wrap: wrap; /* chips drop to their own row instead of crushing */
+      row-gap: 10px;
+    }
+    .brand { gap: 9px; }
+    .brand-logo { width: 40px; height: 40px; }
+    .brand-name { font-size: 26px; top: -3px; }
+    .gh-star { font-size: 12px; }
+    .gh-star-main { padding: 7px 10px; }
+    .gh-star-count { padding: 7px 9px; }
+    h1 { font-size: clamp(36px, 10.5vw, 52px); }
     .hero { align-items: flex-end; }
-    .hero-content { padding-top: 60px; }
-    .actions { gap: 16px; }
+    .hero-content { padding-top: 48px; }
+    .actions { gap: 14px; }
+    .download { width: 100%; justify-content: center; }
   }
 </style>
 </head>
@@ -350,11 +362,11 @@
         <strong>Run it fully local and nothing leaves your machine.</strong>
       </p>
       <div class="actions">
-        <a class="download" href="https://github.com/mriddyagrawal/Magpie/releases" target="_blank" rel="noopener">
+        <a class="download" id="download-btn" href="https://github.com/mriddyagrawal/Magpie/releases" target="_blank" rel="noopener">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
             <path d="M7.5 1v9M4 6.7l3.5 3.6L11 6.7M2 13h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          Download for macOS
+          <span id="download-label">Download for macOS</span>
         </a>
         <a class="gh-link" href="https://github.com/mriddyagrawal/Magpie" target="_blank" rel="noopener">View the source ↗</a>
       </div>
@@ -613,11 +625,43 @@
 <script>
 (function () {
   "use strict";
+  var ua = navigator.platform + " " + navigator.userAgent;
+  var isMac = /Mac/.test(ua);
+  var isWin = /Win/.test(ua);
+
   /* The quarantine note is macOS homework — hide it from everyone else.
      Default is visible, so a Mac user with broken JS still sees it. */
   var card = document.getElementById("mac-firstrun");
-  if (card && !/Mac/.test(navigator.platform + " " + navigator.userAgent)) {
+  if (card && !isMac) {
     card.style.display = "none";
+  }
+
+  /* OS-aware download: label the visitor's platform and link the button
+     straight to the newest installer asset. Falls back to the releases
+     page when the API is unreachable or the OS has no build. */
+  var dl = document.getElementById("download-btn");
+  var dlLabel = document.getElementById("download-label");
+  if (dl && dlLabel) {
+    if (isWin) dlLabel.textContent = "Download for Windows";
+    else if (!isMac) dlLabel.textContent = "Download";
+    if (isMac || isWin) {
+      try {
+        fetch("https://api.github.com/repos/mriddyagrawal/Magpie/releases?per_page=1")
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (rel) {
+            var assets = rel && rel[0] && rel[0].assets ? rel[0].assets : [];
+            var want = isMac ? /\.dmg$/i : /\.exe$/i;
+            for (var i = 0; i < assets.length; i++) {
+              if (want.test(assets[i].name)) {
+                dl.href = assets[i].browser_download_url;
+                dl.removeAttribute("target"); /* download, not a new tab */
+                return;
+              }
+            }
+          })
+          .catch(function () {});
+      } catch (e) {}
+    }
   }
 
   /* Rotating headline word: out through the top, in from below.

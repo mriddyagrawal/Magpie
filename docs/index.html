@@ -655,7 +655,7 @@
   var dlLabel = document.getElementById("download-label");
   if (dl && dlLabel) {
     if (isWin) dlLabel.textContent = "Download for Windows";
-    else if (isMobile) dlLabel.textContent = "Download for desktop";
+    else if (isMobile) dlLabel.textContent = "Available for Mac & Windows";
     else if (!isMac) dlLabel.textContent = "Download";
     if (isMac || isWin) {
       try {

@@ -46,7 +46,7 @@
 
 ---
 
-## the problem
+## The Problem
 
 Every desktop search tool works the same way: you type keywords, it matches filenames and maybe some content. That's fine when you remember the exact word. It falls apart the moment you ask a real question.
 
@@ -60,7 +60,7 @@ Magpie is the "chat with your documents" experience — but pointed at your own 
 
 ---
 
-## why magpie?
+## Why Magpie?
 
 | | Magpie | Spotlight / Windows Search | [ripgrep](https://github.com/BurntSushi/ripgrep) | NotebookLM / ChatGPT |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@ The short version: **grep needs the exact word. Spotlight needs the filename. Ma
 
 ---
 
-## what it does
+## What It Does
 
 - **Answers, not hit lists.** Every answer names the files it relied on, as clickable paths you can open or reveal in the file manager.
 - **Reads what other tools skip.** Text, PDF, DOCX, XLSX, CSV, code, Markdown — plus scanned pages and photos, through a visual model that embeds the rendered page instead of giving up on it.
@@ -89,7 +89,7 @@ The short version: **grep needs the exact word. Spotlight needs the filename. Ma
 
 ---
 
-## architecture
+## Architecture
 
 **Indexing** — every file is routed to the cheapest tier that can actually understand it:
 
@@ -126,7 +126,7 @@ Four models run inside the app — MiniLM for dense embeddings, BM25 for sparse,
 
 ---
 
-## how it holds up
+## How It Holds Up
 
 Magpie is developed against three corpora, each picked to break a different part of the pipeline:
 
@@ -155,7 +155,7 @@ The answer stage is scored on a hand-written question set with known-correct sou
 
 ---
 
-## download
+## Download
 
 **[Latest release →](https://github.com/mriddyagrawal/Magpie/releases)**
 <!-- Deliberately the /releases list, not /releases/latest: GitHub's `latest`
@@ -169,7 +169,7 @@ The answer stage is scored on a hand-written question set with known-correct sou
 | macOS (Intel) | Not built — GitHub retired the Intel CI runner |
 | Linux | Not in this beta ([why](docs/DEVELOPMENT.md#linux)) |
 
-### macOS: the first launch is blocked
+### macOS: The First Launch Is Blocked
 
 The beta is **unsigned and un-notarized**, so macOS quarantines it. This is expected. Either:
 
@@ -185,7 +185,7 @@ SmartScreen will warn you. Click **More info → Run anyway**.
 
 ---
 
-## first run
+## First Run
 
 1. Press **`⌥Space`** to summon the window (`Alt+Space` on Windows).
 2. Open **Settings → Data → Add folder** and point it at something real.
@@ -194,7 +194,7 @@ SmartScreen will warn you. Click **More info → Run anyway**.
 
 **The first question needs an internet connection.** Magpie downloads ~90 MB of embedding models on first use, then works from cache. Indexing large folders also downloads a visual model (500 MB–2 GB) the first time it meets a scanned PDF or image.
 
-### shortcuts
+### Shortcuts
 
 | Key | Action |
 |---|---|
@@ -209,7 +209,7 @@ Magpie hides whenever it loses focus, like Spotlight. `⌥Space` brings it back.
 
 ---
 
-## what works in this beta
+## What Works in This Beta
 
 | | Status |
 |---|---|
@@ -227,7 +227,7 @@ Magpie hides whenever it loses focus, like Spotlight. `⌥Space` brings it back.
 
 ---
 
-## privacy
+## Privacy
 
 What stays local, always:
 
@@ -246,7 +246,7 @@ That second one is the real boundary — worth knowing before you point Magpie a
 
 ---
 
-## build from source
+## Build from Source
 
 ```bash
 git clone https://github.com/mriddyagrawal/Magpie.git
@@ -264,13 +264,13 @@ uv run uvicorn src.server:app --port 8765 --reload    # terminal 2
 cd frontend && pnpm tauri dev                         # terminal 3
 ```
 
-## stack
+## Stack
 
 Python (FastAPI) · Tauri 2 (Rust shell) · React/TS · [Qdrant](https://qdrant.tech/) · MiniLM · BM25 · [ColPali](https://huggingface.co/vidore/colpali) · cross-encoder reranking
 
 ---
 
-## roadmap
+## Roadmap
 
 Nearest first — the ❌ rows above are the honest backlog:
 
@@ -283,7 +283,7 @@ Nearest first — the ❌ rows above are the honest backlog:
 
 Everything we've considered and deliberately deferred — with the reasoning, so we can tell later whether it still holds — lives in [`Plans/Future Plans.md`](Plans/Future%20Plans.md).
 
-## docs
+## Docs
 
 | doc | what |
 |-----|------|
@@ -293,11 +293,11 @@ Everything we've considered and deliberately deferred — with the reasoning, so
 
 ---
 
-## status
+## Status
 
 Magpie is a **beta**. It has been installed and run by a handful of people; expect rough edges, and please open an issue when you find one.
 
-## contributors
+## Contributors
 
 <a href="https://github.com/mriddyagrawal/Magpie/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=mriddyagrawal/Magpie" alt="Contributors" />
@@ -315,7 +315,7 @@ Magpie is a **beta**. It has been installed and run by a handful of people; expe
 
 ---
 
-## license
+## License
 
 Magpie is licensed under the **GNU Affero General Public License, version 3** ([`AGPL-3.0-only`](LICENSE)).
 

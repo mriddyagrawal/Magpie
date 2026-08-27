@@ -55,6 +55,25 @@ def test_answer_prompt_matches():
     )
 
 
+def test_answer_block_constants_match():
+    """The v2 prompt diet split situational guidance into block constants;
+    they are duplicated desktop-side like the base prompt and drift the
+    same way, so they get the same guard."""
+    pairs = [
+        ("ANSWER_CITATION_BLOCK", "_INLINE_CITATION_BLOCK"),
+        ("ANSWER_MATH_BLOCK", "_MATH_BLOCK"),
+        ("ANSWER_PAGE_REF_BLOCK", "_PAGE_REF_BLOCK"),
+        ("ANSWER_FORMAT_BLOCK", "_FORMAT_BLOCK_CLOUD"),
+    ]
+    answer_py = REPO_ROOT / "src" / "answer.py"
+    for server_name, desktop_name in pairs:
+        desktop = _extract_str_constant(answer_py, desktop_name)
+        assert getattr(prompts, server_name) == desktop, (
+            f"Drift: server prompts.{server_name} differs from "
+            f"src/answer.py:{desktop_name}."
+        )
+
+
 def test_rewrite_prompt_matches():
     desktop = _extract_str_constant(
         REPO_ROOT / "src" / "stage2" / "search.py", "REWRITE_SYSTEM_PROMPT"

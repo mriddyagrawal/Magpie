@@ -99,8 +99,25 @@ async def answer(
         parts.append("")
     message = "\n".join(parts)
 
+    # Compose the prompt: citation block always (no toggle server-side),
+    # situational blocks only when the snippets trigger them, and the JSON
+    # format contract always — every provider this server dispatches to is
+    # prompt-enforced (response_format disabled; see desktop src/llm.py).
+    # Note the v1 route passed ANSWER_PROMPT with `{citation_block}`
+    # literally unfilled — fixed here alongside the v2 prompt diet.
+    system_prompt = prompts.ANSWER_PROMPT.replace(
+        "{citation_block}", prompts.ANSWER_CITATION_BLOCK
+    )
+    extras: list[str] = []
+    if "## PDF page" in message:
+        extras.append(prompts.ANSWER_PAGE_REF_BLOCK)
+    if any(sig in message for sig in ("∂", "∫", "∑", "√", "\\frac", "$$")):
+        extras.append(prompts.ANSWER_MATH_BLOCK)
+    extras.append(prompts.ANSWER_FORMAT_BLOCK)
+    message = message + "\n\n" + "\n\n".join(extras)
+
     try:
-        agent = build_agent(prompts.ANSWER_PROMPT, Answer, settings.answer_model)
+        agent = build_agent(system_prompt, Answer, settings.answer_model)
         result = await agent.run(message)
     except Exception as e:  # pylint: disable=broad-except
         status_code, detail = user_facing_error(e)

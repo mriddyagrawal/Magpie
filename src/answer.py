@@ -14,6 +14,7 @@ import argparse
 import asyncio
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Sequence
@@ -206,125 +207,53 @@ class Answer(BaseModel):
     )
 
 
-# NOTE: Until Phase 2.5 step 5 (cloud-provider wiring) lands, this prompt is
-# duplicated in `server/magpie_server/prompts.py:ANSWER_PROMPT`. Edit there,
-# not here — copy back to keep parity. After step 5 lands, this constant is
-# deleted and the desktop calls /llm/answer on the cloud server instead.
+# NOTE: Until Phase 2.5 step 5 (cloud-provider wiring) lands, this prompt and
+# the block constants below are duplicated in `server/magpie_server/prompts.py`
+# (SYSTEM_PROMPT ↔ ANSWER_PROMPT, _INLINE_CITATION_BLOCK ↔
+# ANSWER_CITATION_BLOCK, etc.). Edit there, not here — copy back to keep
+# parity; server/tests/test_prompts_parity.py enforces it. After step 5 lands,
+# these constants are deleted and the desktop calls /llm/answer instead.
+#
+# Prompt diet (2026-08-27): the always-on system prompt was 1,802 tokens of
+# accreted eval patches, all paid on every question. A 3B model has a fragile
+# instruction budget — rules that don't apply to THIS question actively
+# compete with the ones that do — so everything situational now injects into
+# the user message only when triggered (math, page anchors, llm-summary
+# note, cloud output format), following the SYNTHESIS/ENUMERATION MODE
+# pattern below. The always-on core is what's left here.
 SYSTEM_PROMPT = (
-    "You are a file-grounded question-answering assistant. "
-    "Answer the user's question using ONLY the files provided in the message. "
-    "If the files do not contain the information needed to answer, say so explicitly — "
-    "do not invent facts. "
-    "IMPORTANT — terminology and unit mapping. The absence of the user's exact "
-    "phrase does NOT mean the file lacks the information. Before concluding that "
-    "a file does not cover a topic, check whether the file discusses the same "
-    "concept under a different name, a synonym, an abbreviation, or a different "
-    "unit. When it does, answer from what the file states and briefly note the "
-    "mapping. Concrete examples you should handle this way: "
-    "(1) 'beats per second' → the file's 'BPM / beats per minute / tempo' — "
-    "answer with the tempo/BPM definition and note that beats-per-second = BPM ÷ 60; "
-    "(2) 'prereqs' → the file's 'prerequisites'; "
-    "(3) 'bank fees' → the file's 'service charges'; "
-    "(4) 'how long is the class' → the file's 'duration' or 'credit hours'. "
-    "This is grounded answering, not invention — you are reporting what the file "
-    "says and identifying it as the equivalent concept. Do NOT bridge genuinely "
-    "distinct concepts (e.g. don't answer a question about pitch using a file "
-    "that only discusses rhythm). "
-    "Be concise. Default to the shortest answer that directly addresses the "
-    "question — one sentence or a brief list is usually enough. Do not restate "
-    "the question, add background context, or enumerate details the user didn't "
-    "ask for. If the user wants more detail, they will ask a follow-up. "
-    "Exception: if the question is explicitly comparative, aggregative, or asks "
-    "for a list ('which courses...', 'what are all...', 'what receipts do I have'), "
-    "return the full list AND include every retrieved file that qualifies — even "
-    "if the file uses a different word for the category. A 'flight itinerary' or "
-    "'trip confirmation' IS a travel receipt; a 'lease agreement' IS a contract; "
-    "a 'bank statement' IS a financial record / receipt of transactions. Map the "
-    "user's category to its equivalents in the files. Do NOT silently drop files "
-    "from the answer because their internal label differs from the user's word. "
-    "If prior conversation turns are included, use them to interpret the user's "
-    "current question (resolve references like 'that', 'it', 'the same course'), "
-    "but still ground your answer in the files — do not recycle a prior answer "
-    "without checking the current files. "
-    "In `sources_used`, include only the file paths your answer actually "
-    "depends on. The path itself must be copied verbatim from the "
-    "'--- File N: <path> ---' headers — but you MAY append page references "
-    "after the path using this exact format: "
-    "`<path>  [book pp. 254-258 / PDF pp. 269-273]`. Use this format only "
-    "when the file has page anchors (you'll see '## PDF page N (book p. X)' "
-    "headers in the file content). Do NOT invent page numbers; cite only the "
-    "anchors that actually appear in what you read. "
-    "\n\n"
-    "Mathematical notation: PREFER Unicode math symbols — they render "
-    "cleanly in plain-text terminals (which is what most users see). "
-    "Use ∂ ∫ ∑ ∏ √ ⇒ ⇔ ≈ ≠ ≤ ≥ ∇ × · ± ∞ α β γ θ φ ψ ω π Δ where they "
-    "express the equation. Use Unicode subscripts/superscripts where useful "
-    "(x², q̇, m₁). Only fall back to LaTeX `$...$` (inline) or `$$...$$` "
-    "(display) for structures Unicode can't express clearly: fractions like "
-    "$\\frac{a}{b}$, multi-line sums, integrals with limits. "
-    "Source PDFs often have OCR-garbled math (e.g. 'd/dt' shown as 'dldt', "
-    "'∂' shown as 'a', subscripts split across spaces, em-dashes for minus "
-    "signs). Use your knowledge of standard physics/math notation to "
-    "reconstruct the correct expression — never copy garbled OCR verbatim. "
-    "If you can't reliably reconstruct, describe the equation in plain "
-    "language instead. "
-    "\n\n"
-    "Page numbers belong in `sources_used` ONLY. Do NOT pepper the answer "
-    "prose with `[book p. N / PDF p. M]` annotations — they clutter the "
-    "reading experience and the user already sees the consolidated page "
-    "list at the bottom. The only exception: if the user explicitly asked "
-    "'where' or 'on what page', you may give a single short citation in "
-    "the prose using the form 'page N' (book page; the PDF page is in "
-    "sources_used). Otherwise keep the prose clean. "
-    "\n\n"
-    "\n\n"
-    "{citation_block}"
-    "WHEN YOU CANNOT ANSWER FROM THE PROVIDED FILES. If, after reading the "
-    "files carefully (including the synonym/unit mapping above), none of "
-    "them contain the information needed to answer the question, do NOT "
-    "fabricate. Instead, set the result fields as follows:\n"
-    "  - `not_found`: true\n"
-    "  - `answer`: \"\" (empty string)\n"
-    "  - `sources_used`: [] (empty list)\n"
-    "  - `not_found_topic`: a short noun phrase summarizing what the user "
-    "    asked about. Examples: 'a landlord's emergency phone number', "
-    "    'the chemistry final exam time', 'who chairs the math department'. "
-    "    Keep it short (a few words). Do not restate the full question.\n"
-    "Use this branch ONLY when the files genuinely don't contain the answer. "
-    "If the files contain the answer under a synonym, abbreviation, or "
-    "different unit (per the mapping rules above), DO answer normally — "
-    "that's not a not-found case.\n"
-    "\n\n"
-    "OUTPUT FORMAT — required schema. Respond with a single JSON object that "
-    "has EXACTLY these four keys, named EXACTLY as shown, IN THIS ORDER:\n"
-    "  {\"not_found\": <boolean>, \"not_found_topic\": <string>, "
-    "\"answer\": <string>, \"sources_used\": [<file path>, ...]}\n"
-    "All four keys are required. The order above is load-bearing — emit "
-    "`not_found` first so you commit to the verdict before generating "
-    "content. Do NOT rename `answer` to something descriptive like "
-    "`result` / `summary` / `courses_mentioned` / `findings` — small "
-    "models tend to do this and it breaks downstream parsing. The key "
-    "is literally the four letters `answer` regardless of what the "
-    "question is about. "
-    "If the answer is naturally a list (e.g. 'list every X'), join the "
-    "items into a single string inside the `answer` value (use bullets "
-    "`- ` or newlines), do NOT make `answer` a JSON array.\n"
-    "Example for a successful answer with citations:\n"
-    "  {\"not_found\": false, \"not_found_topic\": \"\", "
-    "\"answer\": \"The chair of the Mathematics department is "
-    "Dr. Elena Marquez[1].\", \"sources_used\": "
-    "[\"path/to/math-dept-2024.pdf\"]}\n"
-    "Example for a list-shaped question:\n"
-    "  {\"not_found\": false, \"not_found_topic\": \"\", "
-    "\"answer\": \"- Item one[1]\\n- Item two[2]\\n- Item three[1]\", "
-    "\"sources_used\": [\"path/to/file-a.md\", \"path/to/file-b.md\"]}\n"
-    "Example for a not-found case:\n"
-    "  {\"not_found\": true, \"not_found_topic\": "
-    "\"a landlord's emergency phone number\", "
-    "\"answer\": \"\", \"sources_used\": []}\n"
+    "You are a file-grounded question-answering assistant. Answer the "
+    "user's question using ONLY the files provided in the message. Never "
+    "invent facts.\n"
     "\n"
-    "Output RAW JSON only — do not wrap the response in markdown code fences "
-    "like ```json, and do not include any prose before or after the JSON object."
+    "Terminology: the absence of the user's exact words does NOT mean the "
+    "information is absent. If a file covers the concept under a different "
+    "name, synonym, abbreviation, or unit (e.g. 'prereqs' → the file's "
+    "'prerequisites'), answer from what the file states and briefly note "
+    "the mapping. Do not bridge genuinely different concepts (don't answer "
+    "a question about pitch from a file that only discusses rhythm).\n"
+    "\n"
+    "Be concise: give the shortest answer that directly addresses the "
+    "question — one sentence or a short list. Do not restate the question "
+    "or add background the user didn't ask for. Exception: when the "
+    "question asks for a list or a comparison, completeness beats brevity "
+    "— include every file that qualifies, even when its own label differs "
+    "from the user's word for the category.\n"
+    "\n"
+    "If prior conversation turns are shown, use them only to resolve "
+    "references in the current question ('it', 'that', 'the same course'); "
+    "answer from the current files, never by recycling a prior answer.\n"
+    "\n"
+    "{citation_block}"
+    "In `sources_used`, list only the files your answer actually depends "
+    "on, each path copied verbatim from its '--- File N: <path> ---' "
+    "header. If the answer is naturally a list, write the items as bullet "
+    "lines inside the single `answer` string.\n"
+    "\n"
+    "If none of the files contain the answer (after the terminology rule "
+    "above), do not fabricate: set not_found=true, answer=\"\", "
+    "sources_used=[], and put a short noun phrase naming what was asked "
+    "about in not_found_topic (e.g. 'a landlord's emergency phone number')."
 )
 
 
@@ -343,22 +272,89 @@ _ANSWER_FALLBACK = Answer(
 # when off. The frontend's renderAnswer() handles markerless prose
 # gracefully (no orphan-pill warnings), so toggling at runtime is safe.
 _INLINE_CITATION_BLOCK = (
-    "INLINE CITATION MARKERS. As you write the answer, cite the supporting "
-    "file with a numbered marker in square brackets: `[1]` for the first "
-    "file you cite, `[2]` for the second, and so on. The number is the "
-    "1-based index into your `sources_used` list (the first entry of "
-    "`sources_used` is `[1]`, the second is `[2]`, etc.). Place each "
-    "marker immediately after the claim it supports, with no space "
-    "before the bracket. Re-use the same number whenever you cite the "
-    "same file again. Examples:\n"
-    "  - 'The chair of the Mathematics department is Dr. Elena Marquez[1].'\n"
-    "  - 'CSC-105 has 4 credit hours[1] and is offered every fall[2].'\n"
-    "Do NOT use markers like `[Source 1]`, `[file: foo.pdf]`, or `(1)` — "
-    "the bracketed number alone is the only accepted form. Do NOT invent "
-    "citation numbers that exceed the length of `sources_used`. If you "
-    "have nothing to cite for a claim, omit the marker entirely.\n"
-    "\n\n"
+    "Cite as you write: put a bracketed number immediately after the claim "
+    "it supports — [1] is the first entry of `sources_used`, [2] the "
+    "second; reuse a file's number on repeat citations. Example: 'CSC-105 "
+    "has 4 credit hours[1] and is offered every fall[2].' Only this form "
+    "counts (never '[Source 1]', '[file: x.pdf]', or '(1)'), and never use "
+    "a number beyond the length of `sources_used`.\n"
+    "\n"
 )
+
+
+# ---------------------------------------------------------------------------
+# Situational blocks — injected into the USER message only when the
+# assembled file content actually triggers them. Rationale for the split:
+# each was an always-on system-prompt rule costing every question its full
+# token weight (math 220, page-refs 229) even on corpora that never need
+# them, and small-model instruction-following degrades as irrelevant rules
+# stack up. Same injection mechanism as SYNTHESIS/ENUMERATION MODE.
+# ---------------------------------------------------------------------------
+
+_MATH_BLOCK = (
+    "MATH NOTATION: prefer Unicode math symbols (∂ ∑ ∫ √ ≤ ≥ π x² m₁); "
+    "use LaTeX $...$ only for structures Unicode can't express (fractions, "
+    "integrals with limits). Source PDFs often garble math ('dldt' for "
+    "'d/dt') — reconstruct the standard notation instead of copying it; if "
+    "you can't reconstruct reliably, describe the equation in words."
+)
+
+# Fires on symbols/keywords that only show up in genuinely mathematical
+# text. False positive = 80 wasted tokens; false negative = the model
+# falls back to its default LaTeX habits. Both are cheap.
+_MATH_SIGNALS = re.compile(
+    r"[∂∫∑∏√∇]|\\frac|\$\$|\b(equation|theorem|integral|derivative)s?\b",
+    re.IGNORECASE,
+)
+
+_PAGE_REF_BLOCK = (
+    "PAGE REFERENCES: some files carry '## PDF page N (book p. X)' "
+    "anchors. You may append page ranges to a `sources_used` entry as "
+    "`<path>  [book pp. A-B / PDF pp. C-D]` — only pages that actually "
+    "appear in what you read, never invented. Keep page numbers out of the "
+    "answer prose unless the user explicitly asked where; then a single "
+    "'page N' is allowed."
+)
+
+# The one-time explainer for 'Content type: llm-summary' markers — hoisted
+# out of _summary_supplement so N files cost one explanation, not N.
+_SUMMARY_NOTE = (
+    "Some files include an 'llm-summary' — a distilled overview generated "
+    "at indexing time; read it alongside that file's raw content (raw "
+    "extraction can be thin for scans and large files)."
+)
+
+# Cloud only. The local path compiles the response schema to a GBNF grammar
+# (llama-server json_schema → sampler-level enforcement), so the model
+# literally cannot emit wrong keys, wrong order, fences, or stray prose —
+# format instructions there are dead weight. Cloud providers run with NO
+# response_format at all (Google AI Studio rejects both variants; see
+# src/llm.py) and depend on the prompt plus parse_json_with_repair, so they
+# keep an explicit spec. Placed at the bottom of the message: after
+# thousands of tokens of file content, the recency zone is where a format
+# contract survives.
+_FORMAT_BLOCK_CLOUD = (
+    "OUTPUT FORMAT: respond with a single raw JSON object — no markdown "
+    "fences, no prose before or after — with exactly these four keys in "
+    "this order:\n"
+    "{\"not_found\": <boolean>, \"not_found_topic\": <string>, "
+    "\"answer\": <string>, \"sources_used\": [<file path>, ...]}\n"
+    "Example: {\"not_found\": false, \"not_found_topic\": \"\", "
+    "\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
+    "\"sources_used\": [\"path/to/math-dept-2024.pdf\"]}"
+)
+
+
+def _needs_prompted_format() -> bool:
+    """True when the active provider enforces JSON by prompt rather than
+    grammar. On any doubt, include the block: the cost is ~120 tokens; the
+    failure mode of omitting it on a cloud path is a parse failure."""
+    try:
+        from src.llm import active_provider
+
+        return active_provider().name != "local"
+    except Exception:  # noqa: BLE001
+        return True
 
 
 def _resolve_system_prompt(cite_inline: bool) -> str:
@@ -498,10 +494,10 @@ async def answer_question(
         truncated = len(body) > ANSWER_SUPPLEMENT_MAX_CHARS
         body = body[:ANSWER_SUPPLEMENT_MAX_CHARS]
         suffix = "\n…(supplement truncated)" if truncated else ""
+        # Bare marker — the one-time _SUMMARY_NOTE in the message intro
+        # explains it, so N files don't repeat the same 34-token sentence.
         return (
-            "Content type: llm-summary (distilled overview of the file — use "
-            "alongside the raw content below, especially when the raw "
-            "extraction is thin or the file is large)\n\n---\n"
+            "Content type: llm-summary\n\n---\n"
             f"{body}{suffix}"
         )
 
@@ -646,15 +642,30 @@ async def answer_question(
         intro_parts.append("")
     intro_parts.append(f"Current question: {question}")
     intro_parts.append("")
+    # One line, not a paragraph: the terminology and citation rules already
+    # live in the system prompt — re-explaining them here cost ~100 tokens
+    # per question and taught the model nothing new.
     intro_parts.append(
-        "Answer the current question using the files below. Follow the "
-        "system-prompt guidance on terminology/unit mapping — if the file "
-        "covers the concept under a different name, abbreviation, or unit "
-        "(e.g. 'BPM' when the user asks about 'beats per second'), answer "
-        "from what the file states and note the mapping rather than declaring "
-        "the information absent. Cite the exact file paths (from the "
-        "'--- File N: <path> ---' headers) in `sources_used`."
+        "Answer the current question from the files below. If a file uses "
+        "a different word for the same concept, that still counts — see "
+        "the terminology rule."
     )
+
+    # Situational guidance — injected only when the content that triggers
+    # it is actually in the message (see the block constants above).
+    _flags_text = "\n".join(
+        b for _d, _blocks in per_file_blocks for b in _blocks
+        if isinstance(b, str)
+    )
+    if "Content type: llm-summary" in _flags_text:
+        intro_parts.append("")
+        intro_parts.append(_SUMMARY_NOTE)
+    if _MATH_SIGNALS.search(_flags_text):
+        intro_parts.append("")
+        intro_parts.append(_MATH_BLOCK)
+    if "## PDF page" in _flags_text:
+        intro_parts.append("")
+        intro_parts.append(_PAGE_REF_BLOCK)
 
     # If the user is asking an enumeration ("all my receipts" / "list every
     # X" / "what stuff did I do in Y") query, the strict-grounding rules
@@ -731,14 +742,18 @@ async def answer_question(
         message.append(f"\n--- File {i}: {display} ---")
         message.extend(blocks)
 
+    # Prompt-enforced JSON contract, cloud only — the local grammar makes
+    # it unnecessary (see _FORMAT_BLOCK_CLOUD for the full rationale).
+    if _needs_prompted_format():
+        message.append(f"\n{_FORMAT_BLOCK_CLOUD}")
+
     # Echo the question once more at the bottom (query-aware
     # contextualization). Liu et al. found this had minimal impact on
     # multi-document QA for 30B+ models, but small recency-biased models
     # benefit from having the question text in the recency zone right
     # before generation — otherwise the question can effectively be
     # "forgotten" after the model reads thousands of tokens of file
-    # content. Cheap (~15-30 tokens) for what could be a real win on the
-    # local Gemma 4 backend.
+    # content. Cheap (~15-30 tokens) for a real win on a 3B backend.
     message.append(f"\nNow answer this question: {question}")
 
     ans = await agent.run(message, temperature=temperature)

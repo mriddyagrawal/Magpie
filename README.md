@@ -151,7 +151,7 @@ The answer stage is scored on a hand-written question set with known-correct sou
 | hard | 11 | 10 / 11 | 1 |
 | **total** | **35** | **34 / 35** | **1** |
 
-**Read those numbers honestly.** This is our own question set on our own corpus, not an external benchmark — we wrote the questions, so treat it as a regression test we haven't gamed rather than proof we beat anyone. It ran on kimi-k2.5, which is *not* the model the beta ships with. And 35 questions is a small N. The harness is in [`tests/`](tests/) and the raw per-question output is in [`tests/test results/`](tests/test%20results/) if you want to check our work or run it on your own files.
+**Read those numbers honestly.** This is our own question set on our own corpus, not an external benchmark — we wrote the questions, so treat it as a regression test we haven't gamed rather than proof we beat anyone. It ran on kimi-k2.5, which is *not* the model the beta ships with. And 35 questions is a small N. The harness is in [`tests/`](tests/) if you want to run it on your own files. (The raw per-question dumps aren't published: they were generated over the authors' own documents and quoted them verbatim.)
 
 ---
 

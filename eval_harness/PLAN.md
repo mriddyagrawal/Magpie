@@ -16,17 +16,21 @@ infrastructure. Datasets, metrics, and the judge rubric are fixed before any run
 are never tuned to make a particular model or config look good — a result that kills a
 favored idea is the harness working. Hypotheses are written down *before* running only
 so results can't be rationalized after the fact; being on this list buys a hypothesis
-zero design influence. Current docket (add/remove freely):
+zero design influence. Every hypothesis carries a pre-stated minimum effect size — a
+result below it is "no effect" regardless of direction (§5's latency discipline,
+extended to accuracy). Current docket (add/remove freely):
 
 - **H1 — model sufficiency:** where the gold file is retrieved and fits in budget,
   LFM2.5 answers ≥85% of extractive questions correctly; expected to break down on
   aggregation/enumeration and abstention. (§5's attribution split — retrieved-but-wrong
   vs. never-retrieved — is what tests this either way.)
-- **H2 — rewrite:** query rewrite improves recall@5 on vague phrasings, adds little on
-  keyword-style queries.
-- **H3 — context width:** answer accuracy degrades as top-k grows past ~3–5 even while
-  recall rises (attention dilution on a conv-heavy 3B).
-- **H4 — grammar:** structured-output enforcement costs answer quality on small models.
+- **H2 — rewrite:** rewrite improves recall@5 on vague `question_variants` by ≥10
+  points while moving keyword-style recall@5 by <5 points.
+- **H3 — context width:** extractive key-fact accuracy at `top_k_context=12` is ≥10
+  points below `top_k_context=3` even while retrieval recall rises. Answer-side: tested
+  as a {3, 12} bracket costing two full runs, not by truncation (§2).
+- **H4 — grammar:** enforcement costs ≥5 points of key-fact accuracy vs. enforcement
+  off; anything smaller = no effect, keep enforcement for parse reliability.
 
 ---
 
@@ -44,7 +48,9 @@ practice:
    are deterministic asserts plus a binary-verdict LLM judge.
 3. **Stage-factored cost control.** Index once per (dataset × col model × summary
    config), cache it, sweep answer-side parameters over cached indexes. Retrieve once at
-   k_max and score all smaller top-k by truncation. Sweep retrieval-side parameters with
+   k_max and score all smaller top-k by truncation — **retrieval metrics only**;
+   answer-side context-width effects change the prompt itself, need their own generation
+   runs, and are bracketed instead (§2). Sweep retrieval-side parameters with
    a `--retrieval-only` mode (~5% the cost of a full run). Ablations from a baseline, not
    full factorial; targeted small grids only when an interaction is suspected.
 4. **Full isolation.** Runs use a scratch data directory (env-var override), a fresh
@@ -78,11 +84,13 @@ practice:
 | `prompt_style` | `baseline` (current sandwich), `compact`, (room for more) | answer | full answer run per value |
 | `grammar` | enforced vs off (response_format / structured output) | answer | full answer run per value |
 | `rewrite` | on vs off | retrieval | scored via `--retrieval-only` (cheap) |
-| `top_k` | 1, 3, 5, 12 | retrieval | **free** — retrieve once at k=12, truncate |
+| `top_k_retrieval` | scored at 1, 3, 5, 12 | retrieval | **free for retrieval metrics** — retrieve once at k=12, truncate the ranked list |
+| `top_k_context` | blocks fed to the generator: bracket {3, 12}, widen only if the bracket shows an effect | answer | **not free** — one full answer run per value (this is H3's axis) |
 | `memory` | `null` (reserved; not built) | — | placeholder field only |
 
 Baseline config = current production settings. Sweeps are ablations from baseline
-(one axis at a time): per dataset that is ~7 answer runs instead of ~144.
+(one axis at a time): per dataset that is ~8 answer runs (incl. the top_k_context
+bracket) instead of ~144.
 
 ---
 
@@ -197,7 +205,9 @@ every corpus.
     "col_model": "…", "summary_model": "…",
     "gen_model": "…", "provider": "local",
     "prompt_style": "baseline", "grammar": true,
-    "rewrite": true, "top_k_max": 12,
+    "rewrite": true,
+    "top_k_retrieval_max": 12,
+    "top_k_context": 5,                 // blocks fed to generator; confirm prod default in Phase 0
     "temperature": 0.0,                 // evals run at 0 — variance kills comparisons
     "memory": null
   }
@@ -347,8 +357,8 @@ overfitting hedge: a parameter change must win on at least two to be believed.
   queues runs sequentially (laptop = one run at a time).
 - Cross-run comparison report: one table, rows = configs, columns = headline metrics,
   generated from `runs/` summaries.
-- **Exit:** the full ablation set for the receipts dataset completed and compared in one
-  afternoon of wall-clock.
+- **Exit:** the full ablation set for the receipts dataset (≈8 runs incl. the
+  top_k_context bracket) completed and compared within a day of wall-clock.
 
 ### Phase 5 — Dataset expansion
 - `personal_notes`: subagent fan-out golden generation (blind two-stage), founder
@@ -381,7 +391,7 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 | Full answer run (40–60 q, local 3B, temp 0) | 30–60 min |
 | `--retrieval-only` run | ~1–2 min |
 | Judge pass (cloud, per run) | minutes + small API cost |
-| Full ablation set, one dataset (post-caching) | ~1 afternoon |
+| Full ablation set, one dataset (post-caching) | ≈8 answer runs, 4–8 h wall-clock |
 | Everything, all datasets | a weekend of background compute |
 
 Versus the naive full factorial (~430 monolithic runs × hours each): ~2% of the compute

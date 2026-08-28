@@ -56,6 +56,35 @@ def _write_result(path: Path, obj: dict) -> None:
     path.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _assert_controlled_env(payload: dict) -> None:
+    """Runtime verification (review #26 fix 2): after src import ran
+    load_dotenv, every managed variable must still hold exactly the value
+    envctl built. A mismatch means the environment the run record claims is
+    not the environment that executed — fail the phase, loudly."""
+    import os
+    expected: dict[str, str] = payload.get("expected_env") or {}
+    mismatches = {
+        k: {"expected": v, "actual": os.environ.get(k)}
+        for k, v in expected.items()
+        if os.environ.get(k) != v
+    }
+    if mismatches:
+        raise RuntimeError(
+            "controlled-env violation after src import: "
+            + json.dumps(mismatches, default=str)
+        )
+
+
+def _provider_of(params: dict) -> str:
+    provider = params.get("provider")
+    if not provider:
+        raise ValueError(
+            "worker payload params carry no resolved provider — run configs "
+            "must pass through envctl.resolve_model_config (review #27)"
+        )
+    return provider
+
+
 def _scratch_appdata() -> Path:
     import os
     d = os.environ.get("MAGPIE_DATA_DIR", "")
@@ -73,7 +102,7 @@ def _write_settings(params: dict) -> Path:
     appdata = _scratch_appdata()
     appdata.mkdir(parents=True, exist_ok=True)
     settings = {
-        "provider": params.get("provider", "local"),
+        "provider": _provider_of(params),
         "temperature": float(params.get("temperature", 0.0)),
         "top_k": int(params.get("top_k", 5)),
         "rewrite_default": bool(params.get("rewrite", True)),
@@ -91,6 +120,8 @@ def phase_boot(payload: dict) -> dict:
     _write_settings(payload.get("params", {}))
 
     from src import manifest  # first src import — setdefaults fire (or no-op) here
+
+    _assert_controlled_env(payload)
 
     from src.llm import active_provider
     from src.inference.profiles import default_text_profile, get_profile
@@ -124,6 +155,9 @@ def phase_index(payload: dict) -> dict:
     corpus = Path(payload["corpus_dir"])
     assert corpus.is_dir(), f"corpus dir missing: {corpus}"
     _write_settings(params)
+
+    from src import manifest  # noqa: F401 — trigger load_dotenv before the check
+    _assert_controlled_env(payload)
 
     appdata = _scratch_appdata()
     (appdata / "indexing_rules.json").write_text(
@@ -165,11 +199,41 @@ def phase_answer(payload: dict) -> dict:
     Resume-safe: answers already in the output JSONL are skipped; each result
     is flushed before the next question starts.
     """
+    import hashlib
+
     params = payload.get("params", {})
     _write_settings(params)
     questions = payload["questions"]          # [{id, question}, ...]
     out_path = Path(payload["answers_jsonl"])
     out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Resume guard (review #32): answers.jsonl is only appendable under the
+    # exact params that started it — otherwise one file silently merges two
+    # configurations and every downstream metric averages across both.
+    params_hash = hashlib.sha256(
+        json.dumps(params, sort_keys=True, default=str).encode()
+    ).hexdigest()
+    guard_path = out_path.with_suffix(out_path.suffix + ".params.json")
+    if out_path.exists() and guard_path.exists():
+        prior = json.loads(guard_path.read_text(encoding="utf-8"))
+        if prior.get("params_sha256") != params_hash:
+            raise RuntimeError(
+                f"refusing to resume: {out_path} was produced by different "
+                f"params (prior {prior.get('params_sha256', '?')[:12]}, "
+                f"now {params_hash[:12]}). Move the file aside or use a new "
+                f"run dir."
+            )
+    elif out_path.exists() and not guard_path.exists():
+        raise RuntimeError(
+            f"refusing to resume: {out_path} exists with no params guard "
+            f"({guard_path.name}) — provenance unknown; move it aside."
+        )
+    else:
+        guard_path.write_text(
+            json.dumps({"params_sha256": params_hash, "params": params},
+                       indent=2, default=str),
+            encoding="utf-8",
+        )
 
     done: set[str] = set()
     if out_path.exists():
@@ -182,11 +246,18 @@ def phase_answer(payload: dict) -> dict:
     from src.pipeline import ask
     import asyncio
 
+    from src import manifest  # noqa: F401
+    _assert_controlled_env(payload)
+
     from src.inference.llm_log import session_log_path
 
+    _provider_of(params)  # raise before any question if unresolved
     top_k = int(params.get("top_k", 5))
     rewrite = bool(params.get("rewrite", True))
-    fast = bool(params.get("fast_search", True))
+    # Production ships visual-tier search OFF (server.py:303-306, ask()
+    # default False). Review #31: baseline must match production; datasets
+    # that need it (scanned receipts) turn it on EXPLICITLY in their config.
+    fast = bool(params.get("fast_search", False))
 
     n_ok = n_err = 0
     for q in questions:
@@ -234,6 +305,17 @@ def phase_answer(payload: dict) -> dict:
               file=sys.stderr, flush=True)
 
     llm_log = session_log_path()
+
+    # Review #33: an all-errors run must not look finished. Per-question
+    # errors are recorded and tolerated, but a majority-broken phase fails.
+    attempted = n_ok + n_err
+    if attempted and (n_err / attempted) > 0.5:
+        raise RuntimeError(
+            f"answer phase majority-failed: {n_err}/{attempted} questions "
+            f"errored — configuration is likely broken; see the rows in "
+            f"{out_path}"
+        )
+
     return {
         "answers_jsonl": str(out_path),
         "answered": n_ok,

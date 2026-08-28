@@ -77,13 +77,17 @@ Test Questions/
 
 .venv.broken/
 
-# Eval harness (eval_harness/PLAN.md §3, §9.3): run folders hold indexed
-# personal content, scratch app-data dirs, and multi-GB logs. Only each
-# run's config snapshot, metrics summary, and report are committed - the
-# runner writes those OUTSIDE runs/<id>/raw/. Listed BEFORE the first run
+# Eval harness (eval_harness/PLAN.md §3, §9.3): raw run state holds indexed
+# personal content, scratch app-data dirs, and multi-GB logs - ignored via
+# subpaths, NOT the runs/ tree, because git cannot re-include children of an
+# excluded directory (review #25: a whole-tree rule silently discarded the
+# committed summaries §9.3 decided to keep). config/metrics/report live
+# directly in runs/<id>/ and stay trackable. Listed BEFORE the first run
 # ever executes, because ignoring never untracks (see Test Questions/
 # above for how that went last time).
-eval_harness/runs/
+eval_harness/runs/*/raw/
+eval_harness/runs/*/appdata/
+eval_harness/runs/*/logs/
 # Corpora never live in the repo (size + privacy); manifests and golden
 # QA do. Local corpus-root pointers are per-machine and untracked.
 eval_harness/datasets/*/corpus/

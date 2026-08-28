@@ -45,7 +45,7 @@ def check(name: str, ok: bool, detail: str = "") -> None:
 def main() -> int:
     t_start = time.monotonic()
     params = {
-        "provider": "local",
+        "model_config": "lfm-local",
         "temperature": 0.0,
         "solo_margin": 2.0,
         "top_k": 3,
@@ -54,6 +54,9 @@ def main() -> int:
         "index_fast_tier": False,
         "index_summary_tier": True,
     }
+    resolved = envctl.resolve_model_config(params)
+    params["provider"] = resolved["provider"]
+    params["grammar"] = resolved["grammar"]
 
     run_dir = Path(tempfile.mkdtemp(prefix="magpie-eval-phase0-"))
     appdata = run_dir / "appdata"
@@ -80,7 +83,8 @@ def main() -> int:
     print(f"phase0: cache before = {fp_cache_before}")
 
     ports = envctl.Ports.for_slot(0)
-    env = envctl.build_env(appdata, params, ports)
+    env = envctl.build_env(appdata, params, ports, extra=resolved["env_extra"])
+    expected_env = envctl.non_secret(env)
 
     qdrant = backend.QdrantInstance(
         storage_dir=run_dir / "qdrant",
@@ -94,7 +98,9 @@ def main() -> int:
         qdrant.start()
         print("phase0: qdrant up")
 
-        boot = backend.run_worker("boot", run_dir, env, {"params": params}, timeout_s=300)
+        boot = backend.run_worker("boot", run_dir, env,
+                                  {"params": params, "expected_env": expected_env},
+                                  timeout_s=300)
         print(f"phase0: boot = {json.dumps({k: boot[k] for k in ('app_data_dir', 'provider', 'resolved_ctx_size', 'text_profile')}, indent=2)}")
         # Path.resolve() both sides: macOS /var is a symlink to /private/var
         # and the backend realpaths its data dir.
@@ -112,7 +118,8 @@ def main() -> int:
               str(env_snap.get("LOCAL_SOLO_MARGIN")))
 
         idx = backend.run_worker("index", run_dir, env,
-                                 {"params": params, "corpus_dir": str(corpus)},
+                                 {"params": params, "corpus_dir": str(corpus),
+                                  "expected_env": expected_env},
                                  timeout_s=1800)
         n_manifest = len(idx.get("manifest") or {})
         print(f"phase0: index done in {idx['wall_s']}s; manifest entries: {n_manifest}")
@@ -125,6 +132,7 @@ def main() -> int:
                 "params": params,
                 "questions": [{"id": "phase0-q1", "question": "Who is the project lead of Project Aurora?"}],
                 "answers_jsonl": str(run_dir / "answers.jsonl"),
+                "expected_env": expected_env,
             },
             timeout_s=1800,
         )

@@ -113,6 +113,12 @@ def build_env(
         env["LLAMA_SERVER_PATH"] = str(SHARED_LLAMA_SERVER)
 
     # --- swept / pinned parameters (PLAN.md §2) ---
+    # MAGPIE_FORCE_PROVIDER is the eval-only escape hatch with absolute
+    # precedence (src/llm.py:150-166). LLM_PROVIDER alone is a
+    # settings-unavailable fallback and settings.json always exists with
+    # provider="cloud" - the exact trap that made a 2026-08-24 eval run
+    # answer locally under a cloud label. Set both.
+    env["MAGPIE_FORCE_PROVIDER"] = params.get("provider", "local")
     env["LLM_PROVIDER"] = params.get("provider", "local")
     env["LOCAL_TEMPERATURE"] = str(params.get("temperature", 0.0))
     env["LOCAL_SOLO_MARGIN"] = str(params.get("solo_margin", 2.0))

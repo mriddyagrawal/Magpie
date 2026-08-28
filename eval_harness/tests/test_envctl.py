@@ -75,8 +75,8 @@ def test_base_passthrough_minimal():
         "MAGPIE_DATA_DIR", "HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE",
         "FASTEMBED_CACHE_PATH", "HF_HUB_OFFLINE", "QDRANT_CLUSTER_ENDPOINT",
         "LLAMA_SERVER_BASE_PORT", "LLAMA_SERVER_PATH", "LLM_PROVIDER",
-        "LOCAL_TEMPERATURE", "LOCAL_SOLO_MARGIN", "LOCAL_N_CTX",
-        "LLAMA_SERVER_STARTUP_TIMEOUT_S",
+        "MAGPIE_FORCE_PROVIDER", "LOCAL_TEMPERATURE", "LOCAL_SOLO_MARGIN",
+        "LOCAL_N_CTX", "LLAMA_SERVER_STARTUP_TIMEOUT_S",
     }
     for key in env:
         assert key in allowed_ambient or key in constructed, f"unexpected env var {key}"

@@ -20,12 +20,16 @@ zero design influence. Every hypothesis carries a pre-stated minimum effect size
 result below it is "no effect" regardless of direction (§5's latency discipline,
 extended to accuracy). Current docket (add/remove freely):
 
-- **H1 — model sufficiency:** where the gold file's content is *observed present in the
-  final prompt* (§4.4 `in_prompt` — never inferred from rank: budget trimming keeps
-  best-ranked-first, so "survived the budget" is a rank-biased subset, and the budget
-  doesn't exist at all on cloud arms), LFM2.5 answers ≥85% of extractive questions
-  correctly; expected to break down on aggregation/enumeration and abstention. The
-  retrieved-but-excluded rate (trimmed or solo-gated away) is reported alongside as its
+- **H1 — model sufficiency:** where the question's key facts are *observed present in
+  the assembled prompt* (§4.4 `key_fact_spans` all true — fact-level, because head
+  truncation can keep a file while cutting the asked-about span; never inferred from
+  rank: budget trimming keeps best-ranked-first, so "survived the budget" is a
+  rank-biased subset), LFM2.5 answers ≥85% of extractive questions correctly; expected
+  to break down on aggregation/enumeration and abstention. Reported **per arm** as
+  accuracy × its own eligible fraction (`n_eligible / n_extractive`) — raw percentages
+  are never compared across arms, because the denominators differ structurally (cloud
+  has no budget and no gate, so its eligible set is everyone's). The
+  retrieved-but-excluded rate (trimmed / gated / fact-cut) is reported alongside as its
   own scaffolding-fault class.
 - **H2 — rewrite:** rewrite improves recall@5 on vague `question_variants` by ≥10
   points while moving keyword-style recall@5 by <5 points.
@@ -36,7 +40,14 @@ extended to accuracy). Current docket (add/remove freely):
   Prior evidence this is real (`src/stage2/search.py:840`, 2026-08-24, 121-trace
   replay + reading-isolation ladder): the 3B is near-perfect from a single correct
   file and drops to ~13% with 4 distractors — the bracket measures magnitude, not
-  existence.
+  existence. Expected band, so the number can actually surprise: <10 points = no
+  effect, H3 refuted; 10–30 = real but materially weaker than the ladder predicted
+  (find out why); >40 = consistent with prior.
+- **H5 — solo-gate recovery (the question the shipped gate is betting on):** with
+  distractors present, gate ON (margin 2.0) recovers ≥20 points of extractive accuracy
+  vs. gate OFF at the same k — at a cost of ≤10 points of enumeration coverage (the
+  gate's own docstring predicts the cost: "loses enumeration coverage if starved").
+  Local arms only, by construction.
 - **H4 — grammar:** enforcement costs ≥5 points of key-fact accuracy vs. enforcement
   off; anything smaller = no effect, keep enforcement for parse reliability.
 
@@ -87,7 +98,7 @@ practice:
 | `dataset` | `receipts`, `personal_notes`, `furman_directory` (+ optional `mmlongbench` yardstick) | index | one cached index per (dataset × index-side config) |
 | `col_model` | ColSmol vs ColQwen2.5 (confirm exact HF IDs in Phase 0) | index | doubles index builds; cached |
 | `summary_model` / summary prompt | current default (+ variants later) | index | summaries are written by the gen model at index time → index-side, not answer-side |
-| `model_config` | 3 named configs (decided 2026-08-28): `lfm-local` (LFM2.5-VL-3B, grammar ON) · `gemma26b-local` (Gemma 4 26B-A4B, grammar ON) · `gemma26b-openrouter` (same model via free API, grammar OFF — the free tier forbids grammar enforcement) | answer | full run per value. ⚠ `gemma26b-openrouter` differs from `gemma26b-local` in provider AND grammar at once — differences between those two are not attributable to either factor alone; local arms additionally carry local-only mechanisms cloud lacks (solo gate; context-budget trimming — budget is `None` on cloud, `src/answer.py:61-87`) |
+| `model_config` | 3 named configs (decided 2026-08-28): `lfm-local` (LFM2.5-VL-3B, grammar ON) · `gemma26b-local` (Gemma 4 26B-A4B, grammar ON) · `gemma26b-openrouter` (same model via API, grammar OFF — a codebase choice, not an API limit; see confound table below) | answer | full run per value. ⚠ `gemma26b-openrouter` is a **capability probe** ("can a 26B do it at all?"), not a comparison arm — see the six-factor confound table below the parameter table |
 | `prompt_style` | `baseline` (current sandwich), `compact`, (room for more) | answer | full answer run per value |
 | `grammar` | enforced vs off — H4 ablation, run on a LOCAL model config only (the `model_config` values above otherwise pin their own grammar setting) | answer | full answer run per value |
 | `solo_gate` (`LOCAL_SOLO_MARGIN`) | 2.0 (prod default) vs 0 (off). Local-only: when the top rerank score dominates #2 by the margin, the generator gets that file ALONE — fires on ~24% of questions (measured, see `src/stage2/search.py:840`) | answer | full run per value. Contaminates any axis assuming k controls context width — H3 runs with it OFF; `solo_gated` is recorded per question in every run regardless |
@@ -96,9 +107,29 @@ practice:
 | `top_k_context` | blocks fed to the generator: bracket {3, 12}, widen only if the bracket shows an effect | answer | **not free** — one full answer run per value (this is H3's axis) |
 | `memory` | `null` (reserved; not built) | — | placeholder field only |
 
+**The local-vs-openrouter confound, in full.** `gemma26b-openrouter` differs from
+`gemma26b-local` in **six** ways, so no delta between them is attributable to any single
+factor. Conclusions about parameters come from the two local arms; the openrouter arm
+answers only "can a bigger model do this at all?":
+
+1. provider (the intended axis)
+2. grammar — local compiles GBNF; cloud runs with **no** `response_format` **by
+   codebase choice** (`src/answer.py:330-332`: Google AI Studio rejects both variants —
+   OpenRouter itself supports `response_format` on this model, so this is revisitable)
+3. `gate_to_solo` never fires on cloud (`src/stage2/search.py:863-866`)
+4. no context-budget trimming on cloud (`_context_budget_chars() → None`,
+   `src/answer.py:62-68`)
+5. context window differs ~4× (local `LOCAL_N_CTX` vs OpenRouter's 262,144)
+6. cloud gets `_FORMAT_BLOCK_CLOUD` appended to the prompt (`src/answer.py:336-345`,
+   applied at :746-748) — i.e. choosing this arm silently changes `prompt_style`
+
 Baseline config = current production settings. Sweeps are ablations from baseline
-(one axis at a time): per dataset that is ~8 answer runs (incl. the top_k_context
-bracket) instead of ~144.
+(one axis at a time): per dataset that is ~9 answer runs — the `top_k_context` bracket
+{3, 12} adds two, and baseline's production k=5 supplies a free third point, making the
+bracket a 3-point curve — instead of ~144. Known blind spot, accepted for the compute
+budget: ablations explore the *neighborhood* of the shipped config; a config that only
+wins via two simultaneous changes is invisible until a targeted grid is run. That is a
+scoping choice, not neutrality.
 
 ---
 
@@ -112,7 +143,7 @@ eval_harness/
 │   ├── sidecar.py           ← spawn/teardown of an isolated backend instance
 │   ├── indexing.py          ← index stage + index report
 │   ├── answering.py         ← answer stage (+ --retrieval-only)
-│   ├── metrics.py           ← pytrec_eval wrapper + deterministic asserts
+│   ├── metrics.py           ← pure-Python IR metrics (fixture-tested) + deterministic asserts
 │   └── schemas.py           ← dataclasses / JSON-schema validation for all artifacts
 ├── judge/
 │   ├── rubric.md            ← versioned grading rubric (binary criteria)
@@ -138,6 +169,17 @@ uv run python -m eval_harness.harness.run \
     [--index-only | --retrieval-only | --skip-index]   # --skip-index = use cached index
 ```
 
+**Two drive modes, because the harness never modifies production code** (we are
+measuring current-main; changing it would measure something else): **pipeline mode**
+calls `pipeline.ask()` verbatim — used for baseline and all runs it can express;
+**composed mode** calls the same `run_search` → `gate_to_solo` → `answer_question`
+sequence `ask()` itself uses (mirroring `src/pipeline.py`), needed only where `ask()`
+has no knob (`top_k_context`), with a fidelity test asserting composed(k=5, gate on)
+reproduces pipeline-mode behavior. **Prompt-composition observability** (`in_prompt`,
+`key_fact_spans`) is read back from the backend's own LLM JSONL request log — the
+assembled messages are string-matched after the fact: observed, never inferred, zero
+production changes.
+
 **Isolation mechanics:** the backend must accept a data-directory override
 (`MAGPIE_DATA_DIR` env var or equivalent — Phase 0 confirms whether this exists or adds
 it). Each run gets `runs/<run_id>/appdata/` as its data dir; the sidecar/pipeline is
@@ -156,8 +198,8 @@ import / backend spawn**. Weights are protected from mutation with `HF_HUB_OFFLI
 (a literal read-only mount breaks the hub's lockfile writes on cache hits), which also
 guarantees runs never silently download anything.
 
-**Controlled environment (no ambient `.env`):** `src/manifest.py:53` loads `.env` before
-paths resolve, and `LLM_PROVIDER`, `OPENROUTER_MODEL`, `LOCAL_TEMPERATURE`,
+**Controlled environment (no ambient `.env`):** `src/manifest.py:63` calls
+`load_dotenv()` before paths resolve, and `LLM_PROVIDER`, `OPENROUTER_MODEL`, `LOCAL_TEMPERATURE`,
 `LOCAL_N_CTX`, `LOCAL_SOLO_MARGIN`, `LOCAL_PREFILL_BUDGET_TOKENS`, `LLAMA_SERVER_GPU`
 etc. are ambient env reads — precisely the axes being swept. The runner therefore
 constructs the backend's environment explicitly from the run config (every
@@ -199,7 +241,10 @@ and a vague `question_variants` phrasing for most items. Generation is **blind**
 (questions written from extracted fact lists, not from page text) so questions cannot
 lexically copy the document and make retrieval trivially easy (ViDoRe v2's fix).
 Distractor files — topically similar files that do NOT contain answers — are planted in
-every corpus.
+every corpus. **v1 answer runs execute the primary phrasing only** (`variant: 0`);
+`question_variants` power a separate ~10-question robustness mini-experiment rather than
+multiplying every run by the variant count (which would cut directly against §3's cost
+discipline).
 
 `qrels.tsv` (`question-id  file-id  relevance`) is generated mechanically from
 `gold_sources`/`acceptable_sources` so pytrec_eval can compute all retrieval metrics.
@@ -256,6 +301,12 @@ questions sourced to this file: derivable from the summary alone? yes/no →
                  "in_prompt": "full | truncated | dropped | solo_excluded"}, …],
   // full ranked list at k_max; in_prompt records what ACTUALLY reached the generator
   // (observed, never inferred from rank/budget arithmetic)
+  "key_fact_spans": {"0": true, "1": false},
+  // each key fact string-matched (normalized) against the assembled prompt read from
+  // the LLM request log. File-level presence is NOT enough: head truncation
+  // (src/answer.py:124-128) keeps a file's beginning and cuts its tail — on a receipt
+  // the total is at the BOTTOM, so "in_prompt: truncated" can mean the asked-about
+  // fact is gone. H1 conditions on the FACT being present, not the file.
   "answer": "…", "cited": ["…"],
   "latency_s": {"rewrite": 1.8, "retrieval": 0.2, "generation": 24.1, "total": 26.1},
   "tokens": {"prompt": 9800, "completion": 210},
@@ -272,14 +323,21 @@ version, and the composite score.
 
 ## 5. Metrics
 
-**Retrieval** (deterministic, via pytrec_eval over qrels): **nDCG@5** (ViDoRe
-convention for these exact models), **Recall@k** for k ∈ {1,3,5,12}, **MRR**. Computed
-per question and aggregated; also split by `answer_type` and `requires.visual_tier`.
+**Retrieval** (deterministic, over qrels): **nDCG@5** (ViDoRe convention for these
+exact models), **Recall@k** for k ∈ {1,3,5,12}, **MRR**. Implemented as pure-Python
+functions in `harness/metrics.py`, unit-tested against hand-computed fixtures — no
+`pytrec_eval` dependency (C extension; would bite Windows setup and add an app-adjacent
+dep for ~40 lines of math). The qrels TSV stays pytrec_eval-compatible so anyone can
+cross-check externally. Computed per question and aggregated; also split by
+`answer_type` and `requires.visual_tier`.
 
 **Answer:** exact/fuzzy match where `key_facts` are short and deterministic; otherwise
 reference-guided binary LLM judge per key fact. Headline per-answer **composite score**
 (OpenJarvis DocQA weights, adopted as-is until we have reason to change):
-`0.5 × key_facts_matched + 0.3 × citations_correct + 0.2 × judge_checklist`.
+`0.5 × key_facts_matched + 0.3 × citations_correct + 0.2 × judge_checklist`. The three
+components are always reported separately; the composite is a **sort key for triage**,
+never a headline claim — a blended float is exactly the Likert-shaped thing §1.5 bans,
+so it exists to order failures for reading, not to compare configs.
 
 **Citation** (ALCE-style at file granularity, deterministic): citation precision
 (every cited file ∈ gold/acceptable sources) and citation recall (every gold source that
@@ -319,9 +377,10 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 ## 7. Phases
 
 ### Phase 0 — Prerequisites & decisions *(small, unblocks everything)*
-- Audit how the backend resolves its data dir; add/confirm an env-var override so a run
-  can point all state (index, DB, logs, settings) at a scratch folder. **This is the
-  only production-code change the harness needs.**
+- **Verified: `MAGPIE_DATA_DIR` already exists** (`src/manifest.py:74`) — isolation
+  requires **zero production-code changes**; all Phase 0 work is harness-side contract
+  (env construction, cache exports, boot/teardown). `top_k_context` likewise needs no
+  production change: the runner's composed mode (§3) supplies it.
 - Implement the cache-sharing contract from §3: export `HF_HOME` / `HF_HUB_CACHE` /
   `TRANSFORMERS_CACHE` / `FASTEMBED_CACHE_PATH` to the shared cache before backend
   import, plus `HF_HUB_OFFLINE=1`; verify with a run that downloads zero bytes.
@@ -351,12 +410,17 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 - Dataset: `receipts` first (small files, fast indexing, deterministic answers).
 - Deterministic metrics only in this phase (exact-match facts, citation asserts,
   retrieval hit@k) — no judge yet.
-- **Exit:** two consecutive baseline runs produce identical retrieval metrics and
-  ≥95%-identical answer verdicts; a written list of every bug the first runs surfaced
-  (this phase is a bug-finding machine — expect it to pay for itself immediately).
+- **Exit:** two consecutive baseline runs agree **within stated tolerance** — bit-identical
+  is not the bar, because Qdrant fuses dense+BM25 via RRF and tie-breaks aren't
+  guaranteed stable across runs: per-question hit@k identical on ≥95% of questions,
+  MRR within ±0.02, deterministic answer verdicts stable on ≥95% at temp 0. Plus a
+  written list of every bug the first runs surfaced (this phase is a bug-finding
+  machine — expect it to pay for itself immediately).
 
 ### Phase 2 — Retrieval eval done properly
-- qrels generation from golden sets; pytrec_eval integration (nDCG@5, Recall@k, MRR).
+- qrels generation from golden sets; pure-Python nDCG@5 / Recall@k / MRR with
+  hand-computed fixture tests (qrels kept pytrec_eval-compatible for external
+  cross-checks).
 - `--retrieval-only` mode (rewrite + retrieval, no generation): full retrieval sweep on
   a dataset in ~1 minute.
 - Top-k-by-truncation scoring; rewrite on/off comparison as the first real experiment.
@@ -369,7 +433,10 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 - Abstention metrics wired (needs `not_found` items in golden sets).
 - **Calibration:** both founders independently pass/fail the same 30–50 judged answers;
   measure judge agreement (target ≥90%); iterate rubric until hit. Keep the labeled set
-  as the permanent judge-regression fixture.
+  as the permanent judge-regression fixture. The fixture deliberately includes several
+  **correct answers phrased unlike the Claude-authored gold** — the judge and the
+  golden-set author are both Claude, and this is the cheap test that the judge isn't
+  rewarding its own phrasing (self-preference channel).
 - **Exit:** full metric suite (retrieval + answer + citation + abstention + composite)
   produced for one baseline run, with a calibrated judge.
 
@@ -414,8 +481,13 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 | Full answer run (40–60 q, local 3B, temp 0) | 30–60 min |
 | `--retrieval-only` run | ~1–2 min |
 | Judge pass (cloud, per run) | minutes + small API cost |
-| Full ablation set, one dataset (post-caching) | ≈8 answer runs, 4–8 h wall-clock |
+| Full ablation set, one dataset (post-caching) | ≈9 answer runs, 5–9 h wall-clock |
 | Everything, all datasets | a weekend of background compute |
+| **Golden-set review — both founders, per dataset** | **2–4 h of human time** |
+| **Judge-calibration labeling — both founders, once** | **2–3 h of human time** |
+
+The two human rows are the critical path, not GPU time — machine hours run overnight;
+founder hours don't.
 
 Versus the naive full factorial (~430 monolithic runs × hours each): ~2% of the compute
 for the same decisions.
@@ -427,8 +499,11 @@ for the same decisions.
 1. **Judge model:** a high-tier Claude (Opus 5 / Fable 5). Pinning is about
    comparability, not capability: judge ID + rubric version on every verdict, never mix
    judge versions within a comparison, upgrades only after recalibrating on the
-   human-labeled fixture + one anchor run. (Different family than LFM/Gemma, so bias
-   hygiene is satisfied.)
+   human-labeled fixture + one anchor run. If the pinned snapshot is retired
+   mid-project, treat retirement as a forced upgrade: same recalibration gate before
+   any new verdicts count. (Different family than LFM/Gemma, so bias hygiene is
+   satisfied; the Claude-judges-Claude-goldens channel is tested by the calibration
+   fixture's unlike-gold items, §7 Phase 3.)
 2. **Model axis:** exactly three `model_config` values — `lfm-local` (grammar on),
    `gemma26b-local` (grammar on), `gemma26b-openrouter` (grammar off; free API forbids
    enforcement). The openrouter config's provider+grammar confound is accepted and
@@ -436,7 +511,10 @@ for the same decisions.
 3. **`runs/` git policy:** commit config + metrics + reports; gitignore raw
    appdata/logs.
 4. **Personal-notes privacy:** approved — that corpus's content may go to the cloud
-   judge.
+   judge. Scope of what leaves the machine, in writing: the question, gold answer +
+   key facts, the generated answer, cited/retrieved file *names*, and — only when a
+   verdict requires it — the specific retrieved snippet under dispute. Never whole
+   documents.
 5. **SROIE subset:** 150 receipts.
 6. **MMLongBench-Doc adapter:** deferred — re-ask the owner at Phase 5 kickoff.
 
@@ -456,3 +534,7 @@ for the same decisions.
 - LLM-as-judge biases: "Judging LLM-as-a-Judge with MT-Bench" (arXiv:2306.05685)
 - Practitioner doctrine (binary verdicts, judge calibration, error analysis):
   hamel.dev/blog/posts/evals/ · hamel.dev/blog/posts/evals-faq/ · Anthropic eval docs
+- **Internal prior work** (closest thing to prior art, and it's ours): the 2026-08-24
+  reading-isolation ladder + 121-trace retrieval replay recorded in the `gate_to_solo`
+  docstring (`src/stage2/search.py:840`) — single-clean-file ≈ near-perfect, 4
+  distractors ≈ 13%, margin≥2 → top-1 correct 93%, fires ~24%.

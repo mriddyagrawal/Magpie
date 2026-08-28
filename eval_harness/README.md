@@ -11,9 +11,11 @@ just download-qdrant             # bundled qdrant binary (the harness spawns
                                  #   its own instance per run — NEVER the
                                  #   live app's, and never port 6433)
 just install-llama-server        # llama.cpp server binary
-uv run python eval_harness/scripts/warm_model_cache.py   # one-time, online:
-                                 #   fills processor/tokenizer gaps in the
-                                 #   shared model cache
+uv run python eval_harness/scripts/warm_model_cache.py   # REQUIRED, one-time,
+                                 #   online: fills processor/tokenizer gaps in
+                                 #   the shared cache. Runs go online but any
+                                 #   model-blob download DURING a run fails the
+                                 #   run's isolation check - warm first.
 # per dataset, per machine (corpora live OUTSIDE the repo):
 uv run --with datasets --with pillow python eval_harness/scripts/prepare_receipts.py
 ```
@@ -65,9 +67,10 @@ PLAN §6) and the judge is calibrated (PLAN §7 Phase 3).
 
 ## Review protocol
 
-Commits on this branch are reviewed in `comments.md` (local-only, never
-committed). Reply inline under the review block; severity tags are
-BLOCKER/MAJOR/MINOR/NIT.
+On the machine where this branch is being developed, commits are reviewed in
+`comments.md` — a per-machine working-session artifact, local-only and never
+committed; a fresh clone will not have it and doesn't need it. Reply inline
+under the review block; severity tags are BLOCKER/MAJOR/MINOR/NIT.
 
 ## Where things live
 

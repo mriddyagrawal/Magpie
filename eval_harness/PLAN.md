@@ -25,7 +25,11 @@ extended to accuracy). Current docket (add/remove freely):
   truncation can keep a file while cutting the asked-about span; never inferred from
   rank: budget trimming keeps best-ranked-first, so "survived the budget" is a
   rank-biased subset), LFM2.5 answers ≥85% of extractive questions correctly; expected
-  to break down on aggregation/enumeration and abstention. Reported **per arm** as
+  to break down on aggregation/enumeration and abstention. **Basis caveat (2026-08-28,
+  finding #50):** on image corpora fact-spans are unobservable and eligibility degrades
+  to file-level ("the right image was in the prompt") — a DIFFERENT claim, since fact
+  legibility is part of what's being measured. H1 numbers are reported per basis and
+  never pooled across bases; `receipts` is 100% file-level basis. Reported **per arm** as
   accuracy × its own eligible fraction (`n_eligible / n_extractive`) — raw percentages
   are never compared across arms, because the denominators differ structurally (cloud
   has no budget and no gate, so its eligible set is everyone's). The
@@ -47,7 +51,12 @@ extended to accuracy). Current docket (add/remove freely):
   distractors present, gate ON (margin 2.0) recovers ≥20 points of extractive accuracy
   vs. gate OFF at the same k — at a cost of ≤10 points of enumeration coverage (the
   gate's own docstring predicts the cost: "loses enumeration coverage if starved").
-  Local arms only, by construction.
+  Local arms only, by construction. **BLOCKED on `receipts` (2026-08-28, finding
+  #1/#59):** rerank scores every visual-tier hit against the constant placeholder
+  "(visual match — page N)" (`src/stage2/rerank.py:92`, `search.py:523`), so the
+  gate's margin is structurally 0 on image corpora and it can never fire there at ANY
+  `LOCAL_SOLO_MARGIN`. Test H5 on a text corpus, or after the rerank placeholder bug
+  is fixed. (Baseline evidence: fire rate 0/53, all margins exactly 0.0.)
 - **H4 — grammar:** enforcement costs ≥5 points of key-fact accuracy vs. enforcement
   off; anything smaller = no effect, keep enforcement for parse reliability.
 

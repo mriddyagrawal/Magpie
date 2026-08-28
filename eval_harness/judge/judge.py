@@ -68,10 +68,17 @@ cited_file_names: {[Path(c).name for c in (row.get("cited") or [])]}
 Output the rubric's JSON object now."""
 
 
-def call_claude(prompt: str, model: str, timeout_s: int = 120) -> dict:
+def call_claude(prompt: str, model: str, timeout_s: int = 120) -> tuple[dict, str]:
+    """Returns (parsed verdict JSON, resolved model id).
+
+    Prompt goes over STDIN, not argv (#57: argv is visible in the process
+    table to any local user, and §9.4's approval is scoped). The resolved
+    model id is read from the CLI payload's modelUsage keys when present —
+    a bare alias like 'claude-opus-5' can silently re-point mid-project,
+    which is exactly the drift the pinning rule exists to catch (#56)."""
     proc = subprocess.run(
-        ["claude", "-p", prompt, "--model", model, "--output-format", "json"],
-        capture_output=True, text=True, timeout=timeout_s,
+        ["claude", "-p", "--model", model, "--output-format", "json"],
+        input=prompt, capture_output=True, text=True, timeout=timeout_s,
     )
     if proc.returncode != 0:
         raise RuntimeError(f"claude CLI exited {proc.returncode}: {proc.stderr[:400]}")
@@ -79,10 +86,14 @@ def call_claude(prompt: str, model: str, timeout_s: int = 120) -> dict:
     text = payload.get("result") if isinstance(payload, dict) else None
     if not text:
         raise RuntimeError(f"no result field in claude output: {proc.stdout[:200]}")
+    resolved = model
+    usage = payload.get("modelUsage")
+    if isinstance(usage, dict) and usage:
+        resolved = sorted(usage.keys())[0]
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
         raise RuntimeError(f"no JSON object in judge reply: {text[:200]}")
-    return json.loads(text[start : end + 1])
+    return json.loads(text[start : end + 1]), resolved
 
 
 def derive_verdict(item: dict, judged: dict, deterministic: str) -> str:
@@ -111,6 +122,9 @@ def main() -> int:
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--model", default=JUDGE_MODEL_DEFAULT)
     ap.add_argument("--limit", type=int)
+    ap.add_argument("--audit-correct", type=int, default=5,
+                    help="sample N deterministically-correct rows to measure "
+                         "matcher precision (#55); 0 disables")
     ap.add_argument("--dry-run", action="store_true",
                     help="print which rows would be judged and the first prompt")
     args = ap.parse_args()
@@ -136,6 +150,18 @@ def main() -> int:
             or golden[r["qa_id"]]["answer_type"] == "enumeration"
         )
     ]
+    # Matcher-precision audit (#55): the judge otherwise only ever revises
+    # verdicts UPWARD (false negatives get fixed, false positives are never
+    # seen, headline drifts up). Sample deterministically-correct rows too
+    # and report the disagreement rate as measured matcher precision.
+    import random as _random
+
+    audit_pool = [r for r in enriched
+                  if r["qa_id"] in golden and r.get("verdict") == "correct"]
+    audit_rng = _random.Random(run_record.get("run_id", "seed"))
+    audit_rows = audit_rng.sample(audit_pool, min(args.audit_correct, len(audit_pool)))
+    audit_ids = {r["qa_id"] for r in audit_rows}
+    todo = todo + audit_rows
     if args.limit:
         todo = todo[: args.limit]
 
@@ -150,7 +176,8 @@ def main() -> int:
     verdicts: dict[str, dict] = {}
     if out_path.exists():
         prior = json.loads(out_path.read_text(encoding="utf-8"))
-        if prior.get("judge_model") == args.model and prior.get("rubric_sha") == rubric_sha():
+        prior_requested = prior.get("judge_model_requested", prior.get("judge_model"))
+        if prior_requested == args.model and prior.get("rubric_sha") == rubric_sha():
             verdicts = prior.get("verdicts", {})
         else:
             print("judge: existing verdicts are from a different judge/rubric — "
@@ -158,35 +185,50 @@ def main() -> int:
             out_path.rename(out_path.with_suffix(".json.old"))
 
     n_err = 0
+    resolved_model = args.model
     for row in todo:
         qa_id = row["qa_id"]
         if qa_id in verdicts:
             continue
         item = golden[qa_id]
         try:
-            judged = call_claude(build_prompt(item, row), args.model)
+            judged, resolved_model = call_claude(build_prompt(item, row), args.model)
             final = derive_verdict(item, judged, row["verdict"])
             verdicts[qa_id] = {
                 "criteria": judged,
                 "verdict": final,
                 "deterministic_verdict": row["verdict"],
                 "changed": final != row["verdict"],
+                "audit_of_correct": qa_id in audit_ids,
             }
             print(f"  {qa_id}: {row['verdict']} -> {final}"
-                  + (" (changed)" if final != row["verdict"] else ""))
+                  + (" (changed)" if final != row["verdict"] else "")
+                  + (" [matcher audit]" if qa_id in audit_ids else ""))
         except Exception as e:  # noqa: BLE001 — record and continue
             n_err += 1
             verdicts[qa_id] = {"error": f"{type(e).__name__}: {e}"}
             print(f"  {qa_id}: JUDGE ERROR {e}", file=sys.stderr)
+        audit_done = [v for v in verdicts.values() if v.get("audit_of_correct")]
+        audit_agree = sum(1 for v in audit_done if not v.get("changed"))
         out_path.write_text(json.dumps({
-            "judge_model": args.model,
+            "judge_model_requested": args.model,
+            "judge_model": resolved_model,
             "rubric_sha": rubric_sha(),
+            "matcher_audit": {
+                "sampled_correct": len(audit_done),
+                "judge_agreed": audit_agree,
+                "matcher_precision": (audit_agree / len(audit_done))
+                if audit_done else None,
+            },
             "verdicts": verdicts,
         }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    changed = sum(1 for v in verdicts.values() if v.get("changed"))
-    print(f"judge: done — {len(verdicts)} verdicts, {changed} changed from "
-          f"deterministic, {n_err} errors -> {out_path}")
+    changed = sum(
+        1 for v in verdicts.values()
+        if v.get("changed") and not v.get("audit_of_correct")
+    )
+    print(f"judge: done — {len(verdicts)} verdicts ({resolved_model}), "
+          f"{changed} non-audit changes, {n_err} errors -> {out_path}")
     return 0 if n_err == 0 else 1
 
 

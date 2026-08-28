@@ -123,6 +123,11 @@ def main() -> int:
         "index_params_hash": idx_hash,
         "questions": len(questions),
         "backend_git_sha": envctl.git_sha(REPO),
+        # same repo, but phases and (re-runnable) enrichment can execute at
+        # different commits — enrich stamps its own sha into metrics.json
+        # (#58); this one covers the phases.
+        "harness_git_sha": envctl.git_sha(REPO),
+        "status": "running",  # #54: running | complete | failed
         "machine": envctl.machine_info(),
         "env_snapshot": envctl.snapshot_env(env),
         "dataset_manifest_files": dataset["manifest"].get("n_files"),
@@ -162,6 +167,7 @@ def main() -> int:
     )
 
     t0 = time.monotonic()
+    completed = False
     try:
         qdrant.start()
 
@@ -177,6 +183,8 @@ def main() -> int:
             run_record["phases"]["index"] = {
                 "wall_s": round(time.monotonic() - t, 1),
                 "manifest_entries": len(idx.get("manifest") or {}),
+                # a sys.exit absorbed as benign is still a product finding (#53)
+                "summary_tier_note": idx.get("summary_tier_note"),
             }
             save_record()
             print(f"[run] index done in {run_record['phases']['index']['wall_s']}s")
@@ -212,8 +220,12 @@ def main() -> int:
                 "llm_log": ans.get("llm_log"),
             }
             save_record()
+        completed = True
     finally:
         qdrant.stop()
+        if not completed:
+            run_record["status"] = "failed"
+            save_record()
 
     fp_cache_after = envctl.cache_fingerprint()
     run_record["isolation"] = {
@@ -236,6 +248,9 @@ def main() -> int:
     # that only writes a JSON field nobody must read is not a control). The
     # artifacts above are written first — they are the evidence.
     iso = run_record["isolation"]
+    if not (iso["cache_model_blobs_unchanged"] and iso["real_appdata_untouched"]):
+        run_record["status"] = "failed_isolation"
+        save_record()
     if not iso["cache_model_blobs_unchanged"]:
         raise SystemExit(
             f"[run] FAILED: shared model cache changed during the run "
@@ -250,6 +265,8 @@ def main() -> int:
             f"See {run_dir / 'run.json'}"
         )
 
+    run_record["status"] = "complete"
+    save_record()
     print(f"[run] done in {run_record['wall_s_total']}s -> {run_dir}")
     return 0
 

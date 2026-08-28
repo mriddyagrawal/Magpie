@@ -29,14 +29,54 @@ def _norm_text(s: str) -> str:
 
 def _norm_fact(s: str) -> str:
     """Facts are short strings (totals, dates, addresses). Comparison strips
-    currency-ish punctuation and collapses whitespace/case."""
+    currency tokens and collapses whitespace/case. Currency is stripped as a
+    TOKEN, never a substring (review #51: replace('rm','') turned PHARMACY
+    into PHACY, silently raising vendor-collision odds — false positives in
+    exactly the abstention slices)."""
     s = _norm_text(s)
-    return s.replace(",", "").replace("rm", "").replace("$", "").strip()
+    s = s.replace(",", "")
+    s = re.sub(r"\brm\b\s*", "", s)
+    s = s.replace("$", "")
+    return s.strip()
+
+
+_DATE_FORMATS = (
+    "%d/%m/%Y", "%d-%m-%Y", "%d.%m.%Y", "%d/%m/%y",
+    "%Y-%m-%d", "%d %b %Y", "%d %B %Y", "%b %d %Y", "%B %d %Y",
+)
+_DATE_TOKEN_RE = re.compile(
+    r"\b(\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}|\d{4}-\d{2}-\d{2}|"
+    r"\d{1,2} [A-Za-z]{3,9} \d{4}|[A-Za-z]{3,9} \d{1,2},? \d{4})\b"
+)
+
+
+def _parse_date(s: str):
+    from datetime import datetime
+
+    s = s.strip().replace(",", "")
+    for fmt in _DATE_FORMATS:
+        try:
+            return datetime.strptime(s, fmt).date()
+        except ValueError:
+            continue
+    return None
 
 
 def fact_in_text(fact: str, text: str) -> bool:
     f, t = _norm_fact(fact), _norm_fact(text)
-    return bool(f) and f in t
+    if not f:
+        return False
+    if f in t:
+        return True
+    # Date-aware comparison (review #52): SROIE labels are OCR-formatted
+    # (DD/MM/YYYY etc.); a model rendering the same date differently
+    # ('2/1/2019', '02-01-2019') must still count. Parse both sides.
+    gold_date = _parse_date(fact)
+    if gold_date is not None:
+        for m in _DATE_TOKEN_RE.finditer(text or ""):
+            if _parse_date(m.group(0)) == gold_date:
+                return True
+    return False
 
 
 _IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".tiff", ".bmp"}
@@ -327,6 +367,17 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
         enriched.append(out)
 
     summary = _summarize(enriched, params)
+    # Review #58: phases and enrichment can run under different harness
+    # versions (enrichment is re-runnable by design); both must be stamped
+    # or the archive is uninterpretable.
+    try:
+        import subprocess as _sp
+        summary["enriched_at_sha"] = _sp.run(
+            ["git", "rev-parse", "HEAD"], cwd=str(Path(__file__).resolve().parents[2]),
+            capture_output=True, text=True, timeout=10,
+        ).stdout.strip()
+    except Exception:  # noqa: BLE001
+        summary["enriched_at_sha"] = "unknown"
     # Silver-golden gate (reviewer note on ad18e5a): headline numbers from an
     # unverified golden set are provisional and must say so everywhere.
     n_unverified = sum(1 for q in golden if not q.get("human_verified"))
@@ -354,18 +405,36 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
     citation_agg = metrics.aggregate([e["citations"] for e in answerable if e.get("citations")])
 
     # H1 slice: eligibility observed per row (fact-level for text gold,
-    # file-level for image gold — see enrich_run)
+    # file-level for image gold — see enrich_run). Review #50: the two bases
+    # measure DIFFERENT claims (fact was available vs right image was shown),
+    # so a combined number is refused whenever both bases occur; per-basis
+    # accuracies are always reported and must never be pooled or compared
+    # across bases.
     h1_eligible = [e for e in extractive if e.get("h1_eligible")]
+    basis_counts = {
+        b: sum(1 for e in h1_eligible if e.get("h1_basis") == b)
+        for b in ("fact_spans", "file_level_image")
+    }
+    mixed_basis = sum(1 for v in basis_counts.values() if v) > 1
+    per_basis_acc = {
+        b: rate([e for e in h1_eligible if e.get("h1_basis") == b],
+                lambda e: e["verdict"] == "correct")
+        for b, n in basis_counts.items() if n
+    }
     h1 = {
         "n_extractive": len(extractive),
         "n_eligible": len(h1_eligible),
         "eligible_fraction": rate(extractive, lambda e: e in h1_eligible),
-        "basis_counts": {
-            b: sum(1 for e in h1_eligible if e.get("h1_basis") == b)
-            for b in ("fact_spans", "file_level_image")
-        },
-        "accuracy_on_eligible": rate(h1_eligible, lambda e: e["verdict"] == "correct"),
-        "note": "per-arm number; never compare raw across arms (PLAN H1)",
+        "basis_counts": basis_counts,
+        "accuracy_by_basis": per_basis_acc,
+        "accuracy_on_eligible": (
+            None if mixed_basis
+            else rate(h1_eligible, lambda e: e["verdict"] == "correct")
+        ),
+        "mixed_basis": mixed_basis,
+        "note": "per-arm number; never compare raw across arms OR across "
+                "bases (PLAN H1). accuracy_on_eligible is None when bases "
+                "are mixed - use accuracy_by_basis.",
     }
 
     product_findings = {
@@ -458,7 +527,10 @@ def _write_report(run_dir: Path, s: dict, enriched: list[dict], run_record: dict
         f"- extractive n={s['h1_slice']['n_extractive']}, eligible "
         f"n={s['h1_slice']['n_eligible']} ({s['h1_slice']['eligible_fraction']}) "
         f"— basis: {s['h1_slice']['basis_counts']}",
-        f"- accuracy on eligible: {s['h1_slice']['accuracy_on_eligible']}",
+        f"- accuracy by basis: {s['h1_slice']['accuracy_by_basis']} "
+        + ("(mixed bases — no combined number; bases measure different claims)"
+           if s['h1_slice']['mixed_basis'] else
+           f"| combined: {s['h1_slice']['accuracy_on_eligible']}"),
         "",
         "## Product findings (deterministic observations, not verdicts)",
         "",

@@ -107,9 +107,13 @@ eligible half is a rank-biased survivor subset.
   arms: vague ON .875 vs OFF .906; primary ON .936 vs OFF .979. Both deltas
   are under H2's own 10-point floor (primary is inside its <5 "no movement"
   band), so the docket's rule reads them as no effect — NOT as "rewrite
-  hurts." The claim that survives: rewrite costs ~1.3–2s per query
-  (a mechanism, not a measurement), so on this corpus it isn't earning its
-  latency. Single-corpus; ≥2-corpora rule before acting.
+  hurts." In counts: the entire vague-phrasing difference is **one question
+  out of 32** (28/32 vs 29/32). The claim that survives: rewrite costs
+  ~1.3–2s per query (a mechanism, not a measurement), so on this corpus it
+  isn't earning its latency. Single-corpus; ≥2-corpora rule before acting.
+  Follow-up registered as H2′: after H3, the decision-relevant config is
+  k=1, where hit@1 — not recall@5 — is the whole retrieval story, and hit@1
+  moved more (26/32 vs 29/32 on vague; still 3 questions, not a finding).
 - **H4 (grammar): not yet run** (needs a grammar off-switch investigation).
 
 ## What this suggests for the product (owner's call, not tonight's)

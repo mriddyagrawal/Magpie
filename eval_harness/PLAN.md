@@ -46,6 +46,14 @@ extended to accuracy). Current docket (add/remove freely):
   measurement), so it is not earning its latency on this corpus. Single-corpus;
   §6's ≥2-corpora rule before generalizing. Evidence: committed metrics in
   runs/h2-* (retrieval-only mode).
+- **H2′ — rewrite at the config that now matters (registered 2026-08-28, after H3):**
+  H2 was specified on recall@5 when k=5 was the assumed default; H3 made k=1 the
+  decision-relevant config, where hit@1 is the whole retrieval story. Prediction:
+  rewrite changes hit@1 on vague phrasings by ≥10 points. Test on ≥64 vague
+  phrasings (add the second corpus and/or more variants) so a 3-question swing —
+  the size of the suggestive-but-noise movement observed tonight (26/32 vs 29/32) —
+  cannot clear the threshold. H2's recorded verdict stands; this is a new question
+  the H3 result created, not a revision.
 - **H3 — context width:** extractive key-fact accuracy at `top_k_context=12` is ≥10
   points below `top_k_context=3` even while retrieval recall rises.
   **RESULT (2026-08-28, receipts, 4-point curve k∈{1,3,5,12}): CONFIRMED beyond the

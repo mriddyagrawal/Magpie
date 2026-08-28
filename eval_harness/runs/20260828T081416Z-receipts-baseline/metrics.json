@@ -1,0 +1,67 @@
+{
+  "n_questions": 53,
+  "answer": {
+    "correct": 0.021,
+    "partial": 0.0,
+    "wrong": 0.34,
+    "false_abstain": 0.638,
+    "by_type": {
+      "enumeration": 0.0,
+      "extractive": 0.024
+    }
+  },
+  "abstention": {
+    "n_not_found": 6,
+    "correct_abstain_rate": 0.667,
+    "false_answer_rate": 0.333
+  },
+  "retrieval": {
+    "n": 47,
+    "first_gold_rank": 1.2666666666666666,
+    "hit@1": 0.8723404255319149,
+    "hit@12": 0.9574468085106383,
+    "hit@3": 0.9148936170212766,
+    "hit@5": 0.9361702127659575,
+    "mrr": 0.8984295845997974,
+    "ndcg@5": 0.9055660917371245,
+    "recall@1": 0.8092198581560285,
+    "recall@12": 0.9574468085106383,
+    "recall@3": 0.9063829787234042,
+    "recall@5": 0.9361702127659575
+  },
+  "citations": {
+    "n": 47,
+    "citation_precision": 0.0553191489361702,
+    "citation_recall": 0.14893617021276595,
+    "cited": 0.7021276595744681,
+    "hallucinated_citations": 0.46808510638297873
+  },
+  "solo_gate": {
+    "fire_rate": 0.0
+  },
+  "h1_slice": {
+    "n_extractive": 42,
+    "n_eligible": 38,
+    "eligible_fraction": 0.905,
+    "basis_counts": {
+      "fact_spans": 0,
+      "file_level_image": 38
+    },
+    "accuracy_on_eligible": 0.026,
+    "note": "per-arm number; never compare raw across arms (PLAN H1)"
+  },
+  "product_findings": {
+    "not_found_flag_missing": 0,
+    "zero_citation_answers": 9
+  },
+  "latency": {
+    "p50_total_s": 35.6,
+    "p95_total_s": 41.1
+  },
+  "errors": 0,
+  "golden_set": {
+    "items": 53,
+    "human_verified": 0,
+    "status": "SILVER (provisional)"
+  }
+}

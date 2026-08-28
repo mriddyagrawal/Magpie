@@ -61,5 +61,25 @@
     "qdrant_http": 6533,
     "llama_base": 9400
   },
-  "phases": {}
+  "phases": {
+    "index": {
+      "wall_s": 421.0,
+      "manifest_entries": 150
+    },
+    "retrieve": {
+      "wall_s": 100.2,
+      "errors": 0
+    },
+    "answer": {
+      "wall_s": 1819.8,
+      "answered": 53,
+      "errors": 0,
+      "llm_log": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260828T081416Z-receipts-baseline/raw/appdata/logs/llm-2026-08-28T08-22-58Z.log"
+    }
+  },
+  "isolation": {
+    "real_appdata_untouched": true,
+    "cache_unchanged": true
+  },
+  "wall_s_total": 2341.7
 }

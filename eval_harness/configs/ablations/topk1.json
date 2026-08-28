@@ -1,0 +1,23 @@
+{
+  "config_name": "topk1",
+  "dataset": "receipts",
+  "params": {
+    "model_config": "lfm-local",
+    "prompt_style": "baseline",
+    "temperature": 0.0,
+    "solo_margin": 2.0,
+    "local_n_ctx": 16384,
+    "top_k": 1,
+    "top_k_retrieval_max": 12,
+    "rewrite": true,
+    "enumerate_lists": true,
+    "fast_search": true,
+    "index_fast_tier": true,
+    "index_summary_tier": true,
+    "llama_startup_timeout_s": 300,
+    "memory": null,
+    "_notes": {
+      "top_k": "H3-adjacent probe: single near-oracle file (retrieval hit@1=0.87). If accuracy jumps vs baseline 2.1%, context stacking is THE cause of the collapse; if it stays low, the vision path itself is broken."
+    }
+  }
+}

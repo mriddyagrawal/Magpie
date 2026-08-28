@@ -24,7 +24,9 @@ def test_env_is_built_from_scratch_not_inherited(monkeypatch):
     assert env["LOCAL_TEMPERATURE"] == "0.0"
     assert env["LOCAL_SOLO_MARGIN"] == "2.0"
     assert "OPENROUTER_API_KEY" not in env
-    assert "LOCAL_N_CTX" not in env  # unset param -> backend default, not ambient
+    # ALWAYS pinned: an unset var would be filled from repo .env by
+    # load_dotenv, so "unset" is not a real option for swept knobs.
+    assert env["LOCAL_N_CTX"] == "16384"
     assert "RANDOM_AMBIENT_THING" not in env
 
 

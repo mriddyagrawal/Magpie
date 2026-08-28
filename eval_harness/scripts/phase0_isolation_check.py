@@ -96,7 +96,11 @@ def main() -> int:
 
         boot = backend.run_worker("boot", run_dir, env, {"params": params}, timeout_s=300)
         print(f"phase0: boot = {json.dumps({k: boot[k] for k in ('app_data_dir', 'provider', 'resolved_ctx_size', 'text_profile')}, indent=2)}")
-        check("boot: scratch app dir", boot["app_data_dir"] == str(appdata), boot["app_data_dir"])
+        # Path.resolve() both sides: macOS /var is a symlink to /private/var
+        # and the backend realpaths its data dir.
+        check("boot: scratch app dir",
+              Path(boot["app_data_dir"]).resolve() == appdata.resolve(),
+              boot["app_data_dir"])
         check("boot: shared HF cache", boot["hf_home"] == str(envctl.SHARED_MODEL_CACHE))
         check("boot: offline locked", boot["hf_hub_offline"] == "1")
         check("boot: provider forced local (repo .env conflicts)", boot["provider"] == "local", boot["provider"])

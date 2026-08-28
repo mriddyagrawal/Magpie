@@ -122,12 +122,13 @@ def build_env(
     env["LLM_PROVIDER"] = params.get("provider", "local")
     env["LOCAL_TEMPERATURE"] = str(params.get("temperature", 0.0))
     env["LOCAL_SOLO_MARGIN"] = str(params.get("solo_margin", 2.0))
-    local_n_ctx = params.get("local_n_ctx")
-    if local_n_ctx is not None:
-        # None = shipped-app behavior (profile auto-sizing). The resolved
-        # value is recorded by the worker, so "auto" is still reproducible
-        # evidence, just not a forced setting.
-        env["LOCAL_N_CTX"] = str(local_n_ctx)
+    # ALWAYS set: "leave unset for the backend default" is a lie whenever the
+    # repo .env defines the var - load_dotenv (manifest.py:63) fills unset
+    # vars, so an omitted knob would silently inherit this machine's dotfile
+    # (observed live in the first phase0 run: .env's LOCAL_N_CTX=65536 leaked
+    # into an env that meant to leave ctx at the coded default). 16384 is the
+    # .env.example fresh-clone value and what the shipped beta runs at.
+    env["LOCAL_N_CTX"] = str(params.get("local_n_ctx", 16384))
 
     startup_timeout = params.get("llama_startup_timeout_s", 300)
     env["LLAMA_SERVER_STARTUP_TIMEOUT_S"] = str(startup_timeout)

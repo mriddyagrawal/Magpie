@@ -94,11 +94,11 @@ def phase_boot(payload: dict) -> dict:
 
     from src.llm import active_provider
     from src.inference.profiles import default_text_profile, get_profile
-    from src.inference.llama_server_binary import resolve_binary
+    from src.inference.llama_server_binary import find_llama_server
 
     prof = get_profile(default_text_profile())
     try:
-        binary = str(resolve_binary())
+        binary = str(find_llama_server())
     except Exception as e:  # noqa: BLE001 — report, don't crash boot
         binary = f"<unresolved: {e}>"
 

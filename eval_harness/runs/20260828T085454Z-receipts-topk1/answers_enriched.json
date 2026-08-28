@@ -1,0 +1,4139 @@
+[
+  {
+    "qa_id": "rcpt-total-01",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Aa Pharmacy?",
+    "rewritten_query": {
+      "query": "Aa Pharmacy receipt total amount",
+      "keywords": [
+        "Aa Pharmacy",
+        "receipt",
+        "total amount",
+        "transaction",
+        "payment",
+        "invoice",
+        "pharmacy",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719823.jpg",
+        "score": -10.679577827453613,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "46.20 ZRL",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719823.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Aa Pharmacy",
+    "error": null,
+    "latency_s": {
+      "total": 23.33,
+      "rewrite": 2.45,
+      "retrieval": 11.5,
+      "generation_approx": 9.38
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719823.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-02",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Ali Baba International Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Ali Baba International Sdn Bhd receipt total amount",
+      "keywords": [
+        "Ali Baba International Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:56"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005447859.jpg",
+        "score": -10.774991035461426,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "1.45 RM [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005447859.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Ali Baba International Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 9.68,
+      "rewrite": 1.18,
+      "retrieval": 0.48,
+      "generation_approx": 8.02
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 0.2,
+      "first_gold_rank": 5,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 0.0,
+      "recall@3": 0.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 0.38685280723454163
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005447859.jpg": "full",
+      "receipt_X51006311714.jpg": "solo_excluded"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": false,
+    "h1_basis": null,
+    "citations": {
+      "cited": 1,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 1
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-03",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Aso Electrical Trading Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Aso Electrical Trading Sdn Bhd receipt total amount",
+      "keywords": [
+        "Aso Electrical Trading Sdn Bhd",
+        "receipt",
+        "total amount",
+        "invoice",
+        "transaction",
+        "EDT",
+        "2026-08-28",
+        "04:57",
+        "date",
+        "time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705729.jpg",
+        "score": -10.66472053527832,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "94.60",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705729.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Aso Electrical Trading Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 9.9,
+      "rewrite": 1.45,
+      "retrieval": 0.48,
+      "generation_approx": 7.97
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005705729.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-04",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Bakalima Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Bakalima Sdn Bhd receipt total amount",
+      "keywords": [
+        "Bakalima Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:57"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005724609.jpg",
+        "score": -10.808874130249023,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "100.00 RM",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005724609.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt from Bakalima Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 11.27,
+      "rewrite": 1.5,
+      "retrieval": 0.44,
+      "generation_approx": 9.33
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005724609.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-05",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Bemed (Sp) Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Bemed (Sp) Sdn Bhd receipt total amount",
+      "keywords": [
+        "Bemed",
+        "Sp",
+        "Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "2026-08-28",
+        "EDT"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005746204.jpg",
+        "score": -10.816835403442383,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 5.52,
+      "rewrite": 1.47,
+      "retrieval": 0.48,
+      "generation_approx": 3.57
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005746204.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-06",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Beyond Brothers Hardware?",
+    "rewritten_query": {
+      "query": "Beyond Brothers Hardware receipt total amount",
+      "keywords": [
+        "Beyond Brothers Hardware",
+        "receipt",
+        "total amount",
+        "transaction",
+        "purchase",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005675914.jpg",
+        "score": -10.970062255859375,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "67.85 RM (inclusive of GST)",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005675914.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Beyond Brothers Hardware",
+    "error": null,
+    "latency_s": {
+      "total": 11.1,
+      "rewrite": 1.21,
+      "retrieval": 0.46,
+      "generation_approx": 9.43
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005675914.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-07",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Chop Yew Lian?",
+    "rewritten_query": {
+      "query": "Chop Yew Lian receipt total amount",
+      "keywords": [
+        "Chop Yew Lian",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005587261.jpg",
+        "score": -10.920402526855469,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "30.00 RM [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005587261.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Chop Yew Lian",
+    "error": null,
+    "latency_s": {
+      "total": 11.08,
+      "rewrite": 1.31,
+      "retrieval": 0.44,
+      "generation_approx": 9.33
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005587261.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-08",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Contento?",
+    "rewritten_query": {
+      "query": "Contento receipt total amount",
+      "keywords": [
+        "Contento",
+        "receipt",
+        "total",
+        "amount",
+        "invoice",
+        "transaction",
+        "payment",
+        "billing",
+        "order",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008206.jpg",
+        "score": -10.728939056396484,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The total amount on the receipt from Contento was RM 63.90[1].",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008206.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 8.41,
+      "rewrite": 1.33,
+      "retrieval": 0.43,
+      "generation_approx": 6.65
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 0.0,
+      "first_gold_rank": null,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 0.0,
+      "recall@3": 0.0,
+      "hit@5": 0.0,
+      "recall@5": 0.0,
+      "hit@12": 0.0,
+      "recall@12": 0.0,
+      "ndcg@5": 0.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51006008206.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": false,
+    "h1_basis": null,
+    "citations": {
+      "cited": 1,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 1
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-09",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Cpi Rocku Sdn. Bhd?",
+    "rewritten_query": {
+      "query": "Cpi Rocku Sdn. Bhd receipt total amount",
+      "keywords": [
+        "Cpi Rocku Sdn. Bhd",
+        "receipt",
+        "total amount",
+        "invoice",
+        "transaction",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:58"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719855.jpg",
+        "score": -10.961441040039062,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "181.55 RM",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719855.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Cpi Rocku Sdn. Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 11.3,
+      "rewrite": 1.52,
+      "retrieval": 0.45,
+      "generation_approx": 9.33
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719855.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-10",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Dewina Host Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Dewina Host Sdn Bhd receipt total amount",
+      "keywords": [
+        "Dewina Host Sdn Bhd",
+        "receipt",
+        "total amount",
+        "invoice",
+        "transaction",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:58"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008206.jpg",
+        "score": -10.946396827697754,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The total amount on the receipt from Dewina Host Sdn Bhd was RM 63.90[1].",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008206.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 8.75,
+      "rewrite": 1.48,
+      "retrieval": 0.42,
+      "generation_approx": 6.85
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51006008206.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-11",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Dream Arts?",
+    "rewritten_query": {
+      "query": "Dream Arts receipt total amount",
+      "keywords": [
+        "Dream Arts",
+        "receipt",
+        "total",
+        "amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006248253.jpg",
+        "score": -10.911420822143555,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "15.00 RM",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006248253.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Dream Arts",
+    "error": null,
+    "latency_s": {
+      "total": 9.51,
+      "rewrite": 1.28,
+      "retrieval": 0.4,
+      "generation_approx": 7.83
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51006248253.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-12",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Econsave Cash & Carry (Fc) S/B?",
+    "rewritten_query": {
+      "query": "Econsave Cash & Carry Fc S/B receipt total amount",
+      "keywords": [
+        "Econsave Cash & Carry",
+        "Fc S/B",
+        "receipt",
+        "total amount",
+        "transaction",
+        "purchase",
+        "invoice",
+        "bill",
+        "date",
+        "time",
+        "2026-08-28",
+        "EDT",
+        "current date",
+        "current time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005605295.jpg",
+        "score": -10.383228302001953,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 5.66,
+      "rewrite": 1.7,
+      "retrieval": 0.49,
+      "generation_approx": 3.47
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005605295.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-13",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from F&P Pharmacy?",
+    "rewritten_query": {
+      "query": "F&P Pharmacy receipt total amount",
+      "keywords": [
+        "F&P Pharmacy",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "pharmacy",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005365187.jpg",
+        "score": -10.567516326904297,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "31.90 RM",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005365187.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from F&P Pharmacy",
+    "error": null,
+    "latency_s": {
+      "total": 10.84,
+      "rewrite": 1.15,
+      "retrieval": 0.42,
+      "generation_approx": 9.27
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005365187.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-14",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Florism De Art?",
+    "rewritten_query": {
+      "query": "Florism De Art receipt total amount",
+      "keywords": [
+        "Florism De Art",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008166.jpg",
+        "score": -11.094064712524414,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "750.00 RM [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008166.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Florism De Art",
+    "error": null,
+    "latency_s": {
+      "total": 9.55,
+      "rewrite": 1.24,
+      "retrieval": 0.43,
+      "generation_approx": 7.88
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51006008166.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-15",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Fy Eagle Enterprise?",
+    "rewritten_query": {
+      "query": "Fy Eagle Enterprise receipt total amount",
+      "keywords": [
+        "Fy Eagle Enterprise",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:58"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705759.jpg",
+        "score": -10.942550659179688,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "109.90",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705759.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Fy Eagle Enterprise",
+    "error": null,
+    "latency_s": {
+      "total": 10.96,
+      "rewrite": 1.28,
+      "retrieval": 0.43,
+      "generation_approx": 9.25
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 0.5,
+      "first_gold_rank": 2,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 0.6309297535714575
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005705759.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": false,
+    "h1_basis": null,
+    "citations": {
+      "cited": 1,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 1
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-16",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Gm Rack Enterprise?",
+    "rewritten_query": {
+      "query": "Gm Rack Enterprise receipt total amount",
+      "keywords": [
+        "Gm Rack Enterprise",
+        "receipt",
+        "total amount",
+        "invoice",
+        "purchase",
+        "transaction",
+        "date",
+        "time",
+        "2026-08-28",
+        "EDT"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005715006.jpg",
+        "score": -10.89713191986084,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "160.00 SR [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005715006.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Gm Rack Enterprise",
+    "error": null,
+    "latency_s": {
+      "total": 8.24,
+      "rewrite": 1.25,
+      "retrieval": 0.43,
+      "generation_approx": 6.56
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005715006.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-17",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Grand Companions Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Grand Companions Sdn Bhd receipt total amount",
+      "keywords": [
+        "Grand Companions Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:59"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005757233.jpg",
+        "score": -10.745973587036133,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "9.95 RM [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005757233.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Grand Companions Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 11.29,
+      "rewrite": 1.42,
+      "retrieval": 0.47,
+      "generation_approx": 9.4
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 0.0,
+      "first_gold_rank": null,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 0.0,
+      "recall@3": 0.0,
+      "hit@5": 0.0,
+      "recall@5": 0.0,
+      "hit@12": 0.0,
+      "recall@12": 0.0,
+      "ndcg@5": 0.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005757233.jpg": "full",
+      "receipt_X51006311714.jpg": "solo_excluded"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": false,
+    "h1_basis": null,
+    "citations": {
+      "cited": 1,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 1
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-18",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Great Zone Household Centre Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Great Zone Household Centre Sdn Bhd receipt total amount",
+      "keywords": [
+        "Great Zone Household Centre Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:59"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806692.jpg",
+        "score": -10.77219009399414,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The total amount on the receipt is RM 367.30 [1].",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806692.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 6.52,
+      "rewrite": 1.45,
+      "retrieval": 0.45,
+      "generation_approx": 4.62
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005806692.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-19",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Green Lane Pharmacy Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Green Lane Pharmacy Sdn Bhd receipt total amount",
+      "keywords": [
+        "Green Lane Pharmacy Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "pharmacy",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719895.jpg",
+        "score": -10.45402717590332,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "34.80",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719895.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 5.99,
+      "rewrite": 1.22,
+      "retrieval": 0.42,
+      "generation_approx": 4.35
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719895.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-20",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Heng Kee Delights Bak Kut Teh?",
+    "rewritten_query": {
+      "query": "Heng Kee Delights Bak Kut Teh receipt total amount",
+      "keywords": [
+        "Heng Kee Delights",
+        "Bak Kut Teh",
+        "receipt",
+        "total amount",
+        "transaction",
+        "order",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719889.jpg",
+        "score": -10.872270584106445,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "RM 42.00 [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719889.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Heng Kee Delights Bak Kut Teh",
+    "error": null,
+    "latency_s": {
+      "total": 11.34,
+      "rewrite": 1.49,
+      "retrieval": 0.43,
+      "generation_approx": 9.42
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719889.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-01",
+    "variant": 0,
+    "question": "On what date was the receipt from Hugo Trading Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "Hugo Trading Sdn Bhd receipt issued date",
+      "keywords": [
+        "Hugo Trading Sdn Bhd",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "EDT time",
+        "transaction",
+        "invoice",
+        "document",
+        "date of issue"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806718.jpg",
+        "score": -10.661506652832031,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "13/01/2018",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806718.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date",
+    "error": null,
+    "latency_s": {
+      "total": 9.6,
+      "rewrite": 1.34,
+      "retrieval": 0.42,
+      "generation_approx": 7.84
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005806718.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-02",
+    "variant": 0,
+    "question": "On what date was the receipt from Image Printec (M) Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "Image Printec (M) Sdn Bhd receipt issued date",
+      "keywords": [
+        "Image Printec",
+        "M Sdn Bhd",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "current date"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806696.jpg",
+        "score": -10.393255233764648,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "23/02/2018 7:44:16 [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806696.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date from Image Printec (M) Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 8.37,
+      "rewrite": 1.18,
+      "retrieval": 0.46,
+      "generation_approx": 6.73
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005806696.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-03",
+    "variant": 0,
+    "question": "On what date was the receipt from Kaison Furnishing Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "Kaison Furnishing Sdn Bhd receipt issued date",
+      "keywords": [
+        "Kaison Furnishing Sdn Bhd",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "current date and time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005715007.jpg",
+        "score": -10.793545722961426,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "receipt date from Kaison Furnishing Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 5.92,
+      "rewrite": 1.15,
+      "retrieval": 0.42,
+      "generation_approx": 4.35
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005715007.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-04",
+    "variant": 0,
+    "question": "On what date was the receipt from Keda Papan Yew Chjan issued?",
+    "rewritten_query": {
+      "query": "Keda Papan Yew Chjan receipt issued date",
+      "keywords": [
+        "Keda Papan Yew Chjan",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "time",
+        "Friday",
+        "05:00",
+        "EDT"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005724624.jpg",
+        "score": -10.400303840637207,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "16/03/2018 [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005724624.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt from Keda Papan Yew Chjan",
+    "error": null,
+    "latency_s": {
+      "total": 10.97,
+      "rewrite": 1.2,
+      "retrieval": 0.43,
+      "generation_approx": 9.34
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 0.125,
+      "first_gold_rank": 8,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 0.0,
+      "recall@3": 0.0,
+      "hit@5": 0.0,
+      "recall@5": 0.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 0.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005724624.jpg": "full",
+      "receipt_X51005724611.jpg": "solo_excluded"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": false,
+    "h1_basis": null,
+    "citations": {
+      "cited": 1,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 1
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-05",
+    "variant": 0,
+    "question": "On what date was the receipt from La Stationery Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "La Stationery Sdn Bhd receipt issued date",
+      "keywords": [
+        "La Stationery Sdn Bhd",
+        "receipt",
+        "issued date",
+        "date of issue",
+        "transaction date"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806695.jpg",
+        "score": -10.674259185791016,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "28-Feb-2018 16:37:04",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806695.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date",
+    "error": null,
+    "latency_s": {
+      "total": 7.93,
+      "rewrite": 1.05,
+      "retrieval": 0.41,
+      "generation_approx": 6.47
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 0.3333333333333333,
+      "first_gold_rank": 3,
+      "hit@1": 0.0,
+      "recall@1": 0.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 0.5
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005806695.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": false,
+    "h1_basis": null,
+    "citations": {
+      "cited": 1,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 1
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-06",
+    "variant": 0,
+    "question": "On what date was the receipt from Mei Let Restaurant issued?",
+    "rewritten_query": {
+      "query": "Mei Let Restaurant receipt issued date",
+      "keywords": [
+        "Mei Let Restaurant",
+        "receipt",
+        "date",
+        "issued",
+        "2026-08-28",
+        "EDT",
+        "current date and time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006327953.jpg",
+        "score": -10.496274948120117,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "receipt date from Mei Let Restaurant",
+    "error": null,
+    "latency_s": {
+      "total": 5.07,
+      "rewrite": 1.01,
+      "retrieval": 0.41,
+      "generation_approx": 3.65
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51006327953.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-07",
+    "variant": 0,
+    "question": "On what date was the receipt from Modern Depot Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "Modern Depot Sdn Bhd receipt issued date",
+      "keywords": [
+        "Modern Depot Sdn Bhd",
+        "receipt",
+        "issued date",
+        "transaction date",
+        "invoice",
+        "date of purchase"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005582745.jpg",
+        "score": -10.762590408325195,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "04/12/2016 [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005582745.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date from Modern Depot Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 5.94,
+      "rewrite": 1.07,
+      "retrieval": 0.41,
+      "generation_approx": 4.46
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005582745.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-08",
+    "variant": 0,
+    "question": "On what date was the receipt from Mr. D. I. Y. (Kuchai) Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "Kuchai Sdn Bhd receipt issued date",
+      "keywords": [
+        "Kuchai",
+        "Sdn Bhd",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "05:00",
+        "EDT"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719898.jpg",
+        "score": -10.317938804626465,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "5/60",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719898.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date",
+    "error": null,
+    "latency_s": {
+      "total": 9.32,
+      "rewrite": 1.11,
+      "retrieval": 0.44,
+      "generation_approx": 7.77
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719898.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-09",
+    "variant": 0,
+    "question": "On what date was the receipt from Mun Heng Electrical & Hardware Supply issued?",
+    "rewritten_query": {
+      "query": "Mun Heng Electrical & Hardware Supply receipt issued date",
+      "keywords": [
+        "Mun Heng Electrical & Hardware Supply",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "current date and time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005745213.jpg",
+        "score": -9.90914249420166,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "01/02/2018 [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005745213.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date",
+    "error": null,
+    "latency_s": {
+      "total": 10.9,
+      "rewrite": 1.19,
+      "retrieval": 0.42,
+      "generation_approx": 9.29
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005745213.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-10",
+    "variant": 0,
+    "question": "On what date was the receipt from My Mydin Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "My Mydin Sdn Bhd receipt issued date",
+      "keywords": [
+        "My Mydin Sdn Bhd",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "current date and time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005741929.jpg",
+        "score": -10.889657974243164,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "15/01/2018",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005741929.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date",
+    "error": null,
+    "latency_s": {
+      "total": 10.68,
+      "rewrite": 1.12,
+      "retrieval": 0.43,
+      "generation_approx": 9.13
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005741929.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-11",
+    "variant": 0,
+    "question": "On what date was the receipt from Mydin Mart Sri Muda issued?",
+    "rewritten_query": {
+      "query": "Mydin Mart Sri Muda receipt issued date",
+      "keywords": [
+        "Mydin Mart Sri Muda",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "current date and time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705759.jpg",
+        "score": -10.77094554901123,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "1/08/2017",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705759.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt date",
+    "error": null,
+    "latency_s": {
+      "total": 10.66,
+      "rewrite": 1.06,
+      "retrieval": 0.41,
+      "generation_approx": 9.19
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005705759.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 1,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-12",
+    "variant": 0,
+    "question": "On what date was the receipt from Old Town Kopitam Snd Bhd issued?",
+    "rewritten_query": {
+      "query": "Old Town Kopitam Snd Bhd receipt issued date",
+      "keywords": [
+        "Old Town Kopitam Snd Bhd",
+        "receipt",
+        "issued date",
+        "date of issue",
+        "transaction date"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005337867.jpg",
+        "score": -10.867940902709961,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "receipt date from Old Town Kopitam Snd Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 6.39,
+      "rewrite": 1.13,
+      "retrieval": 0.41,
+      "generation_approx": 4.85
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005337867.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-01",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Pasar Mini Jin Seng?",
+    "rewritten_query": {
+      "query": "Pasar Mini Jin Seng receipt address",
+      "keywords": [
+        "Pasar Mini Jin Seng",
+        "receipt",
+        "address",
+        "store location",
+        "transaction receipt"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005433548.jpg",
+        "score": -10.811941146850586,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "address on the receipt from Pasar Mini Jin Seng",
+    "error": null,
+    "latency_s": {
+      "total": 7.48,
+      "rewrite": 0.9,
+      "retrieval": 0.41,
+      "generation_approx": 6.17
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005433548.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 2,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-02",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Perniagaan Zheng Hui?",
+    "rewritten_query": {
+      "query": "Perniagaan Zheng Hui receipt address",
+      "keywords": [
+        "Perniagaan Zheng Hui",
+        "receipt",
+        "address",
+        "EDT",
+        "2026-08-28",
+        "05:01",
+        "current date and time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005200931.jpg",
+        "score": -10.831796646118164,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "address on the receipt from Perniagaan Zheng Hui",
+    "error": null,
+    "latency_s": {
+      "total": 7.87,
+      "rewrite": 1.2,
+      "retrieval": 0.45,
+      "generation_approx": 6.22
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005200931.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-03",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Petron Bkt Lanjan Sb?",
+    "rewritten_query": {
+      "query": "Petron Bkt Lanjan Sb receipt address",
+      "keywords": [
+        "Petron Bkt Lanjan Sb",
+        "receipt",
+        "address",
+        "store location",
+        "transaction receipt"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005230605.jpg",
+        "score": -10.672269821166992,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "address on the receipt from Petron Bkt Lanjan Sb",
+    "error": null,
+    "latency_s": {
+      "total": 4.97,
+      "rewrite": 1.01,
+      "retrieval": 0.4,
+      "generation_approx": 3.56
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005230605.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 2,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-04",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Potters Garden Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Potters Garden Sdn Bhd receipt address",
+      "keywords": [
+        "Potters Garden Sdn Bhd",
+        "receipt",
+        "address",
+        "EDT",
+        "2026-08-28",
+        "05:01",
+        "transaction",
+        "invoice",
+        "merchant",
+        "location"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719888.jpg",
+        "score": -10.350894927978516,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "Batu 11. Sg Buloh, 47000 Selangor",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719888.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "address on receipt from Potters Garden Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 9.91,
+      "rewrite": 1.38,
+      "retrieval": 0.42,
+      "generation_approx": 8.11
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719888.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 2,
+    "facts_matched": 2,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-05",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Premio Stationery Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Premio Stationery Sdn Bhd receipt address",
+      "keywords": [
+        "Premio Stationery Sdn Bhd",
+        "receipt",
+        "address",
+        "EDT",
+        "2026-08-28",
+        "05:02",
+        "invoice",
+        "order confirmation"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005621482.jpg",
+        "score": -10.638655662536621,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "No file contains the address from the receipt.",
+    "cited": [],
+    "not_found": false,
+    "not_found_topic": "address on the receipt from Premio Stationery Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 10.67,
+      "rewrite": 1.31,
+      "retrieval": 0.46,
+      "generation_approx": 8.9
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005621482.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 2,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-06",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Saint Heart Pastry?",
+    "rewritten_query": {
+      "query": "Saint Heart Pastry receipt address",
+      "keywords": [
+        "Saint Heart Pastry",
+        "receipt",
+        "address",
+        "address printed",
+        "printed address"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719905.jpg",
+        "score": -10.299032211303711,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The receipt from Saint Heart Pastry does not display an address; it lists the business address separately as 29, JLN SJ 17, SELANGOR [1].",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719905.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "address on receipt from Saint Heart Pastry",
+    "error": null,
+    "latency_s": {
+      "total": 9.49,
+      "rewrite": 0.82,
+      "retrieval": 0.39,
+      "generation_approx": 8.28
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719905.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "partial",
+    "facts_total": 2,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-07",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Sayang You Station Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Sayang You Station Sdn Bhd receipt address",
+      "keywords": [
+        "Sayang You Station Sdn Bhd",
+        "receipt",
+        "address",
+        "EDT",
+        "2026-08-28",
+        "05:02",
+        "transaction",
+        "payment",
+        "merchant",
+        "location"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806695.jpg",
+        "score": -10.536925315856934,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The provided receipt from Juwita Weddings does not contain an address; it lists the business address for Juwita Weddings separately.",
+    "cited": [],
+    "not_found": false,
+    "not_found_topic": "address on receipt from Sayang You Station Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 8.23,
+      "rewrite": 1.42,
+      "retrieval": 0.43,
+      "generation_approx": 6.38
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005806695.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-08",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Secure Parking Corporation S/B?",
+    "rewritten_query": {
+      "query": "Secure Parking Corporation S/B receipt address",
+      "keywords": [
+        "Secure Parking Corporation S/B",
+        "receipt",
+        "address",
+        "S/B",
+        "parking",
+        "EDT",
+        "2026-08-28",
+        "05:02"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005288570.jpg",
+        "score": -10.564567565917969,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "address on the receipt from Secure Parking Corporation S/B",
+    "error": null,
+    "latency_s": {
+      "total": 3.62,
+      "rewrite": 1.22,
+      "retrieval": 0.44,
+      "generation_approx": 1.96
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005288570.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 2,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-09",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Sen Lee Heong Restaurant?",
+    "rewritten_query": {
+      "query": "Sen Lee Heong Restaurant receipt address",
+      "keywords": [
+        "Sen Lee Heong Restaurant",
+        "receipt",
+        "address",
+        "restaurant receipt",
+        "restaurant bill",
+        "restaurant invoice"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719863.jpg",
+        "score": -10.36948299407959,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "G-0-1, M. AVENUE NO.1, JLN 1/38A, SEGAMDUT BAHAGIA, 51200, K. LUMPUL, TEL: 012-2525903/ 03-6258 5987",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719863.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "address on the receipt from Sen Lee Heong Restaurant",
+    "error": null,
+    "latency_s": {
+      "total": 9.81,
+      "rewrite": 1.04,
+      "retrieval": 0.37,
+      "generation_approx": 8.4
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719863.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "partial",
+    "facts_total": 2,
+    "facts_matched": 1,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-addr-10",
+    "variant": 0,
+    "question": "What address is printed on the receipt from Sin Lianhap Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Sin Lianhap Sdn Bhd receipt address",
+      "keywords": [
+        "Sin Lianhap Sdn Bhd",
+        "receipt",
+        "address",
+        "EDT",
+        "2026-08-28",
+        "05:02",
+        "current date and time"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005230621.jpg",
+        "score": -10.731734275817871,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "LOT 13, JALAN IPOH, KG BATU 30, ULU YAM LAMA, 44300 BTG KALI, SELANGOR.",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005230621.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "address on receipt from Sin Lianhap Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 6.63,
+      "rewrite": 1.34,
+      "retrieval": 0.43,
+      "generation_approx": 4.86
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005230621.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "correct",
+    "facts_total": 2,
+    "facts_matched": 2,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-absent-01",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from King'S Confectionery S/B?",
+    "rewritten_query": {
+      "query": "King'S Confectionery S/B receipt total amount",
+      "keywords": [
+        "King's Confectionery S/B",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "purchase",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "05:02"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005605295.jpg",
+        "score": -10.610811233520508,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 5.8,
+      "rewrite": 1.58,
+      "retrieval": 0.45,
+      "generation_approx": 3.77
+    },
+    "answer_type": "not_found",
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005605295.jpg": "full"
+    },
+    "key_fact_spans": {},
+    "h1_eligible": false,
+    "h1_basis": null,
+    "verdict": "correct_abstain",
+    "facts_total": 0,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-absent-02",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Tanjongmas Bookcentre Pj Sdn Bhd receipt total amount",
+      "keywords": [
+        "Tanjongmas Bookcentre",
+        "Pj Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "date",
+        "time",
+        "2026-08-28",
+        "EDT",
+        "amount",
+        "payment",
+        "purchase",
+        "document"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705759.jpg",
+        "score": -10.729118347167969,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "109.90",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705759.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 11.7,
+      "rewrite": 1.82,
+      "retrieval": 0.47,
+      "generation_approx": 9.41
+    },
+    "answer_type": "not_found",
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005705759.jpg": "full",
+      "receipt_X51006008090.jpg": "solo_excluded"
+    },
+    "key_fact_spans": {},
+    "h1_eligible": false,
+    "h1_basis": null,
+    "verdict": "false_answer",
+    "facts_total": 0,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-absent-03",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Semboyan Tegas Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Semboyan Tegas Sdn Bhd receipt total amount",
+      "keywords": [
+        "Semboyan Tegas Sdn Bhd",
+        "receipt",
+        "total amount",
+        "invoice",
+        "transaction",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "05:03"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719898.jpg",
+        "score": -10.918105125427246,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "RM 11.90",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719898.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Semboyan Tegas Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 10.07,
+      "rewrite": 1.56,
+      "retrieval": 0.45,
+      "generation_approx": 8.06
+    },
+    "answer_type": "not_found",
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005719898.jpg": "full",
+      "receipt_X51006311714.jpg": "solo_excluded"
+    },
+    "key_fact_spans": {},
+    "h1_eligible": false,
+    "h1_basis": null,
+    "verdict": "false_answer",
+    "facts_total": 0,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-absent-04",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from The Cut Steakhouse &Burgers?",
+    "rewritten_query": {
+      "query": "The Cut Steakhouse &Burgers receipt total amount",
+      "keywords": [
+        "The Cut Steakhouse &Burgers",
+        "receipt",
+        "total amount",
+        "transaction",
+        "bill",
+        "order",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008206.jpg",
+        "score": -9.433424949645996,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "RM63.90 [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008206.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from The Cut Steakhouse &Burgers",
+    "error": null,
+    "latency_s": {
+      "total": 8.41,
+      "rewrite": 1.42,
+      "retrieval": 0.43,
+      "generation_approx": 6.56
+    },
+    "answer_type": "not_found",
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51006008206.jpg": "full"
+    },
+    "key_fact_spans": {},
+    "h1_eligible": false,
+    "h1_basis": null,
+    "verdict": "false_answer",
+    "facts_total": 0,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-absent-05",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Biru Petroleum?",
+    "rewritten_query": {
+      "query": "Biru Petroleum receipt total amount",
+      "keywords": [
+        "Biru Petroleum",
+        "receipt",
+        "total amount",
+        "invoice",
+        "transaction",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "05:03"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008166.jpg",
+        "score": -10.808998107910156,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "750.00 RM",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008166.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipt from Biru Petroleum",
+    "error": null,
+    "latency_s": {
+      "total": 9.52,
+      "rewrite": 1.32,
+      "retrieval": 0.42,
+      "generation_approx": 7.78
+    },
+    "answer_type": "not_found",
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51006008166.jpg": "full",
+      "receipt_X51006008206.jpg": "solo_excluded"
+    },
+    "key_fact_spans": {},
+    "h1_eligible": false,
+    "h1_basis": null,
+    "verdict": "false_answer",
+    "facts_total": 0,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-absent-06",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Platinum Racking Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Platinum Racking Sdn Bhd receipt total amount",
+      "keywords": [
+        "Platinum Racking Sdn Bhd",
+        "receipt",
+        "total amount",
+        "invoice",
+        "transaction",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "05:03"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005757233.jpg",
+        "score": -10.943236351013184,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "9.95 RM [1]",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005757233.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "total amount on the receipt from Platinum Racking Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 11.24,
+      "rewrite": 1.42,
+      "retrieval": 0.43,
+      "generation_approx": 9.39
+    },
+    "answer_type": "not_found",
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005757233.jpg": "full"
+    },
+    "key_fact_spans": {},
+    "h1_eligible": false,
+    "h1_basis": null,
+    "verdict": "false_answer",
+    "facts_total": 0,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-count-01",
+    "variant": 0,
+    "question": "How many receipts from 99 Speed Mart S/B are in the files?",
+    "rewritten_query": {
+      "query": "99 Speed Mart S/B receipts count",
+      "keywords": [
+        "99 Speed Mart S/B",
+        "receipts",
+        "file",
+        "count",
+        "how many"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005268408.jpg",
+        "score": -10.736949920654297,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "1 receipt found in the files [1].",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005268408.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipts from 99 Speed Mart S/B",
+    "error": null,
+    "latency_s": {
+      "total": 9.29,
+      "rewrite": 0.92,
+      "retrieval": 0.39,
+      "generation_approx": 7.98
+    },
+    "answer_type": "enumeration",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 0.2,
+      "hit@3": 1.0,
+      "recall@3": 0.6,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005268408.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": true
+    },
+    "h1_eligible": true,
+    "h1_basis": "fact_spans",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 0.2,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-count-02",
+    "variant": 0,
+    "question": "How many receipts from Aeon Co. (M) Bhd are in the files?",
+    "rewritten_query": {
+      "query": "Aeon Co. (M) Bhd receipts count",
+      "keywords": [
+        "Aeon Co. (M) Bhd",
+        "receipts",
+        "files",
+        "count",
+        "how many",
+        "in the files"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005757220.jpg",
+        "score": -10.731616973876953,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "19 receipts from Aeon Co. (M) Bhd are in the files [1].",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005757220.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipts from Aeon Co. (M) Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 11.02,
+      "rewrite": 1.02,
+      "retrieval": 0.42,
+      "generation_approx": 9.58
+    },
+    "answer_type": "enumeration",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 0.3333333333333333,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005757220.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": false,
+    "h1_basis": null,
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 0.3333333333333333,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-count-03",
+    "variant": 0,
+    "question": "How many receipts from Bens Independent Grocer Sdn. Bhd are in the files?",
+    "rewritten_query": {
+      "query": "Bens Independent Grocer Sdn. Bhd receipts count",
+      "keywords": [
+        "Bens Independent Grocer Sdn. Bhd",
+        "receipts",
+        "file",
+        "count",
+        "invoice",
+        "transaction",
+        "document",
+        "record",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005444040.jpg",
+        "score": -10.826641082763672,
+        "rank": 1,
+        "tier": "fast"
+      }
+    ],
+    "answer": "1 receipt found in the file: /Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005444040.jpg",
+    "cited": [
+      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005444040.jpg"
+    ],
+    "not_found": false,
+    "not_found_topic": "receipts from Bens Independent Grocer Sdn. Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 11.61,
+      "rewrite": 1.39,
+      "retrieval": 0.45,
+      "generation_approx": 9.77
+    },
+    "answer_type": "enumeration",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 0.5,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": true,
+    "solo_margin_observed": 0.0,
+    "gate_inference_disagreement": true,
+    "in_prompt": {
+      "receipt_X51005444040.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": true
+    },
+    "h1_eligible": true,
+    "h1_basis": "fact_spans",
+    "citations": {
+      "cited": 1,
+      "citation_precision": 1.0,
+      "citation_recall": 0.5,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-listdates-04",
+    "variant": 0,
+    "question": "List the dates of every receipt from Cross Channel Network Sdn. Bhd.",
+    "rewritten_query": {
+      "query": "Cross Channel Network Sdn. Bhd. receipt dates",
+      "keywords": [
+        "Cross Channel Network Sdn. Bhd.",
+        "receipt",
+        "invoice",
+        "payment",
+        "transaction",
+        "date",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005230657.jpg",
+        "score": 0.01639344262295082,
+        "rank": 1,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005230648.jpg",
+        "score": 0.016129032258064516,
+        "rank": 2,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806695.jpg",
+        "score": 0.015873015873015872,
+        "rank": 3,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005568866.jpg",
+        "score": 0.015625,
+        "rank": 4,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005568855.jpg",
+        "score": 0.015384615384615385,
+        "rank": 5,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005705759.jpg",
+        "score": 0.015151515151515152,
+        "rank": 6,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008083.jpg",
+        "score": 0.014925373134328358,
+        "rank": 7,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005447842.jpg",
+        "score": 0.014705882352941176,
+        "rank": 8,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005337877.jpg",
+        "score": 0.014492753623188406,
+        "rank": 9,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005447859.jpg",
+        "score": 0.014285714285714285,
+        "rank": 10,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005806718.jpg",
+        "score": 0.014084507042253521,
+        "rank": 11,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005268275.jpg",
+        "score": 0.013888888888888888,
+        "rank": 12,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "Cross Channel Network Sdn Bhd receipts",
+    "error": null,
+    "latency_s": {
+      "total": 38.43,
+      "rewrite": 1.25,
+      "retrieval": 0.28,
+      "generation_approx": 36.9
+    },
+    "answer_type": "enumeration",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 0.5,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": false,
+    "in_prompt": {
+      "receipt_X51005230657.jpg": "full",
+      "receipt_X51005230648.jpg": "full",
+      "receipt_X51005806695.jpg": "full",
+      "receipt_X51005568866.jpg": "full",
+      "receipt_X51005568855.jpg": "full",
+      "receipt_X51005705759.jpg": "full",
+      "receipt_X51006008083.jpg": "full",
+      "receipt_X51005447842.jpg": "dropped",
+      "receipt_X51005337877.jpg": "dropped",
+      "receipt_X51005447859.jpg": "dropped",
+      "receipt_X51005806718.jpg": "dropped",
+      "receipt_X51005268275.jpg": "dropped"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 2,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-listdates-05",
+    "variant": 0,
+    "question": "List the dates of every receipt from Evergreen Light Sdn Bhd.",
+    "rewritten_query": {
+      "query": "receipts from Evergreen Light Sdn Bhd",
+      "keywords": [
+        "Evergreen Light Sdn Bhd",
+        "receipts",
+        "date",
+        "list",
+        "transaction",
+        "invoice",
+        "payment",
+        "EDT",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005568885.jpg",
+        "score": 0.01639344262295082,
+        "rank": 1,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005568892.jpg",
+        "score": 0.016129032258064516,
+        "rank": 2,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005749904.jpg",
+        "score": 0.015873015873015872,
+        "rank": 3,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005230659.jpg",
+        "score": 0.015625,
+        "rank": 4,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005715007.jpg",
+        "score": 0.015384615384615385,
+        "rank": 5,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005268275.jpg",
+        "score": 0.015151515151515152,
+        "rank": 6,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005301666.jpg",
+        "score": 0.014925373134328358,
+        "rank": 7,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005444046.jpg",
+        "score": 0.014705882352941176,
+        "rank": 8,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51006008083.jpg",
+        "score": 0.014492753623188406,
+        "rank": 9,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005447842.jpg",
+        "score": 0.014285714285714285,
+        "rank": 10,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005447859.jpg",
+        "score": 0.014084507042253521,
+        "rank": 11,
+        "tier": "fast"
+      },
+      {
+        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/receipt_X51005719888.jpg",
+        "score": 0.013888888888888888,
+        "rank": 12,
+        "tier": "fast"
+      }
+    ],
+    "answer": "",
+    "cited": [],
+    "not_found": true,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 33.55,
+      "rewrite": 1.01,
+      "retrieval": 0.29,
+      "generation_approx": 32.25
+    },
+    "answer_type": "enumeration",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 0.5,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 12,
+    "solo_gated": false,
+    "in_prompt": {
+      "receipt_X51005568885.jpg": "full",
+      "receipt_X51005568892.jpg": "full",
+      "receipt_X51005749904.jpg": "full",
+      "receipt_X51005230659.jpg": "full",
+      "receipt_X51005715007.jpg": "full",
+      "receipt_X51005268275.jpg": "full",
+      "receipt_X51005301666.jpg": "full",
+      "receipt_X51005444046.jpg": "dropped",
+      "receipt_X51006008083.jpg": "dropped",
+      "receipt_X51005447842.jpg": "dropped",
+      "receipt_X51005447859.jpg": "dropped",
+      "receipt_X51005719888.jpg": "dropped"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block",
+      "1": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 2,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "flag",
+    "not_found_flag_missing": false
+  }
+]

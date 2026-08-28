@@ -108,10 +108,28 @@ uv run python -m eval_harness.harness.run \
 **Isolation mechanics:** the backend must accept a data-directory override
 (`MAGPIE_DATA_DIR` env var or equivalent — Phase 0 confirms whether this exists or adds
 it). Each run gets `runs/<run_id>/appdata/` as its data dir; the sidecar/pipeline is
-spawned fresh, port-isolated, and torn down at the end. The HF weights cache is pointed
-at the existing shared cache read-only. Backend logs and the LLM JSONL log are captured
-into the run folder (including raw bodies of any 4xx/5xx — the llama-server 400s must be
-visible this time).
+spawned fresh, port-isolated, and torn down at the end. Backend logs and the LLM JSONL
+log are captured into the run folder (including raw bodies of any 4xx/5xx — the
+llama-server 400s must be visible this time).
+
+**Cache-sharing contract (verified against src/manifest.py, 2026-08-28):**
+`src/manifest.py:97-100` derives the HF model cache from `APP_DATA_DIR`, so a naive
+data-dir override would point the cache at an empty folder and re-download ~10 GB of
+weights per run. The env vars are set with `os.environ.setdefault`, which is the escape
+hatch: the harness MUST export `HF_HOME`, `HF_HUB_CACHE`, `TRANSFORMERS_CACHE`, **and**
+`FASTEMBED_CACHE_PATH` (fastembed ignores `HF_HOME` entirely — see
+`src/manifest.py:102-114`) pointing at the real shared cache **before any `src.*`
+import / backend spawn**. Weights are protected from mutation with `HF_HUB_OFFLINE=1`
+(a literal read-only mount breaks the hub's lockfile writes on cache hits), which also
+guarantees runs never silently download anything.
+
+**Controlled environment (no ambient `.env`):** `src/manifest.py:53` loads `.env` before
+paths resolve, and `LLM_PROVIDER`, `OPENROUTER_MODEL`, `LOCAL_TEMPERATURE`, `LOCAL_N_CTX`
+etc. are ambient env reads — precisely the axes being swept. The runner therefore
+constructs the backend's environment explicitly from the run config (every
+parameter-relevant var set; the repo `.env` never inherited) and writes the fully
+resolved environment + the scratch `settings.json` it generated into the run record, so
+two "baseline" runs on two machines are comparable by construction.
 
 **Offline stages (Claude-side, via subagent fan-out, never inside the runner):**
 golden-set generation, judge pass, run comparison reports. Wrapped later as a repo skill
@@ -170,7 +188,9 @@ every corpus.
 ```
 
 The runner stamps in: `run_id`, backend git SHA, harness git SHA, machine info,
-start/end timestamps, and the resolved index-cache key it used.
+start/end timestamps, the resolved index-cache key it used, and the **fully resolved
+environment** it constructed for the backend (see §3 controlled environment) — ambient
+`.env` values must never be able to change a run without appearing in the record.
 
 ### 4.3 Index report (`runs/<id>/index_report.json`, one entry per file)
 
@@ -257,6 +277,14 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 - Audit how the backend resolves its data dir; add/confirm an env-var override so a run
   can point all state (index, DB, logs, settings) at a scratch folder. **This is the
   only production-code change the harness needs.**
+- Implement the cache-sharing contract from §3: export `HF_HOME` / `HF_HUB_CACHE` /
+  `TRANSFORMERS_CACHE` / `FASTEMBED_CACHE_PATH` to the shared cache before backend
+  import, plus `HF_HUB_OFFLINE=1`; verify with a run that downloads zero bytes.
+- Implement controlled-env construction + resolved-env snapshotting (§3/§4.2); confirm
+  the isolation test passes with a deliberately conflicting repo `.env` present.
+- Confirm the `furman_directory` and personal-notes corpus paths still exist on this
+  machine (corpora live outside the repo by design; `manifest.json` records the
+  expected root via a local untracked path config).
 - Confirm exact model IDs for both axes (gen: LFM2.5-VL-3B / Gemma; col: ColSmol /
   ColQwen2.5) and that both are installable into the shared cache.
 - Pin the judge model (a Claude model ID) and create `judge/rubric.md` v1.
@@ -361,6 +389,9 @@ for the same decisions.
 ## 10. References
 
 - OpenJarvis (Stanford, 2026) — runner + DocQA scorer pattern: github.com/open-jarvis/OpenJarvis
+  (existence re-verified via GitHub API 2026-08-28: 9,093 stars, Apache-2.0, pushed
+  2026-08-27 — the project postdates most models' training data, so offline reviewers
+  cannot see it)
 - ViDoRe v1/v2/v3 + vidore-benchmark (ColQwen's own eval): github.com/illuin-tech/vidore-benchmark
 - BEIR corpus/queries/qrels format: github.com/beir-cellar/beir · pytrec_eval
 - MMLongBench-Doc: github.com/mayubo2333/MMLongBench-Doc

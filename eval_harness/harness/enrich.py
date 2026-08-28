@@ -235,6 +235,14 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
         enriched.append(out)
 
     summary = _summarize(enriched, params)
+    # Silver-golden gate (reviewer note on ad18e5a): headline numbers from an
+    # unverified golden set are provisional and must say so everywhere.
+    n_unverified = sum(1 for q in golden if not q.get("human_verified"))
+    summary["golden_set"] = {
+        "items": len(golden),
+        "human_verified": len(golden) - n_unverified,
+        "status": "GOLD" if n_unverified == 0 else "SILVER (provisional)",
+    }
     envs = _load_json(run_dir / "run.json")
     _write_report(run_dir, summary, enriched, envs)
     _dump(run_dir / "answers_enriched.json", enriched)
@@ -305,8 +313,21 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
 
 
 def _write_report(run_dir: Path, s: dict, enriched: list[dict], run_record: dict) -> None:
+    gs = s.get("golden_set", {})
+    silver_banner = (
+        []
+        if gs.get("status") == "GOLD"
+        else [
+            "",
+            f"> ⚠️ **{gs.get('status', 'SILVER')} golden set** — "
+            f"{gs.get('human_verified', 0)}/{gs.get('items', '?')} items human-verified. "
+            "Every number below is provisional until both founders complete the "
+            "silver→gold review (PLAN §6). Do not act on H1 or publish these figures.",
+        ]
+    )
     lines = [
         f"# Eval report — {run_record.get('run_id', run_dir.name)}",
+        *silver_banner,
         "",
         f"Config `{run_record.get('config_name')}` · dataset `{run_record.get('dataset')}` · "
         f"{s['n_questions']} questions · backend `{str(run_record.get('backend_git_sha'))[:12]}`",

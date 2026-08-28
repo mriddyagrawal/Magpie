@@ -9,7 +9,9 @@ answers one hardcoded question through the real pipeline, and asserts:
      settings, qdrant collections); a run that silently read the real index
      would pass check 1 while measuring the wrong thing.
   3. ZERO downloads — shared model cache file-count and byte-total unchanged
-     (HF_HUB_OFFLINE=1 doing its job).
+     (runs are ONLINE like production; the fingerprint assertion is the
+     enforcement — see envctl's cache-contract note for why offline mode
+     can't be used with adapter-style repos).
   4. CONTROLLED ENV — the worker's resolved provider/temp/solo-margin match
      the config, not the repo .env (which deliberately conflicts on this
      machine: it sets a cloud provider and nonzero temperature).
@@ -108,7 +110,6 @@ def main() -> int:
               Path(boot["app_data_dir"]).resolve() == appdata.resolve(),
               boot["app_data_dir"])
         check("boot: shared HF cache", boot["hf_home"] == str(envctl.SHARED_MODEL_CACHE))
-        check("boot: offline locked", boot["hf_hub_offline"] == "1")
         check("boot: provider forced local (repo .env conflicts)", boot["provider"] == "local", boot["provider"])
         check("boot: run-private qdrant", boot["qdrant_endpoint"].endswith(str(ports.qdrant_http)))
         env_snap = boot.get("resolved_env", {})

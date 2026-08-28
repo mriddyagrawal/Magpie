@@ -230,15 +230,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-01",
-    "question": "On what date was the receipt from Dream Arts issued?",
+    "id": "rcpt-total-11",
+    "question": "What was the total amount on the receipt from Dream Arts?",
     "question_variants": [
-      "when did i buy from dream arts"
+      "dream arts receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The Dream Arts receipt is dated 29/03/2018.",
+    "gold_answer": "The total on the Dream Arts receipt was 15.00.",
     "key_facts": [
-      "29/03/2018"
+      "15.00"
     ],
     "gold_sources": [
       "receipt_X51006248253.jpg"
@@ -253,15 +253,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-02",
-    "question": "On what date was the receipt from Econsave Cash & Carry (Fc) S/B issued?",
+    "id": "rcpt-total-12",
+    "question": "What was the total amount on the receipt from Econsave Cash & Carry (Fc) S/B?",
     "question_variants": [
-      "when did i buy from econsave cash & carry (fc) s/b"
+      "econsave cash & carry (fc) s/b receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The Econsave Cash & Carry (Fc) S/B receipt is dated 22/03/18.",
+    "gold_answer": "The total on the Econsave Cash & Carry (Fc) S/B receipt was 5.15.",
     "key_facts": [
-      "22/03/18"
+      "5.15"
     ],
     "gold_sources": [
       "receipt_X51005605295.jpg"
@@ -276,15 +276,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-03",
-    "question": "On what date was the receipt from F&P Pharmacy issued?",
+    "id": "rcpt-total-13",
+    "question": "What was the total amount on the receipt from F&P Pharmacy?",
     "question_variants": [
-      "when did i buy from f&p pharmacy"
+      "f&p pharmacy receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The F&P Pharmacy receipt is dated 02/03/2018.",
+    "gold_answer": "The total on the F&P Pharmacy receipt was 31.90.",
     "key_facts": [
-      "02/03/2018"
+      "31.90"
     ],
     "gold_sources": [
       "receipt_X51005365187.jpg"
@@ -299,15 +299,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-04",
-    "question": "On what date was the receipt from Florism De Art issued?",
+    "id": "rcpt-total-14",
+    "question": "What was the total amount on the receipt from Florism De Art?",
     "question_variants": [
-      "when did i buy from florism de art"
+      "florism de art receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The Florism De Art receipt is dated 14/01/2018.",
+    "gold_answer": "The total on the Florism De Art receipt was 750.00.",
     "key_facts": [
-      "14/01/2018"
+      "750.00"
     ],
     "gold_sources": [
       "receipt_X51006008166.jpg"
@@ -322,15 +322,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-05",
-    "question": "On what date was the receipt from Fy Eagle Enterprise issued?",
+    "id": "rcpt-total-15",
+    "question": "What was the total amount on the receipt from Fy Eagle Enterprise?",
     "question_variants": [
-      "when did i buy from fy eagle enterprise"
+      "fy eagle enterprise receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The Fy Eagle Enterprise receipt is dated 07/12/2017.",
+    "gold_answer": "The total on the Fy Eagle Enterprise receipt was 10.00.",
     "key_facts": [
-      "07/12/2017"
+      "10.00"
     ],
     "gold_sources": [
       "receipt_X51005577191.jpg"
@@ -345,15 +345,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-06",
-    "question": "On what date was the receipt from Gm Rack Enterprise issued?",
+    "id": "rcpt-total-16",
+    "question": "What was the total amount on the receipt from Gm Rack Enterprise?",
     "question_variants": [
-      "when did i buy from gm rack enterprise"
+      "gm rack enterprise receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The Gm Rack Enterprise receipt is dated 20/03/2018.",
+    "gold_answer": "The total on the Gm Rack Enterprise receipt was 160.00.",
     "key_facts": [
-      "20/03/2018"
+      "160.00"
     ],
     "gold_sources": [
       "receipt_X51005715006.jpg"
@@ -368,15 +368,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-07",
-    "question": "On what date was the receipt from Grand Companions Sdn Bhd issued?",
+    "id": "rcpt-total-17",
+    "question": "What was the total amount on the receipt from Grand Companions Sdn Bhd?",
     "question_variants": [
-      "when did i buy from grand companions sdn bhd"
+      "grand companions sdn bhd receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The Grand Companions Sdn Bhd receipt is dated 03 MAR 19.",
+    "gold_answer": "The total on the Grand Companions Sdn Bhd receipt was 269.40.",
     "key_facts": [
-      "03 MAR 19"
+      "269.40"
     ],
     "gold_sources": [
       "receipt_X51005442322.jpg"
@@ -391,15 +391,15 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-date-08",
-    "question": "On what date was the receipt from Great Zone Household Centre Sdn Bhd issued?",
+    "id": "rcpt-total-18",
+    "question": "What was the total amount on the receipt from Great Zone Household Centre Sdn Bhd?",
     "question_variants": [
-      "when did i buy from great zone household centre sdn bhd"
+      "great zone household centre sdn bhd receipt total"
     ],
     "answer_type": "extractive",
-    "gold_answer": "The Great Zone Household Centre Sdn Bhd receipt is dated 18/02/2018.",
+    "gold_answer": "The total on the Great Zone Household Centre Sdn Bhd receipt was 367.30.",
     "key_facts": [
-      "18/02/2018"
+      "367.30"
     ],
     "gold_sources": [
       "receipt_X51005806692.jpg"
@@ -414,16 +414,339 @@
     "generator": "prepare_receipts.py (mechanical, SROIE labels)"
   },
   {
-    "id": "rcpt-addr-01",
-    "question": "What address is printed on the receipt from Green Lane Pharmacy Sdn Bhd?",
-    "question_variants": [],
+    "id": "rcpt-total-19",
+    "question": "What was the total amount on the receipt from Green Lane Pharmacy Sdn Bhd?",
+    "question_variants": [
+      "green lane pharmacy sdn bhd receipt total"
+    ],
     "answer_type": "extractive",
-    "gold_answer": "The Green Lane Pharmacy Sdn Bhd receipt shows the address: 33 JLN BANGAU 1,KEPONG BARU, 52100 KEPONG,KL.",
+    "gold_answer": "The total on the Green Lane Pharmacy Sdn Bhd receipt was 34.80.",
     "key_facts": [
-      "33 JLN BANGAU 1,KEPONG BARU, 52100 KEPONG,KL"
+      "34.80"
     ],
     "gold_sources": [
       "receipt_X51005719895.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-20",
+    "question": "What was the total amount on the receipt from Heng Kee Delights Bak Kut Teh?",
+    "question_variants": [
+      "heng kee delights bak kut teh receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Heng Kee Delights Bak Kut Teh receipt was 42.00.",
+    "key_facts": [
+      "42.00"
+    ],
+    "gold_sources": [
+      "receipt_X51005719889.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-01",
+    "question": "On what date was the receipt from Hugo Trading Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from hugo trading sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Hugo Trading Sdn Bhd receipt is dated 13/01/2018.",
+    "key_facts": [
+      "13/01/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005806718.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-02",
+    "question": "On what date was the receipt from Image Printec (M) Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from image printec (m) sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Image Printec (M) Sdn Bhd receipt is dated 23/02/2018.",
+    "key_facts": [
+      "23/02/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005806696.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-03",
+    "question": "On what date was the receipt from Kaison Furnishing Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from kaison furnishing sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Kaison Furnishing Sdn Bhd receipt is dated 25-03-18.",
+    "key_facts": [
+      "25-03-18"
+    ],
+    "gold_sources": [
+      "receipt_X51005715007.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-04",
+    "question": "On what date was the receipt from Keda Papan Yew Chjan issued?",
+    "question_variants": [
+      "when did i buy from keda papan yew chjan"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Keda Papan Yew Chjan receipt is dated 08/03/2018.",
+    "key_facts": [
+      "08/03/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005724623.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-05",
+    "question": "On what date was the receipt from La Stationery Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from la stationery sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The La Stationery Sdn Bhd receipt is dated 09/02/2018.",
+    "key_facts": [
+      "09/02/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005663307.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-06",
+    "question": "On what date was the receipt from Mei Let Restaurant issued?",
+    "question_variants": [
+      "when did i buy from mei let restaurant"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Mei Let Restaurant receipt is dated 03/02/2017.",
+    "key_facts": [
+      "03/02/2017"
+    ],
+    "gold_sources": [
+      "receipt_X51006327953.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-07",
+    "question": "On what date was the receipt from Modern Depot Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from modern depot sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Modern Depot Sdn Bhd receipt is dated 04/12/2016.",
+    "key_facts": [
+      "04/12/2016"
+    ],
+    "gold_sources": [
+      "receipt_X51005582745.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-08",
+    "question": "On what date was the receipt from Mr. D. I. Y. (Kuchai) Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from mr. d. i. y. (kuchai) sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Mr. D. I. Y. (Kuchai) Sdn Bhd receipt is dated 19-03-18.",
+    "key_facts": [
+      "19-03-18"
+    ],
+    "gold_sources": [
+      "receipt_X51005719898.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-09",
+    "question": "On what date was the receipt from Mun Heng Electrical & Hardware Supply issued?",
+    "question_variants": [
+      "when did i buy from mun heng electrical & hardware supply"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Mun Heng Electrical & Hardware Supply receipt is dated 01/02/2018.",
+    "key_facts": [
+      "01/02/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005745213.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-10",
+    "question": "On what date was the receipt from My Mydin Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from my mydin sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The My Mydin Sdn Bhd receipt is dated 15/01/2018.",
+    "key_facts": [
+      "15/01/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005741929.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-11",
+    "question": "On what date was the receipt from Mydin Mart Sri Muda issued?",
+    "question_variants": [
+      "when did i buy from mydin mart sri muda"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Mydin Mart Sri Muda receipt is dated 1/08/2017.",
+    "key_facts": [
+      "1/08/2017"
+    ],
+    "gold_sources": [
+      "receipt_X51005705759.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-12",
+    "question": "On what date was the receipt from Old Town Kopitam Snd Bhd issued?",
+    "question_variants": [
+      "when did i buy from old town kopitam snd bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Old Town Kopitam Snd Bhd receipt is dated 22 MAR 18.",
+    "key_facts": [
+      "22 MAR 18"
+    ],
+    "gold_sources": [
+      "receipt_X51005337867.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-01",
+    "question": "What address is printed on the receipt from Pasar Mini Jin Seng?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Pasar Mini Jin Seng receipt shows the address: 379, JALAN PERMAS SATU, BANDAR BARU PERMAS JAYA 81750 PLENTONG, JOHOR..",
+    "key_facts": [
+      "81750",
+      "JOHOR"
+    ],
+    "gold_sources": [
+      "receipt_X51005433548.jpg"
     ],
     "acceptable_sources": [],
     "requires": {
@@ -436,15 +759,15 @@
   },
   {
     "id": "rcpt-addr-02",
-    "question": "What address is printed on the receipt from Heng Kee Delights Bak Kut Teh?",
+    "question": "What address is printed on the receipt from Perniagaan Zheng Hui?",
     "question_variants": [],
     "answer_type": "extractive",
-    "gold_answer": "The Heng Kee Delights Bak Kut Teh receipt shows the address: NO31 , JALAN 3/62A , BANDAR MENJALARA KEPONG. 52100 KUALA LUMPUR.",
+    "gold_answer": "The Perniagaan Zheng Hui receipt shows the address: NO.59 JALAN PERMAS 9/5 BANDAR BARU PERMAS JAYA 81750 JOHOR BAHRU.",
     "key_facts": [
-      "NO31 , JALAN 3/62A , BANDAR MENJALARA KEPONG. 52100 KUALA LUMPUR"
+      "81750"
     ],
     "gold_sources": [
-      "receipt_X51005719889.jpg"
+      "receipt_X51005200931.jpg"
     ],
     "acceptable_sources": [],
     "requires": {
@@ -457,15 +780,16 @@
   },
   {
     "id": "rcpt-addr-03",
-    "question": "What address is printed on the receipt from Hugo Trading Sdn Bhd?",
+    "question": "What address is printed on the receipt from Petron Bkt Lanjan Sb?",
     "question_variants": [],
     "answer_type": "extractive",
-    "gold_answer": "The Hugo Trading Sdn Bhd receipt shows the address: LOT 8&9, KOMPLEKS PASAR BORONG SELANGOR, 43300 SERI KEMBANGAN, SEL.",
+    "gold_answer": "The Petron Bkt Lanjan Sb receipt shows the address: KM 458.4 BKT LANJAN UTARA, L/RAYA UTARA SELATAN,SG BULOH 47000 SUNGAI BUL.",
     "key_facts": [
-      "LOT 8&9, KOMPLEKS PASAR BORONG SELANGOR, 43300 SERI KEMBANGAN, SEL"
+      "47000",
+      "SG BULOH  SUNGAI BUL"
     ],
     "gold_sources": [
-      "receipt_X51005806718.jpg"
+      "receipt_X51005230605.jpg"
     ],
     "acceptable_sources": [],
     "requires": {
@@ -478,15 +802,16 @@
   },
   {
     "id": "rcpt-addr-04",
-    "question": "What address is printed on the receipt from Image Printec (M) Sdn Bhd?",
+    "question": "What address is printed on the receipt from Potters Garden Sdn Bhd?",
     "question_variants": [],
     "answer_type": "extractive",
-    "gold_answer": "The Image Printec (M) Sdn Bhd receipt shows the address: NO. 12A-G, JALAN WANGSA DELIMA 11, D'WANGSA WANGSA MAJU, 53300 KUALA LUMPUR..",
+    "gold_answer": "The Potters Garden Sdn Bhd receipt shows the address: BATU 11 . SG BULOH , 47000 SELANGOR ..",
     "key_facts": [
-      "NO. 12A-G, JALAN WANGSA DELIMA 11, D'WANGSA WANGSA MAJU, 53300 KUALA LUMPUR."
+      "47000",
+      "SELANGOR"
     ],
     "gold_sources": [
-      "receipt_X51005806696.jpg"
+      "receipt_X51005719888.jpg"
     ],
     "acceptable_sources": [],
     "requires": {
@@ -499,15 +824,16 @@
   },
   {
     "id": "rcpt-addr-05",
-    "question": "What address is printed on the receipt from Kaison Furnishing Sdn Bhd?",
+    "question": "What address is printed on the receipt from Premio Stationery Sdn Bhd?",
     "question_variants": [],
     "answer_type": "extractive",
-    "gold_answer": "The Kaison Furnishing Sdn Bhd receipt shows the address: LOT NO. L3-012, LEVEL 3, MYTOWN SHOPPING CENTRE, NO. 6, JALAN COCHRANE, SEKSYEN 90 55100 KUALA LUMPUR..",
+    "gold_answer": "The Premio Stationery Sdn Bhd receipt shows the address: NO 57, JALAN SS 3/29, 47300 PETALING JAYA, SELANGOR.",
     "key_facts": [
-      "LOT NO. L3-012, LEVEL 3, MYTOWN SHOPPING CENTRE, NO. 6, JALAN COCHRANE, SEKSYEN 90 55100 KUALA LUMPUR."
+      "47300",
+      "SELANGOR"
     ],
     "gold_sources": [
-      "receipt_X51005715007.jpg"
+      "receipt_X51005621482.jpg"
     ],
     "acceptable_sources": [],
     "requires": {
@@ -520,15 +846,16 @@
   },
   {
     "id": "rcpt-addr-06",
-    "question": "What address is printed on the receipt from Keda Papan Yew Chjan?",
+    "question": "What address is printed on the receipt from Saint Heart Pastry?",
     "question_variants": [],
     "answer_type": "extractive",
-    "gold_answer": "The Keda Papan Yew Chjan receipt shows the address: LOT 276 JALAN BANTING 800 DEN SELANGOR..",
+    "gold_answer": "The Saint Heart Pastry receipt shows the address: 29,JLN SJ 17, TMN SELAYANG JAYA, 68100 BATU CAVES, SELANGOR.",
     "key_facts": [
-      "LOT 276 JALAN BANTING 800 DEN SELANGOR."
+      "68100",
+      "SELANGOR"
     ],
     "gold_sources": [
-      "receipt_X51005724623.jpg"
+      "receipt_X51005719905.jpg"
     ],
     "acceptable_sources": [],
     "requires": {
@@ -541,15 +868,81 @@
   },
   {
     "id": "rcpt-addr-07",
-    "question": "What address is printed on the receipt from La Stationery Sdn Bhd?",
+    "question": "What address is printed on the receipt from Sayang You Station Sdn Bhd?",
     "question_variants": [],
     "answer_type": "extractive",
-    "gold_answer": "The La Stationery Sdn Bhd receipt shows the address: NO.8, JALAN 46/26, TAMAN SRI RAMPAI, 53300 KUALA LUMPUR..",
+    "gold_answer": "The Sayang You Station Sdn Bhd receipt shows the address: LOT G18 & G19, JLN 8/27A WANGSA MAJU (AEON BIG SHOPPING CENTER) 53300 KUALA LUMPUR.",
     "key_facts": [
-      "NO.8, JALAN 46/26, TAMAN SRI RAMPAI, 53300 KUALA LUMPUR."
+      "53300"
     ],
     "gold_sources": [
-      "receipt_X51005663307.jpg"
+      "receipt_X51005806695.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-08",
+    "question": "What address is printed on the receipt from Secure Parking Corporation S/B?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Secure Parking Corporation S/B receipt shows the address: RIVERWALK VILLAGE BATU 3, JALAN IPOH 51200 KL..",
+    "key_facts": [
+      "51200",
+      "JALAN IPOH  KL"
+    ],
+    "gold_sources": [
+      "receipt_X51005288570.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-09",
+    "question": "What address is printed on the receipt from Sen Lee Heong Restaurant?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Sen Lee Heong Restaurant receipt shows the address: G-0-1 ,M.AVENUE NO.1 ,JLN 1/38A, SEGAMBUT BAHAGIA,51200, K.LUMPUL.",
+    "key_facts": [
+      "51200",
+      "K.LUMPUL"
+    ],
+    "gold_sources": [
+      "receipt_X51005719863.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-10",
+    "question": "What address is printed on the receipt from Sin Lianhap Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Sin Lianhap Sdn Bhd receipt shows the address: LOT 13, JALAN IPOH, KG BATU 30, ULU YAM LAMA 44300 BTG KALI, SELANGOR..",
+    "key_facts": [
+      "44300",
+      "SELANGOR"
+    ],
+    "gold_sources": [
+      "receipt_X51005230621.jpg"
     ],
     "acceptable_sources": [],
     "requires": {
@@ -575,27 +968,11 @@
     },
     "difficulty": "medium",
     "human_verified": false,
-    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)",
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
   },
   {
     "id": "rcpt-absent-02",
-    "question": "What was the total amount on the receipt from Olive9 Pharmacy Sdn Bhd?",
-    "question_variants": [],
-    "answer_type": "not_found",
-    "gold_answer": "No receipt from Olive9 Pharmacy Sdn Bhd exists in the files.",
-    "key_facts": [],
-    "gold_sources": [],
-    "acceptable_sources": [],
-    "requires": {
-      "visual_tier": true,
-      "multi_file": false
-    },
-    "difficulty": "medium",
-    "human_verified": false,
-    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
-  },
-  {
-    "id": "rcpt-absent-03",
     "question": "What was the total amount on the receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd?",
     "question_variants": [],
     "answer_type": "not_found",
@@ -609,10 +986,11 @@
     },
     "difficulty": "medium",
     "human_verified": false,
-    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)",
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
   },
   {
-    "id": "rcpt-absent-04",
+    "id": "rcpt-absent-03",
     "question": "What was the total amount on the receipt from Semboyan Tegas Sdn Bhd?",
     "question_variants": [],
     "answer_type": "not_found",
@@ -626,14 +1004,33 @@
     },
     "difficulty": "medium",
     "human_verified": false,
-    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)",
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+  },
+  {
+    "id": "rcpt-absent-04",
+    "question": "What was the total amount on the receipt from The Cut Steakhouse &Burgers?",
+    "question_variants": [],
+    "answer_type": "not_found",
+    "gold_answer": "No receipt from The Cut Steakhouse &Burgers exists in the files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)",
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
   },
   {
     "id": "rcpt-absent-05",
-    "question": "What was the total amount on the receipt from Bemed (Sp) Sdn. Bhd?",
+    "question": "What was the total amount on the receipt from Biru Petroleum?",
     "question_variants": [],
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Bemed (Sp) Sdn. Bhd exists in the files.",
+    "gold_answer": "No receipt from Biru Petroleum exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -643,14 +1040,15 @@
     },
     "difficulty": "medium",
     "human_verified": false,
-    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)",
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
   },
   {
     "id": "rcpt-absent-06",
-    "question": "What was the total amount on the receipt from Five Star Cash & Carry?",
+    "question": "What was the total amount on the receipt from Platinum Racking Sdn Bhd?",
     "question_variants": [],
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Five Star Cash & Carry exists in the files.",
+    "gold_answer": "No receipt from Platinum Racking Sdn Bhd exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -660,7 +1058,8 @@
     },
     "difficulty": "medium",
     "human_verified": false,
-    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)",
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
   },
   {
     "id": "rcpt-count-01",

@@ -30,11 +30,15 @@ def norm_path(p: str) -> str:
 
 def path_matches(gold: str, candidate: str) -> bool:
     """True when `candidate` (usually absolute) refers to `gold` (usually
-    corpus-relative). Suffix-based, separator/case-insensitive."""
+    corpus-relative). Suffix-anchored, separator/case-insensitive. Flat gold
+    names (no '/') anchor on the final path segment — safe only when gold
+    basenames are unique within a dataset, which the runner asserts at
+    golden-load time (review #35: same-named files in nested corpora would
+    otherwise cross-match)."""
     g, c = norm_path(gold), norm_path(candidate)
     if not g or not c:
         return False
-    return c == g or c.endswith("/" + g) or (("/" not in g) and c.rsplit("/", 1)[-1] == g)
+    return c == g or c.endswith("/" + g)
 
 
 def _relevance_of(candidate: str, qrels: Mapping[str, int]) -> int:

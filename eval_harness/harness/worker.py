@@ -125,10 +125,13 @@ def phase_boot(payload: dict) -> dict:
 
     from src.llm import active_provider
     from src.inference.profiles import default_text_profile, get_profile
-    from src.inference.llama_server_binary import find_llama_server
-
     prof = get_profile(default_text_profile())
     try:
+        # import inside the try so a renamed symbol reports as <unresolved>
+        # instead of crashing boot (review #36 — the resolve_binary
+        # ImportError did exactly that)
+        from src.inference.llama_server_binary import find_llama_server
+
         binary = str(find_llama_server())
     except Exception as e:  # noqa: BLE001 — report, don't crash boot
         binary = f"<unresolved: {e}>"

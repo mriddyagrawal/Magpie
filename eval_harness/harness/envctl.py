@@ -79,7 +79,7 @@ _BASE_PASSTHROUGH = ("PATH", "HOME", "TMPDIR", "LANG", "LC_ALL")
 # layer agreeing it was told to.
 MODEL_CONFIGS: dict[str, dict] = {
     "lfm-local": {"provider": "local", "grammar": True, "env": {}},
-    "gemma26b-local": {"provider": "local", "grammar": True, "env": None},
+    "gemma26b-local": {"provider": "local", "grammar": True, "env": {}},
     "gemma26b-openrouter": {
         "provider": "openrouter",
         "grammar": False,  # codebase choice, not API limit — PLAN §2 factor 2
@@ -202,7 +202,15 @@ def build_env(
     env["HF_HUB_CACHE"] = str(SHARED_MODEL_CACHE / "hub")
     env["TRANSFORMERS_CACHE"] = str(SHARED_MODEL_CACHE)
     env["FASTEMBED_CACHE_PATH"] = str(SHARED_MODEL_CACHE / "fastembed")
-    env["HF_HUB_OFFLINE"] = "1"
+    # NO HF_HUB_OFFLINE: transformers' offline mode structurally fails on
+    # adapter-style repos with no config.json (colqwen2.5-v0.2) — the missing
+    # -file probe lands in the connection-error branch and raises where the
+    # online 404 path falls back gracefully (verified empirically 2026-08-28;
+    # transformers hub.py cached_files consults .no_exist only when a
+    # _commit_hash is passed, which these probes don't). Production runs
+    # online, so this is also baseline-faithful. The zero-download invariant
+    # is enforced POST-HOC instead: every run asserts cache_fingerprint()
+    # unchanged (envctl), failing the run loudly if anything downloaded.
 
     # --- per-run services ---
     env["QDRANT_CLUSTER_ENDPOINT"] = f"http://127.0.0.1:{ports.qdrant_http}"
@@ -249,6 +257,9 @@ def build_env(
     # Every .env name must therefore be explicitly set above or consciously
     # listed in ACCEPTED_ENV_LEAKS; a new .env line fails here loudly until
     # someone classifies it.
+    # Assumes the repo .env is the one load_dotenv will find (true for any
+    # cwd inside the repo, incl. the documented invocation; a .env picked up
+    # from elsewhere is outside this guard's sight - reviewer note).
     repo_root = Path(__file__).resolve().parents[2]
     unmanaged = dotenv_names(repo_root) - set(env) - ACCEPTED_ENV_LEAKS
     if unmanaged:
@@ -315,14 +326,16 @@ def cache_fingerprint() -> dict:
     """Cheap before/after probe of the shared cache: file count + total bytes.
     HF_HUB_OFFLINE should make these identical across a run; the isolation
     test asserts it (zero-bytes-downloaded exit criterion, PLAN.md Phase 0).
-    `.locks` entries are excluded — the hub writes those even on pure cache
-    hits (the exact reason HF_HUB_OFFLINE was chosen over a read-only mount),
-    so counting them would fail a correct run (review #30)."""
+    `.locks` and `.no_exist` entries are excluded — the hub writes lockfiles
+    on cache hits and zero-byte negative-cache markers on 404 probes (runs
+    are online, matching production; see build_env's cache-contract note),
+    and neither is model bytes; counting them would fail a correct run
+    (review #30)."""
     n_files = 0
     total = 0
     if SHARED_MODEL_CACHE.exists():
         for p in SHARED_MODEL_CACHE.rglob("*"):
-            if ".locks" in p.parts:
+            if ".locks" in p.parts or ".no_exist" in p.parts:
                 continue
             if p.is_file():
                 n_files += 1

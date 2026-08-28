@@ -37,7 +37,7 @@ def test_cache_contract_present_and_offline():
     assert env["HF_HUB_CACHE"] == cache + "/hub"
     assert env["TRANSFORMERS_CACHE"] == cache
     assert env["FASTEMBED_CACHE_PATH"] == cache + "/fastembed"
-    assert env["HF_HUB_OFFLINE"] == "1"
+    assert "HF_HUB_OFFLINE" not in env  # online like production; zero-download enforced post-hoc
     assert env["MAGPIE_DATA_DIR"] == "/tmp/x"
 
 

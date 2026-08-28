@@ -83,6 +83,22 @@ def main() -> int:
 
     dataset = load_dataset(config["dataset"], config.get("dataset_dir"))
     golden = dataset["golden"]
+
+    # Review #37: a dataset whose items require the visual tier must not be
+    # run with visual search disabled — the run would complete and score a
+    # different system than the golden set declares.
+    needs_visual = any((q.get("requires") or {}).get("visual_tier") for q in golden)
+    if needs_visual and not params.get("fast_search"):
+        raise SystemExit(
+            f"dataset {config['dataset']!r} has visual_tier-required items but "
+            f"the config sets fast_search={params.get('fast_search')!r} — enable "
+            f"it explicitly (see baseline.json _notes) or use a text dataset"
+        )
+    # Review #35: flat gold basenames anchor path matching on the final
+    # segment, which is only sound when basenames are unique.
+    basenames = [Path(f["name"]).name for f in dataset["manifest"].get("files", [])]
+    if len(basenames) != len(set(basenames)):
+        raise SystemExit(f"dataset {config['dataset']!r} has duplicate file basenames")
     questions = [{"id": q["id"], "question": q["question"]} for q in golden]
     if args.questions_limit:
         questions = questions[: args.questions_limit]

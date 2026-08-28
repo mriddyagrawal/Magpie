@@ -38,6 +38,40 @@ DEFAULT_CORPUS = Path.home() / "Documents" / "Magpie-eval-corpora" / "receipts"
 
 N_CORPUS = 150          # decided 2026-08-28 (PLAN §9.5)
 GENERATOR = "prepare_receipts.py (mechanical, SROIE labels)"
+# Pinned dataset revision (review #41): resolved 2026-08-28. Without a pin,
+# "deterministic" depends on whatever HEAD resolves on rerun day.
+REVISION = "bffe40c26759f3376ec2b3ae9031dbba54cd587c"
+
+# Tokens too generic to prove two company strings are the same vendor
+# (review #42): legal suffixes and ubiquitous trade words.
+_GENERIC_TOKENS = {
+    "sdn", "bhd", "s/b", "sb", "the", "and", "enterprise", "trading",
+    "store", "mart", "shop", "restoran", "restaurant", "cafe", "sales",
+    "services", "service", "company", "co", "malaysia",
+}
+
+
+def _company_tokens(name: str) -> set[str]:
+    toks = re.findall(r"[a-z0-9]+", name.casefold())
+    return {t for t in toks if len(t) >= 4 and t not in _GENERIC_TOKENS}
+
+
+def address_facts(addr: str) -> list[str]:
+    """Atomic, binary-checkable facts from an OCR address (review #39): the
+    5-digit postcode and the trailing locality segment. Full OCR addresses
+    are too noisy for exact matching and would misattribute grading noise
+    to scaffolding."""
+    facts: list[str] = []
+    m = re.search(r"\b(\d{5})\b", addr or "")
+    if m:
+        facts.append(m.group(1))
+    segments = [s.strip() for s in re.split(r"[,\n]", addr or "") if s.strip()]
+    if segments:
+        last = segments[-1]
+        last = re.sub(r"\b\d{5}\b", "", last).strip(" .,-")
+        if 3 <= len(last) <= 40:
+            facts.append(last)
+    return facts
 
 
 def norm_company(raw: str) -> str:
@@ -63,19 +97,43 @@ def sha256_file(p: Path) -> str:
 
 
 def load_split():
-    from datasets import load_dataset
+    from datasets import Image, load_dataset
 
-    ds = load_dataset("jsdnrs/ICDAR2019-SROIE", split="test")
+    ds = load_dataset("jsdnrs/ICDAR2019-SROIE", split="test", revision=REVISION)
+    # decode=False -> original bytes written verbatim (review #40): no second
+    # lossy JPEG pass altering the pixels a visual retriever reads.
+    ds_raw = ds.cast_column("image", Image(decode=False))
     rows = []
-    for i, row in enumerate(ds):
+    for i, row in enumerate(ds_raw):
         rows.append({"i": i, **{k: row[k] for k in row.keys()}})
     return rows
+
+
+def verify(corpus_dir: Path) -> int:
+    """Re-hash the on-disk corpus against the committed manifest (review #41:
+    the sha256s exist to be load-bearing, not decorative)."""
+    manifest = json.loads((DATASET_DIR / "manifest.json").read_text(encoding="utf-8"))
+    bad = 0
+    for entry in manifest["files"]:
+        p = corpus_dir / entry["name"]
+        if not p.exists():
+            print(f"MISSING {entry['name']}")
+            bad += 1
+        elif sha256_file(p) != entry["sha256"]:
+            print(f"HASH MISMATCH {entry['name']}")
+            bad += 1
+    print(f"verify: {len(manifest['files']) - bad}/{len(manifest['files'])} files OK")
+    return 1 if bad else 0
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus-dir", default=str(DEFAULT_CORPUS))
+    ap.add_argument("--verify", action="store_true",
+                    help="re-hash the corpus against the committed manifest and exit")
     args = ap.parse_args()
+    if args.verify:
+        raise SystemExit(verify(Path(args.corpus_dir).expanduser()))
     corpus_dir = Path(args.corpus_dir).expanduser()
     corpus_dir.mkdir(parents=True, exist_ok=True)
     DATASET_DIR.mkdir(parents=True, exist_ok=True)
@@ -107,8 +165,17 @@ def main() -> None:
         if img is None:
             raise SystemExit(f"row {row_key(r)} has no image column")
         if not dest.exists():
-            img = img.convert("RGB") if img.mode not in ("RGB", "L") else img
-            img.save(dest, quality=92)
+            # decode=False rows carry the ORIGINAL bytes — written verbatim
+            # (review #40: no second lossy encode altering retrieval pixels)
+            raw = img.get("bytes") if isinstance(img, dict) else None
+            if raw:
+                dest.write_bytes(raw)
+            else:  # fallback for rows without raw bytes
+                pil = img if not isinstance(img, dict) else None
+                if pil is None:
+                    raise SystemExit(f"row {row_key(r)}: no bytes and no PIL image")
+                pil = pil.convert("RGB") if pil.mode not in ("RGB", "L") else pil
+                pil.save(dest, quality=95)
         r["_file"] = name
         manifest_files.append(name)
 
@@ -130,11 +197,20 @@ def main() -> None:
     unique_companies = {c: rs[0] for c, rs in by_company.items() if len(rs) == 1}
     multi_companies = {c: rs for c, rs in by_company.items() if 2 <= len(rs) <= 5}
 
+    # Held-out vendors for not_found items (review #42): exact-string absence
+    # is not enough — OCR'd company labels vary ("X" vs "X SDN BHD"), so a
+    # vendor could be present under a variant spelling. Require zero overlap
+    # of significant tokens with ANY corpus company.
+    corpus_tokens: set[str] = set()
+    for c in by_company:
+        corpus_tokens |= _company_tokens(c)
     held_out_companies = []
-    corpus_company_set = set(by_company)
     for r in held_out:
         c = norm_company(entities(r)["company"])
-        if c and c not in corpus_company_set and c not in held_out_companies:
+        if not c or c in held_out_companies:
+            continue
+        toks = _company_tokens(c)
+        if toks and not (toks & corpus_tokens):
             held_out_companies.append(c)
 
     golden: list[dict] = []
@@ -156,13 +232,16 @@ def main() -> None:
             "generator": GENERATOR,
         })
 
-    # --- extractive: totals (10), dates (8), addresses (7) -------------------
+    # --- extractive: totals (20), dates (12), addresses (10) -----------------
+    # Raised from 10/8/7 (review #38): H1 is stated on extractive questions,
+    # and at n=25 its CI was ±14 points — too wide for the stated threshold.
     uniq = sorted(unique_companies.items())
-    picked_total = [(c, r) for c, r in uniq if norm_total(entities(r)["total"])][:10]
+    picked_total = [(c, r) for c, r in uniq if norm_total(entities(r)["total"])][:20]
     rest = [(c, r) for c, r in uniq if (c, r) not in picked_total]
-    picked_date = [(c, r) for c, r in rest if entities(r)["date"]][:8]
+    picked_date = [(c, r) for c, r in rest if entities(r)["date"]][:12]
     rest = [(c, r) for c, r in rest if (c, r) not in picked_date]
-    picked_addr = [(c, r) for c, r in rest if entities(r)["address"]][:7]
+    picked_addr = [(c, r) for c, r in rest
+                   if entities(r)["address"] and address_facts(entities(r)["address"])][:10]
 
     for n, (c, r) in enumerate(picked_total, 1):
         e = entities(r)
@@ -183,10 +262,13 @@ def main() -> None:
 
     for n, (c, r) in enumerate(picked_addr, 1):
         e = entities(r)
+        # atomic facts (postcode + locality), never the raw OCR string —
+        # review #39: long OCR addresses fail exact-match and key_fact_spans
+        # for formatting reasons, misattributing grading noise to scaffolding
         add(f"rcpt-addr-{n:02d}",
             f"What address is printed on the receipt from {c}?",
             "extractive", f"The {c} receipt shows the address: {e['address']}.",
-            [e["address"]], [r["_file"]], "medium")
+            address_facts(e["address"]), [r["_file"]], "medium")
 
     # --- abstention: 6 held-out companies ------------------------------------
     for n, c in enumerate(held_out_companies[:6], 1):
@@ -195,6 +277,11 @@ def main() -> None:
             "not_found",
             f"No receipt from {c} exists in the files.",
             [], [], "medium")
+        golden[-1]["review_note"] = (
+            "founder-review priority: vendor absence established by "
+            "token-overlap filtering of OCR labels; verify it is truly "
+            "not in the corpus under any variant spelling"
+        )
 
     # --- aggregation / enumeration over recurring companies ------------------
     agg = sorted(multi_companies.items())[:5]
@@ -228,6 +315,7 @@ def main() -> None:
     (DATASET_DIR / "manifest.json").write_text(json.dumps({
         "dataset": "receipts",
         "source": "jsdnrs/ICDAR2019-SROIE (test split; CC-BY-4.0)",
+        "source_revision": REVISION,
         "n_files": len(manifest_files),
         "selection": f"first {N_CORPUS} of test split under deterministic sort",
         "files": [{"name": r["_file"], "sha256": r["_sha"]} for r in corpus_rows],

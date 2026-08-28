@@ -11,6 +11,20 @@ This folder (`eval_harness/`) is self-contained. The legacy `Evaluations/` folde
 separate one-off flow and is deliberately **not** used, extended, or modified by anything
 here.
 
+**Central hypothesis (what the baseline eval must settle):** working theory is that
+LFM2.5 is smart enough and quality is bounded by everything around it — indexing,
+retrieval, prompting, memory. "Model vs. scaffolding" is partly a false dichotomy
+(scaffolding is how a 3B does a big model's job), so the sharper question is which
+failure classes scaffolding can fix at acceptable latency, and which stay broken no
+matter what surrounds the model. The diagnostic split in §5 attributes this directly:
+gold file in top-k but answer wrong → model's fault; gold file never retrieved →
+scaffolding's fault. Falsifiable form, tested on the baseline (current-main) run:
+**where the gold file is retrieved and fits in budget, LFM answers ≥85% of extractive
+questions correctly.** If it holds, effort goes to retrieval/indexing/memory; if it
+lands near 60%, we talk model routing. Expected outcome: holds for extractive, fails
+for aggregation and abstention — two carve-outs that likely need map-reduce-style
+scaffolding or a cloud fallback.
+
 ---
 
 ## 1. Design principles

@@ -47,8 +47,12 @@
       "fact_spans": 0,
       "file_level_image": 36
     },
+    "accuracy_by_basis": {
+      "file_level_image": 0.611
+    },
     "accuracy_on_eligible": 0.611,
-    "note": "per-arm number; never compare raw across arms (PLAN H1)"
+    "mixed_basis": false,
+    "note": "per-arm number; never compare raw across arms OR across bases (PLAN H1). accuracy_on_eligible is None when bases are mixed - use accuracy_by_basis."
   },
   "product_findings": {
     "not_found_flag_missing": 0,
@@ -59,6 +63,7 @@
     "p95_total_s": 23.3
   },
   "errors": 0,
+  "enriched_at_sha": "a6e8948516ce93470c3861356ba834882d6536a0",
   "golden_set": {
     "items": 53,
     "human_verified": 0,

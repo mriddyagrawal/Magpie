@@ -25,7 +25,7 @@ Config `baseline` · dataset `receipts` · 53 questions · backend `96f3aea3c620
 ## H1 slice (per-arm; never compare raw across arms)
 
 - extractive n=42, eligible n=38 (0.905) — basis: {'fact_spans': 0, 'file_level_image': 38}
-- accuracy on eligible: 0.026
+- accuracy by basis: {'file_level_image': 0.026} | combined: 0.026
 
 ## Product findings (deterministic observations, not verdicts)
 

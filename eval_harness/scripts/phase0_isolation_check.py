@@ -156,7 +156,7 @@ def main() -> int:
     fp_app_after = envctl.appdata_fingerprint()
     fp_cache_after = envctl.cache_fingerprint()
     check("WRITE isolation: real app dir untouched", fp_app_before == fp_app_after)
-    check("ZERO downloads: cache unchanged", fp_cache_before == fp_cache_after,
+    check("ZERO model-blob downloads (locks/no_exist metadata excluded)", fp_cache_before == fp_cache_after,
           f"before={fp_cache_before} after={fp_cache_after}")
     check("READ isolation: scratch qdrant storage populated",
           any((run_dir / "qdrant").rglob("*")), "")

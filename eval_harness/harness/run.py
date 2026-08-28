@@ -215,21 +215,40 @@ def main() -> int:
     finally:
         qdrant.stop()
 
+    fp_cache_after = envctl.cache_fingerprint()
     run_record["isolation"] = {
         "real_appdata_untouched": envctl.appdata_fingerprint() == fp_app_before,
-        "cache_unchanged": envctl.cache_fingerprint() == fp_cache_before,
+        # "unchanged" = no model blobs added/removed/resized; .locks and
+        # .no_exist negative-cache metadata excluded by definition (#48)
+        "cache_model_blobs_unchanged": fp_cache_after == fp_cache_before,
+        "cache_before": fp_cache_before,
+        "cache_after": fp_cache_after,
     }
     run_record["wall_s_total"] = round(time.monotonic() - t0, 1)
     save_record()
-
-    if not run_record["isolation"]["real_appdata_untouched"]:
-        print("[run] WARNING: real app dir fingerprint changed — investigate "
-              "before trusting this run", file=sys.stderr)
 
     if not args.index_only:
         print("[run] enriching + scoring …")
         enrich.enrich_run(run_dir, golden, params)
         print(f"[run] report: {run_dir / 'report.md'}")
+
+    # Isolation violations FAIL the run (review #47: a compensating control
+    # that only writes a JSON field nobody must read is not a control). The
+    # artifacts above are written first — they are the evidence.
+    iso = run_record["isolation"]
+    if not iso["cache_model_blobs_unchanged"]:
+        raise SystemExit(
+            f"[run] FAILED: shared model cache changed during the run "
+            f"(before={fp_cache_before} after={fp_cache_after}) — something "
+            f"downloaded. Runs are no longer comparable until the cache is "
+            f"reconciled; see {run_dir / 'run.json'}"
+        )
+    if not iso["real_appdata_untouched"]:
+        raise SystemExit(
+            f"[run] FAILED: the REAL app data dir changed during the run — "
+            f"isolation broken; do not trust these artifacts. "
+            f"See {run_dir / 'run.json'}"
+        )
 
     print(f"[run] done in {run_record['wall_s_total']}s -> {run_dir}")
     return 0

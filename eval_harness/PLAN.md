@@ -297,10 +297,14 @@ questions sourced to this file: derivable from the summary alone? yes/no →
   "qa_id": "receipts-007", "variant": 0,
   "rewritten_query": "…",
   "solo_gated": false,                              // did gate_to_solo fire on this question
-  "retrieved": [{"path": "…", "score": 0.031, "rank": 1,
-                 "in_prompt": "full | truncated | dropped | solo_excluded"}, …],
-  // full ranked list at k_max; in_prompt records what ACTUALLY reached the generator
-  // (observed, never inferred from rank/budget arithmetic)
+  "retrieved": [{"path": "…", "score": 0.031, "rank": 1}, …],
+  "in_prompt": {"<basename>":
+      "full | truncated | dropped | solo_excluded | absent | unknown_log_truncated"},
+  // observed from the backend's own prompt markers (the '--- File N: … ---'
+  // headers, the '…(truncated to fit…)' marker inside a file's block, and the
+  // omitted-files context note) — never inferred from rank/budget arithmetic.
+  // unknown_log_truncated = the LLM log's 50KB per-string cap cut the middle
+  // of the request, so presence is undecidable (three-valued honesty).
   "key_fact_spans": {"0": true, "1": false},
   // each key fact string-matched (normalized) against the assembled prompt read from
   // the LLM request log. File-level presence is NOT enough: head truncation

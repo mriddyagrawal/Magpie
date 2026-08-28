@@ -223,17 +223,59 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
         if out["solo_gated"] and len(ranked_paths) >= 2 and ret:
             r0, r1 = ret["ranked"][0], ret["ranked"][1]
             out["solo_margin_observed"] = round(r0["score"] - r1["score"], 3)
+            # self-validation (review #46): the gate inference is a heuristic
+            # over two separate passes; require the margin the gate itself
+            # keys on to corroborate, and flag when it doesn't.
+            try:
+                out["gate_inference_disagreement"] = (
+                    out["solo_margin_observed"] < float(params.get("solo_margin", 2.0))
+                )
+            except (TypeError, ValueError):
+                out["gate_inference_disagreement"] = None
 
-        # observed prompt composition
+        # observed prompt composition — from the backend's OWN markers, not
+        # bare filename presence (review #44: the "--- File N: <path> ---"
+        # header AND the omitted-files context note both name files whose
+        # content was cut, so filename presence alone reads truncated and
+        # dropped files as "full", emptying §5's budget-fault class).
         req = find_answer_request(reqs, row.get("question", "")) if reqs else None
         if req:
             ptext = req["text"]
             unknown = req["truncated_in_log"]
-            in_prompt = {}
-            for h in post_gate:
-                base = Path(h["path"]).name
-                present = base.casefold() in ptext.casefold()
-                in_prompt[base] = "full" if present else ("unknown_log_truncated" if unknown else "absent")
+            # split into per-file blocks on the exact header answer.py emits
+            # (answer.py:742: "--- File {i}: {display} ---")
+            header_re = re.compile(r"--- File \d+: (.+?) ---")
+            blocks: dict[str, str] = {}
+            matches = list(header_re.finditer(ptext))
+            for i, m in enumerate(matches):
+                end = matches[i + 1].start() if i + 1 < len(matches) else len(ptext)
+                blocks[Path(m.group(1).strip()).name.casefold()] = ptext[m.start():end]
+            # files named by the omitted-note (answer.py:141-142)
+            omitted_note = re.search(
+                r"\(Context note: \d+ lower-ranked source file\(s\) were omitted[^)]*\)",
+                ptext,
+            )
+            omitted_text = omitted_note.group(0).casefold() if omitted_note else ""
+
+            def classify(path: str) -> str:
+                base = Path(path).name.casefold()
+                block = blocks.get(base)
+                if block is not None:
+                    if "…(truncated to fit the local model's context window)" in block:
+                        return "truncated"
+                    return "full"
+                if base in omitted_text:
+                    return "dropped"
+                return "unknown_log_truncated" if unknown else "absent"
+
+            in_prompt = {Path(h["path"]).name: classify(h["path"]) for h in post_gate}
+            # pre-gate files the solo gate excluded never reached the prompt
+            if params.get("provider") == "local" and len(post_gate) == 1:
+                post_names = {Path(h["path"]).name for h in post_gate}
+                for h in (ret or {}).get("ranked", [])[: int(params.get("top_k", 5))]:
+                    name = Path(h["path"]).name
+                    if name not in post_names and name not in in_prompt:
+                        in_prompt[name] = "solo_excluded"
             out["in_prompt"] = in_prompt
             # Fact-span observability only exists for TEXT blocks. When the
             # gold sources are images, the prompt carries pixels the log

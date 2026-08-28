@@ -1,6 +1,6 @@
 {
-  "run_id": "20260828T090619Z-receipts-topk3",
-  "config_name": "topk3",
+  "run_id": "h2-vague-rw0",
+  "config_name": "h2-vague-rw0",
   "dataset": "receipts",
   "params": {
     "model_config": "lfm-local",
@@ -8,9 +8,9 @@
     "temperature": 0.0,
     "solo_margin": 2.0,
     "local_n_ctx": 16384,
-    "top_k": 3,
+    "top_k": 5,
     "top_k_retrieval_max": 12,
-    "rewrite": true,
+    "rewrite": false,
     "enumerate_lists": true,
     "fast_search": true,
     "index_fast_tier": true,
@@ -26,8 +26,10 @@
     "grammar": true
   },
   "index_params_hash": "5ff3e0adf0448de6",
-  "questions": 53,
-  "backend_git_sha": "c046326b7170614c45f41ad571585cf7a1f58007",
+  "questions": 32,
+  "backend_git_sha": "6f4cf3d185f01b402401e7ebe75bcca22c5da6dd",
+  "harness_git_sha": "6f4cf3d185f01b402401e7ebe75bcca22c5da6dd",
+  "status": "complete",
   "machine": {
     "platform": "macOS-26.4.1-arm64-arm-64bit",
     "machine": "arm64",
@@ -48,7 +50,7 @@
     "LOCAL_N_CTX": "16384",
     "LOCAL_SOLO_MARGIN": "2.0",
     "LOCAL_TEMPERATURE": "0.0",
-    "MAGPIE_DATA_DIR": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260828T090619Z-receipts-topk3/raw/appdata",
+    "MAGPIE_DATA_DIR": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/h2-vague-rw0/raw/appdata",
     "MAGPIE_FORCE_PROVIDER": "local",
     "PATH": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/.venv/bin:/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/.venv/bin:/Users/mriddy/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:/Users/mriddy/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/Users/mriddy/.cargo/bin:/Users/mriddy/.claude/plugins/cache/claude-plugins-official/frontend-design/e33a9ec0973a/bin:/Users/mriddy/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:/Users/mriddy/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin",
     "QDRANT_CLUSTER_ENDPOINT": "http://127.0.0.1:6533",
@@ -56,21 +58,15 @@
     "TRANSFORMERS_CACHE": "/Users/mriddy/Library/Application Support/Magpie/cache"
   },
   "dataset_manifest_files": 150,
-  "started_utc": "20260828T090619Z",
+  "started_utc": "20260828T095630Z",
   "ports": {
     "qdrant_http": 6533,
     "llama_base": 9400
   },
   "phases": {
     "retrieve": {
-      "wall_s": 95.4,
+      "wall_s": 18.0,
       "errors": 0
-    },
-    "answer": {
-      "wall_s": 1217.2,
-      "answered": 53,
-      "errors": 0,
-      "llm_log": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260828T090619Z-receipts-topk3/raw/appdata/logs/llm-2026-08-28T09-07-56Z.log"
     }
   },
   "reused_index_from": "20260828T081416Z-receipts-baseline",
@@ -86,7 +82,5 @@
       "bytes": 21540575951
     }
   },
-  "wall_s_total": 1313.3,
-  "status": "complete",
-  "_backfilled": "status/harness_git_sha absent because the run started pre-a6e8948; backfilled 2026-08-28, phases ran at backend_git_sha"
+  "wall_s_total": 18.6
 }

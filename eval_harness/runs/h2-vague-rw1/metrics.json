@@ -1,0 +1,48 @@
+{
+  "n_questions": 0,
+  "answer": {
+    "correct": null,
+    "partial": null,
+    "wrong": null,
+    "false_abstain": null,
+    "by_type": {}
+  },
+  "abstention": {
+    "n_not_found": 0,
+    "correct_abstain_rate": null,
+    "false_answer_rate": null
+  },
+  "retrieval": {},
+  "citations": {},
+  "solo_gate": {
+    "fire_rate": null
+  },
+  "h1_slice": {
+    "n_extractive": 0,
+    "n_eligible": 0,
+    "eligible_fraction": null,
+    "basis_counts": {
+      "fact_spans": 0,
+      "file_level_image": 0
+    },
+    "accuracy_by_basis": {},
+    "accuracy_on_eligible": null,
+    "mixed_basis": false,
+    "note": "per-arm number; never compare raw across arms OR across bases (PLAN H1). accuracy_on_eligible is None when bases are mixed - use accuracy_by_basis."
+  },
+  "product_findings": {
+    "not_found_flag_missing": 0,
+    "zero_citation_answers": 0
+  },
+  "latency": {
+    "p50_total_s": null,
+    "p95_total_s": null
+  },
+  "errors": 0,
+  "enriched_at_sha": "6f4cf3d185f01b402401e7ebe75bcca22c5da6dd",
+  "golden_set": {
+    "items": 32,
+    "human_verified": 0,
+    "status": "SILVER (provisional)"
+  }
+}

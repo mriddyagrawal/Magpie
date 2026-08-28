@@ -61,6 +61,12 @@ there is just blanket refusal.
 **Read**: the shipped config (k=5) answers 1 question in 47. One file (k=1) is
 22× better and 3.7× faster. The failure mode flips with k: low k
 force-answers (bad on not_found), high k blanket-refuses (bad on everything).
+Curve caveats (reviewer #67/#68): judge H3 on the H1-eligible column (extractive
+only) — enumeration items are exempt from k (the router widens their top_k, so
+they never varied) and dilute the "correct" column ~equally across arms; and the
+k=12 point is half a BUDGET result — twelve receipt images exceed ctx-16384, the
+gold file was evicted for 21/42 extractive questions (dropped 10→145), so its
+eligible half is a rank-biased survivor subset.
 
 ## Product bugs found (each verified in code)
 
@@ -93,8 +99,12 @@ force-answers (bad on not_found), high k blanket-refuses (bad on everything).
   bracket — beyond the ">40 = consistent with the ladder" band.
 - **H5 (gate recovers the collapse): BLOCKED on receipts** by bug #1 — the
   gate cannot fire there at any margin. Test on a text corpus or after the fix.
-- **H2 (rewrite), H4 (grammar): not yet run** (next ablations; ~20 min each
-  with the cached index).
+- **H2 (rewrite helps vague queries): REFUTED on receipts — and inverted.**
+  recall@5, retrieval-only arms: vague phrasings rewrite ON .875 vs OFF .906
+  (−3.1 pts; needed ≥+10); primary phrasings ON .936 vs OFF .979 (−4.3 pts).
+  Rewrite adds ~1.3–2s/query and slightly degrades ColQwen retrieval here.
+  Single-corpus result — §6's ≥2-corpora rule applies before generalizing.
+- **H4 (grammar): not yet run** (needs a grammar off-switch investigation).
 
 ## What this suggests for the product (owner's call, not tonight's)
 
@@ -111,7 +121,8 @@ force-answers (bad on not_found), high k blanket-refuses (bad on everything).
    `not_found` items carry specific review notes) — unlocks acting on numbers.
 2. Judge calibration (PLAN §7 Phase 3): both founders label the same 30–50
    judged rows; fixture includes unlike-gold phrasings.
-3. H2/H4 ablations on the cached index; H5 on a text corpus.
+3. H4 ablation (needs a grammar off-switch first); H5 on a text corpus;
+   re-test H2 on a second corpus before acting on the rewrite-off finding.
 4. Datasets 2–3 (personal_notes, furman_directory) per PLAN §6.
 5. Decide which product bugs to file as issues (drafts above are
    copy-pasteable; I did not file publicly from a silver-set night run).

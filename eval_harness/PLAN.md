@@ -37,8 +37,17 @@ extended to accuracy). Current docket (add/remove freely):
   own scaffolding-fault class.
 - **H2 — rewrite:** rewrite improves recall@5 on vague `question_variants` by ≥10
   points while moving keyword-style recall@5 by <5 points.
+  **RESULT (2026-08-28, receipts, retrieval-only arms): REFUTED — inverted.**
+  Vague: ON .875 vs OFF .906 (−3.1). Primary: ON .936 vs OFF .979 (−4.3).
+  Rewrite costs ~1.3–2s/query and slightly degrades ColQwen retrieval on this
+  corpus. Single-corpus; §6's ≥2-corpora rule before generalizing.
 - **H3 — context width:** extractive key-fact accuracy at `top_k_context=12` is ≥10
-  points below `top_k_context=3` even while retrieval recall rises. Answer-side: tested
+  points below `top_k_context=3` even while retrieval recall rises.
+  **RESULT (2026-08-28, receipts, 4-point curve k∈{1,3,5,12}): CONFIRMED beyond the
+  top band** — H1-eligible accuracy 61.1 → 15.8 → 2.6 → 0.0. Caveats: judge on the
+  extractive slice only (enumeration queries get router-widened top_k and never
+  varied — finding #67); the k=12 point is half a budget-eviction result (gold
+  dropped for 21/42 at ctx-16384 — finding #68). Answer-side: tested
   as a {3, 12} bracket costing two full runs, not by truncation (§2). Both bracket runs
   set `LOCAL_SOLO_MARGIN=0` — with the gate on, ~24% of questions ignore k entirely.
   Prior evidence this is real (`src/stage2/search.py:840`, 2026-08-24, 121-trace

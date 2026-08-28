@@ -89,7 +89,17 @@ def call_claude(prompt: str, model: str, timeout_s: int = 120) -> tuple[dict, st
     resolved = model
     usage = payload.get("modelUsage")
     if isinstance(usage, dict) and usage:
-        resolved = sorted(usage.keys())[0]
+        keys = sorted(usage.keys())
+        if len(keys) == 1:
+            resolved = keys[0]
+        else:
+            # #65: never guess among multiple models (alphabetical picked
+            # haiku over opus). Prefer the family of the requested model;
+            # if that's ambiguous, record ALL keys — a list showing the
+            # ambiguity beats a confident wrong string.
+            fam = model.split("-")[1] if "-" in model else model
+            fam_matches = [k for k in keys if fam in k]
+            resolved = fam_matches[0] if len(fam_matches) == 1 else json.dumps(keys)
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
         raise RuntimeError(f"no JSON object in judge reply: {text[:200]}")

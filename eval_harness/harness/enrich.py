@@ -130,12 +130,25 @@ def load_llm_requests(llm_log_path: Path) -> list[dict]:
             rec = json.loads(line)
         except Exception:  # noqa: BLE001
             continue
-        if rec.get("phase") != "request":
-            continue
-        text = "\n".join(
-            _string_leaves(rec.get("messages")) + _string_leaves(rec.get("system_prompt"))
-        )
-        reqs.append({"text": text, "truncated_in_log": _TRUNC_MARKER in text})
+        phase = rec.get("phase")
+        if phase == "request":
+            text = "\n".join(
+                _string_leaves(rec.get("messages")) + _string_leaves(rec.get("system_prompt"))
+            )
+            reqs.append({
+                "text": text,
+                "truncated_in_log": _TRUNC_MARKER in text,
+                "request_id": rec.get("request_id"),
+                "usage": None,
+            })
+        elif phase == "response" and rec.get("request_id"):
+            # pair token usage back onto its request (#69: prompt tokens are
+            # the missing variable for separating distractor count from
+            # context length)
+            for r in reversed(reqs):
+                if r.get("request_id") == rec["request_id"]:
+                    r["usage"] = rec.get("usage")
+                    break
     return reqs
 
 

@@ -79,10 +79,9 @@ practice:
 | `dataset` | `receipts`, `personal_notes`, `furman_directory` (+ optional `mmlongbench` yardstick) | index | one cached index per (dataset × index-side config) |
 | `col_model` | ColSmol vs ColQwen2.5 (confirm exact HF IDs in Phase 0) | index | doubles index builds; cached |
 | `summary_model` / summary prompt | current default (+ variants later) | index | summaries are written by the gen model at index time → index-side, not answer-side |
-| `gen_model` | LFM2.5-VL-3B vs Gemma (confirm exact IDs in Phase 0) | answer | full answer run per value |
-| `provider` | `local` (primary) vs cloud (optional axis) | answer | cloud runs are fast but cost API money |
+| `model_config` | 3 named configs (decided 2026-08-28): `lfm-local` (LFM2.5-VL-3B, grammar ON) · `gemma26b-local` (Gemma 4 26B-A4B, grammar ON) · `gemma26b-openrouter` (same model via free API, grammar OFF — the free tier forbids grammar enforcement) | answer | full run per value. ⚠ `gemma26b-openrouter` differs from `gemma26b-local` in provider AND grammar at once — differences between those two are not attributable to either factor alone |
 | `prompt_style` | `baseline` (current sandwich), `compact`, (room for more) | answer | full answer run per value |
-| `grammar` | enforced vs off (response_format / structured output) | answer | full answer run per value |
+| `grammar` | enforced vs off — H4 ablation, run on a LOCAL model config only (the `model_config` values above otherwise pin their own grammar setting) | answer | full answer run per value |
 | `rewrite` | on vs off | retrieval | scored via `--retrieval-only` (cheap) |
 | `top_k_retrieval` | scored at 1, 3, 5, 12 | retrieval | **free for retrieval metrics** — retrieve once at k=12, truncate the ranked list |
 | `top_k_context` | blocks fed to the generator: bracket {3, 12}, widen only if the bracket shows an effect | answer | **not free** — one full answer run per value (this is H3's axis) |
@@ -203,8 +202,9 @@ every corpus.
   "dataset": "receipts",
   "params": {
     "col_model": "…", "summary_model": "…",
-    "gen_model": "…", "provider": "local",
-    "prompt_style": "baseline", "grammar": true,
+    "model_config": "lfm-local",        // lfm-local | gemma26b-local | gemma26b-openrouter
+    "prompt_style": "baseline",
+    "grammar": true,                    // resolved from model_config unless an H4 ablation overrides it
     "rewrite": true,
     "top_k_retrieval_max": 12,
     "top_k_context": 5,                 // blocks fed to generator; confirm prod default in Phase 0
@@ -288,7 +288,7 @@ facts right? (no → generation/grounding problem). Every answer row carries all
 
 | Dataset | Source | Golden QA | Prep |
 |---|---|---|---|
-| `receipts` | **SROIE** (ICDAR 2019, CC-BY-4.0 mirror) — ~150–300 of 987 scanned receipts | Converted mechanically from labeled fields (total, date, vendor, address) → exact-match QA; plus a handful of hand-written cross-receipt aggregation questions | ~1 hr scripting |
+| `receipts` | **SROIE** (ICDAR 2019, CC-BY-4.0 mirror) — 150 of 987 scanned receipts (decided 2026-08-28) | Converted mechanically from labeled fields (total, date, vendor, address) → exact-match QA; plus a handful of hand-written cross-receipt aggregation questions | ~1 hr scripting |
 | `personal_notes` | User's syllabi / class notes / books (stays **out of the repo**, path in a local untracked config; judge pass on it requires explicit OK since content goes to the cloud judge) | Claude-generated via subagent fan-out: agent A extracts fact list per file → agent B writes questions from facts only (blind) → both founders review every item (silver→gold; expect to cut/fix 20–30%) | half a day incl. review |
 | `furman_directory` | Furman CSV corpus (already on disk) | Fresh golden set generated under §4.1 schema (structured-data QA: filters, aggregation, multi-hop) | ~2 hrs |
 | `mmlongbench` (optional yardstick) | MMLongBench-Doc: 135 real PDFs, 1,091 QA with evidence pages + 22.5% unanswerable, CC-BY-NC-4.0 | Ships with ground truth — adapter converts to §4.1 | ~2 hrs adapter |
@@ -312,11 +312,16 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 - Confirm the `furman_directory` and personal-notes corpus paths still exist on this
   machine (corpora live outside the repo by design; `manifest.json` records the
   expected root via a local untracked path config).
-- Confirm exact model IDs for both axes (gen: LFM2.5-VL-3B / Gemma; col: ColSmol /
-  ColQwen2.5) and that both are installable into the shared cache.
-- Pin the judge model (a Claude model ID) and create `judge/rubric.md` v1.
-- Decide git policy for `runs/` (proposal: commit config + metrics + reports, gitignore
-  raw appdata/logs).
+- Confirm exact model IDs for the three `model_config` values (LFM2.5-VL-3B GGUF; the
+  Gemma 4 26B-A4B GGUF **and whether this machine can actually serve it locally** —
+  MoE with ~4B active params should fit, verify; OpenRouter slug
+  `google/gemma-4-26b-a4b-it:free` per `.env.example`) and both col models, all
+  installable into the shared cache.
+- Set the judge (a high-tier Claude: Opus 5 or Fable 5) and create `judge/rubric.md` v1.
+  Pinning discipline: judge model ID + rubric version stamped on every verdict; never
+  mix judge versions within one comparison; judge upgrades are allowed only after
+  re-running the human-labeled calibration fixture + one anchor run with the new judge
+  and confirming agreement.
 - **Exit:** a script boots the backend against a scratch data dir, answers one hardcoded
   question, and tears down — with `~/Library/Application Support/Magpie` untouched
   (verified by mtime/hash check).
@@ -399,17 +404,23 @@ for the same decisions.
 
 ---
 
-## 9. Open questions for review
+## 9. Decisions (resolved with the owner, 2026-08-28)
 
-1. **Judge model:** pin which Claude model? (Different family than LFM/Gemma either way,
-   so bias hygiene is satisfied.)
-2. **Cloud provider axis:** include moonshot/openrouter in the sweep from Phase 1, or
-   local-only until Phase 4?
-3. **`runs/` git policy:** commit summaries+metrics only (proposed) — agree?
-4. **Personal-notes privacy:** OK sending that corpus's answers/snippets to the cloud
-   judge, or should that dataset get deterministic-only grading?
-5. **SROIE subset size:** 150 receipts (fast iteration) vs 300+ (tighter numbers)?
-6. **MMLongBench-Doc:** worth the adapter in Phase 5, or park it?
+1. **Judge model:** a high-tier Claude (Opus 5 / Fable 5). Pinning is about
+   comparability, not capability: judge ID + rubric version on every verdict, never mix
+   judge versions within a comparison, upgrades only after recalibrating on the
+   human-labeled fixture + one anchor run. (Different family than LFM/Gemma, so bias
+   hygiene is satisfied.)
+2. **Model axis:** exactly three `model_config` values — `lfm-local` (grammar on),
+   `gemma26b-local` (grammar on), `gemma26b-openrouter` (grammar off; free API forbids
+   enforcement). The openrouter config's provider+grammar confound is accepted and
+   documented in §2; H4 tests grammar cleanly on a local config.
+3. **`runs/` git policy:** commit config + metrics + reports; gitignore raw
+   appdata/logs.
+4. **Personal-notes privacy:** approved — that corpus's content may go to the cloud
+   judge.
+5. **SROIE subset:** 150 receipts.
+6. **MMLongBench-Doc adapter:** deferred — re-ask the owner at Phase 5 kickoff.
 
 ---
 

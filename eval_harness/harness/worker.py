@@ -171,13 +171,25 @@ def phase_index(payload: dict) -> dict:
     from src.pipeline import sync_files
 
     t0 = time.monotonic()
-    asyncio.run(
-        sync_files(
-            corpus,
-            do_fast=bool(params.get("index_fast_tier", True)),
-            do_summary=bool(params.get("index_summary_tier", True)),
+    summary_tier_note = None
+    try:
+        asyncio.run(
+            sync_files(
+                corpus,
+                do_fast=bool(params.get("index_fast_tier", True)),
+                do_summary=bool(params.get("index_summary_tier", True)),
+            )
         )
-    )
+    except SystemExit as e:
+        # src/stage1/summarize.py:603 sys.exit()s when the summary tier finds
+        # zero supported files — expected-benign for all-image corpora (every
+        # file routed to the fast tier, which has already run by then).
+        # Anything else is a real failure.
+        msg = str(e)
+        if "no supported files" in msg:
+            summary_tier_note = msg
+        else:
+            raise
     wall_s = time.monotonic() - t0
 
     manifest_path = appdata / "manifest.json"
@@ -191,6 +203,7 @@ def phase_index(payload: dict) -> dict:
     return {
         "corpus_dir": str(corpus),
         "wall_s": round(wall_s, 2),
+        "summary_tier_note": summary_tier_note,
         "manifest_path": str(manifest_path),
         "manifest": manifest_raw,
     }

@@ -1,0 +1,495 @@
+[
+  {
+    "qa_id": "rcpt-total-01",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Aa Pharmacy?",
+    "rewritten_query": {
+      "query": "Aa Pharmacy receipt total amount",
+      "keywords": [
+        "Aa Pharmacy",
+        "receipt",
+        "total amount",
+        "transaction",
+        "payment",
+        "invoice",
+        "pharmacy",
+        "2026-08-28"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005719823.jpg",
+        "score": -10.679577827453613,
+        "rank": 1,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005230605.jpg",
+        "score": -10.679577827453613,
+        "rank": 2,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005806718.jpg",
+        "score": -10.679577827453613,
+        "rank": 3,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469671.jpg",
+        "score": -10.679577827453613,
+        "rank": 4,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005230616.jpg",
+        "score": -10.679577827453613,
+        "rank": 5,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The total amount on the receipt from Aa Pharmacy is not found in the provided files.",
+    "cited": [],
+    "not_found": false,
+    "not_found_topic": "Aa Pharmacy receipt",
+    "error": null,
+    "latency_s": {
+      "total": 36.16,
+      "rewrite": 2.12,
+      "retrieval": 12.11,
+      "generation_approx": 21.93
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 10,
+    "solo_gated": false,
+    "in_prompt": {
+      "receipt_X51005719823.jpg": "full",
+      "receipt_X51005230605.jpg": "full",
+      "receipt_X51005806718.jpg": "full",
+      "receipt_X00016469671.jpg": "full",
+      "receipt_X51005230616.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "false_abstain",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "prose",
+    "not_found_flag_missing": true
+  },
+  {
+    "qa_id": "rcpt-total-02",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Ali Baba International Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Ali Baba International Sdn Bhd receipt total amount",
+      "keywords": [
+        "Ali Baba International Sdn Bhd",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "payment",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:10"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005719857.jpg",
+        "score": -10.774991035461426,
+        "rank": 1,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005806718.jpg",
+        "score": -10.774991035461426,
+        "rank": 2,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469671.jpg",
+        "score": -10.774991035461426,
+        "rank": 3,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469670.jpg",
+        "score": -10.774991035461426,
+        "rank": 4,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005230605.jpg",
+        "score": -10.774991035461426,
+        "rank": 5,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The total amount on the receipt from Ali Baba International Sdn Bhd is RM 193.00 [1].",
+    "cited": [],
+    "not_found": false,
+    "not_found_topic": "a landlord's emergency phone number",
+    "error": null,
+    "latency_s": {
+      "total": 27.0,
+      "rewrite": 1.31,
+      "retrieval": 0.47,
+      "generation_approx": 25.22
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 10,
+    "solo_gated": false,
+    "in_prompt": {
+      "receipt_X51005719857.jpg": "full",
+      "receipt_X51005806718.jpg": "full",
+      "receipt_X00016469671.jpg": "full",
+      "receipt_X00016469670.jpg": "full",
+      "receipt_X51005230605.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-total-03",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from Aso Electrical Trading Sdn Bhd?",
+    "rewritten_query": {
+      "query": "Aso Electrical Trading Sdn Bhd receipt total amount",
+      "keywords": [
+        "Aso Electrical Trading Sdn Bhd",
+        "receipt",
+        "total amount",
+        "invoice",
+        "transaction",
+        "EDT",
+        "2026-08-28",
+        "04:10"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005705729.jpg",
+        "score": -10.66472053527832,
+        "rank": 1,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005806718.jpg",
+        "score": -10.66472053527832,
+        "rank": 2,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469671.jpg",
+        "score": -10.66472053527832,
+        "rank": 3,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469670.jpg",
+        "score": -10.66472053527832,
+        "rank": 4,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005230605.jpg",
+        "score": -10.66472053527832,
+        "rank": 5,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The receipt from Aso Electrical Trading Sdn Bhd does not list a total amount.",
+    "cited": [],
+    "not_found": false,
+    "not_found_topic": "Aso Electrical Trading Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 20.97,
+      "rewrite": 1.43,
+      "retrieval": 0.47,
+      "generation_approx": 19.07
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 10,
+    "solo_gated": false,
+    "in_prompt": {
+      "receipt_X51005705729.jpg": "full",
+      "receipt_X51005806718.jpg": "full",
+      "receipt_X00016469671.jpg": "full",
+      "receipt_X00016469670.jpg": "full",
+      "receipt_X51005230605.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-date-01",
+    "variant": 0,
+    "question": "On what date was the receipt from Hugo Trading Sdn Bhd issued?",
+    "rewritten_query": {
+      "query": "Hugo Trading Sdn Bhd receipt issued date",
+      "keywords": [
+        "Hugo Trading Sdn Bhd",
+        "receipt",
+        "issued",
+        "date",
+        "2026-08-28",
+        "EDT",
+        "EDT time",
+        "transaction",
+        "invoice",
+        "document",
+        "date of issue"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005806718.jpg",
+        "score": -10.661506652832031,
+        "rank": 1,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005705729.jpg",
+        "score": -10.661506652832031,
+        "rank": 2,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005230621.jpg",
+        "score": -10.661506652832031,
+        "rank": 3,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469670.jpg",
+        "score": -10.661506652832031,
+        "rank": 4,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469671.jpg",
+        "score": -10.661506652832031,
+        "rank": 5,
+        "tier": "fast"
+      }
+    ],
+    "answer": "02/01/2019 2:47:14 PM [1]",
+    "cited": [],
+    "not_found": false,
+    "not_found_topic": "receipt from Hugo Trading Sdn Bhd",
+    "error": null,
+    "latency_s": {
+      "total": 20.57,
+      "rewrite": 1.3,
+      "retrieval": 0.45,
+      "generation_approx": 18.82
+    },
+    "answer_type": "extractive",
+    "retrieval": {
+      "mrr": 1.0,
+      "first_gold_rank": 1,
+      "hit@1": 1.0,
+      "recall@1": 1.0,
+      "hit@3": 1.0,
+      "recall@3": 1.0,
+      "hit@5": 1.0,
+      "recall@5": 1.0,
+      "hit@12": 1.0,
+      "recall@12": 1.0,
+      "ndcg@5": 1.0
+    },
+    "ranked_pre_gate": 10,
+    "solo_gated": false,
+    "in_prompt": {
+      "receipt_X51005806718.jpg": "full",
+      "receipt_X51005705729.jpg": "full",
+      "receipt_X51005230621.jpg": "full",
+      "receipt_X00016469670.jpg": "full",
+      "receipt_X00016469671.jpg": "full"
+    },
+    "key_fact_spans": {
+      "0": "unknown_image_block"
+    },
+    "h1_eligible": true,
+    "h1_basis": "file_level_image",
+    "citations": {
+      "cited": 0,
+      "citation_precision": 0.0,
+      "citation_recall": 0.0,
+      "hallucinated_citations": 0
+    },
+    "verdict": "wrong",
+    "facts_total": 1,
+    "facts_matched": 0,
+    "abstained": false,
+    "abstain_source": null,
+    "not_found_flag_missing": false
+  },
+  {
+    "qa_id": "rcpt-absent-01",
+    "variant": 0,
+    "question": "What was the total amount on the receipt from King'S Confectionery S/B?",
+    "rewritten_query": {
+      "query": "King'S Confectionery S/B receipt total amount",
+      "keywords": [
+        "King's Confectionery S/B",
+        "receipt",
+        "total amount",
+        "transaction",
+        "invoice",
+        "purchase",
+        "date",
+        "time",
+        "EDT",
+        "2026-08-28",
+        "04:11"
+      ]
+    },
+    "retrieved": [
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005230605.jpg",
+        "score": -10.610811233520508,
+        "rank": 1,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005806718.jpg",
+        "score": -10.610811233520508,
+        "rank": 2,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X00016469671.jpg",
+        "score": -10.610811233520508,
+        "rank": 3,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005719857.jpg",
+        "score": -10.610811233520508,
+        "rank": 4,
+        "tier": "fast"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-mriddy-Documents-GitHub-NotAnotherSpotlight/ab51713c-8215-4bf0-8936-97f9d7114d94/scratchpad/receipts_smoke_corpus/receipt_X51005230616.jpg",
+        "score": -10.610811233520508,
+        "rank": 5,
+        "tier": "fast"
+      }
+    ],
+    "answer": "The total amount on the receipt from King'S Confectionery S/B is not found in the provided files.",
+    "cited": [],
+    "not_found": false,
+    "not_found_topic": "King'S Confectionery S/B",
+    "error": null,
+    "latency_s": {
+      "total": 23.55,
+      "rewrite": 1.45,
+      "retrieval": 0.45,
+      "generation_approx": 21.65
+    },
+    "answer_type": "not_found",
+    "ranked_pre_gate": 10,
+    "solo_gated": false,
+    "in_prompt": {
+      "receipt_X51005230605.jpg": "full",
+      "receipt_X51005806718.jpg": "full",
+      "receipt_X00016469671.jpg": "full",
+      "receipt_X51005719857.jpg": "full",
+      "receipt_X51005230616.jpg": "full"
+    },
+    "key_fact_spans": {},
+    "h1_eligible": false,
+    "h1_basis": null,
+    "verdict": "correct_abstain",
+    "facts_total": 0,
+    "facts_matched": 0,
+    "abstained": true,
+    "abstain_source": "prose",
+    "not_found_flag_missing": true
+  }
+]

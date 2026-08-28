@@ -39,6 +39,29 @@ def fact_in_text(fact: str, text: str) -> bool:
     return bool(f) and f in t
 
 
+_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".tiff", ".bmp"}
+
+
+def _is_image_path(p: str) -> bool:
+    return Path(p).suffix.lower() in _IMAGE_EXTS
+
+
+# Deterministic prose-abstain detector: the model can decline in prose while
+# the structured not_found flag stays False (observed live in smoke-02 —
+# itself a product finding: the frontend would render a normal answer card
+# instead of the not-found state). Conservative patterns; the judge refines.
+_ABSTAIN_RE = re.compile(
+    r"(is not found|was not found|not in the provided|no receipt|"
+    r"does not exist|could ?n[o']t find|couldn't locate|no such file|"
+    r"not available in the provided|do not contain|does not contain any)",
+    re.IGNORECASE,
+)
+
+
+def prose_abstain(answer: str) -> bool:
+    return bool(_ABSTAIN_RE.search(answer or ""))
+
+
 # --- llm-log mining ---------------------------------------------------------
 
 _TRUNC_MARKER = "[...truncated "
@@ -124,7 +147,9 @@ def deterministic_verdict(item: dict, row: dict) -> dict:
     """Binary, rule-based scoring. The judge pass may OVERRIDE `verdict` for
     prose nuance; facts/citations/abstention are ground truth already."""
     answer_text = row.get("answer") or ""
-    abstained = bool(row.get("not_found")) or not answer_text.strip()
+    flag_abstain = bool(row.get("not_found")) or not answer_text.strip()
+    prose = prose_abstain(answer_text)
+    abstained = flag_abstain or prose
     facts = item.get("key_facts") or []
     facts_hit = [fact_in_text(f, answer_text) for f in facts]
 
@@ -143,6 +168,9 @@ def deterministic_verdict(item: dict, row: dict) -> dict:
         "facts_total": len(facts),
         "facts_matched": sum(facts_hit),
         "abstained": abstained,
+        "abstain_source": ("flag" if flag_abstain else "prose" if prose else None),
+        # flag/prose disagreement is a product signal, not just scoring detail
+        "not_found_flag_missing": prose and not flag_abstain,
     }
 
 
@@ -207,16 +235,38 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
                 present = base.casefold() in ptext.casefold()
                 in_prompt[base] = "full" if present else ("unknown_log_truncated" if unknown else "absent")
             out["in_prompt"] = in_prompt
+            # Fact-span observability only exists for TEXT blocks. When the
+            # gold sources are images, the prompt carries pixels the log
+            # can't expose — fact presence is undecidable, not false
+            # (smoke-02: every span read false and H1's eligible set was
+            # empty on a dataset where retrieval was perfect).
+            gold_all_images = bool(item.get("gold_sources")) and all(
+                _is_image_path(p) for p in item["gold_sources"]
+            )
             spans = {}
             for i, f in enumerate(item.get("key_facts") or []):
                 if fact_in_text(f, ptext):
                     spans[str(i)] = True
+                elif gold_all_images:
+                    spans[str(i)] = "unknown_image_block"
                 else:
                     spans[str(i)] = "unknown_log_truncated" if unknown else False
             out["key_fact_spans"] = spans
+            # H1 eligibility basis (PLAN H1): fact-level when observable;
+            # file-level fallback for image gold sources.
+            gold_in_prompt_full = bool(item.get("gold_sources")) and all(
+                in_prompt.get(Path(p).name) == "full" for p in item["gold_sources"]
+            )
+            if spans and all(v is True for v in spans.values()):
+                out["h1_eligible"], out["h1_basis"] = True, "fact_spans"
+            elif gold_all_images and gold_in_prompt_full:
+                out["h1_eligible"], out["h1_basis"] = True, "file_level_image"
+            else:
+                out["h1_eligible"], out["h1_basis"] = False, None
         else:
             out["in_prompt"] = {}
             out["key_fact_spans"] = {}
+            out["h1_eligible"], out["h1_basis"] = False, None
 
         # citations + verdict
         cited = row.get("cited") or []
@@ -261,17 +311,27 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
     retrieval_agg = metrics.aggregate([e["retrieval"] for e in answerable if e.get("retrieval")])
     citation_agg = metrics.aggregate([e["citations"] for e in answerable if e.get("citations")])
 
-    # H1 slice: extractive rows whose key facts were OBSERVED in the prompt
-    h1_eligible = [
-        e for e in extractive
-        if e.get("key_fact_spans") and all(v is True for v in e["key_fact_spans"].values())
-    ]
+    # H1 slice: eligibility observed per row (fact-level for text gold,
+    # file-level for image gold — see enrich_run)
+    h1_eligible = [e for e in extractive if e.get("h1_eligible")]
     h1 = {
         "n_extractive": len(extractive),
-        "n_eligible_fact_in_prompt": len(h1_eligible),
+        "n_eligible": len(h1_eligible),
         "eligible_fraction": rate(extractive, lambda e: e in h1_eligible),
+        "basis_counts": {
+            b: sum(1 for e in h1_eligible if e.get("h1_basis") == b)
+            for b in ("fact_spans", "file_level_image")
+        },
         "accuracy_on_eligible": rate(h1_eligible, lambda e: e["verdict"] == "correct"),
         "note": "per-arm number; never compare raw across arms (PLAN H1)",
+    }
+
+    product_findings = {
+        "not_found_flag_missing": sum(1 for e in enriched if e.get("not_found_flag_missing")),
+        "zero_citation_answers": sum(
+            1 for e in answerable
+            if not (e.get("cited")) and e["verdict"] in ("correct", "partial", "wrong")
+        ),
     }
 
     lat_totals = sorted(
@@ -307,6 +367,7 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
             "fire_rate": rate(enriched, lambda e: e.get("solo_gated")),
         },
         "h1_slice": h1,
+        "product_findings": product_findings,
         "latency": {"p50_total_s": pct(0.50), "p95_total_s": pct(0.95)},
         "errors": sum(1 for e in enriched if e.get("error")),
     }
@@ -352,10 +413,17 @@ def _write_report(run_dir: Path, s: dict, enriched: list[dict], run_record: dict
         "",
         "## H1 slice (per-arm; never compare raw across arms)",
         "",
-        f"- extractive n={s['h1_slice']['n_extractive']}, key-facts-in-prompt eligible "
-        f"n={s['h1_slice']['n_eligible_fact_in_prompt']} "
-        f"({s['h1_slice']['eligible_fraction']})",
+        f"- extractive n={s['h1_slice']['n_extractive']}, eligible "
+        f"n={s['h1_slice']['n_eligible']} ({s['h1_slice']['eligible_fraction']}) "
+        f"— basis: {s['h1_slice']['basis_counts']}",
         f"- accuracy on eligible: {s['h1_slice']['accuracy_on_eligible']}",
+        "",
+        "## Product findings (deterministic observations, not verdicts)",
+        "",
+        f"- answers that abstained in prose while the structured not_found flag "
+        f"stayed False: {s['product_findings']['not_found_flag_missing']}",
+        f"- non-abstain answers returned with ZERO cited sources: "
+        f"{s['product_findings']['zero_citation_answers']}",
         "",
         "## Failures (deterministic verdicts)",
         "",

@@ -1,0 +1,781 @@
+[
+  {
+    "id": "rcpt-total-01",
+    "question": "What was the total amount on the receipt from Aa Pharmacy?",
+    "question_variants": [
+      "aa pharmacy receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Aa Pharmacy receipt was 46.20.",
+    "key_facts": [
+      "46.20"
+    ],
+    "gold_sources": [
+      "receipt_X51005719823.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-02",
+    "question": "What was the total amount on the receipt from Ali Baba International Sdn Bhd?",
+    "question_variants": [
+      "ali baba international sdn bhd receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Ali Baba International Sdn Bhd receipt was 23.80.",
+    "key_facts": [
+      "23.80"
+    ],
+    "gold_sources": [
+      "receipt_X51005719857.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-03",
+    "question": "What was the total amount on the receipt from Aso Electrical Trading Sdn Bhd?",
+    "question_variants": [
+      "aso electrical trading sdn bhd receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Aso Electrical Trading Sdn Bhd receipt was 94.60.",
+    "key_facts": [
+      "94.60"
+    ],
+    "gold_sources": [
+      "receipt_X51005705729.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-04",
+    "question": "What was the total amount on the receipt from Bakalima Sdn Bhd?",
+    "question_variants": [
+      "bakalima sdn bhd receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Bakalima Sdn Bhd receipt was 100.00.",
+    "key_facts": [
+      "100.00"
+    ],
+    "gold_sources": [
+      "receipt_X51005724609.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-05",
+    "question": "What was the total amount on the receipt from Bemed (Sp) Sdn Bhd?",
+    "question_variants": [
+      "bemed (sp) sdn bhd receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Bemed (Sp) Sdn Bhd receipt was 308.70.",
+    "key_facts": [
+      "308.70"
+    ],
+    "gold_sources": [
+      "receipt_X51005746204.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-06",
+    "question": "What was the total amount on the receipt from Beyond Brothers Hardware?",
+    "question_variants": [
+      "beyond brothers hardware receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Beyond Brothers Hardware receipt was 67.85.",
+    "key_facts": [
+      "67.85"
+    ],
+    "gold_sources": [
+      "receipt_X51005675914.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-07",
+    "question": "What was the total amount on the receipt from Chop Yew Lian?",
+    "question_variants": [
+      "chop yew lian receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Chop Yew Lian receipt was 30.00.",
+    "key_facts": [
+      "30.00"
+    ],
+    "gold_sources": [
+      "receipt_X51005587261.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-08",
+    "question": "What was the total amount on the receipt from Contento?",
+    "question_variants": [
+      "contento receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Contento receipt was 21.60.",
+    "key_facts": [
+      "21.60"
+    ],
+    "gold_sources": [
+      "receipt_X51005442388.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-09",
+    "question": "What was the total amount on the receipt from Cpi Rocku Sdn. Bhd?",
+    "question_variants": [
+      "cpi rocku sdn. bhd receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Cpi Rocku Sdn. Bhd receipt was 181.55.",
+    "key_facts": [
+      "181.55"
+    ],
+    "gold_sources": [
+      "receipt_X51005719855.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-total-10",
+    "question": "What was the total amount on the receipt from Dewina Host Sdn Bhd?",
+    "question_variants": [
+      "dewina host sdn bhd receipt total"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The total on the Dewina Host Sdn Bhd receipt was 63.90.",
+    "key_facts": [
+      "63.90"
+    ],
+    "gold_sources": [
+      "receipt_X51006008206.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-01",
+    "question": "On what date was the receipt from Dream Arts issued?",
+    "question_variants": [
+      "when did i buy from dream arts"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Dream Arts receipt is dated 29/03/2018.",
+    "key_facts": [
+      "29/03/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51006248253.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-02",
+    "question": "On what date was the receipt from Econsave Cash & Carry (Fc) S/B issued?",
+    "question_variants": [
+      "when did i buy from econsave cash & carry (fc) s/b"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Econsave Cash & Carry (Fc) S/B receipt is dated 22/03/18.",
+    "key_facts": [
+      "22/03/18"
+    ],
+    "gold_sources": [
+      "receipt_X51005605295.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-03",
+    "question": "On what date was the receipt from F&P Pharmacy issued?",
+    "question_variants": [
+      "when did i buy from f&p pharmacy"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The F&P Pharmacy receipt is dated 02/03/2018.",
+    "key_facts": [
+      "02/03/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005365187.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-04",
+    "question": "On what date was the receipt from Florism De Art issued?",
+    "question_variants": [
+      "when did i buy from florism de art"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Florism De Art receipt is dated 14/01/2018.",
+    "key_facts": [
+      "14/01/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51006008166.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-05",
+    "question": "On what date was the receipt from Fy Eagle Enterprise issued?",
+    "question_variants": [
+      "when did i buy from fy eagle enterprise"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Fy Eagle Enterprise receipt is dated 07/12/2017.",
+    "key_facts": [
+      "07/12/2017"
+    ],
+    "gold_sources": [
+      "receipt_X51005577191.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-06",
+    "question": "On what date was the receipt from Gm Rack Enterprise issued?",
+    "question_variants": [
+      "when did i buy from gm rack enterprise"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Gm Rack Enterprise receipt is dated 20/03/2018.",
+    "key_facts": [
+      "20/03/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005715006.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-07",
+    "question": "On what date was the receipt from Grand Companions Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from grand companions sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Grand Companions Sdn Bhd receipt is dated 03 MAR 19.",
+    "key_facts": [
+      "03 MAR 19"
+    ],
+    "gold_sources": [
+      "receipt_X51005442322.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-date-08",
+    "question": "On what date was the receipt from Great Zone Household Centre Sdn Bhd issued?",
+    "question_variants": [
+      "when did i buy from great zone household centre sdn bhd"
+    ],
+    "answer_type": "extractive",
+    "gold_answer": "The Great Zone Household Centre Sdn Bhd receipt is dated 18/02/2018.",
+    "key_facts": [
+      "18/02/2018"
+    ],
+    "gold_sources": [
+      "receipt_X51005806692.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-01",
+    "question": "What address is printed on the receipt from Green Lane Pharmacy Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Green Lane Pharmacy Sdn Bhd receipt shows the address: 33 JLN BANGAU 1,KEPONG BARU, 52100 KEPONG,KL.",
+    "key_facts": [
+      "33 JLN BANGAU 1,KEPONG BARU, 52100 KEPONG,KL"
+    ],
+    "gold_sources": [
+      "receipt_X51005719895.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-02",
+    "question": "What address is printed on the receipt from Heng Kee Delights Bak Kut Teh?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Heng Kee Delights Bak Kut Teh receipt shows the address: NO31 , JALAN 3/62A , BANDAR MENJALARA KEPONG. 52100 KUALA LUMPUR.",
+    "key_facts": [
+      "NO31 , JALAN 3/62A , BANDAR MENJALARA KEPONG. 52100 KUALA LUMPUR"
+    ],
+    "gold_sources": [
+      "receipt_X51005719889.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-03",
+    "question": "What address is printed on the receipt from Hugo Trading Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Hugo Trading Sdn Bhd receipt shows the address: LOT 8&9, KOMPLEKS PASAR BORONG SELANGOR, 43300 SERI KEMBANGAN, SEL.",
+    "key_facts": [
+      "LOT 8&9, KOMPLEKS PASAR BORONG SELANGOR, 43300 SERI KEMBANGAN, SEL"
+    ],
+    "gold_sources": [
+      "receipt_X51005806718.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-04",
+    "question": "What address is printed on the receipt from Image Printec (M) Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Image Printec (M) Sdn Bhd receipt shows the address: NO. 12A-G, JALAN WANGSA DELIMA 11, D'WANGSA WANGSA MAJU, 53300 KUALA LUMPUR..",
+    "key_facts": [
+      "NO. 12A-G, JALAN WANGSA DELIMA 11, D'WANGSA WANGSA MAJU, 53300 KUALA LUMPUR."
+    ],
+    "gold_sources": [
+      "receipt_X51005806696.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-05",
+    "question": "What address is printed on the receipt from Kaison Furnishing Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Kaison Furnishing Sdn Bhd receipt shows the address: LOT NO. L3-012, LEVEL 3, MYTOWN SHOPPING CENTRE, NO. 6, JALAN COCHRANE, SEKSYEN 90 55100 KUALA LUMPUR..",
+    "key_facts": [
+      "LOT NO. L3-012, LEVEL 3, MYTOWN SHOPPING CENTRE, NO. 6, JALAN COCHRANE, SEKSYEN 90 55100 KUALA LUMPUR."
+    ],
+    "gold_sources": [
+      "receipt_X51005715007.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-06",
+    "question": "What address is printed on the receipt from Keda Papan Yew Chjan?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The Keda Papan Yew Chjan receipt shows the address: LOT 276 JALAN BANTING 800 DEN SELANGOR..",
+    "key_facts": [
+      "LOT 276 JALAN BANTING 800 DEN SELANGOR."
+    ],
+    "gold_sources": [
+      "receipt_X51005724623.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-addr-07",
+    "question": "What address is printed on the receipt from La Stationery Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "extractive",
+    "gold_answer": "The La Stationery Sdn Bhd receipt shows the address: NO.8, JALAN 46/26, TAMAN SRI RAMPAI, 53300 KUALA LUMPUR..",
+    "key_facts": [
+      "NO.8, JALAN 46/26, TAMAN SRI RAMPAI, 53300 KUALA LUMPUR."
+    ],
+    "gold_sources": [
+      "receipt_X51005663307.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-absent-01",
+    "question": "What was the total amount on the receipt from King'S Confectionery S/B?",
+    "question_variants": [],
+    "answer_type": "not_found",
+    "gold_answer": "No receipt from King'S Confectionery S/B exists in the files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-absent-02",
+    "question": "What was the total amount on the receipt from Olive9 Pharmacy Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "not_found",
+    "gold_answer": "No receipt from Olive9 Pharmacy Sdn Bhd exists in the files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-absent-03",
+    "question": "What was the total amount on the receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "not_found",
+    "gold_answer": "No receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd exists in the files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-absent-04",
+    "question": "What was the total amount on the receipt from Semboyan Tegas Sdn Bhd?",
+    "question_variants": [],
+    "answer_type": "not_found",
+    "gold_answer": "No receipt from Semboyan Tegas Sdn Bhd exists in the files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-absent-05",
+    "question": "What was the total amount on the receipt from Bemed (Sp) Sdn. Bhd?",
+    "question_variants": [],
+    "answer_type": "not_found",
+    "gold_answer": "No receipt from Bemed (Sp) Sdn. Bhd exists in the files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-absent-06",
+    "question": "What was the total amount on the receipt from Five Star Cash & Carry?",
+    "question_variants": [],
+    "answer_type": "not_found",
+    "gold_answer": "No receipt from Five Star Cash & Carry exists in the files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-count-01",
+    "question": "How many receipts from 99 Speed Mart S/B are in the files?",
+    "question_variants": [],
+    "answer_type": "enumeration",
+    "gold_answer": "There are 5 receipts from 99 Speed Mart S/B.",
+    "key_facts": [
+      "5"
+    ],
+    "gold_sources": [
+      "receipt_X51005268408.jpg",
+      "receipt_X51005444044.jpg",
+      "receipt_X51005715455.jpg",
+      "receipt_X51005745298.jpg",
+      "receipt_X51005764161.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-count-02",
+    "question": "How many receipts from Aeon Co. (M) Bhd are in the files?",
+    "question_variants": [],
+    "answer_type": "enumeration",
+    "gold_answer": "There are 3 receipts from Aeon Co. (M) Bhd.",
+    "key_facts": [
+      "3"
+    ],
+    "gold_sources": [
+      "receipt_X51005605287.jpg",
+      "receipt_X51005757220.jpg",
+      "receipt_X51006008105.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-count-03",
+    "question": "How many receipts from Bens Independent Grocer Sdn. Bhd are in the files?",
+    "question_variants": [],
+    "answer_type": "enumeration",
+    "gold_answer": "There are 2 receipts from Bens Independent Grocer Sdn. Bhd.",
+    "key_facts": [
+      "2"
+    ],
+    "gold_sources": [
+      "receipt_X51005444040.jpg",
+      "receipt_X51005444041.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-listdates-04",
+    "question": "List the dates of every receipt from Cross Channel Network Sdn. Bhd.",
+    "question_variants": [],
+    "answer_type": "enumeration",
+    "gold_answer": "The Cross Channel Network Sdn. Bhd receipts are dated: 29/01/2018, 31/12/2017.",
+    "key_facts": [
+      "29/01/2018",
+      "31/12/2017"
+    ],
+    "gold_sources": [
+      "receipt_X51005230648.jpg",
+      "receipt_X51005230657.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  },
+  {
+    "id": "rcpt-listdates-05",
+    "question": "List the dates of every receipt from Evergreen Light Sdn Bhd.",
+    "question_variants": [],
+    "answer_type": "enumeration",
+    "gold_answer": "The Evergreen Light Sdn Bhd receipts are dated: 10/07/2017, 18/09/2017.",
+    "key_facts": [
+      "10/07/2017",
+      "18/09/2017"
+    ],
+    "gold_sources": [
+      "receipt_X51005568885.jpg",
+      "receipt_X51005568892.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "human_verified": false,
+    "generator": "prepare_receipts.py (mechanical, SROIE labels)"
+  }
+]

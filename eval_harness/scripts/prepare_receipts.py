@@ -87,7 +87,7 @@ def main() -> None:
     # the mirror has one, else the split index (stable for a fixed dataset
     # revision, which the manifest records).
     def row_key(r: dict) -> str:
-        for k in ("filename", "file_name", "id", "image_id"):
+        for k in ("key", "filename", "file_name", "id", "image_id"):
             if isinstance(r.get(k), str) and r[k]:
                 return r[k]
         return f"idx{r['i']:05d}"

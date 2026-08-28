@@ -325,7 +325,81 @@ def phase_answer(payload: dict) -> dict:
     }
 
 
-PHASES = {"boot": phase_boot, "index": phase_index, "answer": phase_answer}
+def phase_retrieve(payload: dict) -> dict:
+    """Retrieval-only pass (PLAN.md §3 `--retrieval-only`, composed mode).
+
+    Mirrors pipeline.ask()'s search step exactly — same rewrite builder, same
+    run_search arguments — but WITHOUT gate_to_solo and at k_max, because
+    ask() returns the post-gate list: on solo-gated questions the answer pass
+    records one file and the true ranking is unrecoverable from it. This
+    phase is therefore the sole source of retrieval metrics, and the
+    solo-gate observation falls out of comparing the two passes.
+    """
+    params = payload.get("params", {})
+    _write_settings(params)
+    questions = payload["questions"]
+    out_path = Path(payload["retrieve_jsonl"])
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    from src import manifest  # noqa: F401
+    _assert_controlled_env(payload)
+    _provider_of(params)
+
+    import asyncio
+
+    from src.stage2.search import run_search
+    from src.stage2.search import rewrite_query, raw_query
+
+    k_max = int(params.get("top_k_retrieval_max", 12))
+    rewrite = bool(params.get("rewrite", True))
+    fast = bool(params.get("fast_search", False))
+    enumerate_lists = bool(params.get("enumerate_lists", True))
+
+    rows_out = []
+    for q in questions:
+        t0 = time.monotonic()
+        row: dict = {"qa_id": q["id"], "question": q["question"]}
+        try:
+            sq = rewrite_query(q["question"]) if rewrite else raw_query(q["question"])
+            t_search = time.monotonic()
+            hits = run_search(
+                sq, k_max, question=q["question"], skip_fast=not fast,
+                rerank=True, enumerate_lists=enumerate_lists,
+            )
+            row.update(
+                rewritten_query={"query": sq.query,
+                                 "keywords": list(getattr(sq, "keywords", []) or [])},
+                ranked=[
+                    {"path": str(r.path), "score": float(r.score), "rank": i,
+                     "tier": getattr(r, "tier", None)}
+                    for i, r in enumerate(hits, 1)
+                ],
+                latency_s={"rewrite": round(t_search - t0, 3),
+                           "search": round(time.monotonic() - t_search, 3)},
+                error=None,
+            )
+        except Exception as e:  # noqa: BLE001
+            row.update(ranked=[], error=f"{type(e).__name__}: {e}")
+        rows_out.append(row)
+
+    with out_path.open("w", encoding="utf-8") as f:
+        for row in rows_out:
+            f.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
+
+    n_err = sum(1 for r in rows_out if r.get("error"))
+    if rows_out and n_err / len(rows_out) > 0.5:
+        raise RuntimeError(
+            f"retrieve phase majority-failed: {n_err}/{len(rows_out)} — see {out_path}"
+        )
+    return {"retrieve_jsonl": str(out_path), "n": len(rows_out), "errors": n_err}
+
+
+PHASES = {
+    "boot": phase_boot,
+    "index": phase_index,
+    "retrieve": phase_retrieve,
+    "answer": phase_answer,
+}
 
 
 def main() -> None:

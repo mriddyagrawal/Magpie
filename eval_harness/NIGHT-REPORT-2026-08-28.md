@@ -47,19 +47,22 @@ MRR .90 · nDCG@5 .91**. ColQwen is doing its job.
 
 Answering vs context width (same cached index, only `top_k` changes):
 
-| k | correct (answerable) | H1-eligible accuracy* | false-abstain | true-not_found OK | citation prec. | p50 |
-|---|---:|---:|---:|---:|---:|---:|
-| **1** | **46.8%** | **61.1%** | 23.4% | 16.7% | .60 | **9.6s** |
-| 3 | 14.9% | 15.8% | 21.3% | 0% | — | 23.5s |
-| 5 (prod) | 2.1% | 2.6% | 63.8% | 66.7% | .06 | 35.6s |
-| 12 | 0.0% | 0.0% | **91.5%** | 100%† | — | 34.8s |
+| k | correct (answerable) | H1-eligible accuracy* | eligible n | false-abstain | true-not_found OK | citation prec. | p50 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **1** | **46.8%** | **61.1%** | 36/42 | 23.4% | 1/6 | .60 | **9.6s** |
+| 3 | 14.9% | 15.8% | 38/42 | 21.3% | 0/6 | — | 23.5s |
+| 5 (prod) | 2.1% | 2.6% | 38/42 | 63.8% | 4/6 | .06 | 35.6s |
+| 12 | 0.0% | 0.0% | **21/42**‡ | **91.5%** | 6/6† | — | 34.8s |
 
 \* file-level basis (image corpus — fact-level spans unobservable; PLAN H1
 caveat). † at k=12 the model abstains on ~everything, so "perfect" abstention
-there is just blanket refusal.
+there is just blanket refusal. The true-not_found column is raw counts on
+n=6 — the non-monotonic swing is what noise looks like at that n; don't read
+a story into it. ‡ k=12's eligible half is a rank-biased survivor subset —
+gold was budget-evicted for the other 21 (see caveats below).
 
-**Read**: the shipped config (k=5) answers 1 question in 47. One file (k=1) is
-22× better and 3.7× faster. The failure mode flips with k: low k
+**Read**: the shipped config (k=5) answers **1 of 47**; a single file answers
+**22 of 47** — same questions, same index, 3.7× faster. The failure mode flips with k: low k
 force-answers (bad on not_found), high k blanket-refuses (bad on everything).
 Curve caveats (reviewer #67/#68): judge H3 on the H1-eligible column (extractive
 only) — enumeration items are exempt from k (the router widens their top_k, so
@@ -99,11 +102,14 @@ eligible half is a rank-biased survivor subset.
   bracket — beyond the ">40 = consistent with the ladder" band.
 - **H5 (gate recovers the collapse): BLOCKED on receipts** by bug #1 — the
   gate cannot fire there at any margin. Test on a text corpus or after the fix.
-- **H2 (rewrite helps vague queries): REFUTED on receipts — and inverted.**
-  recall@5, retrieval-only arms: vague phrasings rewrite ON .875 vs OFF .906
-  (−3.1 pts; needed ≥+10); primary phrasings ON .936 vs OFF .979 (−4.3 pts).
-  Rewrite adds ~1.3–2s/query and slightly degrades ColQwen retrieval here.
-  Single-corpus result — §6's ≥2-corpora rule applies before generalizing.
+- **H2 (rewrite helps vague queries): REFUTED — no recall effect at the
+  pre-registered threshold, in either direction.** recall@5, retrieval-only
+  arms: vague ON .875 vs OFF .906; primary ON .936 vs OFF .979. Both deltas
+  are under H2's own 10-point floor (primary is inside its <5 "no movement"
+  band), so the docket's rule reads them as no effect — NOT as "rewrite
+  hurts." The claim that survives: rewrite costs ~1.3–2s per query
+  (a mechanism, not a measurement), so on this corpus it isn't earning its
+  latency. Single-corpus; ≥2-corpora rule before acting.
 - **H4 (grammar): not yet run** (needs a grammar off-switch investigation).
 
 ## What this suggests for the product (owner's call, not tonight's)

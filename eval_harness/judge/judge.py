@@ -86,12 +86,12 @@ def call_claude(prompt: str, model: str, timeout_s: int = 120) -> tuple[dict, st
     text = payload.get("result") if isinstance(payload, dict) else None
     if not text:
         raise RuntimeError(f"no result field in claude output: {proc.stdout[:200]}")
-    resolved = model
+    resolved, source = model, "fallback_alias"
     usage = payload.get("modelUsage")
     if isinstance(usage, dict) and usage:
         keys = sorted(usage.keys())
         if len(keys) == 1:
-            resolved = keys[0]
+            resolved, source = keys[0], "modelUsage"
         else:
             # #65: never guess among multiple models (alphabetical picked
             # haiku over opus). Prefer the family of the requested model;
@@ -99,11 +99,14 @@ def call_claude(prompt: str, model: str, timeout_s: int = 120) -> tuple[dict, st
             # ambiguity beats a confident wrong string.
             fam = model.split("-")[1] if "-" in model else model
             fam_matches = [k for k in keys if fam in k]
-            resolved = fam_matches[0] if len(fam_matches) == 1 else json.dumps(keys)
+            if len(fam_matches) == 1:
+                resolved, source = fam_matches[0], "modelUsage_family_match"
+            else:
+                resolved, source = json.dumps(keys), "modelUsage_ambiguous"
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
         raise RuntimeError(f"no JSON object in judge reply: {text[:200]}")
-    return json.loads(text[start : end + 1]), resolved
+    return json.loads(text[start : end + 1]), resolved, source
 
 
 def derive_verdict(item: dict, judged: dict, deterministic: str) -> str:
@@ -195,14 +198,14 @@ def main() -> int:
             out_path.rename(out_path.with_suffix(".json.old"))
 
     n_err = 0
-    resolved_model = args.model
+    resolved_model, resolved_source = args.model, "fallback_alias"
     for row in todo:
         qa_id = row["qa_id"]
         if qa_id in verdicts:
             continue
         item = golden[qa_id]
         try:
-            judged, resolved_model = call_claude(build_prompt(item, row), args.model)
+            judged, resolved_model, resolved_source = call_claude(build_prompt(item, row), args.model)
             final = derive_verdict(item, judged, row["verdict"])
             verdicts[qa_id] = {
                 "criteria": judged,
@@ -223,12 +226,18 @@ def main() -> int:
         out_path.write_text(json.dumps({
             "judge_model_requested": args.model,
             "judge_model": resolved_model,
+            "judge_model_source": resolved_source,  # #73: fallback vs resolved is auditable
             "rubric_sha": rubric_sha(),
             "matcher_audit": {
                 "sampled_correct": len(audit_done),
                 "judge_agreed": audit_agree,
+                "counts": f"{audit_agree}/{len(audit_done)}",
                 "matcher_precision": (audit_agree / len(audit_done))
                 if audit_done else None,
+                # #74: at n=5 with zero disagreements, the rule of three
+                # bounds true error only to <=~0.45 at 95% - accumulate
+                # samples across runs before treating this as settled
+                "note": "small-n bound; accumulate across runs",
             },
             "verdicts": verdicts,
         }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

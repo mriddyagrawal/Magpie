@@ -235,6 +235,27 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
 
     retrieve_rows = _load_jsonl(raw / "retrieve.jsonl")
     answer_rows = _load_jsonl(raw / "answers.jsonl")
+    retrieval_only = not answer_rows and bool(retrieve_rows)
+    if retrieval_only:
+        # --retrieval-only runs have no answer phase; the retrieval metrics
+        # ARE the run's product. Without this branch the committed artifacts
+        # were tables of None and the evidence lived only in gitignored raw/
+        # (review #75 — a BLOCKER: a docket verdict with no data in git).
+        answer_rows = [
+            {
+                "qa_id": r["qa_id"],
+                "variant": 0,
+                "question": r.get("question", ""),
+                "retrieved": [],
+                "answer": "",
+                "cited": [],
+                "not_found": False,
+                "error": r.get("error"),
+                "latency_s": dict(r.get("latency_s") or {}),
+                "_retrieval_only": True,
+            }
+            for r in retrieve_rows
+        ]
     stage_lat = parse_stage_latencies(raw / "worker_answer.log")
 
     llm_log = None
@@ -264,6 +285,17 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
         if qrels and ranked_paths:
             out["retrieval"] = metrics.retrieval_row(ranked_paths, qrels)
         out["ranked_pre_gate"] = len(ranked_paths)
+
+        if row.get("_retrieval_only"):
+            # no generator ran: no verdicts, citations, prompt observation,
+            # or gate inference — retrieval metrics + latency only
+            out["verdict"] = None
+            out["in_prompt"] = {}
+            out["key_fact_spans"] = {}
+            out["h1_eligible"], out["h1_basis"] = False, None
+            out["solo_gated"] = None
+            enriched.append(out)
+            continue
 
         # solo gate: observed as pipeline list collapsing to 1 while the
         # pre-gate ranking had more (local provider only, by construction)
@@ -407,9 +439,17 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
 
 
 def _summarize(enriched: list[dict], params: dict) -> dict:
+    retrieval_only = bool(enriched) and all(e.get("_retrieval_only") for e in enriched)
     answerable = [e for e in enriched if e["answer_type"] != "not_found"]
     notfound = [e for e in enriched if e["answer_type"] == "not_found"]
     extractive = [e for e in enriched if e["answer_type"] == "extractive"]
+    if retrieval_only:
+        # answer-side slices are meaningless with no generator run
+        answerable_scored: list[dict] = []
+        notfound_scored: list[dict] = []
+    else:
+        answerable_scored = answerable
+        notfound_scored = notfound
 
     def rate(rows, pred) -> float | None:
         return round(sum(1 for r in rows if pred(r)) / len(rows), 3) if rows else None
@@ -431,7 +471,7 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
     mixed_basis = sum(1 for v in basis_counts.values() if v) > 1
     per_basis_acc = {
         b: rate([e for e in h1_eligible if e.get("h1_basis") == b],
-                lambda e: e["verdict"] == "correct")
+                lambda e: e.get("verdict") == "correct")
         for b, n in basis_counts.items() if n
     }
     h1 = {
@@ -442,7 +482,7 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
         "accuracy_by_basis": per_basis_acc,
         "accuracy_on_eligible": (
             None if mixed_basis
-            else rate(h1_eligible, lambda e: e["verdict"] == "correct")
+            else rate(h1_eligible, lambda e: e.get("verdict") == "correct")
         ),
         "mixed_basis": mixed_basis,
         "note": "per-arm number; never compare raw across arms OR across "
@@ -453,8 +493,8 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
     product_findings = {
         "not_found_flag_missing": sum(1 for e in enriched if e.get("not_found_flag_missing")),
         "zero_citation_answers": sum(
-            1 for e in answerable
-            if not (e.get("cited")) and e["verdict"] in ("correct", "partial", "wrong")
+            1 for e in answerable_scored
+            if not (e.get("cited")) and e.get("verdict") in ("correct", "partial", "wrong")
         ),
     }
 
@@ -467,23 +507,28 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
             return None
         return round(lat_totals[min(len(lat_totals) - 1, int(p * len(lat_totals)))], 1)
 
+    n_abstain_ok = sum(1 for e in notfound_scored if e.get("verdict") == "correct_abstain")
     return {
         "n_questions": len(enriched),
+        "mode": "retrieval_only" if retrieval_only else "full",
         "answer": {
-            "correct": rate(answerable, lambda e: e["verdict"] == "correct"),
-            "partial": rate(answerable, lambda e: e["verdict"] == "partial"),
-            "wrong": rate(answerable, lambda e: e["verdict"] == "wrong"),
-            "false_abstain": rate(answerable, lambda e: e["verdict"] == "false_abstain"),
+            "correct": rate(answerable_scored, lambda e: e.get("verdict") == "correct"),
+            "partial": rate(answerable_scored, lambda e: e.get("verdict") == "partial"),
+            "wrong": rate(answerable_scored, lambda e: e.get("verdict") == "wrong"),
+            "false_abstain": rate(answerable_scored, lambda e: e.get("verdict") == "false_abstain"),
             "by_type": {
-                t: rate([e for e in answerable if e["answer_type"] == t],
-                        lambda e: e["verdict"] == "correct")
-                for t in sorted({e["answer_type"] for e in answerable})
+                t: rate([e for e in answerable_scored if e["answer_type"] == t],
+                        lambda e: e.get("verdict") == "correct")
+                for t in sorted({e["answer_type"] for e in answerable_scored})
             },
         },
         "abstention": {
-            "n_not_found": len(notfound),
-            "correct_abstain_rate": rate(notfound, lambda e: e["verdict"] == "correct_abstain"),
-            "false_answer_rate": rate(notfound, lambda e: e["verdict"] == "false_answer"),
+            "n_not_found": len(notfound_scored),
+            # counts alongside rates (review #72: one decimal place on a
+            # six-item denominator implies precision that doesn't exist)
+            "correct_abstain_counts": f"{n_abstain_ok}/{len(notfound_scored)}" if notfound_scored else None,
+            "correct_abstain_rate": rate(notfound_scored, lambda e: e.get("verdict") == "correct_abstain"),
+            "false_answer_rate": rate(notfound_scored, lambda e: e.get("verdict") == "false_answer"),
         },
         "retrieval": retrieval_agg,
         "citations": citation_agg,
@@ -556,7 +601,7 @@ def _write_report(run_dir: Path, s: dict, enriched: list[dict], run_record: dict
         "",
     ]
     for e in enriched:
-        if e["verdict"] in ("correct", "correct_abstain"):
+        if e.get("_retrieval_only") or e.get("verdict") in ("correct", "correct_abstain", None):
             continue
         r = e.get("retrieval") or {}
         lines.append(

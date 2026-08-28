@@ -1,5 +1,6 @@
 {
-  "n_questions": 0,
+  "n_questions": 32,
+  "mode": "retrieval_only",
   "answer": {
     "correct": null,
     "partial": null,
@@ -9,18 +10,32 @@
   },
   "abstention": {
     "n_not_found": 0,
+    "correct_abstain_counts": null,
     "correct_abstain_rate": null,
     "false_answer_rate": null
   },
-  "retrieval": {},
+  "retrieval": {
+    "n": 32,
+    "first_gold_rank": 1.2333333333333334,
+    "hit@1": 0.90625,
+    "hit@12": 0.9375,
+    "hit@3": 0.90625,
+    "hit@5": 0.90625,
+    "mrr": 0.91015625,
+    "ndcg@5": 0.90625,
+    "recall@1": 0.90625,
+    "recall@12": 0.9375,
+    "recall@3": 0.90625,
+    "recall@5": 0.90625
+  },
   "citations": {},
   "solo_gate": {
-    "fire_rate": null
+    "fire_rate": 0.0
   },
   "h1_slice": {
-    "n_extractive": 0,
+    "n_extractive": 32,
     "n_eligible": 0,
-    "eligible_fraction": null,
+    "eligible_fraction": 0.0,
     "basis_counts": {
       "fact_spans": 0,
       "file_level_image": 0
@@ -35,11 +50,11 @@
     "zero_citation_answers": 0
   },
   "latency": {
-    "p50_total_s": null,
-    "p95_total_s": null
+    "p50_total_s": 0.0,
+    "p95_total_s": 0.0
   },
   "errors": 0,
-  "enriched_at_sha": "6f4cf3d185f01b402401e7ebe75bcca22c5da6dd",
+  "enriched_at_sha": "ab96ffb3cf8dae6de96513a8de4b1bf6f3eb0b28",
   "golden_set": {
     "items": 32,
     "human_verified": 0,

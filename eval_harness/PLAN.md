@@ -37,10 +37,15 @@ extended to accuracy). Current docket (add/remove freely):
   own scaffolding-fault class.
 - **H2 — rewrite:** rewrite improves recall@5 on vague `question_variants` by ≥10
   points while moving keyword-style recall@5 by <5 points.
-  **RESULT (2026-08-28, receipts, retrieval-only arms): REFUTED — inverted.**
-  Vague: ON .875 vs OFF .906 (−3.1). Primary: ON .936 vs OFF .979 (−4.3).
-  Rewrite costs ~1.3–2s/query and slightly degrades ColQwen retrieval on this
-  corpus. Single-corpus; §6's ≥2-corpora rule before generalizing.
+  **RESULT (2026-08-28, receipts, retrieval-only arms): REFUTED — no recall
+  effect at the pre-registered threshold in either direction.** Vague: ON .875
+  vs OFF .906; primary: ON .936 vs OFF .979 — both deltas below the 10-point
+  floor (and the primary delta inside H2's own <5-point "no movement" band),
+  so per the docket's global rule they read as no effect, not as harm. What
+  stands independently: rewrite costs ~1.3–2s/query (mechanism, not
+  measurement), so it is not earning its latency on this corpus. Single-corpus;
+  §6's ≥2-corpora rule before generalizing. Evidence: committed metrics in
+  runs/h2-* (retrieval-only mode).
 - **H3 — context width:** extractive key-fact accuracy at `top_k_context=12` is ≥10
   points below `top_k_context=3` even while retrieval recall rises.
   **RESULT (2026-08-28, receipts, 4-point curve k∈{1,3,5,12}): CONFIRMED beyond the

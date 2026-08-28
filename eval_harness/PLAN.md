@@ -20,15 +20,23 @@ zero design influence. Every hypothesis carries a pre-stated minimum effect size
 result below it is "no effect" regardless of direction (§5's latency discipline,
 extended to accuracy). Current docket (add/remove freely):
 
-- **H1 — model sufficiency:** where the gold file is retrieved and fits in budget,
-  LFM2.5 answers ≥85% of extractive questions correctly; expected to break down on
-  aggregation/enumeration and abstention. (§5's attribution split — retrieved-but-wrong
-  vs. never-retrieved — is what tests this either way.)
+- **H1 — model sufficiency:** where the gold file's content is *observed present in the
+  final prompt* (§4.4 `in_prompt` — never inferred from rank: budget trimming keeps
+  best-ranked-first, so "survived the budget" is a rank-biased subset, and the budget
+  doesn't exist at all on cloud arms), LFM2.5 answers ≥85% of extractive questions
+  correctly; expected to break down on aggregation/enumeration and abstention. The
+  retrieved-but-excluded rate (trimmed or solo-gated away) is reported alongside as its
+  own scaffolding-fault class.
 - **H2 — rewrite:** rewrite improves recall@5 on vague `question_variants` by ≥10
   points while moving keyword-style recall@5 by <5 points.
 - **H3 — context width:** extractive key-fact accuracy at `top_k_context=12` is ≥10
   points below `top_k_context=3` even while retrieval recall rises. Answer-side: tested
-  as a {3, 12} bracket costing two full runs, not by truncation (§2).
+  as a {3, 12} bracket costing two full runs, not by truncation (§2). Both bracket runs
+  set `LOCAL_SOLO_MARGIN=0` — with the gate on, ~24% of questions ignore k entirely.
+  Prior evidence this is real (`src/stage2/search.py:840`, 2026-08-24, 121-trace
+  replay + reading-isolation ladder): the 3B is near-perfect from a single correct
+  file and drops to ~13% with 4 distractors — the bracket measures magnitude, not
+  existence.
 - **H4 — grammar:** enforcement costs ≥5 points of key-fact accuracy vs. enforcement
   off; anything smaller = no effect, keep enforcement for parse reliability.
 
@@ -79,9 +87,10 @@ practice:
 | `dataset` | `receipts`, `personal_notes`, `furman_directory` (+ optional `mmlongbench` yardstick) | index | one cached index per (dataset × index-side config) |
 | `col_model` | ColSmol vs ColQwen2.5 (confirm exact HF IDs in Phase 0) | index | doubles index builds; cached |
 | `summary_model` / summary prompt | current default (+ variants later) | index | summaries are written by the gen model at index time → index-side, not answer-side |
-| `model_config` | 3 named configs (decided 2026-08-28): `lfm-local` (LFM2.5-VL-3B, grammar ON) · `gemma26b-local` (Gemma 4 26B-A4B, grammar ON) · `gemma26b-openrouter` (same model via free API, grammar OFF — the free tier forbids grammar enforcement) | answer | full run per value. ⚠ `gemma26b-openrouter` differs from `gemma26b-local` in provider AND grammar at once — differences between those two are not attributable to either factor alone |
+| `model_config` | 3 named configs (decided 2026-08-28): `lfm-local` (LFM2.5-VL-3B, grammar ON) · `gemma26b-local` (Gemma 4 26B-A4B, grammar ON) · `gemma26b-openrouter` (same model via free API, grammar OFF — the free tier forbids grammar enforcement) | answer | full run per value. ⚠ `gemma26b-openrouter` differs from `gemma26b-local` in provider AND grammar at once — differences between those two are not attributable to either factor alone; local arms additionally carry local-only mechanisms cloud lacks (solo gate; context-budget trimming — budget is `None` on cloud, `src/answer.py:61-87`) |
 | `prompt_style` | `baseline` (current sandwich), `compact`, (room for more) | answer | full answer run per value |
 | `grammar` | enforced vs off — H4 ablation, run on a LOCAL model config only (the `model_config` values above otherwise pin their own grammar setting) | answer | full answer run per value |
+| `solo_gate` (`LOCAL_SOLO_MARGIN`) | 2.0 (prod default) vs 0 (off). Local-only: when the top rerank score dominates #2 by the margin, the generator gets that file ALONE — fires on ~24% of questions (measured, see `src/stage2/search.py:840`) | answer | full run per value. Contaminates any axis assuming k controls context width — H3 runs with it OFF; `solo_gated` is recorded per question in every run regardless |
 | `rewrite` | on vs off | retrieval | scored via `--retrieval-only` (cheap) |
 | `top_k_retrieval` | scored at 1, 3, 5, 12 | retrieval | **free for retrieval metrics** — retrieve once at k=12, truncate the ranked list |
 | `top_k_context` | blocks fed to the generator: bracket {3, 12}, widen only if the bracket shows an effect | answer | **not free** — one full answer run per value (this is H3's axis) |
@@ -148,7 +157,8 @@ import / backend spawn**. Weights are protected from mutation with `HF_HUB_OFFLI
 guarantees runs never silently download anything.
 
 **Controlled environment (no ambient `.env`):** `src/manifest.py:53` loads `.env` before
-paths resolve, and `LLM_PROVIDER`, `OPENROUTER_MODEL`, `LOCAL_TEMPERATURE`, `LOCAL_N_CTX`
+paths resolve, and `LLM_PROVIDER`, `OPENROUTER_MODEL`, `LOCAL_TEMPERATURE`,
+`LOCAL_N_CTX`, `LOCAL_SOLO_MARGIN`, `LOCAL_PREFILL_BUDGET_TOKENS`, `LLAMA_SERVER_GPU`
 etc. are ambient env reads — precisely the axes being swept. The runner therefore
 constructs the backend's environment explicitly from the run config (every
 parameter-relevant var set; the repo `.env` never inherited) and writes the fully
@@ -205,6 +215,7 @@ every corpus.
     "model_config": "lfm-local",        // lfm-local | gemma26b-local | gemma26b-openrouter
     "prompt_style": "baseline",
     "grammar": true,                    // resolved from model_config unless an H4 ablation overrides it
+    "solo_margin": 2.0,                 // LOCAL_SOLO_MARGIN; local-only; 0 disables
     "rewrite": true,
     "top_k_retrieval_max": 12,
     "top_k_context": 5,                 // blocks fed to generator; confirm prod default in Phase 0
@@ -240,7 +251,11 @@ questions sourced to this file: derivable from the summary alone? yes/no →
 {
   "qa_id": "receipts-007", "variant": 0,
   "rewritten_query": "…",
-  "retrieved": [{"path": "…", "score": 0.031, "rank": 1}, …],   // full list at k_max
+  "solo_gated": false,                              // did gate_to_solo fire on this question
+  "retrieved": [{"path": "…", "score": 0.031, "rank": 1,
+                 "in_prompt": "full | truncated | dropped | solo_excluded"}, …],
+  // full ranked list at k_max; in_prompt records what ACTUALLY reached the generator
+  // (observed, never inferred from rank/budget arithmetic)
   "answer": "…", "cited": ["…"],
   "latency_s": {"rewrite": 1.8, "retrieval": 0.2, "generation": 24.1, "total": 26.1},
   "tokens": {"prompt": 9800, "completion": 210},
@@ -279,8 +294,11 @@ rate (HTTP errors, crashes). Timing on a laptop is indicative only — never pic
 on a <10–15% latency delta, and never A/B timing across different thermal sessions.
 
 **Diagnostic reading order when a config scores badly:** was the gold file in top-k?
-(no → retrieval problem) → was it cited? (no → prompt/generation problem) → were the
-facts right? (no → generation/grounding problem). Every answer row carries all three.
+(no → retrieval problem) → did its content actually reach the prompt, or was it trimmed
+by the context budget / excluded by the solo gate? (no → **scaffolding: budget/gating
+fault, not the model's**) → was it cited? (no → prompt/generation problem) → were the
+facts right? (no → generation/grounding problem). Every answer row carries all four —
+`in_prompt` and `solo_gated` are observed and recorded, never inferred.
 
 ---
 

@@ -76,3 +76,15 @@ Evaluations/*/
 Test Questions/
 
 .venv.broken/
+
+# Eval harness (eval_harness/PLAN.md §3, §9.3): run folders hold indexed
+# personal content, scratch app-data dirs, and multi-GB logs. Only each
+# run's config snapshot, metrics summary, and report are committed - the
+# runner writes those OUTSIDE runs/<id>/raw/. Listed BEFORE the first run
+# ever executes, because ignoring never untracks (see Test Questions/
+# above for how that went last time).
+eval_harness/runs/
+# Corpora never live in the repo (size + privacy); manifests and golden
+# QA do. Local corpus-root pointers are per-machine and untracked.
+eval_harness/datasets/*/corpus/
+eval_harness/datasets/*/corpus_root.local.json

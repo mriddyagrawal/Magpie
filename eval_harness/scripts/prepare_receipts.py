@@ -330,12 +330,18 @@ def main() -> None:
     (DATASET_DIR / "corpus_root.local.json").write_text(
         json.dumps({"corpus_root": str(corpus_dir)}, indent=2) + "\n", encoding="utf-8")
 
-    (corpus_dir / "_corpus_info.md").write_text(
-        "# Receipts eval corpus\n\n150 SROIE receipt scans (see "
-        "eval_harness/datasets/receipts/manifest.json).\nThis file also keeps "
-        "the folder indexable: the walker's asset-library\nheuristic skips "
-        "image-only folders (>=15 images, 0 documents) wholesale.\n")
-    print(f"corpus: {len(manifest_files)} images -> {corpus_dir}")
+    # <=14 images per subfolder: the walker's asset-library heuristic skips
+    # image-only folders of >=15 images per-FOLDER; subfoldering disarms it
+    # without planting foreign files that pollute retrieval (a text file
+    # outranks every image at rerank because image snippets are a constant
+    # placeholder).
+    import shutil as _sh
+    for i, name in enumerate(sorted(manifest_files)):
+        sub = corpus_dir / f"batch_{i//14:02d}"
+        sub.mkdir(exist_ok=True)
+        if (corpus_dir / name).exists():
+            _sh.move(str(corpus_dir / name), sub / name)
+    print(f"corpus: {len(manifest_files)} images -> {corpus_dir} (subfoldered)")
     print(f"golden: {len(golden)} items "
           f"({json.loads((DATASET_DIR / 'manifest.json').read_text())['composition']})")
     print(f"committed artifacts in {DATASET_DIR}")

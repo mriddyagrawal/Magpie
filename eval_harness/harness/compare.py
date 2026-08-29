@@ -240,6 +240,17 @@ def axes(a: dict, b: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 
+def _latency_total(v) -> float | None:
+    """Runs store latency_s either as a scalar or as a dict of phase
+    timings with a 'total' key (found the hard way in the first real
+    comparison - the scalar-only check silently collected zero pairs)."""
+    if isinstance(v, (int, float)):
+        return float(v)
+    if isinstance(v, dict) and isinstance(v.get("total"), (int, float)):
+        return float(v["total"])
+    return None
+
+
 def judge_verdict_of(run: dict, qa_id: str) -> str | None:
     j = run.get("judge")
     if not j:
@@ -280,8 +291,9 @@ def compare_pair(a: dict, b: dict, qa_ids: list[str]) -> dict:
         if h1a is not None and h1b is not None:
             hit1_pairs.append((bool(h1a), bool(h1b)))
         abstain_pairs.append((bool(ra.get("abstained")), bool(rb.get("abstained"))))
-        if isinstance(ra.get("latency_s"), (int, float)) and isinstance(rb.get("latency_s"), (int, float)):
-            latency_deltas.append(rb["latency_s"] - ra["latency_s"])
+        la_s, lb_s = _latency_total(ra.get("latency_s")), _latency_total(rb.get("latency_s"))
+        if la_s is not None and lb_s is not None:
+            latency_deltas.append(lb_s - la_s)
 
         if va != vb:
             transitions[f"{va} -> {vb}"] = transitions.get(f"{va} -> {vb}", 0) + 1

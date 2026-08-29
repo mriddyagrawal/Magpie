@@ -116,3 +116,44 @@
 
 <!-- magpie-compare agents append below this line -->
 
+
+# Supervisor synthesis (agents + spot-checked)
+
+## Verdict
+
+**No — k=3 is not worth it on this evidence, and the modest answer improvement (5.8%→8.3%) belongs almost entirely to the OTHER knob (rewrite off), not to k.** The delta is suggestive, not decision-grade (4A/7B discordant, McNemar p=0.549). Retrieval hit@1 was flat — and structurally had to be: the pre-gate ranking never sees `top_k` (ranked at k_max=12 in both runs), and all 19 retrieval flips attribute to the rewrite knob, 0 to k. Of the 11 answer-verdict flips, `top_k` is primary in exactly 1 (low confidence) and co-primary in 2 via first-slot geometry. Meanwhile k=3 costs +7.2s mean / +40s p95 latency (driven by a new degeneration defect) and coincides with a citation collapse. Owner's question answered: stay at k=2 until the ordering fix lands, then re-measure.
+
+## What the comparison actually found (defects > deltas)
+
+1. **Rewriter wall-clock contamination (product bug, run A).** The rewrite LLM injects the current date/time into queries (21/120) and keywords (65/120); on 4 typed queries it REPLACED the query entirely (e.g. `rcpt-nf-05-typed` → `'2026-08-29 03:31 EDT'`, `rcpt-c-10-typed` → `'current date and time Saturday 2026-08-29 03:02 EDT'`). Most of A's "false answers on not_found questions" were temptation files retrieved by contaminated queries. The rewrite-off "abstention improvement" in B is mostly losing those temptation files, NOT a better abstention policy — B false-answered `nf-06` the moment a citable bookshop receipt landed first.
+2. **Guard structural zero re-confirmed at accuracy 1.000 in BOTH runs**: no surviving answer in either run contains any number ≥ 100. Every receipt total over RM100 is unanswerable-correctly; the 29-question wrong↔false_abstain churn is coin-flipping around that threshold (same top-1 file 12/17 and 7/10; gold in-prompt unchanged).
+3. **Best-ranked-last ordering bug confirmed live, both runs**: in 10 of 11 grounded wrong/false answers, content came from the FIRST-presented (worst-ranked) file. `rcpt-a-04-full` is the clean demonstration: B RANKED gold #1 (a retrieval improvement), the reversal presented it last, and the model answered "Cash" from the sibling it met first — a retrieval win converted into an answer regression by prompt assembly.
+4. **NEW in B: degenerate generations** — 8 multi-thousand-token junk emissions ("dropped hallucinated source paths" up to 5.4k chars), exactly the slow tail (p95 20s→57s); zero in A. Plus 1 unparseable output. Attribution medium: 3-image prompts. Needs its own investigation before any k>2 ships.
+5. **Citation collapse in B**: zero-citation answers 9→45 (12%→57% of non-abstained); precision 0.184→0.060. Unattributed (rewrite-off vs 3-image); blocks shipping norewrite as-is.
+6. `rcpt-e-04-typed`'s A "correct" was a lucky fabrication (cited receipt reads VISA; answer said Master Card, matching gold by chance) — that regression is illusory, and a caveat on both judges' blind spot for lucky guesses.
+
+## Cause table (11 answer flips, spot-checked 2/agent)
+
+| Cause | n | qa_ids |
+|---|---|---|
+| retrieval_change (all rewrite-driven) | 7 | e-04-full, nf-06-typed, nf-01-full, nf-01-typed, nf-02-typed, nf-04-full, nf-05-typed |
+| prompt_assembly (ordering/first-slot) | 3 | a-04-full, b-05-typed, nf-07-typed |
+| model_variance | 1 | e-04-typed |
+| guard / judge_disagreement / infra_error | 0 | — (churn is guard-mediated but below the flip threshold; errors identical 4/4 same qa_ids) |
+
+Knob attribution: rewrite primary 7, both 2, top_k 1, unclear 1. Retrieval flips: rewrite 19/19.
+
+## Slice story
+
+Full-sentence hit@1 rose 0.868→0.906 while typed fell 0.698→0.679; the typed↔full gap WIDENED 0.170→0.226. Mechanism (from per-flip evidence): rewrite-off stops fixing typos ("phamacy", "amout", "restarant") — hurting typed — while its catastrophes (vendor-dropped queries) had been typed-concentrated too. Rewrite is high-variance on typed queries, not net-negative: depth asymmetry matters — where rewrite-off lost, gold fell shallow (6/9 within top-3); where rewrite lost, gold fell deep (5 clean misses to None). A contamination-fixed rewrite would likely be a strict win.
+
+## Regression-hunter extras
+
+- Errors/overflows identical (4/4, same qa_ids, widened path reads 12 files regardless of k).
+- Judge not a limiter: same model+rubric, disagreement 6.7%→8.3%, 0 judge_disagreement flips.
+- solo_gate fire_rate 0 both (structurally off, stamped). Index bit-identical (B mounted A's store entry — retrieval deltas are pure query effects).
+- Harness bug found by this comparison: compare.py's paired-latency check expects scalar `latency_s` but runs store a dict — fixed in the commit following this synthesis.
+
+## Recommended next run
+
+**Fix the ordering (best-first when image blocks present — one line in `src/answer.py`), keep k=2, rewrite off, same golden set.** Single code-axis change; index store HIT (key 5ff3e0adf0448de6); ~45–60 min answer run + judge. Expected effect: the 10/11 first-slot wrong answers and the a-04 class of inverted retrieval wins flip — if answer-good doesn't move ≥5 discordant with that fix, the model, not the prompt, is the ceiling. Second in queue: strip wall-clock from the rewriter prompt and re-test rewrite on typed queries only.

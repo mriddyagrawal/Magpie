@@ -695,6 +695,96 @@
             }
           ]
         }
+      },
+      "synthesis": {
+        "verdict": "k=3 not worth it; answer delta (+2.5pt, p=0.549) not decision-grade and attributable to rewrite-off, not k. Stay k=2; fix ordering first.",
+        "cause_counts": {
+          "retrieval_change": 7,
+          "prompt_assembly": 3,
+          "model_variance": 1,
+          "guard": 0,
+          "judge_disagreement": 0,
+          "infra_error": 0
+        },
+        "knob_attribution": {
+          "answer_flips": {
+            "rewrite": 7,
+            "both": 2,
+            "top_k": 1,
+            "unclear": 1
+          },
+          "retrieval_flips": {
+            "rewrite": 19,
+            "top_k": 0,
+            "noise": 0
+          }
+        },
+        "defects_found": [
+          "rewriter injects wall-clock datetime into 66/120 queries; 4 typed queries fully replaced by timestamps",
+          "grounding guard >=100 rule: zero surviving answers with numbers >=100 in either run (accuracy 1.000)",
+          "best-ranked-last ordering: 10/11 grounded wrong answers quote the FIRST-presented worst-ranked file; inverts retrieval wins (rcpt-a-04-full)",
+          "B-only: 8 degenerate multi-thousand-token generations (p95 latency 20s->57s); 1 unparseable output",
+          "B citation collapse: zero-citation answers 9->45, precision 0.184->0.060 (unattributed)",
+          "compare.py paired-latency scalar check vs dict latency_s (fixed post-synthesis)"
+        ],
+        "recommended_next_run": "ordering fix (best-first for vision), k=2, rewrite off, same golden; index HIT; single code axis",
+        "flip_attributions": {
+          "rcpt-a-04-full": {
+            "cause": "prompt_assembly",
+            "knob": "rewrite",
+            "confidence": "med"
+          },
+          "rcpt-e-04-full": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-e-04-typed": {
+            "cause": "model_variance",
+            "knob": "unclear",
+            "confidence": "med"
+          },
+          "rcpt-nf-06-typed": {
+            "cause": "retrieval_change",
+            "knob": "both",
+            "confidence": "med"
+          },
+          "rcpt-b-05-typed": {
+            "cause": "prompt_assembly",
+            "knob": "top_k",
+            "confidence": "low"
+          },
+          "rcpt-nf-01-full": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-01-typed": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-02-typed": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-04-full": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "med"
+          },
+          "rcpt-nf-05-typed": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-07-typed": {
+            "cause": "prompt_assembly",
+            "knob": "both",
+            "confidence": "med"
+          }
+        }
       }
     }
   ]

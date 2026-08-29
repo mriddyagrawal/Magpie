@@ -1,0 +1,1322 @@
+{
+  "rubric_version": "2.0",
+  "judge_model": "claude-opus-5",
+  "run_id": "20260829T065335Z-receipts-topk2-rerank-off",
+  "mode": "full_context",
+  "verdicts": {
+    "rcpt-a-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Receipt X51005442322 prints Total 269.40; Magpie answered 40.80, a value that appears nowhere on the file."
+    },
+    "rcpt-a-01-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered RM 77.40, which is the Sen Lee Heong total from the rank-2 distractor, not Tony Roma's 269.40."
+    },
+    "rcpt-a-02-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found on an answerable question even though the gold receipt was retrieved at rank 2."
+    },
+    "rcpt-a-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found despite the gold receipt X51005365187 sitting at rank 1."
+    },
+    "rcpt-a-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold parking slip was retrieved at rank 1."
+    },
+    "rcpt-a-03-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Named the operator rather than the car park and cited X51005605287 instead of the gold slip, so it answered off a different file."
+    },
+    "rcpt-a-04-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "The invoice X00016469670 plainly shows VISA CARD 193.00 with card ending 4318; Magpie said Cash."
+    },
+    "rcpt-a-04-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Card (VISA) matches the VISA CARD tender line on the verified invoice; the 193.00 amount was supplied in the question itself."
+    },
+    "rcpt-a-05-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found while the gold Zheng Hui receipt was at rank 1."
+    },
+    "rcpt-a-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 0.60 off the rank-2 distractor X51005676542 instead of the gold GST of 24.69."
+    },
+    "rcpt-a-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Reported a 3/4\" aluminium rod at RM19.60 from the Hon Hwa receipt X51005568889, not the AR RED GASKET at 72.00."
+    },
+    "rcpt-a-06-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found after retrieval missed the gold file entirely."
+    },
+    "rcpt-a-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Uroko bill was retrieved at rank 1."
+    },
+    "rcpt-a-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold Uroko bill at rank 1."
+    },
+    "rcpt-a-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the Teo Heng receipt was retrieved at rank 1."
+    },
+    "rcpt-a-08-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered TRI SHAAS SDN BHD, the legal entity on the Mydin receipt X51005705759, which sells no carbon paper; the gold shop is Teo Heng Stationery & Books."
+    },
+    "rcpt-a-09-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly picked December but gave neither the 7.95 nor the 6.35 supporting figure and cited nothing."
+    },
+    "rcpt-a-09-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly picked the 31 December bill and cited both gold files, but supplied neither amount."
+    },
+    "rcpt-a-10-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found even though both gold OJC invoices were retrieved at ranks 1 and 2."
+    },
+    "rcpt-a-10-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 11.13 against a gold sum of 363.00 (170.00 + 193.00), mixing in two non-OJC receipts it also cited."
+    },
+    "rcpt-b-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered RM 63.90, the Burger King total from the rank-2 distractor, not Jiawei's 110.00."
+    },
+    "rcpt-b-01-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold Jiawei bill at rank 1."
+    },
+    "rcpt-b-02-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Modern Depot receipt was at rank 1."
+    },
+    "rcpt-b-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold Modern Depot receipt at rank 1."
+    },
+    "rcpt-b-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the Chop Yew Lian fuel slip was at rank 1."
+    },
+    "rcpt-b-03-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 4.62 litres off the rank-2 distractor X51005230605 instead of the gold 11.54 litres."
+    },
+    "rcpt-b-04-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Receipt X51005444041 tenders RM81.00 as Pmpc (debit) 0012; Magpie said Cash and cited an unrelated Super Seven slip."
+    },
+    "rcpt-b-04-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Said Cash and cited the neighbouring Ben's receipt X51005444040; the verified gold file shows a debit-card tender."
+    },
+    "rcpt-b-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Returned 49.50, which is the exclusive-GST sub-total on X51005568895, not the 2.97 GST line."
+    },
+    "rcpt-b-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 2.64 where the verified invoice prints GST 6% : 2.97."
+    },
+    "rcpt-b-06-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found after query rewriting dropped 'Premio' and retrieval missed the gold file."
+    },
+    "rcpt-b-06-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Premio invoice was at rank 1."
+    },
+    "rcpt-b-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold Popular receipt at rank 1."
+    },
+    "rcpt-b-07-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Named the chain rather than the Sunway Velocity outlet and cited the Great Zone receipt X51005806692."
+    },
+    "rcpt-b-08-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly named 99 Speed Mart from the gold file but gave neither the branch nor the 5.35 amount."
+    },
+    "rcpt-b-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found even though the gold Sunquick receipt was at rank 1."
+    },
+    "rcpt-b-09-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Pipeline returned a 400 error from the local LLM endpoint, so the user received an empty answer on an answerable question."
+    },
+    "rcpt-b-09-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Pipeline returned a 400 error from the local LLM endpoint, leaving an empty answer."
+    },
+    "rcpt-b-10-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although both gold Evergreen Light receipts were retrieved at ranks 1 and 2."
+    },
+    "rcpt-b-10-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with both gold receipts in hand; the not_found_topic was also nonsensical ('a landlord's emergency phone number')."
+    },
+    "rcpt-c-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 63.90 off the Burger King distractor; the verified Mydin receipt totals 109.90 after rounding."
+    },
+    "rcpt-c-01-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 56.80, the LA Stationery total from the rank-2 distractor, against the verified Mydin total of 109.90."
+    },
+    "rcpt-c-02-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Koh Seng receipt was at rank 1."
+    },
+    "rcpt-c-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold Koh Seng receipt at rank 1."
+    },
+    "rcpt-c-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found after retrieval missed the LA Stationery receipt."
+    },
+    "rcpt-c-03-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 4.95 change off an unrelated receipt X51005568866; the gold change is 43.20 on a 100.00 tender."
+    },
+    "rcpt-c-04-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 49.70 off a distractor; the verified Super Terminal invoice lists YAMLUBE (SEMI) MOTOR OIL 1 x 30.00 at 31.80."
+    },
+    "rcpt-c-04-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Returned a garbled item name ('YAMLUBE MOTOP LIFE LINE') and no price at all, where the file shows 30.00 / 31.80."
+    },
+    "rcpt-c-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Named Aeon Co. (M) Bhd from the rank-2 distractor instead of Syarikat Perniagaan Gin Kee."
+    },
+    "rcpt-c-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Named AEON CO. (M) BHD despite citing the gold Gin Kee receipt alongside the distractor."
+    },
+    "rcpt-c-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 36.04 where the gold GST on the Gin Kee cement/pasir bill is 5.04."
+    },
+    "rcpt-c-06-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 16.05, a figure from the co-cited Kedai Papan receipt, not the gold 5.04."
+    },
+    "rcpt-c-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Beyond Brothers receipt was at rank 1."
+    },
+    "rcpt-c-07-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returned the number 3.84 to an address question and cited nothing."
+    },
+    "rcpt-c-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold TS Tools receipt at rank 1."
+    },
+    "rcpt-c-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold TS Tools receipt at rank 1."
+    },
+    "rcpt-c-09-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found after the rewrite dropped 'Wan Sheng' and retrieval returned unrelated receipts."
+    },
+    "rcpt-c-09-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Verified files show 17-03-2018 at 9.60 versus 23-03-2018 at 6.70, so the 23rd was the cheaper visit, not the dearer one by RM0.33."
+    },
+    "rcpt-c-10-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered '5.00 and 4.10' from two unrelated receipts against the gold total of 86.15."
+    },
+    "rcpt-c-10-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Pipeline returned a 400 error from the local LLM endpoint, leaving an empty answer."
+    },
+    "rcpt-d-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 49.70 from the co-cited distractor X51005433556 instead of the Rocku Yakiniku total of 181.55."
+    },
+    "rcpt-d-01-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Same 49.70 misread from the distractor despite citing the gold Rocku Yakiniku bill."
+    },
+    "rcpt-d-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returned '56.80 RM' to a litres question, off the LA Stationery receipt; the gold is 40.49 litres."
+    },
+    "rcpt-d-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Bakalima slip was retrieved at rank 2."
+    },
+    "rcpt-d-03-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered Cheras Leisure Mall from an unrelated receipt; the gold Kaison slip is the MyTOWN outlet."
+    },
+    "rcpt-d-03-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered AEON CO. (M) BHD off the rank-2 distractor rather than MyTOWN Shopping Centre."
+    },
+    "rcpt-d-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Sen Lee Heong bill was retrieved at rank 2."
+    },
+    "rcpt-d-04-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 22 Mar 18 against the gold date of 12-01-2018 and cited nothing."
+    },
+    "rcpt-d-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "The verified AA Pharmacy receipt tenders MASTER 46.20; Magpie said Visa Card off the Green Lane and OJC files it cited."
+    },
+    "rcpt-d-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Said Cash and cited an unrelated Super Seven slip; the verified gold file shows a MASTER card tender."
+    },
+    "rcpt-d-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Reported 7.74, which the verified receipt labels Total Sales excluding GST; the Total GST line is 0.46."
+    },
+    "rcpt-d-06-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 0.77, a figure absent from the verified receipt, which prints Total GST 0.46."
+    },
+    "rcpt-d-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold GM Rack invoice was at rank 1."
+    },
+    "rcpt-d-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold GM Rack invoice at rank 1."
+    },
+    "rcpt-d-08-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Named Popular Book Co. from the co-cited distractor rather than 99 Speed Mart on the gold file."
+    },
+    "rcpt-d-08-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered glass PAPER from Popular at 5.60, a different product and shop than the gold's TLC Glass Cleaner at 99 Speed Mart for 10.60."
+    },
+    "rcpt-d-09-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 1.70 from an unrelated receipt against a gold day-total of 213.06."
+    },
+    "rcpt-d-09-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Pipeline returned a 400 error from the local LLM endpoint, leaving an empty answer."
+    },
+    "rcpt-d-10-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Verified files give AA Pharmacy 46.20 and Green Lane 34.80, so the conclusion is inverted and 25.80 is Green Lane's zero-rated subtotal, not its total."
+    },
+    "rcpt-d-10-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Correctly picked AA Pharmacy against the verified files but gave neither the 46.20 nor the 34.80 figure."
+    },
+    "rcpt-e-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Echoed the vendor name twice with no total at all and cited a Kuching USB-cable receipt instead of the gold invoice."
+    },
+    "rcpt-e-01-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 4.10 off an unrelated receipt against the gold total of 750.00."
+    },
+    "rcpt-e-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returned the restaurant name instead of a date, so the 'when' question is answered with no date despite citing the gold file."
+    },
+    "rcpt-e-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Mei Let bill was at rank 1."
+    },
+    "rcpt-e-03-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered RM11.90 off the rank-2 distractor; the four Whopper JRs come to 40.60 on the gold file."
+    },
+    "rcpt-e-03-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 8.20, the Saint Heart Pastry total from the rank-2 distractor, not 40.60."
+    },
+    "rcpt-e-04-typed": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Master Card matches the verified gold invoice's payment line and 408 was given in the question, though the gold file was never retrieved and the cited receipt actually says VISA CARD."
+    },
+    "rcpt-e-04-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Master Card matches the verified MASTER CARD payment line on the cited gold invoice; the amount was supplied in the question."
+    },
+    "rcpt-e-05-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Great Zone invoice was at rank 1."
+    },
+    "rcpt-e-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 81.00, the Ben's Grocer total from the rank-2 distractor, against a gold GST of 20.79."
+    },
+    "rcpt-e-06-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold 99 Speed Mart slip at rank 1."
+    },
+    "rcpt-e-06-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold 99 Speed Mart slip at rank 1."
+    },
+    "rcpt-e-07-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gave the chain's legal name instead of the Solaris Mount Kiara branch and cited nothing."
+    },
+    "rcpt-e-07-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Same chain-name-for-branch substitution with no citation, so the branch question goes unanswered."
+    },
+    "rcpt-e-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although the gold Dream Arts receipt was at rank 1."
+    },
+    "rcpt-e-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with the gold Dream Arts receipt at rank 1."
+    },
+    "rcpt-e-09-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Reached the right conclusion but asserted Empire at 5.99, which is a tape line item on the AEON slip; the verified Empire total is 30.50."
+    },
+    "rcpt-e-09-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Said Empire cost more, but the verified files show Empire 30.50 against AEON Shah Alam 30.70."
+    },
+    "rcpt-e-10-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 30.25 off two non-Mr-DIY receipts against the gold March total of 34.30."
+    },
+    "rcpt-e-10-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered RM 63.90 with no citations even though all three gold Mr DIY receipts were in the 12-item retrieval set."
+    },
+    "rcpt-en-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Counted 4 Wan Sheng visits against a gold count of 5, with only two files retrieved to count over."
+    },
+    "rcpt-en-01-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Counted 6 Wan Sheng visits against a gold count of 5, again from a two-file retrieval set."
+    },
+    "rcpt-en-02-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although two of the eight gold Kedai Papan invoices were retrieved."
+    },
+    "rcpt-en-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found with two gold Kedai Papan invoices in the retrieval set."
+    },
+    "rcpt-en-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with not_found although two of the six gold Gin Kee January receipts were retrieved."
+    },
+    "rcpt-en-03-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Named only January 4th, presenting one of six gold January dates as the complete answer."
+    },
+    "rcpt-nf-01-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Supplied POPULAR BOOK CO. as the PappaRich receipt when no PappaRich receipt exists in the corpus."
+    },
+    "rcpt-nf-01-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Invented a PappaRich spend of 59.40 from Anchor Flour and Diamond Foil line items on a Burger King receipt."
+    },
+    "rcpt-nf-02-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gave 25.80 as a Secret Recipe total when no Secret Recipe receipt exists."
+    },
+    "rcpt-nf-02-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gave RM 63.90, the Burger King total, as the Secret Recipe bill."
+    },
+    "rcpt-nf-03-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined on a vendor absent from the corpus despite the OldTown White Coffee lexical lure."
+    },
+    "rcpt-nf-03-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Stated in prose that no Coffee Bean & Tea Leaf receipt exists, which is the correct decline."
+    },
+    "rcpt-nf-04-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Echoed 'moonlight cake house' while citing a Restaurant Jiawei receipt, asserting an entry that does not exist."
+    },
+    "rcpt-nf-04-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'Yes, the Moonlight Cake House receipt is available' for a vendor absent from the corpus."
+    },
+    "rcpt-nf-05-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gave 'golden key maker bill: 56.80' using the LA Stationery total for a non-existent vendor."
+    },
+    "rcpt-nf-05-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Quoted a locksmith charge of 18.70 RM for a vendor with no receipt in the corpus."
+    },
+    "rcpt-nf-06-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined on Tanjongmas Bookcentre despite same-category bookshop distractors being retrieved."
+    },
+    "rcpt-nf-06-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Gave 12.15, the verified total of a Popular Book Co. AEON Shah Alam slip, as a Tanjongmas Bookcentre purchase."
+    },
+    "rcpt-nf-07-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Echoed 'Platinum Racking Sdn BHD' while citing a receipt, presenting a non-existent vendor as found."
+    },
+    "rcpt-nf-07-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'No, there is nothing from Platinum Racking in your receipts', which is the correct decline in prose."
+    }
+  },
+  "golden_issues": [
+    {
+      "qa_id": "rcpt-e-09-typed",
+      "problem": "The corpus holds two Popular Book Co. AEON Shah Alam receipts from 06/03/18 three minutes apart - X51006008092 (Total RM 30.70, 18:01) and X51006008093 (Total RM 12.15, 18:04). 'The one at AEON Shah Alam' is therefore under-specified; the gold silently assumes the 30.70 slip. Verified by reading both images."
+    },
+    {
+      "qa_id": "rcpt-e-09-full",
+      "problem": "Same ambiguity as rcpt-e-09-typed: two AEON Shah Alam Popular receipts exist on 06/03/18 (30.70 and 12.15), so the comparison against Empire's 30.50 has two defensible readings. The gold's 30.70 / 30.50 figures are themselves correct per the images."
+    },
+    {
+      "qa_id": "rcpt-d-05-typed",
+      "problem": "The AA Pharmacy receipt X51005719823 prints a 'CASH' mode header near the top while the tender block reads TOTAL 46.20 / MASTER 46.20 / CHANGE 0.00. The gold ('went on the card') follows the tender line and is right, but the file is internally contradictory and should get a human pass before this item is promoted to gold."
+    },
+    {
+      "qa_id": "rcpt-b-08-typed",
+      "problem": "The question asks only 'which shop', but key_facts carries both the shop and the 5.35 amount, forcing a fully responsive answer ('99 SPEED MART S/B') down to partial. Several golds bundle unasked-for facts this way (see also rcpt-a-03, rcpt-b-07, rcpt-e-07); key_facts should be scoped to what the question actually requests."
+    },
+    {
+      "qa_id": "rcpt-a-09-typed",
+      "problem": "On comparison items the key_facts are the two supporting amounts (7.95, 6.35) rather than the selection itself, so an answer that names the right bill scores zero facts. Comparison golds should carry the chosen item as a key fact. Same shape at rcpt-b-10, rcpt-c-09, rcpt-e-09 and rcpt-d-10 (where rcpt-d-10 does correctly list 'AA PHARMACY' first)."
+    }
+  ],
+  "summary": {
+    "n": 120,
+    "correct": 3,
+    "partial": 4,
+    "wrong": 56,
+    "false_abstain": 43,
+    "correct_abstain": 4,
+    "false_answer": 10,
+    "by_phrasing": {
+      "typed": {
+        "correct": 1,
+        "n": 60
+      },
+      "full": {
+        "correct": 2,
+        "n": 60
+      }
+    },
+    "disagreements_with_deterministic": 8
+  },
+  "judge_model_self_report": "claude-opus-5",
+  "judge_model_source": "wrapper_requested (self-report advisory)",
+  "judge_model_requested": "claude-opus-5",
+  "rubric_sha": "47e93a279e70cef9",
+  "matcher_audit": {
+    "matrix": {
+      "wrong": {
+        "n": 57,
+        "judge_agrees": 54
+      },
+      "false_abstain": {
+        "n": 43,
+        "judge_agrees": 43
+      },
+      "partial": {
+        "n": 6,
+        "judge_agrees": 2
+      },
+      "false_answer": {
+        "n": 11,
+        "judge_agrees": 10
+      },
+      "correct_abstain": {
+        "n": 3,
+        "judge_agrees": 3
+      }
+    },
+    "matcher_precision": null,
+    "note": "precision = P(judge also says correct | deterministic said correct)"
+  }
+}

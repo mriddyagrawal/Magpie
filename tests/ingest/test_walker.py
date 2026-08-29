@@ -68,6 +68,44 @@ def _mock_decision(routes: list[str]) -> RouteDecision:
     )
 
 
+def test_find_candidates_single_file_root(isolated, tmp_path: Path):
+    """Single-file roots short-circuit the walk and must return the same
+    (files, ignored) 2-tuple as the directory path — regression guard for
+    the 3-tuple returns left behind by the asset-library excision.
+
+    Passes `indexing_rules` explicitly so the test never triggers
+    `ensure_path_included` against the user's real config.
+    """
+    import json
+
+    from src.config import load_indexing_rules
+
+    rules_json = tmp_path / "indexing_rules.json"
+    rules_json.write_text(json.dumps({
+        "version": 1,
+        "include_paths": [
+            {"path": str(tmp_path), "enabled": True,
+             "rules": None, "display_name": None},
+        ],
+    }), encoding="utf-8")
+    rules = load_indexing_rules(user_path=rules_json)
+
+    ok_file = tmp_path / "solo.md"
+    ok_file.write_text("hello", encoding="utf-8")
+    found, ignored = find_candidates(ok_file, indexing_rules=rules)
+    assert found == [ok_file]
+    assert ignored == 0
+
+    # Extension whitelist does NOT apply to single-file roots (explicit-
+    # include precedence), so use a default-ignore secrets pattern to hit
+    # the ineligible branch.
+    bad_file = tmp_path / ".env"
+    bad_file.write_text("SECRET=1", encoding="utf-8")
+    found, ignored = find_candidates(bad_file, indexing_rules=rules)
+    assert found == []
+    assert ignored == 1
+
+
 def test_find_candidates_picks_supported_extensions(isolated, tmp_path: Path):
     corpus = tmp_path / "corpus"
     corpus.mkdir()

@@ -41,12 +41,12 @@ def rubric_sha() -> str:
     return hashlib.sha256(RUBRIC_PATH.read_bytes()).hexdigest()[:16]
 
 
-def build_prompt(run_dir: Path, corpus_root: Path, n_questions: int) -> str:
+def build_prompt(run_dir: Path, ds_dir: Path, corpus_root: Path, n_questions: int) -> str:
     return f"""You are the FULL-CONTEXT JUDGE for one Magpie eval run (rubric v2.0).
 
 Read, in this order:
 1. {RUBRIC_PATH} — the rubric; your two output artifacts must match its formats EXACTLY.
-2. {EVAL / 'datasets/receipts/golden.json'} — all golden items (id, question, gold_answer, key_facts, gold_sources, answer_type, phrasing, pair_id).
+2. {ds_dir / 'golden.json'} — all golden items (id, question, gold_answer, key_facts, gold_sources, answer_type, phrasing, pair_id).
 3. {run_dir / 'raw/answers.jsonl'} — Magpie's answers (qa_id, answer, cited, not_found, error).
 4. {run_dir / 'answers_enriched.json'} — the deterministic verdicts (field "verdict"), for the disagreement count and §5 of the report. They are NOT your verdicts — grade independently first.
 5. Source files: for any question where the gold answer and Magpie's answer disagree, or the gold looks doubtful, Read the actual image at {corpus_root}/<gold_source> and let the FILE settle it. You do not need to open files for clear-cut agreements.
@@ -93,13 +93,13 @@ def main() -> int:
                       .read_text(encoding="utf-8").splitlines() if l.strip())
 
     prior = run_dir / "judge_verdicts.json"
-    if prior.exists():
+    if prior.exists() and not args.dry_run:
         old = json.loads(prior.read_text(encoding="utf-8"))
         if old.get("rubric_version") != "2.0" or old.get("judge_model") != args.model:
             prior.rename(prior.with_suffix(".json.old"))
             print("judge: prior verdicts from different judge/rubric set aside as .old")
 
-    prompt = build_prompt(run_dir, corpus_root, n_questions)
+    prompt = build_prompt(run_dir, ds_dir, corpus_root, n_questions)
     if args.dry_run:
         print(prompt)
         return 0

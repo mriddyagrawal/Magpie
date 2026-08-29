@@ -1,0 +1,82 @@
+{
+  "n_questions": 106,
+  "mode": "full",
+  "answer": {
+    "correct": 0.0,
+    "partial": 0.0,
+    "wrong": 0.0,
+    "false_abstain": 1.0,
+    "by_type": {
+      "enumeration": 0.0,
+      "extractive": 0.0
+    }
+  },
+  "abstention": {
+    "n_not_found": 12,
+    "correct_abstain_counts": "12/12",
+    "correct_abstain_rate": 1.0,
+    "false_answer_rate": 0.0
+  },
+  "retrieval": {},
+  "citations": {
+    "n": 94,
+    "citation_precision": 0.0,
+    "citation_recall": 0.0,
+    "cited": 0.0,
+    "hallucinated_citations": 0.0
+  },
+  "solo_gate": {
+    "fire_rate": 0.0
+  },
+  "h1_slice": {
+    "n_extractive": 84,
+    "n_eligible": 0,
+    "eligible_fraction": 0.0,
+    "basis_counts": {
+      "fact_spans": 0,
+      "file_level_image": 0
+    },
+    "accuracy_by_basis": {},
+    "accuracy_on_eligible": null,
+    "mixed_basis": false,
+    "note": "per-arm number; never compare raw across arms OR across bases (PLAN H1). accuracy_on_eligible is None when bases are mixed - use accuracy_by_basis."
+  },
+  "by_phrasing": {
+    "typed": {
+      "n": 47,
+      "correct": 0.0,
+      "correct_counts": "0/47",
+      "retrieval_hit@1": null,
+      "retrieval_recall@5": null
+    },
+    "full": {
+      "n": 47,
+      "correct": 0.0,
+      "correct_counts": "0/47",
+      "retrieval_hit@1": null,
+      "retrieval_recall@5": null
+    }
+  },
+  "product_findings": {
+    "not_found_flag_missing": 0,
+    "zero_citation_answers": 0
+  },
+  "latency": {
+    "p50_total_s": 1.1,
+    "p95_total_s": 1.9
+  },
+  "errors": 0,
+  "enriched_at_sha": "0a3968fb26b7c21344fddb267b414d7335e32b63",
+  "golden_set": {
+    "items": 106,
+    "human_verified": 0,
+    "model_authored": 0,
+    "label_derived": 106,
+    "status": "SILVER (provisional; label-derived)"
+  },
+  "golden_sha": "7a4a7010a845435f",
+  "index_store": {
+    "key": "5ff3e0adf0448de6",
+    "hit": false
+  }
+}

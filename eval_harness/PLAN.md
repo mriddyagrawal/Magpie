@@ -82,6 +82,13 @@ extended to accuracy). Current docket (add/remove freely):
 - **H4 — grammar:** enforcement costs ≥5 points of key-fact accuracy vs. enforcement
   off; anything smaller = no effect, keep enforcement for parse reliability.
 
+**Grammar caveat on every result above (#78, 2026-08-29):** all runs recorded
+before the GBNF merge (0a3968f) executed with NO structural output constraint —
+llama-server silently ignored response_format while run records said
+`grammar: true`. H3's curve survives (the parse penalty is constant across k);
+H1's absolute level and the abstention/citation findings are confounded by
+parse failures. Post-merge re-runs supersede those absolute numbers.
+
 ---
 
 ## 1. Design principles
@@ -513,7 +520,7 @@ overfitting hedge: a parameter change must win on at least two to be believed.
 | Operation | Rough cost |
 |---|---|
 | Index build (50-file dataset, visual tier) | 1–2 h, cached forever after |
-| Full answer run (40–60 q, local 3B, temp 0) | 30–60 min |
+| Full answer run (dual-phrasing golden, ~106 q, local 3B, temp 0) | 60–90 min |
 | `--retrieval-only` run | ~1–2 min |
 | Judge pass (cloud, per run) | minutes + small API cost |
 | Full ablation set, one dataset (post-caching) | ≈9 answer runs, 5–9 h wall-clock |

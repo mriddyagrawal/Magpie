@@ -106,11 +106,13 @@ def main() -> int:
 
     # #90: the judge gets Write for its two artifacts only in spirit - verify
     # in fact that it modified nothing else it also reads.
-    import hashlib as _h
+    # #105: snapshot BYTES, not git state - these files are typically
+    # untracked at judge time (the skill commits after judging), so a
+    # `git checkout --` restore would silently do nothing. Restoring from
+    # the in-memory snapshot works regardless of git status.
     protected = [ds_dir / "golden.json", run_dir / "answers_enriched.json",
                  run_dir / "metrics.json", run_dir / "raw" / "answers.jsonl"]
-    pre_hashes = {str(f): _h.sha256(f.read_bytes()).hexdigest()
-                  for f in protected if f.exists()}
+    pre_bytes = {f: f.read_bytes() for f in protected if f.exists()}
 
     print(f"judge: full-context grading of {n_questions} answers "
           f"(model={args.model}, rubric={rubric_sha()}) — one instance, "
@@ -125,12 +127,18 @@ def main() -> int:
         raise SystemExit(f"judge instance exited {proc.returncode}: {proc.stderr[:500]}")
     print(f"judge instance says: {proc.stdout.strip()[-300:]}")
 
-    for f_str, h in pre_hashes.items():
-        f = Path(f_str)
-        if f.exists() and _h.sha256(f.read_bytes()).hexdigest() != h:
-            subprocess.run(["git", "checkout", "--", f_str], cwd=str(EVAL.parent))
-            raise SystemExit(f"judge modified a protected artifact ({f.name}) - "
-                             f"restored from git; verdicts rejected")
+    tampered = []
+    for f, original in pre_bytes.items():
+        current = f.read_bytes() if f.exists() else None
+        if current != original:
+            f.write_bytes(original)
+            if f.read_bytes() != original:
+                raise SystemExit(f"judge modified {f.name} and restore FAILED - "
+                                 f"recover manually before trusting anything")
+            tampered.append(f.name)
+    if tampered:
+        raise SystemExit(f"judge modified protected artifact(s) {tampered} - "
+                         f"restored from byte snapshot; verdicts rejected")
 
     out = validate(run_dir)
     # stamp what the wrapper knows; the instance's self-report is advisory (#88)

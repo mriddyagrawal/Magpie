@@ -38,7 +38,10 @@ Ask (AskUserQuestion, multiple rounds fine):
    ask whether to proceed. Any one differing → announce which layer changed
    (config / code / questions) and continue as a legitimate comparison.
 
-The judge is NOT a question: it always runs.
+The judge is NOT a question, it always runs — but note to the owner when the
+dataset is personal: the judge reads corpus files in full, so their contents
+go to the API (standing approval exists; still say it out loud for personal
+corpora).
 
 ## Phase 2 — Golden set (only if generate/adapt)
 
@@ -89,9 +92,16 @@ notification, not the timer, is the real signal; the timer is for the owner's
 visibility. If a run fails, show the tail of its worker log and ask the owner
 before retrying.
 
+When a run completes, VERIFY before judging — a recorded config is a claim,
+not a fact, and this project has twice shipped runs whose recorded config was
+not in force. Check in `run.json`: `status: "complete"`; both `isolation.*`
+values true; and `env_snapshot` values match the requested config on every
+swept axis (temperature, solo margin, ctx, provider). Any mismatch: stop and
+show the owner.
+
 ## Phase 4 — Judge (always)
 
-When a run completes (enrichment runs automatically inside the harness):
+After verification (enrichment runs automatically inside the harness):
 
 ```bash
 uv run python eval_harness/judge/judge.py --run-dir eval_harness/runs/<id>

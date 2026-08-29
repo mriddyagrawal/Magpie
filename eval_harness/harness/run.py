@@ -131,11 +131,11 @@ def main() -> int:
         "index_params_hash": idx_hash,
         "golden_sha": golden_sha,
         "questions": len(questions),
-        "backend_git_sha": envctl.git_sha(REPO),
-        # same repo, but phases and (re-runnable) enrichment can execute at
-        # different commits — enrich stamps its own sha into metrics.json
-        # (#58); this one covers the phases.
-        "harness_git_sha": envctl.git_sha(REPO),
+        # scoped shas (#102): the last commit touching the code under test,
+        # not repo HEAD - so doc/skill commits don't fake a "code change"
+        "backend_git_sha": envctl.git_sha(REPO, "src/"),
+        "harness_git_sha": envctl.git_sha(REPO, "eval_harness/"),
+        "repo_head_sha": envctl.git_sha(REPO),
         "status": "running",  # #54: running | complete | failed
         "machine": envctl.machine_info(),
         "env_snapshot": envctl.snapshot_env(env),

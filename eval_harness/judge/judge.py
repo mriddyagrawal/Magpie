@@ -104,6 +104,14 @@ def main() -> int:
         print(prompt)
         return 0
 
+    # #90: the judge gets Write for its two artifacts only in spirit - verify
+    # in fact that it modified nothing else it also reads.
+    import hashlib as _h
+    protected = [ds_dir / "golden.json", run_dir / "answers_enriched.json",
+                 run_dir / "metrics.json", run_dir / "raw" / "answers.jsonl"]
+    pre_hashes = {str(f): _h.sha256(f.read_bytes()).hexdigest()
+                  for f in protected if f.exists()}
+
     print(f"judge: full-context grading of {n_questions} answers "
           f"(model={args.model}, rubric={rubric_sha()}) — one instance, "
           f"reads sources itself; this takes several minutes")
@@ -117,10 +125,40 @@ def main() -> int:
         raise SystemExit(f"judge instance exited {proc.returncode}: {proc.stderr[:500]}")
     print(f"judge instance says: {proc.stdout.strip()[-300:]}")
 
+    for f_str, h in pre_hashes.items():
+        f = Path(f_str)
+        if f.exists() and _h.sha256(f.read_bytes()).hexdigest() != h:
+            subprocess.run(["git", "checkout", "--", f_str], cwd=str(EVAL.parent))
+            raise SystemExit(f"judge modified a protected artifact ({f.name}) - "
+                             f"restored from git; verdicts rejected")
+
     out = validate(run_dir)
-    # stamp what the wrapper knows (the instance may not know its own id)
+    # stamp what the wrapper knows; the instance's self-report is advisory (#88)
+    out["judge_model_self_report"] = out.get("judge_model")
+    out["judge_model"] = args.model
+    out["judge_model_source"] = "wrapper_requested (self-report advisory)"
     out["judge_model_requested"] = args.model
     out["rubric_sha"] = rubric_sha()
+
+    # #87: matcher precision from the FULL deterministic-vs-judge matrix -
+    # a tracked number, not prose. P(judge agrees | deterministic verdict).
+    det = {r["qa_id"]: r.get("verdict") for r in json.loads(
+        (run_dir / "answers_enriched.json").read_text(encoding="utf-8"))}
+    matrix: dict = {}
+    for qa_id, v in out["verdicts"].items():
+        d, j = det.get(qa_id), v.get("verdict")
+        if d is None or j is None:
+            continue
+        cell = matrix.setdefault(d, {"n": 0, "judge_agrees": 0})
+        cell["n"] += 1
+        cell["judge_agrees"] += (d == j)
+    correct_cell = matrix.get("correct", {"n": 0, "judge_agrees": 0})
+    out["matcher_audit"] = {
+        "matrix": matrix,
+        "matcher_precision": (correct_cell["judge_agrees"] / correct_cell["n"])
+        if correct_cell["n"] else None,
+        "note": "precision = P(judge also says correct | deterministic said correct)",
+    }
     (run_dir / "judge_verdicts.json").write_text(
         json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     s = out.get("summary", {})

@@ -44,8 +44,8 @@ extended to accuracy). Current docket (add/remove freely):
   so per the docket's global rule they read as no effect, not as harm. What
   stands independently: rewrite costs ~1.3–2s/query (mechanism, not
   measurement), so it is not earning its latency on this corpus. Single-corpus;
-  §6's ≥2-corpora rule before generalizing. Evidence: committed metrics in
-  runs/h2-* (retrieval-only mode).
+  §6's ≥2-corpora rule before generalizing. Evidence: runs/h2-* at commit ab96ffb (runs later wiped in c97e031;
+  recover via `git show ab96ffb:eval_harness/runs/...`).
 - **H2′ — rewrite at the config that now matters (registered 2026-08-28, after H3):**
   H2 was specified on recall@5 when k=5 was the assumed default; H3 made k=1 the
   decision-relevant config, where hit@1 is the whole retrieval story. Prediction:

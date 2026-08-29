@@ -312,11 +312,15 @@ def machine_info() -> dict[str, str]:
     return info
 
 
-def git_sha(repo_root: Path) -> str:
+def git_sha(repo_root: Path, pathspec: str | None = None) -> str:
+    """Repo HEAD, or with `pathspec`, the last commit touching that path -
+    the sha that actually identifies the code under test (#102: repo HEAD
+    changes on every doc commit, disabling any guard keyed on it)."""
     try:
+        cmd = (["git", "log", "-1", "--format=%H", "--", pathspec]
+               if pathspec else ["git", "rev-parse", "HEAD"])
         return subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=repo_root,
-            capture_output=True, text=True, timeout=10,
+            cmd, cwd=repo_root, capture_output=True, text=True, timeout=10,
         ).stdout.strip()
     except Exception:
         return "unknown"

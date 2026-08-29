@@ -276,6 +276,20 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
     ranked_by_id = {r["qa_id"]: r for r in retrieve_rows}
     enriched: list[dict] = []
 
+    # #83 enforcement: a golden set that doesn't match this run's qa_ids must
+    # FAIL, not silently produce a near-empty but complete-looking report
+    # (regenerated goldens change ids/content; the stamp alone only makes the
+    # mismatch detectable, this makes it fatal).
+    matched = sum(1 for r in answer_rows if r["qa_id"] in by_id)
+    if answer_rows and matched < 0.9 * len(answer_rows):
+        import hashlib as _h
+        raise SystemExit(
+            f"enrich refused: only {matched}/{len(answer_rows)} answered qa_ids "
+            f"exist in the provided golden set — the run was scored against a "
+            f"different golden version. Run golden_sha vs current golden differ; "
+            f"see run.json golden_sha."
+        )
+
     for row in answer_rows:
         qa_id = row["qa_id"]
         item = by_id.get(qa_id)
@@ -443,10 +457,16 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
     # Silver-golden gate (reviewer note on ad18e5a): headline numbers from an
     # unverified golden set are provisional and must say so everywhere.
     n_unverified = sum(1 for q in golden if not q.get("human_verified"))
+    n_model_authored = sum(1 for q in golden if "label" not in (q.get("generator") or "").lower())
     summary["golden_set"] = {
         "items": len(golden),
         "human_verified": len(golden) - n_unverified,
-        "status": "GOLD" if n_unverified == 0 else "SILVER (provisional)",
+        "model_authored": n_model_authored,
+        "label_derived": len(golden) - n_model_authored,
+        "status": "GOLD" if n_unverified == 0 else (
+            "SILVER (provisional; includes MODEL-AUTHORED gold - review those first)"
+            if n_model_authored else "SILVER (provisional; label-derived)"
+        ),
     }
     envs = _load_json(run_dir / "run.json")
     summary["golden_sha"] = envs.get("golden_sha")
@@ -562,6 +582,7 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
             ph: {
                 "n": len(rows),
                 "correct": rate(rows, lambda e: e.get("verdict") == "correct"),
+                "correct_counts": f"{sum(1 for e in rows if e.get('verdict') == 'correct')}/{len(rows)}",
                 "retrieval_hit@1": (metrics.aggregate(
                     [e["retrieval"] for e in rows if e.get("retrieval")]
                 ).get("hit@1")),

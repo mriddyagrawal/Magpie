@@ -147,4 +147,4 @@ uv run python eval_harness/harness/run.py \
     --reuse-index <baseline-run-id>
 ```
 
-Committed run artifacts: `eval_harness/runs/…-receipts-{baseline,topk1,topk3,topk12}/`.
+Run artifacts: `eval_harness/runs/…-receipts-{baseline,topk1,topk3,topk12}/` at commit `18c4035` (runs wiped in `c97e031`; recover via `git show`).

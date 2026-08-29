@@ -1,9 +1,16 @@
-"""Unit tests for the LFM2.5 launch profiles + their filename patterns.
+"""Unit tests for the shipped LFM2.5 launch profile + its filename patterns.
 
-No subprocess, no network — these lock the two things that are cheap to
-get wrong and expensive to discover: the exact GGUF/mmproj filenames in
-Liquid's repos (a typo only surfaces as a 404 after `just install`), and
-the fact that adding these profiles did not move any default.
+No subprocess, no network — these lock the things that are cheap to get
+wrong and expensive to discover: the exact GGUF/mmproj filenames in
+Liquid's repos (a typo only surfaces as a 404 after `just install`), the
+sampler set the model card asks for, and the absolute-path escape hatch
+that lets a machine with the weights already on disk skip a second copy.
+
+History: an earlier draft of this file tested four LFM profiles
+(1.2b-text / 2.6b-text / vl-1.6b / vl-3b) against a Gemma default. That
+design was deliberately reverted — `profiles.py` now registers ONE
+vision profile, on purpose, and says why. The assertions that survived
+the revert are the ones below.
 """
 
 from __future__ import annotations
@@ -20,16 +27,10 @@ from src.inference.profiles import (
     all_profiles,
     default_text_profile,
     get_profile,
-    short_model_name,
 )
 
 
-LFM_PROFILE_NAMES = [
-    "lfm2.5-1.2b-text",
-    "lfm2.5-2.6b-text",
-    "lfm2.5-vl-1.6b-vision",
-    "lfm2.5-vl-3b-vision",
-]
+SHIPPED_PROFILE = "lfm25-vl-vision"
 
 
 # ---------------------------------------------------------------------------
@@ -39,21 +40,8 @@ LFM_PROFILE_NAMES = [
 @pytest.mark.parametrize(
     "repo_id, quant, expected",
     [
-        (
-            "LiquidAI/LFM2.5-1.2B-Instruct-GGUF",
-            "Q8_0",
-            "LFM2.5-1.2B-Instruct-Q8_0.gguf",
-        ),
-        # Liquid's quantization-aware-distilled 4-bit build rides the same
-        # pattern — it is a quant name, not a separate filename shape.
-        (
-            "LiquidAI/LFM2.5-1.2B-Instruct-GGUF",
-            "QAD-Q4_0",
-            "LFM2.5-1.2B-Instruct-QAD-Q4_0.gguf",
-        ),
-        ("LiquidAI/LFM2.5-2.6B-GGUF", "Q4_K_M", "LFM2.5-2.6B-Q4_K_M.gguf"),
-        ("LiquidAI/LFM2.5-VL-1.6B-GGUF", "Q8_0", "LFM2.5-VL-1.6B-Q8_0.gguf"),
         ("LiquidAI/LFM2.5-VL-3B-GGUF", "Q8_0", "LFM2.5-VL-3B-Q8_0.gguf"),
+        ("LiquidAI/LFM2.5-VL-3B-GGUF", "Q6_K", "LFM2.5-VL-3B-Q6_K.gguf"),
         # Gemma must keep resolving exactly as before.
         (
             "unsloth/gemma-4-E4B-it-GGUF",
@@ -66,104 +54,69 @@ def test_gguf_filename_patterns(repo_id, quant, expected):
     assert _filename_for(repo_id, quant) == expected
 
 
-def test_lfm_mmproj_filenames_disagree_on_capitalisation():
-    """The 1.6B repo spells its weights `...VL-1.6B-...` and its projector
-    `...VL-1.6b-...`; the 3B repo uses `3B` in both. Same publisher, one
-    character apart. Getting either wrong is a 404 several GB into a
-    download, so both are pinned."""
-    assert (
-        _mmproj_filename_for("LiquidAI/LFM2.5-VL-1.6B-GGUF", "BF16")
-        == "mmproj-LFM2.5-VL-1.6b-BF16.gguf"
-    )
+def test_vl_3b_mmproj_filename():
     assert (
         _mmproj_filename_for("LiquidAI/LFM2.5-VL-3B-GGUF", "Q8_0")
         == "mmproj-LFM2.5-VL-3B-Q8_0.gguf"
     )
 
 
-def test_text_only_lfm_repos_have_no_projector():
-    """Membership in the GGUF table implies nothing about the mmproj
-    table — asking for a projector on a text-only repo must raise, not
-    silently build a filename that 404s."""
-    with pytest.raises(ValueError, match="unknown mmproj repo"):
-        _mmproj_filename_for("LiquidAI/LFM2.5-1.2B-Instruct-GGUF", "BF16")
-
-
-def test_unknown_repo_still_names_the_wired_ones():
-    with pytest.raises(ValueError, match="LiquidAI/LFM2.5-2.6B-GGUF"):
+def test_unknown_repo_raises_rather_than_guessing():
+    """Building a filename for an unwired repo would 404 several GB into
+    a download; failing at resolution time keeps the cause visible."""
+    with pytest.raises(ValueError):
         _filename_for("someone/not-wired-GGUF", "Q8_0")
 
 
 # ---------------------------------------------------------------------------
-# Profile registry
+# Profile registry — one profile, and it is the vision one
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("name", LFM_PROFILE_NAMES)
-def test_lfm_profiles_registered(name):
-    assert name in all_profiles()
+def test_the_shipped_profile_is_registered_and_default():
+    assert SHIPPED_PROFILE in all_profiles()
+    assert default_text_profile() == SHIPPED_PROFILE
 
 
-def test_adding_lfm_did_not_move_the_default():
-    """Plan #22 step 3: a new profile is opt-in via LLAMA_SERVER_TEXT_MODEL.
-    Registering these must not change what a user with no env var gets."""
-    assert default_text_profile() == "gemma-4-e4b-vision"
+def test_shipped_profile_declares_vision_from_its_own_repo():
+    p = get_profile(SHIPPED_PROFILE)
+    assert p.has_vision is True
+    assert p.args.mmproj_repo_id == p.args.repo_id
 
 
-@pytest.mark.parametrize("name", LFM_PROFILE_NAMES)
-def test_lfm_profiles_use_liquids_recommended_temperature(name):
-    """Liquid's cards call for 0.1, not Gemma's 0.7. A small instruct
-    model at 0.7 wanders on structured extraction, which is most of what
-    Magpie asks it to do."""
-    assert get_profile(name).args.temperature == pytest.approx(0.1)
-
-
-@pytest.mark.parametrize("name", LFM_PROFILE_NAMES)
-def test_lfm_profiles_keep_jinja_on(name):
-    """Every model in this class ships its chat template inside the GGUF."""
-    assert get_profile(name).args.jinja is True
-
-
-def test_only_the_vl_profiles_declare_vision():
-    for name in ("lfm2.5-vl-1.6b-vision", "lfm2.5-vl-3b-vision"):
-        assert get_profile(name).has_vision is True
-        assert get_profile(name).args.mmproj_repo_id is not None
-    for name in ("lfm2.5-1.2b-text", "lfm2.5-2.6b-text"):
-        assert get_profile(name).has_vision is False
-        assert get_profile(name).args.mmproj_repo_id is None
-
-
-@pytest.mark.parametrize(
-    "name", ["lfm2.5-vl-1.6b-vision", "lfm2.5-vl-3b-vision"]
-)
-def test_vl_profiles_load_their_projector_from_their_own_repo(name):
-    """Liquid ships weights and projector in one repo, same as Unsloth
-    does for Gemma — no second repo to resolve."""
-    args = get_profile(name).args
-    assert args.mmproj_repo_id == args.repo_id
-
-
-@pytest.mark.parametrize("name", LFM_PROFILE_NAMES)
-def test_lfm_profiles_pass_liquids_sampling_flags(name):
-    """The recommended repetition penalty rides in `extra_args` because
-    LaunchArgs has no typed field for it. If that ever moves to a real
-    field, this test is the reminder to update the profiles too."""
-    assert "--repeat-penalty" in get_profile(name).args.extra_args
+def test_shipped_profile_keeps_jinja_on():
+    """LFM2.5 ships its chat template inside the GGUF."""
+    assert get_profile(SHIPPED_PROFILE).args.jinja is True
 
 
 # ---------------------------------------------------------------------------
-# Labelling — an A/B run that mislabels its own report is worse than useless
+# Sampling — Liquid's card, not Gemma's leftovers
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize(
-    "profile_name, expected",
-    [
-        ("lfm2.5-vl-1.6b-vision", "LFM2.5-VL-1.6B"),
-        ("lfm2.5-1.2b-text", "LFM2.5-1.2B-Instruct"),
-        ("gemma-4-e4b-vision", "gemma-4-E4B-it"),
-    ],
-)
-def test_short_model_name_drops_owner_and_gguf_suffix(profile_name, expected):
-    assert short_model_name(get_profile(profile_name)) == expected
+def test_profile_uses_liquids_recommended_sampler_set():
+    """Liquid's card calls for temperature 0.1 / min_p 0.15 /
+    repetition_penalty 1.05, not Gemma's 0.7 with llama.cpp's stock
+    samplers. A small instruct model at 0.7 wanders on structured
+    extraction, which is most of what Magpie asks it to do: the n=3 sweep
+    of the 40-question eval scored {15, 11, 11} with ~8 questions flipping
+    between runs on identical prompts."""
+    args = get_profile(SHIPPED_PROFILE).args
+    assert args.temperature == pytest.approx(0.1)
+    assert args.min_p == pytest.approx(0.15)
+    assert args.repeat_penalty == pytest.approx(1.05)
+
+
+def test_sampler_set_reaches_the_llama_server_argv(tmp_path, monkeypatch):
+    """A profile field nobody passes to the subprocess is decoration."""
+    gguf = tmp_path / "LFM2.5-VL-3B-Q8_0.gguf"
+    gguf.write_bytes(b"not really a gguf")
+    mmproj = tmp_path / "mmproj-LFM2.5-VL-3B-Q8_0.gguf"
+    mmproj.write_bytes(b"not really a projector")
+    monkeypatch.setenv("LLAMA_SERVER_MODEL_PATH", str(gguf))
+    monkeypatch.setenv("LLAMA_SERVER_MMPROJ_PATH", str(mmproj))
+    argv = LlamaServerPool()._build_argv(get_profile(SHIPPED_PROFILE), 9199)
+    assert argv[argv.index("--min-p") + 1] == "0.15"
+    assert argv[argv.index("--repeat-penalty") + 1] == "1.05"
+    assert argv[argv.index("--temp") + 1] == "0.1"
 
 
 # ---------------------------------------------------------------------------
@@ -201,8 +154,62 @@ def test_path_override_beats_the_profile_repo(tmp_path, monkeypatch):
     monkeypatch.setenv("LLAMA_SERVER_MODEL_PATH", str(gguf))
     monkeypatch.setenv("LLAMA_SERVER_MMPROJ_PATH", str(mmproj))
 
-    pool = LlamaServerPool()
-    argv = pool._build_argv(get_profile("lfm2.5-vl-3b-vision"), 9199)
+    argv = LlamaServerPool()._build_argv(get_profile(SHIPPED_PROFILE), 9199)
 
     assert argv[argv.index("--model") + 1] == str(gguf)
     assert argv[argv.index("--mmproj") + 1] == str(mmproj)
+
+
+def test_subprocess_pipes_never_raise_on_bad_bytes():
+    """llama-server emits progress bars and locale bytes that are not valid
+    UTF-8. A decode error in the drain thread kills the thread, the stderr
+    pipe fills, and llama-server BLOCKS on write — the server never reaches
+    /health and every request hangs. Cost one eval run a 12-minute stall
+    before it was found, and it had been raising in every log all session."""
+    import inspect
+
+    from src.inference import llama_server_pool
+
+    src = inspect.getsource(llama_server_pool)
+    spawn = src[src.index("stdout=subprocess.PIPE"):]
+    assert 'errors="replace"' in spawn[:1200], "subprocess pipes must not raise on bad bytes"
+
+
+def test_stderr_drain_failure_cannot_block_the_subprocess():
+    """Draining is a logging convenience. If it dies it must keep emptying
+    the pipe rather than let the subprocess deadlock behind a full buffer."""
+    import inspect
+
+    from src.inference.llama_server_pool import LlamaServerPool
+
+    body = inspect.getsource(LlamaServerPool._drain_stderr)
+    assert "except Exception" in body and "readline" in body
+
+
+def test_solo_gate_hedges_by_one(monkeypatch):
+    """The gate hands over the top TWO files, not one.
+
+    Original design sent one, on the college_data finding that a >=2.0 margin
+    meant the top hit was right 93% of the time. sem_4 breaks that premise:
+    the gate fired on 18 of 25 questions and was right 56% of the time, vs
+    86% on the questions it left alone — and the margin carried no signal
+    (16.97 put the wrong file first; 2.21 put the right one first). In every
+    failure the correct file sat at rank 2-4, already retrieved and then
+    discarded."""
+    from src.stage2.search import SearchResult, gate_to_solo
+
+    monkeypatch.setenv("MAGPIE_FORCE_PROVIDER", "local")
+    monkeypatch.delenv("LOCAL_SOLO_KEEP", raising=False)
+    hits = [SearchResult(summary=f"s{i}", path=f"/f{i}", score=10.0 - 5 * i) for i in range(5)]
+    kept = gate_to_solo(hits, question="what is the total?")
+    assert len(kept) == 2, "a confident gate should still hedge by one file"
+    assert [h.path for h in kept] == ["/f0", "/f1"]
+
+
+def test_solo_gate_width_is_tunable(monkeypatch):
+    from src.stage2.search import SearchResult, gate_to_solo
+
+    monkeypatch.setenv("MAGPIE_FORCE_PROVIDER", "local")
+    monkeypatch.setenv("LOCAL_SOLO_KEEP", "1")
+    hits = [SearchResult(summary=f"s{i}", path=f"/f{i}", score=10.0 - 5 * i) for i in range(5)]
+    assert len(gate_to_solo(hits, question="what is the total?")) == 1

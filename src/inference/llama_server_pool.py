@@ -252,6 +252,14 @@ class LlamaServerPool:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            # llama-server writes progress bars and locale-dependent bytes
+            # that are not always valid UTF-8. Without errors="replace" the
+            # decode raises inside the drain thread, the thread dies, the
+            # pipe fills, and llama-server BLOCKS on write — the server never
+            # reaches /health and every request hangs until the spawn
+            # timeout. Seen in every log this session as a UnicodeDecodeError
+            # on byte 0xc4, and it cost one eval run a 12-minute stall.
+            errors="replace",
             bufsize=1,  # line-buffered
             # Windows: don't flash a console window for the server process.
             **no_window_kwargs(),
@@ -326,7 +334,8 @@ class LlamaServerPool:
         """
         from src.inference.model_downloader import ensure_model, ensure_mmproj
 
-        gguf = ensure_model(profile.args.repo_id, profile.args.quant)
+        override = _path_override("LLAMA_SERVER_MODEL_PATH")
+        gguf = override or ensure_model(profile.args.repo_id, profile.args.quant)
         argv: list[str] = [
             str(self._binary),
             "--model", str(gguf),
@@ -335,6 +344,12 @@ class LlamaServerPool:
             "-ngl", str(profile.args.ngl),
             "-c", str(profile.args.ctx_size),
             "--temp", str(profile.args.temperature),
+            # Liquid's recommended sampler set rides alongside the
+            # temperature — see profiles.DEFAULT_MIN_P. These are the
+            # server's baseline; the HTTP client sends the same values
+            # per request so a trace shows what actually applied.
+            "--min-p", str(profile.args.min_p),
+            "--repeat-penalty", str(profile.args.repeat_penalty),
             # One slot, full context. Without an explicit -np, llama-server
             # splits ctx_size across its default parallel slots (~4K each at
             # 16K) — too small to decode an image, which produced the
@@ -350,7 +365,9 @@ class LlamaServerPool:
         ]
         # mmproj resolution: explicit path wins (test fixtures), else
         # download from the repo when mmproj_repo_id is set.
-        mmproj_path: Optional[str] = profile.args.mmproj
+        mmproj_path: Optional[str] = (
+            _path_override("LLAMA_SERVER_MMPROJ_PATH") or profile.args.mmproj
+        )
         if mmproj_path is None and profile.args.mmproj_repo_id:
             mmproj_path = str(
                 ensure_mmproj(
@@ -431,6 +448,25 @@ class LlamaServerPool:
         if inst.process.stderr is None:
             return
         verbose = os.environ.get("LLAMA_SERVER_VERBOSE") == "1"
+        # Belt and braces: even with errors="replace" on the pipe, a drain
+        # thread that raises for any reason must not take the server down
+        # with it. Draining is a logging convenience; blocking the
+        # subprocess is not an acceptable failure mode for it.
+        try:
+            self._drain_stderr_lines(name, inst, verbose)
+        except Exception as e:  # noqa: BLE001
+            print(
+                f"[llama-server:{name}] stderr drain stopped ({type(e).__name__}); "
+                "draining silently so the subprocess cannot block on a full pipe",
+                file=sys.stderr,
+            )
+            try:
+                for _ in iter(inst.process.stderr.readline, ""):
+                    pass
+            except Exception:  # noqa: BLE001
+                pass
+
+    def _drain_stderr_lines(self, name: str, inst: "_LoadedInstance", verbose: bool) -> None:
         for line in iter(inst.process.stderr.readline, ""):
             line = line.rstrip("\n")
             inst.stderr_tail.append(line)
@@ -531,6 +567,25 @@ _HIGH_SIGNAL_SUBSTRINGS = (
     "model loaded",
     "server is listening",
 )
+
+
+def _path_override(env_var: str) -> Optional[str]:
+    """Absolute-path escape hatch for model weights already on disk.
+
+    `LLAMA_SERVER_MODEL_PATH` / `LLAMA_SERVER_MMPROJ_PATH` let a machine
+    that already holds a GGUF point the pool straight at it instead of
+    paying for a second multi-GB copy inside Magpie's HF cache. Unset =
+    None (normal download path). Set-but-wrong is an error here rather
+    than 40 lines into llama-server's load log.
+    """
+    raw = os.environ.get(env_var, "").strip()
+    if not raw:
+        return None
+    if not Path(raw).is_file():
+        raise LlamaServerSpawnError(
+            f"{env_var}={raw!r} does not point at a file"
+        )
+    return raw
 
 
 def _is_high_signal(line: str) -> bool:

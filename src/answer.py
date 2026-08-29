@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from src.content import SummarizeError, build_content_blocks
+from src.grounding import looks_fabricated, strip_generated_blocks
 from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
 from src.llm import ChatAgent, build_agent
 from src.manifest import APP_DATA_DIR, Manifest
@@ -81,9 +82,21 @@ def _context_budget_chars() -> int | None:
     # full window. Fewer-but-sharper sources also suits a 3B model — see the
     # Lost-in-the-Middle note at the prompt assembly below.
     gpu_default = "metal" if sys.platform == "darwin" else "cpu"
-    if os.environ.get("LLAMA_SERVER_GPU", gpu_default).lower() == "cpu":
-        prefill_cap = int(os.environ.get("LOCAL_PREFILL_BUDGET_TOKENS", "8000"))
+    on_cpu = os.environ.get("LLAMA_SERVER_GPU", gpu_default).lower() == "cpu"
+    cap_env = os.environ.get("LOCAL_PREFILL_BUDGET_TOKENS", "").strip()
+    if on_cpu:
+        prefill_cap = int(cap_env or "8000")
         usable_tokens = min(usable_tokens, max(2_000, prefill_cap))
+    elif cap_env:
+        # GPU backends prefill far faster than CPU, so they were left
+        # uncapped — which on a 32K-window profile means a document budget of
+        # ~29,700 tokens. Measured 2026-08-28 on the phyll corpus: the answer
+        # step is ~48% of query wall-clock and scales with files read (2 files
+        # 4.5s, 5 files up to 15.7s). Setting this caps GPU prefill the same
+        # way, which is also what the Lost-in-the-Middle result argues for on
+        # a 3B model: fewer, sharper sources beat a packed window. Unset =
+        # previous behaviour (no GPU cap).
+        usable_tokens = min(usable_tokens, max(2_000, int(cap_env)))
     return int(usable_tokens * _CHARS_PER_TOKEN)
 
 
@@ -154,39 +167,35 @@ def _trim_blocks_to_budget(
 # FileSummary while still truncating accidental misuse.
 ANSWER_SUPPLEMENT_MAX_CHARS = 10_000
 
+# Above this much raw extracted text, a file speaks for itself and the
+# index-time summary is dropped from the answer context. Below it (scans,
+# thin extractions) the summary is often the only readable content there is.
+SUMMARY_UNNEEDED_ABOVE_CHARS = 1_500
+
 
 class Answer(BaseModel):
-    # Field order matters: this is the order llama-server's GBNF grammar
-    # forces the model to emit. Putting `not_found` first lets the model
-    # commit to the verdict before generating any content — natural for
-    # the not-found path (answer="", sources_used=[]) and harmless for
-    # the found path. Reverse order (answer first) forces the model to
-    # commit to either real-text or empty-string before it has finished
-    # "deciding" whether the files contain the answer; under grammar
-    # constraint that's a known small-model failure mode (Tam et al.,
-    # "Let me speak freely?", 2024). The flat-vs-discriminated-union
-    # question stays parked at Plan #25 Choice A.
-    not_found: bool = Field(
-        ...,  # required — the schema's `required` list controls what the
-              # GBNF grammar enforces; with a Python default, pydantic
-              # would mark this optional and the model could legally omit it.
-        description=(
-            "Set to true when the provided files do not contain enough information "
-            "to answer the question. When true, leave `answer` empty, leave "
-            "`sources_used` empty, and set `not_found_topic` to a short noun "
-            "phrase summarizing what the user was asking about."
-        ),
-    )
-    not_found_topic: str = Field(
-        ...,  # required: emit "" in found cases, the topic phrase in not-found cases.
-        description=(
-            "Short noun phrase summarizing what the user asked about, used in "
-            "the UI's not-found copy ('I read 5 likely sources but didn't find "
-            "anything about <topic>...'). Only set when `not_found=true`. "
-            "Examples: 'a landlord's emergency phone number', 'the chemistry "
-            "final exam time', 'who chairs the math department'."
-        ),
-    )
+    # Field order matters: it is the order the GBNF grammar forces the model
+    # to emit (src/inference/gbnf.py). It used to run not_found first, on the
+    # reasoning that letting the model commit to the verdict up front was
+    # natural for the not-found path and harmless otherwise.
+    #
+    # That reasoning was written while `response_format` was believed to be
+    # constraining generation. It wasn't — llama-server accepted the schema
+    # and ignored it — so the order was never actually enforced and never
+    # actually tested. The first run with a real grammar showed what it costs:
+    # the model emits `not_found: true` as its opening token, with nothing
+    # generated to base that on, and then writes the correct answer anyway.
+    # Measured on the sem6 set (2026-08-27), verbatim:
+    #
+    #   {"not_found": true, ..., "answer": "The W-2 lists Furman University
+    #    as the employer with the address 3300 Poinsett Highway, ..."}
+    #   {"not_found": true, ..., "answer": "Receipt shows Avelo Airlines for
+    #    170.18 USD[1]", "sources_used": [".../Flight Yale - GSP Receipt.pdf"]}
+    #
+    # Both correct, both deleted by the not-found contract below. Answer
+    # first, verdict second: the model states what it found, then judges
+    # whether that constitutes an answer — the decision now follows the
+    # evidence instead of preceding it.
     answer: str = Field(
         ...,  # required: in not-found cases the model emits an empty string,
               # not a missing field — the strict JSON schema requires presence.
@@ -203,6 +212,26 @@ class Answer(BaseModel):
             "Copied verbatim from the '--- File N: <path> ---' headers. "
             "Do not include files you consulted but did not actually use. "
             "Empty list when `not_found=true`."
+        ),
+    )
+    not_found: bool = Field(
+        ...,  # required — the schema's `required` list controls what the
+              # GBNF grammar enforces; with a Python default, pydantic
+              # would mark this optional and the model could legally omit it.
+        description=(
+            "Set to true ONLY when `answer` above is empty because the provided "
+            "files do not contain enough information. If you wrote an answer "
+            "above, this is false."
+        ),
+    )
+    not_found_topic: str = Field(
+        ...,  # required: emit "" in found cases, the topic phrase in not-found cases.
+        description=(
+            "Short noun phrase summarizing what the user asked about, used in "
+            "the UI's not-found copy ('I read 5 likely sources but didn't find "
+            "anything about <topic>...'). Only set when `not_found=true`. "
+            "Examples: 'a landlord's emergency phone number', 'the chemistry "
+            "final exam time', 'who chairs the math department'."
         ),
     )
 
@@ -337,11 +366,46 @@ _FORMAT_BLOCK_CLOUD = (
     "OUTPUT FORMAT: respond with a single raw JSON object — no markdown "
     "fences, no prose before or after — with exactly these four keys in "
     "this order:\n"
-    "{\"not_found\": <boolean>, \"not_found_topic\": <string>, "
-    "\"answer\": <string>, \"sources_used\": [<file path>, ...]}\n"
-    "Example: {\"not_found\": false, \"not_found_topic\": \"\", "
-    "\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
-    "\"sources_used\": [\"path/to/math-dept-2024.pdf\"]}"
+    "{\"answer\": <string>, \"sources_used\": [<file path>, ...], "
+    "\"not_found\": <boolean>, \"not_found_topic\": <string>}\n"
+    "Example: {\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
+    "\"sources_used\": [\"path/to/math-dept-2024.pdf\"], "
+    "\"not_found\": false, \"not_found_topic\": \"\"}"
+)
+
+
+# MULTI-PART questions — the quietest failure class in the sem6 eval. Asked
+# "what was my academic standing and class standing", the model answers one
+# and stops; asked for fall AND spring inspection dates, it gives fall. Every
+# such answer is strict-binary wrong while looking helpful, which is the
+# worst combination for trust. Detector and injection follow the
+# SYNTHESIS/ENUMERATION MODE pattern: pure regex, scoped to the questions
+# that need it, so single-fact questions never see the extra instruction.
+_MULTIPART_BLOCK = (
+    "MULTI-PART QUESTION: this asks for more than one thing. Answer EVERY "
+    "part explicitly, in the order asked, even when a part is a single word "
+    "or a single number. Do not stop after the first part, and do not merge "
+    "two parts into one vague sentence. If one part genuinely is not in the "
+    "files, answer the parts that are and say which part is missing."
+)
+
+# Fires on: two interrogatives joined by 'and' ('when ... and where ...'),
+# an explicit pairing ('both X and Y', 'X and Y respectively'), or a
+# coordinated noun pair in the question's object ('the fall and spring
+# inspections', 'my total and section scores'). Deliberately does NOT fire on
+# a bare 'and' inside a proper noun.
+_MULTIPART_RE = re.compile(
+    r"\b(what|when|where|who|which|how (?:much|many|long|far))\b[^?]{0,80}?"
+    r"\band\b[^?]{0,80}?\b(what|when|where|who|which|how|did|was|were|is|are|do|does)\b"
+    r"|\bboth\b.{0,60}\band\b"
+    r"|\b(fall|spring|first|second|total)\b\s+and\s+\b(spring|fall|second|third|section)\b"
+    # A repeated head noun across the conjunction: "academic standing and
+    # class standing", "trip fare and total fare". The repetition is what
+    # marks it as two things rather than one compound name.
+    r"|\b(?P<head>\w{4,})\b[^?]{0,24}\band\b[^?]{0,24}\b(?P=head)\b"
+    # An Oxford-comma list is three or more things by construction.
+    r"|,\s+and\b",
+    re.IGNORECASE,
 )
 
 
@@ -617,6 +681,27 @@ async def answer_question(
         # and for very long files where the first-N-pages window misses the
         # user's target content (TOCs, later chapters, etc.).
         supplement = _summary_supplement(display)
+        # A summary earns its place when raw extraction is thin — a scan, or a
+        # long file whose first pages miss the target. When the file already
+        # yields plenty of real text, the summary is a paraphrase competing
+        # with the source, and a bad one wins: the sem_4 corpus contains a
+        # $20 Cursor invoice whose generated summary describes "a flight from
+        # Atlanta to Hartford, flight number DL1492, passenger Jane Doe". The
+        # model saw the real receipt AND that fiction, and refused. Five
+        # questions died on that one summary.
+        #
+        # MAGPIE_SUMMARY_WHEN_THIN=0 restores the old always-attach behaviour.
+        # Pre-registered gate was >=12/25 on sem_4; it landed 8/25 against a
+        # 7/25 baseline, so it does NOT ship. Off by default, kept behind
+        # MAGPIE_SUMMARY_WHEN_THIN=1 because the diagnosis behind it is still
+        # sound (one invented summary poisoned five questions) — the fix just
+        # is not "hide the summary", it is "do not write a fictional one".
+        if supplement is not None and os.environ.get(
+            "MAGPIE_SUMMARY_WHEN_THIN", "0"
+        ).strip() == "1":
+            raw_chars = sum(len(b) for b in blocks if isinstance(b, str))
+            if raw_chars >= SUMMARY_UNNEEDED_ABOVE_CHARS:
+                supplement = None
         if supplement is not None:
             blocks = [supplement, *blocks]
 
@@ -706,6 +791,14 @@ async def answer_question(
             "name that missing side in `not_found_topic`."
         )
 
+    # Off by default until measured; the arm that tests it sets
+    # MAGPIE_MULTIPART=1. Same escape-hatch shape as LOCAL_GRAMMAR.
+    if os.environ.get("MAGPIE_MULTIPART", "0").strip() == "1" and (
+        _MULTIPART_RE.search(question)
+    ):
+        intro_parts.append("")
+        intro_parts.append(_MULTIPART_BLOCK)
+
     from src.stage2.query_classify import QueryClass, classify as _classify_q
     if enumerate_lists and _classify_q(question) is QueryClass.LIST_ALL:
         intro_parts.append(
@@ -773,6 +866,41 @@ async def answer_question(
         ans.answer = ""
         ans.sources_used = []
         return ans
+
+    # Groundedness guard. Every number in the answer is checked against the
+    # text the model was actually shown; if NONE of them appear there (and
+    # none is the sum of numbers that do), the answer is a fabrication and
+    # the honest output is the not-found contract. Measured on the sem6
+    # absence probe: asked what he paid for his dorm room — a figure no file
+    # in the corpus contains — the model answered "$159.00". Deterministic,
+    # no extra model call, and deliberately conservative: an answer with one
+    # bad figure among good ones is a misreading the citations let the user
+    # check, and it passes through untouched. See src/grounding.py.
+    if ans.answer:
+        # Index-time LLM summaries do NOT count as support for a figure. A
+        # summary is the model's own earlier output; letting it ground a
+        # later answer is how a fabrication launders itself into a fact.
+        # Measured on the 40-question sem6 set: score-neutral (31/40 either
+        # way) and it converted two invented figures — a €2,500.00 salary and
+        # a postcode — into honest refusals. MAGPIE_STRICT_GROUNDING=0 turns
+        # it off for anyone who would rather have the guess.
+        _blocks = [
+            b for _d, blocks in per_file_blocks for b in blocks if isinstance(b, str)
+        ]
+        if os.environ.get("MAGPIE_STRICT_GROUNDING", "1").strip() != "0":
+            _blocks = strip_generated_blocks(_blocks)
+        context_text = "\n".join(_blocks)
+        if looks_fabricated(ans.answer, context_text):
+            print(
+                "  note: every figure in the answer is absent from the files "
+                "read; returning not-found instead",
+                file=sys.stderr,
+            )
+            ans.not_found = True
+            ans.not_found_topic = ans.not_found_topic or question.strip().rstrip("?")
+            ans.answer = ""
+            ans.sources_used = []
+            return ans
 
     # Defensive: drop any path the model invented that wasn't in our input.
     # Match is whitespace-tolerant — the model sometimes collapses double-spaces

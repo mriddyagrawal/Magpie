@@ -82,7 +82,22 @@ def _auto_n_ctx() -> int:
     if total_gb >= 7.5:
         return 16384
     return 8192
-DEFAULT_TEMPERATURE = 0.7
+# Sampling defaults come from Liquid's own model card for the LFM2.5
+# family: temperature 0.1, min_p 0.15, repetition_penalty 1.05. Magpie ran
+# 0.7 with llama.cpp's stock samplers until 2026-08-27, which is a Gemma-era
+# leftover — and the answer step is an extraction task, not prose. The
+# measured cost was variance: an n=3 sweep of the 40-question set scored
+# {15, 11, 11} with ~8 questions flipping correct<->wrong between runs on
+# byte-identical prompts (Evaluations/college_data/REPORT.md).
+#
+# A 2026-08-24 trial of temperature 0.2 was rejected after degenerate
+# generations (a lone `{`, a 726s loop). That trial set temperature ALONE:
+# no min_p floor and no repetition penalty, which is precisely the
+# configuration those two failures describe. The temperature was blamed for
+# the sampler set's absence.
+DEFAULT_TEMPERATURE = 0.1
+DEFAULT_MIN_P = 0.15
+DEFAULT_REPEAT_PENALTY = 1.05
 
 # llama-server uses `-ngl` (number of GPU layers). 999 = "offload all,"
 # the standard idiom across llama.cpp documentation. Equivalent to
@@ -180,6 +195,14 @@ class LaunchArgs:
     # the caller passes temperature/max_tokens. These set the server's
     # baseline.
     temperature: float = DEFAULT_TEMPERATURE
+    # `--min-p` — floor a token's probability at min_p x P(top token).
+    # At low temperature this is what keeps the tail from collapsing to a
+    # single token and looping; llama.cpp's stock 0.05 is looser than
+    # Liquid asks for.
+    min_p: float = DEFAULT_MIN_P
+    # `--repeat-penalty` — llama.cpp ships 1.0 (off). The 726s generation
+    # in the rejected temp-0.2 trial is what "off" looks like.
+    repeat_penalty: float = DEFAULT_REPEAT_PENALTY
 
     # Escape hatch for one-off flags we don't want to canonicalize yet.
     # Items are passed verbatim after the canonical args. Useful for
@@ -276,6 +299,13 @@ register(
             # unset lets _auto_n_ctx() size it to this machine's RAM.
             ctx_size=int(os.environ.get("LOCAL_N_CTX", "").strip() or _auto_n_ctx()),
             temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
+            # Env-readable like LOCAL_TEMPERATURE above, for the same
+            # reason: an A/B run has to be able to reproduce the old
+            # sampler set without editing code between arms.
+            min_p=float(os.environ.get("LOCAL_MIN_P", DEFAULT_MIN_P)),
+            repeat_penalty=float(
+                os.environ.get("LOCAL_REPEAT_PENALTY", DEFAULT_REPEAT_PENALTY)
+            ),
             jinja=True,
         ),
     )

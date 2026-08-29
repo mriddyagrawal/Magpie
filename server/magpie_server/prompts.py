@@ -118,11 +118,11 @@ ANSWER_FORMAT_BLOCK = (
     "OUTPUT FORMAT: respond with a single raw JSON object — no markdown "
     "fences, no prose before or after — with exactly these four keys in "
     "this order:\n"
-    "{\"not_found\": <boolean>, \"not_found_topic\": <string>, "
-    "\"answer\": <string>, \"sources_used\": [<file path>, ...]}\n"
-    "Example: {\"not_found\": false, \"not_found_topic\": \"\", "
-    "\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
-    "\"sources_used\": [\"path/to/math-dept-2024.pdf\"]}"
+    "{\"answer\": <string>, \"sources_used\": [<file path>, ...], "
+    "\"not_found\": <boolean>, \"not_found_topic\": <string>}\n"
+    "Example: {\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
+    "\"sources_used\": [\"path/to/math-dept-2024.pdf\"], "
+    "\"not_found\": false, \"not_found_topic\": \"\"}"
 )
 
 
@@ -202,18 +202,16 @@ The JSON MUST have exactly these keys (and only these keys):
 - key_entities (list of named entities: people, organisations, places, products, branches — copied verbatim from the file)
 - identifiers (list of exact tokens that uniquely distinguish this file: numeric IDs, dates in their ORIGINAL format, SKUs, version strings, exact prices with currency, URLs — copied verbatim)
 
-EXAMPLE:
+FORMAT EXAMPLE — placeholders only. Every value below is a <SLOT>, not
+content. NEVER copy a value from this example into your output; if the file
+does not contain something, leave that field out rather than borrowing.
 Input:
-Filename: flight-receipt.pdf
-Content type: pdf
-Delta Airlines - Flight Receipt
-Passenger: Jane Doe
-Flight DL1492, Atlanta ATL -> Hartford BDL, 25 May 2022
-Confirmation code: ABC123
-Total charged: $247.50
+Filename: <FILENAME>
+Content type: <TYPE>
+<the file's own text>
 
 Output:
-{"title": "Delta flight DL1492 Atlanta to Hartford - Jane Doe", "summary": "Delta Airlines flight receipt for passenger Jane Doe. Flight DL1492 from Atlanta ATL to Hartford BDL on 25 May 2022. Confirmation code ABC123. Total charged: $247.50.", "content_type": "pdf", "keywords": ["flight", "receipt", "airline", "delta", "travel"], "key_entities": ["Delta Airlines", "Jane Doe", "Atlanta ATL", "Hartford BDL"], "identifiers": ["DL1492", "25 May 2022", "ABC123", "$247.50"]}
+{"title": "<short name drawn from the file>", "summary": "<2-4 sentences, only facts present in the file above>", "content_type": "<one of the allowed types>", "keywords": ["<term from the file>", "<term from the file>"], "key_entities": ["<person, org or place NAMED IN THE FILE>"], "identifiers": ["<id, code, date or amount COPIED FROM THE FILE>"]}
 
 Now analyze the file below. Return ONLY the JSON object - no markdown fences, no code blocks, no commentary. Start with { and end with }."""
 

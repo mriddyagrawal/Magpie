@@ -17,6 +17,7 @@ import argparse
 import asyncio
 import csv
 import io
+import re
 import hashlib
 import json
 import os
@@ -191,18 +192,16 @@ The JSON MUST have exactly these keys (and only these keys):
 - key_entities (list of named entities: people, organisations, places, products, branches — copied verbatim from the file)
 - identifiers (list of exact tokens that uniquely distinguish this file: numeric IDs, dates in their ORIGINAL format, SKUs, version strings, exact prices with currency, URLs — copied verbatim)
 
-EXAMPLE:
+FORMAT EXAMPLE — placeholders only. Every value below is a <SLOT>, not
+content. NEVER copy a value from this example into your output; if the file
+does not contain something, leave that field out rather than borrowing.
 Input:
-Filename: flight-receipt.pdf
-Content type: pdf
-Delta Airlines - Flight Receipt
-Passenger: Jane Doe
-Flight DL1492, Atlanta ATL -> Hartford BDL, 25 May 2022
-Confirmation code: ABC123
-Total charged: $247.50
+Filename: <FILENAME>
+Content type: <TYPE>
+<the file's own text>
 
 Output:
-{"title": "Delta flight DL1492 Atlanta to Hartford - Jane Doe", "summary": "Delta Airlines flight receipt for passenger Jane Doe. Flight DL1492 from Atlanta ATL to Hartford BDL on 25 May 2022. Confirmation code ABC123. Total charged: $247.50.", "content_type": "pdf", "keywords": ["flight", "receipt", "airline", "delta", "travel"], "key_entities": ["Delta Airlines", "Jane Doe", "Atlanta ATL", "Hartford BDL"], "identifiers": ["DL1492", "25 May 2022", "ABC123", "$247.50"]}
+{"title": "<short name drawn from the file>", "summary": "<2-4 sentences, only facts present in the file above>", "content_type": "<one of the allowed types>", "keywords": ["<term from the file>", "<term from the file>"], "key_entities": ["<person, org or place NAMED IN THE FILE>"], "identifiers": ["<id, code, date or amount COPIED FROM THE FILE>"]}
 
 Now analyze the file below. Return ONLY the JSON object - no markdown fences, no code blocks, no commentary. Start with { and end with }."""
 
@@ -461,7 +460,24 @@ async def _run_with_retry(agent: ChatAgent[FileSummary], message: list, label: s
             await asyncio.sleep(wait)
 
     # Primary failed. Last-ditch attempt on the fallback agent if configured.
-    fallback = get_fallback_agent()
+    #
+    # Building that agent can itself hard-exit: `_CloudAgent.__init__` calls
+    # sys.exit when the fallback provider has no API key, which is the normal
+    # state of a Local-only install. Observed 2026-08-27 indexing a code
+    # folder — one file's summary failed, the fallback tried to construct an
+    # unconfigured `ollama` agent, and SystemExit propagated out of the
+    # worker and killed a sync that had already summarized 28 of 98 files.
+    # A missing fallback is not an error condition; it just means there is
+    # no fallback, and the caller's own retry/stub path should handle it.
+    try:
+        fallback = get_fallback_agent()
+    except (SystemExit, Exception) as e:  # noqa: BLE001 — never kill a sync here
+        from tqdm import tqdm
+        tqdm.write(
+            f"  note: no usable fallback provider for {label} "
+            f"({type(e).__name__}); continuing with the primary failure"
+        )
+        fallback = None
     if fallback is not None and last_error is not None:
         from tqdm import tqdm
         primary_kind = type(last_error).__name__
@@ -478,6 +494,159 @@ async def _run_with_retry(agent: ChatAgent[FileSummary], message: list, label: s
     if last_error is not None:
         raise last_error
     raise RuntimeError("unreachable")
+
+
+# Declaration shapes for the languages this corpus actually contains. Each
+# pattern captures ONE name. Kept deliberately dumb: a regex that misses an
+# exotic declaration costs us one symbol, while a parser per language costs a
+# dependency per language.
+_SYMBOL_PATTERNS = (
+    # C#, Java, TypeScript: modifiers then class/interface/struct/enum/record
+    r"\b(?:class|interface|struct|enum|record)\s+([A-Za-z_]\w*)",
+    # C#/Java method: modifiers, return type, name, open paren
+    # ...the trailing `(?:<...>)?` is load-bearing: a generic method reads
+    # `public static List<T> GetUniqueItems<T>(...)`, and without it the
+    # name-then-paren match fails on exactly the methods most worth finding.
+    r"\b(?:public|private|protected|internal|static|async|override|virtual)\s+"
+    r"[\w<>\[\],?\s]+?\s+([A-Za-z_]\w*)\s*(?:<[^>()]{0,40}>)?\s*\(",
+    # Python / Ruby
+    r"^\s*def\s+([A-Za-z_]\w*)",
+    # JS/TS functions and Go/Rust
+    r"\bfunction\s+([A-Za-z_]\w*)",
+    r"^\s*func\s+(?:\([^)]*\)\s*)?([A-Za-z_]\w*)",
+    r"^\s*(?:pub\s+)?fn\s+([A-Za-z_]\w*)",
+    # namespace / package / module
+    r"\b(?:namespace|package|module)\s+([A-Za-z_][\w.]*)",
+)
+
+_CODE_SUFFIXES = {
+    ".cs", ".java", ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs",
+    ".rb", ".kt", ".swift", ".cpp", ".c", ".h", ".hpp",
+}
+
+# Below this much extracted text, the file is effectively unreadable and its
+# summary cannot be checked against anything. Scanned pages land here.
+MIN_SOURCE_CHARS = 200
+
+# Cap so one generated file cannot flood the embedding text with symbols.
+MAX_SYMBOLS = 60
+
+# Names that appear in every project and identify nothing.
+_SYMBOL_STOPWORDS = {
+    "Main", "ToString", "Equals", "GetHashCode", "Dispose", "get", "set",
+    "if", "for", "while", "switch", "return", "using", "new",
+}
+
+
+def extract_code_symbols(path: Path) -> list[str]:
+    """Class / method / namespace names declared in a source file.
+
+    Why this exists: the summarizer describes code in prose and drops every
+    identifier. Measured on the sem5 C# corpus — the summary of
+    `GeneralUtils.cs` contains none of `GetIndentation`, `ToCamelCase`,
+    `IsPasswordStrong` or `IsValidOperator`, and its `Identifiers:` line is
+    empty. Search embeds the summary, not the file, so a question naming any
+    of those methods had no dense OR lexical hook and the file was never
+    retrieved: 7 of 25 questions lost their key file that way.
+
+    Symbols are exactly the kind of thing a regex gets right and a 3B gets
+    vague about, so they are extracted here rather than asked for.
+    """
+    if path.suffix.lower() not in _CODE_SUFFIXES:
+        return []
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+
+    found: list[str] = []
+    seen: set[str] = set()
+    for pattern in _SYMBOL_PATTERNS:
+        for m in re.finditer(pattern, text, re.MULTILINE):
+            name = m.group(1)
+            if name in seen or name in _SYMBOL_STOPWORDS or len(name) < 3:
+                continue
+            seen.add(name)
+            found.append(name)
+            if len(found) >= MAX_SYMBOLS:
+                return found
+    return found
+
+
+def scrub_invented_numbers(summary: FileSummary, path: Path) -> FileSummary:
+    """Remove figures from a summary that do not appear in the source file.
+
+    A summary is written once and read forever: every question about that
+    file is answered with it in context, so a number the summarizer invented
+    becomes a permanent, apparently-grounded fact. This is not theoretical.
+    The Max Planck invitation letter in the sem6 corpus has all of its digits
+    destroyed by a font-encoding bug — the salary reads 'Ҏ.ҔҐҎ.ҕɦ €' — and
+    its summary confidently states '2,500.00' and postcode '44801'. Asked
+    what the letter offers, Magpie answered '€2,500.00'. The lie was
+    manufactured at index time, months before the question.
+
+    So each figure in the summary text is checked against the extracted
+    source and replaced with '[unreadable]' when it is absent. Deliberately
+    only figures: prose can paraphrase, numbers cannot.
+    """
+    from src.grounding import numerals
+
+    try:
+        blocks = build_content_blocks(path, max_chars=60_000, max_pdf_pages=20)
+    except Exception:  # noqa: BLE001 — no source text means nothing to check against
+        return summary
+    source = "".join(b for b in blocks if isinstance(b, str))
+
+    # A scanned page has no text layer, so its extraction is a one-line
+    # marker and NOTHING the summarizer wrote can be matched against it —
+    # including the figures a vision pass read correctly off the image.
+    # Scrubbing there deletes good data: a hotel folio in the sem6 corpus
+    # lost its confirmation number, both stay dates and its total to this
+    # exact mistake. No text to check against means no checking.
+    if "scanned / image-only" in source or len(source.strip()) < MIN_SOURCE_CHARS:
+        return summary
+
+    # The filename is evidence too — a year or an invoice number that
+    # appears only in the path is still grounded, not invented.
+    source = f"{path.name}\n{source}"
+    if not source.strip():
+        return summary
+    # Compare against a de-spaced copy too: letter-spaced PDFs render '2026'
+    # as '2 0 2 6', and that is support, not a fabrication.
+    haystack = re.sub(r"(?<=\d),(?=\d)", "", source)
+    despaced = re.sub(r"\s+", "", haystack)
+
+    scrubbed = 0
+
+    def _replace(match: "re.Match[str]") -> str:
+        nonlocal scrubbed
+        tok = match.group(0)
+        bare = tok.replace(",", "")
+        if bare in haystack or bare in despaced or tok in haystack:
+            return tok
+        scrubbed += 1
+        return "[unreadable]"
+
+    text = summary.summary
+    # Same numeral shape and same "ignore the small stuff" floor the runtime
+    # groundedness check uses, so index time and answer time agree.
+    interesting = {n for n in numerals(text)}
+    if not interesting:
+        return summary
+    new_text = re.sub(
+        r"\d[\d,]*(?:\.\d+)?",
+        lambda m: _replace(m) if m.group(0).replace(",", "").rstrip(".") in interesting
+        else m.group(0),
+        text,
+    )
+    if not scrubbed:
+        return summary
+    from tqdm import tqdm
+    tqdm.write(
+        f"  note: {path.name}: {scrubbed} figure(s) in the summary appear "
+        f"nowhere in the file; replaced with [unreadable]"
+    )
+    return summary.model_copy(update={"summary": new_text})
 
 
 async def summarize_one(
@@ -557,6 +726,15 @@ async def summarize_one(
             key_entities=[],
             identifiers=[path.name],
         )
+    summary = await asyncio.to_thread(scrub_invented_numbers, summary, path)
+    # Code files get their declared symbols added to `identifiers`, which
+    # `stage2.db._build_embedding_text` already folds into the embedded text
+    # for both dense and BM25. Without this a code corpus is searchable only
+    # by the prose the summarizer chose to write about it.
+    symbols = await asyncio.to_thread(extract_code_symbols, path)
+    if symbols:
+        merged = list(dict.fromkeys([*summary.identifiers, *symbols]))[:MAX_SYMBOLS]
+        summary = summary.model_copy(update={"identifiers": merged})
     await asyncio.to_thread(write_summary_at, out_path, summary, source_rel)
 
     new_summary_rel = str(out_path.relative_to(REPO_ROOT))
@@ -566,10 +744,25 @@ async def summarize_one(
 
 
 def find_supported_files(root: Path) -> list[Path]:
-    return sorted(
-        p for p in root.rglob("*")
-        if p.is_file() and not p.name.startswith(".") and p.suffix.lower() in SUPPORTED_EXTS
-    )
+    """Every file under `root` this tier can summarize.
+
+    Delegates the walk to `src.ingest.walker.find_candidates` — the same
+    rules-aware walker the app and `nas explain` use — then keeps only the
+    extensions this tier handles. Going through the walker rather than a bare
+    `rglob` is what gets us, for free:
+
+    * the user's `indexing_rules.json` (`exclude_globs`, `exclude_paths`) is
+      actually honored here; a bare rglob ignored it, so `just sync` indexed
+      files the app itself would refuse,
+    * dot-folders (`.git/`, `.venv/`, `.cache/`) are pruned during traversal
+      instead of being walked and then filtered file-by-file, and
+    * `os.walk` skips directories it cannot read, so one unreadable folder
+      no longer aborts the entire sync with `OSError: [Errno 5]`.
+    """
+    from src.ingest.walker import find_candidates
+
+    files, _ignored, _asset_skipped = find_candidates(root)
+    return sorted(p for p in files if p.suffix.lower() in SUPPORTED_EXTS)
 
 
 async def run_batch(

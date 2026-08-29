@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
-CLAUDE.md
+# CLAUDE.md is SHARED (owner 2026-08-29): repo-wide Claude instructions
 .claude/scheduled_tasks.lock
 Test Content/
 Test Content Deprecated/

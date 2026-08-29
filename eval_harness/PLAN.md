@@ -545,11 +545,9 @@ for the same decisions.
    documented in §2; H4 tests grammar cleanly on a local config.
 3. **`runs/` git policy:** commit config + metrics + reports; gitignore raw
    appdata/logs.
-4. **Personal-notes privacy:** approved — that corpus's content may go to the cloud
-   judge. Scope of what leaves the machine, in writing: the question, gold answer +
-   key facts, the generated answer, cited/retrieved file *names*, and — only when a
-   verdict requires it — the specific retrieved snippet under dispute. Never whole
-   documents.
+4. **Privacy (superseded 2026-08-29):** the owner approves sending ANY eval corpus
+   files — including personal datasets — to the cloud judge, full-context. The
+   earlier snippet-only scope is retired. Standing approval, recorded here.
 5. **SROIE subset:** 150 receipts.
 6. **MMLongBench-Doc adapter:** deferred — re-ask the owner at Phase 5 kickoff.
 

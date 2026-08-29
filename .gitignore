@@ -85,6 +85,8 @@ Test Questions/
 # directly in runs/<id>/ and stay trackable. Listed BEFORE the first run
 # ever executes, because ignoring never untracks (see Test Questions/
 # above for how that went last time).
+# Shared index store (multi-GB scratch indexes; rebuildable)
+eval_harness/indexes/
 eval_harness/runs/*/raw/
 eval_harness/runs/*/appdata/
 eval_harness/runs/*/logs/

@@ -449,6 +449,8 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
         "status": "GOLD" if n_unverified == 0 else "SILVER (provisional)",
     }
     envs = _load_json(run_dir / "run.json")
+    summary["golden_sha"] = envs.get("golden_sha")
+    summary["index_store"] = envs.get("index_store")
     _write_report(run_dir, summary, enriched, envs)
     _dump(run_dir / "answers_enriched.json", enriched)
     _dump(run_dir / "metrics.json", summary)

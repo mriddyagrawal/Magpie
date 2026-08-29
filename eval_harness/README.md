@@ -35,8 +35,9 @@ uv run python eval_harness/harness/run.py --config eval_harness/configs/baseline
 # variants:
 #   --retrieval-only            retrieval sweep only (~2 min; no generation)
 #   --index-only                build + report the index, stop
-#   --reuse-index <run_id>      mount a prior run's index (same dataset +
-#                               index-side params enforced via hash)
+#   (indexes are cached automatically in eval_harness/indexes/ keyed by
+#    dataset + index-side params; a matching entry mounts in seconds)
+#   --rebuild-index             force a fresh index build + republish
 #   --questions-limit N         smoke-sized subset
 ```
 

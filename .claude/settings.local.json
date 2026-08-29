@@ -9,5 +9,6 @@
       "PowerShell($env:VIRTUAL_ENV=$null; uv sync --python 3.11)",
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -c \"from src.subproc import no_window_kwargs; print\\(no_window_kwargs\\(\\)\\)\")"
     ]
-  }
+  },
+  "outputStyle": "Concise"
 }

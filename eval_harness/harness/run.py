@@ -3,17 +3,20 @@
     uv run python eval_harness/harness/run.py \
         --config eval_harness/configs/baseline.json \
         [--questions-limit N] [--index-only | --retrieval-only] \
-        [--reuse-index <prior_run_id>] [--run-id NAME]
+        [--rebuild-index] [--run-id NAME]
 
 Produces (committed, directly in runs/<run_id>/): run.json (provenance),
 metrics.json, report.md. Everything else — scratch appdata, qdrant storage,
 worker logs, answer/retrieve JSONL — lives under runs/<run_id>/raw/
 (gitignored; holds indexed corpus content).
 
---reuse-index copies a prior run's scratch appdata + qdrant storage instead
-of re-indexing: the embryonic form of PLAN §7 Phase 4's index cache. Valid
-only when the prior run used the same dataset + index-side params (enforced
-via the index params hash recorded in run.json).
+Indexes are a shared, first-class store: eval_harness/indexes/<index_key>/
+(gitignored), keyed by hash(dataset + index-side params). On launch the
+runner mounts a matching store entry (seconds) or builds and then publishes
+one; --rebuild-index forces a fresh build. Runs are therefore pure
+answer-side experiments by default. Every run also stamps golden_sha (hash
+of the dataset's golden.json) - the comparability triple is
+(params, backend sha, golden sha).
 """
 
 from __future__ import annotations
@@ -36,6 +39,7 @@ import envctl  # noqa: E402
 
 REPO = HERE.parents[1]
 EVAL = REPO / "eval_harness"
+INDEX_STORE = EVAL / "indexes"
 
 INDEX_SIDE_PARAMS = (
     "model_config", "index_fast_tier", "index_summary_tier", "local_n_ctx",
@@ -71,7 +75,8 @@ def main() -> int:
     ap.add_argument("--questions-limit", type=int)
     ap.add_argument("--index-only", action="store_true")
     ap.add_argument("--retrieval-only", action="store_true")
-    ap.add_argument("--reuse-index", metavar="PRIOR_RUN_ID")
+    ap.add_argument("--rebuild-index", action="store_true",
+                    help="build a fresh index even when the store has one")
     ap.add_argument("--slot", type=int, default=0)
     args = ap.parse_args()
 
@@ -115,12 +120,16 @@ def main() -> int:
     expected_env = envctl.non_secret(env)
 
     idx_hash = index_params_hash(config["dataset"], params)
+    golden_sha = hashlib.sha256(
+        (dataset["dir"] / "golden.json").read_bytes()
+    ).hexdigest()[:16]
     run_record: dict = {
         "run_id": run_id,
         "config_name": config["config_name"],
         "dataset": config["dataset"],
         "params": params,
         "index_params_hash": idx_hash,
+        "golden_sha": golden_sha,
         "questions": len(questions),
         "backend_git_sha": envctl.git_sha(REPO),
         # same repo, but phases and (re-runnable) enrichment can execute at
@@ -143,23 +152,32 @@ def main() -> int:
     fp_app_before = envctl.appdata_fingerprint()
     fp_cache_before = envctl.cache_fingerprint()
 
-    # --- index reuse (embryonic Phase 4 cache) ---
-    if args.reuse_index:
-        prior_dir = EVAL / "runs" / args.reuse_index
-        prior = json.loads((prior_dir / "run.json").read_text(encoding="utf-8"))
-        if prior.get("index_params_hash") != idx_hash:
-            raise SystemExit(
-                f"--reuse-index refused: prior run's index params hash "
-                f"{prior.get('index_params_hash')} != this config's {idx_hash} "
-                f"(dataset or index-side params differ)"
-            )
+    # --- index store mount (three-layer cache: golden / index / run) ---
+    index_mounted = False
+    store_dir = INDEX_STORE / idx_hash
+    if not args.rebuild_index and (store_dir / "meta.json").exists():
+        meta = json.loads((store_dir / "meta.json").read_text(encoding="utf-8"))
         for sub in ("appdata", "qdrant"):
-            src, dst = prior_dir / "raw" / sub, raw / sub
+            dst = raw / sub
             if dst.exists():
                 shutil.rmtree(dst)
-            shutil.copytree(src, dst)
-        run_record["reused_index_from"] = args.reuse_index
-        print(f"[run] reusing index from {args.reuse_index}")
+            shutil.copytree(store_dir / sub, dst)
+        index_mounted = True
+        run_record["index_store"] = {
+            "key": idx_hash, "hit": True,
+            "built_under_sha": meta.get("backend_sha"),
+        }
+        print(f"[run] index store HIT {idx_hash} (built {meta.get('built_utc')})")
+        if meta.get("backend_sha") != run_record["backend_git_sha"]:
+            # key is params-only so routine commits don't invalidate; a SHA
+            # drift is recorded and warned, since indexing code may differ
+            print(f"[run] WARNING: stored index built under "
+                  f"{str(meta.get('backend_sha'))[:12]}, current backend is "
+                  f"{run_record['backend_git_sha'][:12]} - rebuild with "
+                  f"--rebuild-index if indexing code changed", file=sys.stderr)
+    else:
+        run_record["index_store"] = {"key": idx_hash, "hit": False}
+        print(f"[run] index store MISS {idx_hash} - will build and publish")
 
     qdrant = backend.QdrantInstance(
         storage_dir=raw / "qdrant", http_port=ports.qdrant_http,
@@ -171,7 +189,7 @@ def main() -> int:
     try:
         qdrant.start()
 
-        if not args.reuse_index:
+        if not index_mounted:
             print(f"[run] indexing {dataset['corpus_root']} …")
             t = time.monotonic()
             idx = backend.run_worker(
@@ -264,6 +282,26 @@ def main() -> int:
             f"isolation broken; do not trust these artifacts. "
             f"See {run_dir / 'run.json'}"
         )
+
+    if completed and not index_mounted:
+        tmp = INDEX_STORE / f".tmp-{idx_hash}"
+        if tmp.exists():
+            shutil.rmtree(tmp)
+        tmp.mkdir(parents=True)
+        for sub in ("appdata", "qdrant"):
+            shutil.copytree(raw / sub, tmp / sub)
+        envctl.dump_json(tmp / "meta.json", {
+            "key": idx_hash,
+            "dataset": config["dataset"],
+            "index_side_params": {k: params.get(k) for k in INDEX_SIDE_PARAMS},
+            "backend_sha": run_record["backend_git_sha"],
+            "built_utc": ts,
+            "built_by_run": run_id,
+        })
+        if store_dir.exists():
+            shutil.rmtree(store_dir)
+        tmp.replace(store_dir)
+        print(f"[run] index published to store as {idx_hash}")
 
     run_record["status"] = "complete"
     save_record()

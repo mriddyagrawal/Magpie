@@ -32,13 +32,11 @@ Ask (AskUserQuestion, multiple rounds fine):
    configurations = separate skill runs; never launch multiple arms in one.
 
    **Duplicate guard**: before launching, compare the chosen config against
-   every prior `eval_harness/runs/*/run.json` — hash the resolved `params`
-   and read the current backend git SHA. If an existing COMPLETE run has the
-   same params hash AND the same backend SHA, tell the owner it is an exact
-   re-run of <run_id> and ask whether to proceed anyway. Same params on a
-   DIFFERENT SHA is a legitimate before/after comparison — say so and
-   continue. (`--reuse-index` from a prior run is still fine when the
-   index-side params match; the harness enforces that itself.)
+   every prior `eval_harness/runs/*/run.json` on the comparability TRIPLE —
+   resolved-params hash, backend git SHA, and `golden_sha`. All three equal
+   on a COMPLETE run → tell the owner it is an exact re-run of <run_id> and
+   ask whether to proceed. Any one differing → announce which layer changed
+   (config / code / questions) and continue as a legitimate comparison.
 
 The judge is NOT a question: it always runs.
 
@@ -68,6 +66,8 @@ Question requirements:
   `human_verified: false` until the founders review.
 
 Assemble, cross-check, show the owner a sample plus anything doubtful, commit.
+Regenerating a golden set changes `golden_sha`: tell the owner that runs
+before and after are no longer comparable question-for-question.
 
 ## Phase 3 — Run (one run, one config)
 
@@ -75,8 +75,12 @@ Launch the single run in the background, wrapped so the Mac cannot sleep:
 
 ```bash
 caffeinate -dims uv run python eval_harness/harness/run.py \
-    --config <config> [--reuse-index <prior_run_id>] > /tmp/eval-run.log 2>&1
+    --config <config> > /tmp/eval-run.log 2>&1
 ```
+
+Indexes cache automatically (`eval_harness/indexes/`, keyed by dataset +
+index-side params): the runner prints store HIT (mounts in seconds) or MISS
+(builds, then publishes). Include that in your first progress line.
 
 Schedule a wake every **3 minutes** (ScheduleWakeup). At each wake, report
 progress in one line: phase (index/retrieve/answer), questions answered so far

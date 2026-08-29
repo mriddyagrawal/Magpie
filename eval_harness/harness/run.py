@@ -205,6 +205,18 @@ def main() -> int:
                 "summary_tier_note": idx.get("summary_tier_note"),
             }
             save_record()
+            # #106: an index phase that indexed NOTHING must never reach the
+            # answer phase - downstream it produces 106 clean-looking
+            # not_found rows with zero errors and every provenance signal
+            # green, a published zero that measures nothing.
+            if run_record["phases"]["index"]["manifest_entries"] == 0:
+                run_record["status"] = "failed"
+                save_record()
+                raise SystemExit(
+                    f"[run] FAILED (#106): index produced 0 manifest entries - "
+                    f"corpus path or file discovery is wrong; see "
+                    f"{raw / 'worker_index.log'}"
+                )
             print(f"[run] index done in {run_record['phases']['index']['wall_s']}s")
 
         if not args.index_only:
@@ -283,7 +295,9 @@ def main() -> int:
             f"See {run_dir / 'run.json'}"
         )
 
-    if completed and not index_mounted:
+    if completed and not index_mounted and (
+        run_record.get("phases", {}).get("index", {}).get("manifest_entries", 0) > 0
+    ):
         tmp = INDEX_STORE / f".tmp-{idx_hash}"
         if tmp.exists():
             shutil.rmtree(tmp)

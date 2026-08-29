@@ -324,6 +324,18 @@ def phase_answer(payload: dict) -> dict:
 
     # Review #33: an all-errors run must not look finished. Per-question
     # errors are recorded and tolerated, but a majority-broken phase fails.
+    # #106: uniformly-empty retrieval is failure, not measurement - the
+    # pipeline short-circuits to not_found without invoking the model, so
+    # error counting alone (#33) is blind to it.
+    rows_all = [json.loads(l) for l in out_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    n_zero_retrieved = sum(1 for r in rows_all if not r.get("retrieved"))
+    if rows_all and n_zero_retrieved / len(rows_all) > 0.9:
+        raise RuntimeError(
+            f"answer phase degenerate (#106): {n_zero_retrieved}/{len(rows_all)} "
+            f"rows retrieved nothing - the model was never invoked; the index "
+            f"is empty or unsearchable"
+        )
+
     attempted = n_ok + n_err
     if attempted and (n_err / attempted) > 0.5:
         raise RuntimeError(
@@ -402,6 +414,12 @@ def phase_retrieve(payload: dict) -> dict:
         for row in rows_out:
             f.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
 
+    n_zero = sum(1 for r in rows_out if not r.get("ranked"))
+    if rows_out and n_zero / len(rows_out) > 0.9:
+        raise RuntimeError(
+            f"retrieve phase degenerate (#106): {n_zero}/{len(rows_out)} "
+            f"questions got zero hits - index empty or unsearchable"
+        )
     n_err = sum(1 for r in rows_out if r.get("error"))
     if rows_out and n_err / len(rows_out) > 0.5:
         raise RuntimeError(

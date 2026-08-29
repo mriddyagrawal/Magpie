@@ -330,6 +330,11 @@ def main() -> None:
     (DATASET_DIR / "corpus_root.local.json").write_text(
         json.dumps({"corpus_root": str(corpus_dir)}, indent=2) + "\n", encoding="utf-8")
 
+    (corpus_dir / "_corpus_info.md").write_text(
+        "# Receipts eval corpus\n\n150 SROIE receipt scans (see "
+        "eval_harness/datasets/receipts/manifest.json).\nThis file also keeps "
+        "the folder indexable: the walker's asset-library\nheuristic skips "
+        "image-only folders (>=15 images, 0 documents) wholesale.\n")
     print(f"corpus: {len(manifest_files)} images -> {corpus_dir}")
     print(f"golden: {len(golden)} items "
           f"({json.loads((DATASET_DIR / 'manifest.json').read_text())['composition']})")

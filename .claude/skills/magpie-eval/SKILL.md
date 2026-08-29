@@ -22,16 +22,27 @@ you spawn. Ground rules that apply the whole way through:
 
 Ask (AskUserQuestion, multiple rounds fine):
 1. **Dataset** — which `eval_harness/datasets/<name>`, or a new corpus path.
-2. **Golden set** — one of: *reuse* the committed golden as-is; *adapt* an
-   existing annotation source into our schema; *generate fresh* by reading the
-   files (Phase 2).
+2. **Golden set** — one of: *reuse* a committed golden if the dataset has
+   one; *adapt* an existing annotation source into our schema; *generate
+   fresh* by reading the files (Phase 2). If the dataset directory has no
+   `golden.json`, say so and offer only adapt/generate.
 3. **Config — exactly ONE per skill run.** A skill run drives Magpie end to
    end once, under one fixed configuration: model_config, top_k, rewrite,
-   solo-gate margin (0 disables the gate), rerank (false kills the
-   cross-encoder stage AND structurally disables the solo gate — its margin
-   is on cross-encoder score scale), temperature, anything else in
-   `configs/baseline.json`. Offer baseline as the default. Comparing
-   configurations = separate skill runs; never launch multiple arms in one.
+   temperature, anything else in `configs/baseline.json`. Offer baseline as
+   the default. Comparing configurations = separate skill runs; never launch
+   multiple arms in one.
+
+   **Always ask explicitly — rerank and solo gate** (never silently inherit
+   these two from a config file):
+   - **rerank** — on/off. Off kills the cross-encoder stage
+     (`MAGPIE_RERANK=0`); results come back in fusion order (for visual
+     corpora that is ColQwen's own ranking). Warn when the answer is off:
+     it ALSO structurally disables the solo gate (the gate's margin is on
+     cross-encoder score scale), so the run is a rerank+gate change, and
+     `solo_gate_structurally_off` will be stamped in run.json.
+   - **solo gate** — margin value (`solo_margin`; 0 disables, production
+     default 2.0). If rerank is off, tell the owner the gate cannot fire
+     regardless and recommend pinning 0 so the config says what the run does.
 
    **Duplicate guard**: before launching, compare the chosen config against
    every prior `eval_harness/runs/*/run.json` on the comparability TRIPLE —

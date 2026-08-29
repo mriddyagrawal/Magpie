@@ -140,6 +140,15 @@ def main() -> int:
         "machine": envctl.machine_info(),
         "env_snapshot": envctl.snapshot_env(env),
         "dataset_manifest_files": dataset["manifest"].get("n_files"),
+        # #112: a solo_gated=0% run is ambiguous - never triggered vs
+        # couldn't trigger. The gate is structurally off when the rerank
+        # stage is killed (its margin is cross-encoder-scale) or when the
+        # margin itself disables it. Stamped so the confound travels with
+        # the data, not just envctl comments.
+        "solo_gate_structurally_off": (
+            not params.get("rerank", True)
+            or float(params.get("solo_margin", 2.0)) <= 0
+        ),
         "started_utc": ts,
         "ports": {"qdrant_http": ports.qdrant_http, "llama_base": ports.llama_base},
         "phases": {},

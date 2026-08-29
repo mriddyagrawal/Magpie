@@ -278,6 +278,8 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
 
         out = dict(row)
         out["answer_type"] = item["answer_type"]
+        out["phrasing"] = item.get("phrasing")
+        out["pair_id"] = item.get("pair_id", qa_id)
 
         # retrieval metrics from the PRE-gate retrieve pass
         ret = ranked_by_id.get(qa_id)
@@ -536,6 +538,25 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
             "fire_rate": rate(enriched, lambda e: e.get("solo_gated")),
         },
         "h1_slice": h1,
+        # golden v2: every fact is asked twice (typed human-style vs full
+        # sentence) - slice the headline metrics by phrasing so each run is
+        # its own rewrite/robustness eval
+        "by_phrasing": {
+            ph: {
+                "n": len(rows),
+                "correct": rate(rows, lambda e: e.get("verdict") == "correct"),
+                "retrieval_hit@1": (metrics.aggregate(
+                    [e["retrieval"] for e in rows if e.get("retrieval")]
+                ).get("hit@1")),
+                "retrieval_recall@5": (metrics.aggregate(
+                    [e["retrieval"] for e in rows if e.get("retrieval")]
+                ).get("recall@5")),
+            }
+            for ph, rows in (
+                ("typed", [e for e in answerable if e.get("phrasing") == "typed"]),
+                ("full", [e for e in answerable if e.get("phrasing") == "full"]),
+            ) if rows
+        },
         "product_findings": product_findings,
         "latency": {"p50_total_s": pct(0.50), "p95_total_s": pct(0.95)},
         "errors": sum(1 for e in enriched if e.get("error")),

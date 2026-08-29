@@ -606,10 +606,12 @@
       "sha256": "e42b41826822da6e11547e625f1a071ca2e57d717b1e043bbe62fed54d88bc91"
     }
   ],
-  "golden_items": 53,
+  "golden_items": 106,
   "composition": {
-    "extractive": 42,
-    "not_found": 6,
-    "enumeration": 5
-  }
+    "pairs": 53,
+    "extractive": 84,
+    "not_found": 12,
+    "enumeration": 10
+  },
+  "golden_generation": "v2 2026-08-28: dual-phrasing pairs (typed human-style + full sentence), extractive facts read from images by vision agents, cross-checked vs labels"
 }

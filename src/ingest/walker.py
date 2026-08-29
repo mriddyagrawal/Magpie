@@ -197,7 +197,7 @@ def find_candidates(
     ad-hoc CLI walks register the path as a managed root for the future
     daemon to pick up).
 
-    Three filter layers run in order:
+    Two filter layers run in order:
 
     1. **Dot-folder prune** during traversal — dot-folders (`.config/`,
        `.codex/`, `.antigravity/`, `.cache/`, etc.) are pruned in-place
@@ -206,11 +206,8 @@ def find_candidates(
     2. **Leaf-dotfile filter** — leaf-name dotfiles default to skipped,
        except the small `_USEFUL_DOTFILE_NAMES` allowlist (`.bashrc`,
        `.vimrc`, `.gitconfig`, etc.) which actually carry user content.
-    3. **Asset-library folder rule** — folders dominated by images with
-       zero documents are treated as asset libraries and their images
-       are dropped wholesale (post-walk, structural).
 
-    Both layers (1) and (2) are **disabled** for a subtree when its
+    Both layers are **disabled** for a subtree when its
     nearest-ancestor `.nasconfig.yaml` says `include_dotfiles: true`. The
     built-in default ignore patterns (secrets, `node_modules/`, etc.)
     still apply — opting in to dotfiles doesn't disable safety rails.
@@ -235,7 +232,7 @@ def find_candidates(
 
     # Single-file root short-circuit. When the walker is invoked on a file
     # path (e.g. an entry in include_paths that points at a single file),
-    # we skip the os.walk + asset-library pipeline entirely and just feed
+    # we skip the os.walk pipeline entirely and just feed
     # the one file forward — assuming `should_index()` accepts it. The
     # explicit-file-include precedence rule (#0) means user-listed file
     # includes pass even when gitignore / category / size would reject.
@@ -246,8 +243,8 @@ def find_candidates(
                 f"  warn: {root} not eligible for indexing: {reason}",
                 flush=True,
             )
-            return [], 1, 0
-        return [root], 0, 0
+            return [], 1
+        return [root], 0
 
     pre_accepted: list[Path] = []
     ignored = 0
@@ -857,8 +854,8 @@ def _fast_tier_orphan_cleanup(manifest: Manifest) -> int:
     """Drop fast_tier points whose source path no longer exists in the manifest.
 
     Mirrors Stage 2's summary-collection orphan cleanup. Necessary so that
-    files dropped by the asset-library rule (or any other manifest removal)
-    don't leave zombie ColPali patches on disk forever.
+    files removed from the manifest don't leave zombie ColPali patches on
+    disk forever.
     """
     try:
         from src.stage2.fast_db import delete_path, get_indexed_paths
@@ -1101,7 +1098,7 @@ def main() -> None:
         )
 
     # Fast-tier orphan cleanup: drop ColPali points for files that no longer
-    # exist in the manifest. Without this, asset-library skips and `--rebuild`
+    # exist in the manifest. Without this, `--rebuild` and manifest removals
     # leave zombie multi-vectors on disk indefinitely. Mirrors the
     # summary-collection orphan cleanup in `ingest_from_manifest`.
     try:

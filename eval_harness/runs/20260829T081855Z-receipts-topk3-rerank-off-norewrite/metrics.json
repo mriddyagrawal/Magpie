@@ -1,0 +1,99 @@
+{
+  "n_questions": 120,
+  "mode": "full",
+  "answer": {
+    "correct": 0.009,
+    "partial": 0.047,
+    "wrong": 0.623,
+    "false_abstain": 0.321,
+    "by_type": {
+      "enumeration": 0.0,
+      "extractive": 0.013,
+      "synthesis": 0.0
+    }
+  },
+  "abstention": {
+    "n_not_found": 14,
+    "correct_abstain_counts": "7/14",
+    "correct_abstain_rate": 0.5,
+    "false_answer_rate": 0.5
+  },
+  "retrieval": {
+    "n": 106,
+    "first_gold_rank": 1.4411764705882353,
+    "hit@1": 0.7924528301886793,
+    "hit@12": 0.9622641509433962,
+    "hit@3": 0.8867924528301887,
+    "hit@5": 0.9433962264150944,
+    "mrr": 0.8508647798742138,
+    "ndcg@5": 0.8604884447010349,
+    "recall@1": 0.6806603773584906,
+    "recall@12": 0.9516509433962265,
+    "recall@3": 0.8580188679245282,
+    "recall@5": 0.9080188679245281
+  },
+  "citations": {
+    "n": 106,
+    "citation_precision": 0.06037735849056604,
+    "citation_recall": 0.11202830188679246,
+    "cited": 0.5188679245283019,
+    "hallucinated_citations": 0.3584905660377358
+  },
+  "solo_gate": {
+    "fire_rate": 0.0
+  },
+  "h1_slice": {
+    "n_extractive": 80,
+    "n_eligible": 73,
+    "eligible_fraction": 0.912,
+    "basis_counts": {
+      "fact_spans": 0,
+      "file_level_image": 73
+    },
+    "accuracy_by_basis": {
+      "file_level_image": 0.014
+    },
+    "accuracy_on_eligible": 0.014,
+    "mixed_basis": false,
+    "note": "per-arm number; never compare raw across arms OR across bases (PLAN H1). accuracy_on_eligible is None when bases are mixed - use accuracy_by_basis."
+  },
+  "by_phrasing": {
+    "typed": {
+      "n": 53,
+      "correct": 0.019,
+      "correct_counts": "1/53",
+      "retrieval_hit@1": 0.6792452830188679,
+      "retrieval_recall@5": 0.8388364779874214
+    },
+    "full": {
+      "n": 53,
+      "correct": 0.0,
+      "correct_counts": "0/53",
+      "retrieval_hit@1": 0.9056603773584906,
+      "retrieval_recall@5": 0.9772012578616354
+    }
+  },
+  "product_findings": {
+    "not_found_flag_missing": 0,
+    "zero_citation_answers": 45
+  },
+  "latency": {
+    "p50_total_s": 20.3,
+    "p95_total_s": 58.1
+  },
+  "errors": 4,
+  "enriched_at_sha": "f5f936b62777b5bea137c51775883aa5212532c2",
+  "golden_set": {
+    "items": 120,
+    "human_verified": 0,
+    "model_authored": 114,
+    "label_derived": 6,
+    "status": "SILVER (provisional; includes MODEL-AUTHORED gold - review those first)"
+  },
+  "golden_sha": "a3b05ea95c052a65",
+  "index_store": {
+    "key": "5ff3e0adf0448de6",
+    "hit": true,
+    "built_under_sha": "c823a44f1227a18359f1823af720fcc7f0979209"
+  }
+}

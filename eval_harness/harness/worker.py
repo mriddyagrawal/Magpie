@@ -301,8 +301,8 @@ def phase_answer(payload: dict) -> dict:
                     }
                     for i, r in enumerate(res.retrieved, 1)
                 ],
-                answer=res.answer,
-                cited=[str(p) for p in res.sources_used],
+                magpie_answer=res.answer,
+                magpie_cited=[str(p) for p in res.sources_used],
                 not_found=bool(res.not_found),
                 not_found_topic=res.not_found_topic,
                 error=None,
@@ -310,7 +310,7 @@ def phase_answer(payload: dict) -> dict:
             n_ok += 1
         except Exception as e:  # noqa: BLE001 — record and continue, never abort the run
             row.update(
-                retrieved=[], answer="", cited=[], not_found=False,
+                retrieved=[], magpie_answer="", magpie_cited=[], not_found=False,
                 error=f"{type(e).__name__}: {e}",
             )
             n_err += 1

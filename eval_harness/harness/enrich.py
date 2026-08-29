@@ -196,10 +196,18 @@ def parse_stage_latencies(worker_log: Path) -> dict[str, dict]:
 
 # --- verdicts (deterministic component only) --------------------------------
 
+def magpie_answer_of(row: dict) -> str:
+    return row.get("magpie_answer", row.get("answer")) or ""
+
+
+def magpie_cited_of(row: dict) -> list:
+    return row.get("magpie_cited", row.get("cited")) or []
+
+
 def deterministic_verdict(item: dict, row: dict) -> dict:
     """Binary, rule-based scoring. The judge pass may OVERRIDE `verdict` for
     prose nuance; facts/citations/abstention are ground truth already."""
-    answer_text = row.get("answer") or ""
+    answer_text = magpie_answer_of(row)
     flag_abstain = bool(row.get("not_found")) or not answer_text.strip()
     prose = prose_abstain(answer_text)
     abstained = flag_abstain or prose
@@ -247,8 +255,8 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
                 "variant": 0,
                 "question": r.get("question", ""),
                 "retrieved": [],
-                "answer": "",
-                "cited": [],
+                "magpie_answer": "",
+                "magpie_cited": [],
                 "not_found": False,
                 "error": r.get("error"),
                 "latency_s": dict(r.get("latency_s") or {}),
@@ -277,6 +285,13 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
         qrels.update({p: 1 for p in item.get("acceptable_sources", [])})
 
         out = dict(row)
+        # naming contract (owner 2026-08-29): magpie_answer / golden_answer /
+        # magpie_cited - never a bare "answer". Normalize rows from older runs.
+        out["magpie_answer"] = magpie_answer_of(row)
+        out["magpie_cited"] = magpie_cited_of(row)
+        out.pop("answer", None)
+        out.pop("cited", None)
+        out["golden_answer"] = item.get("golden_answer", item.get("gold_answer"))
         out["answer_type"] = item["answer_type"]
         out["phrasing"] = item.get("phrasing")
         out["pair_id"] = item.get("pair_id", qa_id)
@@ -398,7 +413,7 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
             out["h1_eligible"], out["h1_basis"] = False, None
 
         # citations + verdict
-        cited = row.get("cited") or []
+        cited = magpie_cited_of(row)
         if qrels:
             out["citations"] = metrics.citation_scores(cited, qrels)
         out.update(deterministic_verdict(item, row))
@@ -496,7 +511,7 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
         "not_found_flag_missing": sum(1 for e in enriched if e.get("not_found_flag_missing")),
         "zero_citation_answers": sum(
             1 for e in answerable_scored
-            if not (e.get("cited")) and e.get("verdict") in ("correct", "partial", "wrong")
+            if not (e.get("magpie_cited")) and e.get("verdict") in ("correct", "partial", "wrong")
         ),
     }
 

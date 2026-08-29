@@ -1,7 +1,7 @@
 # Judge rubric — v2.0 (2026-08-28)
 
 One judge instance (a pinned high-tier Claude, default Opus 5) grades an ENTIRE
-run with full context: every question, its gold answer, Magpie's answer, AND the
+run with full context: every question, its golden answer, Magpie's answer, AND the
 actual source files (it Reads the gold-source images/documents itself). It
 writes two artifacts in exactly the formats below. Owner decision 2026-08-28,
 replacing the per-row partial-context judge.
@@ -14,7 +14,7 @@ owner's explicit per-dataset OK (PLAN §9.4).
 
 Verdicts (exactly one per question):
 - `correct` — every key fact stated (formatting variants fine: 46.20 ≈ RM46.20;
-  13/01/2018 ≈ "13 Jan 2018"), nothing contradicting the gold answer.
+  13/01/2018 ≈ "13 Jan 2018"), nothing contradicting the golden answer.
 - `partial` — some but not all key facts, no contradiction.
 - `wrong` — contradicts gold, states a different value, or answers a different
   receipt/file.
@@ -24,7 +24,7 @@ Verdicts (exactly one per question):
   correctly / supplied a concrete value.
 
 Discipline:
-- Grade against the gold answer, not taste; phrasing-blind (a correct answer
+- Grade against the golden answer, not taste; phrasing-blind (a correct answer
   worded unlike the gold is still correct).
 - Consult the source image when gold and answer disagree — if the GOLD is wrong
   (label error, ambiguous receipt), keep the verdict relative to the file's

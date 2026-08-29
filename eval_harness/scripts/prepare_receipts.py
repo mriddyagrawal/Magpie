@@ -215,14 +215,14 @@ def main() -> None:
 
     golden: list[dict] = []
 
-    def add(qid, question, answer_type, gold_answer, key_facts, gold_sources,
+    def add(qid, question, answer_type, golden_answer, key_facts, gold_sources,
             difficulty, variants=None):
         golden.append({
             "id": qid,
             "question": question,
             "question_variants": variants or [],
             "answer_type": answer_type,
-            "gold_answer": gold_answer,
+            "golden_answer": golden_answer,
             "key_facts": key_facts,
             "gold_sources": gold_sources,
             "acceptable_sources": [],

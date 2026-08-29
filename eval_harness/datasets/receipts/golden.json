@@ -5,7 +5,6 @@
     "phrasing": "typed",
     "question": "aa pharmacy receipt total",
     "answer_type": "extractive",
-    "gold_answer": "The AA Pharmacy receipt shows a final TOTAL of RM46.20, paid by Master card.",
     "key_facts": [
       "46.20"
     ],
@@ -20,7 +19,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "AA PHARMACY"
+    "vendor_as_printed": "AA PHARMACY",
+    "golden_answer": "The AA Pharmacy receipt shows a final TOTAL of RM46.20, paid by Master card."
   },
   {
     "id": "rcpt-total-01-full",
@@ -28,7 +28,6 @@
     "phrasing": "full",
     "question": "What is the total amount on the AA Pharmacy receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The AA Pharmacy receipt shows a final TOTAL of RM46.20, paid by Master card.",
     "key_facts": [
       "46.20"
     ],
@@ -43,7 +42,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "AA PHARMACY"
+    "vendor_as_printed": "AA PHARMACY",
+    "golden_answer": "The AA Pharmacy receipt shows a final TOTAL of RM46.20, paid by Master card."
   },
   {
     "id": "rcpt-total-06-typed",
@@ -51,7 +51,6 @@
     "phrasing": "typed",
     "question": "how much beyond brothers hardware",
     "answer_type": "extractive",
-    "gold_answer": "The Beyond Brothers Hardware receipt shows Total Sales (Inclusive of GST) of RM67.85, paid with RM70.00 cash and RM2.15 change.",
     "key_facts": [
       "67.85"
     ],
@@ -66,7 +65,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "BEYOND BROTHERS HARDWARE"
+    "vendor_as_printed": "BEYOND BROTHERS HARDWARE",
+    "golden_answer": "The Beyond Brothers Hardware receipt shows Total Sales (Inclusive of GST) of RM67.85, paid with RM70.00 cash and RM2.15 change."
   },
   {
     "id": "rcpt-total-06-full",
@@ -74,7 +74,6 @@
     "phrasing": "full",
     "question": "How much in total was paid at Beyond Brothers Hardware?",
     "answer_type": "extractive",
-    "gold_answer": "The Beyond Brothers Hardware receipt shows Total Sales (Inclusive of GST) of RM67.85, paid with RM70.00 cash and RM2.15 change.",
     "key_facts": [
       "67.85"
     ],
@@ -89,7 +88,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "BEYOND BROTHERS HARDWARE"
+    "vendor_as_printed": "BEYOND BROTHERS HARDWARE",
+    "golden_answer": "The Beyond Brothers Hardware receipt shows Total Sales (Inclusive of GST) of RM67.85, paid with RM70.00 cash and RM2.15 change."
   },
   {
     "id": "rcpt-total-11-typed",
@@ -97,7 +97,6 @@
     "phrasing": "typed",
     "question": "total on dream arts reciept",
     "answer_type": "extractive",
-    "gold_answer": "The Dream Arts receipt shows a Rounded Total (RM) of 15.00, paid in cash.",
     "key_facts": [
       "15.00"
     ],
@@ -112,7 +111,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "Dream Arts"
+    "vendor_as_printed": "Dream Arts",
+    "golden_answer": "The Dream Arts receipt shows a Rounded Total (RM) of 15.00, paid in cash."
   },
   {
     "id": "rcpt-total-11-full",
@@ -120,7 +120,6 @@
     "phrasing": "full",
     "question": "What was the total on the Dream Arts receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The Dream Arts receipt shows a Rounded Total (RM) of 15.00, paid in cash.",
     "key_facts": [
       "15.00"
     ],
@@ -135,7 +134,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "Dream Arts"
+    "vendor_as_printed": "Dream Arts",
+    "golden_answer": "The Dream Arts receipt shows a Rounded Total (RM) of 15.00, paid in cash."
   },
   {
     "id": "rcpt-total-16-typed",
@@ -143,7 +143,6 @@
     "phrasing": "typed",
     "question": "gm rack total paid",
     "answer_type": "extractive",
-    "gold_answer": "The GM Rack Enterprise invoice shows a TOTAL of RM160.00, paid in cash.",
     "key_facts": [
       "160.00"
     ],
@@ -158,7 +157,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "GM Rack Enterprise"
+    "vendor_as_printed": "GM Rack Enterprise",
+    "golden_answer": "The GM Rack Enterprise invoice shows a TOTAL of RM160.00, paid in cash."
   },
   {
     "id": "rcpt-total-16-full",
@@ -166,7 +166,6 @@
     "phrasing": "full",
     "question": "What is the total amount on the GM Rack Enterprise invoice?",
     "answer_type": "extractive",
-    "gold_answer": "The GM Rack Enterprise invoice shows a TOTAL of RM160.00, paid in cash.",
     "key_facts": [
       "160.00"
     ],
@@ -181,7 +180,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "GM Rack Enterprise"
+    "vendor_as_printed": "GM Rack Enterprise",
+    "golden_answer": "The GM Rack Enterprise invoice shows a TOTAL of RM160.00, paid in cash."
   },
   {
     "id": "rcpt-date-01-typed",
@@ -189,7 +189,6 @@
     "phrasing": "typed",
     "question": "date bought from hugo trading",
     "answer_type": "extractive",
-    "gold_answer": "The Hugo Trading tax invoice is dated 13/01/2018 (printed with time 11:44:30PM).",
     "key_facts": [
       "13/01/2018"
     ],
@@ -204,7 +203,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "HUGO TRADING SDN BHD"
+    "vendor_as_printed": "HUGO TRADING SDN BHD",
+    "golden_answer": "The Hugo Trading tax invoice is dated 13/01/2018 (printed with time 11:44:30PM)."
   },
   {
     "id": "rcpt-date-01-full",
@@ -212,7 +212,6 @@
     "phrasing": "full",
     "question": "What is the date on the Hugo Trading receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The Hugo Trading tax invoice is dated 13/01/2018 (printed with time 11:44:30PM).",
     "key_facts": [
       "13/01/2018"
     ],
@@ -227,7 +226,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "HUGO TRADING SDN BHD"
+    "vendor_as_printed": "HUGO TRADING SDN BHD",
+    "golden_answer": "The Hugo Trading tax invoice is dated 13/01/2018 (printed with time 11:44:30PM)."
   },
   {
     "id": "rcpt-date-06-typed",
@@ -235,7 +235,6 @@
     "phrasing": "typed",
     "question": "mei let bill date",
     "answer_type": "extractive",
-    "gold_answer": "The Mei Let Restaurant bill is dated 03/02/2017 (BILL DT: 03/02/2017 09:26:48 PM).",
     "key_facts": [
       "03/02/2017"
     ],
@@ -250,7 +249,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MEI LET RESTAURANT"
+    "vendor_as_printed": "MEI LET RESTAURANT",
+    "golden_answer": "The Mei Let Restaurant bill is dated 03/02/2017 (BILL DT: 03/02/2017 09:26:48 PM)."
   },
   {
     "id": "rcpt-date-06-full",
@@ -258,7 +258,6 @@
     "phrasing": "full",
     "question": "On what date was the bill at Mei Let Restaurant issued?",
     "answer_type": "extractive",
-    "gold_answer": "The Mei Let Restaurant bill is dated 03/02/2017 (BILL DT: 03/02/2017 09:26:48 PM).",
     "key_facts": [
       "03/02/2017"
     ],
@@ -273,7 +272,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MEI LET RESTAURANT"
+    "vendor_as_printed": "MEI LET RESTAURANT",
+    "golden_answer": "The Mei Let Restaurant bill is dated 03/02/2017 (BILL DT: 03/02/2017 09:26:48 PM)."
   },
   {
     "id": "rcpt-date-11-typed",
@@ -281,7 +281,6 @@
     "phrasing": "typed",
     "question": "when did i shop at mydin",
     "answer_type": "extractive",
-    "gold_answer": "The Mydin (Mydin Mart Sri Muda) receipt is dated 1/08/2017 (03:56:06PM).",
     "key_facts": [
       "1/08/2017"
     ],
@@ -296,7 +295,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MYDIN (TRI SHAAS SDN BHD, MYDIN MART SRI MUDA)"
+    "vendor_as_printed": "MYDIN (TRI SHAAS SDN BHD, MYDIN MART SRI MUDA)",
+    "golden_answer": "The Mydin (Mydin Mart Sri Muda) receipt is dated 1/08/2017 (03:56:06PM)."
   },
   {
     "id": "rcpt-date-11-full",
@@ -304,7 +304,6 @@
     "phrasing": "full",
     "question": "On what date was the Mydin receipt issued?",
     "answer_type": "extractive",
-    "gold_answer": "The Mydin (Mydin Mart Sri Muda) receipt is dated 1/08/2017 (03:56:06PM).",
     "key_facts": [
       "1/08/2017"
     ],
@@ -319,7 +318,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MYDIN (TRI SHAAS SDN BHD, MYDIN MART SRI MUDA)"
+    "vendor_as_printed": "MYDIN (TRI SHAAS SDN BHD, MYDIN MART SRI MUDA)",
+    "golden_answer": "The Mydin (Mydin Mart Sri Muda) receipt is dated 1/08/2017 (03:56:06PM)."
   },
   {
     "id": "rcpt-addr-04-typed",
@@ -327,7 +327,6 @@
     "phrasing": "typed",
     "question": "potters garden address",
     "answer_type": "extractive",
-    "gold_answer": "Potters Garden Sdn Bhd's printed address is Batu 11, Sg Buloh, 47000 Selangor.",
     "key_facts": [
       "47000",
       "Selangor"
@@ -343,7 +342,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "POTTERS GARDEN SDN BHD"
+    "vendor_as_printed": "POTTERS GARDEN SDN BHD",
+    "golden_answer": "Potters Garden Sdn Bhd's printed address is Batu 11, Sg Buloh, 47000 Selangor."
   },
   {
     "id": "rcpt-addr-04-full",
@@ -351,7 +351,6 @@
     "phrasing": "full",
     "question": "What is the printed address of Potters Garden?",
     "answer_type": "extractive",
-    "gold_answer": "Potters Garden Sdn Bhd's printed address is Batu 11, Sg Buloh, 47000 Selangor.",
     "key_facts": [
       "47000",
       "Selangor"
@@ -367,7 +366,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "POTTERS GARDEN SDN BHD"
+    "vendor_as_printed": "POTTERS GARDEN SDN BHD",
+    "golden_answer": "Potters Garden Sdn Bhd's printed address is Batu 11, Sg Buloh, 47000 Selangor."
   },
   {
     "id": "rcpt-addr-09-typed",
@@ -375,7 +375,6 @@
     "phrasing": "typed",
     "question": "sen lee heong restarant address",
     "answer_type": "extractive",
-    "gold_answer": "Sen Lee Heong Restaurant's printed address is G-0-1, M.Avenue No.1, Jln 1/38A, Segambut Bahagia, 51200, Kuala Lumpur (the degraded print renders the city as 'K.LUMPUL').",
     "key_facts": [
       "51200",
       "Segambut"
@@ -391,7 +390,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SEN LEE HEONG RESTAURANT"
+    "vendor_as_printed": "SEN LEE HEONG RESTAURANT",
+    "golden_answer": "Sen Lee Heong Restaurant's printed address is G-0-1, M.Avenue No.1, Jln 1/38A, Segambut Bahagia, 51200, Kuala Lumpur (the degraded print renders the city as 'K.LUMPUL')."
   },
   {
     "id": "rcpt-addr-09-full",
@@ -399,7 +399,6 @@
     "phrasing": "full",
     "question": "What is the street address of Sen Lee Heong Restaurant?",
     "answer_type": "extractive",
-    "gold_answer": "Sen Lee Heong Restaurant's printed address is G-0-1, M.Avenue No.1, Jln 1/38A, Segambut Bahagia, 51200, Kuala Lumpur (the degraded print renders the city as 'K.LUMPUL').",
     "key_facts": [
       "51200",
       "Segambut"
@@ -415,7 +414,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SEN LEE HEONG RESTAURANT"
+    "vendor_as_printed": "SEN LEE HEONG RESTAURANT",
+    "golden_answer": "Sen Lee Heong Restaurant's printed address is G-0-1, M.Avenue No.1, Jln 1/38A, Segambut Bahagia, 51200, Kuala Lumpur (the degraded print renders the city as 'K.LUMPUL')."
   },
   {
     "id": "rcpt-total-02-typed",
@@ -423,7 +423,6 @@
     "phrasing": "typed",
     "question": "salon du chocolat receipt total",
     "answer_type": "extractive",
-    "gold_answer": "The final total on the Salon Du Chocolat receipt (after rounding) is RM23.80.",
     "key_facts": [
       "23.80"
     ],
@@ -438,7 +437,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "Salon Du Chocolat (ALI BABA INTERNATIONAL SDN BHD)"
+    "vendor_as_printed": "Salon Du Chocolat (ALI BABA INTERNATIONAL SDN BHD)",
+    "golden_answer": "The final total on the Salon Du Chocolat receipt (after rounding) is RM23.80."
   },
   {
     "id": "rcpt-total-02-full",
@@ -446,7 +446,6 @@
     "phrasing": "full",
     "question": "What was the final total on the Salon Du Chocolat receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The final total on the Salon Du Chocolat receipt (after rounding) is RM23.80.",
     "key_facts": [
       "23.80"
     ],
@@ -461,7 +460,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "Salon Du Chocolat (ALI BABA INTERNATIONAL SDN BHD)"
+    "vendor_as_printed": "Salon Du Chocolat (ALI BABA INTERNATIONAL SDN BHD)",
+    "golden_answer": "The final total on the Salon Du Chocolat receipt (after rounding) is RM23.80."
   },
   {
     "id": "rcpt-total-07-typed",
@@ -469,7 +469,6 @@
     "phrasing": "typed",
     "question": "how much chop yew lian",
     "answer_type": "extractive",
-    "gold_answer": "The total paid at Chop Yew Lian (a Shell fuel station) was RM30.00 in cash.",
     "key_facts": [
       "30.00"
     ],
@@ -484,7 +483,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "CHOP YEW LIAN"
+    "vendor_as_printed": "CHOP YEW LIAN",
+    "golden_answer": "The total paid at Chop Yew Lian (a Shell fuel station) was RM30.00 in cash."
   },
   {
     "id": "rcpt-total-07-full",
@@ -492,7 +492,6 @@
     "phrasing": "full",
     "question": "How much was the total paid at Chop Yew Lian?",
     "answer_type": "extractive",
-    "gold_answer": "The total paid at Chop Yew Lian (a Shell fuel station) was RM30.00 in cash.",
     "key_facts": [
       "30.00"
     ],
@@ -507,7 +506,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "CHOP YEW LIAN"
+    "vendor_as_printed": "CHOP YEW LIAN",
+    "golden_answer": "The total paid at Chop Yew Lian (a Shell fuel station) was RM30.00 in cash."
   },
   {
     "id": "rcpt-total-12-typed",
@@ -515,7 +515,6 @@
     "phrasing": "typed",
     "question": "total on the econsave reciept",
     "answer_type": "extractive",
-    "gold_answer": "The total (incl. GST) on the Econsave Cash & Carry receipt is RM5.15.",
     "key_facts": [
       "5.15"
     ],
@@ -530,7 +529,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "ECONSAVE CASH & CARRY (FC) S/B"
+    "vendor_as_printed": "ECONSAVE CASH & CARRY (FC) S/B",
+    "golden_answer": "The total (incl. GST) on the Econsave Cash & Carry receipt is RM5.15."
   },
   {
     "id": "rcpt-total-12-full",
@@ -538,7 +538,6 @@
     "phrasing": "full",
     "question": "What is the total including GST on the Econsave Cash & Carry receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The total (incl. GST) on the Econsave Cash & Carry receipt is RM5.15.",
     "key_facts": [
       "5.15"
     ],
@@ -553,7 +552,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "ECONSAVE CASH & CARRY (FC) S/B"
+    "vendor_as_printed": "ECONSAVE CASH & CARRY (FC) S/B",
+    "golden_answer": "The total (incl. GST) on the Econsave Cash & Carry receipt is RM5.15."
   },
   {
     "id": "rcpt-total-17-typed",
@@ -561,7 +561,6 @@
     "phrasing": "typed",
     "question": "tony romas total",
     "answer_type": "extractive",
-    "gold_answer": "The total on the Tony Roma's (AEON Tebrau City) receipt is RM269.40.",
     "key_facts": [
       "269.40"
     ],
@@ -576,7 +575,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "TONY ROMA'S AEON TEBRAU CITY (GRAND COMPANIONS SDN BHD)"
+    "vendor_as_printed": "TONY ROMA'S AEON TEBRAU CITY (GRAND COMPANIONS SDN BHD)",
+    "golden_answer": "The total on the Tony Roma's (AEON Tebrau City) receipt is RM269.40."
   },
   {
     "id": "rcpt-total-17-full",
@@ -584,7 +584,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the Tony Roma's receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The total on the Tony Roma's (AEON Tebrau City) receipt is RM269.40.",
     "key_facts": [
       "269.40"
     ],
@@ -599,7 +598,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "TONY ROMA'S AEON TEBRAU CITY (GRAND COMPANIONS SDN BHD)"
+    "vendor_as_printed": "TONY ROMA'S AEON TEBRAU CITY (GRAND COMPANIONS SDN BHD)",
+    "golden_answer": "The total on the Tony Roma's (AEON Tebrau City) receipt is RM269.40."
   },
   {
     "id": "rcpt-date-02-typed",
@@ -607,7 +607,6 @@
     "phrasing": "typed",
     "question": "image printec invoice date",
     "answer_type": "extractive",
-    "gold_answer": "The Image Printec tax invoice is dated 23/02/2018.",
     "key_facts": [
       "23/02/2018"
     ],
@@ -622,7 +621,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "IMAGE PRINTEC (M) SDN BHD"
+    "vendor_as_printed": "IMAGE PRINTEC (M) SDN BHD",
+    "golden_answer": "The Image Printec tax invoice is dated 23/02/2018."
   },
   {
     "id": "rcpt-date-02-full",
@@ -630,7 +630,6 @@
     "phrasing": "full",
     "question": "What is the date on the Image Printec tax invoice?",
     "answer_type": "extractive",
-    "gold_answer": "The Image Printec tax invoice is dated 23/02/2018.",
     "key_facts": [
       "23/02/2018"
     ],
@@ -645,7 +644,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "IMAGE PRINTEC (M) SDN BHD"
+    "vendor_as_printed": "IMAGE PRINTEC (M) SDN BHD",
+    "golden_answer": "The Image Printec tax invoice is dated 23/02/2018."
   },
   {
     "id": "rcpt-date-07-typed",
@@ -653,7 +653,6 @@
     "phrasing": "typed",
     "question": "when did i buy from modern depo",
     "answer_type": "extractive",
-    "gold_answer": "The Modern Depot receipt is dated 04/12/2016.",
     "key_facts": [
       "04/12/2016"
     ],
@@ -668,7 +667,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MODERN DEPOT SDN BHD"
+    "vendor_as_printed": "MODERN DEPOT SDN BHD",
+    "golden_answer": "The Modern Depot receipt is dated 04/12/2016."
   },
   {
     "id": "rcpt-date-07-full",
@@ -676,7 +676,6 @@
     "phrasing": "full",
     "question": "On what date was the Modern Depot receipt issued?",
     "answer_type": "extractive",
-    "gold_answer": "The Modern Depot receipt is dated 04/12/2016.",
     "key_facts": [
       "04/12/2016"
     ],
@@ -691,7 +690,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MODERN DEPOT SDN BHD"
+    "vendor_as_printed": "MODERN DEPOT SDN BHD",
+    "golden_answer": "The Modern Depot receipt is dated 04/12/2016."
   },
   {
     "id": "rcpt-date-12-typed",
@@ -699,7 +699,6 @@
     "phrasing": "typed",
     "question": "oldtown white coffee date",
     "answer_type": "extractive",
-    "gold_answer": "The OldTown White Coffee (Sri Rampai) guest check is dated 22 Mar 18.",
     "key_facts": [
       "22 Mar 18"
     ],
@@ -714,7 +713,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "OLDTOWN WHITE COFFEE (Old Town Kopitiam Sdn Bhd)"
+    "vendor_as_printed": "OLDTOWN WHITE COFFEE (Old Town Kopitiam Sdn Bhd)",
+    "golden_answer": "The OldTown White Coffee (Sri Rampai) guest check is dated 22 Mar 18."
   },
   {
     "id": "rcpt-date-12-full",
@@ -722,7 +722,6 @@
     "phrasing": "full",
     "question": "What date is printed on the OldTown White Coffee guest check?",
     "answer_type": "extractive",
-    "gold_answer": "The OldTown White Coffee (Sri Rampai) guest check is dated 22 Mar 18.",
     "key_facts": [
       "22 Mar 18"
     ],
@@ -737,7 +736,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "OLDTOWN WHITE COFFEE (Old Town Kopitiam Sdn Bhd)"
+    "vendor_as_printed": "OLDTOWN WHITE COFFEE (Old Town Kopitiam Sdn Bhd)",
+    "golden_answer": "The OldTown White Coffee (Sri Rampai) guest check is dated 22 Mar 18."
   },
   {
     "id": "rcpt-addr-05-typed",
@@ -745,7 +745,6 @@
     "phrasing": "typed",
     "question": "premio stationary address",
     "answer_type": "extractive",
-    "gold_answer": "Premio Stationery's printed address is No 57, Jalan SS 3/29, 47300 Petaling Jaya, Selangor.",
     "key_facts": [
       "47300",
       "Petaling Jaya"
@@ -761,7 +760,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PREMIO STATIONERY SDN BHD"
+    "vendor_as_printed": "PREMIO STATIONERY SDN BHD",
+    "golden_answer": "Premio Stationery's printed address is No 57, Jalan SS 3/29, 47300 Petaling Jaya, Selangor."
   },
   {
     "id": "rcpt-addr-05-full",
@@ -769,7 +769,6 @@
     "phrasing": "full",
     "question": "What is the street address printed on the Premio Stationery receipt?",
     "answer_type": "extractive",
-    "gold_answer": "Premio Stationery's printed address is No 57, Jalan SS 3/29, 47300 Petaling Jaya, Selangor.",
     "key_facts": [
       "47300",
       "Petaling Jaya"
@@ -785,7 +784,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PREMIO STATIONERY SDN BHD"
+    "vendor_as_printed": "PREMIO STATIONERY SDN BHD",
+    "golden_answer": "Premio Stationery's printed address is No 57, Jalan SS 3/29, 47300 Petaling Jaya, Selangor."
   },
   {
     "id": "rcpt-addr-10-typed",
@@ -793,7 +793,6 @@
     "phrasing": "typed",
     "question": "sin lianhap address",
     "answer_type": "extractive",
-    "gold_answer": "Sin Lianhap's printed address is Lot 13, Jalan Ipoh, Kg Batu 30, Ulu Yam Lama, 44300 Btg Kali, Selangor.",
     "key_facts": [
       "44300",
       "BTG KALI"
@@ -809,7 +808,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SIN LIANHAP SDN BHD"
+    "vendor_as_printed": "SIN LIANHAP SDN BHD",
+    "golden_answer": "Sin Lianhap's printed address is Lot 13, Jalan Ipoh, Kg Batu 30, Ulu Yam Lama, 44300 Btg Kali, Selangor."
   },
   {
     "id": "rcpt-addr-10-full",
@@ -817,7 +817,6 @@
     "phrasing": "full",
     "question": "What address is printed on the Sin Lianhap receipt?",
     "answer_type": "extractive",
-    "gold_answer": "Sin Lianhap's printed address is Lot 13, Jalan Ipoh, Kg Batu 30, Ulu Yam Lama, 44300 Btg Kali, Selangor.",
     "key_facts": [
       "44300",
       "BTG KALI"
@@ -833,7 +832,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SIN LIANHAP SDN BHD"
+    "vendor_as_printed": "SIN LIANHAP SDN BHD",
+    "golden_answer": "Sin Lianhap's printed address is Lot 13, Jalan Ipoh, Kg Batu 30, Ulu Yam Lama, 44300 Btg Kali, Selangor."
   },
   {
     "id": "rcpt-total-03-typed",
@@ -841,7 +841,6 @@
     "phrasing": "typed",
     "question": "aso electrical receipt total",
     "answer_type": "extractive",
-    "gold_answer": "The total on the ASO Electrical Trading receipt is RM 94.60, paid with RM 100.00 cash.",
     "key_facts": [
       "94.60"
     ],
@@ -856,7 +855,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "ASO ELECTRICAL TRADING SDN BHD"
+    "vendor_as_printed": "ASO ELECTRICAL TRADING SDN BHD",
+    "golden_answer": "The total on the ASO Electrical Trading receipt is RM 94.60, paid with RM 100.00 cash."
   },
   {
     "id": "rcpt-total-03-full",
@@ -864,7 +864,6 @@
     "phrasing": "full",
     "question": "What is the total amount on the ASO Electrical Trading receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The total on the ASO Electrical Trading receipt is RM 94.60, paid with RM 100.00 cash.",
     "key_facts": [
       "94.60"
     ],
@@ -879,7 +878,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "ASO ELECTRICAL TRADING SDN BHD"
+    "vendor_as_printed": "ASO ELECTRICAL TRADING SDN BHD",
+    "golden_answer": "The total on the ASO Electrical Trading receipt is RM 94.60, paid with RM 100.00 cash."
   },
   {
     "id": "rcpt-total-08-typed",
@@ -887,7 +887,6 @@
     "phrasing": "typed",
     "question": "how much contento",
     "answer_type": "extractive",
-    "gold_answer": "The total on the Contento receipt is RM 21.60.",
     "key_facts": [
       "21.60"
     ],
@@ -902,7 +901,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "CONTENTO"
+    "vendor_as_printed": "CONTENTO",
+    "golden_answer": "The total on the Contento receipt is RM 21.60."
   },
   {
     "id": "rcpt-total-08-full",
@@ -910,7 +910,6 @@
     "phrasing": "full",
     "question": "How much did I pay in total at Contento?",
     "answer_type": "extractive",
-    "gold_answer": "The total on the Contento receipt is RM 21.60.",
     "key_facts": [
       "21.60"
     ],
@@ -925,7 +924,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "CONTENTO"
+    "vendor_as_printed": "CONTENTO",
+    "golden_answer": "The total on the Contento receipt is RM 21.60."
   },
   {
     "id": "rcpt-total-13-typed",
@@ -933,7 +933,6 @@
     "phrasing": "typed",
     "question": "total on the pharmacy reciept f&p",
     "answer_type": "extractive",
-    "gold_answer": "The total sales inclusive of GST on the F&P Pharmacy receipt is RM 31.90.",
     "key_facts": [
       "31.90"
     ],
@@ -948,7 +947,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "F&P PHARMACY"
+    "vendor_as_printed": "F&P PHARMACY",
+    "golden_answer": "The total sales inclusive of GST on the F&P Pharmacy receipt is RM 31.90."
   },
   {
     "id": "rcpt-total-13-full",
@@ -956,7 +956,6 @@
     "phrasing": "full",
     "question": "What was the total on the F&P Pharmacy receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The total sales inclusive of GST on the F&P Pharmacy receipt is RM 31.90.",
     "key_facts": [
       "31.90"
     ],
@@ -971,7 +970,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "F&P PHARMACY"
+    "vendor_as_printed": "F&P PHARMACY",
+    "golden_answer": "The total sales inclusive of GST on the F&P Pharmacy receipt is RM 31.90."
   },
   {
     "id": "rcpt-total-18-typed",
@@ -979,7 +979,6 @@
     "phrasing": "typed",
     "question": "great zone household total paid",
     "answer_type": "extractive",
-    "gold_answer": "The rounded total on the Great Zone Household Centre receipt is RM 367.30, paid by credit card.",
     "key_facts": [
       "367.30"
     ],
@@ -994,7 +993,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "GREAT ZONE HOUSEHOLD CENTRE SDN BHD"
+    "vendor_as_printed": "GREAT ZONE HOUSEHOLD CENTRE SDN BHD",
+    "golden_answer": "The rounded total on the Great Zone Household Centre receipt is RM 367.30, paid by credit card."
   },
   {
     "id": "rcpt-total-18-full",
@@ -1002,7 +1002,6 @@
     "phrasing": "full",
     "question": "What was the total amount charged on the Great Zone Household Centre receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The rounded total on the Great Zone Household Centre receipt is RM 367.30, paid by credit card.",
     "key_facts": [
       "367.30"
     ],
@@ -1017,7 +1016,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "GREAT ZONE HOUSEHOLD CENTRE SDN BHD"
+    "vendor_as_printed": "GREAT ZONE HOUSEHOLD CENTRE SDN BHD",
+    "golden_answer": "The rounded total on the Great Zone Household Centre receipt is RM 367.30, paid by credit card."
   },
   {
     "id": "rcpt-date-03-typed",
@@ -1025,7 +1025,6 @@
     "phrasing": "typed",
     "question": "date bought from kaison",
     "answer_type": "extractive",
-    "gold_answer": "The Kaison Furnishing receipt is dated 25-03-18 (at 18:34).",
     "key_facts": [
       "25-03-18"
     ],
@@ -1040,7 +1039,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "KAISON FURNISHING SDN BHD"
+    "vendor_as_printed": "KAISON FURNISHING SDN BHD",
+    "golden_answer": "The Kaison Furnishing receipt is dated 25-03-18 (at 18:34)."
   },
   {
     "id": "rcpt-date-03-full",
@@ -1048,7 +1048,6 @@
     "phrasing": "full",
     "question": "On what date was the purchase at Kaison Furnishing made?",
     "answer_type": "extractive",
-    "gold_answer": "The Kaison Furnishing receipt is dated 25-03-18 (at 18:34).",
     "key_facts": [
       "25-03-18"
     ],
@@ -1063,7 +1062,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "KAISON FURNISHING SDN BHD"
+    "vendor_as_printed": "KAISON FURNISHING SDN BHD",
+    "golden_answer": "The Kaison Furnishing receipt is dated 25-03-18 (at 18:34)."
   },
   {
     "id": "rcpt-date-08-typed",
@@ -1071,7 +1071,6 @@
     "phrasing": "typed",
     "question": "mr diy receipt date",
     "answer_type": "extractive",
-    "gold_answer": "The Mr. D.I.Y. (Kuchai) receipt is dated 19-03-18 (printed at the bottom with time 13:09).",
     "key_facts": [
       "19-03-18"
     ],
@@ -1086,7 +1085,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MR. D.I.Y.(KUCHAI) SDN BHD"
+    "vendor_as_printed": "MR. D.I.Y.(KUCHAI) SDN BHD",
+    "golden_answer": "The Mr. D.I.Y. (Kuchai) receipt is dated 19-03-18 (printed at the bottom with time 13:09)."
   },
   {
     "id": "rcpt-date-08-full",
@@ -1094,7 +1094,6 @@
     "phrasing": "full",
     "question": "What is the date on the Mr. D.I.Y. receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The Mr. D.I.Y. (Kuchai) receipt is dated 19-03-18 (printed at the bottom with time 13:09).",
     "key_facts": [
       "19-03-18"
     ],
@@ -1109,7 +1108,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MR. D.I.Y.(KUCHAI) SDN BHD"
+    "vendor_as_printed": "MR. D.I.Y.(KUCHAI) SDN BHD",
+    "golden_answer": "The Mr. D.I.Y. (Kuchai) receipt is dated 19-03-18 (printed at the bottom with time 13:09)."
   },
   {
     "id": "rcpt-addr-01-typed",
@@ -1117,7 +1117,6 @@
     "phrasing": "typed",
     "question": "pasar mini jin seng adress",
     "answer_type": "extractive",
-    "gold_answer": "Pasar Mini Jin Seng's printed address is 379, Jalan Permas Satu, Bandar Baru Permas Jaya, 81750 Plentong, Johor.",
     "key_facts": [
       "81750",
       "Plentong"
@@ -1133,7 +1132,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PASAR MINI JIN SENG"
+    "vendor_as_printed": "PASAR MINI JIN SENG",
+    "golden_answer": "Pasar Mini Jin Seng's printed address is 379, Jalan Permas Satu, Bandar Baru Permas Jaya, 81750 Plentong, Johor."
   },
   {
     "id": "rcpt-addr-01-full",
@@ -1141,7 +1141,6 @@
     "phrasing": "full",
     "question": "What is the street address printed on the Pasar Mini Jin Seng receipt?",
     "answer_type": "extractive",
-    "gold_answer": "Pasar Mini Jin Seng's printed address is 379, Jalan Permas Satu, Bandar Baru Permas Jaya, 81750 Plentong, Johor.",
     "key_facts": [
       "81750",
       "Plentong"
@@ -1157,7 +1156,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PASAR MINI JIN SENG"
+    "vendor_as_printed": "PASAR MINI JIN SENG",
+    "golden_answer": "Pasar Mini Jin Seng's printed address is 379, Jalan Permas Satu, Bandar Baru Permas Jaya, 81750 Plentong, Johor."
   },
   {
     "id": "rcpt-addr-06-typed",
@@ -1165,7 +1165,6 @@
     "phrasing": "typed",
     "question": "saint heart pastry address",
     "answer_type": "extractive",
-    "gold_answer": "Saint Heart Pastry's printed address is 29, Jln SJ 17, Tmn Selayang Jaya, 68100 Batu Caves, Selangor.",
     "key_facts": [
       "68100",
       "Batu Caves"
@@ -1181,7 +1180,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SAINT HEART PASTRY"
+    "vendor_as_printed": "SAINT HEART PASTRY",
+    "golden_answer": "Saint Heart Pastry's printed address is 29, Jln SJ 17, Tmn Selayang Jaya, 68100 Batu Caves, Selangor."
   },
   {
     "id": "rcpt-addr-06-full",
@@ -1189,7 +1189,6 @@
     "phrasing": "full",
     "question": "What is the address of Saint Heart Pastry as printed on the receipt?",
     "answer_type": "extractive",
-    "gold_answer": "Saint Heart Pastry's printed address is 29, Jln SJ 17, Tmn Selayang Jaya, 68100 Batu Caves, Selangor.",
     "key_facts": [
       "68100",
       "Batu Caves"
@@ -1205,7 +1204,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SAINT HEART PASTRY"
+    "vendor_as_printed": "SAINT HEART PASTRY",
+    "golden_answer": "Saint Heart Pastry's printed address is 29, Jln SJ 17, Tmn Selayang Jaya, 68100 Batu Caves, Selangor."
   },
   {
     "id": "rcpt-total-04-typed",
@@ -1213,7 +1213,6 @@
     "phrasing": "typed",
     "question": "bakalima receipt total",
     "answer_type": "extractive",
-    "gold_answer": "The total on the Bakalima (Shell station) receipt is RM 100.00, paid in cash for V-Power 97 fuel.",
     "key_facts": [
       "100.00"
     ],
@@ -1228,7 +1227,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "BAKALIMA SDN BHD"
+    "vendor_as_printed": "BAKALIMA SDN BHD",
+    "golden_answer": "The total on the Bakalima (Shell station) receipt is RM 100.00, paid in cash for V-Power 97 fuel."
   },
   {
     "id": "rcpt-total-04-full",
@@ -1236,7 +1236,6 @@
     "phrasing": "full",
     "question": "What was the total amount paid on the Bakalima receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The total on the Bakalima (Shell station) receipt is RM 100.00, paid in cash for V-Power 97 fuel.",
     "key_facts": [
       "100.00"
     ],
@@ -1251,7 +1250,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "BAKALIMA SDN BHD"
+    "vendor_as_printed": "BAKALIMA SDN BHD",
+    "golden_answer": "The total on the Bakalima (Shell station) receipt is RM 100.00, paid in cash for V-Power 97 fuel."
   },
   {
     "id": "rcpt-total-09-typed",
@@ -1259,7 +1259,6 @@
     "phrasing": "typed",
     "question": "how much rocku yakiniku",
     "answer_type": "extractive",
-    "gold_answer": "The total at Rocku Yakiniku was RM 181.55 for a buffet dinner for three plus green tea.",
     "key_facts": [
       "181.55"
     ],
@@ -1274,7 +1273,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "ROCKU YAKINIKU"
+    "vendor_as_printed": "ROCKU YAKINIKU",
+    "golden_answer": "The total at Rocku Yakiniku was RM 181.55 for a buffet dinner for three plus green tea."
   },
   {
     "id": "rcpt-total-09-full",
@@ -1282,7 +1282,6 @@
     "phrasing": "full",
     "question": "How much was the total bill at Rocku Yakiniku?",
     "answer_type": "extractive",
-    "gold_answer": "The total at Rocku Yakiniku was RM 181.55 for a buffet dinner for three plus green tea.",
     "key_facts": [
       "181.55"
     ],
@@ -1297,7 +1296,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "ROCKU YAKINIKU"
+    "vendor_as_printed": "ROCKU YAKINIKU",
+    "golden_answer": "The total at Rocku Yakiniku was RM 181.55 for a buffet dinner for three plus green tea."
   },
   {
     "id": "rcpt-total-14-typed",
@@ -1305,7 +1305,6 @@
     "phrasing": "typed",
     "question": "total on florism de art invoice",
     "answer_type": "extractive",
-    "gold_answer": "The rounded total on the Florism De Art tax invoice was RM 750.00, paid by credit card.",
     "key_facts": [
       "750.00"
     ],
@@ -1320,7 +1319,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "FLORISM DE ART"
+    "vendor_as_printed": "FLORISM DE ART",
+    "golden_answer": "The rounded total on the Florism De Art tax invoice was RM 750.00, paid by credit card."
   },
   {
     "id": "rcpt-total-14-full",
@@ -1328,7 +1328,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the Florism De Art tax invoice?",
     "answer_type": "extractive",
-    "gold_answer": "The rounded total on the Florism De Art tax invoice was RM 750.00, paid by credit card.",
     "key_facts": [
       "750.00"
     ],
@@ -1343,7 +1342,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "FLORISM DE ART"
+    "vendor_as_printed": "FLORISM DE ART",
+    "golden_answer": "The rounded total on the Florism De Art tax invoice was RM 750.00, paid by credit card."
   },
   {
     "id": "rcpt-total-19-typed",
@@ -1351,7 +1351,6 @@
     "phrasing": "typed",
     "question": "total on the pharmacy reciept green lane",
     "answer_type": "extractive",
-    "gold_answer": "The total at Green Lane Pharmacy was RM 34.80, paid by Mastercard.",
     "key_facts": [
       "34.80"
     ],
@@ -1366,7 +1365,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "GREEN LANE PHARMACY SDN BHD"
+    "vendor_as_printed": "GREEN LANE PHARMACY SDN BHD",
+    "golden_answer": "The total at Green Lane Pharmacy was RM 34.80, paid by Mastercard."
   },
   {
     "id": "rcpt-total-19-full",
@@ -1374,7 +1374,6 @@
     "phrasing": "full",
     "question": "What was the total amount paid at Green Lane Pharmacy?",
     "answer_type": "extractive",
-    "gold_answer": "The total at Green Lane Pharmacy was RM 34.80, paid by Mastercard.",
     "key_facts": [
       "34.80"
     ],
@@ -1389,7 +1388,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "GREEN LANE PHARMACY SDN BHD"
+    "vendor_as_printed": "GREEN LANE PHARMACY SDN BHD",
+    "golden_answer": "The total at Green Lane Pharmacy was RM 34.80, paid by Mastercard."
   },
   {
     "id": "rcpt-date-04-typed",
@@ -1397,7 +1397,6 @@
     "phrasing": "typed",
     "question": "date bought from kedai papan yew chuan",
     "answer_type": "extractive",
-    "gold_answer": "The Kedai Papan Yew Chuan tax invoice is dated 08/03/2018.",
     "key_facts": [
       "08/03/2018"
     ],
@@ -1412,7 +1411,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "KEDAI PAPAN YEW CHUAN"
+    "vendor_as_printed": "KEDAI PAPAN YEW CHUAN",
+    "golden_answer": "The Kedai Papan Yew Chuan tax invoice is dated 08/03/2018."
   },
   {
     "id": "rcpt-date-04-full",
@@ -1420,7 +1420,6 @@
     "phrasing": "full",
     "question": "What is the date on the Kedai Papan Yew Chuan tax invoice?",
     "answer_type": "extractive",
-    "gold_answer": "The Kedai Papan Yew Chuan tax invoice is dated 08/03/2018.",
     "key_facts": [
       "08/03/2018"
     ],
@@ -1435,7 +1434,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "KEDAI PAPAN YEW CHUAN"
+    "vendor_as_printed": "KEDAI PAPAN YEW CHUAN",
+    "golden_answer": "The Kedai Papan Yew Chuan tax invoice is dated 08/03/2018."
   },
   {
     "id": "rcpt-date-09-typed",
@@ -1443,7 +1443,6 @@
     "phrasing": "typed",
     "question": "mun heng hardware receipt date",
     "answer_type": "extractive",
-    "gold_answer": "The Mun Heng Electrical & Hardware Supply tax invoice is dated 01/02/2018.",
     "key_facts": [
       "01/02/2018"
     ],
@@ -1458,7 +1457,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MUN HENG ELECTRICAL & HARDWARE SUPPLY"
+    "vendor_as_printed": "MUN HENG ELECTRICAL & HARDWARE SUPPLY",
+    "golden_answer": "The Mun Heng Electrical & Hardware Supply tax invoice is dated 01/02/2018."
   },
   {
     "id": "rcpt-date-09-full",
@@ -1466,7 +1466,6 @@
     "phrasing": "full",
     "question": "On what date was the purchase at Mun Heng Electrical & Hardware Supply made?",
     "answer_type": "extractive",
-    "gold_answer": "The Mun Heng Electrical & Hardware Supply tax invoice is dated 01/02/2018.",
     "key_facts": [
       "01/02/2018"
     ],
@@ -1481,7 +1480,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MUN HENG ELECTRICAL & HARDWARE SUPPLY"
+    "vendor_as_printed": "MUN HENG ELECTRICAL & HARDWARE SUPPLY",
+    "golden_answer": "The Mun Heng Electrical & Hardware Supply tax invoice is dated 01/02/2018."
   },
   {
     "id": "rcpt-addr-02-typed",
@@ -1489,7 +1489,6 @@
     "phrasing": "typed",
     "question": "perniagaan zheng hui adress",
     "answer_type": "extractive",
-    "gold_answer": "Perniagaan Zheng Hui is at No. 59 Jalan Permas 9/5, Bandar Baru Permas Jaya, 81750 Johor Bahru.",
     "key_facts": [
       "81750",
       "JOHOR BAHRU"
@@ -1505,7 +1504,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PERNIAGAAN ZHENG HUI"
+    "vendor_as_printed": "PERNIAGAAN ZHENG HUI",
+    "golden_answer": "Perniagaan Zheng Hui is at No. 59 Jalan Permas 9/5, Bandar Baru Permas Jaya, 81750 Johor Bahru."
   },
   {
     "id": "rcpt-addr-02-full",
@@ -1513,7 +1513,6 @@
     "phrasing": "full",
     "question": "What is the printed address of Perniagaan Zheng Hui?",
     "answer_type": "extractive",
-    "gold_answer": "Perniagaan Zheng Hui is at No. 59 Jalan Permas 9/5, Bandar Baru Permas Jaya, 81750 Johor Bahru.",
     "key_facts": [
       "81750",
       "JOHOR BAHRU"
@@ -1529,7 +1528,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PERNIAGAAN ZHENG HUI"
+    "vendor_as_printed": "PERNIAGAAN ZHENG HUI",
+    "golden_answer": "Perniagaan Zheng Hui is at No. 59 Jalan Permas 9/5, Bandar Baru Permas Jaya, 81750 Johor Bahru."
   },
   {
     "id": "rcpt-addr-07-typed",
@@ -1537,7 +1537,6 @@
     "phrasing": "typed",
     "question": "where is juwita weddings",
     "answer_type": "extractive",
-    "gold_answer": "Juwita Weddings is at Lot G18 & G19, Jln 8/27A, Wangsa Maju (AEON Big Shopping Center), 53300 Kuala Lumpur.",
     "key_facts": [
       "53300",
       "KUALA LUMPUR"
@@ -1553,7 +1552,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "JUWITA WEDDINGS"
+    "vendor_as_printed": "JUWITA WEDDINGS",
+    "golden_answer": "Juwita Weddings is at Lot G18 & G19, Jln 8/27A, Wangsa Maju (AEON Big Shopping Center), 53300 Kuala Lumpur."
   },
   {
     "id": "rcpt-addr-07-full",
@@ -1561,7 +1561,6 @@
     "phrasing": "full",
     "question": "What is the street address printed on the Juwita Weddings receipt?",
     "answer_type": "extractive",
-    "gold_answer": "Juwita Weddings is at Lot G18 & G19, Jln 8/27A, Wangsa Maju (AEON Big Shopping Center), 53300 Kuala Lumpur.",
     "key_facts": [
       "53300",
       "KUALA LUMPUR"
@@ -1577,7 +1576,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "JUWITA WEDDINGS"
+    "vendor_as_printed": "JUWITA WEDDINGS",
+    "golden_answer": "Juwita Weddings is at Lot G18 & G19, Jln 8/27A, Wangsa Maju (AEON Big Shopping Center), 53300 Kuala Lumpur."
   },
   {
     "id": "rcpt-total-05-typed",
@@ -1585,7 +1585,6 @@
     "phrasing": "typed",
     "question": "bemed receipt total",
     "answer_type": "extractive",
-    "gold_answer": "The BEMED (SP) Sdn Bhd cash receipt shows a Total Inclusive GST of 308.70, paid by MASTER card.",
     "key_facts": [
       "308.70"
     ],
@@ -1600,7 +1599,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "BEMED (SP) SDN. BHD."
+    "vendor_as_printed": "BEMED (SP) SDN. BHD.",
+    "golden_answer": "The BEMED (SP) Sdn Bhd cash receipt shows a Total Inclusive GST of 308.70, paid by MASTER card."
   },
   {
     "id": "rcpt-total-05-full",
@@ -1608,7 +1608,6 @@
     "phrasing": "full",
     "question": "What was the total amount paid on the BEMED (SP) cash receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The BEMED (SP) Sdn Bhd cash receipt shows a Total Inclusive GST of 308.70, paid by MASTER card.",
     "key_facts": [
       "308.70"
     ],
@@ -1623,7 +1622,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "BEMED (SP) SDN. BHD."
+    "vendor_as_printed": "BEMED (SP) SDN. BHD.",
+    "golden_answer": "The BEMED (SP) Sdn Bhd cash receipt shows a Total Inclusive GST of 308.70, paid by MASTER card."
   },
   {
     "id": "rcpt-total-10-typed",
@@ -1631,7 +1631,6 @@
     "phrasing": "typed",
     "question": "how much burger king klia",
     "answer_type": "extractive",
-    "gold_answer": "The Burger King (KLIA Satellite Building) receipt shows a Total After Rounding of RM63.90.",
     "key_facts": [
       "63.90"
     ],
@@ -1646,7 +1645,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "Burger King (Dewina Host Sdn Bhd), Kuala Lumpur International Airport"
+    "vendor_as_printed": "Burger King (Dewina Host Sdn Bhd), Kuala Lumpur International Airport",
+    "golden_answer": "The Burger King (KLIA Satellite Building) receipt shows a Total After Rounding of RM63.90."
   },
   {
     "id": "rcpt-total-10-full",
@@ -1654,7 +1654,6 @@
     "phrasing": "full",
     "question": "How much was the total after rounding on the Burger King receipt from KLIA?",
     "answer_type": "extractive",
-    "gold_answer": "The Burger King (KLIA Satellite Building) receipt shows a Total After Rounding of RM63.90.",
     "key_facts": [
       "63.90"
     ],
@@ -1669,7 +1668,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "Burger King (Dewina Host Sdn Bhd), Kuala Lumpur International Airport"
+    "vendor_as_printed": "Burger King (Dewina Host Sdn Bhd), Kuala Lumpur International Airport",
+    "golden_answer": "The Burger King (KLIA Satellite Building) receipt shows a Total After Rounding of RM63.90."
   },
   {
     "id": "rcpt-total-15-typed",
@@ -1677,7 +1677,6 @@
     "phrasing": "typed",
     "question": "total on the fy eagle reciept",
     "answer_type": "extractive",
-    "gold_answer": "The FY Eagle Enterprise tax invoice total is 10.00, paid in cash with 0.00 change.",
     "key_facts": [
       "10.00"
     ],
@@ -1692,7 +1691,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "FY EAGLE ENTERPRISE"
+    "vendor_as_printed": "FY EAGLE ENTERPRISE",
+    "golden_answer": "The FY Eagle Enterprise tax invoice total is 10.00, paid in cash with 0.00 change."
   },
   {
     "id": "rcpt-total-15-full",
@@ -1700,7 +1700,6 @@
     "phrasing": "full",
     "question": "What is the total amount on the FY Eagle Enterprise tax invoice?",
     "answer_type": "extractive",
-    "gold_answer": "The FY Eagle Enterprise tax invoice total is 10.00, paid in cash with 0.00 change.",
     "key_facts": [
       "10.00"
     ],
@@ -1715,7 +1714,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "FY EAGLE ENTERPRISE"
+    "vendor_as_printed": "FY EAGLE ENTERPRISE",
+    "golden_answer": "The FY Eagle Enterprise tax invoice total is 10.00, paid in cash with 0.00 change."
   },
   {
     "id": "rcpt-total-20-typed",
@@ -1723,7 +1723,6 @@
     "phrasing": "typed",
     "question": "heng kee bak kut teh total",
     "answer_type": "extractive",
-    "gold_answer": "The Heng Kee Delights Bak Kut Teh receipt total is RM 42.00.",
     "key_facts": [
       "42.00"
     ],
@@ -1738,7 +1737,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "HENG KEE DELIGHTS BAK KUT TEH."
+    "vendor_as_printed": "HENG KEE DELIGHTS BAK KUT TEH.",
+    "golden_answer": "The Heng Kee Delights Bak Kut Teh receipt total is RM 42.00."
   },
   {
     "id": "rcpt-total-20-full",
@@ -1746,7 +1746,6 @@
     "phrasing": "full",
     "question": "What was the total on the Heng Kee Delights Bak Kut Teh receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The Heng Kee Delights Bak Kut Teh receipt total is RM 42.00.",
     "key_facts": [
       "42.00"
     ],
@@ -1761,7 +1760,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "HENG KEE DELIGHTS BAK KUT TEH."
+    "vendor_as_printed": "HENG KEE DELIGHTS BAK KUT TEH.",
+    "golden_answer": "The Heng Kee Delights Bak Kut Teh receipt total is RM 42.00."
   },
   {
     "id": "rcpt-date-05-typed",
@@ -1769,7 +1769,6 @@
     "phrasing": "typed",
     "question": "date bought from la stationery",
     "answer_type": "extractive",
-    "gold_answer": "The LA Stationery Sdn Bhd tax invoice is dated 09/02/2018 (09:21:19 AM).",
     "key_facts": [
       "09/02/2018"
     ],
@@ -1784,7 +1783,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "LA STATIONERY SDN BHD (640899-P)"
+    "vendor_as_printed": "LA STATIONERY SDN BHD (640899-P)",
+    "golden_answer": "The LA Stationery Sdn Bhd tax invoice is dated 09/02/2018 (09:21:19 AM)."
   },
   {
     "id": "rcpt-date-05-full",
@@ -1792,7 +1792,6 @@
     "phrasing": "full",
     "question": "What is the invoice date on the LA Stationery receipt?",
     "answer_type": "extractive",
-    "gold_answer": "The LA Stationery Sdn Bhd tax invoice is dated 09/02/2018 (09:21:19 AM).",
     "key_facts": [
       "09/02/2018"
     ],
@@ -1807,7 +1806,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "LA STATIONERY SDN BHD (640899-P)"
+    "vendor_as_printed": "LA STATIONERY SDN BHD (640899-P)",
+    "golden_answer": "The LA Stationery Sdn Bhd tax invoice is dated 09/02/2018 (09:21:19 AM)."
   },
   {
     "id": "rcpt-date-10-typed",
@@ -1815,7 +1815,6 @@
     "phrasing": "typed",
     "question": "mydin subang bestari recipt date",
     "answer_type": "extractive",
-    "gold_answer": "The MyMydin Subang Bestari receipt is dated 15/01/2018 (10:59:13).",
     "key_facts": [
       "15/01/2018"
     ],
@@ -1830,7 +1829,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MyMydin Subang Bestari 2300 (MY MYDIN SDN BHD)"
+    "vendor_as_printed": "MyMydin Subang Bestari 2300 (MY MYDIN SDN BHD)",
+    "golden_answer": "The MyMydin Subang Bestari receipt is dated 15/01/2018 (10:59:13)."
   },
   {
     "id": "rcpt-date-10-full",
@@ -1838,7 +1838,6 @@
     "phrasing": "full",
     "question": "On what date was the receipt from MyMydin Subang Bestari issued?",
     "answer_type": "extractive",
-    "gold_answer": "The MyMydin Subang Bestari receipt is dated 15/01/2018 (10:59:13).",
     "key_facts": [
       "15/01/2018"
     ],
@@ -1853,7 +1852,8 @@
     "difficulty": "easy",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "MyMydin Subang Bestari 2300 (MY MYDIN SDN BHD)"
+    "vendor_as_printed": "MyMydin Subang Bestari 2300 (MY MYDIN SDN BHD)",
+    "golden_answer": "The MyMydin Subang Bestari receipt is dated 15/01/2018 (10:59:13)."
   },
   {
     "id": "rcpt-addr-03-typed",
@@ -1861,7 +1861,6 @@
     "phrasing": "typed",
     "question": "petron bukit lanjan address",
     "answer_type": "extractive",
-    "gold_answer": "Petron Bkt Lanjan SB (Alserkam Enterprise) prints its address as KM 458.4 Bkt Lanjan Utara, L/Raya Utara Selatan, Sg Buloh, 47000 Sungai Bul - the last line is Sungai Buloh truncated in print.",
     "key_facts": [
       "47000",
       "SUNGAI BUL"
@@ -1877,7 +1876,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PETRON BKT LANJAN SB (ALSERKAM ENTERPRISE)"
+    "vendor_as_printed": "PETRON BKT LANJAN SB (ALSERKAM ENTERPRISE)",
+    "golden_answer": "Petron Bkt Lanjan SB (Alserkam Enterprise) prints its address as KM 458.4 Bkt Lanjan Utara, L/Raya Utara Selatan, Sg Buloh, 47000 Sungai Bul - the last line is Sungai Buloh truncated in print."
   },
   {
     "id": "rcpt-addr-03-full",
@@ -1885,7 +1885,6 @@
     "phrasing": "full",
     "question": "What is the printed address of the Petron Bukit Lanjan station?",
     "answer_type": "extractive",
-    "gold_answer": "Petron Bkt Lanjan SB (Alserkam Enterprise) prints its address as KM 458.4 Bkt Lanjan Utara, L/Raya Utara Selatan, Sg Buloh, 47000 Sungai Bul - the last line is Sungai Buloh truncated in print.",
     "key_facts": [
       "47000",
       "SUNGAI BUL"
@@ -1901,7 +1900,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "PETRON BKT LANJAN SB (ALSERKAM ENTERPRISE)"
+    "vendor_as_printed": "PETRON BKT LANJAN SB (ALSERKAM ENTERPRISE)",
+    "golden_answer": "Petron Bkt Lanjan SB (Alserkam Enterprise) prints its address as KM 458.4 Bkt Lanjan Utara, L/Raya Utara Selatan, Sg Buloh, 47000 Sungai Bul - the last line is Sungai Buloh truncated in print."
   },
   {
     "id": "rcpt-addr-08-typed",
@@ -1909,7 +1909,6 @@
     "phrasing": "typed",
     "question": "secure parking riverwalk address",
     "answer_type": "extractive",
-    "gold_answer": "Secure Parking Corporation S/B prints its address as Riverwalk Village, Batu 3, Jalan Ipoh, 51200 KL.",
     "key_facts": [
       "51200",
       "KL"
@@ -1925,7 +1924,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SECURE PARKING CORPORATION S/B"
+    "vendor_as_printed": "SECURE PARKING CORPORATION S/B",
+    "golden_answer": "Secure Parking Corporation S/B prints its address as Riverwalk Village, Batu 3, Jalan Ipoh, 51200 KL."
   },
   {
     "id": "rcpt-addr-08-full",
@@ -1933,7 +1933,6 @@
     "phrasing": "full",
     "question": "What street address is printed on the Secure Parking receipt?",
     "answer_type": "extractive",
-    "gold_answer": "Secure Parking Corporation S/B prints its address as Riverwalk Village, Batu 3, Jalan Ipoh, 51200 KL.",
     "key_facts": [
       "51200",
       "KL"
@@ -1949,7 +1948,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "claude agents reading the actual receipt images (vision); SROIE labels used only as post-hoc cross-check (42/42 agreed, one case-only diff)",
-    "vendor_as_printed": "SECURE PARKING CORPORATION S/B"
+    "vendor_as_printed": "SECURE PARKING CORPORATION S/B",
+    "golden_answer": "Secure Parking Corporation S/B prints its address as Riverwalk Village, Batu 3, Jalan Ipoh, 51200 KL."
   },
   {
     "id": "rcpt-absent-01-typed",
@@ -1957,7 +1957,6 @@
     "phrasing": "typed",
     "question": "kings confectionery receipt total",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from King'S Confectionery S/B exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -1968,7 +1967,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from King'S Confectionery S/B exists in the files."
   },
   {
     "id": "rcpt-absent-01-full",
@@ -1976,7 +1976,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the receipt from King'S Confectionery S/B?",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from King'S Confectionery S/B exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -1987,7 +1986,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from King'S Confectionery S/B exists in the files."
   },
   {
     "id": "rcpt-absent-02-typed",
@@ -1995,7 +1995,6 @@
     "phrasing": "typed",
     "question": "how much tanjongmas bookcentre",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2006,7 +2005,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd exists in the files."
   },
   {
     "id": "rcpt-absent-02-full",
@@ -2014,7 +2014,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd?",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2025,7 +2024,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Tanjongmas Bookcentre (Pj) Sdn Bhd exists in the files."
   },
   {
     "id": "rcpt-absent-03-typed",
@@ -2033,7 +2033,6 @@
     "phrasing": "typed",
     "question": "semboyan tegas reciept total",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Semboyan Tegas Sdn Bhd exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2044,7 +2043,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Semboyan Tegas Sdn Bhd exists in the files."
   },
   {
     "id": "rcpt-absent-03-full",
@@ -2052,7 +2052,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the receipt from Semboyan Tegas Sdn Bhd?",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Semboyan Tegas Sdn Bhd exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2063,7 +2062,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Semboyan Tegas Sdn Bhd exists in the files."
   },
   {
     "id": "rcpt-absent-04-typed",
@@ -2071,7 +2071,6 @@
     "phrasing": "typed",
     "question": "the cut steakhouse total",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from The Cut Steakhouse &Burgers exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2082,7 +2081,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from The Cut Steakhouse &Burgers exists in the files."
   },
   {
     "id": "rcpt-absent-04-full",
@@ -2090,7 +2090,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the receipt from The Cut Steakhouse &Burgers?",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from The Cut Steakhouse &Burgers exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2101,7 +2100,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from The Cut Steakhouse &Burgers exists in the files."
   },
   {
     "id": "rcpt-absent-05-typed",
@@ -2109,7 +2109,6 @@
     "phrasing": "typed",
     "question": "biru petroleum receipt",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Biru Petroleum exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2120,7 +2119,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Biru Petroleum exists in the files."
   },
   {
     "id": "rcpt-absent-05-full",
@@ -2128,7 +2128,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the receipt from Biru Petroleum?",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Biru Petroleum exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2139,7 +2138,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Biru Petroleum exists in the files."
   },
   {
     "id": "rcpt-absent-06-typed",
@@ -2147,7 +2147,6 @@
     "phrasing": "typed",
     "question": "total from platinum racking",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Platinum Racking Sdn Bhd exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2158,7 +2157,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Platinum Racking Sdn Bhd exists in the files."
   },
   {
     "id": "rcpt-absent-06-full",
@@ -2166,7 +2166,6 @@
     "phrasing": "full",
     "question": "What was the total amount on the receipt from Platinum Racking Sdn Bhd?",
     "answer_type": "not_found",
-    "gold_answer": "No receipt from Platinum Racking Sdn Bhd exists in the files.",
     "key_facts": [],
     "gold_sources": [],
     "acceptable_sources": [],
@@ -2177,7 +2176,8 @@
     "difficulty": "medium",
     "human_verified": false,
     "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
-    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling"
+    "review_note": "founder-review priority: vendor absence established by token-overlap filtering of OCR labels; verify it is truly not in the corpus under any variant spelling",
+    "golden_answer": "No receipt from Platinum Racking Sdn Bhd exists in the files."
   },
   {
     "id": "rcpt-count-01-typed",
@@ -2185,7 +2185,6 @@
     "phrasing": "typed",
     "question": "how many 99 speedmart receipts",
     "answer_type": "enumeration",
-    "gold_answer": "There are 5 receipts from 99 Speed Mart S/B.",
     "key_facts": [
       "5"
     ],
@@ -2203,7 +2202,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "There are 5 receipts from 99 Speed Mart S/B."
   },
   {
     "id": "rcpt-count-01-full",
@@ -2211,7 +2211,6 @@
     "phrasing": "full",
     "question": "How many receipts from 99 Speed Mart S/B are in the files?",
     "answer_type": "enumeration",
-    "gold_answer": "There are 5 receipts from 99 Speed Mart S/B.",
     "key_facts": [
       "5"
     ],
@@ -2229,7 +2228,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "There are 5 receipts from 99 Speed Mart S/B."
   },
   {
     "id": "rcpt-count-02-typed",
@@ -2237,7 +2237,6 @@
     "phrasing": "typed",
     "question": "aeon receipts count",
     "answer_type": "enumeration",
-    "gold_answer": "There are 3 receipts from Aeon Co. (M) Bhd.",
     "key_facts": [
       "3"
     ],
@@ -2253,7 +2252,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "There are 3 receipts from Aeon Co. (M) Bhd."
   },
   {
     "id": "rcpt-count-02-full",
@@ -2261,7 +2261,6 @@
     "phrasing": "full",
     "question": "How many receipts from Aeon Co. (M) Bhd are in the files?",
     "answer_type": "enumeration",
-    "gold_answer": "There are 3 receipts from Aeon Co. (M) Bhd.",
     "key_facts": [
       "3"
     ],
@@ -2277,7 +2276,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "There are 3 receipts from Aeon Co. (M) Bhd."
   },
   {
     "id": "rcpt-count-03-typed",
@@ -2285,7 +2285,6 @@
     "phrasing": "typed",
     "question": "how many bens independent grocer reciepts",
     "answer_type": "enumeration",
-    "gold_answer": "There are 2 receipts from Bens Independent Grocer Sdn. Bhd.",
     "key_facts": [
       "2"
     ],
@@ -2300,7 +2299,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "There are 2 receipts from Bens Independent Grocer Sdn. Bhd."
   },
   {
     "id": "rcpt-count-03-full",
@@ -2308,7 +2308,6 @@
     "phrasing": "full",
     "question": "How many receipts from Bens Independent Grocer Sdn. Bhd are in the files?",
     "answer_type": "enumeration",
-    "gold_answer": "There are 2 receipts from Bens Independent Grocer Sdn. Bhd.",
     "key_facts": [
       "2"
     ],
@@ -2323,7 +2322,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "There are 2 receipts from Bens Independent Grocer Sdn. Bhd."
   },
   {
     "id": "rcpt-listdates-04-typed",
@@ -2331,7 +2331,6 @@
     "phrasing": "typed",
     "question": "cross channel network receipt dates",
     "answer_type": "enumeration",
-    "gold_answer": "The Cross Channel Network Sdn. Bhd receipts are dated: 29/01/2018, 31/12/2017.",
     "key_facts": [
       "29/01/2018",
       "31/12/2017"
@@ -2347,7 +2346,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "The Cross Channel Network Sdn. Bhd receipts are dated: 29/01/2018, 31/12/2017."
   },
   {
     "id": "rcpt-listdates-04-full",
@@ -2355,7 +2355,6 @@
     "phrasing": "full",
     "question": "List the dates of every receipt from Cross Channel Network Sdn. Bhd.",
     "answer_type": "enumeration",
-    "gold_answer": "The Cross Channel Network Sdn. Bhd receipts are dated: 29/01/2018, 31/12/2017.",
     "key_facts": [
       "29/01/2018",
       "31/12/2017"
@@ -2371,7 +2370,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "The Cross Channel Network Sdn. Bhd receipts are dated: 29/01/2018, 31/12/2017."
   },
   {
     "id": "rcpt-listdates-05-typed",
@@ -2379,7 +2379,6 @@
     "phrasing": "typed",
     "question": "all evergreen light receipt dates",
     "answer_type": "enumeration",
-    "gold_answer": "The Evergreen Light Sdn Bhd receipts are dated: 10/07/2017, 18/09/2017.",
     "key_facts": [
       "10/07/2017",
       "18/09/2017"
@@ -2395,7 +2394,8 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "The Evergreen Light Sdn Bhd receipts are dated: 10/07/2017, 18/09/2017."
   },
   {
     "id": "rcpt-listdates-05-full",
@@ -2403,7 +2403,6 @@
     "phrasing": "full",
     "question": "List the dates of every receipt from Evergreen Light Sdn Bhd.",
     "answer_type": "enumeration",
-    "gold_answer": "The Evergreen Light Sdn Bhd receipts are dated: 10/07/2017, 18/09/2017.",
     "key_facts": [
       "10/07/2017",
       "18/09/2017"
@@ -2419,6 +2418,7 @@
     },
     "difficulty": "hard",
     "human_verified": false,
-    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)"
+    "generator": "derived from SROIE labels (absence/group facts are not readable from single images)",
+    "golden_answer": "The Evergreen Light Sdn Bhd receipts are dated: 10/07/2017, 18/09/2017."
   }
 ]

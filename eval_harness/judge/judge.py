@@ -46,8 +46,8 @@ def build_prompt(run_dir: Path, ds_dir: Path, corpus_root: Path, n_questions: in
 
 Read, in this order:
 1. {RUBRIC_PATH} — the rubric; your two output artifacts must match its formats EXACTLY.
-2. {ds_dir / 'golden.json'} — all golden items (id, question, gold_answer, key_facts, gold_sources, answer_type, phrasing, pair_id).
-3. {run_dir / 'raw/answers.jsonl'} — Magpie's answers (qa_id, answer, cited, not_found, error).
+2. {ds_dir / 'golden.json'} — all golden items (id, question, golden_answer, key_facts, gold_sources, answer_type, phrasing, pair_id).
+3. {run_dir / 'raw/answers.jsonl'} — Magpie's answers (qa_id, magpie_answer — older runs say 'answer', magpie_cited/'cited', not_found, error).
 4. {run_dir / 'answers_enriched.json'} — the deterministic verdicts (field "verdict"), for the disagreement count and §5 of the report. They are NOT your verdicts — grade independently first.
 5. Source files: for any question where the gold answer and Magpie's answer disagree, or the gold looks doubtful, Read the actual image at {corpus_root}/<gold_source> and let the FILE settle it. You do not need to open files for clear-cut agreements.
 

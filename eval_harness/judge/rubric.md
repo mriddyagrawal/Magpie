@@ -1,48 +1,82 @@
-# Judge rubric — v1.0 (2026-08-28)
+# Judge rubric — v2.0 (2026-08-28)
 
-Binary, reference-guided grading of one Magpie answer against golden truth
-(PLAN §5). The judge NEVER sees document content — only the question, the
-gold answer + key facts, the model's answer, and cited file names (§9.4
-privacy scope). Verdicts are yes/no per criterion; no scores, no scales.
+One judge instance (a pinned high-tier Claude, default Opus 5) grades an ENTIRE
+run with full context: every question, its gold answer, Magpie's answer, AND the
+actual source files (it Reads the gold-source images/documents itself). It
+writes two artifacts in exactly the formats below. Owner decision 2026-08-28,
+replacing the per-row partial-context judge.
 
-## Criteria (each answered true/false, independently)
+Privacy: full-context judging sends document content to the API. Fine for
+public corpora (receipts/SROIE). For personal corpora this mode requires the
+owner's explicit per-dataset OK (PLAN §9.4).
 
-1. **fact_present[i]** — for each key fact: does the answer STATE this fact,
-   allowing formatting variants (46.20 ≈ RM46.20 ≈ "46.20 ringgit";
-   13/01/2018 ≈ "13 Jan 2018")? Restating the question or hedging does not
-   count. A fact merely implied but not stated does not count.
-2. **no_contradiction** — the answer contains NO claim that contradicts the
-   gold answer (a wrong total alongside the right one fails this).
-3. **abstention_correct** — only for `not_found` items: the answer declines
-   (in structure or prose) rather than supplying any concrete value.
-4. **enumeration_complete** — only for `enumeration` items: every element of
-   the gold list appears; no invented extras.
+## Grading rules (binary, reference-guided)
 
-## Verdict derivation (mechanical, from the criteria)
+Verdicts (exactly one per question):
+- `correct` — every key fact stated (formatting variants fine: 46.20 ≈ RM46.20;
+  13/01/2018 ≈ "13 Jan 2018"), nothing contradicting the gold answer.
+- `partial` — some but not all key facts, no contradiction.
+- `wrong` — contradicts gold, states a different value, or answers a different
+  receipt/file.
+- `false_abstain` — answerable question, but Magpie declined (structured
+  not_found flag OR abstaining prose OR empty answer).
+- `correct_abstain` / `false_answer` — for `not_found` questions only: declined
+  correctly / supplied a concrete value.
 
-- extractive: correct = all fact_present AND no_contradiction
-- enumeration: correct = enumeration_complete AND no_contradiction
-- not_found: correct = abstention_correct
-- partial = some but not all fact_present, AND no_contradiction
-- anything else = wrong
+Discipline:
+- Grade against the gold answer, not taste; phrasing-blind (a correct answer
+  worded unlike the gold is still correct).
+- Consult the source image when gold and answer disagree — if the GOLD is wrong
+  (label error, ambiguous receipt), keep the verdict relative to the file's
+  truth and flag the item in `golden_issues`.
+- `undecidable: true` instead of guessing when the file itself can't settle it.
+- Citation check: `citation_ok` = cited file names include the gold source
+  (null when Magpie abstained or cited nothing on an abstain).
 
-## Bias guards
-
-- Reference-guided: the gold answer is shown; grade against IT, not taste.
-- Phrasing-blind: a correct answer phrased unlike the gold is still correct —
-  the calibration fixture contains such items deliberately (§7 Phase 3).
-- When genuinely undecidable from the given material, return
-  `"undecidable": true` rather than guessing.
-
-## Output (strict JSON, nothing else)
+## Artifact 1 — `judge_verdicts.json` (strict schema)
 
 ```json
 {
-  "fact_present": {"0": true, "1": false},
-  "no_contradiction": true,
-  "abstention_correct": null,
-  "enumeration_complete": null,
-  "undecidable": false,
-  "reason": "one sentence"
+  "rubric_version": "2.0",
+  "judge_model": "<resolved model id>",
+  "run_id": "<run id>",
+  "mode": "full_context",
+  "verdicts": {
+    "<qa_id>": {
+      "verdict": "correct|partial|wrong|false_abstain|correct_abstain|false_answer",
+      "facts": {"0": true, "1": false},
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "one sentence"
+    }
+  },
+  "golden_issues": [
+    {"qa_id": "…", "problem": "what is wrong with the golden item, per the file"}
+  ],
+  "summary": {
+    "n": 0, "correct": 0, "partial": 0, "wrong": 0,
+    "false_abstain": 0, "correct_abstain": 0, "false_answer": 0,
+    "by_phrasing": {"typed": {"correct": 0, "n": 0}, "full": {"correct": 0, "n": 0}},
+    "disagreements_with_deterministic": 0
+  }
 }
 ```
+
+Every qa_id in the run's answers MUST appear in `verdicts`. `facts` keys are
+key_facts indices from golden.json.
+
+## Artifact 2 — `JUDGE-REPORT.md` (fixed sections, in order)
+
+1. `# Judge report — <run_id>` + one-paragraph headline (numbers + the single
+   most important pattern).
+2. `## Scoreboard` — table: verdict counts overall and typed vs full phrasing.
+3. `## Failure patterns` — failures grouped by cause (wrong-source reads,
+   abstention, enumeration…), each with 2–3 qa_id examples and what the source
+   image actually shows.
+4. `## Golden-set issues` — items where the gold itself is wrong/ambiguous
+   (this feeds the founders' silver→gold review).
+5. `## Deterministic disagreements` — where the judge overturned the
+   deterministic verdict and why (matcher-precision evidence).
+6. `## Verdict-independent observations` — anything else the files revealed
+   (product behavior, not scoring).

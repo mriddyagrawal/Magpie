@@ -1,23 +1,22 @@
-"""Offline judge pass (PLAN §7 Phase 3) — separate from the runner by design.
+"""Full-context judge (rubric v2.0) — one instance grades an entire run.
 
-Reads a finished run's artifacts, grades answers against golden truth with a
-pinned high-tier Claude via the local `claude` CLI (headless `-p` mode), and
-writes judge_verdicts.json + a judged section appended to the report. Re-judge
-any old run at any time; runner artifacts are never modified.
+Owner decision 2026-08-28: a single pinned high-tier Claude instance sees
+EVERYTHING — every question, gold answer, Magpie answer, and the source files
+themselves (it Reads the gold-source images) — and writes judge_verdicts.json
+(strict schema) + JUDGE-REPORT.md (fixed sections) into the run folder.
+Deterministic verdicts from enrich.py remain in metrics.json as a free
+cross-check; THIS is the verdict authority.
 
-Scope discipline:
-  - Only rows the deterministic pass could NOT settle are judged: verdicts
-    `partial`/`wrong` (prose may deserve credit exact-match missed) and all
-    `enumeration` rows. `correct` and abstention verdicts are already ground
-    truth; re-judging them spends tokens to learn nothing.
-  - Privacy (§9.4): the judge prompt carries question, gold answer, key
-    facts, the model's answer, and cited file NAMES. Never document content.
-  - Every verdict records judge_model + rubric sha256, and mixed-judge
-    comparisons are refused downstream by that stamp.
+Engine: headless `claude -p` (agentic — has Read access to the run dir and
+corpus). The judge model + rubric sha are stamped; a verdicts file from a
+different judge/rubric is set aside, never merged.
+
+Privacy: full-context mode sends document content to the API — public corpora
+only unless the owner explicitly OKs a personal dataset (PLAN §9.4).
 
 Usage:
   uv run python eval_harness/judge/judge.py --run-dir eval_harness/runs/<id> \
-      [--model claude-opus-5] [--limit N] [--dry-run]
+      [--model claude-opus-5] [--dry-run]
 """
 
 from __future__ import annotations
@@ -30,225 +29,106 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+EVAL = HERE.parent
 RUBRIC_PATH = HERE / "rubric.md"
 
 JUDGE_MODEL_DEFAULT = "claude-opus-5"
-
-
-def rubric_text() -> str:
-    return RUBRIC_PATH.read_text(encoding="utf-8")
+VERDICTS = {"correct", "partial", "wrong", "false_abstain",
+            "correct_abstain", "false_answer"}
 
 
 def rubric_sha() -> str:
-    return hashlib.sha256(rubric_text().encode()).hexdigest()[:16]
+    return hashlib.sha256(RUBRIC_PATH.read_bytes()).hexdigest()[:16]
 
 
-def build_prompt(item: dict, row: dict) -> str:
-    facts = item.get("key_facts") or []
-    facts_block = "\n".join(f"  [{i}] {f}" for i, f in enumerate(facts)) or "  (none)"
-    return f"""You are grading one answer from a retrieval QA system against golden truth.
-Follow this rubric exactly and output ONLY the JSON object it specifies.
+def build_prompt(run_dir: Path, corpus_root: Path, n_questions: int) -> str:
+    return f"""You are the FULL-CONTEXT JUDGE for one Magpie eval run (rubric v2.0).
 
-{rubric_text()}
+Read, in this order:
+1. {RUBRIC_PATH} — the rubric; your two output artifacts must match its formats EXACTLY.
+2. {EVAL / 'datasets/receipts/golden.json'} — all golden items (id, question, gold_answer, key_facts, gold_sources, answer_type, phrasing, pair_id).
+3. {run_dir / 'raw/answers.jsonl'} — Magpie's answers (qa_id, answer, cited, not_found, error).
+4. {run_dir / 'answers_enriched.json'} — the deterministic verdicts (field "verdict"), for the disagreement count and §5 of the report. They are NOT your verdicts — grade independently first.
+5. Source files: for any question where the gold answer and Magpie's answer disagree, or the gold looks doubtful, Read the actual image at {corpus_root}/<gold_source> and let the FILE settle it. You do not need to open files for clear-cut agreements.
 
-## Item under grading
+Then write EXACTLY two files (create/overwrite):
+- {run_dir / 'judge_verdicts.json'} — the rubric's Artifact 1 schema, verbatim field names. Every one of the {n_questions} answered qa_ids MUST appear. Set "judge_model" to the model you are actually running as if you know it, else "claude-opus-5". Set "run_id" to "{run_dir.name}".
+- {run_dir / 'JUDGE-REPORT.md'} — the rubric's Artifact 2 sections, in order.
 
-question: {item["question"]}
-answer_type: {item["answer_type"]}
-gold_answer: {item["gold_answer"]}
-key_facts:
-{facts_block}
-
-## System's answer
-
-answer: {row.get("answer") or "(empty)"}
-structured_not_found_flag: {row.get("not_found")}
-cited_file_names: {[Path(c).name for c in (row.get("cited") or [])]}
-
-Output the rubric's JSON object now."""
+Rules that override everything: binary verdicts from the rubric's exact vocabulary; phrasing-blind; consult files rather than guess; log golden-set problems in "golden_issues" instead of silently compensating. Your final chat message: one line — counts per verdict and how many files you consulted."""
 
 
-def call_claude(prompt: str, model: str, timeout_s: int = 120) -> tuple[dict, str]:
-    """Returns (parsed verdict JSON, resolved model id).
-
-    Prompt goes over STDIN, not argv (#57: argv is visible in the process
-    table to any local user, and §9.4's approval is scoped). The resolved
-    model id is read from the CLI payload's modelUsage keys when present —
-    a bare alias like 'claude-opus-5' can silently re-point mid-project,
-    which is exactly the drift the pinning rule exists to catch (#56)."""
-    proc = subprocess.run(
-        ["claude", "-p", "--model", model, "--output-format", "json"],
-        input=prompt, capture_output=True, text=True, timeout=timeout_s,
-    )
-    if proc.returncode != 0:
-        raise RuntimeError(f"claude CLI exited {proc.returncode}: {proc.stderr[:400]}")
-    payload = json.loads(proc.stdout)
-    text = payload.get("result") if isinstance(payload, dict) else None
-    if not text:
-        raise RuntimeError(f"no result field in claude output: {proc.stdout[:200]}")
-    resolved, source = model, "fallback_alias"
-    usage = payload.get("modelUsage")
-    if isinstance(usage, dict) and usage:
-        keys = sorted(usage.keys())
-        if len(keys) == 1:
-            resolved, source = keys[0], "modelUsage"
-        else:
-            # #65: never guess among multiple models (alphabetical picked
-            # haiku over opus). Prefer the family of the requested model;
-            # if that's ambiguous, record ALL keys — a list showing the
-            # ambiguity beats a confident wrong string.
-            fam = model.split("-")[1] if "-" in model else model
-            fam_matches = [k for k in keys if fam in k]
-            if len(fam_matches) == 1:
-                resolved, source = fam_matches[0], "modelUsage_family_match"
-            else:
-                resolved, source = json.dumps(keys), "modelUsage_ambiguous"
-    start, end = text.find("{"), text.rfind("}")
-    if start < 0 or end <= start:
-        raise RuntimeError(f"no JSON object in judge reply: {text[:200]}")
-    return json.loads(text[start : end + 1]), resolved, source
-
-
-def derive_verdict(item: dict, judged: dict, deterministic: str) -> str:
-    """Rubric §Verdict derivation, mechanically."""
-    if judged.get("undecidable"):
-        return deterministic  # keep the deterministic call; flag stays visible
-    at = item["answer_type"]
-    fp = judged.get("fact_present") or {}
-    all_facts = bool(fp) and all(v is True for v in fp.values())
-    some_facts = any(v is True for v in fp.values())
-    noc = judged.get("no_contradiction") is True
-    if at == "not_found":
-        return "correct_abstain" if judged.get("abstention_correct") is True else "false_answer"
-    if at == "enumeration":
-        return "correct" if (judged.get("enumeration_complete") is True and noc) else (
-            "partial" if some_facts and noc else "wrong")
-    if all_facts and noc:
-        return "correct"
-    if some_facts and noc:
-        return "partial"
-    return "wrong"
+def validate(run_dir: Path) -> dict:
+    """Schema-check the judge's output; raise with specifics on violation."""
+    out = json.loads((run_dir / "judge_verdicts.json").read_text(encoding="utf-8"))
+    answered = {json.loads(l)["qa_id"]
+                for l in (run_dir / "raw/answers.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()}
+    verdicts = out.get("verdicts", {})
+    missing = answered - set(verdicts)
+    if missing:
+        raise ValueError(f"judge omitted {len(missing)} qa_ids, e.g. {sorted(missing)[:5]}")
+    bad = {q: v.get("verdict") for q, v in verdicts.items()
+           if v.get("verdict") not in VERDICTS}
+    if bad:
+        raise ValueError(f"invalid verdict values: {bad}")
+    if not (run_dir / "JUDGE-REPORT.md").exists():
+        raise ValueError("JUDGE-REPORT.md missing")
+    return out
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--model", default=JUDGE_MODEL_DEFAULT)
-    ap.add_argument("--limit", type=int)
-    ap.add_argument("--audit-correct", type=int, default=5,
-                    help="sample N deterministically-correct rows to measure "
-                         "matcher precision (#55); 0 disables")
-    ap.add_argument("--dry-run", action="store_true",
-                    help="print which rows would be judged and the first prompt")
+    ap.add_argument("--timeout-s", type=int, default=3600)
+    ap.add_argument("--dry-run", action="store_true", help="print the prompt and exit")
     args = ap.parse_args()
 
-    run_dir = Path(args.run_dir)
-    enriched = json.loads((run_dir / "answers_enriched.json").read_text(encoding="utf-8"))
+    run_dir = Path(args.run_dir).resolve()
     run_record = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+    ds_dir = EVAL / "datasets" / run_record["dataset"]
+    corpus_root = Path(json.loads(
+        (ds_dir / "corpus_root.local.json").read_text(encoding="utf-8"))["corpus_root"])
+    n_questions = sum(1 for l in (run_dir / "raw/answers.jsonl")
+                      .read_text(encoding="utf-8").splitlines() if l.strip())
 
-    ds_dir = Path(__file__).resolve().parents[1] / "datasets" / run_record["dataset"]
-    golden_path = ds_dir / "golden.json"
-    if not golden_path.exists():
-        raise SystemExit(
-            f"golden.json for dataset {run_record['dataset']!r} not found at "
-            f"{golden_path} (ad-hoc/smoke datasets: pass their golden via a "
-            f"dataset dir symlink or judge from the primary datasets only)"
-        )
-    golden = {q["id"]: q for q in json.loads(golden_path.read_text(encoding="utf-8"))}
+    prior = run_dir / "judge_verdicts.json"
+    if prior.exists():
+        old = json.loads(prior.read_text(encoding="utf-8"))
+        if old.get("rubric_version") != "2.0" or old.get("judge_model") != args.model:
+            prior.rename(prior.with_suffix(".json.old"))
+            print("judge: prior verdicts from different judge/rubric set aside as .old")
 
-    todo = [
-        r for r in enriched
-        if r["qa_id"] in golden and (
-            r.get("verdict") in ("partial", "wrong")
-            or golden[r["qa_id"]]["answer_type"] == "enumeration"
-        )
-    ]
-    # Matcher-precision audit (#55): the judge otherwise only ever revises
-    # verdicts UPWARD (false negatives get fixed, false positives are never
-    # seen, headline drifts up). Sample deterministically-correct rows too
-    # and report the disagreement rate as measured matcher precision.
-    import random as _random
-
-    audit_pool = [r for r in enriched
-                  if r["qa_id"] in golden and r.get("verdict") == "correct"]
-    audit_rng = _random.Random(run_record.get("run_id", "seed"))
-    audit_rows = audit_rng.sample(audit_pool, min(args.audit_correct, len(audit_pool)))
-    audit_ids = {r["qa_id"] for r in audit_rows}
-    todo = todo + audit_rows
-    if args.limit:
-        todo = todo[: args.limit]
-
-    print(f"judge: {len(todo)}/{len(enriched)} rows need judging "
-          f"(model={args.model}, rubric={rubric_sha()})")
+    prompt = build_prompt(run_dir, corpus_root, n_questions)
     if args.dry_run:
-        if todo:
-            print(build_prompt(golden[todo[0]["qa_id"]], todo[0]))
+        print(prompt)
         return 0
 
-    out_path = run_dir / "judge_verdicts.json"
-    verdicts: dict[str, dict] = {}
-    if out_path.exists():
-        prior = json.loads(out_path.read_text(encoding="utf-8"))
-        prior_requested = prior.get("judge_model_requested", prior.get("judge_model"))
-        if prior_requested == args.model and prior.get("rubric_sha") == rubric_sha():
-            verdicts = prior.get("verdicts", {})
-        else:
-            print("judge: existing verdicts are from a different judge/rubric — "
-                  "starting fresh (old file preserved as .old)")
-            out_path.rename(out_path.with_suffix(".json.old"))
-
-    n_err = 0
-    resolved_model, resolved_source = args.model, "fallback_alias"
-    for row in todo:
-        qa_id = row["qa_id"]
-        if qa_id in verdicts:
-            continue
-        item = golden[qa_id]
-        try:
-            judged, resolved_model, resolved_source = call_claude(build_prompt(item, row), args.model)
-            final = derive_verdict(item, judged, row["verdict"])
-            verdicts[qa_id] = {
-                "criteria": judged,
-                "verdict": final,
-                "deterministic_verdict": row["verdict"],
-                "changed": final != row["verdict"],
-                "audit_of_correct": qa_id in audit_ids,
-            }
-            print(f"  {qa_id}: {row['verdict']} -> {final}"
-                  + (" (changed)" if final != row["verdict"] else "")
-                  + (" [matcher audit]" if qa_id in audit_ids else ""))
-        except Exception as e:  # noqa: BLE001 — record and continue
-            n_err += 1
-            verdicts[qa_id] = {"error": f"{type(e).__name__}: {e}"}
-            print(f"  {qa_id}: JUDGE ERROR {e}", file=sys.stderr)
-        audit_done = [v for v in verdicts.values() if v.get("audit_of_correct")]
-        audit_agree = sum(1 for v in audit_done if not v.get("changed"))
-        out_path.write_text(json.dumps({
-            "judge_model_requested": args.model,
-            "judge_model": resolved_model,
-            "judge_model_source": resolved_source,  # #73: fallback vs resolved is auditable
-            "rubric_sha": rubric_sha(),
-            "matcher_audit": {
-                "sampled_correct": len(audit_done),
-                "judge_agreed": audit_agree,
-                "counts": f"{audit_agree}/{len(audit_done)}",
-                "matcher_precision": (audit_agree / len(audit_done))
-                if audit_done else None,
-                # #74: at n=5 with zero disagreements, the rule of three
-                # bounds true error only to <=~0.45 at 95% - accumulate
-                # samples across runs before treating this as settled
-                "note": "small-n bound; accumulate across runs",
-            },
-            "verdicts": verdicts,
-        }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-
-    changed = sum(
-        1 for v in verdicts.values()
-        if v.get("changed") and not v.get("audit_of_correct")
+    print(f"judge: full-context grading of {n_questions} answers "
+          f"(model={args.model}, rubric={rubric_sha()}) — one instance, "
+          f"reads sources itself; this takes several minutes")
+    proc = subprocess.run(
+        ["claude", "-p", "--model", args.model,
+         "--allowedTools", "Read,Write,Glob,Grep"],
+        input=prompt, capture_output=True, text=True, timeout=args.timeout_s,
+        cwd=str(EVAL.parent),
     )
-    print(f"judge: done — {len(verdicts)} verdicts ({resolved_model}), "
-          f"{changed} non-audit changes, {n_err} errors -> {out_path}")
-    return 0 if n_err == 0 else 1
+    if proc.returncode != 0:
+        raise SystemExit(f"judge instance exited {proc.returncode}: {proc.stderr[:500]}")
+    print(f"judge instance says: {proc.stdout.strip()[-300:]}")
+
+    out = validate(run_dir)
+    # stamp what the wrapper knows (the instance may not know its own id)
+    out["judge_model_requested"] = args.model
+    out["rubric_sha"] = rubric_sha()
+    (run_dir / "judge_verdicts.json").write_text(
+        json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    s = out.get("summary", {})
+    print(f"judge: VALID — {s.get('correct')}✓ {s.get('partial')}~ {s.get('wrong')}✗ "
+          f"fa={s.get('false_abstain')} | golden issues: {len(out.get('golden_issues', []))} "
+          f"| disagreements vs deterministic: {s.get('disagreements_with_deterministic')} "
+          f"-> {run_dir / 'JUDGE-REPORT.md'}")
+    return 0
 
 
 if __name__ == "__main__":

@@ -1294,10 +1294,10 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
     from src.ingest.walker import find_candidates
 
     ensure_path_included(root)
-    files, ignored, asset_lib_skipped = find_candidates(
+    files, ignored = find_candidates(
         root, indexing_rules=load_indexing_rules()
     )
-    if not files and ignored == 0 and asset_lib_skipped == 0:
+    if not files:
         print(f"no indexable files under {root}")
         return 0
 
@@ -1345,7 +1345,6 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
         f"T0={tally['T0']} T1={tally['T1']} T2={tally['T2']} "
         f"T3={tally['T3']} T4={tally['T4']} SKIP={tally['SKIP']} "
         f"(multi-tier={multi_tier}, ignored={ignored}, "
-        f"asset_lib_skipped={asset_lib_skipped}, gpu={'yes' if gpu else 'no'})"
     )
     return 0
 

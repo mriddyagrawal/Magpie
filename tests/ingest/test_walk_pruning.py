@@ -70,7 +70,7 @@ def test_find_candidates_does_not_descend_into_node_modules(tmp_path: Path):
     _touch(tmp_path / "real_doc.md", "real content")
 
     rules = _rules_for(tmp_path)
-    files, _, _ = find_candidates(tmp_path, indexing_rules=rules)
+    files, _ = find_candidates(tmp_path, indexing_rules=rules)
     names = {f.name for f in files}
     assert names == {"real_doc.md"}
 
@@ -84,7 +84,7 @@ def test_find_candidates_does_not_descend_into_recycle_bin(tmp_path: Path):
     _touch(tmp_path / "real_doc.md", "real")
 
     rules = _rules_for(tmp_path)
-    files, _, _ = find_candidates(tmp_path, indexing_rules=rules)
+    files, _ = find_candidates(tmp_path, indexing_rules=rules)
     names = {f.name for f in files}
     assert names == {"real_doc.md"}
 

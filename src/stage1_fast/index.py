@@ -39,7 +39,7 @@ def _iter_fast_files(root: Path) -> list[Path]:
     """
     from src.ingest.walker import find_candidates
 
-    files, _ignored, _asset_skipped = find_candidates(root)
+    files, _ignored = find_candidates(root)
     return sorted(p for p in files if route_file(p) == "fast")
 
 

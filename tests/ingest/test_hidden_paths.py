@@ -29,7 +29,7 @@ def test_dot_folders_pruned_during_walk(tmp_path: Path):
     _touch(tmp_path / ".antigravity" / "extensions" / "icon.png", "fake")
     _touch(tmp_path / ".cache" / "huge_blob.json", "{}")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     names = {f.name for f in files}
     assert names == {"real.md"}
 
@@ -41,7 +41,7 @@ def test_leaf_dotfiles_default_skipped(tmp_path: Path):
     _touch(tmp_path / ".env", "SECRET=...")
     _touch(tmp_path / ".some_random_config", "noise")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     names = {f.name for f in files}
     assert names == {"real.md"}
 
@@ -53,7 +53,7 @@ def test_useful_dotfiles_are_indexed(tmp_path: Path):
     _touch(tmp_path / ".gitconfig", "[user] name = Test")
     _touch(tmp_path / "ignored.unknown_ext", "junk")  # filtered by ext
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     names = {f.name for f in files}
     assert ".bashrc" in names
     assert ".vimrc" in names
@@ -66,7 +66,7 @@ def test_useful_dotfiles_inside_dotfolder_still_skipped(tmp_path: Path):
     _touch(tmp_path / ".config" / ".bashrc", "should not be indexed")
     _touch(tmp_path / "real.md", "real")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     names = {f.name for f in files}
     assert names == {"real.md"}
     assert ".bashrc" not in names
@@ -83,7 +83,7 @@ def test_walk_root_can_itself_be_a_dotfolder(tmp_path: Path):
     root.mkdir()
     _touch(root / "notes.md", "real")
 
-    files, _, _ = find_candidates(root)
+    files, _ = find_candidates(root)
     names = {f.name for f in files}
     assert "notes.md" in names
 
@@ -112,7 +112,7 @@ def test_secrets_inside_corpus_skipped_by_ignore_rule(tmp_path: Path):
     _touch(tmp_path / "id_ed25519", "secret")
     _touch(tmp_path / "subfolder" / ".env", "more secrets")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     names_with_paths = {str(f.relative_to(tmp_path)) for f in files}
     assert names_with_paths == {"real.md"}
 
@@ -147,7 +147,7 @@ def test_include_dotfiles_opt_in_unprunes_dotfolders(tmp_path: Path):
     _touch(tmp_path / ".some-arbitrary-dotfile", "user notes")
     _touch(tmp_path / "regular.md", "also content")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     rels = {str(f.relative_to(tmp_path)) for f in files}
     assert "regular.md" in rels
     # With the opt-in, both the previously-pruned dot-folder content and the
@@ -165,7 +165,7 @@ def test_include_dotfiles_opt_in_does_not_disable_secret_skip(tmp_path: Path):
     _touch(tmp_path / "id_rsa", "-----BEGIN PRIVATE KEY-----")
     _touch(tmp_path / ".some-other-dotfile", "user content")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     rels = {str(f.relative_to(tmp_path)) for f in files}
     # Secrets stay out
     assert ".env" not in rels
@@ -187,7 +187,7 @@ def test_include_dotfiles_scoped_to_subtree(tmp_path: Path):
     _touch(optin / ".nasconfig.yaml", "include_dotfiles: true\n")
     _touch(optin / ".reachable" / "deep.md", "should appear")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     rels = {str(f.relative_to(tmp_path)) for f in files}
     assert "regular_root.md" in rels
     assert "with_optin/.reachable/deep.md" in rels
@@ -199,7 +199,7 @@ def test_include_dotfiles_default_false_when_no_config(tmp_path: Path):
     """Sanity: with no .nasconfig.yaml at all, dot-folders are still pruned."""
     _touch(tmp_path / ".pruned" / "noise.md", "should not appear")
     _touch(tmp_path / "real.md", "real")
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     rels = {f.name for f in files}
     assert rels == {"real.md"}
 

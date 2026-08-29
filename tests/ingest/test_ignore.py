@@ -431,10 +431,9 @@ def test_walker_find_candidates_filters_node_modules(tmp_path: Path):
     _touch(tmp_path / "build" / "bundle.js", "...")
     _touch(tmp_path / "src" / "util.py", "...")
 
-    files, ignored, asset_skipped = find_candidates(tmp_path)
+    files, ignored = find_candidates(tmp_path)
     names = {f.name for f in files}
     assert names == {"app.py", "README.md", "util.py"}
     # `ignored` is 0 because the prune skipped node_modules/ and build/
     # before per-file ignore-rule checks ran. That's the speed win.
     assert ignored == 0
-    assert asset_skipped == 0    # no asset-library-shaped folders here

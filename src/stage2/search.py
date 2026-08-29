@@ -534,6 +534,21 @@ def _search_fast_tier(query_text: str, limit: int) -> list[SearchResult]:
 RRF_K = 60  # standard RRF constant; higher = flatter fusion curve
 
 
+def _rerank_enabled() -> bool:
+    """Global kill-switch for the cross-encoder rerank stage.
+
+    `MAGPIE_RERANK=0` disables reranking everywhere, regardless of what a
+    caller passes for `rerank=` — results come back in RRF-fusion order.
+    Anything else (unset, "1", garbage) leaves reranking caller-controlled,
+    so the default behavior is exactly what it was before the switch.
+
+    The solo gate (`gate_to_solo`) also checks this: its margin threshold is
+    calibrated to cross-encoder score scale, so with reranking off the gate
+    is structurally off too — see the comment there.
+    """
+    return os.environ.get("MAGPIE_RERANK", "1").strip() != "0"
+
+
 def _hit_key(r: SearchResult) -> tuple[str, int | None]:
     """Dedup key for RRF fusion. Composite to handle within-file chunks.
 
@@ -715,9 +730,13 @@ def run_search(
     pair with a small cross-encoder model, then returns the top-k by that
     score. Default off because cross-encoders occasionally regress factoid
     queries (rememex postmortem). Enable in the REPL with `.rerank on`.
-    See `src.stage2.rerank`.
+    `MAGPIE_RERANK=0` is a global kill-switch that overrides any caller's
+    `rerank=True` — see `_rerank_enabled`. See `src.stage2.rerank`.
     """
     from src.stage2.query_classify import QueryClass, classify_and_config
+
+    if rerank and not _rerank_enabled():
+        rerank = False
 
     if question is not None and enumerate_lists:
         klass, cfg = classify_and_config(question)
@@ -853,11 +872,19 @@ def gate_to_solo(
 
     Local provider only — cloud's 26B reads through distractor stacks fine
     (47% strict with the crowd) and loses enumeration coverage if starved.
-    Tune/disable via LOCAL_SOLO_MARGIN (0 disables).
+    Tune/disable via LOCAL_SOLO_MARGIN (0 disables). Also structurally off
+    when reranking is disabled (`MAGPIE_RERANK=0`) — see below.
     """
     if len(retrieved) < 2:
         return retrieved
     if question is not None and _COMPARATIVE_Q_RE.search(question):
+        return retrieved
+    # The margin below is a CROSS-ENCODER score margin. With the rerank
+    # stage killed (MAGPIE_RERANK=0), `score` holds RRF-fusion values on a
+    # ~1/RRF_K scale where the default 2.0 threshold can never fire — so
+    # treat the gate as explicitly off rather than let it silently never
+    # fire against the wrong scale.
+    if not _rerank_enabled():
         return retrieved
     try:
         from src.llm import active_provider

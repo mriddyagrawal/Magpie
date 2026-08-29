@@ -1,0 +1,83 @@
+{
+  "n_questions": 106,
+  "mode": "retrieval_only",
+  "answer": {
+    "correct": null,
+    "partial": null,
+    "wrong": null,
+    "false_abstain": null,
+    "by_type": {}
+  },
+  "abstention": {
+    "n_not_found": 0,
+    "correct_abstain_counts": null,
+    "correct_abstain_rate": null,
+    "false_answer_rate": null
+  },
+  "retrieval": {
+    "n": 94,
+    "first_gold_rank": 1.5227272727272727,
+    "hit@1": 0.8191489361702128,
+    "hit@12": 0.9361702127659575,
+    "hit@3": 0.8829787234042553,
+    "hit@5": 0.8829787234042553,
+    "mrr": 0.8525037610143994,
+    "ndcg@5": 0.8545114982260408,
+    "recall@1": 0.7613475177304964,
+    "recall@12": 0.9340425531914893,
+    "recall@3": 0.8744680851063829,
+    "recall@5": 0.8808510638297872
+  },
+  "citations": {},
+  "solo_gate": {
+    "fire_rate": 0.0
+  },
+  "h1_slice": {
+    "n_extractive": 84,
+    "n_eligible": 0,
+    "eligible_fraction": 0.0,
+    "basis_counts": {
+      "fact_spans": 0,
+      "file_level_image": 0
+    },
+    "accuracy_by_basis": {},
+    "accuracy_on_eligible": null,
+    "mixed_basis": false,
+    "note": "per-arm number; never compare raw across arms OR across bases (PLAN H1). accuracy_on_eligible is None when bases are mixed - use accuracy_by_basis."
+  },
+  "by_phrasing": {
+    "typed": {
+      "n": 47,
+      "correct": 0.0,
+      "retrieval_hit@1": 0.723404255319149,
+      "retrieval_recall@5": 0.8042553191489361
+    },
+    "full": {
+      "n": 47,
+      "correct": 0.0,
+      "retrieval_hit@1": 0.9148936170212766,
+      "retrieval_recall@5": 0.9574468085106383
+    }
+  },
+  "product_findings": {
+    "not_found_flag_missing": 0,
+    "zero_citation_answers": 0
+  },
+  "latency": {
+    "p50_total_s": 0.0,
+    "p95_total_s": 0.0
+  },
+  "errors": 0,
+  "enriched_at_sha": "e8ab5ccf6f7b44a7fce0af456277457fa52fdd27",
+  "golden_set": {
+    "items": 106,
+    "human_verified": 0,
+    "status": "SILVER (provisional)"
+  },
+  "golden_sha": "7a4a7010a845435f",
+  "index_store": {
+    "key": "5ff3e0adf0448de6",
+    "hit": true,
+    "built_under_sha": "e8ab5ccf6f7b44a7fce0af456277457fa52fdd27"
+  }
+}

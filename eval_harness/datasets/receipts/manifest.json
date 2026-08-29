@@ -2,8 +2,8 @@
   "dataset": "receipts",
   "source": "jsdnrs/ICDAR2019-SROIE (test split; CC-BY-4.0)",
   "source_revision": "bffe40c26759f3376ec2b3ae9031dbba54cd587c",
-  "n_files": 150,
-  "selection": "first 150 of test split under deterministic sort",
+  "n_files": 148,
+  "selection": "first 150 of test split under deterministic sort, then deduped to 148 by content hash (owner decision 2026-08-29): the split contained two byte-identical pairs \u2014 receipt_X51005301666.jpg (== receipt_X51005268275.jpg) and receipt_X510056849111.jpg (== receipt_X51005684949.jpg) \u2014 which make retrieval scoring ambiguous, since a correct hit on either twin looks like a miss against qrels naming the other. The listed survivor of each pair is kept. NOTE: prepare_receipts.py regenerates all 150 from the HF split; re-running it restores the two dropped files on disk and they must be deleted again to match this manifest.",
   "files": [
     {
       "name": "receipt_X00016469670.jpg",
@@ -52,10 +52,6 @@
     {
       "name": "receipt_X51005288570.jpg",
       "sha256": "07d936dc5d4b62d89260878d7d985178969fec47140c80a6c8f6e2beda078884"
-    },
-    {
-      "name": "receipt_X51005301666.jpg",
-      "sha256": "8dcbd4a1cd262db07f58da70bd95785cc60af0a307ab8083d1d05130026e64e7"
     },
     {
       "name": "receipt_X51005337867.jpg",
@@ -304,10 +300,6 @@
     {
       "name": "receipt_X51005677337.jpg",
       "sha256": "2c0fbf55e83269249b43035876cf6876c03853ed215e357954077af1119503c1"
-    },
-    {
-      "name": "receipt_X510056849111.jpg",
-      "sha256": "462401ac15e48c17410856e422e0d8882b423eef6b5528b5197613fa0562ad99"
     },
     {
       "name": "receipt_X51005684949.jpg",

@@ -329,7 +329,20 @@ def _build_embedding_text(s: ParsedSummary) -> str:
     Includes key_entities and identifiers so BM25 can match exact tokens
     (order numbers, dates, product names) that dense embeddings tend to wash out.
     """
-    parts = [s.title, s.summary]
+    parts = []
+    # The relative path, tokenized (underscores/dashes/slashes -> spaces), so
+    # dense + BM25 can separate near-duplicate siblings whose summaries read
+    # almost identically — `math_docs/k_factor_grouped.md` vs
+    # `ascii_docs/k_factor_grouped.md`, or one config repeated across four
+    # bench folders. Without it the path is invisible to the whole retrieval
+    # stack and the tie is broken arbitrarily. Off unless MAGPIE_EMBED_PATH=1.
+    if os.environ.get("MAGPIE_EMBED_PATH", "0").strip() == "1":
+        src = getattr(s, "source_path", "") or ""
+        tail = src.rsplit("/", 4)[-4:] if "/" in src else [src]
+        hint = " ".join(t.replace("_", " ").replace("-", " ") for t in tail if t)
+        if hint:
+            parts.append(hint)
+    parts += [s.title, s.summary]
     if s.keywords:
         parts.append(", ".join(s.keywords))
     if s.key_entities:

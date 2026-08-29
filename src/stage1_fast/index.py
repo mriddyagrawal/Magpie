@@ -30,13 +30,17 @@ PDF_RENDER_DPI = 150  # balance between quality and speed; ColPali trained ~150
 
 
 def _iter_fast_files(root: Path) -> list[Path]:
-    """Walk `root` and return sorted list of files the router tagged `fast`."""
-    return sorted(
-        p for p in root.rglob("*")
-        if p.is_file()
-        and not p.name.startswith(".")
-        and route_file(p) == "fast"
-    )
+    """Walk `root` and return sorted list of files the router tagged `fast`.
+
+    Shares `src.ingest.walker.find_candidates` with the summary tier so both
+    tiers see the same corpus: the user's `indexing_rules.json` is honored,
+    dot-folders are pruned during traversal, and a directory that cannot be
+    read is skipped instead of aborting the run.
+    """
+    from src.ingest.walker import find_candidates
+
+    files, _ignored, _asset_skipped = find_candidates(root)
+    return sorted(p for p in files if route_file(p) == "fast")
 
 
 def _render_pages(path: Path) -> list:

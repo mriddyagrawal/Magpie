@@ -93,6 +93,9 @@ def run_one(ask_sync, q: dict, *, provider: str, top_k: int, rewrite: bool, fast
                 {"path": x.path, "score": x.score} for x in r.retrieved
             ],
             "latency_seconds": round(time.time() - t0, 2),
+            # Where the seconds went, per stage, so a slow run can be diagnosed
+            # from the answers file alone (retrieval vs reader vs files read).
+            "stage_timings": {k: round(v, 3) for k, v in (r.timings or {}).items()},
         }
     except Exception as e:  # noqa: BLE001 — record any failure, keep going
         return {

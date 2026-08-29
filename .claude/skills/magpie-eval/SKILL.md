@@ -27,7 +27,9 @@ Ask (AskUserQuestion, multiple rounds fine):
    files (Phase 2).
 3. **Config — exactly ONE per skill run.** A skill run drives Magpie end to
    end once, under one fixed configuration: model_config, top_k, rewrite,
-   solo-gate margin (0 disables the gate), temperature, anything else in
+   solo-gate margin (0 disables the gate), rerank (false kills the
+   cross-encoder stage AND structurally disables the solo gate — its margin
+   is on cross-encoder score scale), temperature, anything else in
    `configs/baseline.json`. Offer baseline as the default. Comparing
    configurations = separate skill runs; never launch multiple arms in one.
 

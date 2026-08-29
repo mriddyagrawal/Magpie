@@ -237,6 +237,11 @@ def build_env(
     env["LLM_PROVIDER"] = provider
     env["LOCAL_TEMPERATURE"] = str(params.get("temperature", 0.0))
     env["LOCAL_SOLO_MARGIN"] = str(params.get("solo_margin", 2.0))
+    # Cross-encoder rerank kill-switch (src/stage2/search.py:_rerank_enabled).
+    # Independent of solo_margin, but note the coupling: rerank=false also
+    # structurally disables the solo gate (its margin threshold is on
+    # cross-encoder score scale). Production default is on.
+    env["MAGPIE_RERANK"] = "1" if params.get("rerank", True) else "0"
     # ALWAYS set: "leave unset for the backend default" is a lie whenever the
     # repo .env defines the var - load_dotenv (manifest.py:63) fills unset
     # vars, so an omitted knob would silently inherit this machine's dotfile

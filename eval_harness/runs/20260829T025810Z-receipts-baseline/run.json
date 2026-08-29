@@ -29,7 +29,7 @@
   "questions": 106,
   "backend_git_sha": "dfa5074d5e2a4367eda559f9d14a8ab7f9c0759f",
   "harness_git_sha": "dfa5074d5e2a4367eda559f9d14a8ab7f9c0759f",
-  "status": "running",
+  "status": "complete",
   "machine": {
     "platform": "macOS-26.4.1-arm64-arm-64bit",
     "machine": "arm64",
@@ -67,7 +67,26 @@
     "retrieve": {
       "wall_s": 177.4,
       "errors": 0
+    },
+    "answer": {
+      "wall_s": 3533.2,
+      "answered": 105,
+      "errors": 1,
+      "llm_log": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T025810Z-receipts-baseline/raw/appdata/logs/llm-2026-08-29T03-01-09Z.log"
     }
   },
-  "reused_index_from": "20260828T081416Z-receipts-baseline"
+  "reused_index_from": "20260828T081416Z-receipts-baseline",
+  "isolation": {
+    "real_appdata_untouched": true,
+    "cache_model_blobs_unchanged": true,
+    "cache_before": {
+      "files": 152,
+      "bytes": 21540575951
+    },
+    "cache_after": {
+      "files": 152,
+      "bytes": 21540575951
+    }
+  },
+  "wall_s_total": 3711.2
 }

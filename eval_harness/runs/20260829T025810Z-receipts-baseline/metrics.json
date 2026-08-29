@@ -1,0 +1,88 @@
+{
+  "n_questions": 106,
+  "mode": "full",
+  "answer": {
+    "correct": 0.064,
+    "partial": 0.021,
+    "wrong": 0.34,
+    "false_abstain": 0.574,
+    "by_type": {
+      "enumeration": 0.1,
+      "extractive": 0.06
+    }
+  },
+  "abstention": {
+    "n_not_found": 12,
+    "correct_abstain_counts": "6/12",
+    "correct_abstain_rate": 0.5,
+    "false_answer_rate": 0.5
+  },
+  "retrieval": {
+    "n": 94,
+    "first_gold_rank": 1.625,
+    "hit@1": 0.7872340425531915,
+    "hit@12": 0.9361702127659575,
+    "hit@3": 0.8617021276595744,
+    "hit@5": 0.8829787234042553,
+    "mrr": 0.8304795677136104,
+    "ndcg@5": 0.8380057441715663,
+    "recall@1": 0.7294326241134751,
+    "recall@12": 0.9340425531914893,
+    "recall@3": 0.853191489361702,
+    "recall@5": 0.8808510638297872
+  },
+  "citations": {
+    "n": 94,
+    "citation_precision": 0.032446808510638296,
+    "citation_recall": 0.10638297872340426,
+    "cited": 0.6808510638297872,
+    "hallucinated_citations": 0.5212765957446809
+  },
+  "solo_gate": {
+    "fire_rate": 0.0
+  },
+  "h1_slice": {
+    "n_extractive": 84,
+    "n_eligible": 73,
+    "eligible_fraction": 0.869,
+    "basis_counts": {
+      "fact_spans": 0,
+      "file_level_image": 73
+    },
+    "accuracy_by_basis": {
+      "file_level_image": 0.068
+    },
+    "accuracy_on_eligible": 0.068,
+    "mixed_basis": false,
+    "note": "per-arm number; never compare raw across arms OR across bases (PLAN H1). accuracy_on_eligible is None when bases are mixed - use accuracy_by_basis."
+  },
+  "by_phrasing": {
+    "typed": {
+      "n": 47,
+      "correct": 0.085,
+      "retrieval_hit@1": 0.6595744680851063,
+      "retrieval_recall@5": 0.8042553191489361
+    },
+    "full": {
+      "n": 47,
+      "correct": 0.043,
+      "retrieval_hit@1": 0.9148936170212766,
+      "retrieval_recall@5": 0.9574468085106383
+    }
+  },
+  "product_findings": {
+    "not_found_flag_missing": 1,
+    "zero_citation_answers": 26
+  },
+  "latency": {
+    "p50_total_s": 33.8,
+    "p95_total_s": 42.4
+  },
+  "errors": 1,
+  "enriched_at_sha": "fbc46e43fba817e015dbf569cd61684b20fb83b5",
+  "golden_set": {
+    "items": 106,
+    "human_verified": 0,
+    "status": "SILVER (provisional)"
+  }
+}

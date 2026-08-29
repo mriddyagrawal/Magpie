@@ -370,16 +370,13 @@ def find_candidates(
                 continue
             pre_accepted.append(p)
 
-    asset_folders = _asset_library_folders(pre_accepted)
-    accepted: list[Path] = []
-    asset_skipped = 0
-    for p in pre_accepted:
-        if p.parent in asset_folders and p.suffix.lower() in _IMAGE_EXTS_FOR_FILTER:
-            asset_skipped += 1
-            continue
-        accepted.append(p)
-
-    return sorted(accepted), ignored, asset_skipped
+    # Asset-library skip removed (owner decision 2026-08-29): the >=15-images
+    # + 0-docs sibling-density rule silently made image-only folders -
+    # receipt shoeboxes, scanned-document dumps, exactly the corpora Magpie
+    # exists for - unindexable, with no override. Per-file routing and the
+    # ignore rules remain the filters. asset_skipped stays in the return
+    # shape for compatibility and is always 0.
+    return sorted(pre_accepted), ignored, 0
 
 
 # ---------------------------------------------------------------------------
@@ -647,11 +644,6 @@ async def run_batch(
 
     if progress_callback:
         progress_callback(0, len(files), None)
-    if asset_lib_skipped:
-        print(
-            f"skipped {asset_lib_skipped} images in {root} "
-            f"(asset-library folders: ≥{_ASSET_LIBRARY_MIN_IMAGES} images + 0 docs)"
-        )
 
     # Manifest prune for files that vanished under this root. When the walked
     # root lives under REPO_ROOT we scope the prune to repo-relative prefixes;

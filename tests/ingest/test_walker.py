@@ -84,7 +84,7 @@ def test_find_candidates_picks_supported_extensions(isolated, tmp_path: Path):
 
 
 def test_find_candidates_skips_asset_library_folder(isolated, tmp_path: Path):
-    """Sibling-density rule: a folder with ≥15 images and 0 docs is an asset library."""
+    """Asset-library rule REMOVED (2026-08-29): image-only folders index fully."""
     corpus = tmp_path / "corpus"
     corpus.mkdir()
 
@@ -107,14 +107,14 @@ def test_find_candidates_skips_asset_library_folder(isolated, tmp_path: Path):
     # Notes folder images survive because chapter.md is a sibling doc.
     assert "chapter.md" in names
     assert "fig0.png" in names
-    # Asset-library images are all dropped, regardless of the folder's name.
-    assert not any(n.startswith("stock") for n in names)
-    assert asset_skipped == 20
+    # Image-only folders are indexed like any other folder now.
+    assert all(f"stock{i}.jpg" in names for i in range(20))
+    assert asset_skipped == 0
     assert ignored == 0
 
 
 def test_find_candidates_asset_rule_ignores_subfolder_docs(isolated, tmp_path: Path):
-    """The check is strictly per-folder — docs in subfolders don't save the parent."""
+    """Rule removed: subfolder layout is irrelevant; everything indexes."""
     corpus = tmp_path / "corpus"
     corpus.mkdir()
 
@@ -129,11 +129,10 @@ def test_find_candidates_asset_rule_ignores_subfolder_docs(isolated, tmp_path: P
     (sub / "notes.md").write_text("writeup", encoding="utf-8")
 
     found, ignored, asset_skipped = find_candidates(corpus)
-    # Images in assets_dir are dropped (0 docs immediately alongside them).
-    assert not any(p.name.startswith("img") for p in found)
-    # The subfolder's notes.md survives.
+    # Rule removed: images index regardless of sibling docs.
+    assert sum(1 for p in found if p.name.startswith("img")) == 20
     assert any(p.name == "notes.md" for p in found)
-    assert asset_skipped == 20
+    assert asset_skipped == 0
 
 
 def test_walker_end_to_end_t1_only(isolated, tmp_path: Path):

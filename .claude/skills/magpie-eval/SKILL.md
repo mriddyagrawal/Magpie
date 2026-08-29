@@ -25,11 +25,20 @@ Ask (AskUserQuestion, multiple rounds fine):
 2. **Golden set** — one of: *reuse* the committed golden as-is; *adapt* an
    existing annotation source into our schema; *generate fresh* by reading the
    files (Phase 2).
-3. **Config / permutations** — which arms to run: model_config, top_k,
-   rewrite on/off, solo-gate margin (0 disables the gate; it is a first-class
-   axis), temperature, anything else in `configs/baseline.json`. Offer
-   baseline-only as the default and ablation arms as options. One index per
-   index-side config; reuse it across answer-side arms (`--reuse-index`).
+3. **Config — exactly ONE per skill run.** A skill run drives Magpie end to
+   end once, under one fixed configuration: model_config, top_k, rewrite,
+   solo-gate margin (0 disables the gate), temperature, anything else in
+   `configs/baseline.json`. Offer baseline as the default. Comparing
+   configurations = separate skill runs; never launch multiple arms in one.
+
+   **Duplicate guard**: before launching, compare the chosen config against
+   every prior `eval_harness/runs/*/run.json` — hash the resolved `params`
+   and read the current backend git SHA. If an existing COMPLETE run has the
+   same params hash AND the same backend SHA, tell the owner it is an exact
+   re-run of <run_id> and ask whether to proceed anyway. Same params on a
+   DIFFERENT SHA is a legitimate before/after comparison — say so and
+   continue. (`--reuse-index` from a prior run is still fine when the
+   index-side params match; the harness enforces that itself.)
 
 The judge is NOT a question: it always runs.
 
@@ -60,13 +69,13 @@ Question requirements:
 
 Assemble, cross-check, show the owner a sample plus anything doubtful, commit.
 
-## Phase 3 — Run
+## Phase 3 — Run (one run, one config)
 
-For each arm, launch in the background, wrapped so the Mac cannot sleep:
+Launch the single run in the background, wrapped so the Mac cannot sleep:
 
 ```bash
 caffeinate -dims uv run python eval_harness/harness/run.py \
-    --config <config> [--reuse-index <prior_run_id>] > /tmp/<arm>.log 2>&1
+    --config <config> [--reuse-index <prior_run_id>] > /tmp/eval-run.log 2>&1
 ```
 
 Schedule a wake every **3 minutes** (ScheduleWakeup). At each wake, report
@@ -88,22 +97,22 @@ One full-context judge instance grades every answer against the golden set and
 the source files themselves, per `eval_harness/judge/rubric.md`, producing
 `judge_verdicts.json` + `JUDGE-REPORT.md`. Verify the wrapper reported VALID.
 
-## Phase 5 — Report agents (after all arms are judged)
+## Phase 5 — Report agents (after the run is judged)
 
-Spawn exactly these, in parallel, each reading the run folders (and raw/ logs
-locally) for every arm:
+Spawn exactly these, in parallel, each reading this run's folder (and its
+raw/ logs). Where a prior run with comparable provenance exists, they may
+cite it for contrast, but this run is the subject:
 
 1. **Answers report** — why answers failed or succeeded, per failure cluster,
    with qa_id examples; abstention behavior; typed-vs-full comparison.
-2. **Retrieval report** — hit@k/recall/MRR across arms, where ranking went
-   wrong and why (read the retrieve JSONLs), gate behavior, phrasing gap.
+2. **Retrieval report** — hit@k/recall/MRR, where ranking went wrong and
+   why (read the retrieve JSONL), gate behavior, phrasing gap.
 3. **Indexing report** — quality of what indexing produced: read the scratch
    summaries/manifest in `raw/appdata`, spot-check against source files, note
    per-file failures, timing, and anything that would poison downstream
    answers.
 
-Each writes `eval_harness/runs/<run_id>/REPORT-{answers,retrieval,indexing}.md`
-(multi-arm comparisons go in the newest run's folder). Reports must explain
+Each writes `eval_harness/runs/<run_id>/REPORT-{answers,retrieval,indexing}.md`. Reports must explain
 WHY, not just tabulate — every claim tied to qa_ids or files.
 
 ## Phase 6 — Supervisor synthesis

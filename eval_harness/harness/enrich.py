@@ -631,6 +631,11 @@ def _write_report(run_dir: Path, s: dict, enriched: list[dict], run_record: dict
         f"| False abstain | {s['answer']['false_abstain']} |",
         f"| Correct abstain (of {s['abstention']['n_not_found']} not_found) | {s['abstention']['correct_abstain_rate']} |",
         f"| False answer on not_found | {s['abstention']['false_answer_rate']} |",
+        f"| hit@1 (pooled) | {s['retrieval'].get('hit@1')} |",
+        *([f"| hit@1 typed / full | {s['by_phrasing']['typed'].get('retrieval_hit@1')} / "
+           f"{s['by_phrasing']['full'].get('retrieval_hit@1')} |"]
+          if s.get('by_phrasing', {}).get('typed') and s.get('by_phrasing', {}).get('full')
+          else []),
         f"| hit@5 | {s['retrieval'].get('hit@5')} |",
         f"| recall@12 | {s['retrieval'].get('recall@12')} |",
         f"| MRR | {s['retrieval'].get('mrr')} |",

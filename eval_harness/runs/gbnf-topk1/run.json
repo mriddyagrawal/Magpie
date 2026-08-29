@@ -63,5 +63,15 @@
     "qdrant_http": 6533,
     "llama_base": 9400
   },
-  "phases": {}
+  "phases": {
+    "retrieve": {
+      "wall_s": 140.6,
+      "errors": 0
+    }
+  },
+  "index_store": {
+    "key": "5ff3e0adf0448de6",
+    "hit": true,
+    "built_under_sha": "0a3968fb26b7c21344fddb267b414d7335e32b63"
+  }
 }

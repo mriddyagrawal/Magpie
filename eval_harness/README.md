@@ -16,7 +16,10 @@ uv run python eval_harness/scripts/warm_model_cache.py   # REQUIRED, one-time,
                                  #   the shared cache. Runs go online but any
                                  #   model-blob download DURING a run fails the
                                  #   run's isolation check - warm first.
-# per dataset, per machine (corpora live OUTSIDE the repo):
+# per dataset, per machine (corpora live OUTSIDE the repo).
+# NOTE: the judge reads corpus files IN FULL, so their contents go to the
+# Claude API - if you point the harness at a personal corpus, that is what
+# you are agreeing to (standing owner approval recorded in PLAN 9.4):
 uv run --with datasets --with pillow python eval_harness/scripts/prepare_receipts.py
 ```
 

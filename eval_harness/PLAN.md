@@ -279,10 +279,10 @@ and a vague `question_variants` phrasing for most items. Generation is **blind**
 (questions written from extracted fact lists, not from page text) so questions cannot
 lexically copy the document and make retrieval trivially easy (ViDoRe v2's fix).
 Distractor files — topically similar files that do NOT contain answers — are planted in
-every corpus. **v1 answer runs execute the primary phrasing only** (`variant: 0`);
-`question_variants` power a separate ~10-question robustness mini-experiment rather than
-multiplying every run by the variant count (which would cut directly against §3's cost
-discipline).
+every corpus. **Superseded (owner, 2026-08-29): every fact is asked twice** — golden v2 makes
+`typed` and `full` phrasings first-class paired items (`pair_id`), so a run answers
+both and every run doubles as the phrasing-robustness eval. §8's cost table reflects
+the doubled run length.
 
 `qrels.tsv` (`question-id  file-id  relevance`) is generated mechanically from
 `gold_sources`/`acceptable_sources` so pytrec_eval can compute all retrieval metrics.

@@ -185,7 +185,7 @@ flowchart LR
 | Cross-encoder rerank | on (pipeline passes `rerank=True`) | `RERANK_MODEL` | `stage2/rerank.py` |
 | Solo gate | on, local only | `LOCAL_SOLO_MARGIN=2.0`, `LOCAL_SOLO_KEEP=2` (0 disables) | `stage2/search.py` |
 | doc2query "hype" tier | off (experiment) | `MAGPIE_HYPE_WEIGHT=0` | `stage2/search.py` |
-| Index-time transcripts | on when a transcript exists | `MAGPIE_TRANSCRIBE_MAX_PAGES=8`, `MAGPIE_TRANSCRIPTS_DIR` | `transcribe.py`, `content.py` |
+| Index-time transcripts | on — the walker writes one per pixels-only file as it indexes | `MAGPIE_TRANSCRIBE_BACKEND=auto` (ocr when RapidOCR is installed, else the local VLM; `off` writes nothing), `MAGPIE_TRANSCRIBE_MAX_PAGES=8`, `MAGPIE_TRANSCRIPTS_DIR` | `transcribe.py`, `content.py` |
 | Summary supplement | always attached | `MAGPIE_SUMMARY_WHEN_THIN=0` (1 = drop it when raw text is plentiful; did not ship) | `answer.py` |
 | Context budget | on, local only | `LOCAL_PREFILL_BUDGET_TOKENS` (8000 on CPU; unset on GPU = full window) | `answer.py` |
 | Extractive fast path | off | `MAGPIE_EXTRACTIVE=1`, `MAGPIE_EXTRACTIVE_MIN_SCORE=0.5` | `extractive.py` |
@@ -206,6 +206,7 @@ the code that record them; from here on they come from `RUNLOG.jsonl`.
 
 | Date | Change | Dataset | Evidence | Commit |
 |---|---|---|---|---|
+| 2026-08-30 | Transcript writing wired into the walker: every pixels-only file (photo, scanned PDF) gets its OCR / VLM transcript as it is indexed, not only when `Evaluations/transcribe_index.py` is run by hand. Read side unchanged; `MAGPIE_TRANSCRIBE_BACKEND=off` restores the pixel path | sroie / sem6 | same transcript path already measured: receipts read as OCR text 3/4 vs pixels 1/4 (eyes_vs_brain, 08-29); no new arm — this only makes the app do what the eval sweep did | rahul/transcribe-at-index |
 | 2026-08-29 | *Implemented, not yet evaluated:* evidence grounding mode — the model quotes the span(s) it read before answering; each quote must be in the files and every answer figure must sit inside a quote or derive from quoted figures. Replaces the numerals check's magnitude floor (29% of numeric ground truths sit entirely below 100) and its sum-only arithmetic. Default stays `numerals` until a sem6 arm (`MAGPIE_GROUNDING=evidence`, then `MAGPIE_GROUNDING_ACTION=warn` to measure without refusing) clears the gate | sem6 (pending) | analysis: absence probe q25 had rerank top-1 −7.7 vs median 0.02 — the retrieval signal existed and was discarded; guard fired on 3/22 arms | uncommitted |
 | 2026-08-29 | Images (photographed receipts) read their index-time transcript like scanned PDFs do | sem6 / sroie | transcript path measured far more accurate than answer-time pixels (see 08-25) | uncommitted |
 | 2026-08-29 | Prompt order chosen per question: files-first only when the KV slot already exists, else question-first | sem6 | files-first blind cost 5/40 questions | uncommitted |

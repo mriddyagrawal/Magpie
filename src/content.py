@@ -32,9 +32,10 @@ IMAGE_EXTS = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
 # scanned page near-perfectly (GPAs, handwritten forms, a bilingual tax
 # certificate) while the answer-time pixel path converted ~1/12 of scanned
 # eval questions — same crowd/format story as text. So: transcribe pages
-# ONCE at index time (Evaluations/transcribe_index.py writes
-# <APP_DATA_DIR>/transcripts/<key>.md), and at answer time read the
-# transcript as TEXT — which also makes scanned docs answerable in cloud
+# ONCE at index time (the walker writes <APP_DATA_DIR>/transcripts/<key>.md
+# through src/transcribe.py; Evaluations/transcribe_index.py is the same
+# thing as a sweep over an already-indexed corpus), and at answer time read
+# the transcript as TEXT — which also makes scanned docs answerable in cloud
 # mode without pixels ever leaving the machine. No transcript → the pixel
 # path below is unchanged.
 # ---------------------------------------------------------------------------

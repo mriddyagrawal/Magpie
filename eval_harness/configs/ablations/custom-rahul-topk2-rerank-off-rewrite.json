@@ -1,0 +1,36 @@
+{
+  "config_name": "custom-rahul-topk2-rerank-off-rewrite",
+  "dataset": "custom_dataset_rahul_Aug30",
+  "params": {
+    "model_config": "lfm-local",
+    "col_model": "auto",
+    "prompt_style": "baseline",
+    "temperature": 0.0,
+    "solo_margin": 0,
+    "rerank": false,
+    "local_n_ctx": 16384,
+    "top_k": 2,
+    "top_k_retrieval_max": 12,
+    "rewrite": true,
+    "enumerate_lists": true,
+    "fast_search": true,
+    "index_fast_tier": true,
+    "index_summary_tier": true,
+    "llama_startup_timeout_s": 300,
+    "memory": null,
+    "_notes": {
+      "arm": "Single-knob ablation against custom-rahul-topk2-rerank-off-norewrite (run 20260830T095758Z): rewrite is the ONLY param that differs (owner decision 2026-08-30). The progress-watcher merge between the runs touches eval_harness/ only, so backend_git_sha (scoped to src/) is unchanged and the comparability triple moves on exactly one axis.",
+      "rewrite": "ON (owner decision 2026-08-30) - the knob under test. Query-side only: worker.py passes it into ask(), and the retrieval sweep replays the answer pass's recorded query, so both passes rank the same rewritten string. KNOWN RISK, deliberately measured: rewrite_query() makes an LLM call whose prompt embeds wall-clock text (the receipts runs measured two temp-0 rewrites diverging on 45/120 questions because of it). Composed-mode replay removes the intra-run inconsistency; what this arm measures is whether the rewrite itself helps or hurts on this corpus.",
+      "dataset": "custom_dataset_rahul_Aug30: 545 files, 15 visual categories, assembled from public benchmark sources (OWID charts, UCSF industry documents, arXiv figures, IAM handwriting, RICO screenshots, scene-text photos, French annual-report tables, handwritten C++ study notes, receipts). Same registration and golden set (golden_sha 0ebcdcbcdf109adb) as the norewrite run.",
+      "notes_iam_excluded": "Same as norewrite run: the 30 notes_iam files stay INDEXED as distractors and carry ZERO golden items; any retrieval hit on them is a false positive by construction.",
+      "top_k": "k=2, matching the norewrite run. One knob, both axes - top_k goes straight into ask(), so 2 files are retrieved AND 2 are fed to the generator. top_k_retrieval_max stays 12 (retrieval-only sweeps; unused by this full run).",
+      "rerank": "OFF, unchanged from the norewrite run (NOT part of this ablation). Cross-encoder scores visual hits against the constant '(visual match - page N)' placeholder, so rerank off = ColQwen's own fusion ranking. false ALSO structurally disables the solo gate; run.py stamps solo_gate_structurally_off.",
+      "solo_margin": "0 = gate off, stated explicitly, unchanged from the norewrite run.",
+      "fast_search": "REQUIRED: every golden item carries requires.visual_tier=true and run.py hard-fails without it.",
+      "col_model": "auto, unchanged - index-side param; this machine resolves ColQwen. The index store entry from the norewrite run mounts directly (rewrite is not an index-side param).",
+      "temperature": "evals run at 0 (PLAN 4.2); production settings.json default is 0.7",
+      "local_n_ctx": "pinned: .env.example fresh-clone value & shipped-beta ctx; this machine's .env says 65536 and must not leak (PLAN 3)",
+      "prompt_style_and_memory": "INERT - carried for provenance symmetry with baseline.json only."
+    }
+  }
+}

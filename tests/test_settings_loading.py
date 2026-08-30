@@ -60,7 +60,8 @@ def test_load_creates_default_file_when_missing(tmp_path: Path) -> None:
     assert p.exists()
     # Seeded with the live bundled AppDefaults.
     assert s.version == 1
-    assert s.provider == "local"
+    # deliberate default change: shipped default provider is cloud
+    assert s.provider == "cloud"
     assert s.top_k == 5
     assert s.theme == "system"
 
@@ -177,24 +178,30 @@ def test_effective_user_none_falls_through_to_defaults(
     assert eff.theme == "dark"       # default
 
 
-def test_effective_env_overrides_user(tmp_path: Path, monkeypatch) -> None:
+def test_effective_env_does_not_override_user(tmp_path: Path, monkeypatch) -> None:
+    """LLM_PROVIDER was REMOVED from settings precedence on 2026-05-08: it
+    silently overrode the user's Settings -> Search & AI choice.
+    settings.json is the sole routing source here; the env fallback lives
+    only in src/llm.py's active_provider() for the no-settings case.
+    This test asserted the pre-2026-05-08 behavior until the 2026-08-30
+    test-suite triage - it now locks the CURRENT contract."""
     defaults_path = _write_defaults(tmp_path, provider="local")
     user_path = tmp_path / "settings.json"
     save_user_settings(UserSettings(provider="cloud"), user_path)
     monkeypatch.setenv("LLM_PROVIDER", "local")
     eff = effective_settings(user_path=user_path, defaults_path=defaults_path)
-    # Env wins over user setting.
-    assert eff.provider == "local"
+    # User setting WINS; env is not consulted by effective_settings.
+    assert eff.provider == "cloud"
 
 
-def test_effective_env_cloud_provider_name_maps_to_cloud(tmp_path: Path, monkeypatch) -> None:
-    """LLM_PROVIDER=openrouter from .env should map to provider='cloud'
-    so the Settings UI's binary toggle reflects reality."""
+def test_effective_env_ignored_even_without_user_file(tmp_path: Path, monkeypatch) -> None:
+    """Same 2026-05-08 contract, no-user-file case: defaults win, env is
+    ignored by effective_settings (llm.py owns any env fallback)."""
     defaults_path = _write_defaults(tmp_path, provider="local")
     user_path = tmp_path / "settings.json"
     monkeypatch.setenv("LLM_PROVIDER", "openrouter")
     eff = effective_settings(user_path=user_path, defaults_path=defaults_path)
-    assert eff.provider == "cloud"
+    assert eff.provider == "local"  # the written defaults, not the env
 
 
 # ---------------------------------------------------------------------------

@@ -305,7 +305,7 @@ def find_candidates(
             # has NOT opted in.
             if not include_data and ext in _DATA_EXTS_DEFAULT_OFF:
                 continue
-            ok, _ = rules.should_index(p)
+            ok, _ = rules.should_index(p, allow_hidden=include_dot)
             if not ok:
                 ignored += 1
                 continue

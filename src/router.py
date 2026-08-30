@@ -45,20 +45,7 @@ TEXT_EXTS = {".txt", ".md", ".markdown", ".log"}
 # would create a circular dependency since walker already imports from us).
 # When the walker eventually imports its allowlist from this module, the
 # two will be in sync.
-USEFUL_DOTFILE_NAMES = {
-    # Shell / login
-    ".bashrc", ".bash_profile", ".bash_aliases", ".bash_logout",
-    ".zshrc", ".zprofile", ".zshenv", ".zlogin", ".zlogout",
-    ".profile", ".kshrc", ".cshrc", ".tcshrc",
-    ".inputrc", ".dircolors",
-    # Editors
-    ".vimrc", ".nvimrc", ".gvimrc",
-    # Terminal multiplexers / pagers
-    ".tmux.conf", ".screenrc",
-    # Tool config
-    ".gitconfig", ".gitattributes", ".editorconfig",
-    ".condarc",
-}
+from src.config.indexing_rules import USEFUL_DOTFILE_NAMES  # single source
 CODE_EXTS = {
     ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
     ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",

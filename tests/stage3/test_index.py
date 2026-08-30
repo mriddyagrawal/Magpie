@@ -15,6 +15,10 @@ from src.stage3.index import find_alt_files, index_single_alt
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = REPO_ROOT / "Test Videos" / "img_9556_2026-04-16.alt"
+# Personal test media, never committed - skip on machines without it
+# (test-suite triage 2026-08-30).
+pytestmark = __import__("pytest").mark.skipif(
+    not FIXTURE.exists(), reason="Test Videos/ fixture media not present")
 
 
 @pytest.fixture

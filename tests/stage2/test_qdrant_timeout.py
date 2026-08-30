@@ -54,7 +54,7 @@ def test_default_endpoint_is_localhost_6433(monkeypatch):
 
     with patch.object(db_mod, "QdrantClient") as MockClient:
         db_mod.get_qdrant_client()
-        assert MockClient.call_args.kwargs.get("url") == "http://localhost:6433"
+        assert MockClient.call_args.kwargs.get("url") == "http://127.0.0.1:6433"
 
 
 def test_non_localhost_endpoint_hard_errors(monkeypatch):

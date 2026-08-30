@@ -1,0 +1,3094 @@
+[
+  {
+    "id": "viz-01-typed",
+    "pair_id": "viz-01",
+    "phrasing": "typed",
+    "question": "food commodity price index chart cheapest one",
+    "answer_type": "extractive",
+    "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7.",
+    "key_facts": [
+      "Cocoa",
+      "18.81"
+    ],
+    "gold_sources": [
+      "chart_001.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-01-full",
+    "pair_id": "viz-01",
+    "phrasing": "full",
+    "question": "In that long-term food commodity price index chart, which commodity had the lowest index value, and what was it?",
+    "answer_type": "extractive",
+    "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7.",
+    "key_facts": [
+      "Cocoa",
+      "18.81"
+    ],
+    "gold_sources": [
+      "chart_001.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-02-typed",
+    "pair_id": "viz-02",
+    "phrasing": "typed",
+    "question": "vaccines important for children chart lowest country",
+    "answer_type": "extractive",
+    "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%.",
+    "key_facts": [
+      "South Korea",
+      "72%"
+    ],
+    "gold_sources": [
+      "chart_010.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-02-full",
+    "pair_id": "viz-02",
+    "phrasing": "full",
+    "question": "In the chart showing the share of people who agree vaccines are important for children, which country had the lowest share?",
+    "answer_type": "extractive",
+    "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%.",
+    "key_facts": [
+      "South Korea",
+      "72%"
+    ],
+    "gold_sources": [
+      "chart_010.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-03-typed",
+    "pair_id": "viz-03",
+    "phrasing": "typed",
+    "question": "pew social media emotoins chart highest net",
+    "answer_type": "extractive",
+    "golden_answer": "Amused, with a NET of 88. In the Pew Research Center chart on emotions social media users experience, 44% say they frequently see content that makes them feel amused and another 44% say sometimes, for a NET of 88 - the highest of the six emotions listed.",
+    "key_facts": [
+      "Amused",
+      "88",
+      "44"
+    ],
+    "gold_sources": [
+      "chart_005.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-03-full",
+    "pair_id": "viz-03",
+    "phrasing": "full",
+    "question": "In that Pew chart about the emotions social media users experience, which emotion had the highest NET percentage, and what were its numbers?",
+    "answer_type": "extractive",
+    "golden_answer": "Amused, with a NET of 88. In the Pew Research Center chart on emotions social media users experience, 44% say they frequently see content that makes them feel amused and another 44% say sometimes, for a NET of 88 - the highest of the six emotions listed.",
+    "key_facts": [
+      "Amused",
+      "88",
+      "44"
+    ],
+    "gold_sources": [
+      "chart_005.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-04-typed",
+    "pair_id": "viz-04",
+    "phrasing": "typed",
+    "question": "european parliament chart far right share 2014",
+    "answer_type": "extractive",
+    "golden_answer": "The right-wing to far-right share of the European Parliament rose from 7% in 1979 to 20% in 2014. That is from the Pew Research Center chart 'Can the European Parliament's center hold?', which tracks the share of MEPs by political grouping at each parliament's opening session.",
+    "key_facts": [
+      "7%",
+      "20%",
+      "1979",
+      "2014"
+    ],
+    "gold_sources": [
+      "chart_037.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-04-full",
+    "pair_id": "viz-04",
+    "phrasing": "full",
+    "question": "In the chart on whether the European Parliament's center can hold, what share of members belonged to right-wing or far-right groups in 2014 compared with 1979?",
+    "answer_type": "extractive",
+    "golden_answer": "The right-wing to far-right share of the European Parliament rose from 7% in 1979 to 20% in 2014. That is from the Pew Research Center chart 'Can the European Parliament's center hold?', which tracks the share of MEPs by political grouping at each parliament's opening session.",
+    "key_facts": [
+      "7%",
+      "20%",
+      "1979",
+      "2014"
+    ],
+    "gold_sources": [
+      "chart_037.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-05-typed",
+    "pair_id": "viz-05",
+    "phrasing": "typed",
+    "question": "country in both the armed forces share chart and the teaching time chart",
+    "answer_type": "synthesis",
+    "golden_answer": "Madagascar. It appears in the Our World in Data chart 'Armed forces personnel as share of total population, 1985' at 0.21% (the lowest of the three countries there) and in 'Scheduled teaching time that teachers are in the classroom, 2002 to 2016' at 58.09%.",
+    "key_facts": [
+      "Madagascar",
+      "0.21%",
+      "58.09%"
+    ],
+    "gold_sources": [
+      "chart_002.jpg",
+      "chart_036.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-05-full",
+    "pair_id": "viz-05",
+    "phrasing": "full",
+    "question": "Which country appears in both the Our World in Data chart of armed forces personnel as a share of population in 1985 and the chart of scheduled teaching time in the classroom, and what value does it have in each?",
+    "answer_type": "synthesis",
+    "golden_answer": "Madagascar. It appears in the Our World in Data chart 'Armed forces personnel as share of total population, 1985' at 0.21% (the lowest of the three countries there) and in 'Scheduled teaching time that teachers are in the classroom, 2002 to 2016' at 58.09%.",
+    "key_facts": [
+      "Madagascar",
+      "0.21%",
+      "58.09%"
+    ],
+    "gold_sources": [
+      "chart_002.jpg",
+      "chart_036.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "charts",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-06-typed",
+    "pair_id": "viz-06",
+    "phrasing": "typed",
+    "question": "diabetes australia infographic annual cost",
+    "answer_type": "extractive",
+    "golden_answer": "The 'Diabetes in Australia' infographic puts the annual economic cost at $6 billion, and says diabetes affects 1.7 million Australians, or 1 in 10 adults.",
+    "key_facts": [
+      "$6 billion",
+      "1.7 million"
+    ],
+    "gold_sources": [
+      "info_024.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-06-full",
+    "pair_id": "viz-06",
+    "phrasing": "full",
+    "question": "In the Diabetes in Australia infographic, what is the annual economic cost, and how many people are affected?",
+    "answer_type": "extractive",
+    "golden_answer": "The 'Diabetes in Australia' infographic puts the annual economic cost at $6 billion, and says diabetes affects 1.7 million Australians, or 1 in 10 adults.",
+    "key_facts": [
+      "$6 billion",
+      "1.7 million"
+    ],
+    "gold_sources": [
+      "info_024.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-07-typed",
+    "pair_id": "viz-07",
+    "phrasing": "typed",
+    "question": "condom infographic french town population 1806",
+    "answer_type": "extractive",
+    "golden_answer": "The town of Condom, on the Via Podiensis in France, saw its population fall from 7,298 in 1806 to 7,099 in 2009. The same panel of that condoms infographic notes the town's Condom Cathedral was erected in 1506.",
+    "key_facts": [
+      "7,298",
+      "1806",
+      "7,099",
+      "2009"
+    ],
+    "gold_sources": [
+      "info_001.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-07-full",
+    "pair_id": "viz-07",
+    "phrasing": "full",
+    "question": "In that condoms infographic, what happened to the population of the French town called Condom between 1806 and 2009?",
+    "answer_type": "extractive",
+    "golden_answer": "The town of Condom, on the Via Podiensis in France, saw its population fall from 7,298 in 1806 to 7,099 in 2009. The same panel of that condoms infographic notes the town's Condom Cathedral was erected in 1506.",
+    "key_facts": [
+      "7,298",
+      "1806",
+      "7,099",
+      "2009"
+    ],
+    "gold_sources": [
+      "info_001.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-08-typed",
+    "pair_id": "viz-08",
+    "phrasing": "typed",
+    "question": "millenial myths infographic smartphone percentage",
+    "answer_type": "extractive",
+    "golden_answer": "Under 'Myth 5: Millennials are always distracted by technology', the infographic says over 90% of millennials own a smartphone and 65% use it as a way to feel connected to others.",
+    "key_facts": [
+      "90%",
+      "65%"
+    ],
+    "gold_sources": [
+      "info_020.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-08-full",
+    "pair_id": "viz-08",
+    "phrasing": "full",
+    "question": "In the millennials myths infographic, what share of millennials own a smartphone, and what share use it to feel connected to others?",
+    "answer_type": "extractive",
+    "golden_answer": "Under 'Myth 5: Millennials are always distracted by technology', the infographic says over 90% of millennials own a smartphone and 65% use it as a way to feel connected to others.",
+    "key_facts": [
+      "90%",
+      "65%"
+    ],
+    "gold_sources": [
+      "info_020.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-09-typed",
+    "pair_id": "viz-09",
+    "phrasing": "typed",
+    "question": "australia tourism total contribution vs diabetes cost which bigger",
+    "answer_type": "synthesis",
+    "golden_answer": "Tourism is far bigger. The tourism infographic puts tourism's total contribution to Australia's economy at $98 billion for 2014-15, while the diabetes infographic gives an annual economic cost of $6 billion - a gap of about $92 billion, roughly sixteen times larger.",
+    "key_facts": [
+      "$98 billion",
+      "$6 billion"
+    ],
+    "gold_sources": [
+      "info_013.jpg",
+      "info_024.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-09-full",
+    "pair_id": "viz-09",
+    "phrasing": "full",
+    "question": "Between the Australian tourism infographic and the diabetes one, how does tourism's total contribution to the economy compare with the annual economic cost of diabetes?",
+    "answer_type": "synthesis",
+    "golden_answer": "Tourism is far bigger. The tourism infographic puts tourism's total contribution to Australia's economy at $98 billion for 2014-15, while the diabetes infographic gives an annual economic cost of $6 billion - a gap of about $92 billion, roughly sixteen times larger.",
+    "key_facts": [
+      "$98 billion",
+      "$6 billion"
+    ],
+    "gold_sources": [
+      "info_013.jpg",
+      "info_024.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "infographics",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-10-typed",
+    "pair_id": "viz-10",
+    "phrasing": "typed",
+    "question": "leaf diagram cordate obcordate what ob means",
+    "answer_type": "extractive",
+    "golden_answer": "In that leaf shape diagram, 'cordate' means a heart-shaped leaf, and the prefix 'ob' in 'obcordate' refers to a blade that is widest near the apex. The diagram also labels the two parts of the leaf: the blade and the petiole.",
+    "key_facts": [
+      "cordate",
+      "obcordate",
+      "heart-shaped",
+      "apex"
+    ],
+    "gold_sources": [
+      "diagram_018.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "diagrams",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-10-full",
+    "pair_id": "viz-10",
+    "phrasing": "full",
+    "question": "In that leaf shape diagram, what does the term 'cordate' mean, and what does the prefix 'ob' add to it?",
+    "answer_type": "extractive",
+    "golden_answer": "In that leaf shape diagram, 'cordate' means a heart-shaped leaf, and the prefix 'ob' in 'obcordate' refers to a blade that is widest near the apex. The diagram also labels the two parts of the leaf: the blade and the petiole.",
+    "key_facts": [
+      "cordate",
+      "obcordate",
+      "heart-shaped",
+      "apex"
+    ],
+    "gold_sources": [
+      "diagram_018.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "diagrams",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-11-typed",
+    "pair_id": "viz-11",
+    "phrasing": "typed",
+    "question": "antarctic food web diagram which seals were on it",
+    "answer_type": "enumeration",
+    "golden_answer": "Three seal labels appear in that marine food web diagram: leopard seal, elephant seal, and a general 'other seals' group. The rest of the labelled organisms are baleen whale, smaller toothed whales, penguins, birds, fish, krill, carnivorous zooplankton, other herbivorous zooplankton, and phytoplankton.",
+    "key_facts": [
+      "leopard seal",
+      "elephant seal",
+      "other seals"
+    ],
+    "gold_sources": [
+      "diagram_003.jpg"
+    ],
+    "acceptable_sources": [
+      "diagram_004.jpg",
+      "diagram_005.jpg",
+      "diagram_006.jpg",
+      "diagram_007.jpg",
+      "diagram_008.jpg",
+      "diagram_009.jpg",
+      "diagram_010.jpg",
+      "diagram_011.jpg"
+    ],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "diagrams",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "viz-11-full",
+    "pair_id": "viz-11",
+    "phrasing": "full",
+    "question": "In that Antarctic marine food web diagram, which seals are shown?",
+    "answer_type": "enumeration",
+    "golden_answer": "Three seal labels appear in that marine food web diagram: leopard seal, elephant seal, and a general 'other seals' group. The rest of the labelled organisms are baleen whale, smaller toothed whales, penguins, birds, fish, krill, carnivorous zooplankton, other herbivorous zooplankton, and phytoplankton.",
+    "key_facts": [
+      "leopard seal",
+      "elephant seal",
+      "other seals"
+    ],
+    "gold_sources": [
+      "diagram_003.jpg"
+    ],
+    "acceptable_sources": [
+      "diagram_004.jpg",
+      "diagram_005.jpg",
+      "diagram_006.jpg",
+      "diagram_007.jpg",
+      "diagram_008.jpg",
+      "diagram_009.jpg",
+      "diagram_010.jpg",
+      "diagram_011.jpg"
+    ],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "diagrams",
+    "human_verified": false,
+    "generator": "claude agent (vision read of charts/infographics/diagrams), 2026-08-30"
+  },
+  {
+    "id": "arch-01-typed",
+    "pair_id": "arch-01",
+    "phrasing": "typed",
+    "question": "cuyahoga health spending scan how much local health dept 1960",
+    "answer_type": "extractive",
+    "golden_answer": "That scan is Figure V-8, expenditures for health care services in Cuyahoga County by source of funds, 1955-1960. Local health department programs (including nursing and school health services) totaled $2,496,000 in 1960, up from $1,906,000 in 1955.",
+    "key_facts": [
+      "$2,496,000"
+    ],
+    "gold_sources": [
+      "doc_10877.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "documents",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-01-full",
+    "pair_id": "arch-01",
+    "phrasing": "full",
+    "question": "In the Cuyahoga County health care expenditure chart I saved, how much was spent on local health department programs in 1960?",
+    "answer_type": "extractive",
+    "golden_answer": "That scan is Figure V-8, expenditures for health care services in Cuyahoga County by source of funds, 1955-1960. Local health department programs (including nursing and school health services) totaled $2,496,000 in 1960, up from $1,906,000 in 1955.",
+    "key_facts": [
+      "$2,496,000"
+    ],
+    "gold_sources": [
+      "doc_10877.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "documents",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-02-typed",
+    "pair_id": "arch-02",
+    "phrasing": "typed",
+    "question": "french eps table benefice net courant par action 2017",
+    "answer_type": "extractive",
+    "golden_answer": "The French earnings-per-share table gives a bénéfice net courant par action of 4,58 euros for 2017 (4,54 in 2016). The diluted figure is 4,50 euros for 2017.",
+    "key_facts": [
+      "4,58"
+    ],
+    "gold_sources": [
+      "table_fr_001.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "tables_fr",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-02-full",
+    "pair_id": "arch-02",
+    "phrasing": "full",
+    "question": "In the French annual-report table with the 2017 and 2016 columns, what was the bénéfice net courant par action for 2017?",
+    "answer_type": "extractive",
+    "golden_answer": "The French earnings-per-share table gives a bénéfice net courant par action of 4,58 euros for 2017 (4,54 in 2016). The diluted figure is 4,50 euros for 2017.",
+    "key_facts": [
+      "4,58"
+    ],
+    "gold_sources": [
+      "table_fr_001.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "tables_fr",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-03-typed",
+    "pair_id": "arch-03",
+    "phrasing": "typed",
+    "question": "1953 clinical research society letter, attendance at the 25th annual meeting",
+    "answer_type": "extractive",
+    "golden_answer": "The annual letter of the Central Society for Clinical Research, dated January 5, 1953, says the total attendance at the 25th annual meeting was 849.",
+    "key_facts": [
+      "849"
+    ],
+    "gold_sources": [
+      "scan_fybg0227.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-03-full",
+    "pair_id": "arch-03",
+    "phrasing": "full",
+    "question": "In the 1953 annual letter from the Central Society for Clinical Research, what was the total attendance at the 25th annual meeting?",
+    "answer_type": "extractive",
+    "golden_answer": "The annual letter of the Central Society for Clinical Research, dated January 5, 1953, says the total attendance at the 25th annual meeting was 849.",
+    "key_facts": [
+      "849"
+    ],
+    "gold_sources": [
+      "scan_fybg0227.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-04-typed",
+    "pair_id": "arch-04",
+    "phrasing": "typed",
+    "question": "magazine mailing invoice scan, balance still owed after the advance payment",
+    "answer_type": "extractive",
+    "golden_answer": "On the Laman for Letters, Inc. invoice A-3088 dated 8-19-70 for mailing the Great Western '70 Magazine, charges came to 325.25; after the 270.00 advance payment received August 17, the balance due was $55.25.",
+    "key_facts": [
+      "$55.25",
+      "A-3088"
+    ],
+    "gold_sources": [
+      "scan_mtnh0227.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-04-full",
+    "pair_id": "arch-04",
+    "phrasing": "full",
+    "question": "On the invoice for mailing and labeling the Great Western '70 Magazine, what was the balance due after the advance payment was applied?",
+    "answer_type": "extractive",
+    "golden_answer": "On the Laman for Letters, Inc. invoice A-3088 dated 8-19-70 for mailing the Great Western '70 Magazine, charges came to 325.25; after the 270.00 advance payment received August 17, the balance due was $55.25.",
+    "key_facts": [
+      "$55.25",
+      "A-3088"
+    ],
+    "gold_sources": [
+      "scan_mtnh0227.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-05-typed",
+    "pair_id": "arch-05",
+    "phrasing": "typed",
+    "question": "coke sodium leaflet tomato juice vs diet coke mg per serving",
+    "answer_type": "extractive",
+    "golden_answer": "The Coca-Cola USA leaflet 'You Asked About Sodium in Soft Drinks' says a six-fluid ounce serving of tomato juice processed with added salt has 660 milligrams of sodium, while the same size serving of diet Coke has 35 milligrams or less.",
+    "key_facts": [
+      "660 milligrams",
+      "35 milligrams"
+    ],
+    "gold_sources": [
+      "doc_357.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "documents",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-05-full",
+    "pair_id": "arch-05",
+    "phrasing": "full",
+    "question": "In the Coca-Cola leaflet about sodium in soft drinks, how much sodium is in a six-fluid-ounce serving of salted tomato juice compared with the same serving of diet Coke?",
+    "answer_type": "extractive",
+    "golden_answer": "The Coca-Cola USA leaflet 'You Asked About Sodium in Soft Drinks' says a six-fluid ounce serving of tomato juice processed with added salt has 660 milligrams of sodium, while the same size serving of diet Coke has 35 milligrams or less.",
+    "key_facts": [
+      "660 milligrams",
+      "35 milligrams"
+    ],
+    "gold_sources": [
+      "doc_357.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "documents",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-06-typed",
+    "pair_id": "arch-06",
+    "phrasing": "typed",
+    "question": "fort morgan sugar factory water report - city water dissolved solids and ph",
+    "answer_type": "extractive",
+    "golden_answer": "In the Campaign 1959-60 water analysis report for the Fort Morgan factory of The Great Western Sugar Company, the city water sample dated April 5, 1960 had total dissolved solids at 105 degrees C of 1506.0 parts per million and a pH of 7.8.",
+    "key_facts": [
+      "1506.0",
+      "7.8"
+    ],
+    "gold_sources": [
+      "scan_gzyh0227.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-06-full",
+    "pair_id": "arch-06",
+    "phrasing": "full",
+    "question": "In the Fort Morgan factory campaign water analysis report, what were the total dissolved solids at 105 degrees C and the pH of the city water sample?",
+    "answer_type": "extractive",
+    "golden_answer": "In the Campaign 1959-60 water analysis report for the Fort Morgan factory of The Great Western Sugar Company, the city water sample dated April 5, 1960 had total dissolved solids at 105 degrees C of 1506.0 parts per million and a pH of 7.8.",
+    "key_facts": [
+      "1506.0",
+      "7.8"
+    ],
+    "gold_sources": [
+      "scan_gzyh0227.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-07-typed",
+    "pair_id": "arch-07",
+    "phrasing": "typed",
+    "question": "klm cargo tables - 9 month vs 12 month revenue and america share",
+    "answer_type": "synthesis",
+    "golden_answer": "Total KLM Cargo business revenue was 1,271 million euros in the 9-month financial year 2011, against 1,695 million euros for the 12-month 2010/2011 year. America's share of scheduled KLM Cargo revenue rose from 41.2% in the 12-month year to 42.9% in the 9-month period, while Asia fell from 34.5% to 32.7%.",
+    "key_facts": [
+      "1,271",
+      "1,695",
+      "42.9%",
+      "41.2%"
+    ],
+    "gold_sources": [
+      "table_fr_011.jpg",
+      "table_fr_009.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "medium",
+    "category": "tables_fr",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-07-full",
+    "pair_id": "arch-07",
+    "phrasing": "full",
+    "question": "Across the two KLM Cargo tables I saved, what was total cargo business revenue in the 9-month financial year 2011 versus the 12-month 2010/2011 year, and how did America's share of revenue change?",
+    "answer_type": "synthesis",
+    "golden_answer": "Total KLM Cargo business revenue was 1,271 million euros in the 9-month financial year 2011, against 1,695 million euros for the 12-month 2010/2011 year. America's share of scheduled KLM Cargo revenue rose from 41.2% in the 12-month year to 42.9% in the 9-month period, while Asia fell from 34.5% to 32.7%.",
+    "key_facts": [
+      "1,271",
+      "1,695",
+      "42.9%",
+      "41.2%"
+    ],
+    "gold_sources": [
+      "table_fr_011.jpg",
+      "table_fr_009.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "medium",
+    "category": "tables_fr",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-08-typed",
+    "pair_id": "arch-08",
+    "phrasing": "typed",
+    "question": "takeda pioglitazone letter bladder cancer hazard ratio and CI",
+    "answer_type": "extractive",
+    "golden_answer": "The Takeda safety letter reports a hazard ratio of 2.64 (95% CI 1.11-6.31, P=0.029) for bladder cancer in the meta-analysis of controlled pioglitazone trials: 19 cases among 12506 pioglitazone patients (0.15%) versus 7 cases among 10212 control patients (0.07%).",
+    "key_facts": [
+      "2.64",
+      "1.11-6.31",
+      "0.029"
+    ],
+    "gold_sources": [
+      "scan_psjf0226.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-08-full",
+    "pair_id": "arch-08",
+    "phrasing": "full",
+    "question": "In the Takeda letter about the pioglitazone safety concern, what hazard ratio and confidence interval were reported for bladder cancer in the meta-analysis of controlled clinical trials?",
+    "answer_type": "extractive",
+    "golden_answer": "The Takeda safety letter reports a hazard ratio of 2.64 (95% CI 1.11-6.31, P=0.029) for bladder cancer in the meta-analysis of controlled pioglitazone trials: 19 cases among 12506 pioglitazone patients (0.15%) versus 7 cases among 10212 control patients (0.07%).",
+    "key_facts": [
+      "2.64",
+      "1.11-6.31",
+      "0.029"
+    ],
+    "gold_sources": [
+      "scan_psjf0226.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "scans_multipage",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-09-typed",
+    "pair_id": "arch-09",
+    "phrasing": "typed",
+    "question": "darby travel scans - plane ticket total vs the expense report total, which was bigger",
+    "answer_type": "synthesis",
+    "golden_answer": "The American Airlines ticket issued 24 MAR 80 for William Darby (LaGuardia-Detroit-Saginaw-Cleveland-LaGuardia) totaled 216.00, made up of a 200.00 fare plus 16.00 tax. The Helen Keller International travel expense report he filed for the 11/16-11/18/82 New York trip totaled 318.40. The 1982 expense report is the larger of the two.",
+    "key_facts": [
+      "216.00",
+      "318.40"
+    ],
+    "gold_sources": [
+      "doc_14753.jpg",
+      "doc_14760.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "documents",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-09-full",
+    "pair_id": "arch-09",
+    "phrasing": "full",
+    "question": "Comparing the American Airlines ticket and the Helen Keller International travel expense report for William Darby, what was the total on each, and which was larger?",
+    "answer_type": "synthesis",
+    "golden_answer": "The American Airlines ticket issued 24 MAR 80 for William Darby (LaGuardia-Detroit-Saginaw-Cleveland-LaGuardia) totaled 216.00, made up of a 200.00 fare plus 16.00 tax. The Helen Keller International travel expense report he filed for the 11/16-11/18/82 New York trip totaled 318.40. The 1982 expense report is the larger of the two.",
+    "key_facts": [
+      "216.00",
+      "318.40"
+    ],
+    "gold_sources": [
+      "doc_14753.jpg",
+      "doc_14760.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "documents",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-10-typed",
+    "pair_id": "arch-10",
+    "phrasing": "typed",
+    "question": "french airline table carburant avions and resultat d'exploitation 2010-11",
+    "answer_type": "enumeration",
+    "golden_answer": "In the 2010-11 column of that French airline income statement: chiffre d'affaires 6 649 million euros, carburant avions -1 503 million euros, and résultat d'exploitation 576 million euros (against -47 million in 2009-10).",
+    "key_facts": [
+      "6 649",
+      "-1 503",
+      "576"
+    ],
+    "gold_sources": [
+      "table_fr_005.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "tables_fr",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "arch-10-full",
+    "pair_id": "arch-10",
+    "phrasing": "full",
+    "question": "In the French-language airline income statement comparing 2010-11 with 2009-10, what were revenue, aircraft fuel cost, and operating result for the 2010-11 period?",
+    "answer_type": "enumeration",
+    "golden_answer": "In the 2010-11 column of that French airline income statement: chiffre d'affaires 6 649 million euros, carburant avions -1 503 million euros, and résultat d'exploitation 576 million euros (against -47 million in 2009-10).",
+    "key_facts": [
+      "6 649",
+      "-1 503",
+      "576"
+    ],
+    "gold_sources": [
+      "table_fr_005.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "tables_fr",
+    "human_verified": false,
+    "generator": "claude agent (vision read of archive scans / multipage PDFs / French tables), 2026-08-30"
+  },
+  {
+    "id": "study-01-typed",
+    "pair_id": "study-01",
+    "phrasing": "typed",
+    "question": "cpp notes who invented c++ what year",
+    "answer_type": "extractive",
+    "golden_answer": "The first page of the C++ notes says C++ was developed by Bjarne Stroustrup in 1979 at Bell Labs, and that its earlier name was \"C with Classes\".",
+    "key_facts": [
+      "Bjarne Stroustrup",
+      "1979",
+      "Bell Labs",
+      "earlier name was C with Classes"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-1.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-01-full",
+    "pair_id": "study-01",
+    "phrasing": "full",
+    "question": "In my handwritten C++ notes, who did I write down as the creator of C++, and in what year and at what company was it developed?",
+    "answer_type": "extractive",
+    "golden_answer": "The first page of the C++ notes says C++ was developed by Bjarne Stroustrup in 1979 at Bell Labs, and that its earlier name was \"C with Classes\".",
+    "key_facts": [
+      "Bjarne Stroustrup",
+      "1979",
+      "Bell Labs",
+      "earlier name was C with Classes"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-1.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-02-typed",
+    "pair_id": "study-02",
+    "phrasing": "typed",
+    "question": "my cpp notes that oops concepts mind map, what was on it",
+    "answer_type": "enumeration",
+    "golden_answer": "The OOPs concepts diagram in the C++ notes has eight branches around a \"Concepts of OOPs\" bubble: Object, Class, Inheritance, Message Passing, Polymorphism, Abstraction, Encapsulation and Dynamic Binding.",
+    "key_facts": [
+      "Object",
+      "Class",
+      "Inheritance",
+      "Message Passing",
+      "Polymorphism",
+      "Abstraction",
+      "Encapsulation",
+      "Dynamic Binding"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-3.pdf"
+    ],
+    "acceptable_sources": [
+      "CseGyan-Cpp-Notes-4.pdf",
+      "CseGyan-Cpp-Notes-5.pdf",
+      "CseGyan-Cpp-Notes-6.pdf"
+    ],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-02-full",
+    "pair_id": "study-02",
+    "phrasing": "full",
+    "question": "Which OOP concepts did I list on the mind map I drew in my C++ notes?",
+    "answer_type": "enumeration",
+    "golden_answer": "The OOPs concepts diagram in the C++ notes has eight branches around a \"Concepts of OOPs\" bubble: Object, Class, Inheritance, Message Passing, Polymorphism, Abstraction, Encapsulation and Dynamic Binding.",
+    "key_facts": [
+      "Object",
+      "Class",
+      "Inheritance",
+      "Message Passing",
+      "Polymorphism",
+      "Abstraction",
+      "Encapsulation",
+      "Dynamic Binding"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-3.pdf"
+    ],
+    "acceptable_sources": [
+      "CseGyan-Cpp-Notes-4.pdf",
+      "CseGyan-Cpp-Notes-5.pdf",
+      "CseGyan-Cpp-Notes-6.pdf"
+    ],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-03-typed",
+    "pair_id": "study-03",
+    "phrasing": "typed",
+    "question": "solar deck 50kw system cost per kw and mwh per year",
+    "answer_type": "extractive",
+    "golden_answer": "The clean-energy deck's solar economics slide lists a 50 kW solar power system at $150,000 turn key ($3,000 per kW), producing 67.5 MWh per year, with $500 annual operating cost.",
+    "key_facts": [
+      "50 kW solar power system",
+      "$150,000 turn key",
+      "$3,000 per kW",
+      "67.5 MWh per year",
+      "$500 annual operating cost"
+    ],
+    "gold_sources": [
+      "deck_022.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "slides",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-03-full",
+    "pair_id": "study-03",
+    "phrasing": "full",
+    "question": "In the solar slide deck I saved, what were the stated cost and annual energy output of the 50 kW solar power system?",
+    "answer_type": "extractive",
+    "golden_answer": "The clean-energy deck's solar economics slide lists a 50 kW solar power system at $150,000 turn key ($3,000 per kW), producing 67.5 MWh per year, with $500 annual operating cost.",
+    "key_facts": [
+      "50 kW solar power system",
+      "$150,000 turn key",
+      "$3,000 per kW",
+      "67.5 MWh per year",
+      "$500 annual operating cost"
+    ],
+    "gold_sources": [
+      "deck_022.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "slides",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-04-typed",
+    "pair_id": "study-04",
+    "phrasing": "typed",
+    "question": "cpp notes conditional operator ternary syntax question mark colon",
+    "answer_type": "extractive",
+    "golden_answer": "The notes say the conditional operator is also known as the ternary operator, symbol ( ? : ), and behaves like a shorter if-else. The syntax written down is: variable = Expression ? true statement : false statement; with the example int a = (b > c) ? b : c;",
+    "key_facts": [
+      "also known as Ternary operator",
+      "symbol ( ? : )",
+      "variable = Expression ? true statement : false statement;",
+      "int a = (b > c) ? b : c;",
+      "similar to if-else but shorter"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-15.pdf"
+    ],
+    "acceptable_sources": [
+      "CseGyan-Cpp-Notes-11.pdf",
+      "CseGyan-Cpp-Notes-13.pdf"
+    ],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-04-full",
+    "pair_id": "study-04",
+    "phrasing": "full",
+    "question": "What syntax and example did I write in my C++ notes for the conditional (ternary) operator?",
+    "answer_type": "extractive",
+    "golden_answer": "The notes say the conditional operator is also known as the ternary operator, symbol ( ? : ), and behaves like a shorter if-else. The syntax written down is: variable = Expression ? true statement : false statement; with the example int a = (b > c) ? b : c;",
+    "key_facts": [
+      "also known as Ternary operator",
+      "symbol ( ? : )",
+      "variable = Expression ? true statement : false statement;",
+      "int a = (b > c) ? b : c;",
+      "similar to if-else but shorter"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-15.pdf"
+    ],
+    "acceptable_sources": [
+      "CseGyan-Cpp-Notes-11.pdf",
+      "CseGyan-Cpp-Notes-13.pdf"
+    ],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-05-typed",
+    "pair_id": "study-05",
+    "phrasing": "typed",
+    "question": "electrostatics notes torque on dipole stable unstable angle",
+    "answer_type": "extractive",
+    "golden_answer": "The electrostatics page derives torque on a dipole as tau = qE x 2a sin(theta) = PE sin(theta), i.e. the vector form tau = P x E. It notes that at theta = 0 degrees the torque is zero and the dipole is stable, at theta = 180 degrees it is unstable, and at theta = 90 degrees the torque is maximum, tau_max = PE.",
+    "key_facts": [
+      "tau = PE sin(theta)",
+      "vector form tau = P x E",
+      "theta = 0 gives tau = 0 and is stable",
+      "theta = 180 degrees is unstable",
+      "theta = 90 degrees gives tau_max = PE"
+    ],
+    "gold_sources": [
+      "electric-charge-and-field-9.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-05-full",
+    "pair_id": "study-05",
+    "phrasing": "full",
+    "question": "In my electrostatics notes, what did I write for the torque on a dipole, and which angles did I mark as the stable, unstable and maximum-torque orientations?",
+    "answer_type": "extractive",
+    "golden_answer": "The electrostatics page derives torque on a dipole as tau = qE x 2a sin(theta) = PE sin(theta), i.e. the vector form tau = P x E. It notes that at theta = 0 degrees the torque is zero and the dipole is stable, at theta = 180 degrees it is unstable, and at theta = 90 degrees the torque is maximum, tau_max = PE.",
+    "key_facts": [
+      "tau = PE sin(theta)",
+      "vector form tau = P x E",
+      "theta = 0 gives tau = 0 and is stable",
+      "theta = 180 degrees is unstable",
+      "theta = 90 degrees gives tau_max = PE"
+    ],
+    "gold_sources": [
+      "electric-charge-and-field-9.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-06-typed",
+    "pair_id": "study-06",
+    "phrasing": "typed",
+    "question": "that figure i saved with the train validation test bars 1+ 1- 2+ 2-",
+    "answer_type": "extractive",
+    "golden_answer": "It is the cross-validation split figure: ten columns labelled 1+, 1-, 2+, 2-, 3+, 3-, 4+, 4-, 5+, 5-, with brackets underneath grouping folds 1 through 3 as train, fold 4 as validation and fold 5 as test. Each column is a stack of grey bars with one blue and one green bar highlighted, stepping down a row for each successive fold pair.",
+    "key_facts": [
+      "ten columns labelled 1+ through 5- (plus and minus per fold)",
+      "folds 1, 2 and 3 are bracketed as train",
+      "fold 4 is validation",
+      "fold 5 is test",
+      "one blue and one green highlighted bar per column, stepping down per fold"
+    ],
+    "gold_sources": [
+      "arxiv_017.png"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "figures",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-06-full",
+    "pair_id": "study-06",
+    "phrasing": "full",
+    "question": "One of the arXiv figures I saved shows columns labelled 1+, 1-, 2+, 2- and so on with brackets underneath. How does that figure divide the folds into train, validation and test?",
+    "answer_type": "extractive",
+    "golden_answer": "It is the cross-validation split figure: ten columns labelled 1+, 1-, 2+, 2-, 3+, 3-, 4+, 4-, 5+, 5-, with brackets underneath grouping folds 1 through 3 as train, fold 4 as validation and fold 5 as test. Each column is a stack of grey bars with one blue and one green bar highlighted, stepping down a row for each successive fold pair.",
+    "key_facts": [
+      "ten columns labelled 1+ through 5- (plus and minus per fold)",
+      "folds 1, 2 and 3 are bracketed as train",
+      "fold 4 is validation",
+      "fold 5 is test",
+      "one blue and one green highlighted bar per column, stepping down per fold"
+    ],
+    "gold_sources": [
+      "arxiv_017.png"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "figures",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-07-typed",
+    "pair_id": "study-07",
+    "phrasing": "typed",
+    "question": "nmi vs pin/pout plot attribute sbm vs regular sbm which one wins",
+    "answer_type": "synthesis",
+    "golden_answer": "That figure plots NMI on the y axis against Pin/Pout on the x axis for two methods, Attribute SBM (pink) and Regular SBM (teal). Attribute SBM recovers structure earlier: it is already above zero NMI below Pin/Pout of about 2 where Regular SBM is still flat at 0, and around Pin/Pout = 3 it reaches roughly 0.79 versus about 0.65 for Regular SBM. By Pin/Pout of about 5 both saturate near NMI = 1.",
+    "key_facts": [
+      "y axis is NMI, x axis is Pin/Pout",
+      "two series: Attribute SBM (pink) and Regular SBM (teal)",
+      "Attribute SBM is above zero while Regular SBM is still at 0 below Pin/Pout of about 2",
+      "at Pin/Pout around 3 Attribute SBM is higher (about 0.79 vs about 0.65)",
+      "both saturate near NMI = 1 by Pin/Pout of about 5"
+    ],
+    "gold_sources": [
+      "arxiv_004.png"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "figures",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-07-full",
+    "pair_id": "study-07",
+    "phrasing": "full",
+    "question": "In the figure that plots NMI against Pin/Pout, how does the Attribute SBM compare with the Regular SBM?",
+    "answer_type": "synthesis",
+    "golden_answer": "That figure plots NMI on the y axis against Pin/Pout on the x axis for two methods, Attribute SBM (pink) and Regular SBM (teal). Attribute SBM recovers structure earlier: it is already above zero NMI below Pin/Pout of about 2 where Regular SBM is still flat at 0, and around Pin/Pout = 3 it reaches roughly 0.79 versus about 0.65 for Regular SBM. By Pin/Pout of about 5 both saturate near NMI = 1.",
+    "key_facts": [
+      "y axis is NMI, x axis is Pin/Pout",
+      "two series: Attribute SBM (pink) and Regular SBM (teal)",
+      "Attribute SBM is above zero while Regular SBM is still at 0 below Pin/Pout of about 2",
+      "at Pin/Pout around 3 Attribute SBM is higher (about 0.79 vs about 0.65)",
+      "both saturate near NMI = 1 by Pin/Pout of about 5"
+    ],
+    "gold_sources": [
+      "arxiv_004.png"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "figures",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-08-typed",
+    "pair_id": "study-08",
+    "phrasing": "typed",
+    "question": "biosensor deck food industry pie chart what % was biosensors",
+    "answer_type": "extractive",
+    "golden_answer": "On the \"Usage of Biosensors in Food Industry\" pie chart, biosensors are only 8% of the methods used. LC/MS dominates at 38%, with ELISA and LC/UV at 18% each, other screening methods 12% and electrophoresis 6%. The listed uses are pH, DNA testing, alcohol testing, sugar content testing and contamination in packed food.",
+    "key_facts": [
+      "Biosensors 8%",
+      "LC/MS 38%",
+      "ELISA 18%",
+      "LC/UV 18%",
+      "other screening methods 12%",
+      "electrophoresis 6%"
+    ],
+    "gold_sources": [
+      "deck_027.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "slides",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-08-full",
+    "pair_id": "study-08",
+    "phrasing": "full",
+    "question": "In the biosensors slide deck, what share of food-industry testing did the pie chart give to biosensors, and which method had the largest share?",
+    "answer_type": "extractive",
+    "golden_answer": "On the \"Usage of Biosensors in Food Industry\" pie chart, biosensors are only 8% of the methods used. LC/MS dominates at 38%, with ELISA and LC/UV at 18% each, other screening methods 12% and electrophoresis 6%. The listed uses are pH, DNA testing, alcohol testing, sugar content testing and contamination in packed food.",
+    "key_facts": [
+      "Biosensors 8%",
+      "LC/MS 38%",
+      "ELISA 18%",
+      "LC/UV 18%",
+      "other screening methods 12%",
+      "electrophoresis 6%"
+    ],
+    "gold_sources": [
+      "deck_027.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "slides",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-09-typed",
+    "pair_id": "study-09",
+    "phrasing": "typed",
+    "question": "that attention figure with phi(q) phi(k) and the prefix sum outer product",
+    "answer_type": "synthesis",
+    "golden_answer": "That figure contrasts standard attention with the linearised, kernel-feature form. On the left the causal attention matrix A (a lower-triangular purple block, with a batch dimension) is multiplied by V. On the right the same computation is rewritten as Q' x (K')^T x V, where the rows are feature maps phi(q) and phi(k) produced by a ReLU block phi(u) = ReLU(W u + b). The inset shows that each element of the prefix-sum is the outer product of phi(k) with v, giving an m x d matrix, and red arrows mark the running prefix-sum accumulated down the length dimension L.",
+    "key_facts": [
+      "attention matrix A is lower-triangular (causal) and multiplied by V",
+      "rewritten as Q' times (K')^T times V",
+      "feature maps phi(q) and phi(k)",
+      "phi(u) computed as ReLU of W u + b",
+      "each element of the prefix-sum is the outer product of phi(k) and v, of size m x d",
+      "sequence length dimension labelled L"
+    ],
+    "gold_sources": [
+      "arxiv_029.png"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "figures",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-09-full",
+    "pair_id": "study-09",
+    "phrasing": "full",
+    "question": "There is a figure among my saved arXiv images showing phi(q) and phi(k) feature maps and an outer-product prefix sum. What mechanism is it illustrating, and how is phi computed?",
+    "answer_type": "synthesis",
+    "golden_answer": "That figure contrasts standard attention with the linearised, kernel-feature form. On the left the causal attention matrix A (a lower-triangular purple block, with a batch dimension) is multiplied by V. On the right the same computation is rewritten as Q' x (K')^T x V, where the rows are feature maps phi(q) and phi(k) produced by a ReLU block phi(u) = ReLU(W u + b). The inset shows that each element of the prefix-sum is the outer product of phi(k) with v, giving an m x d matrix, and red arrows mark the running prefix-sum accumulated down the length dimension L.",
+    "key_facts": [
+      "attention matrix A is lower-triangular (causal) and multiplied by V",
+      "rewritten as Q' times (K')^T times V",
+      "feature maps phi(q) and phi(k)",
+      "phi(u) computed as ReLU of W u + b",
+      "each element of the prefix-sum is the outer product of phi(k) and v, of size m x d",
+      "sequence length dimension labelled L"
+    ],
+    "gold_sources": [
+      "arxiv_029.png"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "figures",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-10-typed",
+    "pair_id": "study-10",
+    "phrasing": "typed",
+    "question": "cpp notes implicit vs explicit type casting the arrow chain and the code exampls",
+    "answer_type": "synthesis",
+    "golden_answer": "The type-casting pages say a type cast is a conversion from one primitive data type to another, and there are two kinds. Implicit (automatic) casting is done by the compiler and follows the widening chain char -> short int -> int -> unsigned int -> long int -> float -> double -> long double, with the example short x = 20; int y = x;. Explicit (manual) casting is written by the user with the syntax (data type) Expression; and runs the chain the other way, long double -> double -> float -> long int -> unsigned int -> int -> short int -> char, with the example double x = 1.2; int y = (int) x;",
+    "key_facts": [
+      "two types: implicit / automatic and explicit / manual",
+      "implicit widening chain char -> short int -> int -> unsigned int -> long int -> float -> double -> long double",
+      "implicit example short x = 20; int y = x;",
+      "explicit syntax (data type) Expression;",
+      "explicit chain long double -> double -> float -> long int -> unsigned int -> int -> short int -> char",
+      "explicit example double x = 1.2; int y = (int) x;"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-17.pdf",
+      "CseGyan-Cpp-Notes-18.pdf",
+      "CseGyan-Cpp-Notes-19.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-10-full",
+    "pair_id": "study-10",
+    "phrasing": "full",
+    "question": "Across the type-casting pages of my C++ notes, what is the difference between implicit and explicit type casting, including the conversion chains and the code examples I wrote for each?",
+    "answer_type": "synthesis",
+    "golden_answer": "The type-casting pages say a type cast is a conversion from one primitive data type to another, and there are two kinds. Implicit (automatic) casting is done by the compiler and follows the widening chain char -> short int -> int -> unsigned int -> long int -> float -> double -> long double, with the example short x = 20; int y = x;. Explicit (manual) casting is written by the user with the syntax (data type) Expression; and runs the chain the other way, long double -> double -> float -> long int -> unsigned int -> int -> short int -> char, with the example double x = 1.2; int y = (int) x;",
+    "key_facts": [
+      "two types: implicit / automatic and explicit / manual",
+      "implicit widening chain char -> short int -> int -> unsigned int -> long int -> float -> double -> long double",
+      "implicit example short x = 20; int y = x;",
+      "explicit syntax (data type) Expression;",
+      "explicit chain long double -> double -> float -> long int -> unsigned int -> int -> short int -> char",
+      "explicit example double x = 1.2; int y = (int) x;"
+    ],
+    "gold_sources": [
+      "CseGyan-Cpp-Notes-17.pdf",
+      "CseGyan-Cpp-Notes-18.pdf",
+      "CseGyan-Cpp-Notes-19.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "notes_handwritten",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-11-typed",
+    "pair_id": "study-11",
+    "phrasing": "typed",
+    "question": "those two mobile decks avg number of apps people have on their phone",
+    "answer_type": "synthesis",
+    "golden_answer": "Two different mobile decks give app counts. The Romanian .RO smartphone deck (IAA Mobile Awareness session, 25 April 2015) says smartphone users have 17 installed apps on average. The other mobile-apps deck (dated 19-Dec-14) puts the 2013 average number of apps in a device at 18 for smartphones and 15.5 for tablets, and separately reports average downloaded apps per phone as 88 on iPhone, 68 on Android, 57 on Windows and 49 on BlackBerry.",
+    "key_facts": [
+      "Romanian .RO deck: 17 installed apps on average",
+      "IAA Mobile Awareness session, 25th of April 2015",
+      "other deck: 2013 average apps in device, smartphones 18 and tablets 15.5",
+      "average downloaded apps per phone: iPhone 88, Android 68, Windows 57, BlackBerry 49"
+    ],
+    "gold_sources": [
+      "deck_002.pdf",
+      "deck_018.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "slides",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "study-11-full",
+    "pair_id": "study-11",
+    "phrasing": "full",
+    "question": "I have two decks about mobile phone usage. What numbers do they each give for the average number of apps a person has on their device?",
+    "answer_type": "synthesis",
+    "golden_answer": "Two different mobile decks give app counts. The Romanian .RO smartphone deck (IAA Mobile Awareness session, 25 April 2015) says smartphone users have 17 installed apps on average. The other mobile-apps deck (dated 19-Dec-14) puts the 2013 average number of apps in a device at 18 for smartphones and 15.5 for tablets, and separately reports average downloaded apps per phone as 88 on iPhone, 68 on Android, 57 on Windows and 49 on BlackBerry.",
+    "key_facts": [
+      "Romanian .RO deck: 17 installed apps on average",
+      "IAA Mobile Awareness session, 25th of April 2015",
+      "other deck: 2013 average apps in device, smartphones 18 and tablets 15.5",
+      "average downloaded apps per phone: iPhone 88, Android 68, Windows 57, BlackBerry 49"
+    ],
+    "gold_sources": [
+      "deck_002.pdf",
+      "deck_018.pdf"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "slides",
+    "human_verified": false,
+    "generator": "claude agent (vision read of handwritten notes / slide decks / arXiv figures), 2026-08-30"
+  },
+  {
+    "id": "rcpt-01-typed",
+    "pair_id": "rcpt-01",
+    "phrasing": "typed",
+    "question": "bornga bulgogi rice total",
+    "answer_type": "extractive",
+    "golden_answer": "The Bornga receipt came to 45,500 in total — 1 Bulgogi Rice R at 33,636 plus 1 Mineral 600 ML at 7,727, a subtotal of 41,364 with 4,136 tax. Paid 50,000 cash.",
+    "key_facts": [
+      "45,500",
+      "33,636",
+      "7,727",
+      "41,364"
+    ],
+    "gold_sources": [
+      "receipt_014.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "receipts_phone",
+    "merchant_as_printed": "BORNGA",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-01-full",
+    "pair_id": "rcpt-01",
+    "phrasing": "full",
+    "question": "How much did the bulgogi rice meal at Bornga come to in total?",
+    "answer_type": "extractive",
+    "golden_answer": "The Bornga receipt came to 45,500 in total — 1 Bulgogi Rice R at 33,636 plus 1 Mineral 600 ML at 7,727, a subtotal of 41,364 with 4,136 tax. Paid 50,000 cash.",
+    "key_facts": [
+      "45,500",
+      "33,636",
+      "7,727",
+      "41,364"
+    ],
+    "gold_sources": [
+      "receipt_014.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "receipts_phone",
+    "merchant_as_printed": "BORNGA",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-02-typed",
+    "pair_id": "rcpt-02",
+    "phrasing": "typed",
+    "question": "mcdonalds breakfast mcmuffin porridge what did i get",
+    "answer_type": "enumeration",
+    "golden_answer": "That McDonald's takeout (McDonald's BHP Taman Melawati, 18/01/2018) was 2 ChicMcMuffin at 11.00, 1 M Porridge at 5.60, 1 BM 2HotCakes at 10.00 and 1 L Coke. TakeOut Total incl GST was 26.60.",
+    "key_facts": [
+      "ChicMcMuffin",
+      "11.00",
+      "5.60",
+      "10.00",
+      "26.60"
+    ],
+    "gold_sources": [
+      "bad_receipt_009.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "McDonald's BHP Taman Melawati(#328)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-02-full",
+    "pair_id": "rcpt-02",
+    "phrasing": "full",
+    "question": "What did I order on that McDonald's breakfast receipt with the two ChicMcMuffins, and what was the total?",
+    "answer_type": "enumeration",
+    "golden_answer": "That McDonald's takeout (McDonald's BHP Taman Melawati, 18/01/2018) was 2 ChicMcMuffin at 11.00, 1 M Porridge at 5.60, 1 BM 2HotCakes at 10.00 and 1 L Coke. TakeOut Total incl GST was 26.60.",
+    "key_facts": [
+      "ChicMcMuffin",
+      "11.00",
+      "5.60",
+      "10.00",
+      "26.60"
+    ],
+    "gold_sources": [
+      "bad_receipt_009.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "McDonald's BHP Taman Melawati(#328)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-03-typed",
+    "pair_id": "rcpt-03",
+    "phrasing": "typed",
+    "question": "red velvet nutella cake how much did i pay",
+    "answer_type": "extractive",
+    "golden_answer": "The RedVelvet Nutella cake was 280,000, plus 28,000 PB1, so 308,000 in total, paid on a BCA Card. It came with 5 free mini candles and a large box.",
+    "key_facts": [
+      "280,000",
+      "28,000",
+      "308,000",
+      "BCA Card"
+    ],
+    "gold_sources": [
+      "receipt_022.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(shop name blurred out in the photo — not legible)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-03-full",
+    "pair_id": "rcpt-03",
+    "phrasing": "full",
+    "question": "How much did I end up paying for the RedVelvet Nutella cake, and what did I pay with?",
+    "answer_type": "extractive",
+    "golden_answer": "The RedVelvet Nutella cake was 280,000, plus 28,000 PB1, so 308,000 in total, paid on a BCA Card. It came with 5 free mini candles and a large box.",
+    "key_facts": [
+      "280,000",
+      "28,000",
+      "308,000",
+      "BCA Card"
+    ],
+    "gold_sources": [
+      "receipt_022.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(shop name blurred out in the photo — not legible)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-04-typed",
+    "pair_id": "rcpt-04",
+    "phrasing": "typed",
+    "question": "shell v power fill up how many litres",
+    "answer_type": "extractive",
+    "golden_answer": "At Shell ISNI PETPO TRADING on Jalan Genting Klang (18/03/18) I put in 35.10 litres of V-Power 97 at 2.450 RM per litre, RM 86.00 total, paid by Visa. 35 loyalty points awarded.",
+    "key_facts": [
+      "35.10",
+      "V-Power 97",
+      "2.450",
+      "86.00"
+    ],
+    "gold_sources": [
+      "bad_receipt_019.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "Shell ISNI PETPO TRADING",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-04-full",
+    "pair_id": "rcpt-04",
+    "phrasing": "full",
+    "question": "How many litres of V-Power did I put in at the Shell station, and what did that fill-up cost?",
+    "answer_type": "extractive",
+    "golden_answer": "At Shell ISNI PETPO TRADING on Jalan Genting Klang (18/03/18) I put in 35.10 litres of V-Power 97 at 2.450 RM per litre, RM 86.00 total, paid by Visa. 35 loyalty points awarded.",
+    "key_facts": [
+      "35.10",
+      "V-Power 97",
+      "2.450",
+      "86.00"
+    ],
+    "gold_sources": [
+      "bad_receipt_019.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "Shell ISNI PETPO TRADING",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-05-typed",
+    "pair_id": "rcpt-05",
+    "phrasing": "typed",
+    "question": "that shop where i bought loads of chocolate bars total",
+    "answer_type": "extractive",
+    "golden_answer": "That was Asia Mart in Taman Sentosa, Klang on 22/12/2017 — 17 Delicia Chocolate [50G] on one line (printed amount 15.25) among 25 items in total. The bill came to RM 32.70 inclusive of GST; I paid 40.00 cash and got 7.30 change.",
+    "key_facts": [
+      "ASIA MART",
+      "17",
+      "32.70",
+      "7.30"
+    ],
+    "gold_sources": [
+      "bad_receipt_014.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "ASIA MART",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-05-full",
+    "pair_id": "rcpt-05",
+    "phrasing": "full",
+    "question": "Which shop was it where I bought a whole pile of Delicia chocolate bars, and what did that shop come to?",
+    "answer_type": "extractive",
+    "golden_answer": "That was Asia Mart in Taman Sentosa, Klang on 22/12/2017 — 17 Delicia Chocolate [50G] on one line (printed amount 15.25) among 25 items in total. The bill came to RM 32.70 inclusive of GST; I paid 40.00 cash and got 7.30 change.",
+    "key_facts": [
+      "ASIA MART",
+      "17",
+      "32.70",
+      "7.30"
+    ],
+    "gold_sources": [
+      "bad_receipt_014.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "ASIA MART",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-06-typed",
+    "pair_id": "rcpt-06",
+    "phrasing": "typed",
+    "question": "sliders set chicken rice bowl bca discount total",
+    "answer_type": "extractive",
+    "golden_answer": "That meal came to Rp224,908 on Visa. The lines were Mango Lemon Tea Rp29,090, Sliders Set Rp113,636 and Chicken Vege Rice Bowl Rp86,363, less a 15% BCA discount of -Rp34,363, giving a net total of Rp194,726, plus Rp9,736 service charge and Rp20,446 tax.",
+    "key_facts": [
+      "Rp224,908",
+      "Rp113,636",
+      "-Rp34,363",
+      "Rp194,726"
+    ],
+    "gold_sources": [
+      "receipt_021.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(restaurant name blurred out in the photo — not legible)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-06-full",
+    "pair_id": "rcpt-06",
+    "phrasing": "full",
+    "question": "What did that dinner with the sliders set and the chicken vege rice bowl come to after the BCA card discount?",
+    "answer_type": "extractive",
+    "golden_answer": "That meal came to Rp224,908 on Visa. The lines were Mango Lemon Tea Rp29,090, Sliders Set Rp113,636 and Chicken Vege Rice Bowl Rp86,363, less a 15% BCA discount of -Rp34,363, giving a net total of Rp194,726, plus Rp9,736 service charge and Rp20,446 tax.",
+    "key_facts": [
+      "Rp224,908",
+      "Rp113,636",
+      "-Rp34,363",
+      "Rp194,726"
+    ],
+    "gold_sources": [
+      "receipt_021.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(restaurant name blurred out in the photo — not legible)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-07-typed",
+    "pair_id": "rcpt-07",
+    "phrasing": "typed",
+    "question": "big korean bbq group dinner final total card",
+    "answer_type": "extractive",
+    "golden_answer": "The big Korean BBQ group bill came to 2,352,460 on card — sub total 2,000,000, service 140,000 and tax 212,460, change 0. The biggest lines were Cham Kkot Sal x2 at 620,000, U Seol x2 at 390,000 and U Sam Gyeop x2 at 290,000.",
+    "key_facts": [
+      "2,352,460",
+      "2,000,000",
+      "140,000",
+      "212,460",
+      "620,000"
+    ],
+    "gold_sources": [
+      "receipt_040.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(restaurant name blurred out in the photo; only the phone number 021-5150773 is legible)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-07-full",
+    "pair_id": "rcpt-07",
+    "phrasing": "full",
+    "question": "That enormous Korean BBQ dinner we all went to — what was the final total charged to the card?",
+    "answer_type": "extractive",
+    "golden_answer": "The big Korean BBQ group bill came to 2,352,460 on card — sub total 2,000,000, service 140,000 and tax 212,460, change 0. The biggest lines were Cham Kkot Sal x2 at 620,000, U Seol x2 at 390,000 and U Sam Gyeop x2 at 290,000.",
+    "key_facts": [
+      "2,352,460",
+      "2,000,000",
+      "140,000",
+      "212,460",
+      "620,000"
+    ],
+    "gold_sources": [
+      "receipt_040.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(restaurant name blurred out in the photo; only the phone number 021-5150773 is legible)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-08-typed",
+    "pair_id": "rcpt-08",
+    "phrasing": "typed",
+    "question": "how much did i spend at mr diy altogether",
+    "answer_type": "synthesis",
+    "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket).",
+    "key_facts": [
+      "33.90",
+      "30.90",
+      "37.10",
+      "101.90"
+    ],
+    "gold_sources": [
+      "bad_receipt_002.jpg",
+      "bad_receipt_004.jpg",
+      "bad_receipt_027.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "MR D.I.Y. (JOHOR) SDN BHD / MR D.I.Y. (M) SDN BHD",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-08-full",
+    "pair_id": "rcpt-08",
+    "phrasing": "full",
+    "question": "Adding up all my Mr D.I.Y. receipts, how much did I spend there in total?",
+    "answer_type": "synthesis",
+    "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket).",
+    "key_facts": [
+      "33.90",
+      "30.90",
+      "37.10",
+      "101.90"
+    ],
+    "gold_sources": [
+      "bad_receipt_002.jpg",
+      "bad_receipt_004.jpg",
+      "bad_receipt_027.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "receipts_degraded",
+    "merchant_as_printed": "MR D.I.Y. (JOHOR) SDN BHD / MR D.I.Y. (M) SDN BHD",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-09-typed",
+    "pair_id": "rcpt-09",
+    "phrasing": "typed",
+    "question": "two dinners w original brewed tea which one was pricier",
+    "answer_type": "synthesis",
+    "golden_answer": "The pricier of the two was the Black Pepper Meatball / Quarto Formanggi Pasta / Green Tea With Crumble visit at 304,326 (subttl 261,000, svc chg 6% 15,660, PB1 10% 27,666). The other visit — Grilled Baby Potato, Truffle Cream, Carbonara — was 283,338 (subttl 243,000, svc chg 14,580, PB1 25,758), so 20,988 less. Both bills included 2 Original Brewed Tea at 46,000.",
+    "key_facts": [
+      "304,326",
+      "283,338",
+      "261,000",
+      "243,000",
+      "46,000"
+    ],
+    "gold_sources": [
+      "receipt_034.jpg",
+      "receipt_035.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(restaurant name blurred out on both photos — not legible; identified as the same place by the identical 2 x Original Brewed Tea 46,000 line and matching receipt layout)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "rcpt-09-full",
+    "pair_id": "rcpt-09",
+    "phrasing": "full",
+    "question": "I ate twice at that pasta place where we always got the original brewed tea — which of the two visits was more expensive, and by how much?",
+    "answer_type": "synthesis",
+    "golden_answer": "The pricier of the two was the Black Pepper Meatball / Quarto Formanggi Pasta / Green Tea With Crumble visit at 304,326 (subttl 261,000, svc chg 6% 15,660, PB1 10% 27,666). The other visit — Grilled Baby Potato, Truffle Cream, Carbonara — was 283,338 (subttl 243,000, svc chg 14,580, PB1 25,758), so 20,988 less. Both bills included 2 Original Brewed Tea at 46,000.",
+    "key_facts": [
+      "304,326",
+      "283,338",
+      "261,000",
+      "243,000",
+      "46,000"
+    ],
+    "gold_sources": [
+      "receipt_034.jpg",
+      "receipt_035.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "receipts_phone",
+    "merchant_as_printed": "(restaurant name blurred out on both photos — not legible; identified as the same place by the identical 2 x Original Brewed Tea 46,000 line and matching receipt layout)",
+    "human_verified": false,
+    "generator": "claude agent (vision read of phone/degraded receipt photos), 2026-08-30"
+  },
+  {
+    "id": "phone-01-typed",
+    "pair_id": "phone-01",
+    "phrasing": "typed",
+    "question": "that weather alerts settings screenshot what city was it",
+    "answer_type": "extractive",
+    "golden_answer": "The Weather Notifications settings screen is set to Champaign, IL. Every toggle on it (Severe Weather Alerts, Lightning Alerts, KPLC 7 Alerts, Precipitation Alerts, Temperature Display) is switched on.",
+    "key_facts": [
+      "Champaign, IL"
+    ],
+    "gold_sources": [
+      "screen_24184.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-01-full",
+    "pair_id": "phone-01",
+    "phrasing": "full",
+    "question": "Which city was the weather notifications settings screen I screenshotted configured for?",
+    "answer_type": "extractive",
+    "golden_answer": "The Weather Notifications settings screen is set to Champaign, IL. Every toggle on it (Severe Weather Alerts, Lightning Alerts, KPLC 7 Alerts, Precipitation Alerts, Temperature Display) is switched on.",
+    "key_facts": [
+      "Champaign, IL"
+    ],
+    "gold_sources": [
+      "screen_24184.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-02-typed",
+    "pair_id": "phone-02",
+    "phrasing": "typed",
+    "question": "pic of the tiny intel box in its box, which model was it",
+    "answer_type": "extractive",
+    "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges.",
+    "key_facts": [
+      "NUC5i7RYH",
+      "Intel"
+    ],
+    "gold_sources": [
+      "scene_0464a1dafaa33d6d.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-02-full",
+    "pair_id": "phone-02",
+    "phrasing": "full",
+    "question": "In the photo where I'm holding up a small blue Intel mini-PC box, what is the exact model number printed on it?",
+    "answer_type": "extractive",
+    "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges.",
+    "key_facts": [
+      "NUC5i7RYH",
+      "Intel"
+    ],
+    "gold_sources": [
+      "scene_0464a1dafaa33d6d.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-03-typed",
+    "pair_id": "phone-03",
+    "phrasing": "typed",
+    "question": "guy with the beer box hat what beer was it",
+    "answer_type": "extractive",
+    "golden_answer": "The hat is crocheted in orange and yellow yarn around panels cut from Blitz-Weinhard beer cartons, so the brand on it is Blitz Weinhard. It's a bucket-style hat worn by a man in glasses at some indoor gathering.",
+    "key_facts": [
+      "Blitz Weinhard"
+    ],
+    "gold_sources": [
+      "1007129816.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "photos",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-03-full",
+    "pair_id": "phone-03",
+    "phrasing": "full",
+    "question": "In the photo of the guy wearing a crocheted hat made out of beer cartons, which beer brand were the cartons from?",
+    "answer_type": "extractive",
+    "golden_answer": "The hat is crocheted in orange and yellow yarn around panels cut from Blitz-Weinhard beer cartons, so the brand on it is Blitz Weinhard. It's a bucket-style hat worn by a man in glasses at some indoor gathering.",
+    "key_facts": [
+      "Blitz Weinhard"
+    ],
+    "gold_sources": [
+      "1007129816.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "photos",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-04-typed",
+    "pair_id": "phone-04",
+    "phrasing": "typed",
+    "question": "that cigarette butts beach poster, how many butts did they say",
+    "answer_type": "extractive",
+    "golden_answer": "The poster says 4863 cigarette ends were picked off that beach in the past 7 days. It's a Teignmouth \"NO BUTTS ON THE BEACH\" poster, credited at the bottom to www.teignbridge.gov.uk/leisure.",
+    "key_facts": [
+      "4863",
+      "Teignmouth",
+      "7 days"
+    ],
+    "gold_sources": [
+      "scene_45bed83a9fdbc6e0.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-04-full",
+    "pair_id": "phone-04",
+    "phrasing": "full",
+    "question": "On the anti-littering beach poster I photographed through a window, how many cigarette ends did it claim had been picked off the beach, and over what period?",
+    "answer_type": "extractive",
+    "golden_answer": "The poster says 4863 cigarette ends were picked off that beach in the past 7 days. It's a Teignmouth \"NO BUTTS ON THE BEACH\" poster, credited at the bottom to www.teignbridge.gov.uk/leisure.",
+    "key_facts": [
+      "4863",
+      "Teignmouth",
+      "7 days"
+    ],
+    "gold_sources": [
+      "scene_45bed83a9fdbc6e0.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-05-typed",
+    "pair_id": "phone-05",
+    "phrasing": "typed",
+    "question": "workout app screenshot with the numbered exercise list, what were the exercises",
+    "answer_type": "enumeration",
+    "golden_answer": "The routine is called \"Original\" and the visible list runs: 1 Jumping Jacks, 2 Wall Sit, 3 Pushups, 4 Abdominal Crunch, 5 Step up onto chair, 6 Squat, 7 Triceps dip on chair. A teal bar at the bottom says \"Slide to start workout\".",
+    "key_facts": [
+      "Jumping Jacks",
+      "Wall Sit",
+      "Pushups",
+      "Abdominal Crunch",
+      "Step up onto chair",
+      "Squat",
+      "Triceps dip on chair"
+    ],
+    "gold_sources": [
+      "screen_24509.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-05-full",
+    "pair_id": "phone-05",
+    "phrasing": "full",
+    "question": "In the workout app screenshot with the numbered exercise list and a \"Slide to start workout\" bar, which exercises were listed and in what order?",
+    "answer_type": "enumeration",
+    "golden_answer": "The routine is called \"Original\" and the visible list runs: 1 Jumping Jacks, 2 Wall Sit, 3 Pushups, 4 Abdominal Crunch, 5 Step up onto chair, 6 Squat, 7 Triceps dip on chair. A teal bar at the bottom says \"Slide to start workout\".",
+    "key_facts": [
+      "Jumping Jacks",
+      "Wall Sit",
+      "Pushups",
+      "Abdominal Crunch",
+      "Step up onto chair",
+      "Squat",
+      "Triceps dip on chair"
+    ],
+    "gold_sources": [
+      "screen_24509.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-06-typed",
+    "pair_id": "phone-06",
+    "phrasing": "typed",
+    "question": "runner in the yellow vest flexing with a water bottle - what race bib",
+    "answer_type": "extractive",
+    "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race.",
+    "key_facts": [
+      "Laganside 10K",
+      "Pure Running"
+    ],
+    "gold_sources": [
+      "scene_4952cc3277229b18.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-06-full",
+    "pair_id": "phone-06",
+    "phrasing": "full",
+    "question": "What race name is printed on the bib of the runner in the yellow vest who is flexing and holding a water bottle?",
+    "answer_type": "extractive",
+    "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race.",
+    "key_facts": [
+      "Laganside 10K",
+      "Pure Running"
+    ],
+    "gold_sources": [
+      "scene_4952cc3277229b18.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-07-typed",
+    "pair_id": "phone-07",
+    "phrasing": "typed",
+    "question": "beach volleyball photo whos was on all the sponsor banners",
+    "answer_type": "enumeration",
+    "golden_answer": "The banners round the sand court are Crocs (three of them along the top of the stands), Nautica, Bud Light (repeated along the court edge), Herbalife, Cushman & Wakefield, GameStop and an AVP logo.",
+    "key_facts": [
+      "Crocs",
+      "Bud Light",
+      "Nautica",
+      "Herbalife"
+    ],
+    "gold_sources": [
+      "1080230428.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "photos",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-07-full",
+    "pair_id": "phone-07",
+    "phrasing": "full",
+    "question": "Which sponsor brands appear on the banners around the court in my beach volleyball photo?",
+    "answer_type": "enumeration",
+    "golden_answer": "The banners round the sand court are Crocs (three of them along the top of the stands), Nautica, Bud Light (repeated along the court edge), Herbalife, Cushman & Wakefield, GameStop and an AVP logo.",
+    "key_facts": [
+      "Crocs",
+      "Bud Light",
+      "Nautica",
+      "Herbalife"
+    ],
+    "gold_sources": [
+      "1080230428.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "photos",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-08-typed",
+    "pair_id": "phone-08",
+    "phrasing": "typed",
+    "question": "bus app rewards screen how many trips for a free ticket",
+    "answer_type": "extractive",
+    "golden_answer": "The BoltBus \"My Bolt Rewards\" screen says you get a free one-way ticket for every 8 trips traveled (fees and taxes may apply), plus priority Group A boarding as a rewards member.",
+    "key_facts": [
+      "8 trips",
+      "Group A"
+    ],
+    "gold_sources": [
+      "screen_24243.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-08-full",
+    "pair_id": "phone-08",
+    "phrasing": "full",
+    "question": "On the bus app's rewards sign-up screen I saved, how many trips did you have to take to earn a free ticket, and what boarding perk did members get?",
+    "answer_type": "extractive",
+    "golden_answer": "The BoltBus \"My Bolt Rewards\" screen says you get a free one-way ticket for every 8 trips traveled (fees and taxes may apply), plus priority Group A boarding as a rewards member.",
+    "key_facts": [
+      "8 trips",
+      "Group A"
+    ],
+    "gold_sources": [
+      "screen_24243.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-09-typed",
+    "pair_id": "phone-09",
+    "phrasing": "typed",
+    "question": "dark bar photo neon beer sign over the arcade machines which beer",
+    "answer_type": "extractive",
+    "golden_answer": "The neon sign is a Dos Equis \"XX\" IMPORTED BEER sign, glowing red and orange on a purple painted wall. Below it are three lit-up upright arcade / video gambling machines, with a man in a pale short-sleeved polo standing at the leftmost one.",
+    "key_facts": [
+      "Dos Equis"
+    ],
+    "gold_sources": [
+      "1167908324.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "photos",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-09-full",
+    "pair_id": "phone-09",
+    "phrasing": "full",
+    "question": "In the dim bar photo where a neon beer sign hangs on a purple wall above a row of three lit arcade machines, which beer brand is the neon sign advertising?",
+    "answer_type": "extractive",
+    "golden_answer": "The neon sign is a Dos Equis \"XX\" IMPORTED BEER sign, glowing red and orange on a purple painted wall. Below it are three lit-up upright arcade / video gambling machines, with a man in a pale short-sleeved polo standing at the leftmost one.",
+    "key_facts": [
+      "Dos Equis"
+    ],
+    "gold_sources": [
+      "1167908324.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "photos",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-10-typed",
+    "pair_id": "phone-10",
+    "phrasing": "typed",
+    "question": "old empty soda bottle on the wall by the bricks, what was the slogan",
+    "answer_type": "extractive",
+    "golden_answer": "It's an old empty Kay C root beer bottle sitting on a concrete ledge against a brick wall. The red-and-white paper label reads \"The FIRST for THIRST — Drink Kay C — DELICIOUS ROOT BEER\".",
+    "key_facts": [
+      "Kay C",
+      "FIRST for THIRST"
+    ],
+    "gold_sources": [
+      "scene_40882a42d8d66b36.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-10-full",
+    "pair_id": "phone-10",
+    "phrasing": "full",
+    "question": "What brand and slogan are on the label of the old empty glass soda bottle I photographed on a concrete ledge next to a brick wall?",
+    "answer_type": "extractive",
+    "golden_answer": "It's an old empty Kay C root beer bottle sitting on a concrete ledge against a brick wall. The red-and-white paper label reads \"The FIRST for THIRST — Drink Kay C — DELICIOUS ROOT BEER\".",
+    "key_facts": [
+      "Kay C",
+      "FIRST for THIRST"
+    ],
+    "gold_sources": [
+      "scene_40882a42d8d66b36.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "scene_text",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-11-typed",
+    "pair_id": "phone-11",
+    "phrasing": "typed",
+    "question": "pink bunny period app screenshots - what was the cycle set to and what did the popup want",
+    "answer_type": "synthesis",
+    "golden_answer": "In the Settings screenshot the Cycle Interval is 30 days and the Period Duration is 5 days (notifications are off, app version 2.2). The other screenshot from the same app is a pop-up from the developers, a cartoon pig and rabbit calling themselves Pork 'n' Bunny, asking you to give their free apps 5 stars and a supportive comment.",
+    "key_facts": [
+      "30 days",
+      "5 days",
+      "5 stars"
+    ],
+    "gold_sources": [
+      "screen_24478.jpg",
+      "screen_24479.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "phone-11-full",
+    "pair_id": "phone-11",
+    "phrasing": "full",
+    "question": "Across the two screenshots I have of the pink bunny period-tracker app, what were the cycle interval and period duration set to, and what was the app's pop-up asking me to do?",
+    "answer_type": "synthesis",
+    "golden_answer": "In the Settings screenshot the Cycle Interval is 30 days and the Period Duration is 5 days (notifications are off, app version 2.2). The other screenshot from the same app is a pop-up from the developers, a cartoon pig and rabbit calling themselves Pork 'n' Bunny, asking you to give their free apps 5 stars and a supportive comment.",
+    "key_facts": [
+      "30 days",
+      "5 days",
+      "5 stars"
+    ],
+    "gold_sources": [
+      "screen_24478.jpg",
+      "screen_24479.jpg"
+    ],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": true
+    },
+    "difficulty": "hard",
+    "category": "screenshots",
+    "human_verified": false,
+    "generator": "claude agent (vision read of photos / app screenshots / scene-text images), 2026-08-30"
+  },
+  {
+    "id": "nf-01-typed",
+    "pair_id": "nf-01",
+    "phrasing": "typed",
+    "question": "passport scan",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no passport, driving licence, or national ID document anywhere in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "deck_028.pdf p5 contains the literal phrase 'Driving Licence' in a PESTLE slide about two-wheeler regulations - lexical trap with no ID document behind it"
+    ]
+  },
+  {
+    "id": "nf-01-full",
+    "pair_id": "nf-01",
+    "phrasing": "full",
+    "question": "Do I have a scan of my passport or driving licence saved anywhere?",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no passport, driving licence, or national ID document anywhere in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "deck_028.pdf p5 contains the literal phrase 'Driving Licence' in a PESTLE slide about two-wheeler regulations - lexical trap with no ID document behind it"
+    ]
+  },
+  {
+    "id": "nf-02-typed",
+    "pair_id": "nf-02",
+    "phrasing": "typed",
+    "question": "wedding invitation",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no wedding or party invitation card in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "photos/1039637574.jpg (a wedding/quinceanera photograph)",
+      "screen_24570.jpg (birthday-party photo, cake and balloons)",
+      "scan_fybg0227.pdf (society meeting announcement at The Drake, Chicago)"
+    ]
+  },
+  {
+    "id": "nf-02-full",
+    "pair_id": "nf-02",
+    "phrasing": "full",
+    "question": "Where's that wedding invitation card I saved?",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no wedding or party invitation card in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "easy",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "photos/1039637574.jpg (a wedding/quinceanera photograph)",
+      "screen_24570.jpg (birthday-party photo, cake and balloons)",
+      "scan_fybg0227.pdf (society meeting announcement at The Drake, Chicago)"
+    ]
+  },
+  {
+    "id": "nf-03-typed",
+    "pair_id": "nf-03",
+    "phrasing": "typed",
+    "question": "lease agreement",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no lease, rental, or tenancy agreement in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "doc_4679.jpg ('The Lease Agreements are usually renewable by mutual consent' - an accounting note, not an agreement)",
+      "scan_hzjg0224.pdf (tobacco purchase agreement with blank 'Leased' acreage fields)"
+    ]
+  },
+  {
+    "id": "nf-03-full",
+    "pair_id": "nf-03",
+    "phrasing": "full",
+    "question": "Can you find my apartment lease agreement?",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no lease, rental, or tenancy agreement in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "doc_4679.jpg ('The Lease Agreements are usually renewable by mutual consent' - an accounting note, not an agreement)",
+      "scan_hzjg0224.pdf (tobacco purchase agreement with blank 'Leased' acreage fields)"
+    ]
+  },
+  {
+    "id": "nf-04-typed",
+    "pair_id": "nf-04",
+    "phrasing": "typed",
+    "question": "python notes",
+    "answer_type": "not_found",
+    "golden_answer": "No - there are no Python notes. The handwritten programming notes are C++ only (the other handwritten series is physics/electrostatics).",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "deck_023.pdf ('Perl's PerPot meta-model' - Perl is a researcher's surname, not the language)",
+      "arxiv_007.png ('TimeDistributed', a Keras layer name)"
+    ]
+  },
+  {
+    "id": "nf-04-full",
+    "pair_id": "nf-04",
+    "phrasing": "full",
+    "question": "Pull up my Python notes from last semester.",
+    "answer_type": "not_found",
+    "golden_answer": "No - there are no Python notes. The handwritten programming notes are C++ only (the other handwritten series is physics/electrostatics).",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "deck_023.pdf ('Perl's PerPot meta-model' - Perl is a researcher's surname, not the language)",
+      "arxiv_007.png ('TimeDistributed', a Keras layer name)"
+    ]
+  },
+  {
+    "id": "nf-05-typed",
+    "pair_id": "nf-05",
+    "phrasing": "typed",
+    "question": "transcript",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no academic transcript, exam result slip, or degree certificate in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "scan_xhwg0227.pdf (NIH-style biosketches listing degrees, e.g. 'B.A. Ohio-Wesleyan 1938, Ph.D. Harvard 1941')",
+      "scan_xqgl0226.pdf ('Certificate of Incorporation' - corporate, not academic)",
+      "scan_yjgx0227.pdf p4 (photograph of a certificate being handed over; the sheet itself is blank/illegible)"
+    ]
+  },
+  {
+    "id": "nf-05-full",
+    "pair_id": "nf-05",
+    "phrasing": "full",
+    "question": "Find my university transcript or degree certificate.",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no academic transcript, exam result slip, or degree certificate in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "scan_xhwg0227.pdf (NIH-style biosketches listing degrees, e.g. 'B.A. Ohio-Wesleyan 1938, Ph.D. Harvard 1941')",
+      "scan_xqgl0226.pdf ('Certificate of Incorporation' - corporate, not academic)",
+      "scan_yjgx0227.pdf p4 (photograph of a certificate being handed over; the sheet itself is blank/illegible)"
+    ]
+  },
+  {
+    "id": "nf-06-typed",
+    "pair_id": "nf-06",
+    "phrasing": "typed",
+    "question": "training loss curve",
+    "answer_type": "not_found",
+    "golden_answer": "No - no figure plots loss against epoch, iteration, or training step.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "arxiv_027.png (boxes labelled 'CE loss + Dice loss' and 'IC loss' - a diagram, not a curve)",
+      "arxiv_025.png (panels titled 'Step 1 / Step 50 / Step 100')",
+      "arxiv_017.png (train/validation/test split schematic)"
+    ]
+  },
+  {
+    "id": "nf-06-full",
+    "pair_id": "nf-06",
+    "phrasing": "full",
+    "question": "Show me the training loss curve figure from my experiments.",
+    "answer_type": "not_found",
+    "golden_answer": "No - no figure plots loss against epoch, iteration, or training step.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "arxiv_027.png (boxes labelled 'CE loss + Dice loss' and 'IC loss' - a diagram, not a curve)",
+      "arxiv_025.png (panels titled 'Step 1 / Step 50 / Step 100')",
+      "arxiv_017.png (train/validation/test split schematic)"
+    ]
+  },
+  {
+    "id": "nf-07-typed",
+    "pair_id": "nf-07",
+    "phrasing": "typed",
+    "question": "covid vaccination certificate",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no COVID-19 vaccination certificate or test result in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "chart_007.jpg and chart_027.jpg (Pew charts explicitly about 'the coronavirus outbreak', fielded Apr-May 2020)",
+      "table_fr_010.jpg (French air traffic 2020 at -67.0%, the lockdown collapse)"
+    ]
+  },
+  {
+    "id": "nf-07-full",
+    "pair_id": "nf-07",
+    "phrasing": "full",
+    "question": "Do I still have my COVID vaccination certificate saved?",
+    "answer_type": "not_found",
+    "golden_answer": "No - there is no COVID-19 vaccination certificate or test result in these files.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "medium",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "chart_007.jpg and chart_027.jpg (Pew charts explicitly about 'the coronavirus outbreak', fielded Apr-May 2020)",
+      "table_fr_010.jpg (French air traffic 2020 at -67.0%, the lockdown collapse)"
+    ]
+  },
+  {
+    "id": "nf-08-typed",
+    "pair_id": "nf-08",
+    "phrasing": "typed",
+    "question": "chem notes",
+    "answer_type": "not_found",
+    "golden_answer": "No - there are no handwritten chemistry notes; the handwritten notes are C++ and physics (electrostatics) only. Chemistry content does exist elsewhere in the files, but as scanned reports and slide decks, not as your notes.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "scan_gzyh0227.pdf (7pp water chemistry: SiO2, Na2SO4, CaCO3, pH)",
+      "deck_015.pdf (H2O / hydrogen bonding)",
+      "deck_017.pdf (beta-lactam nomenclature)",
+      "scan_shwg0227.pdf (methionine/cystine, Co60)"
+    ]
+  },
+  {
+    "id": "nf-08-full",
+    "pair_id": "nf-08",
+    "phrasing": "full",
+    "question": "Do I have my handwritten chemistry notes anywhere?",
+    "answer_type": "not_found",
+    "golden_answer": "No - there are no handwritten chemistry notes; the handwritten notes are C++ and physics (electrostatics) only. Chemistry content does exist elsewhere in the files, but as scanned reports and slide decks, not as your notes.",
+    "key_facts": [],
+    "gold_sources": [],
+    "acceptable_sources": [],
+    "requires": {
+      "visual_tier": true,
+      "multi_file": false
+    },
+    "difficulty": "hard",
+    "category": "not_found",
+    "human_verified": false,
+    "generator": "supervisor: absence verified by opening files corpus-wide (545/545 files; slides+scans_multipage each got two independent full-page passes), 2026-08-30",
+    "known_distractors": [
+      "scan_gzyh0227.pdf (7pp water chemistry: SiO2, Na2SO4, CaCO3, pH)",
+      "deck_015.pdf (H2O / hydrogen bonding)",
+      "deck_017.pdf (beta-lactam nomenclature)",
+      "scan_shwg0227.pdf (methionine/cystine, Co60)"
+    ]
+  }
+]

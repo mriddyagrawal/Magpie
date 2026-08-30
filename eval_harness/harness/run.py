@@ -195,9 +195,16 @@ def main() -> int:
                   f"{str(meta.get('backend_sha'))[:12]}, current backend is "
                   f"{run_record['backend_git_sha'][:12]} - rebuild with "
                   f"--rebuild-index if indexing code changed", file=sys.stderr)
+        # the sidecar mirrors the mount so the watch page needs no inference
+        progress.phase_done(raw, "index", note="mounted from store")
     else:
         run_record["index_store"] = {"key": idx_hash, "hit": False}
         print(f"[run] index store MISS {idx_hash} - will build and publish")
+    # persist the mount verdict NOW: run.json is otherwise not rewritten
+    # until the next phase boundary, and on a store hit that is the END of
+    # the answer pass - an hour in which the on-disk record claims no
+    # index_store at all (watch-page grey-index bug, 2026-08-30)
+    save_record()
 
     qdrant = backend.QdrantInstance(
         storage_dir=raw / "qdrant", http_port=ports.qdrant_http,

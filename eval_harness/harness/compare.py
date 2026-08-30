@@ -27,9 +27,10 @@ Design rules (mirroring the harness's own):
     the report says so instead of hiding it behind a rate.
   - Judge verdicts are authoritative for answer quality when present in
     BOTH runs; the deterministic verdict is always reported alongside.
-    Retrieval per-question numbers use the ranked_pre_gate basis (what
-    enrich.py computes); the basis is stamped in the output because the
-    pre-gate and end-to-end lists are known to disagree on some questions.
+    Retrieval per-question numbers prefer the end_to_end basis (what ask()
+    actually returned) and fall back to ranked_pre_gate for runs enriched
+    before that field existed (#117); the basis used is stamped in the
+    output because the two are known to disagree on some questions.
 """
 
 from __future__ import annotations
@@ -133,7 +134,12 @@ def paired_binary(pairs: list[tuple[bool, bool]]) -> dict:
         "concordant_both": both,
         "concordant_neither": neither,
         "mcnemar_p": round(mcnemar_exact(a_only, b_only), 5),
-        "credible": (a_only + b_only) >= 5,
+        # #116: credible means DECISION-GRADE - enough flips to detect an
+        # effect AND a split lopsided enough that coin-luck is a poor
+        # explanation. Volume alone stamped p=1.0 nulls (a perfectly
+        # balanced split, the most noise-like outcome possible) credible.
+        "enough_discordant": (a_only + b_only) >= 5,
+        "credible": (a_only + b_only) >= 5 and mcnemar_exact(a_only, b_only) < 0.05,
     }
 
 
@@ -273,6 +279,7 @@ def compare_pair(a: dict, b: dict, qa_ids: list[str]) -> dict:
     both_judged = bool(a.get("judge")) and bool(b.get("judge"))
 
     det_pairs, judge_pairs, hit1_pairs, abstain_pairs = [], [], [], []
+    hit1_bases: set[str] = set()
     latency_deltas = []
     transitions: dict[str, int] = {}
     flips: dict[str, list[dict]] = {
@@ -293,10 +300,21 @@ def compare_pair(a: dict, b: dict, qa_ids: list[str]) -> dict:
         det_pairs.append((det_a in GOOD_VERDICTS, det_b in GOOD_VERDICTS))
         if both_judged and jv_a and jv_b:
             judge_pairs.append((jv_a in GOOD_VERDICTS, jv_b in GOOD_VERDICTS))
-        h1a = (ra.get("retrieval") or {}).get("hit@1")
-        h1b = (rb.get("retrieval") or {}).get("hit@1")
-        if h1a is not None and h1b is not None:
-            hit1_pairs.append((bool(h1a), bool(h1b)))
+        # #117: prefer the end-to-end basis (what ask() actually returned)
+        # over the pre-gate ranking - the two are known to diverge (17/106
+        # on the topk2-vs-topk3 pair). Old runs without the field fall back
+        # to pre-gate; the basis label follows whichever was used.
+        e2e_a = (ra.get("retrieval_end_to_end") or {}).get("hit@1")
+        e2e_b = (rb.get("retrieval_end_to_end") or {}).get("hit@1")
+        if e2e_a is not None and e2e_b is not None:
+            hit1_pairs.append((bool(e2e_a), bool(e2e_b)))
+            hit1_bases.add("end_to_end")
+        else:
+            h1a = (ra.get("retrieval") or {}).get("hit@1")
+            h1b = (rb.get("retrieval") or {}).get("hit@1")
+            if h1a is not None and h1b is not None:
+                hit1_pairs.append((bool(h1a), bool(h1b)))
+                hit1_bases.add("ranked_pre_gate")
         abstain_pairs.append((bool(ra.get("abstained")), bool(rb.get("abstained"))))
         la_s, lb_s = _latency_total(ra.get("latency_s")), _latency_total(rb.get("latency_s"))
         if la_s is not None and lb_s is not None:
@@ -346,7 +364,9 @@ def compare_pair(a: dict, b: dict, qa_ids: list[str]) -> dict:
         ) | {"basis": "judge" if judge_pairs else "deterministic"},
         "answer_deterministic": paired_binary(det_pairs),
         "answer_judge": paired_binary(judge_pairs) if judge_pairs else None,
-        "retrieval_hit1": paired_binary(hit1_pairs) | {"basis": "ranked_pre_gate"},
+        "retrieval_hit1": paired_binary(hit1_pairs) | {
+            "basis": "+".join(sorted(hit1_bases)) or "none",
+        },
         "abstention": paired_binary(abstain_pairs) | {"note": "outcome=abstained, not correctness"},
         "verdict_transitions": dict(sorted(transitions.items(), key=lambda kv: -kv[1])),
         "slices": {
@@ -368,7 +388,12 @@ AGENT_MARKER = "<!-- magpie-compare agents append below this line -->"
 def _fmt_binary(name: str, s: dict) -> str:
     if not s:
         return ""
-    cred = "" if s.get("credible") else "  *(< 5 discordant - not credibly non-noise)*"
+    if s.get("credible"):
+        cred = ""
+    elif not s.get("enough_discordant"):
+        cred = "  *(not decision-grade: < 5 discordant)*"
+    else:
+        cred = "  *(not decision-grade: p >= 0.05 - split is coin-consistent)*"
     basis = f" ({s['basis']})" if s.get("basis") else ""
     return (
         f"| {name}{basis} | {s['a_rate']} | {s['b_rate']} | {s['delta']:+} "
@@ -445,9 +470,14 @@ def render_md(meta: dict, ax: dict, cmp_: dict, a: dict, b: dict) -> str:
         L.append("")
     L.append("## Caveats (auto-generated)")
     L.append("")
-    L.append("- Retrieval per-question basis is `ranked_pre_gate` (enrich.py's basis); the "
-             "end-to-end `ask()` list is known to disagree on some questions - treat retrieval "
-             "deltas as pre-gate ranking deltas.")
+    basis = (cmp_.get("retrieval_hit1") or {}).get("basis", "none")
+    if basis == "end_to_end":
+        L.append("- Retrieval per-question basis is `end_to_end` - what ask() actually "
+                 "returned to the answer stage.")
+    else:
+        L.append(f"- Retrieval per-question basis is `{basis}`; pre-gate ranking is known "
+                 "to disagree with the end-to-end ask() list on some questions - treat "
+                 "those deltas as pre-gate ranking deltas (old-run fallback).")
     L.append("- Discordant counts below ~5 are inside noise for this golden-set size; "
              "flagged rows say so. Do not tune on them.")
     if meta["pairing_mode"] == "intersection":

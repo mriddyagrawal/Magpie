@@ -31,9 +31,42 @@ def test_paired_binary_counts_and_credibility():
     assert s["discordant_b_only"] == 6
     assert s["a_rate"] == 0.6 and s["b_rate"] == 0.8
     assert s["delta"] == 0.2
-    assert s["credible"] is True
+    # #116 semantics: 2A/6B has p~0.29 - coin-consistent, so detectable
+    # volume but NOT decision-grade
+    assert s["enough_discordant"] is True
+    assert s["credible"] is False
     s2 = compare.paired_binary([(True, False), (False, False)])
+    assert s2["enough_discordant"] is False
     assert s2["credible"] is False
+
+
+def test_retrieval_prefers_end_to_end_basis(tmp_path):
+    a = _mk_run(tmp_path, "eA", "g1", {"q1": "correct"})
+    b = _mk_run(tmp_path, "eB", "g1", {"q1": "correct"})
+    la, lb = compare.load_run(a, False), compare.load_run(b, False)
+    for lr, hit in ((la, 1.0), (lb, 0.0)):
+        for r in lr["rows"].values():
+            r["retrieval_end_to_end"] = {"hit@1": hit}
+    c = compare.compare_pair(la, lb, ["q1"])
+    assert c["retrieval_hit1"]["basis"] == "end_to_end"
+    assert c["retrieval_hit1"]["discordant_a_only"] == 1  # e2e says A-only
+    # without the field, falls back with the honest label
+    for lr in (la, lb):
+        for r in lr["rows"].values():
+            r.pop("retrieval_end_to_end")
+    c2 = compare.compare_pair(la, lb, ["q1"])
+    assert c2["retrieval_hit1"]["basis"] == "ranked_pre_gate"
+
+
+def test_credible_requires_signal_not_just_volume():
+    # perfectly balanced 5A/5B: p = 1.0 - the exact #116 case
+    null = compare.paired_binary([(True, False)] * 5 + [(False, True)] * 5)
+    assert null["mcnemar_p"] == 1.0
+    assert null["enough_discordant"] is True
+    assert null["credible"] is False
+    # lopsided 0A/8B: p ~ 0.008 - decision-grade
+    win = compare.paired_binary([(False, True)] * 8 + [(True, True)] * 4)
+    assert win["credible"] is True
 
 
 def _mk_run(tmp_path: Path, name: str, golden_sha: str, verdicts: dict[str, str],

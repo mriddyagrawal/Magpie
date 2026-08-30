@@ -41,6 +41,12 @@ deps:
 install-llama-server:
     uv run python -m src.tools.install_llama_server
 
+# One-command machine prep: qdrant + llama-server + models this machine will
+# use (same registries as the app; models land in the shared cache). Flags
+# pass through: --check (report only), --col auto|qwen|smol, --llm lfm[,gemma].
+prepare-harness *args:
+    uv run python eval_harness/scripts/prepare_harness.py {{args}}
+
 # Walk every enabled include_paths entry in indexing_rules.json ("do everything").
 # Extra args pass through to `python -m src.ingest` (--include-data, --force, -v).
 # Each include_path runs independently; one failure doesn't abort the rest.

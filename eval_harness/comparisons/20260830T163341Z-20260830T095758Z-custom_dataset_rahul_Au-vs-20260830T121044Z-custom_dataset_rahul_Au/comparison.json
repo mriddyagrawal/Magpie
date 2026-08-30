@@ -1,0 +1,645 @@
+{
+  "baseline": "20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+  "generated_utc": "20260830T163341Z",
+  "pairs": [
+    {
+      "a": "20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+      "b": "20260830T121044Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-rewrite",
+      "meta": {
+        "generated_utc": "20260830T163341Z",
+        "pairing_mode": "full",
+        "pairing_coverage": 1.0,
+        "n_paired": 120
+      },
+      "axes": {
+        "changed_axes": [
+          "config"
+        ],
+        "changed_knobs": [
+          "rewrite"
+        ],
+        "confounded": false,
+        "params_diff": {
+          "rewrite": {
+            "a": false,
+            "b": true
+          }
+        },
+        "backend_git_sha": {
+          "a": "cca67570b04adce9980575d367f3cb9a6836a800",
+          "b": "cca67570b04adce9980575d367f3cb9a6836a800"
+        },
+        "backend_commits_between": [],
+        "harness_git_sha": {
+          "a": "2465ab7b99c8859d434db07662ad332e712993b0",
+          "b": "80f7c6179668dfd2575d0f07357d4c6fc75d134f"
+        },
+        "golden_sha": {
+          "a": "0ebcdcbcdf109adb",
+          "b": "0ebcdcbcdf109adb"
+        },
+        "env_snapshot_diff": {
+          "LANG": {
+            "a": "en_US.UTF-8",
+            "b": "C.UTF-8"
+          },
+          "MAGPIE_DATA_DIR": {
+            "a": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite/raw/appdata",
+            "b": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T121044Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-rewrite/raw/appdata"
+          },
+          "PATH": {
+            "a": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/ed404106fcd8/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin",
+            "b": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/e33a9ec0973a/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin"
+          }
+        },
+        "solo_gate_structurally_off": {
+          "a": true,
+          "b": true
+        },
+        "rerank_coupling_warning": null
+      },
+      "comparison": {
+        "answer_authoritative": {
+          "n": 120,
+          "a_rate": 0.1167,
+          "b_rate": 0.1917,
+          "delta": 0.075,
+          "discordant_a_only": 3,
+          "discordant_b_only": 12,
+          "concordant_both": 11,
+          "concordant_neither": 94,
+          "mcnemar_p": 0.03516,
+          "enough_discordant": true,
+          "credible": true,
+          "basis": "judge"
+        },
+        "answer_deterministic": {
+          "n": 120,
+          "a_rate": 0.0917,
+          "b_rate": 0.1083,
+          "delta": 0.0167,
+          "discordant_a_only": 4,
+          "discordant_b_only": 6,
+          "concordant_both": 7,
+          "concordant_neither": 103,
+          "mcnemar_p": 0.75391,
+          "enough_discordant": true,
+          "credible": false
+        },
+        "answer_judge": {
+          "n": 120,
+          "a_rate": 0.1167,
+          "b_rate": 0.1917,
+          "delta": 0.075,
+          "discordant_a_only": 3,
+          "discordant_b_only": 12,
+          "concordant_both": 11,
+          "concordant_neither": 94,
+          "mcnemar_p": 0.03516,
+          "enough_discordant": true,
+          "credible": true
+        },
+        "retrieval_hit1": {
+          "n": 104,
+          "a_rate": 0.9327,
+          "b_rate": 0.8558,
+          "delta": -0.0769,
+          "discordant_a_only": 9,
+          "discordant_b_only": 1,
+          "concordant_both": 88,
+          "concordant_neither": 6,
+          "mcnemar_p": 0.02148,
+          "enough_discordant": true,
+          "credible": true,
+          "basis": "end_to_end+ranked_pre_gate"
+        },
+        "abstention": {
+          "n": 120,
+          "a_rate": 0.4333,
+          "b_rate": 0.4583,
+          "delta": 0.025,
+          "discordant_a_only": 9,
+          "discordant_b_only": 12,
+          "concordant_both": 43,
+          "concordant_neither": 56,
+          "mcnemar_p": 0.66362,
+          "enough_discordant": true,
+          "credible": false,
+          "note": "outcome=abstained, not correctness"
+        },
+        "verdict_transitions": {
+          "wrong -> false_abstain": 5,
+          "wrong -> correct": 5,
+          "false_answer -> correct_abstain": 4,
+          "wrong -> partial": 4,
+          "false_abstain -> wrong": 4,
+          "partial -> correct": 3,
+          "partial -> false_abstain": 3,
+          "partial -> wrong": 3,
+          "correct_abstain -> false_answer": 2,
+          "false_abstain -> partial": 2,
+          "correct -> wrong": 1
+        },
+        "slices": {
+          "phrasing": {
+            "full": {
+              "n": 60,
+              "a_rate": 0.1667,
+              "b_rate": 0.25,
+              "delta": 0.0833,
+              "discordant_a_only": 0,
+              "discordant_b_only": 5,
+              "concordant_both": 10,
+              "concordant_neither": 45,
+              "mcnemar_p": 0.0625,
+              "enough_discordant": true,
+              "credible": false
+            },
+            "typed": {
+              "n": 60,
+              "a_rate": 0.0667,
+              "b_rate": 0.1333,
+              "delta": 0.0667,
+              "discordant_a_only": 3,
+              "discordant_b_only": 7,
+              "concordant_both": 1,
+              "concordant_neither": 49,
+              "mcnemar_p": 0.34375,
+              "enough_discordant": true,
+              "credible": false
+            }
+          },
+          "answer_type": {
+            "enumeration": {
+              "n": 12,
+              "a_rate": 0.0833,
+              "b_rate": 0.0833,
+              "delta": 0.0,
+              "discordant_a_only": 0,
+              "discordant_b_only": 0,
+              "concordant_both": 1,
+              "concordant_neither": 11,
+              "mcnemar_p": 1.0,
+              "enough_discordant": false,
+              "credible": false
+            },
+            "extractive": {
+              "n": 70,
+              "a_rate": 0.0571,
+              "b_rate": 0.1571,
+              "delta": 0.1,
+              "discordant_a_only": 1,
+              "discordant_b_only": 8,
+              "concordant_both": 3,
+              "concordant_neither": 58,
+              "mcnemar_p": 0.03906,
+              "enough_discordant": true,
+              "credible": true
+            },
+            "not_found": {
+              "n": 16,
+              "a_rate": 0.5625,
+              "b_rate": 0.6875,
+              "delta": 0.125,
+              "discordant_a_only": 2,
+              "discordant_b_only": 4,
+              "concordant_both": 7,
+              "concordant_neither": 3,
+              "mcnemar_p": 0.6875,
+              "enough_discordant": true,
+              "credible": false
+            },
+            "synthesis": {
+              "n": 22,
+              "a_rate": 0.0,
+              "b_rate": 0.0,
+              "delta": 0.0,
+              "discordant_a_only": 0,
+              "discordant_b_only": 0,
+              "concordant_both": 0,
+              "concordant_neither": 22,
+              "mcnemar_p": 1.0,
+              "enough_discordant": false,
+              "credible": false
+            }
+          }
+        },
+        "latency_paired": {
+          "n": 120,
+          "mean_delta_s": -3.11,
+          "p50_delta_s": -0.75
+        },
+        "flips": {
+          "answer_regressions": [
+            {
+              "qa_id": "nf-01-typed",
+              "question": "passport scan",
+              "phrasing": "typed",
+              "verdict_a": "correct_abstain",
+              "verdict_b": "false_answer",
+              "det_a": "correct_abstain",
+              "det_b": "false_answer",
+              "judge_a": "correct_abstain",
+              "judge_b": "false_answer",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "",
+              "answer_b": "31.00",
+              "golden_answer": "No - there is no passport, driving licence, or national ID document anywhere in these files."
+            },
+            {
+              "qa_id": "nf-05-typed",
+              "question": "transcript",
+              "phrasing": "typed",
+              "verdict_a": "correct_abstain",
+              "verdict_b": "false_answer",
+              "det_a": "correct_abstain",
+              "det_b": "false_answer",
+              "judge_a": "correct_abstain",
+              "judge_b": "false_answer",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "",
+              "answer_b": "31.00",
+              "golden_answer": "No - there is no academic transcript, exam result slip, or degree certificate in these files."
+            },
+            {
+              "qa_id": "viz-01-typed",
+              "question": "food commodity price index chart cheapest one",
+              "phrasing": "typed",
+              "verdict_a": "correct",
+              "verdict_b": "wrong",
+              "det_a": "correct",
+              "det_b": "wrong",
+              "judge_a": "correct",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "The cheapest commodity is Cocoa at 18.81",
+              "answer_b": "Cheerios cereal",
+              "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
+            }
+          ],
+          "answer_wins": [
+            {
+              "qa_id": "arch-04-full",
+              "question": "On the invoice for mailing and labeling the Great Western '70 Magazine, what was the balance due after the advance payment was applied?",
+              "phrasing": "full",
+              "verdict_a": "partial",
+              "verdict_b": "correct",
+              "det_a": "partial",
+              "det_b": "partial",
+              "judge_a": "partial",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "55.25",
+              "answer_b": "55.25",
+              "golden_answer": "On the Laman for Letters, Inc. invoice A-3088 dated 8-19-70 for mailing the Great Western '70 Magazine, charges came to 325.25; after the 270.00 advance payment received August 17, the balance due was $55.25."
+            },
+            {
+              "qa_id": "nf-02-typed",
+              "question": "wedding invitation",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "wedding invitation",
+              "answer_b": "",
+              "golden_answer": "No - there is no wedding or party invitation card in these files."
+            },
+            {
+              "qa_id": "nf-06-typed",
+              "question": "training loss curve",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "training loss curve",
+              "answer_b": "",
+              "golden_answer": "No - no figure plots loss against epoch, iteration, or training step."
+            },
+            {
+              "qa_id": "nf-07-typed",
+              "question": "covid vaccination certificate",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "Australia's Coverage Target is 95%",
+              "answer_b": "",
+              "golden_answer": "No - there is no COVID-19 vaccination certificate or test result in these files."
+            },
+            {
+              "qa_id": "nf-08-typed",
+              "question": "chem notes",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "Electric field",
+              "answer_b": "",
+              "golden_answer": "No - there are no handwritten chemistry notes; the handwritten notes are C++ and physics (electrostatics) only. Chemistry content does exist elsewhere in the files, but as scanned reports and slide decks, not as your notes."
+            },
+            {
+              "qa_id": "phone-02-full",
+              "question": "In the photo where I'm holding up a small blue Intel mini-PC box, what is the exact model number printed on it?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "partial",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "palm",
+              "answer_b": "NUC5i7RYH",
+              "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
+            },
+            {
+              "qa_id": "phone-02-typed",
+              "question": "pic of the tiny intel box in its box, which model was it",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "partial",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "palm",
+              "answer_b": "NUC5i7RYH",
+              "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
+            },
+            {
+              "qa_id": "phone-06-full",
+              "question": "What race name is printed on the bib of the runner in the yellow vest who is flexing and holding a water bottle?",
+              "phrasing": "full",
+              "verdict_a": "partial",
+              "verdict_b": "correct",
+              "det_a": "partial",
+              "det_b": "partial",
+              "judge_a": "partial",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Laganside 10K",
+              "answer_b": "Laganside 10K",
+              "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race."
+            },
+            {
+              "qa_id": "phone-06-typed",
+              "question": "runner in the yellow vest flexing with a water bottle - what race bib",
+              "phrasing": "typed",
+              "verdict_a": "partial",
+              "verdict_b": "correct",
+              "det_a": "partial",
+              "det_b": "partial",
+              "judge_a": "partial",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Laganside 10K\" [2]",
+              "answer_b": "Laganside 10K\" [2]",
+              "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race."
+            },
+            {
+              "qa_id": "viz-01-full",
+              "question": "In that long-term food commodity price index chart, which commodity had the lowest index value, and what was it?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Denmark, 0.81",
+              "answer_b": "Cocoa, 18.81",
+              "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
+            },
+            {
+              "qa_id": "viz-02-full",
+              "question": "In the chart showing the share of people who agree vaccines are important for children, which country had the lowest share?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "partial",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Spain",
+              "answer_b": "South Korea",
+              "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%."
+            },
+            {
+              "qa_id": "viz-06-typed",
+              "question": "diabetes australia infographic annual cost",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "partial",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "diabetes australia infographic annual cost",
+              "answer_b": "6 billion",
+              "golden_answer": "The 'Diabetes in Australia' infographic puts the annual economic cost at $6 billion, and says diabetes affects 1.7 million Australians, or 1 in 10 adults."
+            }
+          ],
+          "retrieval_regressions": [
+            {
+              "qa_id": "arch-05-typed",
+              "question": "coke sodium leaflet tomato juice vs diet coke mg per serving",
+              "phrasing": "typed",
+              "verdict_a": "partial",
+              "verdict_b": "false_abstain",
+              "det_a": "partial",
+              "det_b": "wrong",
+              "judge_a": "partial",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "Coca-Cola and Diet Coke have similar sodium levels per serving, both containing about 35 milligrams of sodium, which is less than the 40% of total daily sodium recommended by the Food and Drug Adminis",
+              "answer_b": "Not found",
+              "golden_answer": "The Coca-Cola USA leaflet 'You Asked About Sodium in Soft Drinks' says a six-fluid ounce serving of tomato juice processed with added salt has 660 milligrams of sodium, while the same size serving of diet Coke has 35 milligrams or less."
+            },
+            {
+              "qa_id": "phone-09-typed",
+              "question": "dark bar photo neon beer sign over the arcade machines which beer",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "false_abstain",
+              "det_a": "false_abstain",
+              "det_b": "false_abstain",
+              "judge_a": "false_abstain",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "",
+              "answer_b": "",
+              "golden_answer": "The neon sign is a Dos Equis \"XX\" IMPORTED BEER sign, glowing red and orange on a purple painted wall. Below it are three lit-up upright arcade / video gambling machines, with a man in a pale short-sleeved polo standing at the leftmost one."
+            },
+            {
+              "qa_id": "rcpt-08-full",
+              "question": "Adding up all my Mr D.I.Y. receipts, how much did I spend there in total?",
+              "phrasing": "full",
+              "verdict_a": "false_abstain",
+              "verdict_b": "wrong",
+              "det_a": "false_abstain",
+              "det_b": "partial",
+              "judge_a": "false_abstain",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "",
+              "answer_b": "33.90",
+              "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket)."
+            },
+            {
+              "qa_id": "rcpt-08-typed",
+              "question": "how much did i spend at mr diy altogether",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "false_abstain",
+              "det_a": "wrong",
+              "det_b": "false_abstain",
+              "judge_a": "wrong",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "9.00",
+              "answer_b": "",
+              "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket)."
+            },
+            {
+              "qa_id": "study-04-typed",
+              "question": "cpp notes conditional operator ternary syntax question mark colon",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "false_abstain",
+              "det_a": "wrong",
+              "det_b": "false_abstain",
+              "judge_a": "wrong",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "C++ Tutorials [1]",
+              "answer_b": "",
+              "golden_answer": "The notes say the conditional operator is also known as the ternary operator, symbol ( ? : ), and behaves like a shorter if-else. The syntax written down is: variable = Expression ? true statement : false statement; with the example int a = (b > c) ? b : c;"
+            },
+            {
+              "qa_id": "viz-02-typed",
+              "question": "vaccines important for children chart lowest country",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "Australia",
+              "answer_b": "Tweet #2",
+              "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%."
+            },
+            {
+              "qa_id": "viz-07-typed",
+              "question": "condom infographic french town population 1806",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "false_abstain",
+              "det_a": "false_abstain",
+              "det_b": "false_abstain",
+              "judge_a": "false_abstain",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "",
+              "answer_b": "",
+              "golden_answer": "The town of Condom, on the Via Podiensis in France, saw its population fall from 7,298 in 1806 to 7,099 in 2009. The same panel of that condoms infographic notes the town's Condom Cathedral was erected in 1506."
+            },
+            {
+              "qa_id": "viz-08-typed",
+              "question": "millenial myths infographic smartphone percentage",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "7",
+              "answer_b": "31.00",
+              "golden_answer": "Under 'Myth 5: Millennials are always distracted by technology', the infographic says over 90% of millennials own a smartphone and 65% use it as a way to feel connected to others."
+            },
+            {
+              "qa_id": "viz-10-typed",
+              "question": "leaf diagram cordate obcordate what ob means",
+              "phrasing": "typed",
+              "verdict_a": "partial",
+              "verdict_b": "wrong",
+              "det_a": "partial",
+              "det_b": "wrong",
+              "judge_a": "partial",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "ob means the widest part of the leaf is at the apex\"[2]",
+              "answer_b": "ob means outer",
+              "golden_answer": "In that leaf shape diagram, 'cordate' means a heart-shaped leaf, and the prefix 'ob' in 'obcordate' refers to a blade that is widest near the apex. The diagram also labels the two parts of the leaf: the blade and the petiole."
+            }
+          ],
+          "retrieval_wins": [
+            {
+              "qa_id": "rcpt-05-typed",
+              "question": "that shop where i bought loads of chocolate bars total",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "Hallmark",
+              "answer_b": "SAM SAM TRADING CO",
+              "golden_answer": "That was Asia Mart in Taman Sentosa, Klang on 22/12/2017 — 17 Delicia Chocolate [50G] on one line (printed amount 15.25) among 25 items in total. The bill came to RM 32.70 inclusive of GST; I paid 40.00 cash and got 7.30 change."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -11,6 +11,14 @@ from src.stage3.alt import parse_alt_file
 from src.stage3.transcode import transcode
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+_FIXTURE_DIR = REPO_ROOT / "Test Videos"
+# Personal test media, never committed (size + privacy). On machines without
+# it these are integration tests with no input - skip, don't fail: a red
+# that fires on every clone carries no signal (test-suite triage 2026-08-30).
+pytestmark = __import__("pytest").mark.skipif(
+    not _FIXTURE_DIR.exists(),
+    reason="Test Videos/ fixture media not present on this machine",
+)
 FIXTURE = REPO_ROOT / "Test Videos" / "img_9556_2026-04-16.alt"
 
 

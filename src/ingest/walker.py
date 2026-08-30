@@ -62,6 +62,56 @@ def _choose_primary_tier(decision: RouteDecision) -> Tier | None:
     return None
 
 
+
+# ---------------------------------------------------------------------------
+# Index-time transcripts (src/transcribe.py)
+# ---------------------------------------------------------------------------
+
+def transcribe_backend() -> str:
+    """`MAGPIE_TRANSCRIBE_BACKEND`: ocr | vlm | off | auto (default).
+
+    auto is `ocr` when RapidOCR is installed (the `ocr` extra) and the local
+    vision model otherwise — the same one T3 already uses for image summaries,
+    so a plain install still gets transcripts, just slower ones."""
+    choice = os.environ.get("MAGPIE_TRANSCRIBE_BACKEND", "auto").strip().lower() or "auto"
+    if choice != "auto":
+        return choice
+    try:
+        import rapidocr_onnxruntime  # noqa: F401
+    except ImportError:
+        return "vlm"
+    return "ocr"
+
+
+def write_transcript_if_needed(path: Path, force: bool = False) -> str | None:
+    """Give a pixels-only file (photo, scanned PDF) its text transcript, once.
+
+    Sync and CPU/GPU-bound — call it through `asyncio.to_thread`. Returns a
+    one-line note for the decision line, or None when there was nothing to do.
+    Never raises: a missing backend or a down llama-server just means no
+    transcript, and `content.build_content_blocks` falls back to pixels as it
+    always did. A transcript that already exists is kept unless `force`
+    (Reindex), same as the summary tiers."""
+    from src.content import transcript_path_for
+    from src.transcribe import is_pixel_file, write_transcript
+
+    backend = transcribe_backend()
+    if backend == "off":
+        return None
+    if transcript_path_for(path).exists() and not force:
+        return None
+    if not is_pixel_file(path):
+        return None
+    try:
+        _out, r = write_transcript(path, backend)
+    except Exception as e:  # noqa: BLE001 — never fail the file over its transcript
+        return f"transcript: {backend} failed ({type(e).__name__}: {e})"
+    return (
+        f"transcript: {backend} {r['pages']}/{r['total_pages']} pages "
+        f"{r['chars']} chars {r['seconds']:.1f}s"
+    )
+
+
 async def _run_tier(
     tier: Tier,
     path: Path,
@@ -517,12 +567,19 @@ async def ingest_one(
         )
         return decision, 0.0, None
 
+    # Pixels-only files get their text transcript here, before the tier runs,
+    # so the answer step reads text instead of pixels (src/content.py). The
+    # sweep in Evaluations/transcribe_index.py does the same thing for a
+    # corpus that was indexed before this existed.
+    transcript_note = await asyncio.to_thread(write_transcript_if_needed, path, force)
+
     old_summary_rel = existing.summary_file if existing else None
     outcome, note = await _run_tier(
         primary, path, source_rel, get_agent, manifest, force=force,
         inflight=inflight, inflight_lock=inflight_lock,
     )
-    if note:
+    new_notes = [n for n in (transcript_note, note) if n]
+    if new_notes:
         decision = RouteDecision(
             routes=decision.routes,
             visual_score=decision.visual_score,
@@ -532,7 +589,7 @@ async def ingest_one(
             criticality=decision.criticality,
             criticality_source=decision.criticality_source,
             skip_reason=decision.skip_reason,
-            notes=list(decision.notes) + [note],
+            notes=list(decision.notes) + new_notes,
         )
 
     # T4 manages its own manifest state (fast_indexed_at) inside the worker.

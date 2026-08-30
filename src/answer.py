@@ -110,14 +110,18 @@ def _block_cost_chars(block: object) -> int:
 
 def _trim_blocks_to_budget(
     per_file_blocks: list[tuple[str, list]], budget_chars: int
-) -> list[tuple[str, list]]:
+) -> tuple[list[tuple[str, list]], str | None]:
     """Fit the per-file blocks into `budget_chars`, best-ranked first.
 
     `per_file_blocks` arrives in retrieval rank order (best first). Files
     are kept whole until the budget runs out; the first block that crosses
-    the line is truncated (text blocks only), everything after is dropped,
-    and a note naming the dropped files is appended so the model can say
-    they exist instead of hallucinating or denying them.
+    the line is truncated (text blocks only), everything after is dropped.
+    Returns the kept blocks and a note naming the dropped files (or None),
+    which the caller places with the question so the model can say they
+    exist instead of hallucinating or denying them. The note is kept out of
+    the file text on purpose: the file text is the cached prompt prefix,
+    and the same four files with a different fifth-ranked file dropped must
+    still hit the cache (q17 of the phyll set missed exactly that way).
     """
     kept: list[tuple[str, list]] = []
     dropped: list[str] = []
@@ -145,21 +149,17 @@ def _trim_blocks_to_budget(
             kept.append((display, out_blocks))
         else:
             dropped.append(display)
+    note = None
     if dropped and kept:
-        last_display, last_blocks = kept[-1]
-        kept[-1] = (
-            last_display,
-            [
-                *last_blocks,
-                "(Context note: "
-                f"{len(dropped)} lower-ranked source file(s) were omitted to "
-                "fit the local model's context window: "
-                + ", ".join(dropped)
-                + ". If the answer isn't in the files above, say these files "
-                "exist but were not read — do not claim they don't exist.)",
-            ],
+        note = (
+            "(Context note: "
+            f"{len(dropped)} lower-ranked source file(s) were omitted to "
+            "fit the local model's context window: "
+            + ", ".join(dropped)
+            + ". If the answer isn't in the files above, say these files "
+            "exist but were not read — do not claim they don't exist.)"
         )
-    return kept
+    return kept, note
 # `_summary_supplement` was designed for T3 LLM summaries (~200-500 words,
 # typically <2 KB). Plan #17 Part A made T1 CSV summaries also LLM-generated
 # (no more raw-content dumps), so the cap can be much higher than the
@@ -208,11 +208,15 @@ class Answer(BaseModel):
     sources_used: list[str] = Field(
         ...,  # required: emit an empty list in not-found cases, not a missing field.
         description=(
-            "Subset of the input file paths the answer actually depends on. "
-            "Copied verbatim from the '--- File N: <path> ---' headers. "
+            "The file NUMBERS (from the '--- File N: <path> ---' headers) the "
+            "answer actually depends on, each written as a string, e.g. \"2\". "
             "Do not include files you consulted but did not actually use. "
             "Empty list when `not_found=true`."
         ),
+        # Local grammar: digits-only strings (see src/inference/gbnf.py). Cloud
+        # providers ignore this key and may still write paths; resolve_sources
+        # accepts both.
+        json_schema_extra={"x-gbnf": "numstringlist"},
     )
     not_found: bool = Field(
         ...,  # required — the schema's `required` list controls what the
@@ -275,9 +279,10 @@ SYSTEM_PROMPT = (
     "\n"
     "{citation_block}"
     "In `sources_used`, list only the files your answer actually depends "
-    "on, each path copied verbatim from its '--- File N: <path> ---' "
-    "header. If the answer is naturally a list, write the items as bullet "
-    "lines inside the single `answer` string.\n"
+    "on, each as the NUMBER from its '--- File N: <path> ---' header written "
+    "as a string (e.g. \"2\") — never the path. If the answer is naturally "
+    "a list, write the items as bullet lines inside the single `answer` "
+    "string.\n"
     "\n"
     "If none of the files contain the answer (after the terminology rule "
     "above), do not fabricate: set not_found=true, answer=\"\", "
@@ -339,7 +344,7 @@ _MATH_SIGNALS = re.compile(
 _PAGE_REF_BLOCK = (
     "PAGE REFERENCES: some files carry '## PDF page N (book p. X)' "
     "anchors. You may append page ranges to a `sources_used` entry as "
-    "`<path>  [book pp. A-B / PDF pp. C-D]` — only pages that actually "
+    "`\"2  [book pp. A-B / PDF pp. C-D]\"` — only pages that actually "
     "appear in what you read, never invented. Keep page numbers out of the "
     "answer prose unless the user explicitly asked where; then a single "
     "'page N' is allowed."
@@ -366,10 +371,10 @@ _FORMAT_BLOCK_CLOUD = (
     "OUTPUT FORMAT: respond with a single raw JSON object — no markdown "
     "fences, no prose before or after — with exactly these four keys in "
     "this order:\n"
-    "{\"answer\": <string>, \"sources_used\": [<file path>, ...], "
+    "{\"answer\": <string>, \"sources_used\": [<file number as a string>, ...], "
     "\"not_found\": <boolean>, \"not_found_topic\": <string>}\n"
     "Example: {\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
-    "\"sources_used\": [\"path/to/math-dept-2024.pdf\"], "
+    "\"sources_used\": [\"2\"], "
     "\"not_found\": false, \"not_found_topic\": \"\"}"
 )
 
@@ -407,6 +412,50 @@ _MULTIPART_RE = re.compile(
     r"|,\s+and\b",
     re.IGNORECASE,
 )
+
+
+# Comparison-shaped questions; mirror of search.py's _COMPARATIVE_Q_RE —
+# keep the two in sync.
+_COMPARATIVE_RE = re.compile(
+    r"\b(compare|versus|vs\.?|difference between|connects?|links?|"
+    r"in common|both .{0,40}\b(essays?|files?|documents?|letters?)|"
+    r"same (file|document|content)|are (these|those|they) .{0,20}same)\b",
+    re.IGNORECASE,
+)
+
+
+# Questions whose answer is computed over many rows or files, not read off
+# one line. Kept off the extractive path (see the route in answer_question).
+# Three shapes: aggregation words; money verbs ("how much did I spend"),
+# which are sums over records even without the word "total"; and time
+# ranges ("in March", "last month", "Q1"), which mean "across everything in
+# that period". A stated figure ("how many elements does the panel have")
+# matches none of these and stays eligible.
+_AGGREGATE_RE = re.compile(
+    r"\b(total|sum|average|mean|altogether|combined|overall|in all|"
+    r"how many (times|of|transactions|payments|files|documents|entries|rows|receipts)|"
+    r"spen[dt]|paid|pay|earn(ed)?|received?|deposit(s|ed)?|withdr[ae]w(als?|n)?|cost|charged|"
+    r"january|february|march|april|may|june|july|august|september|october|november|december|"
+    r"(last|this|next|past) (month|week|year|quarter)|q[1-4]|20\d\d|between .{1,30} and)\b",
+    re.IGNORECASE,
+)
+
+# Which path answered the last call and where its seconds went, for the
+# query trace and the eval's per-question timings (same shape as
+# search.LAST_SUBTIMINGS): read = building the file blocks, extractive = the
+# span reader, kv = restoring or saving the prompt prefix, llm = the answer
+# call itself.
+LAST_ROUTE: dict[str, float] = {"extractive": 0.0, "files_first": 0.0}
+LAST_SUBTIMINGS: dict[str, float] = {}
+
+
+def _local_provider() -> bool:
+    try:
+        from src.llm import active_provider
+
+        return active_provider().name == "local"
+    except Exception:  # noqa: BLE001
+        return False
 
 
 def _needs_prompted_format() -> bool:
@@ -590,6 +639,9 @@ async def answer_question(
             return csv_row_hits[abs_str]
         return None
 
+    import time as _time
+    LAST_SUBTIMINGS.clear()
+    _t_read = _time.monotonic()
     # Build blocks for every valid file off the event loop (pypdf, pymupdf, etc. are blocking)
     per_file_blocks: list[tuple[str, list]] = []
     for display, abs_path in valid:
@@ -707,6 +759,7 @@ async def answer_question(
 
         per_file_blocks.append((display, blocks))
 
+    LAST_SUBTIMINGS["read"] = _time.monotonic() - _t_read
     if not per_file_blocks:
         raise SummarizeError("no files could be read (all were unsupported or empty)")
 
@@ -714,8 +767,67 @@ async def answer_question(
     # see _context_budget_chars). Must run BEFORE the recency reversal
     # below so it keeps the best-ranked files, not the worst.
     _budget = _context_budget_chars()
+    omitted_note = None
     if _budget is not None:
-        per_file_blocks = _trim_blocks_to_budget(per_file_blocks, _budget)
+        per_file_blocks, omitted_note = _trim_blocks_to_budget(per_file_blocks, _budget)
+
+    # Extractive fast path (src/extractive.py): a factoid question against
+    # one or two files can be answered by copying the span out of the raw
+    # text — no generation, no chance to invent. Index-time summaries are
+    # left out of what it reads, for the same reason they do not count as
+    # grounding for a figure (see the guard at the bottom of this function).
+    from src.extractive import ENABLED as _extractive_on, extract, is_factoid
+    from src.stage2.query_classify import QueryClass, classify as _classify_q
+
+    # `per_file_blocks` is post-budget here, so "two files" means two files
+    # survived the context cap, not two retrieved. A two-part question
+    # ("how many layers, and what is its dims list?") is excluded outright:
+    # one span can only ever answer half of it — q13 of the phyll set was
+    # lost exactly that way on 2026-08-28. Aggregations ("how many
+    # transactions in March", "what is the total") are counted or summed
+    # across rows, never copied off one line; the LIST_ALL classifier and
+    # _AGGREGATE_RE keep them on the reader.
+    LAST_ROUTE["extractive"] = 0.0
+    _has_table = any(
+        isinstance(b, str) and b.startswith("Content type: csv")
+        for _d, bs in per_file_blocks for b in bs
+    )
+    if (
+        _extractive_on
+        and len(per_file_blocks) <= 2
+        and not _has_table  # rows are for counting and summing, not copying
+        and is_factoid(question)
+        and not _COMPARATIVE_RE.search(question)
+        and not _MULTIPART_RE.search(question)
+        and _classify_q(question) is not QueryClass.LIST_ALL
+        and not _AGGREGATE_RE.search(question)
+        and _local_provider()
+    ):
+        raw_files = [
+            (display, "\n".join(strip_generated_blocks(
+                [b for b in blocks if isinstance(b, str)]
+            )))
+            for display, blocks in per_file_blocks
+        ]
+        _t_ex = _time.monotonic()
+        try:
+            hit = await asyncio.to_thread(extract, question, raw_files)
+        except Exception as e:  # noqa: BLE001 — a missing/undownloaded reader must never sink the question
+            print(f"  extractive: unavailable ({type(e).__name__}: {e}); using the reader",
+                  file=sys.stderr)
+            hit = None
+        LAST_SUBTIMINGS["extractive"] = _time.monotonic() - _t_ex
+        if hit is not None:
+            score, span, display = hit
+            print(
+                f"  extractive: {span!r} from {display} (score {score:.2f})",
+                file=sys.stderr,
+            )
+            LAST_ROUTE["extractive"] = 1.0
+            return Answer(answer=span, sources_used=[display], not_found=False,
+                          not_found_topic="")
+        print("  extractive: no confident span, falling through to the reader",
+              file=sys.stderr)
 
     # Assemble the chat message
     intro_parts: list[str] = []
@@ -731,10 +843,13 @@ async def answer_question(
     # live in the system prompt — re-explaining them here cost ~100 tokens
     # per question and taught the model nothing new.
     intro_parts.append(
-        "Answer the current question from the files below. If a file uses "
+        "Answer the current question from the files above. If a file uses "
         "a different word for the same concept, that still counts — see "
         "the terminology rule."
     )
+    if omitted_note:
+        intro_parts.append("")
+        intro_parts.append(omitted_note)
 
     # Situational guidance — injected only when the content that triggers
     # it is actually in the message (see the block constants above).
@@ -769,13 +884,6 @@ async def answer_question(
     # (Evaluations/college_data/REPORT.md). Injecting per-question, exactly
     # like ENUMERATION MODE below, scopes the permission to the questions
     # shaped like comparisons and leaves single-doc questions untouched.
-    import re as _re
-    _COMPARATIVE_RE = _re.compile(
-        r"\b(compare|versus|vs\.?|difference between|connects?|links?|"
-        r"in common|both .{0,40}\b(essays?|files?|documents?|letters?)|"
-        r"same (file|document|content)|are (these|those|they) .{0,20}same)\b",
-        _re.IGNORECASE,
-    )
     if _COMPARATIVE_RE.search(question):
         intro_parts.append("")
         intro_parts.append(
@@ -799,7 +907,6 @@ async def answer_question(
         intro_parts.append("")
         intro_parts.append(_MULTIPART_BLOCK)
 
-    from src.stage2.query_classify import QueryClass, classify as _classify_q
     if enumerate_lists and _classify_q(question) is QueryClass.LIST_ALL:
         intro_parts.append(
             ""
@@ -830,10 +937,80 @@ async def answer_question(
     # assembles itself, so reversing the prompt order doesn't affect
     # the citation contract.
     ordered_blocks = list(reversed(per_file_blocks))
-    message: list = ["\n".join(intro_parts)]
+
+    # Two prompt orders, chosen per question (2026-08-29).
+    #
+    # QUESTION FIRST is what the small model reads best: told what it is
+    # looking for, it reads 6K tokens of files with purpose, and the question
+    # is echoed once more at the bottom. FILES FIRST makes the file text a
+    # prompt prefix the server can restore from disk instead of re-reading
+    # (src/kv_cache.py) — but the model then reads the files blind, and on
+    # the sem6 set that cost 5 of 40 questions (an absence probe answered
+    # from a lecture, the wrong receipt summed, a config misnamed).
+    #
+    # So: files first only when the slot for exactly these files is already
+    # on disk — a repeat question about the same documents, where the
+    # restore is worth ~1-3 s — and question first otherwise, with the slot
+    # built in the background after the answer so the next question about
+    # these files gets the fast path. MAGPIE_PROMPT_ORDER=files|question
+    # pins one order for an eval arm.
+    #
+    # Text blocks only in the prefix: the local path drops non-text blocks
+    # into image attachments, and an image-bearing request is never cached.
+    file_parts: list[str] = []
+    image_blocks: list = []
     for i, (display, blocks) in enumerate(ordered_blocks, 1):
-        message.append(f"\n--- File {i}: {display} ---")
-        message.extend(blocks)
+        file_parts.append(f"--- File {i}: {display} ---")
+        for b in blocks:
+            if isinstance(b, str):
+                file_parts.append(b)
+            else:
+                image_blocks.append(b)
+    files_text = "\n\n".join(file_parts)
+    # The local flattener joins string parts with a blank line, so this is
+    # exactly how the user message begins — the cache key must match it.
+    # No prefix when the file text itself depends on the question: ripgrep
+    # hits for T0 files and CSV row windows are picked per question, so the
+    # same file never yields the same text twice and a save would only churn
+    # the cache. (Keyword-picked PDF pages have the same property when the
+    # rewriter is on; a repeat of the same question still hits, a different
+    # question about the same PDF does not.)
+    kv_prefix: str | None = files_text + "\n\n"
+    for _d, bs in per_file_blocks:
+        for b in bs:
+            if not isinstance(b, str) or b.startswith(
+                ("Content type: t0-ripgrep", "Content type: csv-row-windows")
+            ):
+                kv_prefix = None
+
+    order = os.environ.get("MAGPIE_PROMPT_ORDER", "auto").strip().lower()
+    files_first = False
+    kv_args = None
+    if kv_prefix is not None and _local_provider():
+        try:
+            from src.inference import get_local_llm
+            from src.kv_cache import slot_exists
+
+            _llm = get_local_llm()
+            kv_args = (_llm._base_url(), _llm.model_id, getattr(agent, "_system_prompt", ""), kv_prefix)
+            if order == "files":
+                files_first = True
+            elif order == "question":
+                files_first = False
+            else:
+                files_first = slot_exists(*kv_args)
+        except Exception as e:  # noqa: BLE001 — the cache is a speedup, never a failure
+            print(f"  kv-cache: lookup skipped ({type(e).__name__}: {e})", file=sys.stderr)
+    LAST_ROUTE["files_first"] = 1.0 if files_first else 0.0
+
+    intro_text = "\n".join(intro_parts).replace(
+        "from the files above.", "from the files above." if files_first else "from the files below."
+    )
+    if files_first:
+        message: list = [files_text, *image_blocks, intro_text]
+    else:
+        message = [intro_text, *image_blocks, files_text]
+        kv_prefix = None  # the question leads; nothing to restore
 
     # Prompt-enforced JSON contract, cloud only — the local grammar makes
     # it unnecessary (see _FORMAT_BLOCK_CLOUD for the full rationale).
@@ -849,7 +1026,17 @@ async def answer_question(
     # content. Cheap (~15-30 tokens) for a real win on a 3B backend.
     message.append(f"\nNow answer this question: {question}")
 
-    ans = await agent.run(message, temperature=temperature)
+    _t_llm = _time.monotonic()
+    ans = await agent.run(message, temperature=temperature, kv_prefix=kv_prefix)
+    from src.llm import LAST_KV_SECONDS
+    LAST_SUBTIMINGS["kv"] = LAST_KV_SECONDS.get("seconds", 0.0)
+    LAST_SUBTIMINGS["llm"] = _time.monotonic() - _t_llm - LAST_SUBTIMINGS["kv"]
+    if kv_args is not None and not files_first:
+        # cold ask: the answer is out, the server is idle — build the slot
+        # for the next question about these files
+        from src.kv_cache import build_in_background
+
+        build_in_background(*kv_args)
 
     # If the model declared not_found, normalize the rest of the payload so the
     # downstream consumer doesn't have to think about partial fills. Some small
@@ -902,28 +1089,47 @@ async def answer_question(
             ans.sources_used = []
             return ans
 
-    # Defensive: drop any path the model invented that wasn't in our input.
-    # Match is whitespace-tolerant — the model sometimes collapses double-spaces
-    # or normalizes separators when echoing paths with spaces (e.g. "101 mus"),
-    # which would cause a valid citation to be filtered out as a hallucination.
-    input_paths = {display for display, _ in per_file_blocks}
-    normalized_input = {_normalize_path_for_match(p): p for p in input_paths}
+    ans.sources_used = resolve_sources(
+        ans.sources_used, [display for display, _ in ordered_blocks]
+    )
+    return ans
 
-    filtered: list[str] = []
+
+def resolve_sources(cited: list[str], numbered_paths: list[str]) -> list[str]:
+    """Turn what the model wrote in `sources_used` into display paths.
+
+    The prompt asks for the file NUMBER from the '--- File N ---' header
+    (2026-08-29): a path is 20-40 tokens to decode, a number is one, and
+    the paths were ~38% of every answer's generated text. `numbered_paths`
+    is in message order (File 1 first). A page-range suffix
+    ("2  [book pp. 4-5]") rides along onto the path. A verbatim or
+    whitespace-mangled path is still accepted — cloud models keep writing
+    them — and anything else is an invention and is dropped.
+    """
+    import re as _re
+
+    input_paths = set(numbered_paths)
+    normalized_input = {_normalize_path_for_match(p): p for p in input_paths}
+    out: list[str] = []
     dropped: list[str] = []
-    for s in ans.sources_used:
+    for s in cited:
+        m = _re.match(r"\s*\[?\s*(\d+)\s*\]?\s*(\[.*\])?\s*$", s)
+        if m and 1 <= int(m.group(1)) <= len(numbered_paths):
+            path = numbered_paths[int(m.group(1)) - 1]
+            out.append(path + ("  " + m.group(2) if m.group(2) else ""))
+            continue
         if s in input_paths:
-            filtered.append(s)
+            out.append(s)
             continue
         canonical = normalized_input.get(_normalize_path_for_match(s))
         if canonical is not None:
-            filtered.append(canonical)
+            out.append(canonical)
         else:
             dropped.append(s)
     if dropped:
-        print(f"  warn: dropped hallucinated source paths: {dropped}", file=sys.stderr)
-    ans.sources_used = filtered
-    return ans
+        print(f"  warn: dropped hallucinated sources: {dropped}", file=sys.stderr)
+    # the same file cited twice ("2" and its path) is one source
+    return list(dict.fromkeys(out))
 
 
 def _normalize_path_for_match(p: str) -> str:

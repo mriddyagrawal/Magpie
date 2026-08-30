@@ -155,6 +155,10 @@ class LlamaServerLLM:
         self.default_min_p = profile.args.min_p
         self.default_repeat_penalty = profile.args.repeat_penalty
         self.request_timeout_s = request_timeout_s
+        # llama-server's own clock for the last completion: prompt_n /
+        # prompt_ms / predicted_n / predicted_ms. The one latency number
+        # that disk and Python overhead cannot inflate; the agent logs it.
+        self.last_timings: dict[str, Any] | None = None
 
     # ----- pool-resolved URL -------------------------------------------------
 
@@ -246,7 +250,9 @@ class LlamaServerLLM:
         url = self._base_url(profile_name) + "/v1/chat/completions"
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
             resp = await self._post_with_pool_recovery(client, url, body, profile_name)
-        return self._extract_content(resp.json())
+        payload = resp.json()
+        self.last_timings = payload.get("timings") if isinstance(payload, dict) else None
+        return self._extract_content(payload)
 
     def complete_sync(
         self,
@@ -281,7 +287,9 @@ class LlamaServerLLM:
         url = self._base_url(profile_name) + "/v1/chat/completions"
         with httpx.Client(timeout=self.request_timeout_s) as client:
             resp = self._post_with_pool_recovery_sync(client, url, body, profile_name)
-        return self._extract_content(resp.json())
+        payload = resp.json()
+        self.last_timings = payload.get("timings") if isinstance(payload, dict) else None
+        return self._extract_content(payload)
 
     # ----- stream ------------------------------------------------------------
 

@@ -37,6 +37,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.inference.llama_server_binary import resolve_and_check
+from src.manifest import APP_DATA_DIR
 from src.inference.profiles import ModelProfile, get_profile
 from src.subproc import no_window_kwargs
 
@@ -97,6 +98,18 @@ class LlamaServerCrashError(RuntimeError):
     """An inference call discovered the subprocess was no longer alive.
     Caller's request fails; the pool is reset to "no instance" so the
     next call tries to respawn cleanly."""
+
+
+def kv_slot_dir() -> Path:
+    """Where saved KV-cache slots live. Under the app's cache root so it
+    follows the platform data-dir convention and `just clean` style resets
+    sweep it with everything else. MAGPIE_KV_SLOT_DIR moves it — the files
+    are ~100 MB each and a data dir on a slow or small disk is a bad home
+    for them."""
+    override = os.environ.get("MAGPIE_KV_SLOT_DIR", "").strip()
+    d = Path(override) if override else APP_DATA_DIR / "cache" / "kv-slots"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 # ---------------------------------------------------------------------------
@@ -362,6 +375,22 @@ class LlamaServerPool:
             # way. Override per-profile via extra_args if a GPU box wants
             # real parallelism with a proportionally larger -c.
             "-np", "1",
+            # Prefix reuse on a hybrid conv+attention model (LFM2.5). The
+            # server can only resume a cached prompt from a *checkpoint* of
+            # the recurrent state, and the stock spacing (8192 tokens) means
+            # a 6K-token document prefix has none — every question re-read
+            # the whole document even when the cache held it. Measured
+            # 2026-08-28: with no minimum spacing, a second question against
+            # the same files re-processes ~500 tokens (one micro-batch)
+            # instead of ~2700, 0.22s instead of 1.04s. Each checkpoint is a
+            # few MB of conv state, so 64 per slot is cheap.
+            "--checkpoint-min-step", "0",
+            "--ctx-checkpoints", "64",
+            # Enables POST /slots/0?action=save|restore, which the answer step
+            # uses to keep a document's processed state on disk (see
+            # src/kv_cache.py). Restore of a 2.7K-token prefix measured at
+            # 20-60 ms against ~1 s to re-read it.
+            "--slot-save-path", str(kv_slot_dir()),
         ]
         # mmproj resolution: explicit path wins (test fixtures), else
         # download from the repo when mmproj_repo_id is set.

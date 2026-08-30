@@ -191,7 +191,15 @@ def assert_min_version(binary: Path, min_version_tag: str) -> None:
 # Default min version pin — see `Specs/llama_server_migration.md` for
 # the rationale. Override via `LLAMA_SERVER_MIN_VERSION` if you need to
 # experiment with a newer or older tag.
-DEFAULT_MIN_VERSION = "b9049"
+#
+# b9049 -> b10502 (2026-08-28): the pool now starts every server with
+# `--checkpoint-min-step` (llama.cpp PR #22929, merged 2026-05-25, first
+# shipped around b9354). A b9049-era binary passes the old pin, then
+# exits on the unknown flag and Local mode dies with a spawn error instead
+# of the clear "too old, re-download" message this check exists to give.
+# b10502 is also what the installer pins and what the LFM2.5 json_schema
+# fix (#24377) and hybrid-model prompt-cache reuse were measured on.
+DEFAULT_MIN_VERSION = "b10502"
 
 
 def resolve_and_check() -> Path:

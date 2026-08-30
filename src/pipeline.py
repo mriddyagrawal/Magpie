@@ -214,6 +214,13 @@ async def ask(
         temperature=answer_temperature,
     )
     timings["answer"] = time.monotonic() - t
+    try:
+        from src.answer import LAST_ROUTE, LAST_SUBTIMINGS as _ANS_SUB
+        timings["answer_extractive"] = float(LAST_ROUTE.get("extractive", 0.0))
+        timings["answer_files_first"] = float(LAST_ROUTE.get("files_first", 0.0))
+        timings.update({f"ans_{k}": v for k, v in _ANS_SUB.items()})
+    except Exception:  # noqa: BLE001 — instrumentation must never break a query
+        pass
     print(f"[query] answer ({timings['answer']:.2f}s): "
           f"{len(ans.answer)} chars, sources_used={ans.sources_used}",
           file=sys.stderr, flush=True)

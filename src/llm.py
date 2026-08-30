@@ -326,7 +326,12 @@ def _timestamp_prefix() -> str:
     return f"Current date and time: {now.strftime('%A, %Y-%m-%d %H:%M %Z')}"
 
 
-def _prepend_timestamp(message: list) -> list:
+def _prepend_timestamp(message: list, *, after_first: bool = False) -> list:
+    # `after_first` keeps a cacheable leading part (the answer step's file
+    # text) at the very start; the timestamp changes every minute and would
+    # otherwise make every prompt unique from token one.
+    if after_first and message:
+        return [message[0], _timestamp_prefix(), *message[1:]]
     return [_timestamp_prefix(), *message]
 
 
@@ -356,11 +361,13 @@ class ChatAgent(Protocol, Generic[T]):
     async def run(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
+        kv_prefix: str | None = None,
     ) -> T: ...
 
     def run_sync(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
+        kv_prefix: str | None = None,
     ) -> T: ...
 
 
@@ -509,6 +516,7 @@ class _CloudAgent(Generic[T]):
     async def run(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
+        kv_prefix: str | None = None,  # local-only; no equivalent on cloud
     ) -> T:
         from src.inference.llm_log import log_request, log_response
 
@@ -561,6 +569,7 @@ class _CloudAgent(Generic[T]):
     def run_sync(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
+        kv_prefix: str | None = None,
     ) -> T:
         from src.inference.llm_log import log_request, log_response
 
@@ -1092,6 +1101,31 @@ def _flatten_message_for_local(
     ], image_blobs
 
 
+# Seconds the last answer call spent restoring or building its prompt prefix,
+# read by answer.py into its sub-timings.
+LAST_KV_SECONDS: dict[str, float] = {"seconds": 0.0}
+
+
+def _ensure_kv_prefix(llm, msgs: list[dict], system_prompt: str, kv_prefix: str) -> None:
+    """Restore (or build and save) the server-side state for the part of
+    the user message that repeats across questions. See src/kv_cache.py.
+    Only when the flattened message really does start with that text —
+    otherwise the saved state would not line up with the prompt."""
+    from src.kv_cache import ensure_prefix
+
+    LAST_KV_SECONDS["seconds"] = 0.0
+    user_text = msgs[-1].get("content") if msgs else None
+    if not isinstance(user_text, str) or not user_text.startswith(kv_prefix):
+        print("  kv-cache: prefix does not lead the message; skipped", file=sys.stderr)
+        return
+    t = time.monotonic()
+    status = ensure_prefix(
+        llm._base_url(), getattr(llm, "model_id", "local"), system_prompt, kv_prefix
+    )
+    LAST_KV_SECONDS["seconds"] = time.monotonic() - t
+    print(f"  kv-cache: {status} ({LAST_KV_SECONDS['seconds']:.2f}s)", file=sys.stderr)
+
+
 class LocalAgent(Generic[T]):
     """llama-cpp-python-backed agent. Same .run()/.run_sync() shape as _CloudAgent.
 
@@ -1171,12 +1205,13 @@ class LocalAgent(Generic[T]):
     async def run(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
+        kv_prefix: str | None = None,
     ) -> T:
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
 
         msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message)
+            _prepend_timestamp(message, after_first=bool(kv_prefix))
             if _wants_timestamp(self._output_type)
             else message,
             self._system_prompt
@@ -1187,6 +1222,13 @@ class LocalAgent(Generic[T]):
         if images and default_vision_profile() is None:
             images = []
         llm = get_local_llm()
+        # Put the processed prefix in the server's slot before the request
+        # goes out, so the prompt is read from where the prefix ends. Done
+        # off the loop — it is one or three small HTTP calls to the server.
+        if kv_prefix and not images:
+            await asyncio.to_thread(
+                _ensure_kv_prefix, llm, msgs, self._system_prompt, kv_prefix
+            )
         request_id = log_request(
             provider="local",
             model=getattr(llm, "model_id", "local"),
@@ -1218,18 +1260,21 @@ class LocalAgent(Generic[T]):
             request_id=request_id, provider="local",
             model=getattr(llm, "model_id", "local"),
             latency_s=time.monotonic() - t_start, content=raw,
+            # llama-server's prompt_n / prompt_ms / predicted_n / predicted_ms
+            usage=getattr(llm, "last_timings", None),
         )
         return parse_json_with_repair(raw, self._output_type, self._fallback)
 
     def run_sync(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
+        kv_prefix: str | None = None,
     ) -> T:
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
 
         msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message)
+            _prepend_timestamp(message, after_first=bool(kv_prefix))
             if _wants_timestamp(self._output_type)
             else message,
             self._system_prompt
@@ -1237,6 +1282,8 @@ class LocalAgent(Generic[T]):
         if images and default_vision_profile() is None:
             images = []
         llm = get_local_llm()
+        if kv_prefix and not images:
+            _ensure_kv_prefix(llm, msgs, self._system_prompt, kv_prefix)
         request_id = log_request(
             provider="local",
             model=getattr(llm, "model_id", "local"),
@@ -1268,5 +1315,7 @@ class LocalAgent(Generic[T]):
             request_id=request_id, provider="local",
             model=getattr(llm, "model_id", "local"),
             latency_s=time.monotonic() - t_start, content=raw,
+            # llama-server's prompt_n / prompt_ms / predicted_n / predicted_ms
+            usage=getattr(llm, "last_timings", None),
         )
         return parse_json_with_repair(raw, self._output_type, self._fallback)

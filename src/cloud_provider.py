@@ -121,49 +121,50 @@ _FILE_HEADER = re.compile(r"^---\s*File\s+\d+:\s*(.+?)\s*---\s*$")
 def _parse_answer_message(message: list) -> tuple[str, list[dict]]:
     """Split the answer-call message into (question, snippets[]).
 
-    The desktop builds messages like:
-        ["Current date and time: ...",
-         "Question: <user question>",
-         "--- File 1: /path/to/foo.pdf ---",
-         "<file content>",
-         "--- File 2: /path/to/bar.docx ---",
-         "<file content>",
-         ...]
+    The desktop builds messages like (files first since 2026-08-28, so the
+    file text is a cacheable prompt prefix; the question follows):
+        ["--- File 1: /path/to/foo.pdf ---\n<file content>\n\n"
+         "--- File 2: /path/to/bar.docx ---\n<file content>",
+         "Current question: <user question>\nAnswer the current question ...",
+         "...OUTPUT FORMAT...",
+         "Now answer this question: <user question>"]
 
-    We slice it on the `--- File N: <path> ---` markers to recover the
-    structured form the cloud expects.
+    Parts that contain `--- File N: <path> ---` markers are sliced on them
+    into snippets; every other part is prose about the question, and the
+    question itself is the line that starts with `Current question:` (or
+    `Now answer this question:`, or the older `Question:`), wherever it sits.
     """
     parts = _strings_only(message)
     question = ""
     snippets: list[dict] = []
 
-    current_path: str | None = None
-    current_buf: list[str] = []
-
-    def flush():
-        if current_path is not None:
-            snippets.append({"path": current_path, "text": "\n".join(current_buf).strip()})
-
     for part in parts:
-        for line in part.splitlines():
-            m = _FILE_HEADER.match(line.strip())
-            if m:
-                flush()
-                current_path = m.group(1)
-                current_buf = []
-                continue
+        lines = part.splitlines()
+        if any(_FILE_HEADER.match(line.strip()) for line in lines):
+            current_path: str | None = None
+            current_buf: list[str] = []
+            for line in lines:
+                m = _FILE_HEADER.match(line.strip())
+                if m:
+                    if current_path is not None:
+                        snippets.append({"path": current_path, "text": "\n".join(current_buf).strip()})
+                    current_path = m.group(1)
+                    current_buf = []
+                elif current_path is not None:
+                    current_buf.append(line)
             if current_path is not None:
-                current_buf.append(line)
-            elif line.startswith("Question:"):
-                question = line[len("Question:"):].strip()
+                snippets.append({"path": current_path, "text": "\n".join(current_buf).strip()})
+            continue
+        for line in lines:
+            for marker in ("Current question:", "Now answer this question:", "Question:"):
+                if line.startswith(marker) and not question:
+                    question = line[len(marker):].strip()
 
-    flush()
-    # If we never saw a "Question:" prefix, fall back to using the first
-    # non-header text block as the question (defensive).
-    if not question and parts:
+    # Never saw a question marker — fall back to the first prose line.
+    if not question:
         for p in parts:
             stripped = p.strip()
-            if stripped and not _FILE_HEADER.match(stripped):
+            if stripped and not _FILE_HEADER.match(stripped.splitlines()[0]):
                 question = stripped.splitlines()[0]
                 break
 
@@ -212,12 +213,12 @@ class _CloudAgentBase(Generic[T]):
         self._output_type = output_type
         self._client = CloudClient()
 
-    def run_sync(self, message: list, *, thinking: bool = False) -> T:
+    def run_sync(self, message: list, *, thinking: bool = False, **_ignored) -> T:
         return asyncio.get_event_loop().run_until_complete(
             self.run(message, thinking=thinking)
         )
 
-    async def run(self, message: list, *, thinking: bool = False) -> T:
+    async def run(self, message: list, *, thinking: bool = False, **_ignored) -> T:
         raise NotImplementedError
 
 
@@ -232,7 +233,7 @@ def _maybe_warn_thinking(thinking: bool) -> None:
 
 
 class CloudRewriteAgent(_CloudAgentBase[T]):
-    async def run(self, message: list, *, thinking: bool = False) -> T:
+    async def run(self, message: list, *, thinking: bool = False, **_ignored) -> T:
         _maybe_warn_thinking(thinking)
         # The rewrite call is text-only and the message is just the question
         # (plus possibly history lines). For simplicity we forward the joined
@@ -244,7 +245,7 @@ class CloudRewriteAgent(_CloudAgentBase[T]):
 
 
 class CloudAnswerAgent(_CloudAgentBase[T]):
-    async def run(self, message: list, *, thinking: bool = False) -> T:
+    async def run(self, message: list, *, thinking: bool = False, **_ignored) -> T:
         _maybe_warn_thinking(thinking)
         question, snippets = _parse_answer_message(message)
         body = await self._client.post(
@@ -258,7 +259,7 @@ class CloudAnswerAgent(_CloudAgentBase[T]):
 
 
 class CloudSummarizeAgent(_CloudAgentBase[T]):
-    async def run(self, message: list, *, thinking: bool = False) -> T:
+    async def run(self, message: list, *, thinking: bool = False, **_ignored) -> T:
         _maybe_warn_thinking(thinking)
         filename, text = _parse_summarize_message(message)
         body = await self._client.post(

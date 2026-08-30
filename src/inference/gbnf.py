@@ -61,6 +61,8 @@ boolean ::= "true" | "false"
 integer ::= "-"? ("0" | [1-9] [0-9]*)
 number ::= integer ("." [0-9]+)? ([eE] [-+]? [0-9]+)?
 stringlist ::= "[" ws (string (ws "," ws string)*)? ws "]"
+numstring ::= "\"" [0-9]+ ("  [" [^"\\]* "]")? "\""
+numstringlist ::= "[" ws (numstring (ws "," ws numstring)*)? ws "]"
 ws ::= [ \t]?
 '''.strip()
 
@@ -78,6 +80,13 @@ def _rule_for(name: str, prop: dict[str, Any]) -> str:
         return "number"
     if kind == "array":
         items = prop.get("items") or {}
+        # A field that must hold file numbers ("2", optionally "2  [book pp.
+        # 4-5]"). Asked for a number but offered a free string, the model
+        # opens the quote and writes JSON inside it (measured 2026-08-29:
+        # 4 of 25 answers derailed into '":[1,2]]}```json```"' and took
+        # 10-24 s); digits-only after the quote leaves it nowhere to go.
+        if prop.get("x-gbnf") == "numstringlist" and items.get("type") == "string":
+            return "numstringlist"
         if items.get("type") != "string":
             raise UnsupportedSchema(
                 f"property {name!r}: only arrays of strings are supported, "

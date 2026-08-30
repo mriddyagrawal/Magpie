@@ -128,6 +128,20 @@ automatically at the end (`metrics.json`, `report.md`). Indexes cache in
 `eval_harness/indexes/` keyed by dataset + index-side params — the second run
 with the same index config mounts in seconds.
 
+## Watching a run live
+
+```bash
+just eval-watch        # http://127.0.0.1:8765/ — bars, ETA, log tail
+```
+
+The harness writes `runs/<id>/raw/progress.json` as it works (per-question
+in answer/retrieve, phase markers for index/enrich/judge); the page just
+polls it every 2s and auto-follows the newest run via `runs/latest.json`.
+No narrator in the loop — the numbers come from the process doing the work.
+Read-only, safe to leave running across runs; pin an older run with
+`?run=<run_id>`. Runs started by code older than this feature simply show
+"no progress.json".
+
 Judge (needs `claude` CLI):
 
 ```bash

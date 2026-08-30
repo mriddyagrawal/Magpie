@@ -102,3 +102,7 @@ eval_harness/datasets/*/corpus_root.local.json
 
 # smoke runs are throwaway tripwire artifacts - never commit them
 eval_harness/runs/smoke-*/
+
+# live-progress pointer (harness/progress.py); per-run progress.json is
+# already covered by the runs/*/raw/ rule above
+eval_harness/runs/latest.json

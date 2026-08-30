@@ -658,3 +658,9 @@ eval-smoke:
     uv run python eval_harness/harness/run.py \
         --config eval_harness/configs/smoke.json --run-id "$run_id"
     uv run python eval_harness/scripts/smoke_check.py "eval_harness/runs/$run_id"
+
+# Live progress page for eval runs at http://127.0.0.1:8765/ — the harness
+# writes runs/<id>/raw/progress.json as it works; this serves a page that
+# polls it (plus a log tail). Read-only; safe to leave running across runs.
+eval-watch port="8765":
+    uv run python eval_harness/scripts/eval_watch.py --port {{port}} --open

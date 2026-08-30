@@ -36,6 +36,7 @@ sys.path.insert(0, str(HERE))
 import backend  # noqa: E402
 import enrich  # noqa: E402
 import envctl  # noqa: E402
+import progress  # noqa: E402
 
 REPO = HERE.parents[1]
 EVAL = REPO / "eval_harness"
@@ -163,6 +164,11 @@ def main() -> int:
         envctl.dump_json(run_dir / "run.json", run_record)
 
     save_record()
+    # live-progress sidecar (harness/progress.py + `just eval-watch`): the
+    # harness writes counters as data; a localhost page polls them. Both
+    # files are gitignored; every call is exception-swallowing by contract.
+    progress.write_latest(EVAL / "runs", run_id)
+    progress.update(raw, run_id=run_id, status="running")
     fp_app_before = envctl.appdata_fingerprint()
     fp_cache_before = envctl.cache_fingerprint()
 
@@ -205,6 +211,7 @@ def main() -> int:
 
         if not index_mounted:
             print(f"[run] indexing {dataset['corpus_root']} …")
+            progress.update(raw, phase="index", note=str(dataset["corpus_root"]))
             t = time.monotonic()
             idx = backend.run_worker(
                 "index", run_dir, env,
@@ -233,6 +240,10 @@ def main() -> int:
                     f"{raw / 'worker_index.log'}"
                 )
             print(f"[run] index done in {run_record['phases']['index']['wall_s']}s")
+            progress.phase_done(
+                raw, "index",
+                manifest_entries=run_record["phases"]["index"]["manifest_entries"],
+            )
 
         # Answer BEFORE retrieve (2026-08-30): the retrieve pass replays the
         # answer pass's recorded queries so both phases rank the same inputs.
@@ -242,6 +253,7 @@ def main() -> int:
         answered = False
         if not args.index_only and not args.retrieval_only:
             print(f"[run] answer pass ({len(questions)} questions) …")
+            progress.update(raw, phase="answer", done=0, total=len(questions))
             t = time.monotonic()
             ans = backend.run_worker(
                 "answer", run_dir, env,
@@ -256,10 +268,12 @@ def main() -> int:
                 "llm_log": ans.get("llm_log"),
             }
             save_record()
+            progress.phase_done(raw, "answer", errors=ans["errors"])
             answered = True
 
         if not args.index_only:
             print(f"[run] retrieval pass ({len(questions)} questions) …")
+            progress.update(raw, phase="retrieve", done=0, total=len(questions))
             t = time.monotonic()
             retrieve_payload = {
                 "params": params, "questions": questions,
@@ -275,12 +289,14 @@ def main() -> int:
                 "wall_s": round(time.monotonic() - t, 1), "errors": ret["errors"],
             }
             save_record()
+            progress.phase_done(raw, "retrieve", errors=ret["errors"])
         completed = True
     finally:
         qdrant.stop()
         if not completed:
             run_record["status"] = "failed"
             save_record()
+            progress.update(raw, status="failed")
 
     fp_cache_after = envctl.cache_fingerprint()
     run_record["isolation"] = {
@@ -296,7 +312,9 @@ def main() -> int:
 
     if not args.index_only:
         print("[run] enriching + scoring …")
+        progress.update(raw, phase="enrich")
         enrich.enrich_run(run_dir, golden, params)
+        progress.phase_done(raw, "enrich")
         print(f"[run] report: {run_dir / 'report.md'}")
 
     # Isolation violations FAIL the run (review #47: a compensating control
@@ -306,6 +324,7 @@ def main() -> int:
     if not (iso["cache_model_blobs_unchanged"] and iso["real_appdata_untouched"]):
         run_record["status"] = "failed_isolation"
         save_record()
+        progress.update(raw, status="failed_isolation")
     if not iso["cache_model_blobs_unchanged"]:
         raise SystemExit(
             f"[run] FAILED: shared model cache changed during the run "
@@ -344,6 +363,7 @@ def main() -> int:
 
     run_record["status"] = "complete"
     save_record()
+    progress.update(raw, status="complete")
     print(f"[run] done in {run_record['wall_s_total']}s -> {run_dir}")
     return 0
 

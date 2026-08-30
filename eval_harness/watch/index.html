@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magpie eval — live progress</title>
+<style>
+  :root {
+    --bg: #101418; --panel: #171d24; --panel2: #1d242d;
+    --text: #d7dde4; --dim: #8b96a3; --line: #2a333e;
+    --accent: #57b3ff; --ok: #4fc38a; --warn: #e0b653; --bad: #e06c5f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding: 24px; max-width: 980px; margin: 0 auto;
+  }
+  h1 { font-size: 15px; font-weight: 600; margin: 0 0 4px; letter-spacing: .02em; }
+  .sub { color: var(--dim); font-size: 12px; margin-bottom: 18px; overflow-wrap: anywhere; }
+  .pill {
+    display: inline-block; padding: 1px 10px; border-radius: 999px;
+    font-size: 12px; border: 1px solid var(--line); vertical-align: 1px;
+  }
+  .pill.running  { color: var(--accent); border-color: var(--accent); }
+  .pill.complete { color: var(--ok); border-color: var(--ok); }
+  .pill.failed, .pill.failed_isolation { color: var(--bad); border-color: var(--bad); }
+  .pill.stale { color: var(--warn); border-color: var(--warn); }
+  .grid { display: flex; flex-direction: column; gap: 10px; }
+  .phase {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 12px 14px;
+  }
+  .phase .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .phase .name { font-weight: 600; }
+  .phase .meta { color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; }
+  .bar {
+    height: 8px; background: var(--panel2); border-radius: 4px;
+    margin-top: 9px; overflow: hidden; position: relative;
+  }
+  .bar > i {
+    display: block; height: 100%; background: var(--accent);
+    border-radius: 4px; width: 0; transition: width .6s ease;
+  }
+  .phase.done .bar > i { background: var(--ok); }
+  .bar.indet > i {
+    width: 30%; animation: slide 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes slide { from { margin-left: 0; } to { margin-left: 70%; } }
+  @media (prefers-reduced-motion: reduce) { .bar.indet > i { animation: none; width: 100%; opacity: .35; } }
+  .current { color: var(--dim); font-size: 12px; margin-top: 7px; overflow-wrap: anywhere; }
+  .logbox {
+    margin-top: 18px; background: #0b0e12; border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .logbox .cap { color: var(--dim); font-size: 11px; margin-bottom: 6px; }
+  pre {
+    margin: 0; font-size: 11px; line-height: 1.45; color: #a9b4c0;
+    max-height: 300px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .foot { color: var(--dim); font-size: 11px; margin-top: 16px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+  <h1>Magpie eval <span id="status" class="pill">connecting…</span></h1>
+  <div class="sub" id="sub">looking for a run…</div>
+  <div class="grid" id="phases"></div>
+  <div class="logbox" id="logbox" hidden>
+    <div class="cap" id="logcap"></div>
+    <pre id="log"></pre>
+  </div>
+  <div class="foot">
+    polls <code>progress.json</code> every 2s — written by the harness itself, no
+    narrator in the loop. Pin a run with <code>?run=&lt;run_id&gt;</code>.
+    <span id="runs"></span>
+  </div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const qsRun = new URLSearchParams(location.search).get("run");
+  const PHASE_ORDER = ["index", "answer", "retrieve", "enrich", "judge"];
+  const PHASE_LOG = { index: "worker_index.log", answer: "worker_answer.log", retrieve: "worker_retrieve.log" };
+  let runId = qsRun || null;
+  const samples = {};   // phase -> [[ms, done], ...] for client-side rate/ETA
+
+  const fmtDur = s => {
+    if (!isFinite(s) || s < 0) return "—";
+    s = Math.round(s);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    return h ? `${h}h ${String(m).padStart(2,"0")}m` : m ? `${m}m ${String(sec).padStart(2,"0")}s` : `${sec}s`;
+  };
+  const parseUtc = t => t ? Date.parse(t) : NaN;
+
+  async function j(url) {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(`${r.status} ${url}`);
+    return r.json();
+  }
+
+  async function findRun() {
+    if (qsRun) { runId = qsRun; return; }
+    try { runId = (await j("/api/latest")).run_id || runId; } catch (e) { /* no run yet */ }
+  }
+
+  function eta(phase, done, total) {
+    if (total == null || done == null) return null;
+    const now = performance.now();
+    const arr = samples[phase] = (samples[phase] || []).filter(x => now - x[0] < 180000);
+    if (!arr.length || arr[arr.length - 1][1] !== done) arr.push([now, done]);
+    if (arr.length < 2) return null;
+    const [t0, d0] = arr[0], [t1, d1] = arr[arr.length - 1];
+    if (d1 <= d0 || t1 <= t0) return null;
+    const rate = (d1 - d0) / ((t1 - t0) / 1000);  // items/s
+    return { rate, secs: (total - done) / rate };
+  }
+
+  function phaseCard(name, rec, isActive) {
+    const div = document.createElement("div");
+    div.className = "phase" + (rec.state === "done" ? " done" : "");
+    const countable = rec.total != null;
+    let meta = "";
+    if (rec.state === "done") {
+      const w = (parseUtc(rec.last_utc) - parseUtc(rec.first_utc)) / 1000;
+      meta = (countable ? `${rec.done ?? rec.total}/${rec.total} · ` : "") + `done in ${fmtDur(w)}`;
+    } else if (countable) {
+      const e = isActive ? eta(name, rec.done ?? 0, rec.total) : null;
+      meta = `${rec.done ?? 0}/${rec.total}` +
+             (e ? ` · ${e.rate.toFixed(2)}/s · ~${fmtDur(e.secs)} left` : "");
+    } else if (isActive) {
+      const w = (Date.now() - parseUtc(rec.first_utc)) / 1000;
+      meta = `running ${fmtDur(w)}`;
+    }
+    const pct = countable && rec.total > 0 ? (100 * (rec.done ?? 0) / rec.total) : null;
+    div.innerHTML = `
+      <div class="row"><span class="name">${name}</span><span class="meta">${meta}</span></div>
+      <div class="bar${(!countable && rec.state !== "done") ? " indet" : ""}">
+        <i style="width:${rec.state === "done" ? 100 : (pct ?? 0)}%"></i></div>`;
+    const cur = rec.current || rec.note;
+    if (cur && rec.state !== "done") {
+      const c = document.createElement("div");
+      c.className = "current"; c.textContent = cur;
+      div.appendChild(c);
+    }
+    return div;
+  }
+
+  async function tick() {
+    await findRun();
+    if (!runId) { $("sub").textContent = "no run yet — waiting for latest.json…"; return; }
+
+    let prog = null, run = null;
+    try { prog = await j(`/api/run/${runId}/progress`); } catch (e) {}
+    try { run = await j(`/api/run/${runId}/run`); } catch (e) {}
+
+    const status = (run && run.status) || (prog && prog.status) || "unknown";
+    const st = $("status");
+    st.textContent = status; st.className = "pill " + status;
+    const staleMs = prog ? Date.now() - parseUtc(prog.updated_utc) : NaN;
+    if (status === "running" && staleMs > 180000) {
+      st.textContent = `running? no update ${fmtDur(staleMs / 1000)}`;
+      st.className = "pill stale";
+    }
+    $("sub").textContent = run
+      ? `${runId} — ${run.config_name} on ${run.dataset} (${run.questions} questions, started ${run.started_utc})`
+      : runId;
+
+    const box = $("phases");
+    box.textContent = "";
+    const phases = (prog && prog.phases) || {};
+    const names = [...PHASE_ORDER.filter(p => phases[p]),
+                   ...Object.keys(phases).filter(p => !PHASE_ORDER.includes(p))];
+    if (!names.length) {
+      const d = document.createElement("div");
+      d.className = "sub";
+      d.textContent = prog ? "run started — no phase yet" : "no progress.json (pre-watcher run, or not started)";
+      box.appendChild(d);
+    }
+    for (const n of names) box.appendChild(phaseCard(n, phases[n], prog && prog.phase === n));
+
+    const active = prog && prog.phase;
+    const logName = active && phases[active] && phases[active].state !== "done" ? PHASE_LOG[active] : null;
+    if (logName) {
+      try {
+        const r = await fetch(`/api/run/${runId}/tail?file=${logName}&bytes=4000`, { cache: "no-store" });
+        if (r.ok) {
+          $("logbox").hidden = false;
+          $("logcap").textContent = `tail — raw/${logName}`;
+          const pre = $("log");
+          const nearBottom = pre.scrollHeight - pre.scrollTop - pre.clientHeight < 40;
+          pre.textContent = await r.text();
+          if (nearBottom) pre.scrollTop = pre.scrollHeight;
+        }
+      } catch (e) {}
+    } else {
+      $("logbox").hidden = true;
+    }
+  }
+
+  async function listRuns() {
+    try {
+      const { runs } = await j("/api/runs");
+      if (runs && runs.length > 1) {
+        $("runs").innerHTML = " recent: " + runs.slice(0, 4)
+          .map(r => `<a href="?run=${encodeURIComponent(r)}">${r.slice(0, 16)}…</a>`).join(" · ");
+      }
+    } catch (e) {}
+  }
+
+  tick(); listRuns();
+  setInterval(tick, 2000);
+  setInterval(listRuns, 30000);
+})();
+</script>
+</body>
+</html>

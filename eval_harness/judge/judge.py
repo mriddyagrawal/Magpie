@@ -33,6 +33,15 @@ HERE = Path(__file__).resolve().parent
 EVAL = HERE.parent
 RUBRIC_PATH = HERE / "rubric.md"
 
+# live-progress sidecar (harness/progress.py): the judge is the longest
+# silent stretch of a skill run, so it marks itself on the watch page too.
+# Guarded import — the judge must work standalone even if harness/ moves.
+sys.path.insert(0, str(EVAL / "harness"))
+try:
+    import progress
+except Exception:  # noqa: BLE001 — sidecar only, never load-bearing
+    progress = None  # type: ignore[assignment]
+
 JUDGE_MODEL_DEFAULT = "claude-opus-5"
 VERDICTS = {"correct", "partial", "wrong", "false_abstain",
             "correct_abstain", "false_answer"}
@@ -118,6 +127,9 @@ def main() -> int:
     print(f"judge: full-context grading of {n_questions} answers "
           f"(model={args.model}, rubric={rubric_sha()}) — one instance, "
           f"reads sources itself; this takes several minutes")
+    if progress is not None:
+        progress.update(run_dir / "raw", phase="judge",
+                        note=f"grading {n_questions} answers with {args.model}")
     # shutil.which: on Windows the npm shim is claude.cmd, which a bare
     # argv[0] does not resolve; which() honors PATHEXT everywhere.
     claude_bin = shutil.which("claude")
@@ -176,6 +188,8 @@ def main() -> int:
     }
     (run_dir / "judge_verdicts.json").write_text(
         json.dumps(out, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    if progress is not None:
+        progress.phase_done(run_dir / "raw", "judge")
     s = out.get("summary", {})
     print(f"judge: VALID — {s.get('correct')}✓ {s.get('partial')}~ {s.get('wrong')}✗ "
           f"fa={s.get('false_abstain')} | golden issues: {len(out.get('golden_issues', []))} "

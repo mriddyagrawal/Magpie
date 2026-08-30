@@ -122,7 +122,7 @@ startup with a key from the OS keychain.**
 Flow:
 
 1. First run: generate a 256-bit key, store in OS keychain under
-   `notspotlight.encryption-key`. **Never write the key to disk.**
+   `magpie.encryption-key`. **Never write the key to disk.**
 2. Encrypt the Qdrant `storage/` directory using `age` or `libsodium`
    (AES-256-GCM or XChaCha20-Poly1305).
 3. On daemon startup: read key from keychain, decrypt to a tmpfs / memory-only

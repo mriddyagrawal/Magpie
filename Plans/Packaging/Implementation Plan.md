@@ -453,7 +453,7 @@ Tauri 2 has a built-in updater plugin. Wiring:
      "updater": {
        "active": true,
        "endpoints": [
-         "https://github.com/mriddyagrawal/NotAnotherSpotlight/releases/latest/download/latest.json"
+         "https://github.com/mriddyagrawal/Magpie/releases/latest/download/latest.json"
        ],
        "dialog": true,
        "pubkey": "<base64-public-key>"

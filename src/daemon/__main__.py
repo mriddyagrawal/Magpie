@@ -38,9 +38,9 @@ def _cmd_status() -> int:
     if info.idle_timeout_sec > 0:
         remaining = info.idle_timeout_sec - info.last_activity_ago_sec
         print(f"  idle shutdown in:     {max(0, remaining):.0f}s "
-              f"(NS_DAEMON_IDLE_MINUTES={info.idle_timeout_sec // 60})")
+              f"(MAGPIE_DAEMON_IDLE_MINUTES={info.idle_timeout_sec // 60})")
     else:
-        print(f"  idle shutdown:        disabled (NS_DAEMON_IDLE_MINUTES=0)")
+        print(f"  idle shutdown:        disabled (MAGPIE_DAEMON_IDLE_MINUTES=0)")
     return 0
 
 
@@ -73,7 +73,7 @@ def _cmd_detach() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="python -m src.daemon",
-        description="NotAnotherSpotlight daemon — keeps search models hot across CLI invocations.",
+        description="Magpie daemon — keeps search models hot across CLI invocations.",
     )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--detach", action="store_true",

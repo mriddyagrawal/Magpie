@@ -99,7 +99,7 @@ include = ["src*"]
 
 dev = [
     "pytest>=8.0",
-    "notspotlight",
+    "magpie-cli",
 ]
 
 packaging = [
@@ -116,7 +116,7 @@ notebooks = [
 workspace = { members = ["cli"] }
 
 [tool.uv.sources]
-notspotlight = { workspace = true }
+magpie-cli = { workspace = true }
 # Route torch through the pytorch-cpu index by default. Saves ~2.7 GB of
 # bundled CUDA libs that nobody on Mac/Windows/CPU-Linux uses. CUDA users
 # override at install time per the comment in the `dependencies` block above.

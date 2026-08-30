@@ -187,7 +187,7 @@ embedded public key.
 
 ```json
 "endpoints": [
-  "https://github.com/mriddyagrawal/NotAnotherSpotlight/releases/latest/download/latest.json"
+  "https://github.com/mriddyagrawal/Magpie/releases/latest/download/latest.json"
 ]
 ```
 

@@ -76,7 +76,7 @@ Per the README "Step 2 — Run the evaluation":
    the platform equivalent). If they confirm it isn't, offer to
    read and propose an edit to that file. Do not silently edit
    indexing rules — the user controls what gets indexed.
-2. From the repo root (this repo, `NotAnotherSpotlight`), run:
+2. From the repo root (this repo, `Magpie`), run:
    ```bash
    just sync
    ```

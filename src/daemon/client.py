@@ -138,10 +138,10 @@ def ask_via_daemon(
     materializes SearchResult / SearchQuery objects from the in-process
     code; the daemon path reconstructs them from the wire-friendly dicts.
 
-    Set `NS_DAEMON_DISABLED=1` to skip the daemon entirely (for development
+    Set `MAGPIE_DAEMON_DISABLED=1` (legacy `NS_DAEMON_DISABLED`) to skip the daemon entirely (for development
     or troubleshooting).
     """
-    if os.environ.get("NS_DAEMON_DISABLED") == "1":
+    if (os.environ.get("MAGPIE_DAEMON_DISABLED") or os.environ.get("NS_DAEMON_DISABLED")) == "1":
         return _inprocess_fallback(question, top_k, rewrite, rerank, history)
 
     handle = _connect_or_spawn()
@@ -201,7 +201,7 @@ def _wire_to_pipeline_result(response: proto.AskResponse) -> "PipelineResult":  
         question=response.question,
         # The daemon doesn't currently echo the rewritten SearchQuery back —
         # callers that need it (eval, debugging) should set
-        # NS_DAEMON_DISABLED=1. For interactive use, an empty stub is fine.
+        # MAGPIE_DAEMON_DISABLED=1. For interactive use, an empty stub is fine.
         search_query=SearchQuery(query=response.question, keywords=[]),
         retrieved=retrieved,
         answer=response.answer,

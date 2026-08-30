@@ -1,11 +1,11 @@
-# CLI (notspotlight) — Input / Output
+# CLI (magpie-repl) — Input / Output
 
 ## Full Flow Diagram
 
 ```
 ┌─────────────────────────────┐
 │  User launches CLI          │
-│  $ notspotlight / ns / nas  │
+│  $ magpie-repl / ns / nas  │
 │  $ just chat                │
 └─────────────┬───────────────┘
               │
@@ -119,13 +119,13 @@
 
 **Input:** Terminal session launch
 ```
-$ notspotlight
+$ magpie-repl
 ```
 
 **Output:** Banner with version, instructions, and suggested questions
 ```
 ╭───────────────────────────────────────────╮
-│ NotAnotherSpotlight  v0.1.0               │
+│ Magpie  v0.1.0               │
 │ Type your question. .help for commands.   │
 │                                           │
 │ Try asking:                               │
@@ -135,7 +135,7 @@ $ notspotlight
 ╰───────────────────────────────────────────╯
 ```
 
-Loads: `.env` (credentials), `~/.notspotlight_history` (past queries)
+Loads: `.env` (credentials), `~/.magpie_history` (past queries)
 
 ---
 

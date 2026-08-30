@@ -94,7 +94,7 @@
 
 | Tag | What it does |
 |---|---|
-| `repl` | Interactive CLI (`ns` / `notspotlight` / `nas`). Banner shows active LLM + fast-tier model. |
+| `repl` | Interactive CLI (`ns` / `magpie-repl` / `nas`). Banner shows active LLM + fast-tier model. |
 | `dotcmds` | REPL controls — `.rewrite on/off`, `.rerank on/off`, `.top-k N`, `.history on/off/clear`, `.suggest`, `.help`, `.clear`. |
 | `disk-usage` | `just disk-usage` — summary of pipeline storage (markdowns + Qdrant + model cache + venv). |
 | `fast-tier-files` | `just fast-tier-files` — top-50 fast-tier files ranked by indexed pages (~1 MB/page) — diagnoses storage hogs. |

@@ -1,7 +1,7 @@
 """Unit tests for the ingest router.
 
 Covers: tier selection per file type, peek correctness, sensitivity scoring,
-T4 cost gates, `.nasconfig.yaml` overrides, and skip paths.
+T4 cost gates, `.magpieconfig.yaml` overrides, and skip paths.
 
 Fixtures are generated in-test into `tmp_path` — no dependency on the real
 repo contents — so these stay hermetic and fast.
@@ -22,7 +22,7 @@ from src.router import (
     compute_visual_score,
     decide,
     estimate_t4_cost,
-    load_nasconfig,
+    load_magpieconfig,
     peek,
 )
 
@@ -345,7 +345,7 @@ def test_decide_critical_pdf_gets_t3_plus_t2(tmp_path: Path):
 def test_decide_critical_scanned_pdf_gets_t3_plus_t4(tmp_path: Path):
     # Scanned PDF, critical via user override.
     pdf = _make_image_pdf(tmp_path, "scan.pdf", n_pages=10)
-    d = decide(peek(pdf), gpu_available=True, nasconfig={"accuracy": "critical"})
+    d = decide(peek(pdf), gpu_available=True, magpieconfig={"accuracy": "critical"})
     assert "T3" in d.routes
     assert "T4" in d.routes
     assert d.criticality == "critical"
@@ -377,7 +377,7 @@ def test_decide_t4_corpus_budget_exhausted(tmp_path: Path):
 
 
 # ---------------------------------------------------------------------------
-# .nasconfig.yaml
+# .magpieconfig.yaml (+ legacy .nasconfig.yaml)
 # ---------------------------------------------------------------------------
 
 def test_nasconfig_critical_override(tmp_path: Path):
@@ -386,9 +386,9 @@ def test_nasconfig_critical_override(tmp_path: Path):
     (folder / ".nasconfig.yaml").write_text("accuracy: critical\n", encoding="utf-8")
     # A neutral text-native PDF inside this folder should be upgraded to critical.
     pdf = _make_pdf(folder, "ledger.pdf", ["ledger " * 100] * 10)
-    cfg = load_nasconfig(pdf)
+    cfg = load_magpieconfig(pdf)
     assert cfg.get("accuracy") == "critical"
-    d = decide(peek(pdf), nasconfig=cfg, gpu_available=True)
+    d = decide(peek(pdf), magpieconfig=cfg, gpu_available=True)
     assert "T3" in d.routes
     assert d.criticality_source == "user"
 
@@ -398,11 +398,31 @@ def test_nasconfig_colpali_never(tmp_path: Path):
     folder.mkdir()
     (folder / ".nasconfig.yaml").write_text("colpali: never\n", encoding="utf-8")
     pdf = _make_image_pdf(folder, "scan.pdf", n_pages=10)
-    cfg = load_nasconfig(pdf)
-    d = decide(peek(pdf), nasconfig=cfg, gpu_available=True)
+    cfg = load_magpieconfig(pdf)
+    d = decide(peek(pdf), magpieconfig=cfg, gpu_available=True)
     assert d.routes == ["T3"]     # T4 disabled by config
+
+
+def test_magpieconfig_preferred_name(tmp_path: Path):
+    folder = tmp_path / "docs"
+    folder.mkdir()
+    (folder / ".magpieconfig.yaml").write_text("accuracy: critical\n", encoding="utf-8")
+    pdf = folder / "scan.pdf"
+    pdf.write_bytes(b"%PDF-1.4")
+    cfg = load_magpieconfig(pdf)
+    assert cfg.get("accuracy") == "critical"
+
+
+def test_magpieconfig_preferred_beats_legacy_in_same_folder(tmp_path: Path):
+    folder = tmp_path / "docs"
+    folder.mkdir()
+    (folder / ".magpieconfig.yaml").write_text("accuracy: critical\n", encoding="utf-8")
+    (folder / ".nasconfig.yaml").write_text("accuracy: casual\n", encoding="utf-8")
+    pdf = folder / "scan.pdf"
+    pdf.write_bytes(b"%PDF-1.4")
+    assert load_magpieconfig(pdf).get("accuracy") == "critical"
 
 
 def test_nasconfig_missing_returns_empty(tmp_path: Path):
     p = _write(tmp_path, "x.txt", "hi")
-    assert load_nasconfig(p) == {}
+    assert load_magpieconfig(p) == {}

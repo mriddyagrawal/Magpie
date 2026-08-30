@@ -210,7 +210,7 @@ and v1.1 backlog, see `Plans/IO - Colpali.md`.
 | RRF merge                | `src/stage2/search.py` `_rrf_merge` |
 | Answer stage             | `src/answer.py`                   |
 | Pipeline orchestration   | `src/pipeline.py`                 |
-| CLI flags + banner       | `cli/notspotlight/repl.py` + `display.py` |
+| CLI flags + banner       | `cli/magpie_cli/repl.py` + `display.py` |
 | Persistent state         | `src/manifest.py`                 |
 
 ---

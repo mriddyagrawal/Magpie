@@ -38,7 +38,7 @@ from src.router import (
     Tier,
     USEFUL_DOTFILE_NAMES as _USEFUL_DOTFILE_NAMES,
     decide,
-    load_nasconfig,
+    load_magpieconfig,
     peek,
 )
 
@@ -167,14 +167,14 @@ def _include_dotfiles_for(
 ) -> bool:
     """Whether `dirpath` opts in to indexing dotfiles / dot-folders.
 
-    Reads `.nasconfig.yaml` walking up from `dirpath` toward (but not past)
+    Reads `.magpieconfig.yaml` (legacy `.nasconfig.yaml`) walking up from `dirpath` toward (but not past)
     `walk_root`'s parent. Caches per-directory results so a deep walk of
-    one tree doesn't reload nasconfig for every leaf folder.
+    one tree doesn't reload the folder config for every leaf folder.
     """
     if dirpath in cache:
         return cache[dirpath]
     try:
-        cfg = load_nasconfig(dirpath, stop_at=walk_root.parent)
+        cfg = load_magpieconfig(dirpath, stop_at=walk_root.parent)
     except Exception:  # pylint: disable=broad-except
         cfg = {}
     flag = bool(cfg.get("include_dotfiles", False))
@@ -191,7 +191,7 @@ def find_candidates(
     """Walk `root` and return (accepted, ignored_count).
 
     `indexing_rules` is the composed config (defaults + user JSON + cascade-
-    discovered .gitignore/.nasignore/.magpieinclude/.magpieexclude). If
+    discovered .gitignore/.magpieignore(.nasignore)/.magpieinclude/.magpieexclude). If
     omitted, loaded from disk via `load_indexing_rules()`. The walker
     auto-adds `root` to user `include_paths` if not already covered (so
     ad-hoc CLI walks register the path as a managed root for the future
@@ -208,7 +208,7 @@ def find_candidates(
        `.vimrc`, `.gitconfig`, etc.) which actually carry user content.
 
     Both layers are **disabled** for a subtree when its
-    nearest-ancestor `.nasconfig.yaml` says `include_dotfiles: true`. The
+    nearest-ancestor `.magpieconfig.yaml` (or legacy `.nasconfig.yaml`) says `include_dotfiles: true`. The
     built-in default ignore patterns (secrets, `node_modules/`, etc.)
     still apply — opting in to dotfiles doesn't disable safety rails.
 
@@ -248,7 +248,7 @@ def find_candidates(
 
     pre_accepted: list[Path] = []
     ignored = 0
-    nasconfig_cache: dict[Path, bool] = {}
+    magpieconfig_cache: dict[Path, bool] = {}
 
     # Build the active extension whitelist for this run. `--include-data`
     # adds `.dat` (which the router will peek as text), and stops the
@@ -260,7 +260,7 @@ def find_candidates(
     for dirpath, dirnames, filenames in os.walk(root):
         dirpath_p = Path(dirpath)
         include_dot = _include_dotfiles_for(
-            dirpath_p, walk_root=root.resolve(), cache=nasconfig_cache,
+            dirpath_p, walk_root=root.resolve(), cache=magpieconfig_cache,
         )
 
         # Prune dot-folders during traversal — unless the user opted in. Note
@@ -280,7 +280,7 @@ def find_candidates(
         ]
         # Pre-warm the cascade cache for this directory so per-file
         # should_index() calls below reuse the parsed .gitignore /
-        # .nasignore / .magpieinclude / .magpieexclude specs.
+        # .magpieignore(.nasignore) / .magpieinclude / .magpieexclude specs.
         rules.note_directory(dirpath_p)
 
         for fname in filenames:
@@ -405,10 +405,10 @@ async def ingest_one(
         )
 
     peek_result = peek(path)
-    nasconfig = load_nasconfig(path)
+    magpieconfig = load_magpieconfig(path)
     decision = decide(
         peek_result,
-        nasconfig=nasconfig,
+        magpieconfig=magpieconfig,
         gpu_available=gpu_available,
         t4_budget_used_mb=t4_budget_used_mb,
     )
@@ -542,7 +542,7 @@ async def run_batch(
     load_dotenv()
     manifest = Manifest()
 
-    # Pre-walk phase: scan for .gitignore/.nasignore + enumerate candidate
+    # Pre-walk phase: scan for .gitignore/.magpieignore + enumerate candidate
     # files. On large corpora (~10 GB+) this can take a minute or two before
     # the indexing bar appears — print progress so the user knows it isn't
     # hung. Both walks now prune default-ignored directories (node_modules/,
@@ -1008,7 +1008,7 @@ def main() -> None:
     if args.per_child:
         import time
         # Apply parent's indexing rules ($RECYCLE.BIN/, movies/, default
-        # exclusions, .magpieexclude/.nasignore) BEFORE iterating — otherwise
+        # exclusions, .magpieexclude/.magpieignore) BEFORE iterating — otherwise
         # we'd recurse into ignored subdirs because each run_batch's own
         # rules-load can't see all the cascade context. Hidden dotfile dirs
         # are also skipped to mirror the walker's normal prune behavior.

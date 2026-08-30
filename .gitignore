@@ -77,6 +77,10 @@ Test Questions/
 
 .venv.broken/
 
+# Generated knowledge-graph output (graphify) — never track (#124: an
+# over-broad add once swept 596 files of it into history on a side branch).
+graphify-out/
+
 # Eval harness (eval_harness/PLAN.md §3, §9.3): raw run state holds indexed
 # personal content, scratch app-data dirs, and multi-GB logs - ignored via
 # subpaths, NOT the runs/ tree, because git cannot re-include children of an

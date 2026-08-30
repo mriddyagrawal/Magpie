@@ -1,7 +1,7 @@
 """DEPRECATED — superseded by `src.config.indexing_rules.IndexingRules`.
 
 This module used to own:
-  - `IgnoreRules` class (cascading `.gitignore` + `.nasignore` + built-ins)
+  - `IgnoreRules` class (cascading `.gitignore` + `.magpieignore` (legacy `.nasignore`) + built-ins)
   - `DEFAULT_IGNORE_PATTERNS` (the OS-junk / build-cache safety net)
   - `IGNORE_FILENAMES` constant
 
@@ -76,5 +76,8 @@ def __getattr__(name: str):
             DeprecationWarning,
             stacklevel=2,
         )
-        return (".gitignore", ".nasignore", ".magpieexclude", ".magpieinclude")
+        return (
+            ".gitignore", ".magpieignore", ".nasignore",
+            ".magpieexclude", ".magpieinclude",
+        )
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

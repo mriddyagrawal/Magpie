@@ -18,23 +18,23 @@ _HOME = Path.home()
 def _state_dir() -> Path:
     """Per-user directory where the daemon keeps its socket / pid / authkey.
 
-    Linux / macOS: `$XDG_RUNTIME_DIR/notspotlight` if set, else
-    `~/.cache/notspotlight`. The `runtime` dir is preferred because it's
+    Linux / macOS: `$XDG_RUNTIME_DIR/magpie` if set, else
+    `~/.cache/magpie`. The `runtime` dir is preferred because it's
     typically tmpfs (RAM-backed) and auto-cleaned on logout — exactly
     right for transient daemon state.
 
-    Windows: `%LOCALAPPDATA%\\notspotlight` if set, else `~/.notspotlight`.
+    Windows: `%LOCALAPPDATA%\\magpie` if set, else `~/.magpie`.
     """
     if sys.platform == "win32":
         base = os.environ.get("LOCALAPPDATA")
         if base:
-            return Path(base) / "notspotlight"
-        return _HOME / ".notspotlight"
+            return Path(base) / "magpie"
+        return _HOME / ".magpie"
 
     runtime = os.environ.get("XDG_RUNTIME_DIR")
     if runtime:
-        return Path(runtime) / "notspotlight"
-    return _HOME / ".cache" / "notspotlight"
+        return Path(runtime) / "magpie"
+    return _HOME / ".cache" / "magpie"
 
 
 def state_dir() -> Path:
@@ -55,7 +55,7 @@ def socket_address() -> str | tuple[str, int]:
     detects the format automatically.
     """
     if sys.platform == "win32":
-        return r"\\.\pipe\notspotlight-" + str(os.getpid_ns()) if hasattr(os, "getpid_ns") else r"\\.\pipe\notspotlight"
+        return r"\\.\pipe\magpie-" + str(os.getpid_ns()) if hasattr(os, "getpid_ns") else r"\\.\pipe\magpie"
     # Unix — short-ish path because some kernels cap socket paths at 108 chars.
     return str(state_dir() / "daemon.sock")
 

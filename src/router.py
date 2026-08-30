@@ -9,7 +9,7 @@ The router's contract:
     peek_result = peek(path)
     decision = decide(
         peek_result,
-        nasconfig=load_nasconfig(path),
+        magpieconfig=load_magpieconfig(path),
         gpu_available=...,
         t4_budget_used_mb=...,
     )
@@ -139,7 +139,7 @@ T4_MAX_STORAGE_MB_PER_FILE = 50.0
 T4_MAX_SECONDS_PER_FILE_GPU = 30.0
 T4_MAX_SECONDS_PER_FILE_CPU = 10.0
 
-# Default corpus-wide T4 storage budget (MB). Overridable via .nasconfig.yaml.
+# Default corpus-wide T4 storage budget (MB). Overridable via .magpieconfig.yaml.
 DEFAULT_T4_BUDGET_MB = 5 * 1024              # 5 GB
 
 # Size of peek-text slice used for sensitivity scoring.
@@ -774,14 +774,18 @@ def estimate_t4_cost(p: PeekResult, *, gpu_available: bool) -> tuple[float, floa
 
 
 # ---------------------------------------------------------------------------
-# .nasconfig.yaml — folder-level overrides
+# .magpieconfig.yaml — folder-level overrides (legacy .nasconfig.yaml honored)
 # ---------------------------------------------------------------------------
 
-_NASCONFIG_FILENAME = ".nasconfig.yaml"
+# Preferred name first; legacy .nasconfig.yaml stays honored so existing
+# folder-level overrides never silently stop applying (2026-08-30 rename).
+_MAGPIECONFIG_FILENAMES = (".magpieconfig.yaml", ".nasconfig.yaml")
 
 
-def load_nasconfig(path: Path, *, stop_at: Path | None = None) -> dict:
-    """Walk parent folders looking for \`.nasconfig.yaml\`. First match wins (nearest folder).
+def load_magpieconfig(path: Path, *, stop_at: Path | None = None) -> dict:
+    """Walk parent folders looking for \`.magpieconfig.yaml\` (legacy
+    \`.nasconfig.yaml\` honored). First match wins (nearest folder;
+    preferred name wins within one folder).
 
     Returns a dict with any of: {"accuracy": "critical"|"normal"|"casual",
     "t4_budget_gb_override": float, "colpali": "always"|"never"}.
@@ -794,8 +798,12 @@ def load_nasconfig(path: Path, *, stop_at: Path | None = None) -> dict:
 
     current = root
     while True:
-        candidate = current / _NASCONFIG_FILENAME
-        if candidate.is_file():
+        candidate = None
+        for _name in _MAGPIECONFIG_FILENAMES:
+            if (current / _name).is_file():
+                candidate = current / _name
+                break
+        if candidate is not None:
             try:
                 with candidate.open(encoding="utf-8") as f:
                     data = yaml.safe_load(f) or {}
@@ -819,10 +827,10 @@ def load_nasconfig(path: Path, *, stop_at: Path | None = None) -> dict:
 
 def _resolve_criticality(
     sensitivity_score: int,
-    nasconfig: dict,
+    magpieconfig: dict,
 ) -> tuple[Criticality, CriticalitySource]:
     """Criticality can be upgraded by user config or auto-detection, never downgraded."""
-    user_level = str(nasconfig.get("accuracy", "")).lower()
+    user_level = str(magpieconfig.get("accuracy", "")).lower()
 
     # Auto signal: sensitivity_score ≥ 4 → critical
     auto_critical = sensitivity_score >= 4
@@ -856,14 +864,14 @@ def _skip_decision(reason: str, peek: PeekResult) -> RouteDecision:
 def decide(
     p: PeekResult,
     *,
-    nasconfig: dict | None = None,
+    magpieconfig: dict | None = None,
     gpu_available: bool = False,
     t4_budget_used_mb: float = 0.0,
     t4_budget_cap_mb: float | None = None,
 ) -> RouteDecision:
     """Route one file. Pure function of its peek, folder config, and budget state."""
 
-    nasconfig = nasconfig or {}
+    magpieconfig = magpieconfig or {}
     notes: list[str] = []
 
     if p.peek_error and not p.peek_text and p.size_bytes == 0:
@@ -872,19 +880,19 @@ def decide(
     vs = compute_visual_score(p)
     ss = compute_sensitivity_score(p)
     t4_mb, t4_s = estimate_t4_cost(p, gpu_available=gpu_available)
-    criticality, crit_source = _resolve_criticality(ss, nasconfig)
+    criticality, crit_source = _resolve_criticality(ss, magpieconfig)
 
     # Resolve corpus T4 budget (user can override)
     budget_cap = t4_budget_cap_mb
     if budget_cap is None:
-        override = nasconfig.get("t4_budget_gb_override")
+        override = magpieconfig.get("t4_budget_gb_override")
         if isinstance(override, (int, float)) and override > 0:
             budget_cap = float(override) * 1024
         else:
             budget_cap = float(DEFAULT_T4_BUDGET_MB)
 
     # Global opt-out of ColPali in this folder
-    colpali_pref = str(nasconfig.get("colpali", "")).lower()
+    colpali_pref = str(magpieconfig.get("colpali", "")).lower()
     colpali_disabled = colpali_pref == "never"
     colpali_forced = colpali_pref == "always"
 
@@ -1245,8 +1253,8 @@ def _detect_gpu() -> bool:
 def _cli_explain_file(path: Path, gpu: bool) -> int:
     """Print the full routing decision for one file."""
     peeked = peek(path)
-    nasconfig = load_nasconfig(path)
-    decision = decide(peeked, nasconfig=nasconfig, gpu_available=gpu)
+    magpieconfig = load_magpieconfig(path)
+    decision = decide(peeked, magpieconfig=magpieconfig, gpu_available=gpu)
 
     print(f"path:          {path}")
     print(f"ext:           {peeked.ext}")
@@ -1307,8 +1315,8 @@ def _cli_explain_dir(root: Path, gpu: bool, *, limit: int | None) -> int:
 
     for f in files:
         peeked = peek(f)
-        nasconfig = load_nasconfig(f)
-        d = decide(peeked, nasconfig=nasconfig, gpu_available=gpu)
+        magpieconfig = load_magpieconfig(f)
+        d = decide(peeked, magpieconfig=magpieconfig, gpu_available=gpu)
         if d.skipped:
             tally["SKIP"] += 1
             badge = "SKIP"

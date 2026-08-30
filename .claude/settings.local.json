@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Get-ChildItem -Path \"D:\\\\ns\\\\NotAnotherSpotlight\\\\frontend\" -Recurse -Force | Where-Object {$_.Name -match \"\\(main|index|app\\)\\\\.\\(js|ts|jsx|tsx\\)$\"} | Select-Object FullName)",
-      "PowerShell(Get-ChildItem -Path \"D:\\\\ns\\\\NotAnotherSpotlight\\\\frontend\\\\src-tauri\" -Recurse -Force | Where-Object {-not $_.PSIsContainer} | Select-Object FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\ns\\\\Magpie\\\\frontend\" -Recurse -Force | Where-Object {$_.Name -match \"\\(main|index|app\\)\\\\.\\(js|ts|jsx|tsx\\)$\"} | Select-Object FullName)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\ns\\\\Magpie\\\\frontend\\\\src-tauri\" -Recurse -Force | Where-Object {-not $_.PSIsContainer} | Select-Object FullName)",
       "Bash(cargo add *)",
       "PowerShell($py = $null; foreach \\($c in @\\('py -3','python3','C:\\\\Users\\\\rahul\\\\iqmchallenge\\\\.venv\\\\Scripts\\\\python.exe'\\)\\) { try { $v = & \\([scriptblock]::Create\\(\"$c --version\"\\)\\) 2>$null; if \\($v\\) { Write-Output \"FOUND: $c -> $v\"; $py=$c; break } } catch {} }; if \\(-not $py\\) { Write-Output \"NO PYTHON FOUND\" })",
       "PowerShell(py -3 -c \"import sys; sys.path.insert\\(0,'.'\\); from src.subproc import no_window_kwargs; print\\('kwargs ->', no_window_kwargs\\(\\)\\)\")",

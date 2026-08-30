@@ -1,7 +1,7 @@
 # Tiers — per-extension routing diagrams
 
 Every diagram in this folder describes how one file extension flows through
-NotAnotherSpotlight's ingestion pipeline:
+Magpie's ingestion pipeline:
 **walker → router.peek → router.decide → tier worker → Stage 2 push → Qdrant**.
 
 The pipeline is **policy-driven**. The router (`src/router.py`) is a pure

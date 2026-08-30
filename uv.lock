@@ -23,7 +23,7 @@ resolution-markers = [
 [manifest]
 members = [
     "magpie",
-    "notspotlight",
+    "magpie-cli",
 ]
 
 [[package]]
@@ -1606,7 +1606,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "notspotlight" },
+    { name = "magpie-cli" },
     { name = "pytest" },
 ]
 notebooks = [
@@ -1649,7 +1649,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "notspotlight", editable = "cli" },
+    { name = "magpie-cli", editable = "cli" },
     { name = "pytest", specifier = ">=8.0" },
 ]
 notebooks = [
@@ -1658,6 +1658,23 @@ notebooks = [
     { name = "notebook" },
 ]
 packaging = [{ name = "pyinstaller", specifier = ">=6.0" }]
+
+[[package]]
+name = "magpie-cli"
+version = "0.1.0"
+source = { editable = "cli" }
+dependencies = [
+    { name = "magpie" },
+    { name = "prompt-toolkit" },
+    { name = "rich" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "magpie", editable = "." },
+    { name = "prompt-toolkit", specifier = ">=3.0" },
+    { name = "rich", specifier = ">=13.0" },
+]
 
 [[package]]
 name = "markdown-it-py"
@@ -1982,23 +1999,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/54/d2/92fa3243712b9a3e8bafaf60aac366da1cada3639ca767ff4b5b3654ec28/notebook_shim-0.2.4.tar.gz", hash = "sha256:b4b2cfa1b65d98307ca24361f5b30fe785b53c3fd07b7a47e89acb5e6ac638cb", size = 13167, upload-time = "2024-02-14T23:35:18.353Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f9/33/bd5b9137445ea4b680023eb0469b2bb969d61303dedb2aac6560ff3d14a1/notebook_shim-0.2.4-py3-none-any.whl", hash = "sha256:411a5be4e9dc882a074ccbcae671eda64cceb068767e9a3419096986560e1cef", size = 13307, upload-time = "2024-02-14T23:35:16.286Z" },
-]
-
-[[package]]
-name = "notspotlight"
-version = "0.1.0"
-source = { editable = "cli" }
-dependencies = [
-    { name = "magpie" },
-    { name = "prompt-toolkit" },
-    { name = "rich" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "magpie", editable = "." },
-    { name = "prompt-toolkit", specifier = ">=3.0" },
-    { name = "rich", specifier = ">=13.0" },
 ]
 
 [[package]]

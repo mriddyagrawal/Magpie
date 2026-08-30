@@ -38,6 +38,8 @@ uv run python eval_harness/scripts/phase0_isolation_check.py
 
 ```bash
 uv run python eval_harness/harness/run.py --config eval_harness/configs/baseline.json
+# live progress: `just eval-watch` serves http://127.0.0.1:8765/ - the
+# harness writes raw/progress.json as it works; the page polls it
 # variants:
 #   --retrieval-only            retrieval sweep only (~2 min; no generation)
 #   --index-only                build + report the index, stop

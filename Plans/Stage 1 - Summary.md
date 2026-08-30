@@ -91,7 +91,7 @@ uv run python3 -m src.stage1.summarize <path-to-dir> [--concurrency 6] [--force]
 ## Project layout after Stage 1
 
 ```
-NotAnotherSpotlight/
+Magpie/
 ├── .claude/
 ├── CLAUDE.md
 ├── .env / .env.example

@@ -1,4 +1,4 @@
-"""Interactive REPL for NotAnotherSpotlight."""
+"""Interactive REPL for Magpie."""
 
 from __future__ import annotations
 
@@ -515,7 +515,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(
         prog="ns",
-        description="NotAnotherSpotlight — interactive RAG search over your local files.",
+        description="Magpie — interactive RAG search over your local files.",
     )
     parser.add_argument(
         "--sync",

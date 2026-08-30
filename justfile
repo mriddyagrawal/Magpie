@@ -1,4 +1,4 @@
-# NotAnotherSpotlight — command runner
+# Magpie — command runner
 
 # Auto-load .env into every recipe's environment (HF_TOKEN, LLM keys, etc.).
 set dotenv-load
@@ -173,7 +173,7 @@ search q:
 # Daemon — keeps search models hot across CLI invocations so subsequent
 # queries are sub-second instead of paying ~3-5s of model load each time.
 # Auto-spawns on first use; auto-shuts down after 15 min idle (override with
-# NS_DAEMON_IDLE_MINUTES; 0 disables idle shutdown).
+# MAGPIE_DAEMON_IDLE_MINUTES; 0 disables idle shutdown).
 # ----------------------------------------------------------------------------
 
 # Start the daemon (no-op if already running). Idempotent.

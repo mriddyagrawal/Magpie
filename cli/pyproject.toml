@@ -12,7 +12,7 @@ dependencies = [
 
 [project.scripts]
 magpie-repl = "magpie_cli.repl:main"
-# muscle-memory aliases from the NotAnotherSpotlight era
+# muscle-memory aliases from the Magpie era
 ns = "magpie_cli.repl:main"
 nas = "magpie_cli.repl:main"
 

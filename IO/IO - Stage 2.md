@@ -263,12 +263,12 @@ Summary: This spreadsheet tracks the Fall 2024 financial budget...
 
 ---
 
-## Interactive CLI (notspotlight)
+## Interactive CLI (magpie-repl)
 
 ```
 ┌─────────────────────────────┐
 │  User launches CLI          │
-│  $ notspotlight / ns / nas  │
+│  $ magpie-repl / ns / nas  │
 │  $ just chat                │
 └─────────────┬───────────────┘
               │

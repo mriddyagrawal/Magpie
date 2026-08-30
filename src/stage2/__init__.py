@@ -1,4 +1,4 @@
-"""NotAnotherSpotlight Stage 2 — RAG-style semantic search over local documents."""
+"""Magpie Stage 2 — RAG-style semantic search over local documents."""
 
 __version__ = "0.1.0"
 

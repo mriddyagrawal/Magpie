@@ -1,4 +1,4 @@
-# Competitors — NotAnotherSpotlight
+# Competitors — Magpie
 
 Landscape scan as of 2026-04-18. Tracks everyone building in the "semantic search over local files" and "chat with your documents" space. Grouped by how closely they compete with our positioning (vertical RAG for small-business / student document Q&A with grounded, cited answers).
 

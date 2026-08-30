@@ -16,7 +16,7 @@
 ## Today's structure (one repo, three consumers)
 
 ```
-NotAnotherSpotlight/                     ← single git repo
+Magpie/                     ← single git repo
 ├── src/                                  ← THE ENGINE (Python library)
 │   ├── manifest.py                       ← portable APP_DATA_DIR via platformdirs
 │   ├── ingest/                           ← walker + tier workers (T0-T4)
@@ -33,7 +33,7 @@ NotAnotherSpotlight/                     ← single git repo
 │   └── server.py                         ← FastAPI sidecar (local backend for Tauri)
 │
 ├── cli/                                  ← CLI consumer
-│   └── notspotlight/                     ← `ns` REPL, dot-commands, suggestions
+│   └── magpie_cli/                     ← `ns` REPL, dot-commands, suggestions
 │
 ├── frontend/                             ← Tauri + React desktop GUI consumer
 │   ├── src/                              ← React UI (App.tsx, components/, api.ts)

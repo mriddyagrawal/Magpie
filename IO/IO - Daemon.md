@@ -1,7 +1,7 @@
 # Daemon — long-lived backend for hot search models
 
 > **What this doc is.** Architecture overview + RPC contract for the
-> NotAnotherSpotlight daemon. Read this if you're (a) integrating a UI
+> Magpie daemon. Read this if you're (a) integrating a UI
 > against the daemon socket, (b) extending the RPC surface, or (c)
 > debugging "why is my query slow."
 
@@ -157,9 +157,9 @@ talk to your daemon.
 
 | Platform | Address | Discovery |
 |---|---|---|
-| Linux | `$XDG_RUNTIME_DIR/notspotlight/daemon.sock` (else `~/.cache/notspotlight/daemon.sock`) | Unix socket file |
-| macOS | `~/.cache/notspotlight/daemon.sock` | Unix socket file |
-| Windows | `\\.\pipe\notspotlight` | Named pipe |
+| Linux | `$XDG_RUNTIME_DIR/magpie/daemon.sock` (else `~/.cache/magpie/daemon.sock`) | Unix socket file |
+| macOS | `~/.cache/magpie/daemon.sock` | Unix socket file |
+| Windows | `\\.\pipe\magpie` | Named pipe |
 
 Resolved by `src.daemon.paths.socket_address()`.
 

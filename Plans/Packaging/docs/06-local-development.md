@@ -40,7 +40,7 @@ flowchart LR
 After these three:
 
 - Python venv ready (`.venv/`).
-- `notspotlight` / `ns` / `nas` global aliases installed via `uv tool`.
+- `magpie-repl` / `ns` / `nas` global aliases installed via `uv tool`.
 - `llama-server` binary + Gemma 4 mmproj projector cached in `<APP_DATA_DIR>/bin/`.
 - Qdrant binary at `<APP_DATA_DIR>/qdrant/qdrant`.
 

@@ -101,7 +101,7 @@ is gone gets deleted.
 ### Interactive REPL (recommended)
 
 ```bash
-ns        # or notspotlight / nas — same binary
+ns        # or magpie-repl / nas — same binary
 ```
 
 - First query ~20s (ColPali model cold-load, cached after).
@@ -239,7 +239,7 @@ regardless of config.
 ## `.gitignore` / `.nasignore`
 
 Both are honored the same way `git` itself does: cascading, closest folder
-wins. `.nasignore` is the NotAnotherSpotlight-specific equivalent for
+wins. `.nasignore` is the Magpie-specific equivalent for
 things `git` tracks but you don't want indexed (e.g. private folders).
 
 **Built-in defaults are also applied** and cannot be un-ignored by user

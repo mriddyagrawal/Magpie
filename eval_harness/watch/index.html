@@ -244,15 +244,19 @@
                           run ? "not found for this dataset" : ""));
     }
 
-    // 2-5. harness phases
-    const idx = phases.index ||
-      (run && run.index_store && run.index_store.hit
-        ? { state: "done", first_utc: run.started_utc, last_utc: run.started_utc, note: "index store hit" }
-        : null);
-    if (idx && idx.note === "index store hit") {
+    // 2-5. harness phases. A store-hit run never runs an index phase, so
+    // detect the mount from (in order): the sidecar's note, run.json's
+    // index_store, or — for runs whose run.py predates the mount being
+    // persisted immediately — the fact that a later phase is already
+    // running: answering against no index is impossible.
+    const idxRec = phases.index;
+    const laterPhase = phases.answer || phases.retrieve || phases.enrich;
+    const mounted = (idxRec && idxRec.note === "mounted from store")
+      || (!idxRec && ((run && run.index_store && run.index_store.hit) || !!laterPhase));
+    if (mounted) {
       box.appendChild(row("index", "done", "mounted from store"));
     } else {
-      box.appendChild(harnessStep("index", idx, active === "index", failed && active === "index"));
+      box.appendChild(harnessStep("index", idxRec, active === "index", failed && active === "index"));
     }
     box.appendChild(harnessStep("answer", phases.answer, active === "answer", failed && active === "answer"));
     box.appendChild(harnessStep("retrieve", phases.retrieve, active === "retrieve", failed && active === "retrieve"));

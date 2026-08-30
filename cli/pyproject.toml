@@ -1,5 +1,5 @@
 [project]
-name = "notspotlight"
+name = "magpie-cli"
 version = "0.1.0"
 description = "Interactive CLI for Magpie."
 license = "AGPL-3.0-only"
@@ -11,9 +11,10 @@ dependencies = [
 ]
 
 [project.scripts]
-notspotlight = "notspotlight.repl:main"
-ns = "notspotlight.repl:main"
-nas = "notspotlight.repl:main"
+magpie-repl = "magpie_cli.repl:main"
+# muscle-memory aliases from the NotAnotherSpotlight era
+ns = "magpie_cli.repl:main"
+nas = "magpie_cli.repl:main"
 
 [tool.uv.sources]
 magpie = { workspace = true }

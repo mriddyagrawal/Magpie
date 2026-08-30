@@ -15,7 +15,7 @@ deps:
     @echo "==============================================================="
     @echo ""
     @echo " Default (everyone, ~10 MB on top of project):"
-    @echo "   uv sync                       project + dev (pytest, notspotlight)"
+    @echo "   uv sync                       project + dev (pytest, magpie-cli)"
     @echo ""
     @echo " Opt-in (only when you need them):"
     @echo "   uv sync --group packaging     + PyInstaller (Plan #10 build pipeline)"
@@ -201,7 +201,7 @@ summarize path:
 
 # Launch interactive CLI
 chat:
-    uv run notspotlight
+    uv run magpie-repl
 
 # ----------------------------------------------------------------------------
 # Desktop app build
@@ -285,16 +285,17 @@ chat-cloud:
     LLM_PROVIDER=magpie-cloud \
     MAGPIE_CLOUD_URL=http://127.0.0.1:8000 \
     MAGPIE_INVITE_CODE="${MAGPIE_INVITE_CODE:-dev-anonymous}" \
-    uv run notspotlight
+    uv run magpie-repl
 
-# Install global aliases (notspotlight, ns, nas) via uv tool
+# Install global aliases (magpie-repl, ns, nas) via uv tool
 install:
     uv tool install -e cli --force
-    @echo "Installed! You can now run: notspotlight, ns, or nas from anywhere."
+    @echo "Installed! You can now run: magpie-repl, ns, or nas from anywhere."
 
-# Uninstall global aliases
+# Uninstall global aliases (tries the old package name too, for machines
+# that installed before the magpie-cli rename)
 uninstall:
-    uv tool uninstall notspotlight
+    uv tool uninstall magpie-cli || uv tool uninstall notspotlight
 
 # ----------------------------------------------------------------------------
 # Qdrant standalone server — same Rust binary as Qdrant Cloud, run as a

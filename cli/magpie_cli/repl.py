@@ -11,7 +11,7 @@ from pathlib import Path
 # workspace root), so the `src/*` modules aren't reachable via the normal
 # dependency path when `ns` runs as an installed console script. Prepend the
 # repo root to sys.path so `from src.pipeline import ...` works. `__file__`
-# resolves to cli/notspotlight/repl.py under uv's editable workspace install,
+# resolves to cli/magpie_cli/repl.py under uv's editable workspace install,
 # so parents[2] is the repo root.
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
@@ -23,7 +23,7 @@ from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.history import FileHistory
 from rich.console import Console
 
-from notspotlight.display import (
+from magpie_cli.display import (
     console,
     file_link,
     print_banner,
@@ -34,7 +34,7 @@ from notspotlight.display import (
     print_suggestions,
 )
 
-HISTORY_FILE = Path.home() / ".notspotlight_history"
+HISTORY_FILE = Path.home() / ".magpie_history"
 
 # Dot-command menu shown when user starts their input with "."
 DOT_COMMANDS: list[tuple[str, str]] = [
@@ -157,7 +157,7 @@ def _handle_dot_command(cmd: str) -> bool:
         case ".suggest":
             import asyncio
 
-            from notspotlight.suggestions import force_regenerate, load_suggestions
+            from magpie_cli.suggestions import force_regenerate, load_suggestions
 
             if len(parts) > 1 and parts[1] in ("refresh", "new", "regen"):
                 with console.status("[bold blue]  ◦ Regenerating suggestions...", spinner="dots"):
@@ -374,7 +374,7 @@ def _cmd_sync(
     # Best-effort: refresh REPL question hints if the library changed.
     import asyncio
 
-    from notspotlight.suggestions import regenerate_if_stale
+    from magpie_cli.suggestions import regenerate_if_stale
     from src.manifest import Manifest
 
     try:

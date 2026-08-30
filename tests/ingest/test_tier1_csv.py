@@ -105,20 +105,30 @@ class _FakeAgent:
         return asyncio.get_event_loop().run_until_complete(self.run(message))
 
 
-def _reload_data_dir(tmp_path, monkeypatch):
+@pytest.fixture
+def reloaded_data_dir(tmp_path, monkeypatch):
     """Set MAGPIE_DATA_DIR + reload modules that snapshot APP_DATA_DIR at
-    import time, so the test's tmp_path is what the tier sees."""
-    monkeypatch.setenv("MAGPIE_DATA_DIR", str(tmp_path))
+    import time, so the test's tmp_path is what the tier sees.
+
+    MUST reload BACK on teardown: the old helper left src.manifest pointed
+    at the (deleted) tmp dir for the rest of the session, which made
+    unrelated later tests construct empty Manifests (order-dependent
+    failures in stage2/test_pending_resummarize - triage 2026-08-30)."""
     import importlib, src.manifest, src.ingest.common, src.ingest.tier1
-    for mod in (src.manifest, src.ingest.common, src.ingest.tier1):
+    mods = (src.manifest, src.ingest.common, src.ingest.tier1)
+    monkeypatch.setenv("MAGPIE_DATA_DIR", str(tmp_path))
+    for mod in mods:
+        importlib.reload(mod)
+    yield tmp_path
+    monkeypatch.undo()
+    for mod in mods:
         importlib.reload(mod)
 
 
-def test_run_csv_async_writes_real_summary(tmp_path, monkeypatch):
+def test_run_csv_async_writes_real_summary(tmp_path, monkeypatch, reloaded_data_dir):
     """The summary markdown body should contain the LLM-rendered FileSummary
     (title, summary, keywords, key entities, identifiers) — NOT raw CSV
     bytes like the old T1 path."""
-    _reload_data_dir(tmp_path, monkeypatch)
     p = _write_csv(tmp_path, [
         ["id", "name", "dept"],
         ["1", "alice", "physics"],
@@ -152,10 +162,9 @@ def test_run_csv_async_writes_real_summary(tmp_path, monkeypatch):
     assert "alice,physics" not in body
 
 
-def test_run_csv_async_dedup_existing_summary(tmp_path, monkeypatch):
+def test_run_csv_async_dedup_existing_summary(tmp_path, monkeypatch, reloaded_data_dir):
     """If `<digest>_t1.md` already exists, skip the LLM call entirely
     and return a deduped outcome."""
-    _reload_data_dir(tmp_path, monkeypatch)
     p = _write_csv(tmp_path, [["c"], ["v"]])
     agent = _FakeAgent()
 

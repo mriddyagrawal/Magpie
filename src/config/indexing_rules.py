@@ -53,6 +53,27 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 # Filenames we discover during walk to apply per-directory rule cascades.
 # Order matters for explain-string clarity; we report the first match in
 # the cascade by file source.
+# Dotfiles that carry USER CONTENT and must survive the hidden-file check
+# below. Single source of truth - src/router.py imports this set (config
+# cannot import router; the reverse is fine). Restored 2026-08-30: the
+# rules consolidation added the ignore_hidden rejection WITHOUT this
+# allowlist, so the walker admitted .bashrc and this layer then rejected
+# it - four tests red since, now green again.
+USEFUL_DOTFILE_NAMES = {
+    # Shell / login
+    ".bashrc", ".bash_profile", ".bash_aliases", ".bash_logout",
+    ".zshrc", ".zprofile", ".zshenv", ".zlogin", ".zlogout",
+    ".profile", ".kshrc", ".cshrc", ".tcshrc",
+    ".inputrc", ".dircolors",
+    # Editors
+    ".vimrc", ".nvimrc", ".gvimrc",
+    # Terminal multiplexers / pagers
+    ".tmux.conf", ".screenrc",
+    # Tool config
+    ".gitconfig", ".gitattributes", ".editorconfig",
+    ".condarc",
+}
+
 _INLINE_FILENAMES_GITIGNORE = (".gitignore",)
 # Preferred name first; the legacy .nasignore filename stays honored so
 # existing users' opt-outs never silently stop working (2026-08-30 rename).
@@ -549,10 +570,19 @@ class IndexingRules:
 
     # --- the public API ----------------------------------------------------
 
-    def should_index(self, path: Path | str) -> tuple[bool, str]:
+    def should_index(
+        self, path: Path | str, *, allow_hidden: bool = False
+    ) -> tuple[bool, str]:
         """Single gateway: decide whether `path` should be indexed. Returns
         `(allowed, reason)` where `reason` is a short human-readable string
         suitable for `walk-explain` output and the future "why?" GUI panel.
+
+        `allow_hidden=True` skips ONLY the hidden-filename rejection (step
+        9) - the walker passes it for subtrees whose .magpieconfig.yaml
+        says `include_dotfiles: true`. Safety rails (secrets patterns,
+        excludes, size, category) still apply; the opt-in was silently
+        dead after the rules consolidation because this layer re-rejected
+        every dotfile the walker had admitted (restored 2026-08-30).
 
         Precedence: see `Plans/Ingestion Rules/Implementation Plan.md` §4.
         """
@@ -658,9 +688,10 @@ class IndexingRules:
 
         # 9. Hidden file (filename starts with `.`). Don't reject the
         # inline-rule files themselves — they're meant to be present.
-        if self.user.ignore_hidden:
+        if self.user.ignore_hidden and not allow_hidden:
             name = p.name
-            if name.startswith(".") and name not in _ALL_INLINE_FILENAMES:
+            if (name.startswith(".") and name not in _ALL_INLINE_FILENAMES
+                    and name not in USEFUL_DOTFILE_NAMES):
                 return (False, "hidden file")
 
         # 10. Category gating. Per-root override → globals.

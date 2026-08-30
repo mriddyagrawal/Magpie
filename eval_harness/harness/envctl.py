@@ -294,17 +294,28 @@ def non_secret(env: dict[str, str]) -> dict[str, str]:
     return {k: v for k, v in env.items() if not _is_secret(k)}
 
 
+def redact_home(value: str) -> str:
+    """Committed-artifact form of a path: the home directory becomes `~`.
+
+    Run records are committed; absolute home paths in them name the machine
+    and its user (owner request 2026-08-30: no machine paths in anything
+    that ships). `~` keeps the path meaningful and expanduser-restorable
+    on the machine that wrote it."""
+    home = str(Path.home())
+    return value.replace(home, "~") if home and home != "/" else value
+
+
 def snapshot_env(env: dict[str, str]) -> dict[str, str]:
     """Run-record form of the environment: secrets replaced by a stable
     sha256 prefix so two runs can be compared for same/different key without
-    the value ever entering the record."""
+    the value ever entering the record; home paths redacted to `~`."""
     out: dict[str, str] = {}
     for key, value in sorted(env.items()):
         if _is_secret(key):
             digest = hashlib.sha256(value.encode()).hexdigest()[:12]
             out[key] = f"<redacted sha256:{digest}>"
         else:
-            out[key] = value
+            out[key] = redact_home(value)
     return out
 
 

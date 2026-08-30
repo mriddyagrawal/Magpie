@@ -709,7 +709,8 @@ def _write_report(run_dir: Path, s: dict, enriched: list[dict], run_record: dict
         )
     lines.append("")
     lines.append("_Deterministic scoring only; judge pass (Phase 3) refines prose verdicts._")
-    (run_dir / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (run_dir / "report.md").write_text(
+        _redact_home("\n".join(lines)) + "\n", encoding="utf-8")
 
 
 def _load_jsonl(p: Path) -> list[dict]:
@@ -731,5 +732,19 @@ def _load_json(p: Path) -> dict:
         return {}
 
 
+_HOME = str(Path.home())
+
+
+def _redact_home(text: str) -> str:
+    """Committed artifacts must not name the machine (owner 2026-08-30):
+    home-dir prefixes become `~` in everything enrich writes. Applied at
+    the serialization choke point so every path field (retrieved, cited,
+    corpus refs) is covered without threading a flag through the rows."""
+    return text.replace(_HOME, "~") if _HOME and _HOME != "/" else text
+
+
 def _dump(p: Path, obj) -> None:
-    p.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    p.write_text(
+        _redact_home(json.dumps(obj, indent=2, ensure_ascii=False)) + "\n",
+        encoding="utf-8",
+    )

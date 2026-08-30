@@ -110,11 +110,54 @@ def detect_device(*, use_cache: bool = True) -> DeviceConfig:
     ):
         cached = _read_cache()
         if cached is not None:
-            return cached
+            return _apply_col_override(cached)
 
     cfg = _detect_device_uncached()
     _write_cache(cfg)
-    return cfg
+    return _apply_col_override(cfg)
+
+
+def _apply_col_override(cfg: DeviceConfig) -> DeviceConfig:
+    """Honor an explicit MAGPIE_COL_MODEL pin on top of the detected device.
+
+    `auto`/unset keeps the machine's resolution (the cached value). An
+    explicit pin swaps the MODEL slot while keeping the detected device -
+    it deliberately bypasses the RAM/VRAM gates, because a pin exists for
+    exactly the cases the matrix cannot know (cross-machine eval
+    comparability, an experiment). The pin is applied per-call and never
+    written to the cache, so removing the env var restores auto.
+
+    Values: auto | colqwen (aliases qwen, colqwen2_5) | colsmol (aliases
+    smol, colidefics3). Unknown values warn and fall back to auto.
+    NOTE: the fast_tier index must be built and queried by the SAME model -
+    switching the pin over an existing index produces garbage retrieval
+    (incompatible vectors), so pair any switch with a fast-tier rebuild.
+    """
+    raw = os.environ.get("MAGPIE_COL_MODEL", "").strip().lower()
+    if raw in ("", "auto"):
+        return cfg
+    if raw in ("colqwen", "qwen", "colqwen2_5"):
+        family, model_id = "colqwen2_5", COLQWEN_MODEL_ID
+    elif raw in ("colsmol", "smol", "colidefics3"):
+        family, model_id = "colidefics3", COLSMOL_MODEL_ID
+    else:
+        print(f"MAGPIE_COL_MODEL={raw!r} not recognized "
+              f"(auto|colqwen|colsmol) - keeping auto resolution")
+        return cfg
+    if cfg.model_family == family:
+        return cfg
+    if family == "colqwen2_5":
+        print("MAGPIE_COL_MODEL pin: ColQwen2.5 forced - the RAM/VRAM gate "
+              "is bypassed; expect thrashing below "
+              f"{COLQWEN_VRAM_MIN_GB:.0f} GB VRAM / "
+              f"{COLQWEN_UNIFIED_MIN_GB:.0f} GB unified memory")
+        dtype = "bfloat16" if cfg.device == "cuda" else "float16"
+        batch = {"cuda": 4, "mps": 2}.get(cfg.device, 1)
+    else:
+        dtype = "float32" if cfg.device == "cpu" else "float16"
+        batch = 1
+    return DeviceConfig(device=cfg.device, model_id=model_id,
+                        model_family=family, dtype=dtype, batch_size=batch)
 
 
 def _read_cache() -> "DeviceConfig | None":

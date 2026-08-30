@@ -306,7 +306,7 @@ def main() -> None:
     load_dotenv()
 
     parser = argparse.ArgumentParser(
-        prog="notanotherspotlight",
+        prog="magpie",
         description="RAG-style semantic search over local documents.",
     )
     sub = parser.add_subparsers(dest="command", required=True)

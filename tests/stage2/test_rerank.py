@@ -42,7 +42,17 @@ def test_rerank_reorders_by_cross_encoder_score(mock_load):
 
 @patch("src.stage2.rerank._load_model")
 def test_rerank_truncates_to_top_k(mock_load):
-    """Reranker returns at most `top_k` results, in best-first order."""
+    """Reranker returns at most `top_k` results, best-first under the BLEND.
+
+    Since the rank-blend landed (rerank.py: final order = RRF over fusion
+    rank + cross-encoder rank at k=60), the cross-encoder no longer sorts
+    alone - input (fusion) position carries near-equal weight. With cross
+    scores [.5,.8,.2,.9,.6] on inputs p0..p4:
+      p3: fusion#4 + cross#1 -> 1/64+1/61   (top)
+      p1: fusion#2 + cross#2 -> 1/62+1/62
+      p0: fusion#1 + cross#4 -> 1/61+1/64   (beats p4: fusion#5+cross#3)
+    This asserted the pure cross-encoder order until the 2026-08-30 triage;
+    it now locks the blended contract."""
     model = MagicMock()
     model.predict.return_value = np.array([0.5, 0.8, 0.2, 0.9, 0.6])
     mock_load.return_value = model
@@ -51,8 +61,7 @@ def test_rerank_truncates_to_top_k(mock_load):
     out = rerank("q", cands, top_k=3)
 
     assert len(out) == 3
-    # Sorted descending by predicted score: p3 (0.9) > p1 (0.8) > p4 (0.6)
-    assert [r.path for r in out] == ["p3", "p1", "p4"]
+    assert [r.path for r in out] == ["p3", "p1", "p0"]
 
 
 @patch("src.stage2.rerank._load_model")

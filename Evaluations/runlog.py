@@ -38,12 +38,33 @@ LEDGER = REPO_ROOT / "Evaluations" / "RUNLOG.jsonl"
 
 # Env knobs that change what a run measures. Recorded verbatim (None if unset)
 # so a later reader can tell whether two arms were actually comparable.
+# Recorded as its own field so a 3B row and a 450M row can never be read as
+# the same experiment (two model sizes were evaluated side by side on
+# 2026-08-29). LLAMA_SERVER_MODEL_PATH beats the label when it is set.
 TRACKED_ENV = [
     "MAGPIE_DATA_DIR", "QDRANT_CLUSTER_ENDPOINT", "LLM_PROVIDER",
     "LOCAL_SOLO_KEEP", "LOCAL_MIN_P", "LOCAL_REPEAT_PENALTY",
     "MAGPIE_RERANK_FUSE", "MAGPIE_MULTIPART", "MAGPIE_SUMMARY_WHEN_THIN",
     "MAGPIE_HYPE_WEIGHT", "MAGPIE_FORCE_PROVIDER",
+    "LOCAL_PREFILL_BUDGET_TOKENS", "MAGPIE_KV_CACHE", "MAGPIE_KV_SLOT_DIR",
+    "MAGPIE_EXTRACTIVE", "MAGPIE_EXTRACTIVE_MIN_SCORE", "MAGPIE_PROMPT_ORDER",
 ]
+
+
+def _model_label() -> str:
+    """The weights this run answered with, in `repo::quant` shape. A
+    LLAMA_SERVER_MODEL_PATH override names the file instead, since it is
+    what was actually loaded regardless of the profile label."""
+    override = os.environ.get("LLAMA_SERVER_MODEL_PATH", "").strip()
+    if override:
+        return Path(override).name
+    try:
+        from src.inference.profiles import DEFAULT_QUANT, DEFAULT_REPO
+    except Exception:  # noqa: BLE001 — provenance must never block a run
+        DEFAULT_REPO, DEFAULT_QUANT = "?", "?"
+    repo = os.environ.get("LOCAL_MODEL", "").strip() or DEFAULT_REPO
+    quant = os.environ.get("LOCAL_QUANT", "").strip() or DEFAULT_QUANT
+    return f"{repo}::{quant}"
 
 
 def _git(*args: str) -> str:
@@ -145,6 +166,7 @@ def main() -> int:
         "logged_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "dataset": args.dataset,
         "answers_file": str(args.answers.relative_to(REPO_ROOT)),
+        "model": _model_label(),
         "note": args.note,
         "git": {
             "sha": _git("rev-parse", "--short", "HEAD"),

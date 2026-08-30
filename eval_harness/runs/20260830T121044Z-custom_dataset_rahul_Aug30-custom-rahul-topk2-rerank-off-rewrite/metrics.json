@@ -1,0 +1,118 @@
+{
+  "n_questions": 120,
+  "mode": "full",
+  "answer": {
+    "correct": 0.029,
+    "partial": 0.192,
+    "wrong": 0.346,
+    "false_abstain": 0.433,
+    "by_type": {
+      "enumeration": 0.083,
+      "extractive": 0.029,
+      "synthesis": 0.0
+    }
+  },
+  "abstention": {
+    "n_not_found": 16,
+    "correct_abstain_counts": "10/16",
+    "correct_abstain_rate": 0.625,
+    "false_answer_rate": 0.375
+  },
+  "retrieval": {
+    "n": 104,
+    "first_gold_rank": 1.043956043956044,
+    "hit@1": 0.8557692307692307,
+    "hit@12": 0.875,
+    "hit@3": 0.875,
+    "hit@5": 0.875,
+    "mrr": 0.8621794871794871,
+    "ndcg@5": 0.8451940711058769,
+    "recall@1": 0.750534188034188,
+    "recall@12": 0.8605769230769231,
+    "recall@3": 0.8245192307692307,
+    "recall@5": 0.8392094017094018
+  },
+  "retrieval_end_to_end": {
+    "n": 101,
+    "first_gold_rank": 1.0454545454545454,
+    "hit@1": 0.8514851485148515,
+    "hit@12": 0.8712871287128713,
+    "hit@3": 0.8712871287128713,
+    "hit@5": 0.8712871287128713,
+    "mrr": 0.858085808580858,
+    "ndcg@5": 0.8245896953752595,
+    "recall@1": 0.7480748074807481,
+    "recall@12": 0.8146314631463145,
+    "recall@3": 0.8113311331133115,
+    "recall@5": 0.8113311331133115
+  },
+  "retrieval_divergence": {
+    "n_comparable": 101,
+    "n_top1_differs": 2,
+    "n_query_differs": 0
+  },
+  "citations": {
+    "n": 104,
+    "citation_precision": 0.16346153846153846,
+    "citation_recall": 0.17841880341880342,
+    "cited": 0.4807692307692308,
+    "hallucinated_citations": 0.2403846153846154
+  },
+  "solo_gate": {
+    "fire_rate": 0.042
+  },
+  "h1_slice": {
+    "n_extractive": 70,
+    "n_eligible": 44,
+    "eligible_fraction": 0.629,
+    "basis_counts": {
+      "fact_spans": 0,
+      "file_level_image": 44
+    },
+    "accuracy_by_basis": {
+      "file_level_image": 0.045
+    },
+    "accuracy_on_eligible": 0.045,
+    "mixed_basis": false,
+    "note": "per-arm number; never compare raw across arms OR across bases (PLAN H1). accuracy_on_eligible is None when bases are mixed - use accuracy_by_basis."
+  },
+  "by_phrasing": {
+    "typed": {
+      "n": 52,
+      "correct": 0.0,
+      "correct_counts": "0/52",
+      "retrieval_hit@1": 0.7884615384615384,
+      "retrieval_recall@5": 0.7767094017094016
+    },
+    "full": {
+      "n": 52,
+      "correct": 0.058,
+      "correct_counts": "3/52",
+      "retrieval_hit@1": 0.9230769230769231,
+      "retrieval_recall@5": 0.9017094017094018
+    }
+  },
+  "product_findings": {
+    "not_found_flag_missing": 1,
+    "zero_citation_answers": 25
+  },
+  "latency": {
+    "p50_total_s": 14.4,
+    "p95_total_s": 41.0
+  },
+  "errors": 3,
+  "enriched_at_sha": "e9651759a978672b305e9df86925bd8b48d5c01e",
+  "golden_set": {
+    "items": 120,
+    "human_verified": 0,
+    "model_authored": 120,
+    "label_derived": 0,
+    "status": "SILVER (provisional; includes MODEL-AUTHORED gold - review those first)"
+  },
+  "golden_sha": "0ebcdcbcdf109adb",
+  "index_store": {
+    "key": "66974090bdcd62e6",
+    "hit": true,
+    "built_under_sha": "cca67570b04adce9980575d367f3cb9a6836a800"
+  }
+}

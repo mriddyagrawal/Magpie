@@ -26,8 +26,12 @@ _CITATION = re.compile(r"\[\d{1,2}\]")
 # Currency symbols are left outside the token so '$51.32' == '51.32'.
 _NUMERAL = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
-# Below this, numerals are list indices, small counts and years-in-prose.
-# They collide with everything and auditing them is noise, not signal.
+# Below this, bare integers are list indices, small counts and years-in-prose.
+# They collide with everything and auditing them is noise, not signal. A
+# numeral WITH a decimal part is a different thing: 9.00, 60.30, 0.42 are
+# money, and most receipt totals are under 100 — the old rule never looked
+# at them, so an invented "$8.20" for a shop that is not even in the corpus
+# walked straight through (SROIE absence probes, 2026-08-29).
 MIN_INTERESTING = 100
 
 
@@ -42,7 +46,7 @@ def numerals(text: str) -> list[str]:
     for m in _NUMERAL.finditer(normalize(_CITATION.sub(" ", text))):
         tok = m.group(0).rstrip(".")
         try:
-            if abs(float(tok)) < MIN_INTERESTING:
+            if abs(float(tok)) < MIN_INTERESTING and "." not in tok:
                 continue
         except ValueError:
             continue
@@ -51,8 +55,11 @@ def numerals(text: str) -> list[str]:
 
 
 def is_sum_of(target: str, present: list[str]) -> bool:
-    """True when `target` is the sum of two to four numbers that ARE in the
-    context — a total the model computed, not one it invented."""
+    """True when `target` is the sum of two to five numbers that ARE in the
+    context — a total the model computed, not one it invented. Five, not
+    four: an Uber receipt is fare + booking fee + airport surcharge + state
+    surcharge + wait time, and its total only passed the old four-addend
+    rule because 51.32 was under the threshold and never checked."""
     try:
         goal = round(float(target), 2)
     except ValueError:
@@ -63,8 +70,8 @@ def is_sum_of(target: str, present: list[str]) -> bool:
             vals.append(round(float(p), 2))
         except ValueError:
             continue
-    vals = sorted(set(vals))[:40]  # combinatorics guard
-    for n in (2, 3, 4):
+    vals = sorted(set(vals))[:30]  # combinatorics guard: 30 choose 5 is 142k sums
+    for n in (2, 3, 4, 5):
         for combo in itertools.combinations(vals, n):
             if abs(sum(combo) - goal) < 0.005:
                 return True

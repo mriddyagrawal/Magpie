@@ -60,10 +60,9 @@ _CITATION = re.compile(r"\[\d{1,2}\]")
 # out of the token deliberately: '$51.32' and '51.32' should compare equal.
 _NUMERAL = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
-# Numbers this small are almost always list indices, years in prose, or
-# counts the model narrates ('two professors'), and they collide with
-# everything. Auditing them produces noise, not signal.
-_MIN_INTERESTING = 100
+# Which numerals count is decided in one place — src/grounding.MIN_INTERESTING
+# and the decimal rule in src.grounding.numerals — so the shipped guard and
+# this metric can never disagree.
 
 
 

@@ -294,10 +294,13 @@ def test_decide_scanned_pdf_no_gpu_falls_back_to_t3(tmp_path: Path):
     assert d.routes == ["T3"]
 
 
-def test_decide_image_gpu_is_t4(tmp_path: Path):
+def test_decide_image_gpu_is_t3_and_t4(tmp_path: Path):
+    """An image always gets a summary (T3) so ordinary search can find it;
+    ColPali (T4) rides alongside when it fits. T4-only left a folder of
+    receipt photos invisible to every non-visual question (2026-08-29)."""
     img = _make_image(tmp_path, "photo.jpg", (1200, 900))
     d = decide(peek(img), gpu_available=True)
-    assert d.routes == ["T4"]
+    assert d.routes == ["T3", "T4"]
 
 
 def test_decide_image_thumbnail_is_skipped(tmp_path: Path):

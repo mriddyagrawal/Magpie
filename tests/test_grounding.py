@@ -197,3 +197,35 @@ def test_scrubber_keeps_newlines_and_tabs():
     from src.content import scrub_control_chars
 
     assert scrub_control_chars("a\nb\tc\r\nd") == "a\nb\tc\r\nd"
+
+
+def test_grounding_guard_stands_down_for_image_contexts(tmp_path, monkeypatch):
+    """A photographed receipt is pixels; the model's '19/10/2018' cannot be
+    found in any text block, and the guard must not erase it."""
+    import asyncio
+
+    import src.content as content
+    from src.answer import Answer, answer_question
+
+    img = tmp_path / "receipt.jpg"
+    img.write_bytes(b"\xff\xd8\xff" + b"0" * 2000)
+
+    class Blob:
+        data = b"\xff\xd8\xff" + b"0" * 2000
+        media_type = "image/jpeg"
+
+    monkeypatch.setattr(content, "build_content_blocks", lambda *a, **k: ["Content type: image", Blob()])
+    monkeypatch.setenv("MAGPIE_FORCE_PROVIDER", "local")
+    monkeypatch.setenv("LLM_PROVIDER", "local")
+
+    class FakeAgent:
+        _system_prompt = "sys"
+
+        async def run(self, message, **kw):
+            return Answer(answer="19/10/2018, total 60.30", sources_used=["1"], not_found=False, not_found_topic="")
+
+    import src.answer as ans_mod
+    monkeypatch.setattr(ans_mod, "build_content_blocks", lambda *a, **k: ["Content type: image", Blob()])
+    ans = asyncio.run(answer_question(FakeAgent(), "On what date did I shop?", [str(img)]))
+    assert ans.answer == "19/10/2018, total 60.30"
+    assert ans.not_found is False

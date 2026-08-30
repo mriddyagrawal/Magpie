@@ -1,11 +1,11 @@
 ---
-name: prepare-harness
-description: Prepare this machine for Magpie eval runs - interview for model choices, run the deterministic installer, diagnose failures, and verify with a smoke test. Trigger with /prepare-harness.
+name: prepare-eval-harness
+description: Prepare this machine for Magpie eval runs - interview for model choices, run the deterministic installer, diagnose failures, and verify with a smoke test. Trigger with /prepare-eval-harness.
 ---
 
-# Prepare-harness — thin wrapper procedure
+# Prepare-eval-harness — thin wrapper procedure
 
-The installer is `just prepare-harness` (a deterministic script:
+The installer is `just prepare-eval-harness` (a deterministic script:
 `eval_harness/scripts/prepare_harness.py`). This skill NEVER re-implements an
 install step - its job is only what a script cannot do: choose flags with the
 owner, diagnose failures, and prove the result with a real smoke run.
@@ -24,8 +24,8 @@ owner, diagnose failures, and prove the result with a real smoke run.
 
 ## 2. Run
 
-    just prepare-harness --check        # first: report state
-    just prepare-harness [flags]        # then: install what is missing
+    just prepare-eval-harness --check        # first: report state
+    just prepare-eval-harness [flags]        # then: install what is missing
 
 Diagnose, don't improvise: disk space, network, HF auth (gated repos ask for
 `huggingface-cli login`), partial downloads (rerun - every step is

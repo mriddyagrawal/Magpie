@@ -44,7 +44,7 @@ install-llama-server:
 # One-command machine prep: qdrant + llama-server + models this machine will
 # use (same registries as the app; models land in the shared cache). Flags
 # pass through: --check (report only), --col auto|qwen|smol, --llm lfm[,gemma].
-prepare-harness *args:
+prepare-eval-harness *args:
     uv run python eval_harness/scripts/prepare_harness.py {{args}}
 
 # Walk every enabled include_paths entry in indexing_rules.json ("do everything").
@@ -643,7 +643,7 @@ qdrant-counts:
 
 # ~5 min warm: run the frozen 10-question smoke fixture end-to-end through the
 # REAL pipeline (walker, col model, qdrant, llama-server) and gate on loose
-# floors. Requires `just prepare-harness` to have run once on this machine.
+# floors. Requires `just prepare-eval-harness` to have run once on this machine.
 eval-smoke:
     #!/usr/bin/env bash
     set -euo pipefail

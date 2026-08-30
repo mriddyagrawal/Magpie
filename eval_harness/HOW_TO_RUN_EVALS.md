@@ -18,14 +18,14 @@ design rationale. This file is the "I just cloned the repo" path.
 
 ```bash
 uv sync                     # python env (uv: https://docs.astral.sh/uv/)
-just prepare-harness        # binaries + the models THIS machine will use
+just prepare-eval-harness        # binaries + the models THIS machine will use
                             #   --check reports without installing
                             #   --col qwen|smol pins the visual retriever
                             #   --llm lfm,gemma picks answer models (lfm default)
-                            #   Linux GPU: LLAMA_SERVER_GPU=cuda-* just prepare-harness
+                            #   Linux GPU: LLAMA_SERVER_GPU=cuda-* just prepare-eval-harness
 ```
 
-(`/prepare-harness` in Claude Code wraps this with an interview, failure
+(`/prepare-eval-harness` in Claude Code wraps this with an interview, failure
 diagnosis, and a smoke run. The individual recipes `just download-qdrant` /
 `just install-llama-server` still exist.)
 

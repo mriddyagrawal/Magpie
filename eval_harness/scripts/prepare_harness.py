@@ -1,7 +1,7 @@
 """One-command machine prep for the eval harness (and Magpie dev generally).
 
-    just prepare-harness            # binaries + models this machine will use
-    just prepare-harness --check    # report what is present/missing, change nothing
+    just prepare-eval-harness            # binaries + models this machine will use
+    just prepare-eval-harness --check    # report what is present/missing, change nothing
 
 Steps (each idempotent, each skippable):
   1. qdrant binary        -> scripts/download_qdrant.py (per-platform)
@@ -171,7 +171,7 @@ def main() -> None:
         print(f"  {'OK     ' if v else 'MISSING'} {k}")
     hard = [k for k, v in results.items() if not v and k != "claude cli"]
     if hard:
-        sys.exit(f"prepare-harness: incomplete ({', '.join(hard)})"
+        sys.exit(f"prepare-eval-harness: incomplete ({', '.join(hard)})"
                  + ("" if not args.check else " - rerun without --check to install"))
     print("\nready. next: eval_harness/HOW_TO_RUN_EVALS.md")
 

@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
-CLAUDE.md
 .claude/scheduled_tasks.lock
 Test Content/
 Test Content Deprecated/
@@ -73,5 +72,9 @@ Evaluations/*/
 # tracked — ignoring never untracks — so they shipped to the public repo
 # anyway. Regenerate against synthetic documents; do not re-commit.
 Test Questions/
+
+# Shareable eval corpus sampled from sem_4/sem5/sem6/PhyLL (real personal
+# documents). Built by scripts, lives only on disk; never commit it.
+test_files/
 
 .venv.broken/

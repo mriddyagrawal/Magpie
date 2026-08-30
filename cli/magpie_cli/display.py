@@ -83,7 +83,7 @@ def _fast_tier_line() -> str:
 def print_banner() -> None:
     from src.llm import active_model_name, active_provider
 
-    from notspotlight.suggestions import load_suggestions
+    from magpie_cli.suggestions import load_suggestions
 
     qs = load_suggestions() or FALLBACK_SUGGESTIONS
     suggestions = "\n".join(f"  [dim italic]{s}[/dim italic]" for s in qs)

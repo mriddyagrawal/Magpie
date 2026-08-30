@@ -102,7 +102,7 @@ Take `Plans/backlog_20Apr26.md` (23 KB, exists in your corpus right now).
 
 ### Step 1 — Walker discovers it
 
-`just walk /mnt/hardisk/NotAnotherSpotlight/` runs.
+`just walk /mnt/hardisk/Magpie/` runs.
 [walker.py:107 find_candidates()](../src/ingest/walker.py#L107) calls `root.rglob("*")`,
 collects every file with a considered extension, applies ignore rules.
 This file passes — `.md` is in `_CONSIDERED_EXTS`, no `.gitignore` rule

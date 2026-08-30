@@ -103,7 +103,7 @@ Images pass through unchanged (PNG size doesn't hit the char cap — it hits the
 ## File layout after stage 4
 
 ```
-NotAnotherSpotlight/
+Magpie/
 ├── src/
 │   ├── content.py          (new — shared file-reading / content-block builder)
 │   ├── summarize.py        (stage 1, refactored to use content.py)

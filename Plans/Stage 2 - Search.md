@@ -97,10 +97,10 @@ python -m src.stage2 ingest [--force]
 python -m src.stage2 search "your question" [--top-k 5] [--rewrite]
 ||||||| Stash base
 # Ingest all summaries into Qdrant
-python -m notanotherspotlight ingest [--summaries-dir "Test Summaries"] [--force]
+python -m src.stage2 ingest [--summaries-dir "Test Summaries"] [--force]
 
 # Search documents
-python -m notanotherspotlight search "your question" [--top-k 5]
+python -m src.stage2 search "your question" [--top-k 5]
 =======
 python -m src.stage2 ingest [--summaries-dir "Summaries"] [--force]
 python -m src.stage2 search "your question" [--top-k 5] [--rewrite]
@@ -136,10 +136,10 @@ python -m src.stage2 search "your question" [--top-k 5] [--rewrite]
 | `--force` | off | Drop and recreate the Qdrant collection before ingesting. |
 | `--top-k` | `5` | Number of search results to return. |
 =======
-### `cli/notspotlight/` — Interactive CLI (separate package)
+### `cli/magpie_cli/` — Interactive CLI (separate package)
 - `repl.py` — prompt_toolkit REPL loop with step-by-step progress display
 - `display.py` — rich-based output (panels, tables, spinners)
-- Entry points: `notspotlight`, `ns`, `nas`
+- Entry points: `magpie-repl`, `ns`, `nas`
 - Dot-commands: `.help`, `.rewrite on/off`, `.top-k N`, `.clear`
 - Install globally: `just install`
 >>>>>>> Stashed changes
@@ -147,7 +147,7 @@ python -m src.stage2 search "your question" [--top-k 5] [--rewrite]
 ## Project Layout
 
 ```
-NotAnotherSpotlight/
+Magpie/
 ├── src/
 │   ├── stage1/
 │   │   └── summarize.py               (Stage 1 — co-founder)
@@ -163,7 +163,7 @@ NotAnotherSpotlight/
 │   └── pipeline.py                    (full pipeline orchestration)
 ├── cli/
 │   ├── pyproject.toml                 (separate package)
-│   └── notspotlight/
+│   └── magpie_cli/
 │       ├── __init__.py
 │       ├── repl.py                    (interactive REPL)
 │       └── display.py                 (rich output formatting)
@@ -204,4 +204,4 @@ CLI (`cli/pyproject.toml`):
 5. `just chat` launches interactive CLI with banner, suggestions, and dot-commands
 6. Asking a question in the CLI shows step-by-step progress and returns answer + sources
 7. Re-running ingest doesn't create duplicate points
-8. `just install` registers `notspotlight`, `ns`, `nas` as global commands
+8. `just install` registers `magpie-repl`, `ns`, `nas` as global commands

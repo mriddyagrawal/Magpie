@@ -57,6 +57,6 @@ def test_socket_address_per_platform(monkeypatch, tmp_path: Path):
     addr = paths.socket_address()
     assert isinstance(addr, str)
     if sys.platform == "win32":
-        assert addr.startswith(r"\\.\pipe\notspotlight")
+        assert addr.startswith(r"\\.\pipe\magpie")
     else:
         assert addr.endswith("daemon.sock")

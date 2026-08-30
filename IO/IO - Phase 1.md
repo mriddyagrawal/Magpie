@@ -17,7 +17,7 @@
 
 ```python
 # src/manifest.py — BEFORE
-REPO_ROOT = Path(__file__).resolve().parent.parent      # /mnt/.../NotAnotherSpotlight
+REPO_ROOT = Path(__file__).resolve().parent.parent      # /mnt/.../Magpie
 DEFAULT_MANIFEST_PATH = REPO_ROOT / "Test Summaries" / "_manifest.json"
 
 # src/manifest.py — AFTER
@@ -119,7 +119,7 @@ data needs to move once. The script does it:
 
 ```bash
 $ uv run python scripts/migrate_data.py
-legacy data:  /mnt/hardisk/NotAnotherSpotlight/Test Summaries
+legacy data:  /mnt/hardisk/Magpie/Test Summaries
   - manifest: yes
   - summaries: 19355 .md file(s)
 
@@ -131,7 +131,7 @@ DRY RUN — no files moved. Re-run with --apply to migrate.
 
 $ uv run python scripts/migrate_data.py --apply
 done: 19355 summary file(s) moved, manifest moved
-removed empty /mnt/hardisk/NotAnotherSpotlight/Test Summaries
+removed empty /mnt/hardisk/Magpie/Test Summaries
 ```
 
 Idempotent — safe to re-run. Refuses to overwrite if the target already

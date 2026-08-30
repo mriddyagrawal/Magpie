@@ -117,7 +117,7 @@ Conventions:
 - **Revisit trigger:** After the first honest Phase-1 real-data test is published (see D1, D2).
 
 ### C5. Pipx-installable wheel
-- **What:** Publish `notanotherspotlight` to PyPI, user installs with `pipx install notanotherspotlight`, gets a global `ns` command.
+- **What:** Publish `magpie-cli` to PyPI, user installs with `pipx install magpie-cli`, gets a global `ns` command.
 - **Effort:** S (for pipx); Tauri shell is a separate L item.
 - **Why:** Adoption friction. `uv sync` + `-m src.pipeline` is dev-only; nobody finds a product that requires that.
 - **Why not yet:** Some pieces still assume repo-relative paths (see D4); clean up first.
@@ -156,7 +156,7 @@ Conventions:
 - **Revisit trigger:** Pre-public-release.
 
 ### D4. Drop hard REPO_ROOT assumptions
-- **What:** A few paths (summary filenames, manifest key generation) implicitly assume ingest runs inside the NotAnotherSpotlight checkout. A user installing via pipx will not. Audit and fix.
+- **What:** A few paths (summary filenames, manifest key generation) implicitly assume ingest runs inside the Magpie checkout. A user installing via pipx will not. Audit and fix.
 - **Effort:** S.
 - **Why:** Without this, C5 ships a pipx package that only works if you happen to have cloned the repo into `$(pwd)`. Embarrassing.
 - **Why not yet:** Discovered mid-session; ignored scope was tighter.

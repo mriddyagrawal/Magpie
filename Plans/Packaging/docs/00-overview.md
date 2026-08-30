@@ -106,7 +106,7 @@ documentation set below mirrors them.
 
 | Tier | What the user does | Audience | Status today |
 |---|---|---|---|
-| **1** | `uv sync && uv run notspotlight` | other developers | ✅ Working — see [01-bundle-diet.md](01-bundle-diet.md) for size |
+| **1** | `uv sync && uv run magpie-repl` | other developers | ✅ Working — see [01-bundle-diet.md](01-bundle-diet.md) for size |
 | **2** | Run a single binary (`magpie-sidecar`) | testers, "give me the tool" friends | ✅ Builds, ⚠️ smoke-tested in CI but no perf record yet |
 | **3** | Double-click an installer (`.dmg`, `.msi`, etc.) | end customers | 🟡 Builds unsigned; signing + update feed pending — see [05-release-pipeline.md](05-release-pipeline.md) |
 

@@ -286,7 +286,7 @@ tables when picking defaults.
 
 Both are PEFT LoRA adapters whose base model is resolved transitively at load
 time — the `model_id` alone understates ColQwen's download by ~30×. The
-selection is cached at `~/.cache/notspotlight/device.json` with a
+selection is cached at `~/.cache/magpie/device.json` with a
 `selector_version`; bumping the version in `device.py` invalidates old caches
 when the matrix changes.
 
@@ -395,7 +395,7 @@ completes in ~19 minutes. The matrix entry is commented in `build.yml`.
 
 ## The CLI
 
-`cli/notspotlight` provides an `ns` terminal REPL. **It is frozen and partially
+`cli/magpie_cli` provides an `ns` terminal REPL. **It is frozen and partially
 broken** — the tag `v0.1.0-cli` marks its last working state (2026-05-01), taken
 deliberately "before path-portability work begins," and it was never brought
 forward.

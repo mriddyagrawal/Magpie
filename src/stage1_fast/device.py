@@ -11,10 +11,10 @@ collection, since the two produce incompatible vectors and the query encoder
 must match whatever built the index.
 
 The detection itself imports torch and initializes CUDA — together ~10-15s
-on first call. The result is cached at `~/.cache/notspotlight/device.json`
+on first call. The result is cached at `~/.cache/magpie/device.json`
 so repeat REPL launches don't pay that cost. Hardware doesn't change
 between invocations; if the user moves machines they can `rm` the cache
-or set `NS_REDETECT=1`.
+or set `MAGPIE_REDETECT=1` (legacy `NS_REDETECT` still honored).
 """
 
 from __future__ import annotations
@@ -53,7 +53,9 @@ COLSMOL_MODEL_ID = "vidore/colSmol-500M"
 COLSMOL_BASE_ID = "vidore/ColSmolVLM-Instruct-500M-base"
 COLSMOL_TOTAL_GB = 0.93
 
-_CACHE_PATH = Path.home() / ".cache" / "notspotlight" / "device.json"
+_CACHE_PATH = Path.home() / ".cache" / "magpie" / "device.json"
+# Pre-rename location (2026-08-30). Read-migrated once, never written again.
+_LEGACY_CACHE_PATH = Path.home() / ".cache" / "notspotlight" / "device.json"
 
 # Bumped whenever the selection MATRIX changes, not when hardware does. The
 # cache exists to skip a 10-15s torch probe, but it also freezes whatever
@@ -97,13 +99,15 @@ class DeviceConfig:
 def detect_device(*, use_cache: bool = True) -> DeviceConfig:
     """Pick the best available backend and matching model.
 
-    First call (or when `NS_REDETECT=1`) imports torch + probes CUDA — adds
+    First call (or when `MAGPIE_REDETECT=1`) imports torch + probes CUDA — adds
     ~10-15s to the calling process. Result is then written to
-    `~/.cache/notspotlight/device.json`; subsequent calls in any process
+    `~/.cache/magpie/device.json`; subsequent calls in any process
     return the cached value in <1ms. Pass `use_cache=False` to force a
     fresh detection (e.g. after a hardware change).
     """
-    if use_cache and not os.environ.get("NS_REDETECT"):
+    if use_cache and not (
+        os.environ.get("MAGPIE_REDETECT") or os.environ.get("NS_REDETECT")
+    ):
         cached = _read_cache()
         if cached is not None:
             return cached
@@ -114,20 +118,27 @@ def detect_device(*, use_cache: bool = True) -> DeviceConfig:
 
 
 def _read_cache() -> "DeviceConfig | None":
-    if not _CACHE_PATH.exists():
-        return None
+    path = _CACHE_PATH
+    if not path.exists():
+        if _LEGACY_CACHE_PATH.exists():
+            path = _LEGACY_CACHE_PATH  # migrated below on successful read
+        else:
+            return None
     try:
-        data = json.loads(_CACHE_PATH.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("selector_version") != _SELECTOR_VERSION:
             return None  # stale matrix — re-detect rather than honor an old pick
         # Drop any extra fields (e.g. _cached_at) to stay forward-compatible.
-        return DeviceConfig(
+        cfg = DeviceConfig(
             device=data["device"],
             model_id=data["model_id"],
             model_family=data["model_family"],
             dtype=data["dtype"],
             batch_size=data["batch_size"],
         )
+        if path is _LEGACY_CACHE_PATH:
+            _write_cache(cfg)  # one-time migration to the magpie path
+        return cfg
     except (OSError, json.JSONDecodeError, KeyError):
         return None
 

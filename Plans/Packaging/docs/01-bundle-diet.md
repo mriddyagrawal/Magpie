@@ -74,7 +74,7 @@ flowchart TB
     syncprod["uv sync --no-dev"]
 
     project[("project deps<br/>~1.3 GB<br/>torch+cpu, qdrant,<br/>fastembed, transformers")]
-    dev[("dev group<br/>~10 MB<br/>pytest, notspotlight CLI")]
+    dev[("dev group<br/>~10 MB<br/>pytest, magpie-cli")]
     pkg[("packaging group<br/>~30 MB<br/>PyInstaller")]
     nb[("notebooks group<br/>~200 MB<br/>jupyter, ipykernel")]
 

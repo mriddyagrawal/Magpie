@@ -37,8 +37,8 @@ DEFAULT_IDLE_TIMEOUT_SEC = 15 * 60
 
 
 def _idle_timeout_sec() -> int:
-    """Read NS_DAEMON_IDLE_MINUTES env var. 0 disables auto-shutdown."""
-    raw = os.environ.get("NS_DAEMON_IDLE_MINUTES")
+    """Read MAGPIE_DAEMON_IDLE_MINUTES (legacy NS_DAEMON_IDLE_MINUTES honored). 0 disables auto-shutdown."""
+    raw = os.environ.get("MAGPIE_DAEMON_IDLE_MINUTES") or os.environ.get("NS_DAEMON_IDLE_MINUTES")
     if raw is None:
         return DEFAULT_IDLE_TIMEOUT_SEC
     try:
@@ -183,7 +183,7 @@ def _watchdog_loop() -> None:
     """Background thread — exits the daemon if idle exceeds threshold."""
     timeout = _idle_timeout_sec()
     if timeout <= 0:
-        return  # idle-shutdown disabled (NS_DAEMON_IDLE_MINUTES=0).
+        return  # idle-shutdown disabled (MAGPIE_DAEMON_IDLE_MINUTES=0).
     while not _shutdown_requested.is_set():
         if _seconds_since_activity() > timeout:
             print(

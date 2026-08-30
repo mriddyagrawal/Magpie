@@ -307,14 +307,15 @@ def compare_pair(a: dict, b: dict, qa_ids: list[str]) -> dict:
         e2e_a = (ra.get("retrieval_end_to_end") or {}).get("hit@1")
         e2e_b = (rb.get("retrieval_end_to_end") or {}).get("hit@1")
         if e2e_a is not None and e2e_b is not None:
-            hit1_pairs.append((bool(e2e_a), bool(e2e_b)))
+            h1a, h1b = e2e_a, e2e_b
             hit1_bases.add("end_to_end")
         else:
             h1a = (ra.get("retrieval") or {}).get("hit@1")
             h1b = (rb.get("retrieval") or {}).get("hit@1")
             if h1a is not None and h1b is not None:
-                hit1_pairs.append((bool(h1a), bool(h1b)))
                 hit1_bases.add("ranked_pre_gate")
+        if h1a is not None and h1b is not None:
+            hit1_pairs.append((bool(h1a), bool(h1b)))
         abstain_pairs.append((bool(ra.get("abstained")), bool(rb.get("abstained"))))
         la_s, lb_s = _latency_total(ra.get("latency_s")), _latency_total(rb.get("latency_s"))
         if la_s is not None and lb_s is not None:

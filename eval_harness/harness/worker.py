@@ -32,6 +32,17 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import envctl  # noqa: E402  (sibling module; no src.* import happens here)
+import progress  # noqa: E402  (sibling; stdlib-only, no src.* import)
+
+
+def _progress(payload: dict, **kw) -> None:
+    """Best-effort progress.json update. run_worker injects `raw_dir` into
+    every payload; a payload without it (tests, hand-run phases) is a no-op,
+    and progress.update itself never raises."""
+    raw = payload.get("raw_dir")
+    if raw:
+        progress.update(Path(raw), **kw)
+
 
 _ENV_PREFIXES = (
     "MAGPIE_", "LOCAL_", "LLAMA_", "LLM_", "HF_", "QDRANT_",
@@ -282,11 +293,15 @@ def phase_answer(payload: dict) -> dict:
     fast = bool(params.get("fast_search", False))
 
     n_ok = n_err = 0
+    _progress(payload, phase="answer",
+              done=len(done), total=len(questions))
     for q in questions:
         qa_id = q["id"]
         if qa_id in done:
             continue
         print(f"[eval] qa_id={qa_id} begin", file=sys.stderr, flush=True)
+        _progress(payload, done=len(done) + n_ok + n_err,
+                  total=len(questions), current=qa_id)
         row: dict = {"qa_id": qa_id, "variant": 0, "question": q["question"]}
         t0 = time.monotonic()
         try:
@@ -328,6 +343,7 @@ def phase_answer(payload: dict) -> dict:
             f.write(json.dumps(row, ensure_ascii=False, default=str) + "\n")
         print(f"[eval] qa_id={qa_id} end ok={row['error'] is None}",
               file=sys.stderr, flush=True)
+        _progress(payload, done=len(done) + n_ok + n_err, total=len(questions))
 
     llm_log = session_log_path()
 
@@ -425,8 +441,11 @@ def phase_retrieve(payload: dict) -> dict:
                 }
 
     rows_out = []
+    _progress(payload, phase="retrieve", done=0, total=len(questions))
     for q in questions:
         t0 = time.monotonic()
+        _progress(payload, done=len(rows_out), total=len(questions),
+                  current=q["id"])
         row: dict = {"qa_id": q["id"], "question": q["question"]}
         try:
             rec = recorded.get(q["id"])

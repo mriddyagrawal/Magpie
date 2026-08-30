@@ -169,6 +169,10 @@ def run_worker(
     if result_path.exists():
         result_path.unlink()
     payload_path = run_dir / "raw" / f"worker_{phase}_payload.json"
+    # live-progress sidecar: tell the worker where <run>/raw lives so its
+    # loops can write progress.json (harness/progress.py) — additive only,
+    # never load-bearing for the phase itself
+    payload.setdefault("raw_dir", str(run_dir / "raw"))
     payload_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     log_path = run_dir / "raw" / (log_name or f"worker_{phase}.log")

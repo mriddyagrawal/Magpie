@@ -1,0 +1,117 @@
+{
+  "run_id": "20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+  "config_name": "custom-rahul-topk2-rerank-off-norewrite",
+  "dataset": "custom_dataset_rahul_Aug30",
+  "params": {
+    "model_config": "lfm-local",
+    "col_model": "auto",
+    "prompt_style": "baseline",
+    "temperature": 0.0,
+    "solo_margin": 0,
+    "rerank": false,
+    "local_n_ctx": 16384,
+    "top_k": 2,
+    "top_k_retrieval_max": 12,
+    "rewrite": false,
+    "enumerate_lists": true,
+    "fast_search": true,
+    "index_fast_tier": true,
+    "index_summary_tier": true,
+    "llama_startup_timeout_s": 300,
+    "memory": null,
+    "_notes": {
+      "dataset": "custom_dataset_rahul_Aug30: 545 files, 15 visual categories, assembled from public benchmark sources (OWID charts, UCSF industry documents, arXiv figures, IAM handwriting, RICO screenshots, scene-text photos, French annual-report tables, handwritten C++ study notes, receipts). Registered on this machine 2026-08-30 via register_corpus.py; the earlier registration commit was reverted (17111c7) and this run re-registers it. Golden set generated fresh for this run - no prior run shares this dataset, so nothing here is comparable to the two committed receipts runs.",
+      "golden_persona": "Owner decision 2026-08-30: no single person plausibly owns all 15 categories, so the golden set is written under ONE umbrella persona - a CS grad student whose Mac has everything dumped in one place. This keeps questions persona-real (skill Phase 2) and makes cross-category multi-file items legitimate.",
+      "notes_iam_excluded": "Owner decision 2026-08-30: the 30 notes_iam files stay INDEXED (realistic distractors) but carry ZERO golden items. They are IAM/LOB handwriting benchmark strips - unrelated sentence fragments with no coherent subject, so no persona-real question can be asked of them. Any retrieval hit on a notes_iam file is therefore a false positive by construction; the retrieval report should treat that slice as pure distractor pressure, not as unmeasured coverage.",
+      "top_k": "owner decision 2026-08-30: k=2, matching 20260829T065335Z-receipts-topk2-rerank-off. One knob, both axes - worker.py:294 passes top_k straight into ask(), so 2 files are retrieved AND 2 are fed to the generator. top_k_retrieval_max stays 12 (retrieval-only sweeps; unused by this full run).",
+      "rerank": "MAGPIE_RERANK kill-switch; production default is ON - this run deliberately diverges (owner decision 2026-08-30, same rationale as baseline): the cross-encoder scores visual hits against the constant placeholder '(visual match - page N)' (product bug #1), so rerank off = ColQwen's own fusion ranking. false ALSO structurally disables the solo gate (its margin is on cross-encoder score scale); run.py:154 stamps solo_gate_structurally_off. Owner was told this makes the run a rerank+gate change together, not a clean rerank-only test, and chose off.",
+      "solo_margin": "0 = gate off, stated explicitly rather than implied by rerank=false (owner decision 2026-08-30, confirmed when asked). Production default is 2.0; recording 2.0 here would have been a config that lies about the run, since the gate cannot fire at any margin with rerank off.",
+      "rewrite": "OFF (owner decision 2026-08-30). Query-side only: worker.py:278 passes it into ask(), and the retrieval sweep at worker.py:442 swaps rewrite_query() for raw_query(). raw_query() (search.py:1013) makes no LLM call, so the wall-clock-contamination failure mode found on receipts (the rewriter injecting the current date into the query string) cannot occur. Keywords are still populated by extract_rare_tokens() (MAGPIE_RARE_TOKENS defaults on), NOT left empty. Does NOT affect the LIST_ALL widener, which classifies on the raw question (search.py:771).",
+      "fast_search": "REQUIRED, not a free choice: every one of the 545 files is a jpg/png/pdf, so every golden item carries requires.visual_tier=true and run.py:101 hard-fails the run without it. Production ships visual-tier search OFF; this is a dataset-level override (review #31) and the worker default stays production-faithful False.",
+      "col_model": "auto (owner decision 2026-08-30) = this machine resolves ColQwen (>=8GB VRAM / >=24GB unified) or ColSmol. Index-side param, part of the index key; the RESOLVED family is stamped into run.json and the index store meta, so a cross-machine comparison can never silently mix retrievers.",
+      "temperature": "evals run at 0 (PLAN 4.2); production settings.json default is 0.7",
+      "local_n_ctx": "pinned: .env.example fresh-clone value & shipped-beta ctx; this machine's .env says 65536 and must not leak (PLAN 3)",
+      "prompt_style_and_memory": "INERT - neither name is read anywhere under eval_harness/harness/. Carried for provenance symmetry with baseline.json only; they describe nothing about this run's behaviour."
+    },
+    "provider": "local",
+    "grammar": true
+  },
+  "index_params_hash": "66974090bdcd62e6",
+  "golden_sha": "0ebcdcbcdf109adb",
+  "questions": 120,
+  "backend_git_sha": "cca67570b04adce9980575d367f3cb9a6836a800",
+  "harness_git_sha": "2465ab7b99c8859d434db07662ad332e712993b0",
+  "repo_head_sha": "2465ab7b99c8859d434db07662ad332e712993b0",
+  "status": "complete",
+  "machine": {
+    "platform": "macOS-26.4.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "python": "3.11.15",
+    "chip": "Apple M1 Max",
+    "mem_bytes": "68719476736"
+  },
+  "env_snapshot": {
+    "FASTEMBED_CACHE_PATH": "~/Library/Application Support/Magpie/cache/fastembed",
+    "HF_HOME": "~/Library/Application Support/Magpie/cache",
+    "HF_HUB_CACHE": "~/Library/Application Support/Magpie/cache/hub",
+    "HOME": "~",
+    "LANG": "en_US.UTF-8",
+    "LLAMA_SERVER_BASE_PORT": "9400",
+    "LLAMA_SERVER_PATH": "~/Library/Application Support/Magpie/bin/llama-server",
+    "LLAMA_SERVER_STARTUP_TIMEOUT_S": "300",
+    "LLM_PROVIDER": "local",
+    "LOCAL_N_CTX": "16384",
+    "LOCAL_SOLO_MARGIN": "0",
+    "LOCAL_TEMPERATURE": "0.0",
+    "MAGPIE_COL_MODEL": "auto",
+    "MAGPIE_DATA_DIR": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite/raw/appdata",
+    "MAGPIE_FORCE_PROVIDER": "local",
+    "MAGPIE_RERANK": "0",
+    "PATH": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/ed404106fcd8/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin",
+    "QDRANT_CLUSTER_ENDPOINT": "http://127.0.0.1:6533",
+    "TMPDIR": "/var/folders/h0/78n4dc9n5f9d5256336n8q2r0000gn/T/",
+    "TRANSFORMERS_CACHE": "~/Library/Application Support/Magpie/cache"
+  },
+  "dataset_manifest_files": 545,
+  "solo_gate_structurally_off": true,
+  "started_utc": "20260830T095758Z",
+  "ports": {
+    "qdrant_http": 6533,
+    "llama_base": 9400
+  },
+  "phases": {
+    "index": {
+      "wall_s": 2514.3,
+      "manifest_entries": 520,
+      "summary_tier_note": "no supported files found under /Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/datasets/custom_dataset_rahul_Aug30/corpus"
+    },
+    "answer": {
+      "wall_s": 2447.5,
+      "answered": 117,
+      "errors": 3,
+      "llm_log": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite/raw/appdata/logs/llm-2026-08-30T10-40-06Z.log"
+    },
+    "retrieve": {
+      "wall_s": 33.8,
+      "errors": 0
+    }
+  },
+  "index_store": {
+    "key": "66974090bdcd62e6",
+    "hit": false
+  },
+  "col_model_resolved": "colqwen2_5",
+  "isolation": {
+    "real_appdata_untouched": true,
+    "cache_model_blobs_unchanged": true,
+    "cache_before": {
+      "files": 152,
+      "bytes": 21540575951
+    },
+    "cache_after": {
+      "files": 152,
+      "bytes": 21540575951
+    }
+  },
+  "wall_s_total": 4996.3
+}

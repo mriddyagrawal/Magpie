@@ -636,3 +636,25 @@ qdrant-counts:
                python3 -c "import sys, json; data=json.load(sys.stdin); print(data.get('result', {}).get('points_count', 'not found'))" 2>/dev/null)
         echo "$coll: $count"
     done
+
+# ----------------------------------------------------------------------------
+# Eval smoke test - tripwire, not benchmark (eval_harness/scripts/smoke_check.py)
+# ----------------------------------------------------------------------------
+
+# ~5 min warm: run the frozen 10-question smoke fixture end-to-end through the
+# REAL pipeline (walker, col model, qdrant, llama-server) and gate on loose
+# floors. Requires `just prepare-harness` to have run once on this machine.
+eval-smoke:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # per-machine pointer for the committed in-tree corpus (no downloads)
+    python3 -c "
+    import json, pathlib
+    ds = pathlib.Path('eval_harness/datasets/smoke')
+    p = ds / 'corpus_root.local.json'
+    p.write_text(json.dumps({'corpus_root': str((ds / 'files').resolve())}, indent=2) + '\n')
+    "
+    run_id="smoke-$(date -u +%Y%m%dT%H%M%SZ)"
+    uv run python eval_harness/harness/run.py \
+        --config eval_harness/configs/smoke.json --run-id "$run_id"
+    uv run python eval_harness/scripts/smoke_check.py "eval_harness/runs/$run_id"

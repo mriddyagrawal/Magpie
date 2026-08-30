@@ -99,3 +99,6 @@ eval_harness/runs/*/logs/
 # QA do. Local corpus-root pointers are per-machine and untracked.
 eval_harness/datasets/*/corpus/
 eval_harness/datasets/*/corpus_root.local.json
+
+# smoke runs are throwaway tripwire artifacts - never commit them
+eval_harness/runs/smoke-*/

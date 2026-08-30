@@ -22,6 +22,15 @@ you spawn. Ground rules that apply the whole way through:
 
 Ask (AskUserQuestion, multiple rounds fine):
 1. **Dataset** — which `eval_harness/datasets/<name>`, or a new corpus path.
+   For a NEW corpus, register it first (creates the manifest + per-machine
+   pointer the runner requires):
+
+       uv run python eval_harness/scripts/register_corpus.py --name <name> \
+           [--corpus-dir /path/to/files]
+
+   Without `--corpus-dir` it expects files in
+   `eval_harness/datasets/<name>/corpus/` (gitignored). Duplicate basenames
+   are refused - the harness anchors gold matching on basenames.
 2. **Golden set** — one of: *reuse* a committed golden if the dataset has
    one; *adapt* an existing annotation source into our schema; *generate
    fresh* by reading the files (Phase 2). If the dataset directory has no

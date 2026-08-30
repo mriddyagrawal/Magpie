@@ -35,6 +35,28 @@ from src.config.secrets import (
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(autouse=True)
+def _no_dev_machine_credentials(monkeypatch):
+    """These tests assert empty-credential behavior; on a dev machine a real
+    src/config/bundled_key.txt (gitignored, production-build artifact) and
+    .env-loaded keys leak in and every assert sees a real key (test-suite
+    triage 2026-08-30). Neutralize both - a fresh clone is the contract."""
+    from src.config import secrets as secrets_mod
+    monkeypatch.setattr(secrets_mod, "_bundled_key", lambda: "")
+    # ...and the dev machine's real <app-data>/secrets.json - endpoints load
+    # through _secrets_path(), which must resolve to a per-test tmp file.
+    import tempfile as _tf
+    _tmp = Path(_tf.mkdtemp(prefix="magpie-test-secrets-")) / "secrets.json"
+    monkeypatch.setattr(secrets_mod, "_secrets_path", lambda: _tmp)
+    # heal path calls load_dotenv on every load - the repo's real .env
+    # would refill the key straight after we cleared it
+    import dotenv
+    monkeypatch.setattr(dotenv, "load_dotenv", lambda *a, **kw: False)
+    for v in ("OPENROUTER_API_KEY", "OPENROUTER_MODEL", "MOONSHOT_API_KEY",
+              "MOONSHOT_MODEL", "LLM_PROVIDER"):
+        monkeypatch.delenv(v, raising=False)
+
+
 def test_bootstrap_reads_openrouter_credentials_from_env(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

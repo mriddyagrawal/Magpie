@@ -27,8 +27,18 @@ from src.daemon.client import (
 
 @pytest.fixture
 def isolated_daemon_state(monkeypatch, tmp_path: Path):
-    """Each test gets its own state dir so daemons don't collide."""
-    monkeypatch.setenv("XDG_RUNTIME_DIR", str(tmp_path / "rt"))
+    """Each test gets its own state dir so daemons don't collide.
+
+    The socket dir must be SHORT: macOS caps AF_UNIX paths at ~104 chars
+    and pytest's tmp_path (/private/var/folders/.../pytest-of-<user>/...)
+    blows past it - Listener.bind raised "AF_UNIX path too long" and all
+    five tests read as "daemon socket never appeared" for months
+    (triage 2026-08-30). mkdtemp under /tmp stays well under the cap;
+    paths.py itself documents the same constraint for the real dir."""
+    import shutil as _sh
+    import tempfile as _tf
+    short = Path(_tf.mkdtemp(prefix="mgd-", dir="/tmp"))
+    monkeypatch.setenv("XDG_RUNTIME_DIR", str(short))
     monkeypatch.delenv("LOCALAPPDATA", raising=False)
     # Reset module-level state since the daemon module uses globals.
     srv._shutdown_requested.clear()
@@ -37,6 +47,7 @@ def isolated_daemon_state(monkeypatch, tmp_path: Path):
     # Best-effort cleanup if a test left a daemon thread running.
     srv._shutdown_requested.set()
     srv._shutdown_listener()
+    _sh.rmtree(short, ignore_errors=True)
 
 
 def _start_daemon_thread() -> threading.Thread:

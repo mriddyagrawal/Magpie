@@ -48,7 +48,7 @@ DEFAULT_IGNORE_PATTERNS: tuple[str, ...] = (
     "$RECYCLE.BIN/", "System Volume Information/",
     "WindowsApps/", "Program Files/", "Program Files (x86)/",
     "lost+found/",
-    ".env", ".env.*",
+    ".env", ".env.*", ".netrc", ".git-credentials", ".pgpass", ".npmrc",
     "id_rsa", "id_rsa.*", "id_ed25519", "id_ed25519.*",
     "Test Summaries/",
     ".ipynb_checkpoints/",

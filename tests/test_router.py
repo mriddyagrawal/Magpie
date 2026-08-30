@@ -253,16 +253,22 @@ def test_decide_csv_small_is_t1(tmp_path: Path):
     assert d.routes == ["T1"]
 
 
-def test_decide_csv_medium_is_t2(tmp_path: Path):
+def test_decide_csv_under_20mb_is_t1_rowlevel(tmp_path: Path):
+    """CSV routing changed in b8ecab8 (row-level CSV indexing): anything
+    under 20 MB goes T1 row-by-row; T2/T0 apply only above the size cutoff.
+    This asserted the pre-row-level tiers until the 2026-08-30 triage."""
     body = "a,b\n" + "\n".join(f"{i},{i}" for i in range(5_000))
     p = _write(tmp_path, "mid.csv", body)
     d = decide(peek(p))
-    assert d.routes == ["T2"]
+    assert d.routes == ["T1"]
 
 
-def test_decide_csv_huge_is_t0(tmp_path: Path):
-    body = "a,b\n" + "\n".join(f"{i},{i}" for i in range(150_000))
+def test_decide_csv_over_20mb_routes_by_rowcount(tmp_path: Path):
+    """Above CSV_SIZE_T1_MAX (20 MB), rowcount picks T2 vs T0 (b8ecab8)."""
+    # ~26 MB, ~1.2M rows: over the size cutoff AND over CSV_ROWS_T2_MAX
+    body = "a,b\n" + "\n".join(f"{i},{i % 97},padpadpadpad" for i in range(1_200_000))
     p = _write(tmp_path, "huge.csv", body)
+    assert p.stat().st_size > 20 * 1024 * 1024, "fixture must exceed the T1 size cap"
     d = decide(peek(p))
     assert d.routes == ["T0"]
 

@@ -23,8 +23,20 @@ from src.manifest import Entry, Manifest
 @pytest.fixture
 def isolated_manifest(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     mpath = tmp_path / "_manifest.json"
+    # Resolve the CURRENT src.manifest at fixture time, not this module's
+    # import-time copy: other test files importlib.reload src.manifest, and
+    # patching a stale class object leaves the code under test reading the
+    # real default path (order-dependent "manifest says nothing needs
+    # ingestion" - triage 2026-08-30). Patch the live module, its live
+    # class, and the reference stage2.__main__ actually calls.
+    import importlib
+    cur = importlib.import_module("src.manifest")
+    monkeypatch.setattr(cur, "DEFAULT_MANIFEST_PATH", mpath)
+    monkeypatch.setattr(cur.Manifest.__init__, "__defaults__", (mpath,))
     monkeypatch.setattr(manifest_mod, "DEFAULT_MANIFEST_PATH", mpath)
     monkeypatch.setattr(Manifest.__init__, "__defaults__", (mpath,))
+    import src.stage2.__main__ as _stage2_main
+    monkeypatch.setattr(_stage2_main, "Manifest", cur.Manifest, raising=False)
     return mpath
 
 

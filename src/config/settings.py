@@ -10,8 +10,9 @@ Storage layout:
   <APP_DATA_DIR>/settings.json       # user prefs, mutable from UI
 
 Resolution precedence at read time:
-  LLM_PROVIDER env var                  → wins absolutely
   settings.json (UserSettings)          → user's UI choice
+  (LLM_PROVIDER env was REMOVED from this precedence 2026-05-08 — see
+   _env_overrides(); llm.py keeps it only as a no-settings fallback)
   magpie_defaults.json (AppDefaults)    → product defaults
   hardcoded BaseModel defaults          → safety net
 

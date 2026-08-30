@@ -70,6 +70,20 @@ def client(server_module) -> TestClient:
 # ---------------------------------------------------------------------------
 
 
+
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _qdrant_up_stub(monkeypatch, server_module):
+    """These endpoint tests predate _require_qdrant (the 2026-08-23 fail-fast
+    gate); they test job wiring, not DB liveness, so the gate is stubbed to
+    "reachable" (test-suite triage 2026-08-30)."""
+    import src.stage2.db as db_mod
+    monkeypatch.setattr(db_mod, "qdrant_reachable",
+                        lambda: (True, "http://127.0.0.1:6433"))
+
+
 def test_sync_returns_409_when_running(client: TestClient, server_module) -> None:
     server_module._ingest_state["running"] = True
     try:

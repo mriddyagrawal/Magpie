@@ -74,7 +74,11 @@ def test_resummarization_clears_ingested_at(tmp_manifest: Manifest) -> None:
 def test_drop_removes_entry(tmp_manifest: Manifest) -> None:
     tmp_manifest.mark_summarized("a.pdf", 100, "a.md")
     dropped = tmp_manifest.drop("a.pdf")
-    assert isinstance(dropped, Entry)
+    # reload-proof identity check: other test files importlib.reload
+    # src.manifest mid-suite, so isinstance against this module's
+    # import-time Entry class fails on a genuine Entry (triage 2026-08-30)
+    assert type(dropped).__name__ == "Entry"
+    assert dropped.summary_file == "a.md"
     assert tmp_manifest.get("a.pdf") is None
 
 

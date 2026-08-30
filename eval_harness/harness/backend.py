@@ -69,7 +69,9 @@ class QdrantInstance:
             if not _port_free(port):
                 raise RuntimeError(
                     f"qdrant {what} port {port} already in use — a previous run "
-                    f"may not have been torn down (check `pgrep -fl qdrant`)"
+                    f"may not have been torn down (look for a stray qdrant "
+                    f"process: `pgrep -fl qdrant` on mac/Linux, Task Manager "
+                    f"on Windows)"
                 )
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -77,15 +79,26 @@ class QdrantInstance:
             "PATH": os.environ.get("PATH", ""),
             "HOME": os.environ.get("HOME", ""),
             "QDRANT__STORAGE__STORAGE_PATH": str(self.storage_dir),
+        }
+        if sys.platform == "win32":
+            # Windows processes break in non-obvious ways without these:
+            # winsock needs SYSTEMROOT; USERPROFILE is HOME's counterpart.
+            for k in ("SYSTEMROOT", "USERPROFILE", "TEMP", "TMP", "PATHEXT"):
+                if os.environ.get(k):
+                    env[k] = os.environ[k]
+        env.update({
             "QDRANT__SERVICE__HOST": "127.0.0.1",
             "QDRANT__SERVICE__HTTP_PORT": str(self.http_port),
             "QDRANT__SERVICE__GRPC_PORT": str(self.grpc_port),
             "QDRANT__TELEMETRY_DISABLED": "true",
-        }
+        })
         log_f = self.log_path.open("ab")
+        # start_new_session is POSIX-only (silently ignored on Windows);
+        # stop() below matches: process-group kill on POSIX, plain
+        # terminate/kill on Windows where os.killpg does not exist.
         self.proc = subprocess.Popen(
             [str(qdrant_binary())], env=env, stdout=log_f, stderr=log_f,
-            start_new_session=True,
+            start_new_session=(sys.platform != "win32"),
         )
         deadline = time.monotonic() + timeout_s
         while time.monotonic() < deadline:
@@ -107,17 +120,23 @@ class QdrantInstance:
         if self.proc is None:
             return
         if self.proc.poll() is None:
-            try:
-                os.killpg(os.getpgid(self.proc.pid), signal.SIGTERM)
-            except (ProcessLookupError, PermissionError):
+            if sys.platform == "win32":
                 self.proc.terminate()
+            else:
+                try:
+                    os.killpg(os.getpgid(self.proc.pid), signal.SIGTERM)
+                except (ProcessLookupError, PermissionError):
+                    self.proc.terminate()
             try:
                 self.proc.wait(timeout=timeout_s)
             except subprocess.TimeoutExpired:
-                try:
-                    os.killpg(os.getpgid(self.proc.pid), signal.SIGKILL)
-                except (ProcessLookupError, PermissionError):
+                if sys.platform == "win32":
                     self.proc.kill()
+                else:
+                    try:
+                        os.killpg(os.getpgid(self.proc.pid), signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError):
+                        self.proc.kill()
                 self.proc.wait(timeout=5)
         self.proc = None
 

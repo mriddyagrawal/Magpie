@@ -196,6 +196,20 @@ def parse_stage_latencies(worker_log: Path) -> dict[str, dict]:
 
 # --- verdicts (deterministic component only) --------------------------------
 
+def search_query_of(row: dict) -> dict:
+    """Normalize the search-query record across schema generations:
+    new rows carry search_query{final_query, keywords, rewritten}; old rows
+    carried rewritten_query{query, keywords} with no flag (rewritten=None =
+    unknown for those)."""
+    rq = row.get("search_query") or row.get("rewritten_query") or {}
+    q = rq.get("final_query") or rq.get("query")
+    if not q:
+        return {}
+    return {"final_query": q,
+            "keywords": list(rq.get("keywords") or []),
+            "rewritten": rq.get("rewritten", None)}
+
+
 def magpie_answer_of(row: dict) -> str:
     return row.get("magpie_answer", row.get("answer")) or ""
 
@@ -325,11 +339,13 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
         e2e_paths = [h["path"] for h in (row.get("retrieved") or [])]
         if qrels and e2e_paths:
             out["retrieval_end_to_end"] = metrics.retrieval_row(e2e_paths, qrels)
-        ret_q = ((ret or {}).get("rewritten_query") or {})
-        row_q = (row.get("rewritten_query") or {})
+        ret_q = search_query_of(ret or {})
+        row_q = search_query_of(row)
+        out["search_query"] = row_q or None
+        out.pop("rewritten_query", None)
         out["retrieval_query_matched"] = (
-            None if not (ret_q.get("query") and row_q.get("query"))
-            else ret_q.get("query") == row_q.get("query")
+            None if not (ret_q.get("final_query") and row_q.get("final_query"))
+            else ret_q.get("final_query") == row_q.get("final_query")
             and list(ret_q.get("keywords") or []) == list(row_q.get("keywords") or [])
         )
         out["retrieval_top1_matched"] = (

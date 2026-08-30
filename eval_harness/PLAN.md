@@ -334,7 +334,7 @@ questions sourced to this file: derivable from the summary alone? yes/no →
 ```jsonc
 {
   "qa_id": "receipts-007", "variant": 0,
-  "rewritten_query": "…",
+  "search_query": {"final_query": "…", "keywords": [], "rewritten": false},
   "solo_gated": false,                              // did gate_to_solo fire on this question
   "retrieved": [{"path": "…", "score": 0.031, "rank": 1}, …],
   "in_prompt": {"<basename>":

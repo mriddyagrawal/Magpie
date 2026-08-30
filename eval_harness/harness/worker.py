@@ -294,9 +294,12 @@ def phase_answer(payload: dict) -> dict:
                 ask(q["question"], top_k=top_k, rewrite=rewrite, fast=fast)
             )
             row.update(
-                rewritten_query={
-                    "query": res.search_query.query,
+                search_query={
+                    "final_query": res.search_query.query,
                     "keywords": list(getattr(res.search_query, "keywords", []) or []),
+                    # whether the LLM rewrite step ran (config), not whether
+                    # the text happens to differ from the raw question
+                    "rewritten": rewrite,
                 },
                 retrieved=[
                     {
@@ -412,9 +415,14 @@ def phase_retrieve(payload: dict) -> dict:
                 rec = json.loads(line)
             except Exception:  # noqa: BLE001 — malformed line = no replay for it
                 continue
-            rq = rec.get("rewritten_query") or {}
-            if rq.get("query"):
-                recorded[rec["qa_id"]] = rq
+            rq = rec.get("search_query") or rec.get("rewritten_query") or {}
+            q = rq.get("final_query") or rq.get("query")
+            if q:
+                recorded[rec["qa_id"]] = {
+                    "final_query": q,
+                    "keywords": list(rq.get("keywords") or []),
+                    "rewritten": rq.get("rewritten", None),
+                }
 
     rows_out = []
     for q in questions:
@@ -424,7 +432,7 @@ def phase_retrieve(payload: dict) -> dict:
             rec = recorded.get(q["id"])
             if rec is not None:
                 sq = SearchQuery(
-                    query=rec["query"],
+                    query=rec["final_query"],
                     keywords=list(rec.get("keywords") or []),
                 )
                 row["query_source"] = "replayed_from_answer_pass"
@@ -439,8 +447,17 @@ def phase_retrieve(payload: dict) -> dict:
                 rerank=rerank, enumerate_lists=enumerate_lists,
             )
             row.update(
-                rewritten_query={"query": sq.query,
-                                 "keywords": list(getattr(sq, "keywords", []) or [])},
+                search_query={
+                    "final_query": sq.query,
+                    "keywords": list(getattr(sq, "keywords", []) or []),
+                    # replayed rows inherit the answer pass's flag when it
+                    # recorded one; otherwise (standalone mode, or replaying
+                    # an old-format run) the config param is the truth -
+                    # the same config drove both passes.
+                    "rewritten": (rec.get("rewritten")
+                                  if rec is not None and rec.get("rewritten") is not None
+                                  else rewrite),
+                },
                 ranked=[
                     {"path": str(r.path), "score": float(r.score), "rank": i,
                      "tier": getattr(r, "tier", None)}

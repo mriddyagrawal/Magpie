@@ -55,7 +55,11 @@ except ImportError:  # matches the manifest.py documented layouts
         REAL_APP_DATA = Path.home() / ".local" / "share" / "Magpie"
 
 SHARED_MODEL_CACHE = REAL_APP_DATA / "cache"
-SHARED_LLAMA_SERVER = REAL_APP_DATA / "bin" / "llama-server"
+# install_llama_server names the binary llama-server.exe on Windows; this
+# constant must agree with it or Windows never finds an installed server.
+SHARED_LLAMA_SERVER = REAL_APP_DATA / "bin" / (
+    "llama-server.exe" if sys.platform == "win32" else "llama-server"
+)
 
 # Port block far from both the live app's defaults (llama 9100, qdrant 6433)
 # and common dev servers. One run at a time, but keep per-run offsets anyway
@@ -70,7 +74,15 @@ _SECRET_MARKERS = ("API_KEY", "TOKEN", "SECRET", "PASSWORD")
 
 # Minimal system base carried over from the parent so subprocesses (python,
 # llama-server, qdrant) can run at all. Everything else starts absent.
-_BASE_PASSTHROUGH = ("PATH", "HOME", "TMPDIR", "LANG", "LC_ALL")
+# The Windows names are absent on POSIX (and vice versa) so the union is
+# safe: passthrough only copies names that exist in the parent env.
+_BASE_PASSTHROUGH = (
+    "PATH", "HOME", "TMPDIR", "LANG", "LC_ALL",
+    # Windows essentials: winsock needs SYSTEMROOT; USERPROFILE is HOME's
+    # counterpart; TEMP/TMP are TMPDIR's; PATHEXT resolves .exe/.cmd.
+    "SYSTEMROOT", "USERPROFILE", "APPDATA", "LOCALAPPDATA",
+    "TEMP", "TMP", "PATHEXT",
+)
 
 
 # --- model_config resolution (PLAN.md §2/§9.2) -----------------------------

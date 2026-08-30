@@ -41,8 +41,8 @@
         },
         "env_snapshot_diff": {
           "MAGPIE_DATA_DIR": {
-            "a": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T065335Z-receipts-topk2-rerank-off/raw/appdata",
-            "b": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T081855Z-receipts-topk3-rerank-off-norewrite/raw/appdata"
+            "a": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T065335Z-receipts-topk2-rerank-off/raw/appdata",
+            "b": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T081855Z-receipts-topk3-rerank-off-norewrite/raw/appdata"
           }
         },
         "solo_gate_structurally_off": {

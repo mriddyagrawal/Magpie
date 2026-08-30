@@ -45,25 +45,25 @@
     "mem_bytes": "68719476736"
   },
   "env_snapshot": {
-    "FASTEMBED_CACHE_PATH": "/Users/mriddy/Library/Application Support/Magpie/cache/fastembed",
-    "HF_HOME": "/Users/mriddy/Library/Application Support/Magpie/cache",
-    "HF_HUB_CACHE": "/Users/mriddy/Library/Application Support/Magpie/cache/hub",
-    "HOME": "/Users/mriddy",
+    "FASTEMBED_CACHE_PATH": "~/Library/Application Support/Magpie/cache/fastembed",
+    "HF_HOME": "~/Library/Application Support/Magpie/cache",
+    "HF_HUB_CACHE": "~/Library/Application Support/Magpie/cache/hub",
+    "HOME": "~",
     "LANG": "en_US.UTF-8",
     "LLAMA_SERVER_BASE_PORT": "9400",
-    "LLAMA_SERVER_PATH": "/Users/mriddy/Library/Application Support/Magpie/bin/llama-server",
+    "LLAMA_SERVER_PATH": "~/Library/Application Support/Magpie/bin/llama-server",
     "LLAMA_SERVER_STARTUP_TIMEOUT_S": "300",
     "LLM_PROVIDER": "local",
     "LOCAL_N_CTX": "16384",
     "LOCAL_SOLO_MARGIN": "0",
     "LOCAL_TEMPERATURE": "0.0",
-    "MAGPIE_DATA_DIR": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T081855Z-receipts-topk3-rerank-off-norewrite/raw/appdata",
+    "MAGPIE_DATA_DIR": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T081855Z-receipts-topk3-rerank-off-norewrite/raw/appdata",
     "MAGPIE_FORCE_PROVIDER": "local",
     "MAGPIE_RERANK": "0",
-    "PATH": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/.venv/bin:/Users/mriddy/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:/Users/mriddy/.cargo/bin:/Users/mriddy/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/bin:/Users/mriddy/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:/Users/mriddy/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin",
+    "PATH": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin",
     "QDRANT_CLUSTER_ENDPOINT": "http://127.0.0.1:6533",
     "TMPDIR": "/var/folders/h0/78n4dc9n5f9d5256336n8q2r0000gn/T/",
-    "TRANSFORMERS_CACHE": "/Users/mriddy/Library/Application Support/Magpie/cache"
+    "TRANSFORMERS_CACHE": "~/Library/Application Support/Magpie/cache"
   },
   "dataset_manifest_files": 148,
   "solo_gate_structurally_off": true,
@@ -81,7 +81,7 @@
       "wall_s": 2649.7,
       "answered": 116,
       "errors": 4,
-      "llm_log": "/Users/mriddy/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T081855Z-receipts-topk3-rerank-off-norewrite/raw/appdata/logs/llm-2026-08-29T08-19-38Z.log"
+      "llm_log": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T081855Z-receipts-topk3-rerank-off-norewrite/raw/appdata/logs/llm-2026-08-29T08-19-38Z.log"
     }
   },
   "index_store": {

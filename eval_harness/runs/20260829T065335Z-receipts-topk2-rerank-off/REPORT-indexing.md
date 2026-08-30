@@ -1,7 +1,7 @@
 # REPORT — Indexing analyst
 
 Run: `20260829T065335Z-receipts-topk2-rerank-off`
-Corpus: 148 receipt JPEGs, `/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00..batch_10/`
+Corpus: 148 receipt JPEGs, `~/Documents/Magpie-eval-corpora/receipts/batch_00..batch_10/`
 Config: `index_fast_tier: true`, `index_summary_tier: true`, `fast_search: true`, `top_k: 2`, `MAGPIE_RERANK=0`, provider `local`.
 
 **Bottom line:** the fast tier did its job cleanly — 148/148 files, 148 pages, 0 errors, no

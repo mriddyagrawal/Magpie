@@ -5,7 +5,7 @@ Config: `lfm-local`, `top_k=3`, `rewrite=false`, `rerank=false` (`MAGPIE_RERANK=
 `solo_margin=0`, temp 0, `n_ctx` 16384, `index_fast_tier=true`,
 `index_summary_tier=true`, `fast_search=true`.
 Corpus: `receipts`, 148 scanned JPEGs under
-`/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00..batch_10/`.
+`~/Documents/Magpie-eval-corpora/receipts/batch_00..batch_10/`.
 Backend `c823a44`, harness `2e1c851`, `golden_sha` `a3b05ea95c052a65`.
 
 **This run did not build an index.** `run.json` records

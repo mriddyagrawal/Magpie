@@ -20,13 +20,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806718.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806718.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -101,13 +101,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -182,13 +182,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005365187.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005365187.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -263,13 +263,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005365187.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005365187.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -346,13 +346,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005288570.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005288570.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433548.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433548.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -430,13 +430,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005288570.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005288570.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605287.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605287.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -444,7 +444,7 @@
     ],
     "magpie_answer": "Secure Parking (Cash) [2]",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605287.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605287.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Secure Parking receipt from",
@@ -512,13 +512,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -526,8 +526,8 @@
     ],
     "magpie_answer": "Cash",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg"
     ],
     "not_found": false,
     "not_found_topic": "ojc marketing 193 paid by card or cash",
@@ -599,13 +599,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -613,8 +613,8 @@
     ],
     "magpie_answer": "Card (VISA)",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg"
     ],
     "not_found": false,
     "not_found_topic": "payment method",
@@ -687,13 +687,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -770,13 +770,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676542.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676542.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -784,7 +784,7 @@
     ],
     "magpie_answer": "0.60",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676542.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676542.jpg"
     ],
     "not_found": false,
     "not_found_topic": "GST charged on Perniagaan Zheng Hui bill",
@@ -858,13 +858,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442343.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442343.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568889.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568889.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -872,7 +872,7 @@
     ],
     "magpie_answer": "Yong Tat Hardware Trading, 1 item (3/4\" ALUMINIUM ROD), RM 19.60",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568889.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568889.jpg"
     ],
     "not_found": false,
     "not_found_topic": "yong tat hardware what did i buy",
@@ -946,13 +946,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705727.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705727.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1027,13 +1027,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005337877.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005337877.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1107,13 +1107,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005337877.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005337877.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1186,13 +1186,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361912.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361912.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1270,13 +1270,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361912.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361912.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1284,8 +1284,8 @@
     ],
     "magpie_answer": "TRI SHAAS SDN BHD",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361912.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361912.jpg"
     ],
     "not_found": false,
     "not_found_topic": "shop name",
@@ -1359,73 +1359,73 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230657.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230657.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230648.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230648.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268275.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268275.jpg",
         "score": 0.015873015873015872,
         "rank": 3,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230659.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230659.jpg",
         "score": 0.015625,
         "rank": 4,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
         "score": 0.015384615384615385,
         "rank": 5,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724622.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724622.jpg",
         "score": 0.015151515151515152,
         "rank": 6,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724625.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724625.jpg",
         "score": 0.014925373134328358,
         "rank": 7,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg",
         "score": 0.014705882352941176,
         "rank": 8,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663309.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663309.jpg",
         "score": 0.014492753623188406,
         "rank": 9,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
         "score": 0.014285714285714285,
         "rank": 10,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005741929.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005741929.jpg",
         "score": 0.014084507042253521,
         "rank": 11,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724623.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724623.jpg",
         "score": 0.013888888888888888,
         "rank": 12,
         "tier": "fast"
@@ -1513,13 +1513,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230648.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230648.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230657.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230657.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1527,8 +1527,8 @@
     ],
     "magpie_answer": "The 31 December bill came to more",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230657.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230648.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230657.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230648.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Cross Channel Network bills 31 December vs 29 January",
@@ -1597,13 +1597,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1683,73 +1683,73 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg",
         "score": 0.015873015873015872,
         "rank": 3,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
         "score": 0.015625,
         "rank": 4,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
         "score": 0.015384615384615385,
         "rank": 5,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
         "score": 0.015151515151515152,
         "rank": 6,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005676548.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005676548.jpg",
         "score": 0.014925373134328358,
         "rank": 7,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
         "score": 0.014705882352941176,
         "rank": 8,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
         "score": 0.014492753623188406,
         "rank": 9,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
         "score": 0.014285714285714285,
         "rank": 10,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806720.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806720.jpg",
         "score": 0.014084507042253521,
         "rank": 11,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
         "score": 0.013888888888888888,
         "rank": 12,
         "tier": "fast"
@@ -1757,10 +1757,10 @@
     ],
     "magpie_answer": "11.13",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005676548.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005676548.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469670.jpg"
     ],
     "not_found": false,
     "not_found_topic": "a landlord's emergency phone number",
@@ -1845,13 +1845,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -1926,13 +1926,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2009,13 +2009,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005582745.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005582745.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005745213.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005745213.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2093,13 +2093,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005582745.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005582745.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2174,13 +2174,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724609.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724609.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2256,13 +2256,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230605.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230605.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2270,7 +2270,7 @@
     ],
     "magpie_answer": "4.62",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230605.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005230605.jpg"
     ],
     "not_found": false,
     "not_found_topic": "litres per RM30 petrol fill",
@@ -2339,13 +2339,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444040.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444040.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2353,7 +2353,7 @@
     ],
     "magpie_answer": "Cash",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg"
     ],
     "not_found": false,
     "not_found_topic": "bens grocer 8 mar cash or card",
@@ -2424,13 +2424,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444041.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444041.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444040.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444040.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2438,7 +2438,7 @@
     ],
     "magpie_answer": "Cash",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444040.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444040.jpg"
     ],
     "not_found": false,
     "not_found_topic": "payment method for RM81 Ben's Independent Grocer run on the 8th",
@@ -2512,13 +2512,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2526,7 +2526,7 @@
     ],
     "magpie_answer": "49.50",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg"
     ],
     "not_found": false,
     "not_found_topic": "vivopac gst amout sept",
@@ -2597,13 +2597,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2611,8 +2611,8 @@
     ],
     "magpie_answer": "2.64",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568895.jpg"
     ],
     "not_found": false,
     "not_found_topic": "GST charged on Vivopac packaging order in September",
@@ -2681,13 +2681,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2761,13 +2761,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005621482.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005621482.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568894.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2841,13 +2841,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605332.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605332.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2925,13 +2925,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605332.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605332.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -2939,7 +2939,7 @@
     ],
     "magpie_answer": "POPULAR BOOK CO. (M) SDN BHD",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg"
     ],
     "not_found": false,
     "not_found_topic": "popular outlet",
@@ -3014,13 +3014,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3028,7 +3028,7 @@
     ],
     "magpie_answer": "99 SPEED MART S/B",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg"
     ],
     "not_found": false,
     "not_found_topic": "sunquick oren recipt which shop",
@@ -3100,13 +3100,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676537.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676537.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3291,13 +3291,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568892.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568892.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568885.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568885.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3375,13 +3375,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568892.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568892.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568885.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005568885.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3466,13 +3466,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3480,7 +3480,7 @@
     ],
     "magpie_answer": "63.90",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg"
     ],
     "not_found": false,
     "not_found_topic": "mydin sri muda total",
@@ -3552,13 +3552,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3566,8 +3566,8 @@
     ],
     "magpie_answer": "56.80 RM",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705759.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Mydin",
@@ -3638,13 +3638,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663323.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663323.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663309.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663309.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3720,13 +3720,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663323.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663323.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663309.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663309.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3800,13 +3800,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3883,13 +3883,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3897,7 +3897,7 @@
     ],
     "magpie_answer": "4.95",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg"
     ],
     "not_found": false,
     "not_found_topic": "change amount",
@@ -3966,13 +3966,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675099.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675099.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -3980,7 +3980,7 @@
     ],
     "magpie_answer": "49.70 MYR",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg"
     ],
     "not_found": false,
     "not_found_topic": "super terminal motor oil how much",
@@ -4050,13 +4050,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675099.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675099.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746204.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746204.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4064,7 +4064,7 @@
     ],
     "magpie_answer": "YAMLUBE MOTOP LIFE LINE",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675099.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675099.jpg"
     ],
     "not_found": false,
     "not_found_topic": "YAMLube motor oil cost at Super Terminal",
@@ -4133,13 +4133,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675104.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675104.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4147,7 +4147,7 @@
     ],
     "magpie_answer": "Aeon Co. (M) Bhd",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg"
     ],
     "not_found": false,
     "not_found_topic": "12mm plywood which shop",
@@ -4220,13 +4220,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675104.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675104.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4234,8 +4234,8 @@
     ],
     "magpie_answer": "AEON CO. (M) BHD",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675104.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675104.jpg"
     ],
     "not_found": false,
     "not_found_topic": "shop name",
@@ -4308,13 +4308,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677327.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677327.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4322,8 +4322,8 @@
     ],
     "magpie_answer": "36.04",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677327.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677327.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg"
     ],
     "not_found": false,
     "not_found_topic": "gin kee cement pasir gst amount",
@@ -4395,13 +4395,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724625.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724625.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4409,8 +4409,8 @@
     ],
     "magpie_answer": "GST charged: 16.05 RM",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724625.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724625.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676535.jpg"
     ],
     "not_found": false,
     "not_found_topic": "GST charged amount",
@@ -4478,13 +4478,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675914.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675914.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4558,13 +4558,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675914.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675914.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605287.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005605287.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4638,13 +4638,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005710963.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005710963.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005745213.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005745213.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4721,13 +4721,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005710963.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005710963.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005577191.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005577191.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4801,13 +4801,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4888,13 +4888,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711449.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711449.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711443.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711443.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4902,8 +4902,8 @@
     ],
     "magpie_answer": "The March 23rd receipt cost more by RM 0.33 [1] and [2].",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711443.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711449.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711443.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711449.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Restoran Wan Sheng drink runs in March cost comparison",
@@ -4973,13 +4973,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447859.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447859.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -4987,8 +4987,8 @@
     ],
     "magpie_answer": "5.00 and 4.10",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447859.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447859.jpg"
     ],
     "not_found": false,
     "not_found_topic": "kedai buku new acheivers both bills added up",
@@ -5116,13 +5116,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5130,8 +5130,8 @@
     ],
     "magpie_answer": "49.70 MYR",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg"
     ],
     "not_found": false,
     "not_found_topic": "rocku yakiniku total",
@@ -5202,13 +5202,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5216,8 +5216,8 @@
     ],
     "magpie_answer": "49.70 MYR",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433556.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719855.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Rocku Yakiniku buffet dinner total",
@@ -5286,13 +5286,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5300,7 +5300,7 @@
     ],
     "magpie_answer": "56.80 RM",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg"
     ],
     "not_found": false,
     "not_found_topic": "petrol",
@@ -5371,13 +5371,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_03/receipt_X51005587261.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724609.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724609.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5454,13 +5454,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757233.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757233.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5468,7 +5468,7 @@
     ],
     "magpie_answer": "Cheras Leisure Mall",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg"
     ],
     "not_found": false,
     "not_found_topic": "kaison which mall",
@@ -5539,13 +5539,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5553,7 +5553,7 @@
     ],
     "magpie_answer": "AEON CO. (M) BHD",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg"
     ],
     "not_found": false,
     "not_found_topic": "shopping centre",
@@ -5625,13 +5625,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5709,13 +5709,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719863.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5794,13 +5794,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5808,8 +5808,8 @@
     ],
     "magpie_answer": "Visa Card",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X00016469671.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg"
     ],
     "not_found": false,
     "not_found_topic": "aa pharmacy paid cash or card",
@@ -5880,13 +5880,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5894,7 +5894,7 @@
     ],
     "magpie_answer": "Cash",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg"
     ],
     "not_found": false,
     "not_found_topic": "payment method at AA Pharmacy",
@@ -5963,13 +5963,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433518.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433518.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -5977,8 +5977,8 @@
     ],
     "magpie_answer": "SR + GST @6% = 7.74",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433518.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433518.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
     ],
     "not_found": false,
     "not_found_topic": "saint heart pastry gst amount",
@@ -6047,13 +6047,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433548.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433548.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6061,7 +6061,7 @@
     ],
     "magpie_answer": "0.77 RM",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
     ],
     "not_found": false,
     "not_found_topic": "GST charged on the Saint Heart Pastry receipt",
@@ -6129,13 +6129,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005200931.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6209,13 +6209,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268275.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268275.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6289,13 +6289,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6303,8 +6303,8 @@
     ],
     "magpie_answer": "Popular Book Co. (M) Sdn BHD",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg"
     ],
     "not_found": false,
     "not_found_topic": "glass cleaner receipt which shop",
@@ -6376,13 +6376,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715455.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6390,7 +6390,7 @@
     ],
     "magpie_answer": "You bought the H\"MAN GLASS PAPER from POPULAR BOOK CO. (M) SDN BHD for 5.60 RM.",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568866.jpg"
     ],
     "not_found": false,
     "not_found_topic": "shop name and cost of glass cleaner",
@@ -6462,13 +6462,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447851.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447851.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6476,7 +6476,7 @@
     ],
     "magpie_answer": "1.70",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447851.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447851.jpg"
     ],
     "not_found": false,
     "not_found_topic": "kedai papan 21 march both bills together",
@@ -6601,13 +6601,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6615,8 +6615,8 @@
     ],
     "magpie_answer": "aa pharmacy: 34.80, Green Lane Pharmacy: 25.80; Green Lane Pharmacy is more expensive[1][2]",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg"
     ],
     "not_found": false,
     "not_found_topic": "aa pharmacy vs green lane which one more expensive",
@@ -6689,13 +6689,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719895.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6703,7 +6703,7 @@
     ],
     "magpie_answer": "AA Pharmacy",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719823.jpg"
     ],
     "not_found": false,
     "not_found_topic": "pharmacy cost comparison",
@@ -6774,13 +6774,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008166.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008166.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6788,7 +6788,7 @@
     ],
     "magpie_answer": "Florism De Art (Tax Invoice) [2] and FLORISM DE ART (Tax Invoice) [1]",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg"
     ],
     "not_found": false,
     "not_found_topic": "florism de art total",
@@ -6859,13 +6859,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008166.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008166.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6873,7 +6873,7 @@
     ],
     "magpie_answer": "4.10",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg"
     ],
     "not_found": false,
     "not_found_topic": "flower order from Florism De Art at Pavilion",
@@ -6944,13 +6944,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -6958,7 +6958,7 @@
     ],
     "magpie_answer": "Mei Let Restaurant",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg"
     ],
     "not_found": false,
     "not_found_topic": "mei let restarant when",
@@ -7031,13 +7031,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7112,13 +7112,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005745244.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005745244.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7126,7 +7126,7 @@
     ],
     "magpie_answer": "RM11.90",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005745244.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005745244.jpg"
     ],
     "not_found": false,
     "not_found_topic": "burger king whopper jr how much",
@@ -7194,13 +7194,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7208,7 +7208,7 @@
     ],
     "magpie_answer": "8.20 RM",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Whopper Jrs",
@@ -7285,13 +7285,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746207.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7299,7 +7299,7 @@
     ],
     "magpie_answer": "Master Card",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg"
     ],
     "not_found": false,
     "not_found_topic": "super seven 408 paid by what card",
@@ -7369,13 +7369,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746203.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746203.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7383,8 +7383,8 @@
     ],
     "magpie_answer": "Master Card",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746203.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746203.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005763958.jpg"
     ],
     "not_found": false,
     "not_found_topic": "card used for payment",
@@ -7453,13 +7453,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7536,13 +7536,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806692.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444041.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444041.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7550,7 +7550,7 @@
     ],
     "magpie_answer": "81.00",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444041.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444041.jpg"
     ],
     "not_found": false,
     "not_found_topic": "GST amount charged on the Great Zone Household Centre bill",
@@ -7619,13 +7619,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005764161.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005764161.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005444044.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7700,13 +7700,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005764161.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005764161.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005268408.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7781,13 +7781,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006311714.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006311714.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715006.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7864,13 +7864,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006311714.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006311714.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676534.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676534.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -7946,13 +7946,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705729.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705729.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8029,13 +8029,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705729.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005705729.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8112,13 +8112,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008092.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008092.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8126,8 +8126,8 @@
     ],
     "magpie_answer": "popular empire has 5.99 T while aeon shah alam has 30.70 T, so aeon shah alam has more",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008092.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008092.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg"
     ],
     "not_found": false,
     "not_found_topic": "popular empire vs aeon shah alam which more",
@@ -8200,13 +8200,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8214,8 +8214,8 @@
     ],
     "magpie_answer": "The trip at Empire Shopping Gallery cost more[1] and [2].",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg"
     ],
     "not_found": false,
     "not_found_topic": "trip cost",
@@ -8283,13 +8283,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719898.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719898.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8297,8 +8297,8 @@
     ],
     "magpie_answer": "30.25",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719898.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719898.jpg"
     ],
     "not_found": false,
     "not_found_topic": "mr diy march total spent",
@@ -8368,73 +8368,73 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719898.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719898.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442322.jpg",
         "score": 0.015873015873015872,
         "rank": 3,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757308.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757308.jpg",
         "score": 0.015625,
         "rank": 4,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746206.jpg",
         "score": 0.015384615384615385,
         "rank": 5,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006248253.jpg",
         "score": 0.015151515151515152,
         "rank": 6,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.014925373134328358,
         "rank": 7,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757342.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757342.jpg",
         "score": 0.014705882352941176,
         "rank": 8,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757292.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757292.jpg",
         "score": 0.014492753623188406,
         "rank": 9,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746203.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005746203.jpg",
         "score": 0.014285714285714285,
         "rank": 10,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
         "score": 0.014084507042253521,
         "rank": 11,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
         "score": 0.013888888888888888,
         "rank": 12,
         "tier": "fast"
@@ -8523,13 +8523,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711444.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711444.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8537,7 +8537,7 @@
     ],
     "magpie_answer": "4",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711444.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711444.jpg"
     ],
     "not_found": false,
     "not_found_topic": "how many times wan sheng",
@@ -8605,13 +8605,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711402.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711402.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8619,8 +8619,8 @@
     ],
     "magpie_answer": "6 times",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711402.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005711446.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005711402.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Restoran Wan Sheng",
@@ -8693,13 +8693,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724622.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724622.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724624.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724624.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8774,13 +8774,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724552.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724552.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724611.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005724611.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8859,13 +8859,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005676548.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005676548.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675103.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005675103.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8945,13 +8945,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677336.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677336.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676534.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676534.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -8959,8 +8959,8 @@
     ],
     "magpie_answer": "January 4th",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676534.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677336.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005676534.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_05/receipt_X51005677336.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Gin Kee purchase date",
@@ -9032,13 +9032,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9046,7 +9046,7 @@
     ],
     "magpie_answer": "POPULAR BOOK CO. (M) SDN BHD",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg"
     ],
     "not_found": false,
     "not_found_topic": "papparich receipt",
@@ -9095,13 +9095,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757220.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9109,7 +9109,7 @@
     ],
     "magpie_answer": "You spent 44.00ZR on Anchor Flour and 15.40SR on Diamond Foil 7, for a total of 59.40ZR [1].",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg"
     ],
     "not_found": false,
     "not_found_topic": "PappaRich",
@@ -9156,13 +9156,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433543.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433543.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361906.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361906.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9170,8 +9170,8 @@
     ],
     "magpie_answer": "25.80",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361906.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433543.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005361906.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005433543.jpg"
     ],
     "not_found": false,
     "not_found_topic": "secret recipe total",
@@ -9223,13 +9223,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006327953.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9237,7 +9237,7 @@
     ],
     "magpie_answer": "RM 63.90",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg"
     ],
     "not_found": false,
     "not_found_topic": "bill at Secret Recipe",
@@ -9286,13 +9286,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51005806695.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442366.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_01/receipt_X51005442366.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9347,13 +9347,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9361,8 +9361,8 @@
     ],
     "magpie_answer": "No, there is no receipt from Coffee Bean & Tea Leaf in the provided files",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005568855.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_00/receipt_X51005337867.jpg"
     ],
     "not_found": false,
     "not_found_topic": "receipt from Coffee Bean & Tea Leaf",
@@ -9410,13 +9410,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008206.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9424,7 +9424,7 @@
     ],
     "magpie_answer": "moonlight cake house",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447844.jpg"
     ],
     "not_found": false,
     "not_found_topic": "moonlight cake house",
@@ -9477,13 +9477,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719889.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719889.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9491,8 +9491,8 @@
     ],
     "magpie_answer": "Yes, the Moonlight Cake House receipt is available [1].",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719889.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005719889.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_07/receipt_X51005719905.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Moonlight Cake House receipt",
@@ -9541,13 +9541,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008166.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008166.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9555,7 +9555,7 @@
     ],
     "magpie_answer": "golden key maker bill: 56.80",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_04/receipt_X51005663307.jpg"
     ],
     "not_found": false,
     "not_found_topic": "golden key maker bill",
@@ -9604,13 +9604,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757233.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757233.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9618,8 +9618,8 @@
     ],
     "magpie_answer": "18.70 RM",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757233.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
+      "~/Documents/Magpie-eval-corpora/receipts/batch_08/receipt_X51005757233.jpg"
     ],
     "not_found": false,
     "not_found_topic": "locksmith at Golden Key Maker",
@@ -9667,13 +9667,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51006008081.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_09/receipt_X51006008081.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008083.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008083.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9730,13 +9730,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008090.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9744,7 +9744,7 @@
     ],
     "magpie_answer": "12.15",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008093.jpg"
     ],
     "not_found": false,
     "not_found_topic": "purchase amount",
@@ -9792,13 +9792,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447859.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447859.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9806,7 +9806,7 @@
     ],
     "magpie_answer": "Platinum Racking Sdn BHD",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_02/receipt_X51005447842.jpg"
     ],
     "not_found": false,
     "not_found_topic": "platinum racking sdn bhd",
@@ -9858,13 +9858,13 @@
     },
     "retrieved": [
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_06/receipt_X51005715007.jpg",
         "score": 0.01639344262295082,
         "rank": 1,
         "tier": "fast"
       },
       {
-        "path": "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
+        "path": "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg",
         "score": 0.016129032258064516,
         "rank": 2,
         "tier": "fast"
@@ -9872,7 +9872,7 @@
     ],
     "magpie_answer": "No, there is nothing from Platinum Racking in your receipts",
     "magpie_cited": [
-      "/Users/mriddy/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg"
+      "~/Documents/Magpie-eval-corpora/receipts/batch_10/receipt_X51006008105.jpg"
     ],
     "not_found": false,
     "not_found_topic": "Platinum Racking",

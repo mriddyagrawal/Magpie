@@ -13,7 +13,13 @@ for p in (str(HARNESS), str(SCRIPTS)):
         sys.path.insert(0, p)
 
 import progress  # noqa: E402
-from eval_watch import _LOG_NAME, _RUN_ID, tail_bytes  # noqa: E402
+from eval_watch import (  # noqa: E402
+    _LOG_NAME,
+    _RUN_ID,
+    STEP_ARTIFACTS,
+    artifact_stats,
+    tail_bytes,
+)
 
 
 def _read(raw: Path) -> dict:
@@ -90,6 +96,25 @@ def test_tail_bytes_caps_request_size(tmp_path: Path) -> None:
     log = tmp_path / "w.log"
     log.write_bytes(b"x" * 100)
     assert len(tail_bytes(log, 10**9)) == 100  # capped, no OverflowError
+
+
+def test_artifact_stats_reports_existence_and_meta(tmp_path: Path) -> None:
+    run_dir = tmp_path
+    (run_dir / "SUPERVISOR-REPORT.md").write_text("done", encoding="utf-8")
+    (run_dir / "run.json").write_text(json.dumps({"dataset": "nope"}), encoding="utf-8")
+    stats = artifact_stats(run_dir)
+    assert set(stats) == set(STEP_ARTIFACTS) | {"golden"}
+    assert stats["supervisor_report"]["exists"] is True
+    assert stats["supervisor_report"]["size"] == 4
+    assert stats["supervisor_report"]["mtime"] > 0
+    assert stats["report_answers"] == {"exists": False}
+    # unknown dataset -> golden missing, never an exception
+    assert stats["golden"]["exists"] is False
+
+
+def test_artifact_stats_survives_broken_run_json(tmp_path: Path) -> None:
+    (tmp_path / "run.json").write_text("{mid-write", encoding="utf-8")
+    assert artifact_stats(tmp_path)["golden"] == {"exists": False}
 
 
 def test_route_validators_reject_traversal() -> None:

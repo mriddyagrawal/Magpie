@@ -1,0 +1,30 @@
+{
+  "config_name": "topk3-rerank-off-norewrite",
+  "dataset": "receipts",
+  "params": {
+    "model_config": "lfm-local",
+    "prompt_style": "baseline",
+    "temperature": 0.0,
+    "solo_margin": 0,
+    "rerank": false,
+    "local_n_ctx": 16384,
+    "top_k": 3,
+    "top_k_retrieval_max": 12,
+    "rewrite": false,
+    "enumerate_lists": true,
+    "fast_search": true,
+    "index_fast_tier": true,
+    "index_summary_tier": true,
+    "llama_startup_timeout_s": 300,
+    "memory": null,
+    "_notes": {
+      "rewrite": "OFF (owner decision 2026-08-29). Query-side only: worker.py:288 passes it into ask(), and the retrieval sweep at worker.py:391 swaps rewrite_query() for raw_query(). This is the direct test of the previous run's finding #3 - the Kimi rewriter injected wall-clock '2026-08-29'/'EDT' into 55/120 queries, costing 29 points of hit@1 when the date landed in the query string. raw_query() (search.py:1013) makes no LLM call, so that contamination cannot occur; keywords are still populated by extract_rare_tokens() (MAGPIE_RARE_TOKENS defaults on), NOT left empty. Does NOT affect the LIST_ALL widener, which classifies on the raw question (search.py:771) - so the previous run's 4 n_ctx-overflow HTTP 400s (finding #4) are expected to reproduce.",
+      "top_k": "owner decision 2026-08-29: k=3. NOTE ON COMPARABILITY - this run moves TWO axes against 20260829T065335Z-receipts-topk2-rerank-off (top_k 2->3 AND rewrite on->off), so retrieval deltas against that run are NOT attributable to either knob alone. Owner was told and chose k=3 anyway; treat this as a standalone k=3 datapoint. One knob, both axes: worker.py passes top_k straight into ask(), so 3 files are retrieved AND 3 are fed to the generator. top_k_retrieval_max stays 12 (retrieval-only sweeps; unused here).",
+      "rerank": "MAGPIE_RERANK kill-switch; production default is ON - this run deliberately diverges (owner decision 2026-08-29, same rationale as baseline): the cross-encoder scores visual hits against the constant placeholder '(visual match - page N)' (product bug #1), so rerank off = ColQwen's own fusion ranking. false ALSO structurally disables the solo gate (margin is on cross-encoder score scale); run.json stamps solo_gate_structurally_off",
+      "solo_margin": "0 = gate off, stated explicitly rather than implied by rerank=false (owner decision 2026-08-29); production default is 2.0",
+      "fast_search": "production ships visual-tier search OFF; receipts are scanned images and run.py:96 hard-fails a visual_tier-required dataset without it. Dataset-level override (review #31), worker default stays production-faithful False",
+      "temperature": "evals run at 0 (PLAN 4.2); production settings.json default is 0.7",
+      "local_n_ctx": "pinned: .env.example fresh-clone value & shipped-beta ctx; this machine's .env says 65536 and must not leak (PLAN 3)"
+    }
+  }
+}

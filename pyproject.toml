@@ -62,6 +62,16 @@ dependencies = [
     # (or directly: `uv pip install torch --index-url https://download.pytorch.org/whl/cu121 --reinstall`)
     # See `Plans/Bundle Trim/Implementation Plan.md` PR-C.
     "torch>=2.4",
+    # torchvision is transitive (colpali-engine / sentence-transformers) but
+    # pinned here on purpose so [tool.uv.sources] can route it through the SAME
+    # pytorch-cpu index as torch. Without this, uv resolves torchvision from
+    # PyPI, whose wheel is built against the CUDA-flavored torch ABI: importing
+    # it against a `+cpu` torch raises "operator torchvision::nms does not
+    # exist", which surfaces downstream as transformers failing with
+    # "Could not import module 'PreTrainedModel'" and the cross-encoder
+    # reranker silently unavailable. Every `uv sync` re-broke this until the
+    # two packages were pinned to one index.
+    "torchvision==0.25.0",
 ]
 
 [build-system]
@@ -111,6 +121,7 @@ magpie-cli = { workspace = true }
 # bundled CUDA libs that nobody on Mac/Windows/CPU-Linux uses. CUDA users
 # override at install time per the comment in the `dependencies` block above.
 torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
 
 [[tool.uv.index]]
 name = "pytorch-cpu"

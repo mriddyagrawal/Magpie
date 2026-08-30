@@ -1,0 +1,57 @@
+{
+  "dataset": "smoke",
+  "source": "local corpus (register_corpus.py)",
+  "n_files": 10,
+  "files": [
+    {
+      "name": "car_service.txt",
+      "path": "car_service.txt",
+      "sha256": "cd2781cb340b574fee07f91a39faa3987e24a359c40501f183a15aad70f34b84"
+    },
+    {
+      "name": "flight_booking.md",
+      "path": "flight_booking.md",
+      "sha256": "08144abc7bcf35ca34f824117829fa800adf64c9b655b955dc750fdb485cf6bc"
+    },
+    {
+      "name": "gym_plan.txt",
+      "path": "gym_plan.txt",
+      "sha256": "d93c323a68c0139cf85da78e621bd88c8184ec0bdedc1e97266eb79381cea200"
+    },
+    {
+      "name": "insurance_policy.md",
+      "path": "insurance_policy.md",
+      "sha256": "eafa28d81a1254fccad85fb4e54607b7c7340b7da0183d6051ef9a69f6ada829"
+    },
+    {
+      "name": "library_books.txt",
+      "path": "library_books.txt",
+      "sha256": "836323976840a8547a64b0f28db9b6df9c5041a4fbf4d8415ce2b3a434395402"
+    },
+    {
+      "name": "meeting_notes_atlas.md",
+      "path": "meeting_notes_atlas.md",
+      "sha256": "868b2b298cc2718b2f71311987bae33ba9a3a2d41fec6ce37d3efebf167285f8"
+    },
+    {
+      "name": "package_label.png",
+      "path": "package_label.png",
+      "sha256": "ee1d6b99eae42b5686d5396db1d713e40b4a4f795dd3c22f288f782b46810953"
+    },
+    {
+      "name": "parking_receipt.png",
+      "path": "parking_receipt.png",
+      "sha256": "197e1b84d91309c240fbe5664cd9bcddfc61f5062534e75acd39cd96c6f87546"
+    },
+    {
+      "name": "recipe_pasta.md",
+      "path": "recipe_pasta.md",
+      "sha256": "9b6150eee7628058e88a6a4c960a34fe4e733ff502d2def397915ad463c386cf"
+    },
+    {
+      "name": "wifi_and_home.md",
+      "path": "wifi_and_home.md",
+      "sha256": "dc82de6e231575d952c8f24ab993ff903e6ae8d066f9ed1d58f3df55f15d7679"
+    }
+  ]
+}

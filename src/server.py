@@ -1779,7 +1779,7 @@ def _compute_index_plan() -> dict[str, Any]:
             })
             continue
         try:
-            files, _ignored, _asset = find_candidates(
+            files, _ignored = find_candidates(
                 p, indexing_rules=indexing_rules, include_data=False,
             )
         except Exception as e:  # noqa: BLE001 — never crash plan on one bad root

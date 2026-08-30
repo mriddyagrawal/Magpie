@@ -63,6 +63,29 @@ def _load_model() -> "CrossEncoder":
     return CrossEncoder(_model_name())
 
 
+
+def _doc_text(c: "SearchResult") -> str:
+    """What the cross-encoder actually judges for one candidate.
+
+    The summary alone cannot separate near-duplicate siblings: a repo that
+    documents the same script in `math_docs/` and `ascii_docs/`, or the same
+    config repeated across four bench folders, produces two summaries that say
+    almost the same thing. The only discriminator is the path — and until now
+    neither the embedding text nor this function ever showed it to a model.
+
+    Prefixing the path (directories spaced out so the tokenizer sees
+    `math docs` rather than one opaque token) lets a question mentioning
+    "equations" or "ascii" pull its own sibling up. Off by default; set
+    `MAGPIE_RERANK_PATH=1` to enable.
+    """
+    body = c.summary or c.path
+    if os.environ.get("MAGPIE_RERANK_PATH", "0").strip() != "1":
+        return body
+    rel = c.path.rsplit("/", 4)[-4:] if "/" in c.path else [c.path]
+    hint = " ".join(part.replace("_", " ").replace("-", " ") for part in rel if part)
+    return f"{hint}\n{body}"
+
+
 def rerank(
     query: str,
     candidates: list["SearchResult"],
@@ -90,7 +113,7 @@ def rerank(
     # the actual content the cross-encoder needs to score against. Fall back
     # to the path if a summary is missing (fast-tier-only hits show
     # `(visual match — page N)` as their summary; that's still informative).
-    pairs = [(query, c.summary or c.path) for c in candidates]
+    pairs = [(query, _doc_text(c)) for c in candidates]
 
     # `predict()` runs the cross-encoder over all pairs in one call (batched
     # internally per the model's max sequence length). Returns a numpy array.
@@ -102,7 +125,35 @@ def rerank(
     scored: list[tuple["SearchResult", float]] = list(zip(candidates, scores))
     scored.sort(key=lambda kv: kv[1], reverse=True)
 
-    kept: list["SearchResult"] = [cand for cand, _ in scored[:top_k]]
+    if os.environ.get("MAGPIE_RERANK_FUSE", "0").strip() == "1":
+        # Fuse the two orderings instead of letting the cross-encoder replace
+        # the fusion ranking outright.
+        #
+        # The anchor guarantee below protects exactly one hit — fusion #1 —
+        # and that turned out to be one short. Measured 2026-08-27 on "that
+        # spreadsheet with the timing runs": `performance_table.xlsx` is
+        # fusion #2 with rerank OFF, and vanishes past rank 12 with rerank
+        # ON. The cross-encoder's known bias is against terse summaries, and
+        # a spreadsheet's summary is about as terse as this corpus gets, so
+        # the file holding the answer was evicted by a model that had never
+        # seen a number in it.
+        #
+        # Reciprocal rank fusion over (fusion rank, cross-encoder rank) keeps
+        # the cross-encoder's judgement while making a catastrophic eviction
+        # arithmetically impossible: a hit at fusion #2 cannot fall below
+        # roughly rank 2k even if the cross-encoder ranks it last.
+        rrf_k = 60.0
+        fusion_rank = {id(c): i for i, c in enumerate(candidates)}
+        cross_rank = {id(c): i for i, (c, _) in enumerate(scored)}
+        fused_order = sorted(
+            candidates,
+            key=lambda c: -(
+                1.0 / (rrf_k + fusion_rank[id(c)]) + 1.0 / (rrf_k + cross_rank[id(c)])
+            ),
+        )
+        kept = fused_order[:top_k]
+    else:
+        kept = [cand for cand, _ in scored[:top_k]]
 
     # Retrieval-anchor guarantee (2026-08-24). The full re-sort + top-k
     # truncation above CAN silently drop the fusion top-1 — the very hit the

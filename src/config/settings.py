@@ -200,6 +200,7 @@ def load_user_settings(
         # rather than a wall of nulls.
         defaults = load_app_defaults(defaults_path)
         s = UserSettings(
+            version=SETTINGS_VERSION,
             provider=defaults.provider,
             top_k=defaults.top_k,
             rewrite_default=defaults.rewrite_default,
@@ -214,7 +215,37 @@ def load_user_settings(
         return s
     with p.open(encoding="utf-8-sig") as f:
         raw = json.load(f)
+    raw = _migrate(raw, p)
     return UserSettings.model_validate(raw)
+
+
+# The settings schema version. Bump it together with a `_migrate` branch.
+SETTINGS_VERSION = 2
+
+
+def _migrate(raw: dict[str, Any], path: Path) -> dict[str, Any]:
+    """Bring an on-disk settings.json up to `SETTINGS_VERSION`.
+
+    v1 -> v2 (2026-08-27): unpin a temperature that was never chosen.
+    `load_user_settings` seeds a fresh file with every default written out
+    explicitly, so a stored 0.7 is indistinguishable from a deliberate
+    0.7 — and that defeats the whole Optional-means-fall-through design
+    the moment a default moves. The local answer path now wants Liquid's
+    recommended 0.1 (see inference/profiles.DEFAULT_TEMPERATURE), so a
+    seeded 0.7 is cleared back to None. A user who actually picked 0.7
+    loses one non-default setting once; a user who never touched it stops
+    being pinned to a value they never chose.
+    """
+    if raw.get("version", 1) >= SETTINGS_VERSION:
+        return raw
+    if raw.get("temperature") == 0.7:
+        raw["temperature"] = None
+    raw["version"] = SETTINGS_VERSION
+    try:
+        save_user_settings(UserSettings.model_validate(raw), path)
+    except Exception:  # noqa: BLE001 — a read-only config dir must not break startup
+        pass
+    return raw
 
 
 def save_user_settings(settings: UserSettings, path: Optional[Path] = None) -> None:

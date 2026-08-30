@@ -1,0 +1,25 @@
+{
+  "config_name": "topk12",
+  "dataset": "receipts",
+  "params": {
+    "model_config": "lfm-local",
+    "prompt_style": "baseline",
+    "temperature": 0.0,
+    "solo_margin": 2.0,
+    "local_n_ctx": 16384,
+    "top_k": 12,
+    "top_k_retrieval_max": 12,
+    "rewrite": true,
+    "enumerate_lists": true,
+    "fast_search": true,
+    "index_fast_tier": true,
+    "index_summary_tier": true,
+    "llama_startup_timeout_s": 300,
+    "memory": null,
+    "_notes": {
+      "fast_search": "production ships visual-tier search OFF; receipts are scanned images indexed by the fast/ColPali tier, so retrieval REQUIRES fast_search=true on this dataset. Recorded decision (review #31): dataset-level override, explicit here, worker default stays production-faithful False.",
+      "temperature": "evals run at 0 (PLAN 4.2); production settings.json default is 0.7",
+      "local_n_ctx": "pinned: .env.example fresh-clone value & shipped-beta ctx; this machine's .env says 65536 and must not leak (PLAN 3)"
+    }
+  }
+}

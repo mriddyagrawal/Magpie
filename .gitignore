@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
-CLAUDE.md
+# CLAUDE.md is SHARED (owner 2026-08-29): repo-wide Claude instructions
 .claude/scheduled_tasks.lock
 Test Content/
 Test Content Deprecated/
@@ -77,13 +77,28 @@ Test Questions/
 
 .venv.broken/
 
-# Generated knowledge-graph output (graphify) — never track.
+# Generated knowledge-graph output (graphify) — never track (#124: an
+# over-broad add once swept 596 files of it into history on a side branch).
 graphify-out/
 
-# Eval harness (lives on the evaluation_harness branch; rules here are
-# no-ops until merge, then load-bearing — #124: an over-broad add on this
-# branch once swept 572 eval files incl. raw LLM logs into history).
+# Eval harness (eval_harness/PLAN.md §3, §9.3): raw run state holds indexed
+# personal content, scratch app-data dirs, and multi-GB logs - ignored via
+# subpaths, NOT the runs/ tree, because git cannot re-include children of an
+# excluded directory (review #25: a whole-tree rule silently discarded the
+# committed summaries §9.3 decided to keep). config/metrics/report live
+# directly in runs/<id>/ and stay trackable. Listed BEFORE the first run
+# ever executes, because ignoring never untracks (see Test Questions/
+# above for how that went last time).
+# Shared index store (multi-GB scratch indexes; rebuildable)
+eval_harness/indexes/
+eval_harness/runs/**/*.json.old
 eval_harness/runs/*/raw/
 eval_harness/runs/*/appdata/
-eval_harness/indexes/
+eval_harness/runs/*/logs/
+# Corpora never live in the repo (size + privacy); manifests and golden
+# QA do. Local corpus-root pointers are per-machine and untracked.
+eval_harness/datasets/*/corpus/
 eval_harness/datasets/*/corpus_root.local.json
+
+# smoke runs are throwaway tripwire artifacts - never commit them
+eval_harness/runs/smoke-*/

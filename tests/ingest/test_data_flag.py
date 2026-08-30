@@ -26,7 +26,7 @@ def test_data_files_skipped_by_default(tmp_path: Path):
     _touch(tmp_path / "data.csv", "a,b\n1,2\n")
     _touch(tmp_path / "blob.dat", "anything")
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     names = {f.name for f in files}
     assert names == {"real.md", "real.py"}
 
@@ -38,7 +38,7 @@ def test_data_files_indexed_with_include_data(tmp_path: Path):
     _touch(tmp_path / "data.csv", "a,b\n1,2\n")
     _touch(tmp_path / "blob.dat", "fixed-width text data")
 
-    files, _, _ = find_candidates(tmp_path, include_data=True)
+    files, _ = find_candidates(tmp_path, include_data=True)
     names = {f.name for f in files}
     assert names == {"real.md", "settings.json", "data.csv", "blob.dat"}
 
@@ -58,7 +58,7 @@ def test_yaml_toml_still_indexed_by_default(tmp_path: Path):
     _touch(tmp_path / "settings.yml", "k: v")
     _touch(tmp_path / "pyproject.toml", '[project]\nname = "x"')
 
-    files, _, _ = find_candidates(tmp_path)
+    files, _ = find_candidates(tmp_path)
     names = {f.name for f in files}
     assert names == {"config.yaml", "settings.yml", "pyproject.toml"}
 
@@ -71,6 +71,6 @@ def test_data_flag_does_not_disable_other_filters(tmp_path: Path):
     _touch(tmp_path / "kept.json", "should be kept")
     _touch(tmp_path / "node_modules" / "nested.json", "node_modules cruft")
 
-    files, _, _ = find_candidates(tmp_path, include_data=True)
+    files, _ = find_candidates(tmp_path, include_data=True)
     names = {f.name for f in files}
     assert names == {"kept.json"}

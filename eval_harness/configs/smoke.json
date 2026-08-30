@@ -1,0 +1,25 @@
+{
+  "config_name": "smoke",
+  "dataset": "smoke",
+  "params": {
+    "model_config": "lfm-local",
+    "col_model": "auto",
+    "prompt_style": "baseline",
+    "temperature": 0.0,
+    "solo_margin": 0,
+    "rerank": false,
+    "local_n_ctx": 16384,
+    "top_k": 3,
+    "top_k_retrieval_max": 12,
+    "rewrite": false,
+    "enumerate_lists": true,
+    "fast_search": true,
+    "index_fast_tier": true,
+    "index_summary_tier": true,
+    "llama_startup_timeout_s": 300,
+    "memory": null,
+    "_notes": {
+      "purpose": "tripwire, not benchmark: frozen 10-question fixture, loose floors in smoke_check.py. rewrite/rerank/gate OFF for speed and determinism; fast_search ON because two fixtures are images (visual tier is where every catastrophic incident lived)."
+    }
+  }
+}

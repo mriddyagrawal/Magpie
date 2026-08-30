@@ -21,7 +21,7 @@ import argparse
 import asyncio
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from dotenv import load_dotenv
 
@@ -46,6 +46,37 @@ class PipelineResult:
     # Specs/UI/ask_bar.md and Plan #25 in Plans/Future Plans.md.
     not_found: bool = False
     not_found_topic: str = ""
+    # Wall-clock per stage, seconds. Populated by `ask()` so an eval harness
+    # can record where a query's time actually went instead of only its total
+    # — the difference between "the model is slow" and "we read 12 files".
+    timings: dict[str, float] = field(default_factory=dict)
+
+
+def _answer_temperature(effective: float) -> float | None:
+    """Answer-step temperature, provider-aware.
+
+    The app default (0.7) is a cloud number. The local model is
+    LFM2.5-VL-3B, whose card asks for 0.1, and the local answer step is
+    extraction rather than prose — 0.7 there bought us ~8 of 40 eval
+    questions flipping between runs on identical prompts. So on the local
+    provider, a temperature the user never explicitly chose falls through
+    to the model profile's own value (None = "use the profile default"),
+    while an explicit choice is still honored. Cloud is untouched.
+
+    Same shape as `server._rewrite_for_provider`: one knob, two providers,
+    the difference decided here rather than pushed onto the user.
+    """
+    try:
+        from src.config.settings import load_user_settings
+        from src.llm import active_provider
+
+        if load_user_settings().temperature is not None:
+            return effective  # the user pinned it; honor it on both paths
+        if active_provider().name == "local":
+            return None
+    except Exception:  # noqa: BLE001 — never block a query on settings
+        pass
+    return effective
 
 
 async def ask(
@@ -79,6 +110,7 @@ async def ask(
     """
     import time
     t_start = time.monotonic()
+    timings: dict[str, float] = {}
     # Read the user's Settings → Search & AI knobs once per query.
     #   - enumerate_lists: off = treat every query as a regular search
     #     (no top_k widening, no rerank suppression, no ENUMERATION MODE
@@ -90,7 +122,7 @@ async def ask(
         from src.config.settings import effective_settings
         eff = effective_settings()
         enumerate_lists = eff.enumerate_lists
-        answer_temperature = eff.temperature
+        answer_temperature = _answer_temperature(eff.temperature)
     except Exception:  # noqa: BLE001 — defensive, never block on settings
         enumerate_lists = True
         answer_temperature = None
@@ -102,7 +134,8 @@ async def ask(
     if rewrite:
         t = time.monotonic()
         sq: SearchQuery = await asyncio.to_thread(rewrite_query, question)
-        print(f"[query] rewrite ({time.monotonic()-t:.2f}s): "
+        timings["rewrite"] = time.monotonic() - t
+        print(f"[query] rewrite ({timings['rewrite']:.2f}s): "
               f"query={sq.query!r} keywords={sq.keywords}",
               file=sys.stderr, flush=True)
     else:
@@ -119,7 +152,13 @@ async def ask(
     # Confident-retrieval solo gate (local only) — see search.gate_to_solo.
     from src.stage2.search import gate_to_solo
     retrieved = gate_to_solo(retrieved, question=question)
-    print(f"[query] retrieval ({time.monotonic()-t:.2f}s): {len(retrieved)} hits",
+    timings["retrieval"] = time.monotonic() - t
+    try:
+        from src.stage2.search import LAST_SUBTIMINGS
+        timings.update({f"retr_{k}": v for k, v in LAST_SUBTIMINGS.items()})
+    except Exception:  # noqa: BLE001 — instrumentation must never break a query
+        pass
+    print(f"[query] retrieval ({timings['retrieval']:.2f}s): {len(retrieved)} hits",
           file=sys.stderr, flush=True)
     for i, r in enumerate(retrieved, 1):
         # `summary` is the snippet text; truncate to avoid wall-of-text spam.
@@ -174,12 +213,15 @@ async def ask(
         enumerate_lists=enumerate_lists,
         temperature=answer_temperature,
     )
-    print(f"[query] answer ({time.monotonic()-t:.2f}s): "
+    timings["answer"] = time.monotonic() - t
+    print(f"[query] answer ({timings['answer']:.2f}s): "
           f"{len(ans.answer)} chars, sources_used={ans.sources_used}",
           file=sys.stderr, flush=True)
     print(f"[query] total {time.monotonic()-t_start:.2f}s",
           file=sys.stderr, flush=True)
 
+    timings["total"] = time.monotonic() - t_start
+    timings["files_read"] = float(len(paths))
     return PipelineResult(
         question=question,
         search_query=sq,
@@ -188,6 +230,7 @@ async def ask(
         sources_used=ans.sources_used,
         not_found=ans.not_found,
         not_found_topic=ans.not_found_topic,
+        timings=timings,
     )
 
 

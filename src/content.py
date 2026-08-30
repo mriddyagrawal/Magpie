@@ -93,6 +93,27 @@ class SummarizeError(RuntimeError):
     """Raised for per-file failures that should not abort a batch run."""
 
 
+# Control characters that PDF extractors emit where a separator belonged.
+# Stripping them is not cosmetic: `Receipt-2794-8324.pdf` in the sem_4 corpus
+# extracts its invoice number as "9257BD07\x000001", and the consequences ran
+# all the way down the pipeline — the summarizer produced a content-free
+# summary AND leaked raw chat-template tokens (`<|tool_call_end|>`) into it,
+# and four eval questions then came back parroting that empty summary. It was
+# the only file in three corpora with NUL bytes, and the only one with leaked
+# tokens. NUL is replaced with a space (it stands where a separator was);
+# other C0 controls are dropped, keeping tab/newline/carriage return.
+_CONTROL_CHARS = {
+    ord(c): None
+    for c in map(chr, list(range(0, 9)) + [11, 12] + list(range(14, 32)) + [127])
+}
+_CONTROL_CHARS[0] = " "
+
+
+def scrub_control_chars(text: str) -> str:
+    """Replace NUL with a space and drop other C0 control characters."""
+    return text.translate(_CONTROL_CHARS)
+
+
 def extract_pdf_text(path: Path, max_chars: int) -> str:
     from pypdf import PdfReader
     from pypdf.errors import PdfReadError
@@ -499,6 +520,30 @@ def extract_xlsx_text(path: Path) -> str:
 
 
 def build_content_blocks(
+    path: Path,
+    *,
+    max_chars: int,
+    max_pdf_pages: int,
+    search_keywords: list[str] | None = None,
+) -> list:
+    """Scrubbing wrapper — see `_build_content_blocks`.
+
+    Every textual block leaves through here, whatever produced it, so control
+    characters are stripped in exactly one place instead of at a dozen
+    `return` statements.
+    """
+    return [
+        scrub_control_chars(b) if isinstance(b, str) else b
+        for b in _build_content_blocks(
+            path,
+            max_chars=max_chars,
+            max_pdf_pages=max_pdf_pages,
+            search_keywords=search_keywords,
+        )
+    ]
+
+
+def _build_content_blocks(
     path: Path,
     *,
     max_chars: int,

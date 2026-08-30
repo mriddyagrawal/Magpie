@@ -68,6 +68,44 @@ def _mock_decision(routes: list[str]) -> RouteDecision:
     )
 
 
+def test_find_candidates_single_file_root(isolated, tmp_path: Path):
+    """Single-file roots short-circuit the walk and must return the same
+    (files, ignored) 2-tuple as the directory path — regression guard for
+    the 3-tuple returns left behind by the asset-library excision.
+
+    Passes `indexing_rules` explicitly so the test never triggers
+    `ensure_path_included` against the user's real config.
+    """
+    import json
+
+    from src.config import load_indexing_rules
+
+    rules_json = tmp_path / "indexing_rules.json"
+    rules_json.write_text(json.dumps({
+        "version": 1,
+        "include_paths": [
+            {"path": str(tmp_path), "enabled": True,
+             "rules": None, "display_name": None},
+        ],
+    }), encoding="utf-8")
+    rules = load_indexing_rules(user_path=rules_json)
+
+    ok_file = tmp_path / "solo.md"
+    ok_file.write_text("hello", encoding="utf-8")
+    found, ignored = find_candidates(ok_file, indexing_rules=rules)
+    assert found == [ok_file]
+    assert ignored == 0
+
+    # Extension whitelist does NOT apply to single-file roots (explicit-
+    # include precedence), so use a default-ignore secrets pattern to hit
+    # the ineligible branch.
+    bad_file = tmp_path / ".env"
+    bad_file.write_text("SECRET=1", encoding="utf-8")
+    found, ignored = find_candidates(bad_file, indexing_rules=rules)
+    assert found == []
+    assert ignored == 1
+
+
 def test_find_candidates_picks_supported_extensions(isolated, tmp_path: Path):
     corpus = tmp_path / "corpus"
     corpus.mkdir()
@@ -76,64 +114,10 @@ def test_find_candidates_picks_supported_extensions(isolated, tmp_path: Path):
     (corpus / "c.bin").write_bytes(b"\x00\x01")   # unsupported
     (corpus / ".hidden.txt").write_text("h", encoding="utf-8")
 
-    found, ignored, asset_skipped = find_candidates(corpus)
+    found, ignored = find_candidates(corpus)
     names = {p.name for p in found}
     assert names == {"a.py", "b.md"}
     assert ignored == 0
-    assert asset_skipped == 0
-
-
-def test_find_candidates_skips_asset_library_folder(isolated, tmp_path: Path):
-    """Sibling-density rule: a folder with ≥15 images and 0 docs is an asset library."""
-    corpus = tmp_path / "corpus"
-    corpus.mkdir()
-
-    # Real working folder: a few images alongside a document. NOT an asset lib.
-    notes_dir = corpus / "notes"
-    notes_dir.mkdir()
-    (notes_dir / "chapter.md").write_text("notes", encoding="utf-8")
-    for i in range(5):
-        (notes_dir / f"fig{i}.png").write_bytes(b"\x89PNG")
-
-    # Asset library: 20 images, zero documents.
-    assets_dir = corpus / "weird_name_assets"
-    assets_dir.mkdir()
-    for i in range(20):
-        (assets_dir / f"stock{i}.jpg").write_bytes(b"\xff\xd8\xff")
-
-    found, ignored, asset_skipped = find_candidates(corpus)
-    names = {p.name for p in found}
-
-    # Notes folder images survive because chapter.md is a sibling doc.
-    assert "chapter.md" in names
-    assert "fig0.png" in names
-    # Asset-library images are all dropped, regardless of the folder's name.
-    assert not any(n.startswith("stock") for n in names)
-    assert asset_skipped == 20
-    assert ignored == 0
-
-
-def test_find_candidates_asset_rule_ignores_subfolder_docs(isolated, tmp_path: Path):
-    """The check is strictly per-folder — docs in subfolders don't save the parent."""
-    corpus = tmp_path / "corpus"
-    corpus.mkdir()
-
-    assets_dir = corpus / "images"
-    assets_dir.mkdir()
-    for i in range(20):
-        (assets_dir / f"img{i}.png").write_bytes(b"\x89PNG")
-
-    # Doc is in a SUBFOLDER of images/, not a sibling of the images themselves.
-    sub = assets_dir / "writeup"
-    sub.mkdir()
-    (sub / "notes.md").write_text("writeup", encoding="utf-8")
-
-    found, ignored, asset_skipped = find_candidates(corpus)
-    # Images in assets_dir are dropped (0 docs immediately alongside them).
-    assert not any(p.name.startswith("img") for p in found)
-    # The subfolder's notes.md survives.
-    assert any(p.name == "notes.md" for p in found)
-    assert asset_skipped == 20
 
 
 def test_walker_end_to_end_t1_only(isolated, tmp_path: Path):

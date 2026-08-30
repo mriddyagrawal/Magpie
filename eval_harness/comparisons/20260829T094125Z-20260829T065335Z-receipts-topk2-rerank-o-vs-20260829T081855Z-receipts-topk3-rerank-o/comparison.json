@@ -1,0 +1,791 @@
+{
+  "baseline": "20260829T065335Z-receipts-topk2-rerank-off",
+  "generated_utc": "20260829T094125Z",
+  "pairs": [
+    {
+      "a": "20260829T065335Z-receipts-topk2-rerank-off",
+      "b": "20260829T081855Z-receipts-topk3-rerank-off-norewrite",
+      "meta": {
+        "generated_utc": "20260829T094125Z",
+        "pairing_mode": "full",
+        "pairing_coverage": 1.0,
+        "n_paired": 120
+      },
+      "axes": {
+        "changed_axes": [
+          "config"
+        ],
+        "confounded": false,
+        "params_diff": {
+          "rewrite": {
+            "a": true,
+            "b": false
+          },
+          "top_k": {
+            "a": 2,
+            "b": 3
+          }
+        },
+        "backend_git_sha": {
+          "a": "c823a44f1227a18359f1823af720fcc7f0979209",
+          "b": "c823a44f1227a18359f1823af720fcc7f0979209"
+        },
+        "backend_commits_between": [],
+        "harness_git_sha": {
+          "a": "c9eb90a50cf11dfb6e942243b7b18f293f669081",
+          "b": "2e1c85165e8faf79452a186206aaf0f4b66b1c10"
+        },
+        "golden_sha": {
+          "a": "a3b05ea95c052a65",
+          "b": "a3b05ea95c052a65"
+        },
+        "env_snapshot_diff": {
+          "MAGPIE_DATA_DIR": {
+            "a": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T065335Z-receipts-topk2-rerank-off/raw/appdata",
+            "b": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260829T081855Z-receipts-topk3-rerank-off-norewrite/raw/appdata"
+          }
+        },
+        "solo_gate_structurally_off": {
+          "a": true,
+          "b": true
+        },
+        "rerank_coupling_warning": null
+      },
+      "comparison": {
+        "answer_authoritative": {
+          "n": 120,
+          "a_rate": 0.0583,
+          "b_rate": 0.0833,
+          "delta": 0.025,
+          "discordant_a_only": 4,
+          "discordant_b_only": 7,
+          "concordant_both": 3,
+          "concordant_neither": 106,
+          "mcnemar_p": 0.54883,
+          "credible": true,
+          "basis": "judge"
+        },
+        "answer_deterministic": {
+          "n": 120,
+          "a_rate": 0.025,
+          "b_rate": 0.0667,
+          "delta": 0.0417,
+          "discordant_a_only": 2,
+          "discordant_b_only": 7,
+          "concordant_both": 1,
+          "concordant_neither": 110,
+          "mcnemar_p": 0.17969,
+          "credible": true
+        },
+        "answer_judge": {
+          "n": 120,
+          "a_rate": 0.0583,
+          "b_rate": 0.0833,
+          "delta": 0.025,
+          "discordant_a_only": 4,
+          "discordant_b_only": 7,
+          "concordant_both": 3,
+          "concordant_neither": 106,
+          "mcnemar_p": 0.54883,
+          "credible": true
+        },
+        "retrieval_hit1": {
+          "n": 106,
+          "a_rate": 0.783,
+          "b_rate": 0.7925,
+          "delta": 0.0094,
+          "discordant_a_only": 9,
+          "discordant_b_only": 10,
+          "concordant_both": 74,
+          "concordant_neither": 13,
+          "mcnemar_p": 1.0,
+          "credible": true,
+          "basis": "ranked_pre_gate"
+        },
+        "abstention": {
+          "n": 120,
+          "a_rate": 0.3833,
+          "b_rate": 0.3417,
+          "delta": -0.0417,
+          "discordant_a_only": 21,
+          "discordant_b_only": 16,
+          "concordant_both": 25,
+          "concordant_neither": 58,
+          "mcnemar_p": 0.51138,
+          "credible": true,
+          "note": "outcome=abstained, not correctness"
+        },
+        "verdict_transitions": {
+          "false_abstain -> wrong": 18,
+          "wrong -> false_abstain": 11,
+          "false_answer -> correct_abstain": 6,
+          "wrong -> partial": 5,
+          "correct -> wrong": 3,
+          "partial -> wrong": 2,
+          "wrong -> correct": 1,
+          "false_abstain -> partial": 1,
+          "correct_abstain -> false_answer": 1
+        },
+        "slices": {
+          "phrasing": {
+            "full": {
+              "n": 60,
+              "a_rate": 0.0667,
+              "b_rate": 0.0667,
+              "delta": 0.0,
+              "discordant_a_only": 2,
+              "discordant_b_only": 2,
+              "concordant_both": 2,
+              "concordant_neither": 54,
+              "mcnemar_p": 1.0,
+              "credible": false
+            },
+            "typed": {
+              "n": 60,
+              "a_rate": 0.05,
+              "b_rate": 0.1,
+              "delta": 0.05,
+              "discordant_a_only": 2,
+              "discordant_b_only": 5,
+              "concordant_both": 1,
+              "concordant_neither": 52,
+              "mcnemar_p": 0.45312,
+              "credible": true
+            }
+          },
+          "answer_type": {
+            "enumeration": {
+              "n": 6,
+              "a_rate": 0.0,
+              "b_rate": 0.0,
+              "delta": 0.0,
+              "discordant_a_only": 0,
+              "discordant_b_only": 0,
+              "concordant_both": 0,
+              "concordant_neither": 6,
+              "mcnemar_p": 1.0,
+              "credible": false
+            },
+            "extractive": {
+              "n": 80,
+              "a_rate": 0.0375,
+              "b_rate": 0.0125,
+              "delta": -0.025,
+              "discordant_a_only": 3,
+              "discordant_b_only": 1,
+              "concordant_both": 0,
+              "concordant_neither": 76,
+              "mcnemar_p": 0.625,
+              "credible": false
+            },
+            "not_found": {
+              "n": 14,
+              "a_rate": 0.2857,
+              "b_rate": 0.6429,
+              "delta": 0.3571,
+              "discordant_a_only": 1,
+              "discordant_b_only": 6,
+              "concordant_both": 3,
+              "concordant_neither": 4,
+              "mcnemar_p": 0.125,
+              "credible": true
+            },
+            "synthesis": {
+              "n": 20,
+              "a_rate": 0.0,
+              "b_rate": 0.0,
+              "delta": 0.0,
+              "discordant_a_only": 0,
+              "discordant_b_only": 0,
+              "concordant_both": 0,
+              "concordant_neither": 20,
+              "mcnemar_p": 1.0,
+              "credible": false
+            }
+          }
+        },
+        "latency_paired": {},
+        "flips": {
+          "answer_regressions": [
+            {
+              "qa_id": "rcpt-a-04-full",
+              "question": "Did I pay cash or card for the 193.00 invoice from OJC Marketing?",
+              "phrasing": "full",
+              "verdict_a": "correct",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "correct",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Card (VISA)",
+              "answer_b": "Cash",
+              "golden_answer": "That one went on the card — the OJC Marketing tax invoice of 15/01/2019 for 193.00 was settled by VISA CARD, card ending 4318."
+            },
+            {
+              "qa_id": "rcpt-e-04-full",
+              "question": "Which card did I pay with on that big Super Seven shop, the four-hundred-odd ringgit one?",
+              "phrasing": "full",
+              "verdict_a": "correct",
+              "verdict_b": "wrong",
+              "det_a": "partial",
+              "det_b": "wrong",
+              "judge_a": "correct",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 0.0,
+              "answer_a": "Master Card",
+              "answer_b": "VISA CARD",
+              "golden_answer": "That Super Seven Cash & Carry tax invoice dated 01-03-2018 for RM408.45 shows the payment method as MASTER CARD."
+            },
+            {
+              "qa_id": "rcpt-e-04-typed",
+              "question": "super seven 408 paid by what card",
+              "phrasing": "typed",
+              "verdict_a": "correct",
+              "verdict_b": "wrong",
+              "det_a": "partial",
+              "det_b": "wrong",
+              "judge_a": "correct",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 0.0,
+              "answer_a": "Master Card",
+              "answer_b": "VISA CARD",
+              "golden_answer": "That Super Seven Cash & Carry tax invoice dated 01-03-2018 for RM408.45 shows the payment method as MASTER CARD."
+            },
+            {
+              "qa_id": "rcpt-nf-06-typed",
+              "question": "tanjongmas bookcentre",
+              "phrasing": "typed",
+              "verdict_a": "correct_abstain",
+              "verdict_b": "false_answer",
+              "det_a": "correct_abstain",
+              "det_b": "false_answer",
+              "judge_a": "correct_abstain",
+              "judge_b": "false_answer",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "",
+              "answer_b": "Tanjongmas Book Centre",
+              "golden_answer": "There is no Tanjongmas Bookcentre receipt in this collection. (There are receipts from other bookshops and stationers, including Popular Book Co. and Kedai Buku New Acheivers.)"
+            }
+          ],
+          "answer_wins": [
+            {
+              "qa_id": "rcpt-b-05-typed",
+              "question": "vivopac gst amout sept",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 0.0,
+              "hit1_b": 0.0,
+              "answer_a": "49.50",
+              "answer_b": "Vivopac GST amount: RM 2.97",
+              "golden_answer": "The 13/09/2017 Vivopac Marketing invoice charged RM 2.97 of GST at 6% on a RM 49.50 sub-total, for a rounded total of RM 52.45."
+            },
+            {
+              "qa_id": "rcpt-nf-01-full",
+              "question": "How much did I spend at PappaRich?",
+              "phrasing": "full",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "You spent 44.00ZR on Anchor Flour and 15.40SR on Diamond Foil 7, for a total of 59.40ZR [1].",
+              "answer_b": "",
+              "golden_answer": "There is no PappaRich receipt in this collection."
+            },
+            {
+              "qa_id": "rcpt-nf-01-typed",
+              "question": "papparich receipt",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "POPULAR BOOK CO. (M) SDN BHD",
+              "answer_b": "",
+              "golden_answer": "There is no PappaRich receipt in this collection."
+            },
+            {
+              "qa_id": "rcpt-nf-02-typed",
+              "question": "secret recipe total",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "25.80",
+              "answer_b": "",
+              "golden_answer": "There is no Secret Recipe receipt in this collection."
+            },
+            {
+              "qa_id": "rcpt-nf-04-full",
+              "question": "Can you find the Moonlight Cake House receipt?",
+              "phrasing": "full",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "Yes, the Moonlight Cake House receipt is available [1].",
+              "answer_b": "",
+              "golden_answer": "There is no Moonlight Cake House receipt in this collection."
+            },
+            {
+              "qa_id": "rcpt-nf-05-typed",
+              "question": "golden key maker bill",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "golden key maker bill: 56.80",
+              "answer_b": "",
+              "golden_answer": "There is no Golden Key Maker receipt in this collection."
+            },
+            {
+              "qa_id": "rcpt-nf-07-typed",
+              "question": "platinum racking sdn bhd",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "Platinum Racking Sdn BHD",
+              "answer_b": "",
+              "golden_answer": "There is no Platinum Racking receipt in this collection."
+            }
+          ],
+          "retrieval_regressions": [
+            {
+              "qa_id": "rcpt-a-05-typed",
+              "question": "zheng hui gst amout",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "false_abstain",
+              "det_a": "false_abstain",
+              "det_b": "false_abstain",
+              "judge_a": "false_abstain",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "",
+              "answer_b": "",
+              "golden_answer": "The Perniagaan Zheng Hui bill of 09/02/2018 carried 24.69 in GST — RM411.50 excluding GST, RM436.20 paid in cash."
+            },
+            {
+              "qa_id": "rcpt-a-06-typed",
+              "question": "yong tat hardware what did i buy",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "Yong Tat Hardware Trading, 1 item (3/4\" ALUMINIUM ROD), RM 19.60",
+              "answer_b": "5.30",
+              "golden_answer": "One sheet only — a 0.8MM X 50\" X 60\" AR RED GASKET at 72.00 (RM67.92 before GST), on 13/03/2018."
+            },
+            {
+              "qa_id": "rcpt-b-01-typed",
+              "question": "jiawei dinner total",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "false_abstain",
+              "det_a": "wrong",
+              "det_b": "false_abstain",
+              "judge_a": "wrong",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "RM 63.90",
+              "answer_b": "",
+              "golden_answer": "The Restaurant Jiawei bill (23/2/2018, Table 13) came to RM 110.00, with no service charge added."
+            },
+            {
+              "qa_id": "rcpt-b-09-typed",
+              "question": "hon hwa hardware how much altogether",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "false_abstain",
+              "det_a": "false_abstain",
+              "det_b": "false_abstain",
+              "judge_a": "false_abstain",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "",
+              "answer_b": "",
+              "golden_answer": "The three Hon Hwa Hardware Trading receipts add up to RM 31.80 — RM 5.00 on 05/01/2017, RM 19.60 on 11/02/2017 and RM 7.20 on 28/04/2017."
+            },
+            {
+              "qa_id": "rcpt-d-03-full",
+              "question": "Which shopping centre was that Kaison receipt from?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "AEON CO. (M) BHD",
+              "answer_b": "AEON CO. (M) BHD",
+              "golden_answer": "That Kaison Furnishing slip is from the MyTOWN Shopping Centre outlet — Lot No. L3-012, Level 3, No. 6 Jalan Cochrane, 55100 Kuala Lumpur — dated 25-03-18."
+            },
+            {
+              "qa_id": "rcpt-e-02-typed",
+              "question": "mei let restarant when",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "false_abstain",
+              "det_a": "wrong",
+              "det_b": "false_abstain",
+              "judge_a": "wrong",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "Mei Let Restaurant",
+              "answer_b": "",
+              "golden_answer": "The Mei Let Restaurant bill is dated 03/02/2017, 09:26:48 PM — table 13, net total RM68.90."
+            },
+            {
+              "qa_id": "rcpt-e-05-typed",
+              "question": "great zone kluang gst amount",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "false_abstain",
+              "det_a": "false_abstain",
+              "det_b": "false_abstain",
+              "judge_a": "false_abstain",
+              "judge_b": "false_abstain",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "",
+              "answer_b": "",
+              "golden_answer": "GST at 6% on the Great Zone Household Centre invoice of 18/02/2018 was RM20.79, on a sub total of RM346.51, giving a rounded total of RM367.30."
+            },
+            {
+              "qa_id": "rcpt-e-07-full",
+              "question": "Which Guardian branch did I buy that Freeman face mask at?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "Guardian Health And Beauty Sdn Bhd",
+              "answer_b": "BANDINGKAN HARGA KAMI",
+              "golden_answer": "The Freeman BK/CH 6OZ was bought at Guardian Solaris Mount Kiara (No.8 & 10, GF Solaris Mount Kuara, Jln Solaris 5) on 01/01/18, RM22.45 on a Visa card."
+            },
+            {
+              "qa_id": "rcpt-en-03-typed",
+              "question": "gin kee january dates",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "wrong",
+              "det_a": "false_abstain",
+              "det_b": "wrong",
+              "judge_a": "false_abstain",
+              "judge_b": "wrong",
+              "hit1_a": 1.0,
+              "hit1_b": 0.0,
+              "answer_a": "",
+              "answer_b": "CEDA APAN YEW CH JAN",
+              "golden_answer": "There are 6 Syarikat Perniagaan Gin Kee receipts from January 2018: the 3rd, 4th, 15th, 25th, 27th and 31st."
+            }
+          ],
+          "retrieval_wins": [
+            {
+              "qa_id": "rcpt-a-02-typed",
+              "question": "f&p phamacy what date",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "false_abstain",
+              "det_a": "false_abstain",
+              "det_b": "false_abstain",
+              "judge_a": "false_abstain",
+              "judge_b": "false_abstain",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "",
+              "answer_b": "",
+              "golden_answer": "The F&P Pharmacy visit in Seri Kembangan was on 02/03/2018, at 16.46 — doc no CS00110240, RM31.90 in total."
+            },
+            {
+              "qa_id": "rcpt-a-06-full",
+              "question": "What was the item I picked up at Yong Tat Hardware?",
+              "phrasing": "full",
+              "verdict_a": "false_abstain",
+              "verdict_b": "wrong",
+              "det_a": "false_abstain",
+              "det_b": "wrong",
+              "judge_a": "false_abstain",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "",
+              "answer_b": "SR: EXTENSION LADDER 12\" X 12\"",
+              "golden_answer": "One sheet only — a 0.8MM X 50\" X 60\" AR RED GASKET at 72.00 (RM67.92 before GST), on 13/03/2018."
+            },
+            {
+              "qa_id": "rcpt-b-06-typed",
+              "question": "premio battery invoice no",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "false_abstain",
+              "det_a": "false_abstain",
+              "det_b": "false_abstain",
+              "judge_a": "false_abstain",
+              "judge_b": "false_abstain",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "",
+              "answer_b": "",
+              "golden_answer": "It is invoice No SS3-154439, dated 20/03/2018 — one pack of Energizer Battery AA 4's for RM 13.40."
+            },
+            {
+              "qa_id": "rcpt-b-08-typed",
+              "question": "sunquick oren recipt which shop",
+              "phrasing": "typed",
+              "verdict_a": "partial",
+              "verdict_b": "wrong",
+              "det_a": "partial",
+              "det_b": "wrong",
+              "judge_a": "partial",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "99 SPEED MART S/B",
+              "answer_b": "Sunquick Oren",
+              "golden_answer": "The Sunquick Oren 330ML came from 99 Speed Mart (the Tmn Bkt Pandan branch) on 10-03-18, RM 5.35 inclusive of GST."
+            },
+            {
+              "qa_id": "rcpt-c-03-full",
+              "question": "I paid cash at LA Stationery for the pens and glue - how much change did I get back?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "4.95",
+              "answer_b": "11.90",
+              "golden_answer": "You paid 100.00 cash at LA Stationery for a 56.80 bill and got 43.20 change back."
+            },
+            {
+              "qa_id": "rcpt-c-09-full",
+              "question": "Of my two Restoran Wan Sheng drink runs in March, which one cost more and by how much?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "The March 23rd receipt cost more by RM 0.33 [1] and [2].",
+              "answer_b": "The first drink run cost more by 0.80 RM",
+              "golden_answer": "The 17-03-2018 Wan Sheng run was the bigger one at 9.60; the 23-03-2018 one was only 6.70."
+            },
+            {
+              "qa_id": "rcpt-c-10-typed",
+              "question": "kedai buku new acheivers both bills added up",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "5.00 and 4.10",
+              "answer_b": "30.48",
+              "golden_answer": "The two Kedai Buku New Acheivers bills add up to 86.15 - 48.00 on 15/09/2017 and 38.15 on 28/12/2017."
+            },
+            {
+              "qa_id": "rcpt-d-03-typed",
+              "question": "kaison which mall",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "Cheras Leisure Mall",
+              "answer_b": "Guardian Health And Beauty Sdn Bhd",
+              "golden_answer": "That Kaison Furnishing slip is from the MyTOWN Shopping Centre outlet — Lot No. L3-012, Level 3, No. 6 Jalan Cochrane, 55100 Kuala Lumpur — dated 25-03-18."
+            },
+            {
+              "qa_id": "rcpt-d-05-full",
+              "question": "Did I pay cash or by card at AA Pharmacy?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "false_abstain",
+              "det_a": "wrong",
+              "det_b": "wrong",
+              "judge_a": "wrong",
+              "judge_b": "false_abstain",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "Cash",
+              "answer_b": "(model output could not be parsed into Answer)",
+              "golden_answer": "That one went on the card — the AA Pharmacy receipt from 29/01/2018 shows MASTER 46.20 with 0.00 change."
+            },
+            {
+              "qa_id": "rcpt-d-09-typed",
+              "question": "kedai papan 21 march both bills together",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "wrong",
+              "det_a": "wrong",
+              "det_b": "partial",
+              "judge_a": "wrong",
+              "judge_b": "wrong",
+              "hit1_a": 0.0,
+              "hit1_b": 1.0,
+              "answer_a": "1.70",
+              "answer_b": "68.90",
+              "golden_answer": "Two Kedai Papan Yew Chuan invoices are dated 21/03/2018 — CS00011014 for RM68.90 (pasir halus) and CS00011043 for RM144.16 (besi Y 10) — so RM213.06 that day."
+            }
+          ]
+        }
+      },
+      "synthesis": {
+        "verdict": "k=3 not worth it; answer delta (+2.5pt, p=0.549) not decision-grade and attributable to rewrite-off, not k. Stay k=2; fix ordering first.",
+        "cause_counts": {
+          "retrieval_change": 7,
+          "prompt_assembly": 3,
+          "model_variance": 1,
+          "guard": 0,
+          "judge_disagreement": 0,
+          "infra_error": 0
+        },
+        "knob_attribution": {
+          "answer_flips": {
+            "rewrite": 7,
+            "both": 2,
+            "top_k": 1,
+            "unclear": 1
+          },
+          "retrieval_flips": {
+            "rewrite": 19,
+            "top_k": 0,
+            "noise": 0
+          }
+        },
+        "defects_found": [
+          "rewriter injects wall-clock datetime into 66/120 queries; 4 typed queries fully replaced by timestamps",
+          "grounding guard >=100 rule: zero surviving answers with numbers >=100 in either run (accuracy 1.000)",
+          "best-ranked-last ordering: 10/11 grounded wrong answers quote the FIRST-presented worst-ranked file; inverts retrieval wins (rcpt-a-04-full)",
+          "B-only: 8 degenerate multi-thousand-token generations (p95 latency 20s->57s); 1 unparseable output",
+          "B citation collapse: zero-citation answers 9->45, precision 0.184->0.060 (unattributed)",
+          "compare.py paired-latency scalar check vs dict latency_s (fixed post-synthesis)"
+        ],
+        "recommended_next_run": "ordering fix (best-first for vision), k=2, rewrite off, same golden; index HIT; single code axis",
+        "flip_attributions": {
+          "rcpt-a-04-full": {
+            "cause": "prompt_assembly",
+            "knob": "rewrite",
+            "confidence": "med"
+          },
+          "rcpt-e-04-full": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-e-04-typed": {
+            "cause": "model_variance",
+            "knob": "unclear",
+            "confidence": "med"
+          },
+          "rcpt-nf-06-typed": {
+            "cause": "retrieval_change",
+            "knob": "both",
+            "confidence": "med"
+          },
+          "rcpt-b-05-typed": {
+            "cause": "prompt_assembly",
+            "knob": "top_k",
+            "confidence": "low"
+          },
+          "rcpt-nf-01-full": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-01-typed": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-02-typed": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-04-full": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "med"
+          },
+          "rcpt-nf-05-typed": {
+            "cause": "retrieval_change",
+            "knob": "rewrite",
+            "confidence": "high"
+          },
+          "rcpt-nf-07-typed": {
+            "cause": "prompt_assembly",
+            "knob": "both",
+            "confidence": "med"
+          }
+        }
+      }
+    }
+  ]
+}

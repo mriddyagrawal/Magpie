@@ -159,62 +159,6 @@ _DATA_EXTS_DEFAULT_OFF = {".json", ".csv", ".dat"}
 #   .DS_Store, .ipynb_checkpoints                     → OS / app cruft
 
 
-# Extensions of files we consider "documents" (as opposed to images). Used by
-# the asset-library-folder heuristic: a folder with many images and zero docs
-# is treated as an asset library and its images are skipped wholesale.
-_DOCUMENT_EXTS = {
-    ".txt", ".md", ".markdown", ".log",
-    ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
-    ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
-    ".sh", ".sql",
-    ".json", ".yaml", ".yml", ".toml",
-    ".csv",
-    ".pdf", ".docx", ".xlsx", ".xlsm",
-    ".pptx", ".html", ".htm", ".ipynb",
-}
-_IMAGE_EXTS_FOR_FILTER = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
-
-# Threshold for the sibling-density rule. A folder is treated as an asset
-# library if it has at least this many images AND zero document files. Chosen
-# by observation: real working folders with "a few reference pics next to
-# notes" have <5 images; dedicated asset libraries (course media, stock photo
-# folders, scraped galleries) commonly have 20–500+. 15 is comfortably above
-# the "a few reference pics" ceiling and below the "real asset library" floor.
-_ASSET_LIBRARY_MIN_IMAGES = 15
-
-
-def _asset_library_folders(paths: list[Path]) -> set[Path]:
-    """Return the set of folders that look like asset libraries.
-
-    A folder qualifies if, among its own immediate children, there are at
-    least `_ASSET_LIBRARY_MIN_IMAGES` image files AND zero document files.
-    Subfolder contents are NOT counted — the check is strictly per-folder, so
-    `sem6/` won't be flagged just because it contains `sem6/assets/`.
-
-    This is a structural replacement for naming-based path patterns (like
-    `mediasources-4ed/`): instead of encoding every possible asset-folder
-    name into `.magpieignore`, we detect the *shape* — image-dominated folders
-    with no documents — regardless of what the user named them.
-    """
-    # Group files by their immediate parent directory.
-    from collections import defaultdict
-    by_folder_images: dict[Path, int] = defaultdict(int)
-    by_folder_docs: dict[Path, int] = defaultdict(int)
-    for p in paths:
-        ext = p.suffix.lower()
-        parent = p.parent
-        if ext in _IMAGE_EXTS_FOR_FILTER:
-            by_folder_images[parent] += 1
-        elif ext in _DOCUMENT_EXTS:
-            by_folder_docs[parent] += 1
-
-    return {
-        folder
-        for folder, n_images in by_folder_images.items()
-        if n_images >= _ASSET_LIBRARY_MIN_IMAGES and by_folder_docs.get(folder, 0) == 0
-    }
-
-
 def _include_dotfiles_for(
     dirpath: Path,
     *,
@@ -243,8 +187,8 @@ def find_candidates(
     *,
     indexing_rules: IndexingRules | None = None,
     include_data: bool = False,
-) -> tuple[list[Path], int, int]:
-    """Walk `root` and return (accepted, ignored_count, asset_library_skipped).
+) -> tuple[list[Path], int]:
+    """Walk `root` and return (accepted, ignored_count).
 
     `indexing_rules` is the composed config (defaults + user JSON + cascade-
     discovered .gitignore/.magpieignore(.nasignore)/.magpieinclude/.magpieexclude). If
@@ -253,7 +197,7 @@ def find_candidates(
     ad-hoc CLI walks register the path as a managed root for the future
     daemon to pick up).
 
-    Three filter layers run in order:
+    Two filter layers run in order:
 
     1. **Dot-folder prune** during traversal — dot-folders (`.config/`,
        `.codex/`, `.antigravity/`, `.cache/`, etc.) are pruned in-place
@@ -262,11 +206,8 @@ def find_candidates(
     2. **Leaf-dotfile filter** — leaf-name dotfiles default to skipped,
        except the small `_USEFUL_DOTFILE_NAMES` allowlist (`.bashrc`,
        `.vimrc`, `.gitconfig`, etc.) which actually carry user content.
-    3. **Asset-library folder rule** — folders dominated by images with
-       zero documents are treated as asset libraries and their images
-       are dropped wholesale (post-walk, structural).
 
-    Both layers (1) and (2) are **disabled** for a subtree when its
+    Both layers are **disabled** for a subtree when its
     nearest-ancestor `.magpieconfig.yaml` (or legacy `.nasconfig.yaml`) says `include_dotfiles: true`. The
     built-in default ignore patterns (secrets, `node_modules/`, etc.)
     still apply — opting in to dotfiles doesn't disable safety rails.
@@ -291,7 +232,7 @@ def find_candidates(
 
     # Single-file root short-circuit. When the walker is invoked on a file
     # path (e.g. an entry in include_paths that points at a single file),
-    # we skip the os.walk + asset-library pipeline entirely and just feed
+    # we skip the os.walk pipeline entirely and just feed
     # the one file forward — assuming `should_index()` accepts it. The
     # explicit-file-include precedence rule (#0) means user-listed file
     # includes pass even when gitignore / category / size would reject.
@@ -302,8 +243,8 @@ def find_candidates(
                 f"  warn: {root} not eligible for indexing: {reason}",
                 flush=True,
             )
-            return [], 1, 0
-        return [root], 0, 0
+            return [], 1
+        return [root], 0
 
     pre_accepted: list[Path] = []
     ignored = 0
@@ -370,16 +311,7 @@ def find_candidates(
                 continue
             pre_accepted.append(p)
 
-    asset_folders = _asset_library_folders(pre_accepted)
-    accepted: list[Path] = []
-    asset_skipped = 0
-    for p in pre_accepted:
-        if p.parent in asset_folders and p.suffix.lower() in _IMAGE_EXTS_FOR_FILTER:
-            asset_skipped += 1
-            continue
-        accepted.append(p)
-
-    return sorted(accepted), ignored, asset_skipped
+    return sorted(pre_accepted), ignored
 
 
 # ---------------------------------------------------------------------------
@@ -624,34 +556,22 @@ async def run_batch(
         print(f"  + auto-added '{resolved}' to indexing_rules.json", flush=True)
     indexing_rules = load_indexing_rules()
     t_ignore = time.monotonic() - t0
-    files, ignored_count, asset_lib_skipped = find_candidates(
+    files, ignored_count = find_candidates(
         root, indexing_rules=indexing_rules, include_data=include_data,
     )
     t_total = time.monotonic() - t0
     print(
         f"  scan done in {t_total:.1f}s "
         f"(ignore-rules: {t_ignore:.1f}s, candidates: {t_total - t_ignore:.1f}s)\n"
-        f"  found {len(files)} files to consider, {ignored_count} ignored, "
-        f"{asset_lib_skipped} dropped by asset-library rule",
+        f"  found {len(files)} files to consider, {ignored_count} ignored",
         flush=True,
     )
-    if not files and ignored_count == 0 and asset_lib_skipped == 0:
-        print(f"no indexable files found under {root}")
-        return
     if not files:
-        print(
-            f"no indexable files under {root} after filters "
-            f"({ignored_count} ignored, {asset_lib_skipped} in asset-library folders)"
-        )
+        print(f"no indexable files under {root} after filters")
         return
 
     if progress_callback:
         progress_callback(0, len(files), None)
-    if asset_lib_skipped:
-        print(
-            f"skipped {asset_lib_skipped} images in {root} "
-            f"(asset-library folders: ≥{_ASSET_LIBRARY_MIN_IMAGES} images + 0 docs)"
-        )
 
     # Manifest prune for files that vanished under this root. When the walked
     # root lives under REPO_ROOT we scope the prune to repo-relative prefixes;
@@ -934,8 +854,8 @@ def _fast_tier_orphan_cleanup(manifest: Manifest) -> int:
     """Drop fast_tier points whose source path no longer exists in the manifest.
 
     Mirrors Stage 2's summary-collection orphan cleanup. Necessary so that
-    files dropped by the asset-library rule (or any other manifest removal)
-    don't leave zombie ColPali patches on disk forever.
+    files removed from the manifest don't leave zombie ColPali patches on
+    disk forever.
     """
     try:
         from src.stage2.fast_db import delete_path, get_indexed_paths
@@ -1178,7 +1098,7 @@ def main() -> None:
         )
 
     # Fast-tier orphan cleanup: drop ColPali points for files that no longer
-    # exist in the manifest. Without this, asset-library skips and `--rebuild`
+    # exist in the manifest. Without this, `--rebuild` and manifest removals
     # leave zombie multi-vectors on disk indefinitely. Mirrors the
     # summary-collection orphan cleanup in `ingest_from_manifest`.
     try:

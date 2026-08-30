@@ -1,0 +1,2816 @@
+[
+ {
+  "id": "rcpt-a-01-typed",
+  "pair_id": "rcpt-a-01",
+  "phrasing": "typed",
+  "question": "tony romas total",
+  "answer_type": "extractive",
+  "golden_answer": "The Tony Roma's bill at Aeon Tebrau City came to 269.40 — RM231.06 subtotal plus a 10% service charge of 23.10 and 15.25 GST.",
+  "key_facts": [
+   "269.40"
+  ],
+  "gold_sources": [
+   "receipt_X51005442322.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "TONY ROMA'S AEON TEBRAU CITY"
+ },
+ {
+  "id": "rcpt-a-01-full",
+  "pair_id": "rcpt-a-01",
+  "phrasing": "full",
+  "question": "How much did that Tony Roma's dinner come to in the end?",
+  "answer_type": "extractive",
+  "golden_answer": "The Tony Roma's bill at Aeon Tebrau City came to 269.40 — RM231.06 subtotal plus a 10% service charge of 23.10 and 15.25 GST.",
+  "key_facts": [
+   "269.40"
+  ],
+  "gold_sources": [
+   "receipt_X51005442322.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "TONY ROMA'S AEON TEBRAU CITY"
+ },
+ {
+  "id": "rcpt-a-02-typed",
+  "pair_id": "rcpt-a-02",
+  "phrasing": "typed",
+  "question": "f&p phamacy what date",
+  "answer_type": "extractive",
+  "golden_answer": "The F&P Pharmacy visit in Seri Kembangan was on 02/03/2018, at 16.46 — doc no CS00110240, RM31.90 in total.",
+  "key_facts": [
+   "02/03/2018"
+  ],
+  "gold_sources": [
+   "receipt_X51005365187.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "F&P PHARMACY"
+ },
+ {
+  "id": "rcpt-a-02-full",
+  "pair_id": "rcpt-a-02",
+  "phrasing": "full",
+  "question": "When did I go to F&P Pharmacy?",
+  "answer_type": "extractive",
+  "golden_answer": "The F&P Pharmacy visit in Seri Kembangan was on 02/03/2018, at 16.46 — doc no CS00110240, RM31.90 in total.",
+  "key_facts": [
+   "02/03/2018"
+  ],
+  "gold_sources": [
+   "receipt_X51005365187.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "F&P PHARMACY"
+ },
+ {
+  "id": "rcpt-a-03-typed",
+  "pair_id": "rcpt-a-03",
+  "phrasing": "typed",
+  "question": "secure parking which place",
+  "answer_type": "extractive",
+  "golden_answer": "That RM1.00 parking slip is from Secure Parking Corporation at Riverwalk Village, Batu 3, Jalan Ipoh, 51200 KL — parked 23.03.18 from 14:59 to 15:27.",
+  "key_facts": [
+   "Riverwalk Village",
+   "Jalan Ipoh"
+  ],
+  "gold_sources": [
+   "receipt_X51005288570.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SECURE PARKING CORPORATION S/B"
+ },
+ {
+  "id": "rcpt-a-03-full",
+  "pair_id": "rcpt-a-03",
+  "phrasing": "full",
+  "question": "Which car park was that Secure Parking receipt from?",
+  "answer_type": "extractive",
+  "golden_answer": "That RM1.00 parking slip is from Secure Parking Corporation at Riverwalk Village, Batu 3, Jalan Ipoh, 51200 KL — parked 23.03.18 from 14:59 to 15:27.",
+  "key_facts": [
+   "Riverwalk Village",
+   "Jalan Ipoh"
+  ],
+  "gold_sources": [
+   "receipt_X51005288570.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SECURE PARKING CORPORATION S/B"
+ },
+ {
+  "id": "rcpt-a-04-typed",
+  "pair_id": "rcpt-a-04",
+  "phrasing": "typed",
+  "question": "ojc marketing 193 paid by card or cash",
+  "answer_type": "extractive",
+  "golden_answer": "That one went on the card — the OJC Marketing tax invoice of 15/01/2019 for 193.00 was settled by VISA CARD, card ending 4318.",
+  "key_facts": [
+   "VISA CARD",
+   "193.00"
+  ],
+  "gold_sources": [
+   "receipt_X00016469670.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "OJC MARKETING SDN BHD"
+ },
+ {
+  "id": "rcpt-a-04-full",
+  "pair_id": "rcpt-a-04",
+  "phrasing": "full",
+  "question": "Did I pay cash or card for the 193.00 invoice from OJC Marketing?",
+  "answer_type": "extractive",
+  "golden_answer": "That one went on the card — the OJC Marketing tax invoice of 15/01/2019 for 193.00 was settled by VISA CARD, card ending 4318.",
+  "key_facts": [
+   "VISA CARD",
+   "193.00"
+  ],
+  "gold_sources": [
+   "receipt_X00016469670.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "OJC MARKETING SDN BHD"
+ },
+ {
+  "id": "rcpt-a-05-typed",
+  "pair_id": "rcpt-a-05",
+  "phrasing": "typed",
+  "question": "zheng hui gst amout",
+  "answer_type": "extractive",
+  "golden_answer": "The Perniagaan Zheng Hui bill of 09/02/2018 carried 24.69 in GST — RM411.50 excluding GST, RM436.20 paid in cash.",
+  "key_facts": [
+   "24.69"
+  ],
+  "gold_sources": [
+   "receipt_X51005200931.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "PERNIAGAAN ZHENG HUI"
+ },
+ {
+  "id": "rcpt-a-05-full",
+  "pair_id": "rcpt-a-05",
+  "phrasing": "full",
+  "question": "How much GST was charged on that Perniagaan Zheng Hui bill?",
+  "answer_type": "extractive",
+  "golden_answer": "The Perniagaan Zheng Hui bill of 09/02/2018 carried 24.69 in GST — RM411.50 excluding GST, RM436.20 paid in cash.",
+  "key_facts": [
+   "24.69"
+  ],
+  "gold_sources": [
+   "receipt_X51005200931.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "PERNIAGAAN ZHENG HUI"
+ },
+ {
+  "id": "rcpt-a-06-typed",
+  "pair_id": "rcpt-a-06",
+  "phrasing": "typed",
+  "question": "yong tat hardware what did i buy",
+  "answer_type": "extractive",
+  "golden_answer": "One sheet only — a 0.8MM X 50\" X 60\" AR RED GASKET at 72.00 (RM67.92 before GST), on 13/03/2018.",
+  "key_facts": [
+   "AR RED GASKET",
+   "72.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005442343.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "YONG TAT HARDWARE TRADING"
+ },
+ {
+  "id": "rcpt-a-06-full",
+  "pair_id": "rcpt-a-06",
+  "phrasing": "full",
+  "question": "What was the item I picked up at Yong Tat Hardware?",
+  "answer_type": "extractive",
+  "golden_answer": "One sheet only — a 0.8MM X 50\" X 60\" AR RED GASKET at 72.00 (RM67.92 before GST), on 13/03/2018.",
+  "key_facts": [
+   "AR RED GASKET",
+   "72.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005442343.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "YONG TAT HARDWARE TRADING"
+ },
+ {
+  "id": "rcpt-a-07-typed",
+  "pair_id": "rcpt-a-07",
+  "phrasing": "typed",
+  "question": "uroko bill number",
+  "answer_type": "extractive",
+  "golden_answer": "The Uroko Japanese Cuisine bill from 20/03/2018 is bill no 01H-25029 — RM53.00 grand total, table S09.",
+  "key_facts": [
+   "01H-25029"
+  ],
+  "gold_sources": [
+   "receipt_X51005337877.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "UROKO JAPANESE CUISINE SDN BHD"
+ },
+ {
+  "id": "rcpt-a-07-full",
+  "pair_id": "rcpt-a-07",
+  "phrasing": "full",
+  "question": "What is the bill number printed on the Uroko Japanese Cuisine receipt?",
+  "answer_type": "extractive",
+  "golden_answer": "The Uroko Japanese Cuisine bill from 20/03/2018 is bill no 01H-25029 — RM53.00 grand total, table S09.",
+  "key_facts": [
+   "01H-25029"
+  ],
+  "gold_sources": [
+   "receipt_X51005337877.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "UROKO JAPANESE CUISINE SDN BHD"
+ },
+ {
+  "id": "rcpt-a-08-typed",
+  "pair_id": "rcpt-a-08",
+  "phrasing": "typed",
+  "question": "where did i buy carbon paper",
+  "answer_type": "extractive",
+  "golden_answer": "From Teo Heng Stationery & Books in Batang Berjuntai — two sheets of carbon paper at 0.50 each on 29/01/2018, RM1.05 all in.",
+  "key_facts": [
+   "TEO HENG STATIONERY & BOOKS",
+   "1.05"
+  ],
+  "gold_sources": [
+   "receipt_X51005361912.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "TEO HENG STATIONERY & BOOKS"
+ },
+ {
+  "id": "rcpt-a-08-full",
+  "pair_id": "rcpt-a-08",
+  "phrasing": "full",
+  "question": "Which shop did I get the carbon paper from?",
+  "answer_type": "extractive",
+  "golden_answer": "From Teo Heng Stationery & Books in Batang Berjuntai — two sheets of carbon paper at 0.50 each on 29/01/2018, RM1.05 all in.",
+  "key_facts": [
+   "TEO HENG STATIONERY & BOOKS",
+   "1.05"
+  ],
+  "gold_sources": [
+   "receipt_X51005361912.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "TEO HENG STATIONERY & BOOKS"
+ },
+ {
+  "id": "rcpt-a-09-typed",
+  "pair_id": "rcpt-a-09",
+  "phrasing": "typed",
+  "question": "cross channel batang kali which bill bigger dec or jan",
+  "answer_type": "synthesis",
+  "golden_answer": "The December one. Cross Channel Network's 31/12/2017 bill (conduit pipe, PVC connector, cable clips and a nut box) was 7.95, against 6.35 on 29/01/2018 for the Schneider 13A switch socket outlet.",
+  "key_facts": [
+   "7.95",
+   "6.35"
+  ],
+  "gold_sources": [
+   "receipt_X51005230657.jpg",
+   "receipt_X51005230648.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "CROSS CHANNEL NETWORK SDN. BHD."
+ },
+ {
+  "id": "rcpt-a-09-full",
+  "pair_id": "rcpt-a-09",
+  "phrasing": "full",
+  "question": "Between my two Cross Channel Network bills — the 31 December one and the 29 January one — which came to more?",
+  "answer_type": "synthesis",
+  "golden_answer": "The December one. Cross Channel Network's 31/12/2017 bill (conduit pipe, PVC connector, cable clips and a nut box) was 7.95, against 6.35 on 29/01/2018 for the Schneider 13A switch socket outlet.",
+  "key_facts": [
+   "7.95",
+   "6.35"
+  ],
+  "gold_sources": [
+   "receipt_X51005230657.jpg",
+   "receipt_X51005230648.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "CROSS CHANNEL NETWORK SDN. BHD."
+ },
+ {
+  "id": "rcpt-a-10-typed",
+  "pair_id": "rcpt-a-10",
+  "phrasing": "typed",
+  "question": "ojc marketing jan 2019 both safety shoe bills total",
+  "answer_type": "synthesis",
+  "golden_answer": "The two OJC Marketing bills for the Kings Safety Shoes KWD 805 come to 363.00 together — 170.00 on 02/01/2019 and 193.00 on 15/01/2019.",
+  "key_facts": [
+   "363.00",
+   "170.00",
+   "193.00"
+  ],
+  "gold_sources": [
+   "receipt_X00016469671.jpg",
+   "receipt_X00016469670.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "OJC MARKETING SDN BHD"
+ },
+ {
+  "id": "rcpt-a-10-full",
+  "pair_id": "rcpt-a-10",
+  "phrasing": "full",
+  "question": "Adding up both of the OJC Marketing safety shoe bills from January 2019, how much did I spend altogether?",
+  "answer_type": "synthesis",
+  "golden_answer": "The two OJC Marketing bills for the Kings Safety Shoes KWD 805 come to 363.00 together — 170.00 on 02/01/2019 and 193.00 on 15/01/2019.",
+  "key_facts": [
+   "363.00",
+   "170.00",
+   "193.00"
+  ],
+  "gold_sources": [
+   "receipt_X00016469671.jpg",
+   "receipt_X00016469670.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "OJC MARKETING SDN BHD"
+ },
+ {
+  "id": "rcpt-b-01-typed",
+  "pair_id": "rcpt-b-01",
+  "phrasing": "typed",
+  "question": "jiawei dinner total",
+  "answer_type": "extractive",
+  "golden_answer": "The Restaurant Jiawei bill (23/2/2018, Table 13) came to RM 110.00, with no service charge added.",
+  "key_facts": [
+   "110.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005447844.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "RESTAURANT JIAWEI"
+ },
+ {
+  "id": "rcpt-b-01-full",
+  "pair_id": "rcpt-b-01",
+  "phrasing": "full",
+  "question": "How much did that dinner at Restaurant Jiawei come to?",
+  "answer_type": "extractive",
+  "golden_answer": "The Restaurant Jiawei bill (23/2/2018, Table 13) came to RM 110.00, with no service charge added.",
+  "key_facts": [
+   "110.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005447844.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "RESTAURANT JIAWEI"
+ },
+ {
+  "id": "rcpt-b-02-typed",
+  "pair_id": "rcpt-b-02",
+  "phrasing": "typed",
+  "question": "modern depot heat gun date",
+  "answer_type": "extractive",
+  "golden_answer": "That Modern Depot receipt for the STEL670 2000W Stanley heat gun is dated 04/12/2016 at 09:58, total RM 150.00.",
+  "key_facts": [
+   "04/12/2016"
+  ],
+  "gold_sources": [
+   "receipt_X51005582745.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MODERN DEPOT SDN BHD"
+ },
+ {
+  "id": "rcpt-b-02-full",
+  "pair_id": "rcpt-b-02",
+  "phrasing": "full",
+  "question": "When did I buy the Stanley heat gun from Modern Depot?",
+  "answer_type": "extractive",
+  "golden_answer": "That Modern Depot receipt for the STEL670 2000W Stanley heat gun is dated 04/12/2016 at 09:58, total RM 150.00.",
+  "key_facts": [
+   "04/12/2016"
+  ],
+  "gold_sources": [
+   "receipt_X51005582745.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MODERN DEPOT SDN BHD"
+ },
+ {
+  "id": "rcpt-b-03-typed",
+  "pair_id": "rcpt-b-03",
+  "phrasing": "typed",
+  "question": "petrol 30 ringgit how many litres",
+  "answer_type": "extractive",
+  "golden_answer": "That RM 30.00 fill at Chop Yew Lian was 11.54 litres of V-Power 97, at RM 2.600 per litre.",
+  "key_facts": [
+   "11.54",
+   "30.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005587261.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "CHOP YEW LIAN"
+ },
+ {
+  "id": "rcpt-b-03-full",
+  "pair_id": "rcpt-b-03",
+  "phrasing": "full",
+  "question": "On that RM30 petrol fill, how many litres did I actually get?",
+  "answer_type": "extractive",
+  "golden_answer": "That RM 30.00 fill at Chop Yew Lian was 11.54 litres of V-Power 97, at RM 2.600 per litre.",
+  "key_facts": [
+   "11.54",
+   "30.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005587261.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "CHOP YEW LIAN"
+ },
+ {
+  "id": "rcpt-b-04-typed",
+  "pair_id": "rcpt-b-04",
+  "phrasing": "typed",
+  "question": "bens grocer 8 mar cash or card",
+  "answer_type": "extractive",
+  "golden_answer": "That one went on a card, not cash: the 08/03/18 Ben's Independent Grocer receipt shows the RM 81.00 tendered as Pmpc (debit) 0012, approval 578149.",
+  "key_facts": [
+   "debit",
+   "81.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005444041.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "BENS INDEPENDENT GROCER SDN. BHD."
+ },
+ {
+  "id": "rcpt-b-04-full",
+  "pair_id": "rcpt-b-04",
+  "phrasing": "full",
+  "question": "Did I pay cash or by card for that RM81 Ben's Independent Grocer run on the 8th?",
+  "answer_type": "extractive",
+  "golden_answer": "That one went on a card, not cash: the 08/03/18 Ben's Independent Grocer receipt shows the RM 81.00 tendered as Pmpc (debit) 0012, approval 578149.",
+  "key_facts": [
+   "debit",
+   "81.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005444041.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "BENS INDEPENDENT GROCER SDN. BHD."
+ },
+ {
+  "id": "rcpt-b-05-typed",
+  "pair_id": "rcpt-b-05",
+  "phrasing": "typed",
+  "question": "vivopac gst amout sept",
+  "answer_type": "extractive",
+  "golden_answer": "The 13/09/2017 Vivopac Marketing invoice charged RM 2.97 of GST at 6% on a RM 49.50 sub-total, for a rounded total of RM 52.45.",
+  "key_facts": [
+   "2.97"
+  ],
+  "gold_sources": [
+   "receipt_X51005568895.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "VIVOPAC MARKETING SDN BHD"
+ },
+ {
+  "id": "rcpt-b-05-full",
+  "pair_id": "rcpt-b-05",
+  "phrasing": "full",
+  "question": "How much GST was charged on that Vivopac packaging order in September?",
+  "answer_type": "extractive",
+  "golden_answer": "The 13/09/2017 Vivopac Marketing invoice charged RM 2.97 of GST at 6% on a RM 49.50 sub-total, for a rounded total of RM 52.45.",
+  "key_facts": [
+   "2.97"
+  ],
+  "gold_sources": [
+   "receipt_X51005568895.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "VIVOPAC MARKETING SDN BHD"
+ },
+ {
+  "id": "rcpt-b-06-typed",
+  "pair_id": "rcpt-b-06",
+  "phrasing": "typed",
+  "question": "premio battery invoice no",
+  "answer_type": "extractive",
+  "golden_answer": "It is invoice No SS3-154439, dated 20/03/2018 — one pack of Energizer Battery AA 4's for RM 13.40.",
+  "key_facts": [
+   "SS3-154439"
+  ],
+  "gold_sources": [
+   "receipt_X51005621482.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "PREMIO STATIONERY SDN BHD"
+ },
+ {
+  "id": "rcpt-b-06-full",
+  "pair_id": "rcpt-b-06",
+  "phrasing": "full",
+  "question": "What's the invoice number on the Premio receipt for the AA batteries?",
+  "answer_type": "extractive",
+  "golden_answer": "It is invoice No SS3-154439, dated 20/03/2018 — one pack of Energizer Battery AA 4's for RM 13.40.",
+  "key_facts": [
+   "SS3-154439"
+  ],
+  "gold_sources": [
+   "receipt_X51005621482.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "PREMIO STATIONERY SDN BHD"
+ },
+ {
+  "id": "rcpt-b-07-typed",
+  "pair_id": "rcpt-b-07",
+  "phrasing": "typed",
+  "question": "popular rubber band which branch",
+  "answer_type": "extractive",
+  "golden_answer": "That was the Popular Book Co. outlet at Sunway Velocity, on 14/03/18 — CBE Rubber Band 200gm for RM 7.95.",
+  "key_facts": [
+   "SUNWAY VELOCITY",
+   "7.95"
+  ],
+  "gold_sources": [
+   "receipt_X51005605332.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "POPULAR BOOK CO. (M) SDN BHD"
+ },
+ {
+  "id": "rcpt-b-07-full",
+  "pair_id": "rcpt-b-07",
+  "phrasing": "full",
+  "question": "Which Popular outlet did I buy those rubber bands from?",
+  "answer_type": "extractive",
+  "golden_answer": "That was the Popular Book Co. outlet at Sunway Velocity, on 14/03/18 — CBE Rubber Band 200gm for RM 7.95.",
+  "key_facts": [
+   "SUNWAY VELOCITY",
+   "7.95"
+  ],
+  "gold_sources": [
+   "receipt_X51005605332.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "POPULAR BOOK CO. (M) SDN BHD"
+ },
+ {
+  "id": "rcpt-b-08-typed",
+  "pair_id": "rcpt-b-08",
+  "phrasing": "typed",
+  "question": "sunquick oren recipt which shop",
+  "answer_type": "extractive",
+  "golden_answer": "The Sunquick Oren 330ML came from 99 Speed Mart (the Tmn Bkt Pandan branch) on 10-03-18, RM 5.35 inclusive of GST.",
+  "key_facts": [
+   "99 SPEED MART",
+   "5.35"
+  ],
+  "gold_sources": [
+   "receipt_X51005444044.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "99 SPEED MART S/B"
+ },
+ {
+  "id": "rcpt-b-08-full",
+  "pair_id": "rcpt-b-08",
+  "phrasing": "full",
+  "question": "Where did I buy that bottle of Sunquick, and how much was it?",
+  "answer_type": "extractive",
+  "golden_answer": "The Sunquick Oren 330ML came from 99 Speed Mart (the Tmn Bkt Pandan branch) on 10-03-18, RM 5.35 inclusive of GST.",
+  "key_facts": [
+   "99 SPEED MART",
+   "5.35"
+  ],
+  "gold_sources": [
+   "receipt_X51005444044.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "99 SPEED MART S/B"
+ },
+ {
+  "id": "rcpt-b-09-typed",
+  "pair_id": "rcpt-b-09",
+  "phrasing": "typed",
+  "question": "hon hwa hardware how much altogether",
+  "answer_type": "synthesis",
+  "golden_answer": "The three Hon Hwa Hardware Trading receipts add up to RM 31.80 — RM 5.00 on 05/01/2017, RM 19.60 on 11/02/2017 and RM 7.20 on 28/04/2017.",
+  "key_facts": [
+   "31.80",
+   "19.60",
+   "7.20"
+  ],
+  "gold_sources": [
+   "receipt_X51005568887.jpg",
+   "receipt_X51005568889.jpg",
+   "receipt_X51005568890.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "HON HWA HARDWARE TRADING"
+ },
+ {
+  "id": "rcpt-b-09-full",
+  "pair_id": "rcpt-b-09",
+  "phrasing": "full",
+  "question": "Add up everything I've spent at Hon Hwa Hardware — how much is it altogether?",
+  "answer_type": "synthesis",
+  "golden_answer": "The three Hon Hwa Hardware Trading receipts add up to RM 31.80 — RM 5.00 on 05/01/2017, RM 19.60 on 11/02/2017 and RM 7.20 on 28/04/2017.",
+  "key_facts": [
+   "31.80",
+   "19.60",
+   "7.20"
+  ],
+  "gold_sources": [
+   "receipt_X51005568887.jpg",
+   "receipt_X51005568889.jpg",
+   "receipt_X51005568890.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "HON HWA HARDWARE TRADING"
+ },
+ {
+  "id": "rcpt-b-10-typed",
+  "pair_id": "rcpt-b-10",
+  "phrasing": "typed",
+  "question": "evergreen led stick which one more expensive",
+  "answer_type": "synthesis",
+  "golden_answer": "The 10/07/2017 visit was the bigger one at RM 56.00 for 4 PROEMK 10W LED sticks, against RM 26.00 for 2 of them on 18/09/2017.",
+  "key_facts": [
+   "56.00",
+   "26.00",
+   "10/07/2017"
+  ],
+  "gold_sources": [
+   "receipt_X51005568885.jpg",
+   "receipt_X51005568892.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "EVERGREEN LIGHT SDN BHD"
+ },
+ {
+  "id": "rcpt-b-10-full",
+  "pair_id": "rcpt-b-10",
+  "phrasing": "full",
+  "question": "Between my two Evergreen Light receipts for the LED sticks, which visit cost more?",
+  "answer_type": "synthesis",
+  "golden_answer": "The 10/07/2017 visit was the bigger one at RM 56.00 for 4 PROEMK 10W LED sticks, against RM 26.00 for 2 of them on 18/09/2017.",
+  "key_facts": [
+   "56.00",
+   "26.00",
+   "10/07/2017"
+  ],
+  "gold_sources": [
+   "receipt_X51005568885.jpg",
+   "receipt_X51005568892.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "EVERGREEN LIGHT SDN BHD"
+ },
+ {
+  "id": "rcpt-c-01-typed",
+  "pair_id": "rcpt-c-01",
+  "phrasing": "typed",
+  "question": "mydin sri muda total",
+  "answer_type": "extractive",
+  "golden_answer": "The Mydin Mart Sri Muda run came to 109.90 (total after rounding), paid with 150.00 cash.",
+  "key_facts": [
+   "109.90"
+  ],
+  "gold_sources": [
+   "receipt_X51005705759.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MYDIN"
+ },
+ {
+  "id": "rcpt-c-01-full",
+  "pair_id": "rcpt-c-01",
+  "phrasing": "full",
+  "question": "How much did that Mydin run in Sri Muda come to?",
+  "answer_type": "extractive",
+  "golden_answer": "The Mydin Mart Sri Muda run came to 109.90 (total after rounding), paid with 150.00 cash.",
+  "key_facts": [
+   "109.90"
+  ],
+  "gold_sources": [
+   "receipt_X51005705759.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MYDIN"
+ },
+ {
+  "id": "rcpt-c-02-typed",
+  "pair_id": "rcpt-c-02",
+  "phrasing": "typed",
+  "question": "koh seng ladder date",
+  "answer_type": "extractive",
+  "golden_answer": "The two extension ladders from Koh Seng Hardware were bought on 04/12/2017, on receipt CS00042153.",
+  "key_facts": [
+   "04/12/2017"
+  ],
+  "gold_sources": [
+   "receipt_X51005663323.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KOH SENG HARDWARE"
+ },
+ {
+  "id": "rcpt-c-02-full",
+  "pair_id": "rcpt-c-02",
+  "phrasing": "full",
+  "question": "When did I buy those extension ladders from Koh Seng?",
+  "answer_type": "extractive",
+  "golden_answer": "The two extension ladders from Koh Seng Hardware were bought on 04/12/2017, on receipt CS00042153.",
+  "key_facts": [
+   "04/12/2017"
+  ],
+  "gold_sources": [
+   "receipt_X51005663323.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KOH SENG HARDWARE"
+ },
+ {
+  "id": "rcpt-c-03-typed",
+  "pair_id": "rcpt-c-03",
+  "phrasing": "typed",
+  "question": "la stationary change back",
+  "answer_type": "extractive",
+  "golden_answer": "You paid 100.00 cash at LA Stationery for a 56.80 bill and got 43.20 change back.",
+  "key_facts": [
+   "43.20",
+   "100.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005663307.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "LA STATIONERY SDN BHD"
+ },
+ {
+  "id": "rcpt-c-03-full",
+  "pair_id": "rcpt-c-03",
+  "phrasing": "full",
+  "question": "I paid cash at LA Stationery for the pens and glue - how much change did I get back?",
+  "answer_type": "extractive",
+  "golden_answer": "You paid 100.00 cash at LA Stationery for a 56.80 bill and got 43.20 change back.",
+  "key_facts": [
+   "43.20",
+   "100.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005663307.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "LA STATIONERY SDN BHD"
+ },
+ {
+  "id": "rcpt-c-04-typed",
+  "pair_id": "rcpt-c-04",
+  "phrasing": "typed",
+  "question": "super terminal motor oil how much",
+  "answer_type": "extractive",
+  "golden_answer": "The Yamlube (semi) motor oil on the Super Terminal bill was 1 x 30.00 and came to 31.80 with GST.",
+  "key_facts": [
+   "31.80",
+   "30.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005675099.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Super Terminal Sdn Bhd"
+ },
+ {
+  "id": "rcpt-c-04-full",
+  "pair_id": "rcpt-c-04",
+  "phrasing": "full",
+  "question": "What did the Yamlube motor oil cost me at Super Terminal?",
+  "answer_type": "extractive",
+  "golden_answer": "The Yamlube (semi) motor oil on the Super Terminal bill was 1 x 30.00 and came to 31.80 with GST.",
+  "key_facts": [
+   "31.80",
+   "30.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005675099.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Super Terminal Sdn Bhd"
+ },
+ {
+  "id": "rcpt-c-05-typed",
+  "pair_id": "rcpt-c-05",
+  "phrasing": "typed",
+  "question": "12mm plywood which shop",
+  "answer_type": "extractive",
+  "golden_answer": "The 12mm 4/8B plywood came from Syarikat Perniagaan Gin Kee in Setapak, Kuala Lumpur.",
+  "key_facts": [
+   "SYARIKAT PERNIAGAAN GIN KEE"
+  ],
+  "gold_sources": [
+   "receipt_X51005675104.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SYARIKAT PERNIAGAAN GIN KEE"
+ },
+ {
+  "id": "rcpt-c-05-full",
+  "pair_id": "rcpt-c-05",
+  "phrasing": "full",
+  "question": "Which shop did I get the 12mm plywood from?",
+  "answer_type": "extractive",
+  "golden_answer": "The 12mm 4/8B plywood came from Syarikat Perniagaan Gin Kee in Setapak, Kuala Lumpur.",
+  "key_facts": [
+   "SYARIKAT PERNIAGAAN GIN KEE"
+  ],
+  "gold_sources": [
+   "receipt_X51005675104.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SYARIKAT PERNIAGAAN GIN KEE"
+ },
+ {
+  "id": "rcpt-c-06-typed",
+  "pair_id": "rcpt-c-06",
+  "phrasing": "typed",
+  "question": "gin kee cement pasir gst amount",
+  "answer_type": "extractive",
+  "golden_answer": "The GST on the Gin Kee cement and pasir kasar bill was 5.04, on a total of 89.04.",
+  "key_facts": [
+   "5.04"
+  ],
+  "gold_sources": [
+   "receipt_X51005676535.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SYARIKAT PERNIAGAAN GIN KEE"
+ },
+ {
+  "id": "rcpt-c-06-full",
+  "pair_id": "rcpt-c-06",
+  "phrasing": "full",
+  "question": "How much GST was charged on the cement and pasir kasar I bought at Gin Kee?",
+  "answer_type": "extractive",
+  "golden_answer": "The GST on the Gin Kee cement and pasir kasar bill was 5.04, on a total of 89.04.",
+  "key_facts": [
+   "5.04"
+  ],
+  "gold_sources": [
+   "receipt_X51005676535.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SYARIKAT PERNIAGAAN GIN KEE"
+ },
+ {
+  "id": "rcpt-c-07-typed",
+  "pair_id": "rcpt-c-07",
+  "phrasing": "typed",
+  "question": "beyond brothers hardware address",
+  "answer_type": "extractive",
+  "golden_answer": "Beyond Brothers Hardware is at Diamond Square, off Jalan Gombak, 53000 Kuala Lumpur.",
+  "key_facts": [
+   "DIAMOND SQUARE",
+   "53000 KUALA LUMPUR"
+  ],
+  "gold_sources": [
+   "receipt_X51005675914.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "BEYOND BROTHERS HARDWARE"
+ },
+ {
+  "id": "rcpt-c-07-full",
+  "pair_id": "rcpt-c-07",
+  "phrasing": "full",
+  "question": "Where exactly is Beyond Brothers Hardware - what address is printed on that receipt?",
+  "answer_type": "extractive",
+  "golden_answer": "Beyond Brothers Hardware is at Diamond Square, off Jalan Gombak, 53000 Kuala Lumpur.",
+  "key_facts": [
+   "DIAMOND SQUARE",
+   "53000 KUALA LUMPUR"
+  ],
+  "gold_sources": [
+   "receipt_X51005675914.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "BEYOND BROTHERS HARDWARE"
+ },
+ {
+  "id": "rcpt-c-08-typed",
+  "pair_id": "rcpt-c-08",
+  "phrasing": "typed",
+  "question": "ts tools spray paint recipt no",
+  "answer_type": "extractive",
+  "golden_answer": "The TS Tools spray paint bill is receipt no. CS00032256, dated 21/03/2018.",
+  "key_facts": [
+   "CS00032256"
+  ],
+  "gold_sources": [
+   "receipt_X51005710963.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "TS TOOLS HARDWARE & MACHINERY SDN BHD"
+ },
+ {
+  "id": "rcpt-c-08-full",
+  "pair_id": "rcpt-c-08",
+  "phrasing": "full",
+  "question": "What is the receipt number on the TS Tools bill for the Samurai spray paint?",
+  "answer_type": "extractive",
+  "golden_answer": "The TS Tools spray paint bill is receipt no. CS00032256, dated 21/03/2018.",
+  "key_facts": [
+   "CS00032256"
+  ],
+  "gold_sources": [
+   "receipt_X51005710963.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "TS TOOLS HARDWARE & MACHINERY SDN BHD"
+ },
+ {
+  "id": "rcpt-c-09-typed",
+  "pair_id": "rcpt-c-09",
+  "phrasing": "typed",
+  "question": "wan sheng march which one more expensive",
+  "answer_type": "synthesis",
+  "golden_answer": "The 17-03-2018 Wan Sheng run was the bigger one at 9.60; the 23-03-2018 one was only 6.70.",
+  "key_facts": [
+   "9.60",
+   "6.70",
+   "17-03-2018"
+  ],
+  "gold_sources": [
+   "receipt_X51005711402.jpg",
+   "receipt_X51005711443.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "RESTORAN WAN SHENG"
+ },
+ {
+  "id": "rcpt-c-09-full",
+  "pair_id": "rcpt-c-09",
+  "phrasing": "full",
+  "question": "Of my two Restoran Wan Sheng drink runs in March, which one cost more and by how much?",
+  "answer_type": "synthesis",
+  "golden_answer": "The 17-03-2018 Wan Sheng run was the bigger one at 9.60; the 23-03-2018 one was only 6.70.",
+  "key_facts": [
+   "9.60",
+   "6.70",
+   "17-03-2018"
+  ],
+  "gold_sources": [
+   "receipt_X51005711402.jpg",
+   "receipt_X51005711443.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "RESTORAN WAN SHENG"
+ },
+ {
+  "id": "rcpt-c-10-typed",
+  "pair_id": "rcpt-c-10",
+  "phrasing": "typed",
+  "question": "kedai buku new acheivers both bills added up",
+  "answer_type": "synthesis",
+  "golden_answer": "The two Kedai Buku New Acheivers bills add up to 86.15 - 48.00 on 15/09/2017 and 38.15 on 28/12/2017.",
+  "key_facts": [
+   "86.15",
+   "48.00",
+   "38.15"
+  ],
+  "gold_sources": [
+   "receipt_X51005705727.jpg",
+   "receipt_X51005705784.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KEDAI BUKU NEW ACHEIVERS"
+ },
+ {
+  "id": "rcpt-c-10-full",
+  "pair_id": "rcpt-c-10",
+  "phrasing": "full",
+  "question": "What do my two Kedai Buku New Acheivers bills come to altogether?",
+  "answer_type": "synthesis",
+  "golden_answer": "The two Kedai Buku New Acheivers bills add up to 86.15 - 48.00 on 15/09/2017 and 38.15 on 28/12/2017.",
+  "key_facts": [
+   "86.15",
+   "48.00",
+   "38.15"
+  ],
+  "gold_sources": [
+   "receipt_X51005705727.jpg",
+   "receipt_X51005705784.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KEDAI BUKU NEW ACHEIVERS"
+ },
+ {
+  "id": "rcpt-d-01-typed",
+  "pair_id": "rcpt-d-01",
+  "phrasing": "typed",
+  "question": "rocku yakiniku total",
+  "answer_type": "extractive",
+  "golden_answer": "The Rocku Yakiniku bill at 1 Utama on 19/02/2018 came to RM181.55 — three adult buffet dinners and two green teas, plus 10% service charge and 6% GST.",
+  "key_facts": [
+   "181.55"
+  ],
+  "gold_sources": [
+   "receipt_X51005719855.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "ROCKU YAKINIKU"
+ },
+ {
+  "id": "rcpt-d-01-full",
+  "pair_id": "rcpt-d-01",
+  "phrasing": "full",
+  "question": "How much did that Rocku Yakiniku buffet dinner come to in the end?",
+  "answer_type": "extractive",
+  "golden_answer": "The Rocku Yakiniku bill at 1 Utama on 19/02/2018 came to RM181.55 — three adult buffet dinners and two green teas, plus 10% service charge and 6% GST.",
+  "key_facts": [
+   "181.55"
+  ],
+  "gold_sources": [
+   "receipt_X51005719855.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "ROCKU YAKINIKU"
+ },
+ {
+  "id": "rcpt-d-02-typed",
+  "pair_id": "rcpt-d-02",
+  "phrasing": "typed",
+  "question": "bakalima dengkil petrol how many litres",
+  "answer_type": "extractive",
+  "golden_answer": "That RM100.00 fill-up at Bakalima in Dengkil on 14/03/18 was 40.49 litres of V-Power 97 at RM2.470 per litre, on pump 4.",
+  "key_facts": [
+   "40.49",
+   "100.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005724609.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "BAKALIMA SDN BHD"
+ },
+ {
+  "id": "rcpt-d-02-full",
+  "pair_id": "rcpt-d-02",
+  "phrasing": "full",
+  "question": "How many litres did I actually pump on that RM100 fill-up at the Dengkil station?",
+  "answer_type": "extractive",
+  "golden_answer": "That RM100.00 fill-up at Bakalima in Dengkil on 14/03/18 was 40.49 litres of V-Power 97 at RM2.470 per litre, on pump 4.",
+  "key_facts": [
+   "40.49",
+   "100.00"
+  ],
+  "gold_sources": [
+   "receipt_X51005724609.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "BAKALIMA SDN BHD"
+ },
+ {
+  "id": "rcpt-d-03-typed",
+  "pair_id": "rcpt-d-03",
+  "phrasing": "typed",
+  "question": "kaison which mall",
+  "answer_type": "extractive",
+  "golden_answer": "That Kaison Furnishing slip is from the MyTOWN Shopping Centre outlet — Lot No. L3-012, Level 3, No. 6 Jalan Cochrane, 55100 Kuala Lumpur — dated 25-03-18.",
+  "key_facts": [
+   "MyTOWN Shopping Centre"
+  ],
+  "gold_sources": [
+   "receipt_X51005715007.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KAISON FURNISHING SDN BHD"
+ },
+ {
+  "id": "rcpt-d-03-full",
+  "pair_id": "rcpt-d-03",
+  "phrasing": "full",
+  "question": "Which shopping centre was that Kaison receipt from?",
+  "answer_type": "extractive",
+  "golden_answer": "That Kaison Furnishing slip is from the MyTOWN Shopping Centre outlet — Lot No. L3-012, Level 3, No. 6 Jalan Cochrane, 55100 Kuala Lumpur — dated 25-03-18.",
+  "key_facts": [
+   "MyTOWN Shopping Centre"
+  ],
+  "gold_sources": [
+   "receipt_X51005715007.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KAISON FURNISHING SDN BHD"
+ },
+ {
+  "id": "rcpt-d-04-typed",
+  "pair_id": "rcpt-d-04",
+  "phrasing": "typed",
+  "question": "sen lee heong recipt date",
+  "answer_type": "extractive",
+  "golden_answer": "The Sen Lee Heong Restaurant bill is dated 12-01-2018, printed at 21:53, and it came to RM77.40.",
+  "key_facts": [
+   "12-01-2018",
+   "77.40"
+  ],
+  "gold_sources": [
+   "receipt_X51005719863.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SEN LEE HEONG RESTAURANT"
+ },
+ {
+  "id": "rcpt-d-04-full",
+  "pair_id": "rcpt-d-04",
+  "phrasing": "full",
+  "question": "When was that dinner at Sen Lee Heong — I think it was some time in January?",
+  "answer_type": "extractive",
+  "golden_answer": "The Sen Lee Heong Restaurant bill is dated 12-01-2018, printed at 21:53, and it came to RM77.40.",
+  "key_facts": [
+   "12-01-2018",
+   "77.40"
+  ],
+  "gold_sources": [
+   "receipt_X51005719863.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SEN LEE HEONG RESTAURANT"
+ },
+ {
+  "id": "rcpt-d-05-typed",
+  "pair_id": "rcpt-d-05",
+  "phrasing": "typed",
+  "question": "aa phamacy paid cash or card",
+  "answer_type": "extractive",
+  "golden_answer": "That one went on the card — the AA Pharmacy receipt from 29/01/2018 shows MASTER 46.20 with 0.00 change.",
+  "key_facts": [
+   "MASTER",
+   "46.20"
+  ],
+  "gold_sources": [
+   "receipt_X51005719823.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "AA PHARMACY"
+ },
+ {
+  "id": "rcpt-d-05-full",
+  "pair_id": "rcpt-d-05",
+  "phrasing": "full",
+  "question": "Did I pay cash or by card at AA Pharmacy?",
+  "answer_type": "extractive",
+  "golden_answer": "That one went on the card — the AA Pharmacy receipt from 29/01/2018 shows MASTER 46.20 with 0.00 change.",
+  "key_facts": [
+   "MASTER",
+   "46.20"
+  ],
+  "gold_sources": [
+   "receipt_X51005719823.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "AA PHARMACY"
+ },
+ {
+  "id": "rcpt-d-06-typed",
+  "pair_id": "rcpt-d-06",
+  "phrasing": "typed",
+  "question": "saint heart pastry gst amount",
+  "answer_type": "extractive",
+  "golden_answer": "The Saint Heart Pastry slip from 25/03/2018 carries RM0.46 of GST (6% on RM7.74), for a total of RM8.20.",
+  "key_facts": [
+   "0.46"
+  ],
+  "gold_sources": [
+   "receipt_X51005719905.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SAINT HEART PASTRY"
+ },
+ {
+  "id": "rcpt-d-06-full",
+  "pair_id": "rcpt-d-06",
+  "phrasing": "full",
+  "question": "How much GST was charged on the Saint Heart Pastry receipt?",
+  "answer_type": "extractive",
+  "golden_answer": "The Saint Heart Pastry slip from 25/03/2018 carries RM0.46 of GST (6% on RM7.74), for a total of RM8.20.",
+  "key_facts": [
+   "0.46"
+  ],
+  "gold_sources": [
+   "receipt_X51005719905.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SAINT HEART PASTRY"
+ },
+ {
+  "id": "rcpt-d-07-typed",
+  "pair_id": "rcpt-d-07",
+  "phrasing": "typed",
+  "question": "gm rack invoice no",
+  "answer_type": "extractive",
+  "golden_answer": "The GM Rack Enterprise tax invoice dated 20/03/2018 is numbered KNG01-1032303, and it totals RM160.00.",
+  "key_facts": [
+   "KNG01-1032303"
+  ],
+  "gold_sources": [
+   "receipt_X51005715006.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "GM Rack Enterprise"
+ },
+ {
+  "id": "rcpt-d-07-full",
+  "pair_id": "rcpt-d-07",
+  "phrasing": "full",
+  "question": "What is the invoice number on that GM Rack bill for the trays?",
+  "answer_type": "extractive",
+  "golden_answer": "The GM Rack Enterprise tax invoice dated 20/03/2018 is numbered KNG01-1032303, and it totals RM160.00.",
+  "key_facts": [
+   "KNG01-1032303"
+  ],
+  "gold_sources": [
+   "receipt_X51005715006.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "GM Rack Enterprise"
+ },
+ {
+  "id": "rcpt-d-08-typed",
+  "pair_id": "rcpt-d-08",
+  "phrasing": "typed",
+  "question": "glass cleaner recipt which shop",
+  "answer_type": "extractive",
+  "golden_answer": "The glass cleaner came from 99 Speed Mart in Klang on 26-03-18 — two TLC Glass Cleaner at RM5.30 each, RM10.60 in total.",
+  "key_facts": [
+   "99 SPEED MART",
+   "10.60"
+  ],
+  "gold_sources": [
+   "receipt_X51005715455.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "99 SPEED MART S/B"
+ },
+ {
+  "id": "rcpt-d-08-full",
+  "pair_id": "rcpt-d-08",
+  "phrasing": "full",
+  "question": "Which shop did I buy that glass cleaner from, and what did it cost?",
+  "answer_type": "extractive",
+  "golden_answer": "The glass cleaner came from 99 Speed Mart in Klang on 26-03-18 — two TLC Glass Cleaner at RM5.30 each, RM10.60 in total.",
+  "key_facts": [
+   "99 SPEED MART",
+   "10.60"
+  ],
+  "gold_sources": [
+   "receipt_X51005715455.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "99 SPEED MART S/B"
+ },
+ {
+  "id": "rcpt-d-09-typed",
+  "pair_id": "rcpt-d-09",
+  "phrasing": "typed",
+  "question": "kedai papan 21 march both bills together",
+  "answer_type": "synthesis",
+  "golden_answer": "Two Kedai Papan Yew Chuan invoices are dated 21/03/2018 — CS00011014 for RM68.90 (pasir halus) and CS00011043 for RM144.16 (besi Y 10) — so RM213.06 that day.",
+  "key_facts": [
+   "213.06",
+   "68.90",
+   "144.16"
+  ],
+  "gold_sources": [
+   "receipt_X51005724552.jpg",
+   "receipt_X51005724611.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KEDAI PAPAN YEW CHUAN"
+ },
+ {
+  "id": "rcpt-d-09-full",
+  "pair_id": "rcpt-d-09",
+  "phrasing": "full",
+  "question": "What did I spend at Kedai Papan Yew Chuan altogether on 21 March — I think there were two trips that day?",
+  "answer_type": "synthesis",
+  "golden_answer": "Two Kedai Papan Yew Chuan invoices are dated 21/03/2018 — CS00011014 for RM68.90 (pasir halus) and CS00011043 for RM144.16 (besi Y 10) — so RM213.06 that day.",
+  "key_facts": [
+   "213.06",
+   "68.90",
+   "144.16"
+  ],
+  "gold_sources": [
+   "receipt_X51005724552.jpg",
+   "receipt_X51005724611.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "KEDAI PAPAN YEW CHUAN"
+ },
+ {
+  "id": "rcpt-d-10-typed",
+  "pair_id": "rcpt-d-10",
+  "phrasing": "typed",
+  "question": "aa pharmacy vs green lane which one more expensive",
+  "answer_type": "synthesis",
+  "golden_answer": "AA Pharmacy was the bigger one — RM46.20 on 29/01/2018, against RM34.80 at Green Lane Pharmacy.",
+  "key_facts": [
+   "AA PHARMACY",
+   "46.20",
+   "34.80"
+  ],
+  "gold_sources": [
+   "receipt_X51005719823.jpg",
+   "receipt_X51005719895.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29"
+ },
+ {
+  "id": "rcpt-d-10-full",
+  "pair_id": "rcpt-d-10",
+  "phrasing": "full",
+  "question": "Between the AA Pharmacy run and the Green Lane Pharmacy one, which cost me more?",
+  "answer_type": "synthesis",
+  "golden_answer": "AA Pharmacy was the bigger one — RM46.20 on 29/01/2018, against RM34.80 at Green Lane Pharmacy.",
+  "key_facts": [
+   "AA PHARMACY",
+   "46.20",
+   "34.80"
+  ],
+  "gold_sources": [
+   "receipt_X51005719823.jpg",
+   "receipt_X51005719895.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29"
+ },
+ {
+  "id": "rcpt-e-01-typed",
+  "pair_id": "rcpt-e-01",
+  "phrasing": "typed",
+  "question": "florism de art total",
+  "answer_type": "extractive",
+  "golden_answer": "The Florism De Art order at Pavilion Kuala Lumpur on 14/01/2018 came to a rounded total of RM750.00, paid by credit card.",
+  "key_facts": [
+   "750.00"
+  ],
+  "gold_sources": [
+   "receipt_X51006008166.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "FLORISM DE ART"
+ },
+ {
+  "id": "rcpt-e-01-full",
+  "pair_id": "rcpt-e-01",
+  "phrasing": "full",
+  "question": "How much was that flower order from Florism De Art at Pavilion?",
+  "answer_type": "extractive",
+  "golden_answer": "The Florism De Art order at Pavilion Kuala Lumpur on 14/01/2018 came to a rounded total of RM750.00, paid by credit card.",
+  "key_facts": [
+   "750.00"
+  ],
+  "gold_sources": [
+   "receipt_X51006008166.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "FLORISM DE ART"
+ },
+ {
+  "id": "rcpt-e-02-typed",
+  "pair_id": "rcpt-e-02",
+  "phrasing": "typed",
+  "question": "mei let restarant when",
+  "answer_type": "extractive",
+  "golden_answer": "The Mei Let Restaurant bill is dated 03/02/2017, 09:26:48 PM — table 13, net total RM68.90.",
+  "key_facts": [
+   "03/02/2017"
+  ],
+  "gold_sources": [
+   "receipt_X51006327953.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MEI LET RESTAURANT"
+ },
+ {
+  "id": "rcpt-e-02-full",
+  "pair_id": "rcpt-e-02",
+  "phrasing": "full",
+  "question": "When did I eat at Mei Let Restaurant in Shah Alam?",
+  "answer_type": "extractive",
+  "golden_answer": "The Mei Let Restaurant bill is dated 03/02/2017, 09:26:48 PM — table 13, net total RM68.90.",
+  "key_facts": [
+   "03/02/2017"
+  ],
+  "gold_sources": [
+   "receipt_X51006327953.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MEI LET RESTAURANT"
+ },
+ {
+  "id": "rcpt-e-03-typed",
+  "pair_id": "rcpt-e-03",
+  "phrasing": "typed",
+  "question": "burger king klia whopper jr how much",
+  "answer_type": "extractive",
+  "golden_answer": "The four Whopper JR. on the KLIA Burger King bill (27 Mar 2018) came to RM40.60. The whole bill after rounding was RM63.90.",
+  "key_facts": [
+   "40.60"
+  ],
+  "gold_sources": [
+   "receipt_X51006008206.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Burger King"
+ },
+ {
+  "id": "rcpt-e-03-full",
+  "pair_id": "rcpt-e-03",
+  "phrasing": "full",
+  "question": "How much did the Whopper Jrs come to on that Burger King receipt from the airport?",
+  "answer_type": "extractive",
+  "golden_answer": "The four Whopper JR. on the KLIA Burger King bill (27 Mar 2018) came to RM40.60. The whole bill after rounding was RM63.90.",
+  "key_facts": [
+   "40.60"
+  ],
+  "gold_sources": [
+   "receipt_X51006008206.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Burger King"
+ },
+ {
+  "id": "rcpt-e-04-typed",
+  "pair_id": "rcpt-e-04",
+  "phrasing": "typed",
+  "question": "super seven 408 paid by what card",
+  "answer_type": "extractive",
+  "golden_answer": "That Super Seven Cash & Carry tax invoice dated 01-03-2018 for RM408.45 shows the payment method as MASTER CARD.",
+  "key_facts": [
+   "MASTER CARD",
+   "408.45"
+  ],
+  "gold_sources": [
+   "receipt_X51005746203.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SUPER SEVEN CASH & CARRY SDN BHD"
+ },
+ {
+  "id": "rcpt-e-04-full",
+  "pair_id": "rcpt-e-04",
+  "phrasing": "full",
+  "question": "Which card did I pay with on that big Super Seven shop, the four-hundred-odd ringgit one?",
+  "answer_type": "extractive",
+  "golden_answer": "That Super Seven Cash & Carry tax invoice dated 01-03-2018 for RM408.45 shows the payment method as MASTER CARD.",
+  "key_facts": [
+   "MASTER CARD",
+   "408.45"
+  ],
+  "gold_sources": [
+   "receipt_X51005746203.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "SUPER SEVEN CASH & CARRY SDN BHD"
+ },
+ {
+  "id": "rcpt-e-05-typed",
+  "pair_id": "rcpt-e-05",
+  "phrasing": "typed",
+  "question": "great zone kluang gst amount",
+  "answer_type": "extractive",
+  "golden_answer": "GST at 6% on the Great Zone Household Centre invoice of 18/02/2018 was RM20.79, on a sub total of RM346.51, giving a rounded total of RM367.30.",
+  "key_facts": [
+   "20.79"
+  ],
+  "gold_sources": [
+   "receipt_X51005806692.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "GREAT ZONE HOUSEHOLD CENTRE SDN BHD"
+ },
+ {
+  "id": "rcpt-e-05-full",
+  "pair_id": "rcpt-e-05",
+  "phrasing": "full",
+  "question": "How much GST did I get charged on the Great Zone Household Centre bill?",
+  "answer_type": "extractive",
+  "golden_answer": "GST at 6% on the Great Zone Household Centre invoice of 18/02/2018 was RM20.79, on a sub total of RM346.51, giving a rounded total of RM367.30.",
+  "key_facts": [
+   "20.79"
+  ],
+  "gold_sources": [
+   "receipt_X51005806692.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "GREAT ZONE HOUSEHOLD CENTRE SDN BHD"
+ },
+ {
+  "id": "rcpt-e-06-typed",
+  "pair_id": "rcpt-e-06",
+  "phrasing": "typed",
+  "question": "99 speed mart subang bestari invoice no",
+  "answer_type": "extractive",
+  "golden_answer": "That 99 Speed Mart slip from the 1313-Subang Bestari outlet, dated 28-01-18, carries invoice no 18291/102/T0380 and came to RM98.90 after rounding.",
+  "key_facts": [
+   "18291/102/T0380"
+  ],
+  "gold_sources": [
+   "receipt_X51005764161.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "99 SPEED MART S/B"
+ },
+ {
+  "id": "rcpt-e-06-full",
+  "pair_id": "rcpt-e-06",
+  "phrasing": "full",
+  "question": "What is the invoice number on the 99 Speed Mart receipt from the Subang Bestari outlet?",
+  "answer_type": "extractive",
+  "golden_answer": "That 99 Speed Mart slip from the 1313-Subang Bestari outlet, dated 28-01-18, carries invoice no 18291/102/T0380 and came to RM98.90 after rounding.",
+  "key_facts": [
+   "18291/102/T0380"
+  ],
+  "gold_sources": [
+   "receipt_X51005764161.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "99 SPEED MART S/B"
+ },
+ {
+  "id": "rcpt-e-07-typed",
+  "pair_id": "rcpt-e-07",
+  "phrasing": "typed",
+  "question": "guardian freeman mask which branch",
+  "answer_type": "extractive",
+  "golden_answer": "The Freeman BK/CH 6OZ was bought at Guardian Solaris Mount Kiara (No.8 & 10, GF Solaris Mount Kuara, Jln Solaris 5) on 01/01/18, RM22.45 on a Visa card.",
+  "key_facts": [
+   "SOLARIS MOUNT KIARA",
+   "22.45"
+  ],
+  "gold_sources": [
+   "receipt_X51006311714.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Guardian Health And Beauty Sdn Bhd"
+ },
+ {
+  "id": "rcpt-e-07-full",
+  "pair_id": "rcpt-e-07",
+  "phrasing": "full",
+  "question": "Which Guardian branch did I buy that Freeman face mask at?",
+  "answer_type": "extractive",
+  "golden_answer": "The Freeman BK/CH 6OZ was bought at Guardian Solaris Mount Kiara (No.8 & 10, GF Solaris Mount Kuara, Jln Solaris 5) on 01/01/18, RM22.45 on a Visa card.",
+  "key_facts": [
+   "SOLARIS MOUNT KIARA",
+   "22.45"
+  ],
+  "gold_sources": [
+   "receipt_X51006311714.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Guardian Health And Beauty Sdn Bhd"
+ },
+ {
+  "id": "rcpt-e-08-typed",
+  "pair_id": "rcpt-e-08",
+  "phrasing": "typed",
+  "question": "usb cable recipt kuching",
+  "answer_type": "extractive",
+  "golden_answer": "That was Dream Arts at Vivacity Megamall, Jalan Wan Alwi, Kuching — one L123 Android USB cable for RM15.00 on 29/03/2018.",
+  "key_facts": [
+   "Dream Arts",
+   "15.00"
+  ],
+  "gold_sources": [
+   "receipt_X51006248253.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Dream Arts"
+ },
+ {
+  "id": "rcpt-e-08-full",
+  "pair_id": "rcpt-e-08",
+  "phrasing": "full",
+  "question": "Which shop in Kuching did I buy the Android USB cable from?",
+  "answer_type": "extractive",
+  "golden_answer": "That was Dream Arts at Vivacity Megamall, Jalan Wan Alwi, Kuching — one L123 Android USB cable for RM15.00 on 29/03/2018.",
+  "key_facts": [
+   "Dream Arts",
+   "15.00"
+  ],
+  "gold_sources": [
+   "receipt_X51006248253.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "Dream Arts"
+ },
+ {
+  "id": "rcpt-e-09-typed",
+  "pair_id": "rcpt-e-09",
+  "phrasing": "typed",
+  "question": "popular empire vs aeon shah alam which more",
+  "answer_type": "synthesis",
+  "golden_answer": "The AEON Shah Alam trip cost slightly more: RM30.70 on 06/03/18 against RM30.50 at Empire Shopping Gallery on 05/03/18 — 20 sen apart.",
+  "key_facts": [
+   "30.70",
+   "30.50"
+  ],
+  "gold_sources": [
+   "receipt_X51006008092.jpg",
+   "receipt_X51006008090.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "POPULAR BOOK CO. (M) SDN BHD"
+ },
+ {
+  "id": "rcpt-e-09-full",
+  "pair_id": "rcpt-e-09",
+  "phrasing": "full",
+  "question": "Which Popular trip cost me more, the one at Empire Shopping Gallery or the one at AEON Shah Alam?",
+  "answer_type": "synthesis",
+  "golden_answer": "The AEON Shah Alam trip cost slightly more: RM30.70 on 06/03/18 against RM30.50 at Empire Shopping Gallery on 05/03/18 — 20 sen apart.",
+  "key_facts": [
+   "30.70",
+   "30.50"
+  ],
+  "gold_sources": [
+   "receipt_X51006008092.jpg",
+   "receipt_X51006008090.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "POPULAR BOOK CO. (M) SDN BHD"
+ },
+ {
+  "id": "rcpt-e-10-typed",
+  "pair_id": "rcpt-e-10",
+  "phrasing": "typed",
+  "question": "mr diy march total spent",
+  "answer_type": "synthesis",
+  "golden_answer": "Three Mr. D.I.Y. (IOI Puchong) receipts from March 2018 add up to RM34.30 — RM6.60 on 18-03-18, RM21.50 on 21-03-18 and RM6.20 on 23-03-18.",
+  "key_facts": [
+   "34.30"
+  ],
+  "gold_sources": [
+   "receipt_X51005757292.jpg",
+   "receipt_X51005757308.jpg",
+   "receipt_X51005757342.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MR. D.I.Y. (M) SDN BHD"
+ },
+ {
+  "id": "rcpt-e-10-full",
+  "pair_id": "rcpt-e-10",
+  "phrasing": "full",
+  "question": "Altogether, how much did I spend at Mr DIY across those March trips?",
+  "answer_type": "synthesis",
+  "golden_answer": "Three Mr. D.I.Y. (IOI Puchong) receipts from March 2018 add up to RM34.30 — RM6.60 on 18-03-18, RM21.50 on 21-03-18 and RM6.20 on 23-03-18.",
+  "key_facts": [
+   "34.30"
+  ],
+  "gold_sources": [
+   "receipt_X51005757292.jpg",
+   "receipt_X51005757308.jpg",
+   "receipt_X51005757342.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "claude agent (vision read of the receipt images), 2026-08-29",
+  "vendor_as_printed": "MR. D.I.Y. (M) SDN BHD"
+ },
+ {
+  "id": "rcpt-en-01-typed",
+  "pair_id": "rcpt-en-01",
+  "phrasing": "typed",
+  "question": "how many times wan sheng",
+  "answer_type": "enumeration",
+  "golden_answer": "There are 5 Restoran Wan Sheng receipts, all from March 2018: the 7th (4.80), the 10th (7.20), the 17th (9.60), the 21st (4.80) and the 23rd (6.70).",
+  "key_facts": [
+   "5"
+  ],
+  "gold_sources": [
+   "receipt_X51005711402.jpg",
+   "receipt_X51005711443.jpg",
+   "receipt_X51005711444.jpg",
+   "receipt_X51005711446.jpg",
+   "receipt_X51005711449.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: count over agent vision inventories, cross-checked against SROIE labels (both give 5), 2026-08-29",
+  "vendor_as_printed": "RESTORAN WAN SHENG"
+ },
+ {
+  "id": "rcpt-en-01-full",
+  "pair_id": "rcpt-en-01",
+  "phrasing": "full",
+  "question": "How many times did I eat at Restoran Wan Sheng?",
+  "answer_type": "enumeration",
+  "golden_answer": "There are 5 Restoran Wan Sheng receipts, all from March 2018: the 7th (4.80), the 10th (7.20), the 17th (9.60), the 21st (4.80) and the 23rd (6.70).",
+  "key_facts": [
+   "5"
+  ],
+  "gold_sources": [
+   "receipt_X51005711402.jpg",
+   "receipt_X51005711443.jpg",
+   "receipt_X51005711444.jpg",
+   "receipt_X51005711446.jpg",
+   "receipt_X51005711449.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: count over agent vision inventories, cross-checked against SROIE labels (both give 5), 2026-08-29",
+  "vendor_as_printed": "RESTORAN WAN SHENG"
+ },
+ {
+  "id": "rcpt-en-02-typed",
+  "pair_id": "rcpt-en-02",
+  "phrasing": "typed",
+  "question": "biggest kedai papan bill",
+  "answer_type": "enumeration",
+  "golden_answer": "The largest Kedai Papan Yew Chuan invoice is 312.70, dated 08/03/2018. The others range from 68.90 to 283.55.",
+  "key_facts": [
+   "312.70",
+   "08/03/2018"
+  ],
+  "gold_sources": [
+   "receipt_X51005724552.jpg",
+   "receipt_X51005724611.jpg",
+   "receipt_X51005724622.jpg",
+   "receipt_X51005724623.jpg",
+   "receipt_X51005724624.jpg",
+   "receipt_X51005724625.jpg",
+   "receipt_X51005724626.jpg",
+   "receipt_X51005724628.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: max over agent vision inventory of all 8 Kedai Papan receipts; SROIE labels agree on the 312.70 value but mis-OCR the vendor on that file (KEDA PAPAN YEW CHJAN), 2026-08-29",
+  "vendor_as_printed": "KEDAI PAPAN YEW CHUAN"
+ },
+ {
+  "id": "rcpt-en-02-full",
+  "pair_id": "rcpt-en-02",
+  "phrasing": "full",
+  "question": "Which Kedai Papan Yew Chuan invoice was the largest, and how much was it?",
+  "answer_type": "enumeration",
+  "golden_answer": "The largest Kedai Papan Yew Chuan invoice is 312.70, dated 08/03/2018. The others range from 68.90 to 283.55.",
+  "key_facts": [
+   "312.70",
+   "08/03/2018"
+  ],
+  "gold_sources": [
+   "receipt_X51005724552.jpg",
+   "receipt_X51005724611.jpg",
+   "receipt_X51005724622.jpg",
+   "receipt_X51005724623.jpg",
+   "receipt_X51005724624.jpg",
+   "receipt_X51005724625.jpg",
+   "receipt_X51005724626.jpg",
+   "receipt_X51005724628.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: max over agent vision inventory of all 8 Kedai Papan receipts; SROIE labels agree on the 312.70 value but mis-OCR the vendor on that file (KEDA PAPAN YEW CHJAN), 2026-08-29",
+  "vendor_as_printed": "KEDAI PAPAN YEW CHUAN"
+ },
+ {
+  "id": "rcpt-en-03-typed",
+  "pair_id": "rcpt-en-03",
+  "phrasing": "typed",
+  "question": "gin kee january dates",
+  "answer_type": "enumeration",
+  "golden_answer": "There are 6 Syarikat Perniagaan Gin Kee receipts from January 2018: the 3rd, 4th, 15th, 25th, 27th and 31st.",
+  "key_facts": [
+   "6"
+  ],
+  "gold_sources": [
+   "receipt_X51005675103.jpg",
+   "receipt_X51005675104.jpg",
+   "receipt_X51005676534.jpg",
+   "receipt_X51005676548.jpg",
+   "receipt_X51005677333.jpg",
+   "receipt_X51005677336.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: January-2018 subset of the 11 Gin Kee receipts, from agent vision inventory, cross-checked against SROIE labels (both give 6), 2026-08-29",
+  "vendor_as_printed": "SYARIKAT PERNIAGAAN GIN KEE"
+ },
+ {
+  "id": "rcpt-en-03-full",
+  "pair_id": "rcpt-en-03",
+  "phrasing": "full",
+  "question": "Which days in January did I buy something from Gin Kee?",
+  "answer_type": "enumeration",
+  "golden_answer": "There are 6 Syarikat Perniagaan Gin Kee receipts from January 2018: the 3rd, 4th, 15th, 25th, 27th and 31st.",
+  "key_facts": [
+   "6"
+  ],
+  "gold_sources": [
+   "receipt_X51005675103.jpg",
+   "receipt_X51005675104.jpg",
+   "receipt_X51005676534.jpg",
+   "receipt_X51005676548.jpg",
+   "receipt_X51005677333.jpg",
+   "receipt_X51005677336.jpg"
+  ],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": true
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: January-2018 subset of the 11 Gin Kee receipts, from agent vision inventory, cross-checked against SROIE labels (both give 6), 2026-08-29",
+  "vendor_as_printed": "SYARIKAT PERNIAGAAN GIN KEE"
+ },
+ {
+  "id": "rcpt-nf-01-typed",
+  "pair_id": "rcpt-nf-01",
+  "phrasing": "typed",
+  "question": "papparich receipt",
+  "answer_type": "not_found",
+  "golden_answer": "There is no PappaRich receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-01-full",
+  "pair_id": "rcpt-nf-01",
+  "phrasing": "full",
+  "question": "How much did I spend at PappaRich?",
+  "answer_type": "not_found",
+  "golden_answer": "There is no PappaRich receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-02-typed",
+  "pair_id": "rcpt-nf-02",
+  "phrasing": "typed",
+  "question": "secret recipe total",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Secret Recipe receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-02-full",
+  "pair_id": "rcpt-nf-02",
+  "phrasing": "full",
+  "question": "What was the bill at Secret Recipe?",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Secret Recipe receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "easy",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-03-typed",
+  "pair_id": "rcpt-nf-03",
+  "phrasing": "typed",
+  "question": "coffee bean and tea leaf recipt",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Coffee Bean & Tea Leaf receipt in this collection. (The collection does contain an OldTown White Coffee receipt, which is a different shop.)",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor with an in-corpus lexical lure (OLDTOWN WHITE COFFEE), absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-03-full",
+  "pair_id": "rcpt-nf-03",
+  "phrasing": "full",
+  "question": "Do I have a receipt from Coffee Bean & Tea Leaf?",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Coffee Bean & Tea Leaf receipt in this collection. (The collection does contain an OldTown White Coffee receipt, which is a different shop.)",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor with an in-corpus lexical lure (OLDTOWN WHITE COFFEE), absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-04-typed",
+  "pair_id": "rcpt-nf-04",
+  "phrasing": "typed",
+  "question": "moonlight cake house",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Moonlight Cake House receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-04-full",
+  "pair_id": "rcpt-nf-04",
+  "phrasing": "full",
+  "question": "Can you find the Moonlight Cake House receipt?",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Moonlight Cake House receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-05-typed",
+  "pair_id": "rcpt-nf-05",
+  "phrasing": "typed",
+  "question": "golden key maker bill",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Golden Key Maker receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-05-full",
+  "pair_id": "rcpt-nf-05",
+  "phrasing": "full",
+  "question": "What did the locksmith at Golden Key Maker charge me?",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Golden Key Maker receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-06-typed",
+  "pair_id": "rcpt-nf-06",
+  "phrasing": "typed",
+  "question": "tanjongmas bookcentre",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Tanjongmas Bookcentre receipt in this collection. (There are receipts from other bookshops and stationers, including Popular Book Co. and Kedai Buku New Acheivers.)",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor with in-corpus same-category distractors, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-06-full",
+  "pair_id": "rcpt-nf-06",
+  "phrasing": "full",
+  "question": "How much was the Tanjongmas Bookcentre purchase?",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Tanjongmas Bookcentre receipt in this collection. (There are receipts from other bookshops and stationers, including Popular Book Co. and Kedai Buku New Acheivers.)",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "hard",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor with in-corpus same-category distractors, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-07-typed",
+  "pair_id": "rcpt-nf-07",
+  "phrasing": "typed",
+  "question": "platinum racking sdn bhd",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Platinum Racking receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ },
+ {
+  "id": "rcpt-nf-07-full",
+  "pair_id": "rcpt-nf-07",
+  "phrasing": "full",
+  "question": "Is there anything from Platinum Racking in my receipts?",
+  "answer_type": "not_found",
+  "golden_answer": "There is no Platinum Racking receipt in this collection.",
+  "key_facts": [],
+  "gold_sources": [],
+  "acceptable_sources": [],
+  "requires": {
+   "visual_tier": true,
+   "multi_file": false
+  },
+  "difficulty": "medium",
+  "human_verified": false,
+  "generator": "supervisor: SROIE held-out vendor, absence verified corpus-wide, 2026-08-29"
+ }
+]

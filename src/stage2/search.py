@@ -21,7 +21,14 @@ from qdrant_client.models import (
 from src.llm import ChatAgent, build_agent
 from src.manifest import REPO_ROOT
 from src.stage2.db import COLLECTION_NAME, get_qdrant_client
+import time as _time
+
 from src.stage2.embeddings import embed_dense_query, embed_sparse_query
+
+# Last query's retrieval sub-timings, for the eval harness to record. Module
+# state rather than a return value so the change stays additive — nothing in
+# the call chain has to thread a new field through.
+LAST_SUBTIMINGS: dict[str, float] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -378,17 +385,40 @@ def _search_summary_tier(sq: SearchQuery, limit: int) -> list[SearchResult]:
     no_hype = Filter(
         must_not=[FieldCondition(key="hype", match=MatchValue(value=True))]
     )
+    prefetches = [
+        Prefetch(query=dense_vec, using="dense", limit=limit, filter=no_hype),
+        Prefetch(
+            query=SparseVector(indices=sparse_idx, values=sparse_val),
+            using="sparse",
+            limit=limit,
+            filter=no_hype,
+        ),
+    ]
+
+    # Keywords get their OWN sparse prefetch, not just a few extra words on
+    # the end of the sentence. Concatenating them (which is all `dense_text`
+    # above does) leaves one rare token competing with eight common ones for
+    # BM25 weight, and measured on the sem5 code corpus that is not enough:
+    # searching `GetIndentation` alone ranks all three copies of
+    # GeneralUtils.cs 1st, 2nd and 4th, while "What does GetIndentation
+    # return for a level of 3?" does not return the file at all. A separate
+    # prefetch gives the identifier its own vote in the RRF fusion, so a
+    # question that names a thing can find the thing.
+    if sq.keywords:
+        kw_idx, kw_val = embed_sparse_query(" ".join(sq.keywords))
+        if kw_idx:
+            prefetches.append(
+                Prefetch(
+                    query=SparseVector(indices=kw_idx, values=kw_val),
+                    using="sparse",
+                    limit=limit,
+                    filter=no_hype,
+                )
+            )
+
     results = client.query_points(
         collection_name=COLLECTION_NAME,
-        prefetch=[
-            Prefetch(query=dense_vec, using="dense", limit=limit, filter=no_hype),
-            Prefetch(
-                query=SparseVector(indices=sparse_idx, values=sparse_val),
-                using="sparse",
-                limit=limit,
-                filter=no_hype,
-            ),
-        ],
+        prefetch=prefetches,
         query=FusionQuery(fusion="rrf"),
         limit=limit,
         # Payload is path + chunk index only since 2026-05; the display
@@ -805,7 +835,9 @@ def run_search(
     # has real options to reorder. Otherwise stick with the original top_k.
     fetch_k = max(RERANK_MIN_CANDIDATES, top_k * RERANK_OVERSAMPLE) if rerank else top_k
 
+    _t_sub = _time.monotonic()
     summary_hits = _search_summary_tier(sq, fetch_k * 2)
+    LAST_SUBTIMINGS["summary_tier"] = _time.monotonic() - _t_sub
     # Feed the raw dense-query text (same as summary tier) to ColPali; it
     # handles multi-token query encoding internally.
     # When `skip_fast=True`, bypass ColPali entirely — saves the ~30s first-
@@ -839,7 +871,11 @@ def run_search(
         # paraphrased. Fall back to the rewritten query for non-question
         # callers (programmatic use without `question=`).
         rerank_text = question if question is not None else sq.query
-        return cross_encoder_rerank(rerank_text, fused, top_k)
+        _t_rr = _time.monotonic()
+        out = cross_encoder_rerank(rerank_text, fused, top_k)
+        LAST_SUBTIMINGS["rerank"] = _time.monotonic() - _t_rr
+        LAST_SUBTIMINGS["rerank_candidates"] = float(len(fused))
+        return out
 
     return fused[:top_k]
 
@@ -899,15 +935,79 @@ def gate_to_solo(
         threshold = 2.0
     if threshold <= 0:
         return retrieved
+    # How many files a confident gate hands over. One was the original
+    # design, on the college_data finding that a >=2.0 margin meant the top
+    # hit was right 93% of the time.
+    #
+    # That premise is corpus-dependent, and sem_4 breaks it: the gate fired
+    # on 18 of 25 questions there and was right only 56% of the time, versus
+    # 86% on the questions it left alone. Worse, the margin carried no signal
+    # about correctness — a margin of 16.97 put the WRONG file first while a
+    # margin of 2.21 put the right one first — so no threshold separates the
+    # good firings from the bad, and raising it cannot help.
+    #
+    # What was true in every failure: the correct file sat at rank 2-4, i.e.
+    # already retrieved, and the gate discarded it. Handing over the top TWO
+    # keeps the point of the gate (the 3B collapses in a 5-file distractor
+    # pile, not in a pair) while making a single confident mistake
+    # survivable. LOCAL_SOLO_KEEP tunes it; 1 restores the original behavior.
+    try:
+        keep = max(1, int(os.environ.get("LOCAL_SOLO_KEEP", "2")))
+    except ValueError:
+        keep = 2
     margin = float(retrieved[0].score) - float(retrieved[1].score)
     if margin >= threshold:
         print(
             f"  solo-gate: top hit dominates (margin {margin:.2f} >= "
-            f"{threshold}) — sending 1 file instead of {len(retrieved)}",
+            f"{threshold}) — sending {keep} file(s) instead of {len(retrieved)}",
             file=sys.stderr,
         )
-        return retrieved[:1]
+        return retrieved[:keep]
     return retrieved
+
+
+# Tokens that carry retrieval signal all by themselves: CamelCase or
+# PascalCase identifiers, snake_case, dotted paths, anything with a digit
+# glued to letters, and filenames. These are the words a user types when they
+# know what they are looking for, and they are rare enough that one of them
+# beats every other word in the question combined.
+_RARE_TOKEN_RE = re.compile(
+    r"\b("
+    r"[a-z]+[A-Z]\w*"           # camelCase
+    r"|[A-Z][a-z]+[A-Z]\w*"      # PascalCase with an internal capital
+    r"|\w+_\w+"                 # snake_case
+    r"|\w+\.[A-Za-z]{1,5}\b"    # filename.ext
+    r"|[A-Za-z]+\d+"            # CSC223, net9
+    r")"
+)
+
+
+def extract_rare_tokens(question: str) -> list[str]:
+    """Identifier-shaped tokens from a raw question, in order, deduped.
+
+    Why this exists: with rewrite off (the local policy since 2026-08-24, and
+    correctly so — the 3B rewriter replaced questions rather than cleaning
+    them) `keywords` was always empty, so the sparse tier only ever saw the
+    full question. Measured on the sem5 C# corpus: searching `GetIndentation`
+    puts all three copies of GeneralUtils.cs at ranks 1, 2 and 4, while
+    searching "What does GetIndentation return for a level of 3?" does not
+    return the file at all — the eight common words drown the one rare one,
+    and generic build-artifact summaries match generic phrasing better.
+
+    A regex recovers the keyword list the rewriter used to provide, for no
+    model call and no risk of the model inventing a different question.
+    """
+    out: list[str] = []
+    for m in _RARE_TOKEN_RE.finditer(question):
+        tok = m.group(1)
+        if tok.lower() in _RARE_STOPWORDS or tok in out:
+            continue
+        out.append(tok)
+    return out
+
+
+# Shapes that match the pattern but identify nothing.
+_RARE_STOPWORDS = {"i'm", "i've", "don't", "doesn't", "isn't", "what's", "it's"}
 
 
 def raw_query(question: str) -> SearchQuery:
@@ -916,8 +1016,16 @@ def raw_query(question: str) -> SearchQuery:
     Useful when rewrite latency dominates and the raw question is already
     keyword-rich. Pair with the Future-Plans item on asymmetric search /
     HyDE when quality regresses on vague queries.
+
+    `keywords` is filled by `extract_rare_tokens` rather than left empty, so
+    the sparse tier gets the identifier-shaped tokens weighted on their own
+    instead of buried in a sentence. MAGPIE_RARE_TOKENS=0 restores the old
+    empty-keyword behaviour.
     """
-    return SearchQuery(query=question, keywords=[])
+    keywords: list[str] = []
+    if os.environ.get("MAGPIE_RARE_TOKENS", "1").strip() != "0":
+        keywords = extract_rare_tokens(question)
+    return SearchQuery(query=question, keywords=keywords)
 
 
 def search_summaries(

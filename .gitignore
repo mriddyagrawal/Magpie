@@ -76,3 +76,14 @@ Evaluations/*/
 Test Questions/
 
 .venv.broken/
+
+# Generated knowledge-graph output (graphify) — never track.
+graphify-out/
+
+# Eval harness (lives on the evaluation_harness branch; rules here are
+# no-ops until merge, then load-bearing — #124: an over-broad add on this
+# branch once swept 572 eval files incl. raw LLM logs into history).
+eval_harness/runs/*/raw/
+eval_harness/runs/*/appdata/
+eval_harness/indexes/
+eval_harness/datasets/*/corpus_root.local.json

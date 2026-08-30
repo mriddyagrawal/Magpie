@@ -98,6 +98,16 @@ Deterministic paired diff (discordant counts + exact McNemar p — sub-5
 discordant deltas are flagged as noise), agent cause-attribution for every
 flipped question, and a verdict that answers the question you give it.
 
+## The 5-minute sanity check
+
+```bash
+just eval-smoke
+```
+
+Frozen 10-question fixture over a committed fictional corpus (text + images),
+through the real pipeline, gated on loose floors - a tripwire before releases
+and risky merges, not a benchmark. ~2-5 min warm.
+
 ## The manual way
 
 ```bash

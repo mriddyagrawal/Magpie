@@ -49,7 +49,13 @@ def corpus(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         }],
         "exclude_paths": [],
     }
-    (data_dir / "indexing_rules.json").write_text(json.dumps(rules))
+    # Write through the LIVE _user_rules_path(): the repo-wide conftest
+    # isolation fixture redirects it per-test, so a file planted at a
+    # hand-derived APP_DATA_DIR location is never read (triage 2026-08-30).
+    from src.config import indexing_rules as ir
+    rules_path = ir._user_rules_path()
+    rules_path.parent.mkdir(parents=True, exist_ok=True)
+    rules_path.write_text(json.dumps(rules))
     return root
 
 

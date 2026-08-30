@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -117,8 +118,14 @@ def main() -> int:
     print(f"judge: full-context grading of {n_questions} answers "
           f"(model={args.model}, rubric={rubric_sha()}) — one instance, "
           f"reads sources itself; this takes several minutes")
+    # shutil.which: on Windows the npm shim is claude.cmd, which a bare
+    # argv[0] does not resolve; which() honors PATHEXT everywhere.
+    claude_bin = shutil.which("claude")
+    if not claude_bin:
+        sys.exit("judge: `claude` CLI not found on PATH - install Claude "
+                 "Code and log in (the judge cannot run without it)")
     proc = subprocess.run(
-        ["claude", "-p", "--model", args.model,
+        [claude_bin, "-p", "--model", args.model,
          "--allowedTools", "Read,Write,Glob,Grep"],
         input=prompt, capture_output=True, text=True, timeout=args.timeout_s,
         cwd=str(EVAL.parent),

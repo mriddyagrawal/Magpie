@@ -43,6 +43,8 @@ from src.grounding import (  # noqa: E402
     is_sum_of,
     normalize as _normalize,
     numerals as _numerals,
+    span_supported,
+    unsupported_answer_numerals,
     unsupported_numerals,
 )
 
@@ -101,12 +103,25 @@ def audit_entry(entry: dict) -> dict:
     # "the model invented a figure" deserve different columns.
     absent = [t for t in found if t not in context and t not in re.sub(r"\s+", "", context)]
     arithmetic = [t for t in absent if t not in missing and is_sum_of(t, context_numbers)]
+    # Evidence mode (MAGPIE_GROUNDING=evidence) saves the spans the model
+    # quoted as `magpie_evidence`; score those too — how many quotes are
+    # really in the files, and which answer figures sit outside them.
+    spans = [str(x) for x in (entry.get("magpie_evidence") or []) if str(x).strip()]
+    ev = None
+    if spans:
+        good = [sp for sp in spans if span_supported(sp, context)]
+        ev = {
+            "spans": len(spans),
+            "supported": len(good),
+            "uncovered": unsupported_answer_numerals(answer, good, str(entry.get("question", ""))),
+        }
     return {
         "id": entry.get("id"),
         "numerals": len(found),
         "supported": len(found) - len(absent),
         "arithmetic_ok": len(arithmetic),
         "suspicious": missing,
+        "evidence": ev,
     }
 
 
@@ -118,7 +133,12 @@ def audit_file(path: Path) -> dict:
     arithmetic = sum(r["arithmetic_ok"] for r in rows)
     suspicious = sum(len(r["suspicious"]) for r in rows)
     dirty = [r for r in rows if r["suspicious"]]
+    ev_rows = [r["evidence"] for r in rows if r.get("evidence")]
     return {
+        "evidence_answers": len(ev_rows),
+        "evidence_spans": sum(e["spans"] for e in ev_rows),
+        "evidence_supported": sum(e["supported"] for e in ev_rows),
+        "evidence_uncovered": sum(len(e["uncovered"]) for e in ev_rows),
         "file": path.name,
         "answers": len(rows),
         "numerals": total,
@@ -137,7 +157,8 @@ def main() -> int:
         print("usage: grounding_audit.py <eval_answer_*.json> [...]", file=sys.stderr)
         return 2
 
-    print(f"{'run':<40} {'ans':>4} {'nums':>5} {'ok':>5} {'calc':>5} {'susp':>5} {'dirty':>6}")
+    print(f"{'run':<40} {'ans':>4} {'nums':>5} {'ok':>5} {'calc':>5} {'susp':>5} {'dirty':>6}"
+          f"  {'quotes':>6} {'found':>5} {'uncov':>5}")
     reports = []
     for p in paths:
         r = audit_file(p)
@@ -146,6 +167,8 @@ def main() -> int:
             f"{r['file']:<40} {r['answers']:>4} {r['numerals']:>5} "
             f"{r['supported']:>5} {r['arithmetic_ok']:>5} {r['suspicious']:>5} "
             f"{r['answers_with_suspicious']:>6}"
+            + (f"  {r['evidence_spans']:>6} {r['evidence_supported']:>5} {r['evidence_uncovered']:>5}"
+               if r["evidence_answers"] else "")
         )
 
     for r in reports:

@@ -40,6 +40,9 @@ class PipelineResult:
     retrieved: list[SearchResult]       # Qdrant top-k (path, summary, score)
     answer: str                         # Kimi's final answer ("" if not_found)
     sources_used: list[str]             # Subset of retrieved paths Kimi cited
+    # Spans the model quoted as its evidence (evidence grounding mode); empty
+    # in numerals/off mode and on providers that cannot be asked for quotes.
+    evidence: list[str] = field(default_factory=list)
     # Not-found state. When True, `answer` and `sources_used` are empty and the
     # ask bar renders State 5 with the single "Add folder" CTA. The model sets
     # these via the `not_found` / `not_found_topic` fields on Answer; see
@@ -218,6 +221,7 @@ async def ask(
         from src.answer import LAST_ROUTE, LAST_SUBTIMINGS as _ANS_SUB
         timings["answer_extractive"] = float(LAST_ROUTE.get("extractive", 0.0))
         timings["answer_files_first"] = float(LAST_ROUTE.get("files_first", 0.0))
+        timings["answer_grounding_flagged"] = float(LAST_ROUTE.get("grounding_flagged", 0.0))
         timings.update({f"ans_{k}": v for k, v in _ANS_SUB.items()})
     except Exception:  # noqa: BLE001 — instrumentation must never break a query
         pass
@@ -235,6 +239,7 @@ async def ask(
         retrieved=retrieved,
         answer=ans.answer,
         sources_used=ans.sources_used,
+        evidence=list(getattr(ans, "evidence", []) or []),
         not_found=ans.not_found,
         not_found_topic=ans.not_found_topic,
         timings=timings,

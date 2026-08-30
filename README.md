@@ -124,6 +124,8 @@ graph LR
 
 Four models run inside the app — MiniLM for dense embeddings, BM25 for sparse, ColPali for visual pages, and a cross-encoder for reranking. None of them ever call out.
 
+The two sketches above are the short version. The full map — every stage on the query and index paths, what it defaults to, and the eval each one shipped on — lives in [docs/PIPELINE.md](docs/PIPELINE.md) and is updated whenever a change lands on a positive eval.
+
 ---
 
 ## How It Holds Up

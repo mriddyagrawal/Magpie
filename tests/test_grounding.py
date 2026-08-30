@@ -32,8 +32,30 @@ def test_letter_spaced_pdf_text_still_counts_as_support():
 
 
 def test_a_computed_total_is_not_a_fabrication():
+    """An Uber receipt is fare + four fees: five terms. 51.32 has a decimal
+    part, so it IS audited below the floor (MAGPIE_GROUNDING_DECIMALS) —
+    before the decimal rule this test passed only because 51.32 was never
+    looked at."""
     context = "Trip fare 41.80 booking fee 4.97 surcharge 3.75 state 0.42 wait 0.38"
+    assert "51.32" in numerals("The total is 51.32")
     assert unsupported_numerals("The total is 51.32", context) == []
+
+
+def test_decimals_are_audited_below_the_floor(monkeypatch):
+    """Receipt totals are mostly under 100. '20.00' is a stated figure, not
+    a list index, so it is checked; a bare '20' still is not."""
+    assert unsupported_numerals("It cost $20.00", "no figures here") == ["20.00"]
+    assert unsupported_numerals("It cost 20 dollars", "no figures here") == []
+    assert unsupported_numerals("It cost $20.00", "Total $20.00") == []
+    monkeypatch.setenv("MAGPIE_GROUNDING_DECIMALS", "0")
+    assert unsupported_numerals("It cost $20.00", "no figures here") == []
+
+
+def test_sum_terms_is_a_knob(monkeypatch):
+    context = "41.80 4.97 3.75 0.42 0.38"
+    assert is_sum_of("51.32", context.split())
+    monkeypatch.setenv("MAGPIE_GROUNDING_SUM_TERMS", "4")
+    assert not is_sum_of("51.32", context.split())
 
 
 def test_an_invented_figure_is_reported():

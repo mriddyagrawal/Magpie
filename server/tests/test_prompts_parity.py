@@ -64,6 +64,8 @@ def test_answer_block_constants_match():
         ("ANSWER_MATH_BLOCK", "_MATH_BLOCK"),
         ("ANSWER_PAGE_REF_BLOCK", "_PAGE_REF_BLOCK"),
         ("ANSWER_FORMAT_BLOCK", "_FORMAT_BLOCK_CLOUD"),
+        ("ANSWER_EVIDENCE_BLOCK", "_EVIDENCE_BLOCK"),
+        ("ANSWER_FORMAT_BLOCK_EVIDENCE", "_FORMAT_BLOCK_CLOUD_EVIDENCE"),
     ]
     answer_py = REPO_ROOT / "src" / "answer.py"
     for server_name, desktop_name in pairs:

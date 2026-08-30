@@ -126,6 +126,37 @@ ANSWER_FORMAT_BLOCK = (
     "\"not_found\": false, \"not_found_topic\": \"\"}"
 )
 
+# EVIDENCE MODE (desktop MAGPIE_GROUNDING=evidence): the model quotes the
+# spans it read before answering; the desktop's grounding guard checks the
+# quotes against the files. Mirrors src/answer.py:_EVIDENCE_BLOCK. This
+# server does not inject it yet — the route would also need to return the
+# `evidence` key — so on the magpie-cloud provider the desktop falls back
+# to the numerals check.
+ANSWER_EVIDENCE_BLOCK = (
+    "EVIDENCE: before writing the answer, copy into `evidence` the exact "
+    "sentence(s) or table line(s) from the files that state the facts you "
+    "will use — verbatim, character for character, one span per fact. Every "
+    "number, name and date in your answer must appear in those spans (a "
+    "total you compute must have its parts quoted). If you cannot find a "
+    "span to quote, the answer is not in the files: leave `evidence` empty "
+    "and set not_found=true."
+)
+
+# Five-key output contract for evidence mode. Mirrors
+# src/answer.py:_FORMAT_BLOCK_CLOUD_EVIDENCE.
+ANSWER_FORMAT_BLOCK_EVIDENCE = (
+    "OUTPUT FORMAT: respond with a single raw JSON object — no markdown "
+    "fences, no prose before or after — with exactly these five keys in "
+    "this order:\n"
+    "{\"evidence\": [<verbatim span copied from a file>, ...], "
+    "\"answer\": <string>, \"sources_used\": [<file number as a string>, ...], "
+    "\"not_found\": <boolean>, \"not_found_topic\": <string>}\n"
+    "Example: {\"evidence\": [\"Department Chair: Dr. Elena Marquez\"], "
+    "\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
+    "\"sources_used\": [\"2\"], "
+    "\"not_found\": false, \"not_found_topic\": \"\"}"
+)
+
 
 # ---------------------------------------------------------------------------
 # /llm/rewrite — query expansion for retrieval

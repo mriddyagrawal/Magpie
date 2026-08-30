@@ -58,8 +58,11 @@ def test_load_creates_default_file_when_missing(tmp_path: Path) -> None:
     assert not p.exists()
     s = load_user_settings(p)
     assert p.exists()
-    # Seeded with the live bundled AppDefaults.
-    assert s.version == 1
+    # Seeded with the live bundled AppDefaults. Version asserted against
+    # the model's own default so branches carrying the v2 settings
+    # migration and branches still on v1 both hold (triage 2026-08-30).
+    import src.config.settings as _st
+    assert s.version == getattr(_st, "SETTINGS_VERSION", 1)
     # deliberate default change: shipped default provider is cloud
     assert s.provider == "cloud"
     assert s.top_k == 5

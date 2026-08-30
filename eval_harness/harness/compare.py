@@ -212,9 +212,16 @@ def axes(a: dict, b: dict) -> dict:
     if golden_changed:
         changed.append("questions")
     env_diff = dict_diff(ra.get("env_snapshot", {}) or {}, rb.get("env_snapshot", {}) or {})
+    # #115: a comparison is confounded whenever MORE THAN ONE KNOB moved,
+    # not just when more than one axis category moved - a config diff of
+    # {top_k, rewrite} is a two-factor change even though it is one "axis".
+    n_knobs = len(params_diff) + int(backend_changed) + int(golden_changed)
     return {
         "changed_axes": changed or ["none"],
-        "confounded": len(changed) > 1,
+        "changed_knobs": sorted(params_diff)
+        + (["<code>"] if backend_changed else [])
+        + (["<questions>"] if golden_changed else []),
+        "confounded": n_knobs > 1,
         "params_diff": params_diff,
         "backend_git_sha": {"a": ra.get("backend_git_sha"), "b": rb.get("backend_git_sha")},
         "backend_commits_between": (
@@ -375,8 +382,10 @@ def render_md(meta: dict, ax: dict, cmp_: dict, a: dict, b: dict) -> str:
     L.append("")
     L.append(f"- Generated: {meta['generated_utc']}  ·  pairing mode: **{meta['pairing_mode']}** "
              f"(coverage {meta['pairing_coverage']:.0%}, n={meta['n_paired']})")
-    L.append(f"- Changed axes: **{', '.join(ax['changed_axes'])}**"
-             + ("  ⚠ **CONFOUNDED (multiple axes changed)**" if ax["confounded"] else ""))
+    L.append(f"- Changed axes: **{', '.join(ax['changed_axes'])}** "
+             f"(knobs: {', '.join(ax['changed_knobs']) or 'none'})"
+             + ("  ⚠ **CONFOUNDED (more than one knob changed - deltas are "
+                "not attributable to a single cause)**" if ax["confounded"] else ""))
     if ax["params_diff"]:
         L.append("- Params diff: " + ", ".join(
             f"`{k}`: {v['a']} → {v['b']}" for k, v in ax["params_diff"].items()))

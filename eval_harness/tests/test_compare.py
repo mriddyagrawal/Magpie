@@ -107,9 +107,19 @@ def test_axes_confound_detection(tmp_path):
     la, lb = compare.load_run(a, False), compare.load_run(b, False)
     ax = compare.axes(la, lb)
     assert ax["changed_axes"] == ["config"]
-    assert ax["confounded"] is False
+    # #115: two config knobs = confounded, even though only one axis moved
+    assert ax["confounded"] is True
+    assert ax["changed_knobs"] == ["rerank", "top_k"]
     assert set(ax["params_diff"]) == {"top_k", "rerank"}
     assert ax["rerank_coupling_warning"] is not None
+
+
+def test_axes_single_knob_not_confounded(tmp_path):
+    a = _mk_run(tmp_path, "sA", "g1", {"q1": "correct"}, params={"top_k": 2})
+    b = _mk_run(tmp_path, "sB", "g1", {"q1": "correct"}, params={"top_k": 3})
+    ax = compare.axes(compare.load_run(a, False), compare.load_run(b, False))
+    assert ax["confounded"] is False
+    assert ax["changed_knobs"] == ["top_k"]
 
 
 def test_cli_end_to_end(tmp_path):

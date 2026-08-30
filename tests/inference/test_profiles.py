@@ -18,15 +18,27 @@ from src.inference.profiles import (
 # Registry
 # ---------------------------------------------------------------------------
 
-def test_only_the_vision_profile_is_registered():
-    """Exactly one profile ships. A text-only variant was removed rather
-    than merely un-defaulted: `--mmproj` is a spawn-time flag, so the
-    projector cannot be attached to or detached from a live process, and
-    an idle projector costs no inference time. The only thing a text-only
-    profile could buy is 0.54 GB resident, paid for with a full cold
-    reload on every text<->image transition."""
+def test_two_profiles_are_registered_and_vision_is_first():
+    """Two profiles ship: the vision-capable default, and `text-only` for
+    the eyes-vs-brain reader arms (2026-08-29). The default stays the
+    vision profile — `--mmproj` is a spawn-time flag, an idle projector
+    costs no inference time, and swapping profiles is a full cold reload —
+    so `text-only` is opt-in via LLAMA_SERVER_TEXT_MODEL, never the
+    fallback. Order matters: the first registered name is what diagnostics
+    list first."""
     profiles = all_profiles()
-    assert list(profiles) == ["lfm25-vl-vision"]
+    assert list(profiles) == ["lfm25-vl-vision", "text-only"]
+
+
+def test_text_only_profile_has_no_projector():
+    """`text-only` must never try to download or pass an mmproj: it is
+    pointed at pure-text GGUF repos (Qwen2.5-*-Instruct, LFM2.5-1.2B) whose
+    file listings have no projector, and `ensure_mmproj` would raise."""
+    profile = get_profile("text-only")
+    assert profile.has_vision is False
+    assert profile.args.mmproj is None
+    assert profile.args.mmproj_repo_id is None
+    assert profile.args.jinja is True
 
 
 def test_default_text_profile_is_vision_capable():

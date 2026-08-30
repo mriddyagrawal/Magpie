@@ -74,6 +74,11 @@ dependencies = [
     "torchvision==0.25.0",
 ]
 
+[project.optional-dependencies]
+ocr = [
+    "rapidocr-onnxruntime>=1.4.4",
+]
+
 [build-system]
 requires = ["setuptools>=77"]  # >=77 for PEP 639 SPDX `license` + `license-files`
 build-backend = "setuptools.build_meta"

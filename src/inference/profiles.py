@@ -317,6 +317,38 @@ register(
 # ---------------------------------------------------------------------------
 
 
+# A reader with no projector. Not the default (see default_text_profile for
+# why one vision-capable process serves everything) — this exists so the
+# "brain" can be swapped for a pure-text model with two env lines:
+#     LLAMA_SERVER_TEXT_MODEL=text-only
+#     LOCAL_MODEL=Qwen/Qwen2.5-1.5B-Instruct-GGUF   LOCAL_QUANT=q8_0
+# Image requests still go to LLAMA_SERVER_VISION_MODEL (an LRU swap), which
+# is fine once every pixels-only file has an index-time transcript: the
+# reader then never receives an image at all. LOCAL_MODEL is shared with the
+# vision profile, so point LOCAL_MMPROJ_REPO at the VL repo when both run.
+register(
+    ModelProfile(
+        name="text-only",
+        description="Pure-text reader, no mmproj. For the eyes-vs-brain reader arms.",
+        has_vision=False,
+        args=LaunchArgs(
+            repo_id=_env_model_repo(),
+            quant=os.environ.get("LOCAL_QUANT", DEFAULT_QUANT),
+            mmproj=None,
+            mmproj_repo_id=None,
+            ngl=DEFAULT_NGL,
+            ctx_size=int(os.environ.get("LOCAL_N_CTX", "").strip() or _auto_n_ctx()),
+            temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
+            min_p=float(os.environ.get("LOCAL_MIN_P", DEFAULT_MIN_P)),
+            repeat_penalty=float(
+                os.environ.get("LOCAL_REPEAT_PENALTY", DEFAULT_REPEAT_PENALTY)
+            ),
+            jinja=True,
+        ),
+    )
+)
+
+
 def default_text_profile() -> str:
     """Profile name used for **all** inference (text and vision) by default.
 

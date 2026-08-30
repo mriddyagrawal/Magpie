@@ -61,6 +61,29 @@ _REPO_PATTERNS: dict[str, dict[str, str]] = {
         "gguf": "gemma-4-E4B-it-UD-{quant}.gguf",
         "mmproj": "mmproj-{variant}.gguf",
     },
+    # Smaller Liquid VL models — the "eyes" candidates in the eyes-vs-brain
+    # comparison (Evaluations/eyes_vs_brain/). Same layout as the 3B repo;
+    # note the lowercase 'b' in the projector filenames. Verified against the
+    # HF file listings 2026-08-29.
+    "LiquidAI/LFM2.5-VL-1.6B-GGUF": {
+        "gguf": "LFM2.5-VL-1.6B-{quant}.gguf",
+        "mmproj": "mmproj-LFM2.5-VL-1.6b-{variant}.gguf",
+    },
+    "LiquidAI/LFM2.5-VL-450M-GGUF": {
+        "gguf": "LFM2.5-VL-450M-{quant}.gguf",
+        "mmproj": "mmproj-LFM2.5-VL-450m-{variant}.gguf",
+    },
+    # Pure-text readers (no mmproj entry — text-only by construction; use the
+    # `text-only` profile). Candidates for the "brain" half of the comparison:
+    # a text model spends no parameters on vision alignment, so a 1.5B/3B
+    # text model may read a transcript better than the VL-3B's backbone.
+    # Quants are lowercase in Qwen's repos ('q8_0', 'q4_k_m'), uppercase in
+    # Liquid's. Verified against the HF file listings 2026-08-29.
+    "Qwen/Qwen2.5-0.5B-Instruct-GGUF": {"gguf": "qwen2.5-0.5b-instruct-{quant}.gguf"},
+    "Qwen/Qwen2.5-1.5B-Instruct-GGUF": {"gguf": "qwen2.5-1.5b-instruct-{quant}.gguf"},
+    "Qwen/Qwen2.5-3B-Instruct-GGUF": {"gguf": "qwen2.5-3b-instruct-{quant}.gguf"},
+    "LiquidAI/LFM2.5-1.2B-Instruct-GGUF": {"gguf": "LFM2.5-1.2B-Instruct-{quant}.gguf"},
+    "LiquidAI/LFM2-350M-GGUF": {"gguf": "LFM2-350M-{quant}.gguf"},
 }
 
 

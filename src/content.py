@@ -39,22 +39,41 @@ IMAGE_EXTS = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
 # path below is unchanged.
 # ---------------------------------------------------------------------------
 
+def transcripts_dir() -> Path:
+    """Where transcripts live. `MAGPIE_TRANSCRIPTS_DIR` overrides the default
+    so two transcriber backends can be kept side by side and an eval arm can
+    pick one without touching the other (Evaluations/transcript_recall.py)."""
+    import os
+
+    override = os.environ.get("MAGPIE_TRANSCRIPTS_DIR", "").strip()
+    if override:
+        return Path(override)
+    from src.manifest import APP_DATA_DIR
+
+    return APP_DATA_DIR / "transcripts"
+
+
 def transcript_path_for(path: Path) -> Path:
     import hashlib
 
-    from src.manifest import APP_DATA_DIR
-
     key = hashlib.sha256(str(path.resolve()).lower().encode("utf-8")).hexdigest()[:16]
-    return APP_DATA_DIR / "transcripts" / f"{key}.md"
+    return transcripts_dir() / f"{key}.md"
 
 
 def transcript_for(path: Path) -> str | None:
-    """The stored vision transcript for `path`, or None."""
+    """The stored transcript for `path`, or None.
+
+    A transcript with a header but no `## Page` body is a stub written for a
+    picture that had no text in it (src/transcribe.py writes one so the file
+    is not retried every sweep). It must read as "no transcript" here, or the
+    reader would be handed a header instead of the pixels."""
     try:
         text = transcript_path_for(path).read_text(encoding="utf-8").strip()
-        return text or None
     except OSError:
         return None
+    if not text or "## Page" not in text:
+        return None
+    return text
 CODE_EXTS = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
              ".c", ".cpp", ".h", ".hpp", ".cs", ".rb", ".swift", ".kt",
              ".sh", ".sql", ".json", ".yaml", ".yml", ".toml"}
@@ -573,6 +592,18 @@ def _build_content_blocks(
     ext = path.suffix.lower()
 
     if ext in IMAGE_EXTS:
+        # A photographed receipt is the same object as a one-page scanned PDF:
+        # pixels of a document. Read its index-time transcript as text when
+        # one exists (same reasons as the PDF branch below — cacheable,
+        # groundable, cloud-safe); fall back to the pixels only when it does
+        # not. Until 2026-08-29 images skipped this check and always went to
+        # the reader as pixels, so the transcript work never reached them.
+        transcript = transcript_for(path)
+        if transcript:
+            return [
+                "Content type: image (reading the index-time transcript)"
+                f"\n\n---\n{transcript[:max_chars]}"
+            ]
         return [BinaryContent(data=path.read_bytes(), media_type=IMAGE_EXTS[ext])]
 
     if ext in PDF_EXTS:

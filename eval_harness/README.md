@@ -8,21 +8,22 @@ and without Claude.
 ## One-time setup (fresh clone)
 
 ```bash
-just sync-environment            # uv deps
-just download-qdrant             # bundled qdrant binary (the harness spawns
-                                 #   its own instance per run — NEVER the
-                                 #   live app's, and never port 6433)
-just install-llama-server        # llama.cpp server binary
-uv run python eval_harness/scripts/warm_model_cache.py   # REQUIRED, one-time,
-                                 #   online: fills processor/tokenizer gaps in
-                                 #   the shared cache. Runs go online but any
-                                 #   model-blob download DURING a run fails the
-                                 #   run's isolation check - warm first.
-# per dataset, per machine (corpora live OUTSIDE the repo).
+uv sync
+just prepare-eval-harness        # binaries + models this machine will use
+                                 #   (--check reports; --col / --llm pin;
+                                 #   wraps download-qdrant, install-llama-server,
+                                 #   and the model prefetch in one command)
+just eval-smoke                  # ~5 min end-to-end sanity check (committed
+                                 #   fictional corpus; loose-floor tripwire)
+
+# per dataset, per machine. Corpora live either in-tree at
+# datasets/<name>/corpus/ (gitignored) or anywhere via --corpus-dir:
+uv run python eval_harness/scripts/register_corpus.py --name <name> [--corpus-dir DIR]
+# the receipts dataset has its own fetcher (pinned SROIE download):
+uv run --with datasets --with pillow python eval_harness/scripts/prepare_receipts.py
 # NOTE: the judge reads corpus files IN FULL, so their contents go to the
 # Claude API - if you point the harness at a personal corpus, that is what
-# you are agreeing to (standing owner approval recorded in PLAN 9.4):
-uv run --with datasets --with pillow python eval_harness/scripts/prepare_receipts.py
+# you are agreeing to (standing owner approval recorded in PLAN 9.4).
 ```
 
 Prove isolation before trusting anything (Phase 0 exit test — boots the real

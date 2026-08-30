@@ -566,10 +566,21 @@ async def summarize_one(
 
 
 def find_supported_files(root: Path) -> list[Path]:
-    return sorted(
-        p for p in root.rglob("*")
-        if p.is_file() and not p.name.startswith(".") and p.suffix.lower() in SUPPORTED_EXTS
-    )
+    """Every file under `root` this tier can summarize.
+
+    Delegates the walk to `src.ingest.walker.find_candidates` - the same
+    rules-aware walker the app sync uses - then keeps only the extensions
+    this tier handles. The previous bare `rglob` honored NOTHING: user
+    exclude_globs/exclude_paths, gitignore, and dot-FOLDER pruning were all
+    bypassed (a filename dot-check does not stop rglob descending into
+    .venv/), so `just summarize` walked vendor trees and user-excluded
+    paths the app itself refuses (#130; same fix the evaluation_harness
+    branch has carried since 875efe1's tests exposed it there).
+    """
+    from src.ingest.walker import find_candidates
+
+    files, _ignored, _asset_skipped = find_candidates(root)
+    return sorted(p for p in files if p.suffix.lower() in SUPPORTED_EXTS)
 
 
 async def run_batch(

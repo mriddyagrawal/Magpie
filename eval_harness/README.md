@@ -1,7 +1,9 @@
 # Magpie Evaluation Harness
 
 Deterministic, isolated eval runs for the Magpie backend. Design and rationale
-live in [PLAN.md](PLAN.md); this file is the runbook.
+live in [PLAN.md](PLAN.md); this file is the runbook. New here? Start with
+[HOW_TO_RUN_EVALS.md](HOW_TO_RUN_EVALS.md) - fresh clone to judged run, with
+and without Claude.
 
 ## One-time setup (fresh clone)
 

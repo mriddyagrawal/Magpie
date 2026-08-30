@@ -12,16 +12,22 @@ design rationale. This file is the "I just cloned the repo" path.
 |---|---|
 | macOS (Apple silicon) | Proven — every run so far happened here |
 | Linux | Expected to work (all paths/binaries resolve per-platform); untested — first run should be watched |
-| Windows | **Blocked** on known fixes: qdrant teardown uses `os.killpg`, worker env allowlist lacks `SYSTEMROOT`/`USERPROFILE`/`TEMP`, llama-server path lacks `.exe` |
+| Windows | Blockers fixed in code (process-group teardown, env allowlist, `.exe` paths, `claude.cmd` resolution) — **not yet exercised on a real Windows machine**; first run should be watched |
 
 ## Prerequisites (once per machine)
 
 ```bash
 uv sync                     # python env (uv: https://docs.astral.sh/uv/)
-just download-qdrant        # per-platform qdrant binary -> frontend/src-tauri/binaries/
-just install-llama-server   # per-platform llama-server -> <app-data>/bin/
-                            #   Linux GPU: LLAMA_SERVER_GPU=cuda-* just install-llama-server
+just prepare-harness        # binaries + the models THIS machine will use
+                            #   --check reports without installing
+                            #   --col qwen|smol pins the visual retriever
+                            #   --llm lfm,gemma picks answer models (lfm default)
+                            #   Linux GPU: LLAMA_SERVER_GPU=cuda-* just prepare-harness
 ```
+
+(`/prepare-harness` in Claude Code wraps this with an interview, failure
+diagnosis, and a smoke run. The individual recipes `just download-qdrant` /
+`just install-llama-server` still exist.)
 
 - **Models download themselves** on the first run (ColQwen2.5 or ColSmol by
   machine spec, the answer LLM, rerank/embedding models) into
@@ -30,7 +36,10 @@ just install-llama-server   # per-platform llama-server -> <app-data>/bin/
   `~/.local/share/Magpie` (Linux), `%LOCALAPPDATA%\magpie\Magpie` (Windows).
 - **Machine gate**: ColQwen2.5 needs ≥8 GB dedicated VRAM (CUDA) or ≥24 GB
   unified memory (Apple silicon); below that the visual tier runs ColSmol-500M
-  — a *different retriever*, so don't compare such runs against ColQwen runs.
+  — a *different retriever*. The config's `col_model` param (`auto` default,
+  `colqwen`/`colsmol` to pin) is part of the index key, and every run stamps
+  the resolved family in `run.json`, so cross-machine runs can never be
+  silently compared across retrievers.
 - **The Magpie app is NOT required.** The harness only reuses the app's
   directory convention and installer scripts, and it never touches a live
   app's Qdrant or data (own ports, own scratch dirs, isolation verified per
@@ -48,10 +57,21 @@ SROIE scans, downloads from HuggingFace):
 uv run python eval_harness/scripts/prepare_receipts.py
 ```
 
-This writes the corpus to disk, `manifest.json` (sha256 pins), and
+This writes the corpus to disk (subfoldered `batch_NN/`), `manifest.json`
+(sha256 pins + subfolder-relative paths), and
 `datasets/receipts/corpus_root.local.json` — the per-machine pointer the
-runner requires. `--verify` re-checks an existing corpus. For a new corpus of
-your own, the `/magpie-eval` skill sets the dataset up during its interview.
+runner requires. `--verify` re-checks an existing corpus. It does NOT write
+questions — golden sets come from `/magpie-eval`'s file-reading agents.
+
+For a corpus of your own:
+
+```bash
+uv run python eval_harness/scripts/register_corpus.py --name <name> [--corpus-dir DIR]
+```
+
+Without `--corpus-dir` it expects your files in
+`eval_harness/datasets/<name>/corpus/` (gitignored — drop files in, register,
+done). Big or private corpora belong outside the checkout via `--corpus-dir`.
 
 ## The Claude way (recommended)
 

@@ -40,9 +40,14 @@ def test_coerce_drift_rescues_misnamed_string_field():
     the schema's `answer` field without losing sources_used."""
     raw = '{"courses_mentioned": "CS 301, BIO 222, LNG 210", "sources_used": ["a.csv"]}'
     out = _coerce_field_name_drift(raw)
+    # The verdict fields are filled in by the rescue: every field on `Answer`
+    # is required, so a partial payload fails validation and the recovered
+    # text is thrown away anyway.
     assert out == {
         "answer": "CS 301, BIO 222, LNG 210",
         "sources_used": ["a.csv"],
+        "not_found": False,
+        "not_found_topic": "",
     }
 
 
@@ -69,11 +74,33 @@ def test_coerce_drift_returns_none_when_multiple_extra_keys():
     assert _coerce_field_name_drift(raw) is None
 
 
-def test_coerce_drift_returns_none_when_no_sources_used():
-    """The structural anchor for the rescue is `sources_used` being
-    present and correctly named. Without it, we have no signal that
-    this is even an Answer-shaped payload."""
-    raw = '{"courses_mentioned": "..."}'
+def test_coerce_drift_rescues_a_payload_with_no_schema_keys_at_all():
+    """Widened 2026-08-27. `sources_used` used to be the structural anchor
+    for the rescue, on the theory that a payload without it wasn't
+    Answer-shaped enough to trust. Measurement retired that theory: on the
+    sem6 baseline arm (local, no grammar) 25 of 25 answers came back as
+    valid JSON with every key renamed after the question and NO schema key
+    present — several of them factually correct, all of them discarded.
+    Labelled prose from the model's own keys beats losing the answer."""
+    raw = '{"transaction_date": "24 March 2026", "customer_reference": "40-920412413"}'
+    out = _coerce_field_name_drift(raw)
+    assert out is not None
+    assert "24 March 2026" in out["answer"]
+    assert "40-920412413" in out["answer"]
+    assert out["sources_used"] == []
+
+
+def test_coerce_drift_keeps_the_answer_text_when_only_the_citation_key_drifted():
+    raw = '{"not_found": false, "answer": "It cost $159.00", "sources": ["a.pdf"]}'
+    out = _coerce_field_name_drift(raw)
+    assert out["answer"] == "It cost $159.00"
+    assert out["sources_used"] == ["a.pdf"]
+
+
+def test_coerce_drift_refuses_nested_objects():
+    """A nested object means we cannot tell prose from structure, and
+    guessing is how a rescue becomes a fabrication."""
+    raw = '{"result": {"amount": 12, "currency": "USD"}}'
     assert _coerce_field_name_drift(raw) is None
 
 
@@ -98,7 +125,12 @@ def test_coerce_drift_handles_numeric_value():
     Coerce to string so `answer: str` validates."""
     raw = '{"count": 42, "sources_used": []}'
     out = _coerce_field_name_drift(raw)
-    assert out == {"answer": "42", "sources_used": []}
+    assert out == {
+        "answer": "42",
+        "sources_used": [],
+        "not_found": False,
+        "not_found_topic": "",
+    }
 
 
 # ---------------------------------------------------------------------------

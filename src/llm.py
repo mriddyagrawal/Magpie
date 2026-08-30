@@ -330,6 +330,20 @@ def _prepend_timestamp(message: list) -> list:
     return [_timestamp_prefix(), *message]
 
 
+# Agents whose output describes a FILE, not a conversation. The timestamp is
+# there so the answer step can resolve "this semester" or "is this receipt
+# recent" — at index time it is just a plausible-looking date sitting in the
+# context, and a 3B copies it. Measured on sem_4 after the prompt-example fix:
+# `2026-08-27` (the run date) turned up as a claimed *document identifier* in
+# a Cursor invoice, a finance handout and a VR storyboard, none of which
+# contain it. Same copying failure as the Jane Doe example, different source.
+_NO_TIMESTAMP_OUTPUTS = {"FileSummary"}
+
+
+def _wants_timestamp(output_type: type | None) -> bool:
+    return getattr(output_type, "__name__", "") not in _NO_TIMESTAMP_OUTPUTS
+
+
 class ChatAgent(Protocol, Generic[T]):
     """Minimal agent surface used by call sites (summarize / rewrite / answer).
 
@@ -467,7 +481,10 @@ class _CloudAgent(Generic[T]):
         # not wired today), concatenates text into one user message,
         # appends the JSON-shape reminder.
         msgs, _images_dropped = _flatten_message_for_local(
-            _prepend_timestamp(message), self._system_prompt
+            _prepend_timestamp(message)
+            if _wants_timestamp(self._output_type)
+            else message,
+            self._system_prompt
         )
         body: dict[str, Any] = {
             "model": self._model,
@@ -716,6 +733,135 @@ _FENCE_CLOSE = re.compile(r"\n?\s*```\s*$")
 _JSON_OBJECT = re.compile(r"\{.*\}", re.DOTALL)
 
 
+def _flatten_unknown_payload(payload: dict) -> dict | None:
+    """Render a JSON object whose keys match nothing in the schema as prose.
+
+    Only scalars and lists of scalars are flattened; a nested object means we
+    cannot tell prose from structure, and guessing there is how a rescue turns
+    into a fabrication. `sources_used` is taken from an aliased key when the
+    model used one, else left empty — an answer with no citations is honest
+    about what it is.
+    """
+    alias = next(
+        (k for k in ("sources", "source_files", "files", "sources_cited")
+         if isinstance(payload.get(k), list)),
+        None,
+    )
+    sources = [str(x) for x in payload[alias]] if alias else []
+
+    lines: list[str] = []
+    for key, value in payload.items():
+        if key == alias:
+            continue
+        if isinstance(value, (str, int, float, bool)):
+            lines.append(f"{_humanize_key(key)}: {value}")
+        elif isinstance(value, list) and all(
+            isinstance(v, (str, int, float, bool)) for v in value
+        ):
+            joined = ", ".join(str(v) for v in value)
+            lines.append(f"{_humanize_key(key)}: {joined}")
+        else:
+            return None
+    if not lines:
+        return None
+    return _complete_answer_payload(
+        {"answer": "\n".join(lines), "sources_used": sources}
+    )
+
+
+def _humanize_key(key: str) -> str:
+    """`transaction_date` -> `Transaction date`. The key names the model
+    invents are usually the best label for the value it put there."""
+    text = str(key).replace("_", " ").replace("-", " ").strip()
+    return text[:1].upper() + text[1:] if text else str(key)
+
+
+def _complete_answer_payload(rescued: dict) -> dict:
+    """Fill the verdict fields a rescue cannot know.
+
+    Every field on `Answer` is required, so a rescue that returns only
+    `answer` + `sources_used` fails validation and throws away the text it
+    just recovered. We reached this code because the model produced content,
+    so the verdict is not-found=False.
+    """
+    rescued.setdefault("not_found", False)
+    rescued.setdefault("not_found_topic", "")
+    return rescued
+
+
+def _close_truncated_json(text: str) -> str | None:
+    """Close a JSON object that generation cut off mid-flight.
+
+    Under a GBNF grammar the model cannot emit malformed JSON — but it CAN
+    run into `max_tokens` halfway through a string, and the result parses no
+    better than garbage. Observed on enumeration answers, which are the
+    longest ones we ask for. Walking the text and appending the closers the
+    stack still owes turns a lost answer into a truncated one.
+
+    Returns None when nothing was open (the text was not truncated) or when
+    the text is not object-shaped.
+    """
+    if not text.startswith("{"):
+        return None
+    stack: list[str] = []
+    in_string = False
+    escaped = False
+    for ch in text:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch in "{[":
+            stack.append(ch)
+        elif ch in "}]":
+            if stack:
+                stack.pop()
+    if not in_string and not stack:
+        return None
+
+    out = _escape_control_chars_in_strings(text)
+    if escaped:
+        out = out[:-1]
+    if in_string:
+        out += '"'
+    for opener in reversed(stack):
+        out += "}" if opener == "{" else "]"
+    return out
+
+
+def _escape_control_chars_in_strings(text: str) -> str:
+    """Escape raw newlines/tabs that appear inside JSON strings.
+
+    Older grammars (and every un-grammared cloud reply) can put a literal
+    newline inside a string, which JSON forbids — so the payload fails to
+    parse for a reason that has nothing to do with its content.
+    """
+    out: list[str] = []
+    in_string = False
+    escaped = False
+    for ch in text:
+        if in_string and not escaped and ch in "\n\r\t":
+            out.append({"\n": "\\n", "\r": "\\r", "\t": "\\t"}[ch])
+            continue
+        out.append(ch)
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+        elif ch == '"':
+            in_string = True
+    return "".join(out)
+
+
 def _coerce_field_name_drift(json_text: str) -> dict | None:
     """Rescue payloads where the model wrote `{<some-name>: ..., sources_used: [...]}`
     instead of `{answer: ..., sources_used: [...]}`. Returns a dict with
@@ -734,8 +880,34 @@ def _coerce_field_name_drift(json_text: str) -> dict | None:
         payload = json.loads(json_text)
     except json.JSONDecodeError:
         return None
-    if not isinstance(payload, dict) or "sources_used" not in payload:
+    if not isinstance(payload, dict) or not payload:
         return None
+    if "sources_used" not in payload and "answer" in payload:
+        # Half-drifted: the prose field landed correctly and only the
+        # citation key wandered (`sources`, `files`, ...). Keep the model's
+        # own answer text rather than flattening it into labelled lines.
+        alias = next(
+            (k for k in ("sources", "source_files", "files", "sources_cited")
+             if isinstance(payload.get(k), list)),
+            None,
+        )
+        rescued = {
+            "answer": str(payload["answer"]),
+            "sources_used": [str(x) for x in payload[alias]] if alias else [],
+        }
+        for passthrough in ("not_found", "not_found_topic"):
+            if passthrough in payload:
+                rescued[passthrough] = payload[passthrough]
+        return _complete_answer_payload(rescued)
+    if "sources_used" not in payload:
+        # Fully-drifted payload: the model answered in valid JSON but named
+        # every key after the question ({"transaction_date": ...,
+        # "customer_reference": ...}). Measured on the sem6 baseline arm,
+        # this was 25 of 25 local answers — several of them factually
+        # correct and thrown away for their key names. Flatten the whole
+        # object into prose rather than losing it. Cloud has no grammar to
+        # fall back on, so this net matters there permanently.
+        return _flatten_unknown_payload(payload)
     other_keys = [k for k in payload if k != "sources_used"]
     if len(other_keys) != 1:
         return None
@@ -753,7 +925,9 @@ def _coerce_field_name_drift(json_text: str) -> dict | None:
         # Dicts, None, anything else — too ambiguous to flatten safely.
         # Let the diagnostic path log the raw output.
         return None
-    return {"answer": answer_value, "sources_used": payload["sources_used"]}
+    return _complete_answer_payload(
+        {"answer": answer_value, "sources_used": payload["sources_used"]}
+    )
 
 
 class JSONParseError(RuntimeError):
@@ -812,6 +986,22 @@ def parse_json_with_repair(raw: str, schema: type[T], fallback: T | None) -> T:
                 return schema.model_validate(coerced)
             except Exception:
                 pass
+
+    # Truncation rescue. Last resort before giving up: if generation ran out
+    # of tokens mid-object, close what is still open and try again. A
+    # partial answer beats "(model output could not be parsed into Answer)".
+    closed = _close_truncated_json(stripped)
+    if closed is not None:
+        try:
+            return schema.model_validate_json(closed)
+        except Exception:
+            if "answer" in getattr(schema, "model_fields", {}):
+                coerced = _coerce_field_name_drift(closed)
+                if coerced is not None:
+                    try:
+                        return schema.model_validate(coerced)
+                    except Exception:
+                        pass
 
     # Log the raw output on every hard failure — this is the primary
     # diagnostic. Useful whether we raise or fall back.
@@ -950,6 +1140,33 @@ class LocalAgent(Generic[T]):
                 "strict": True,
             },
         }
+        # ...and the grammar that actually enforces it. `response_format` is
+        # a no-op on llama-server b9049 (accepted, ignored — measured), so
+        # the schema is compiled to GBNF here and sent as `grammar`, which
+        # the sampler does honor. Unsupported schema shapes fall back to
+        # response_format + parse_json_with_repair, which is exactly where
+        # this code stood before, so a compiler gap can never be worse than
+        # the status quo.
+        from src.inference.gbnf import UnsupportedSchema, schema_to_gbnf
+
+        try:
+            # LOCAL_GRAMMAR=0 turns the constraint off. Same rationale as
+            # LOCAL_MIN_P in profiles.py: an A/B run has to be able to
+            # reproduce the old (unconstrained) behavior without a code edit
+            # between arms.
+            if os.environ.get("LOCAL_GRAMMAR", "1").strip() == "0":
+                raise UnsupportedSchema("disabled via LOCAL_GRAMMAR=0")
+            self._grammar: str | None = schema_to_gbnf(schema)
+        except UnsupportedSchema as e:
+            self._grammar = None
+            if "LOCAL_GRAMMAR" in str(e):
+                pass  # deliberate A/B disable, not a problem to report
+            else:
+                warnings.warn(
+                    f"no GBNF grammar for {output_type.__name__} ({e}); local "
+                    "structured output falls back to prompt + JSON repair",
+                    stacklevel=2,
+                )
 
     async def run(
         self, message: list, *, thinking: bool = False,
@@ -959,7 +1176,10 @@ class LocalAgent(Generic[T]):
         from src.inference.llm_log import log_request, log_response
 
         msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message), self._system_prompt
+            _prepend_timestamp(message)
+            if _wants_timestamp(self._output_type)
+            else message,
+            self._system_prompt
         )
         # Drop images when no vision profile is registered (rather than
         # raising), so users without the mmproj installed still get a
@@ -985,6 +1205,7 @@ class LocalAgent(Generic[T]):
                 max_tokens=LOCAL_MAX_TOKENS,
                 images=images or None,
                 response_format=self._response_format,
+                grammar=self._grammar,
             )
         except Exception as e:
             log_response(
@@ -1008,7 +1229,10 @@ class LocalAgent(Generic[T]):
         from src.inference.llm_log import log_request, log_response
 
         msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message), self._system_prompt
+            _prepend_timestamp(message)
+            if _wants_timestamp(self._output_type)
+            else message,
+            self._system_prompt
         )
         if images and default_vision_profile() is None:
             images = []
@@ -1031,6 +1255,7 @@ class LocalAgent(Generic[T]):
                 max_tokens=LOCAL_MAX_TOKENS,
                 images=images or None,
                 response_format=self._response_format,
+                grammar=self._grammar,
             )
         except Exception as e:
             log_response(

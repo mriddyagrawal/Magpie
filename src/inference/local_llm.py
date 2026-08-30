@@ -94,6 +94,7 @@ class LocalLLM(Protocol):
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
+        grammar: Optional[str] = None,
     ) -> str: ...
 
     def complete_sync(
@@ -105,6 +106,7 @@ class LocalLLM(Protocol):
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
+        grammar: Optional[str] = None,
     ) -> str: ...
 
     async def stream(
@@ -150,6 +152,8 @@ class LlamaServerLLM:
         # previous LlamaCppLLM so chat_template.is_gemma4(model_id) still works.
         self.model_id = f"{profile.args.repo_id}::{profile.args.quant}"
         self.default_temperature = profile.args.temperature
+        self.default_min_p = profile.args.min_p
+        self.default_repeat_penalty = profile.args.repeat_penalty
         self.request_timeout_s = request_timeout_s
 
     # ----- pool-resolved URL -------------------------------------------------
@@ -205,6 +209,7 @@ class LlamaServerLLM:
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
+        grammar: Optional[str] = None,
     ) -> str:
         """Run a non-streaming chat completion. Returns the response text.
 
@@ -236,6 +241,7 @@ class LlamaServerLLM:
         body = self._build_request_body(
             prepared, temperature, max_tokens, stream=False, thinking=thinking,
             response_format=response_format,
+            grammar=grammar,
         )
         url = self._base_url(profile_name) + "/v1/chat/completions"
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
@@ -251,6 +257,7 @@ class LlamaServerLLM:
         max_tokens: Optional[int] = None,
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
+        grammar: Optional[str] = None,
     ) -> str:
         """Synchronous variant. Used by `LocalAgent.run_sync` from
         non-async paths (`src.stage2.search.rewrite_query`).
@@ -269,6 +276,7 @@ class LlamaServerLLM:
         body = self._build_request_body(
             prepared, temperature, max_tokens, stream=False, thinking=thinking,
             response_format=response_format,
+            grammar=grammar,
         )
         url = self._base_url(profile_name) + "/v1/chat/completions"
         with httpx.Client(timeout=self.request_timeout_s) as client:
@@ -336,6 +344,7 @@ class LlamaServerLLM:
         stream: bool,
         thinking: bool = False,
         response_format: Optional[dict[str, Any]] = None,
+        grammar: Optional[str] = None,
     ) -> dict[str, Any]:
         """OpenAI-compatible chat-completions request body. We omit
         fields with None values so llama-server's defaults stay in
@@ -363,10 +372,27 @@ class LlamaServerLLM:
             # vars). Always set it so the explicit choice is visible in
             # the request — never rely on the model's default.
             "chat_template_kwargs": {"enable_thinking": bool(thinking)},
+            # llama-server accepts the full sampler set on its
+            # OpenAI-compatible endpoint, not just the OpenAI subset. We
+            # send min_p / repeat_penalty explicitly rather than relying on
+            # the spawn-time --min-p / --repeat-penalty, so a request log
+            # shows the sampler that actually ran and a pool started by
+            # someone else's argv cannot silently change our decoding.
+            "min_p": self.default_min_p,
+            "repeat_penalty": self.default_repeat_penalty,
         }
         if max_tokens is not None:
             body["max_tokens"] = max_tokens
-        if response_format is not None:
+        if grammar is not None:
+            # A compiled GBNF grammar is the ONLY structural constraint
+            # llama-server actually honors on this build: `response_format`
+            # is accepted and silently ignored (HTTP 200, free prose), and
+            # the `json_schema` field fails sampler init outright. See
+            # src/inference/gbnf.py for the measurements. When a grammar is
+            # present it fully replaces response_format — sending both risks
+            # a double constraint on builds that honor each.
+            body["grammar"] = grammar
+        elif response_format is not None:
             # llama-server (b3000+ at least) reads `response_format`
             # with type `json_object` (loose) or `json_schema` (strict —
             # compiles the schema to a GBNF grammar and constrains

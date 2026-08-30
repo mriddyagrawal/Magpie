@@ -128,6 +128,31 @@ Per the README "Step 3 — Create the report":
    interesting outliers), 2-4 paragraphs of synthesis, methodology
    caveats. A pure verdict dump is not a report.
 
+## Step 4 — update the pipeline map (only when the result ships)
+
+[`docs/PIPELINE.md`](../../../docs/PIPELINE.md) is the living map of
+the query and index pipeline. It must move in lockstep with the code,
+and the trigger is a **positive eval**: the arm's strict score meets
+its pre-registered gate, or beats the baseline arm on the same dataset
+with the same criteria (`Evaluations/RUNLOG.jsonl` records both), and
+the change is being kept on by default.
+
+When that is true for the change just evaluated:
+
+1. Redraw the affected Mermaid figure if a stage was added, removed,
+   moved, or changed its default (a dashed node is opt-in; a solid one
+   is on).
+2. Update that stage's row in the stage table and, if it has a knob,
+   the defaults table.
+3. Append one entry to the **Change log** at the bottom: date, what
+   changed, dataset, score before → after (strict N/M), the RUNLOG
+   `note` of the winning arm, and the commit once it exists.
+
+When the arm **misses** its gate and the change stays off, still add a
+one-line "tried, did not ship" entry with the number — that is what
+stops the same experiment being re-run blindly next month. Do not
+touch the figures for a change that did not ship.
+
 ## Reporting back
 
 When all requested steps are done, report:

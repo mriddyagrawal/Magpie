@@ -89,6 +89,7 @@ def run_one(ask_sync, q: dict, *, provider: str, top_k: int, rewrite: bool, fast
             "provider": provider,
             "magpie_answer": r.answer,
             "magpie_sources_used": r.sources_used,
+            "magpie_evidence": list(getattr(r, "evidence", []) or []),
             "magpie_retrieved": [
                 {"path": x.path, "score": x.score} for x in r.retrieved
             ],

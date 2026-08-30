@@ -702,6 +702,7 @@ def build_agent(
     fallback: T | None,
     *,
     provider_override: str | None = None,
+    schema_exclude: "tuple[str, ...] | frozenset[str]" = (),
 ) -> ChatAgent[T]:
     """Construct a ChatAgent for the active provider (or an override).
 
@@ -716,13 +717,17 @@ def build_agent(
     - `provider_override` — build against a specific provider name instead
       of `LLM_PROVIDER`. Used by the fallback path so we can spin up a
       backup agent (e.g. Ollama) without mutating env vars.
+    - `schema_exclude` — field names left OUT of the local grammar. The
+      pydantic model keeps them (with their defaults); the sampler is just
+      never asked to emit them. Lets an optional field such as
+      `Answer.evidence` cost nothing when its mode is off.
     """
     cfg = (
         PROVIDERS[provider_override] if provider_override is not None
         else active_provider()
     )
     if cfg.name == "local":
-        return LocalAgent(system_prompt, output_type, fallback)
+        return LocalAgent(system_prompt, output_type, fallback, schema_exclude=schema_exclude)
     if cfg.name == "magpie-cloud":
         # Cloud-managed path: prompts live server-side, the desktop just
         # POSTs questions/snippets to /llm/* endpoints. system_prompt and
@@ -1146,6 +1151,7 @@ class LocalAgent(Generic[T]):
         system_prompt: str,
         output_type: type[T],
         fallback: T | None,
+        schema_exclude: "tuple[str, ...] | frozenset[str]" = (),
     ) -> None:
         self._system_prompt = system_prompt
         self._output_type = output_type
@@ -1164,6 +1170,10 @@ class LocalAgent(Generic[T]):
         # Without it, the model could legally emit extra fields and the
         # grammar wouldn't reject them.
         schema = output_type.model_json_schema()
+        for name in schema_exclude:
+            (schema.get("properties") or {}).pop(name, None)
+            if name in (schema.get("required") or []):
+                schema["required"] = [r for r in schema["required"] if r != name]
         if schema.get("type") == "object" and "additionalProperties" not in schema:
             schema["additionalProperties"] = False
         self._response_format: dict[str, Any] = {

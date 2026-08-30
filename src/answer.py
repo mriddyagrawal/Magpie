@@ -23,7 +23,8 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 from src.content import SummarizeError, build_content_blocks
-from src.grounding import looks_fabricated, strip_generated_blocks
+from src import grounding
+from src.grounding import strip_generated_blocks
 from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
 from src.llm import ChatAgent, build_agent
 from src.manifest import APP_DATA_DIR, Manifest
@@ -196,6 +197,23 @@ class Answer(BaseModel):
     # first, verdict second: the model states what it found, then judges
     # whether that constitutes an answer — the decision now follows the
     # evidence instead of preceding it.
+    # Evidence first (2026-08-29): the span the model is reading from is
+    # generated BEFORE the answer, so the answer is written with the quote in
+    # the recency zone instead of a quote being invented afterwards to match
+    # the answer. Copying is the easiest thing a small model does; the guard
+    # (src/grounding.py, MAGPIE_GROUNDING=evidence) then checks the copy
+    # against the files — no magnitude floor, no arithmetic table. Optional
+    # in pydantic so a cloud reply without the key still validates; it is in
+    # the local grammar only when evidence mode is on (build_answer_agent).
+    evidence: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Exact sentences or table lines copied verbatim from the files "
+            "that state the facts the answer uses — every number, name and "
+            "date in the answer must appear in these spans. Empty when "
+            "not_found=true."
+        ),
+    )
     answer: str = Field(
         ...,  # required: in not-found cases the model emits an empty string,
               # not a missing field — the strict JSON schema requires presence.
@@ -367,6 +385,34 @@ _SUMMARY_NOTE = (
 # keep an explicit spec. Placed at the bottom of the message: after
 # thousands of tokens of file content, the recency zone is where a format
 # contract survives.
+# EVIDENCE MODE (MAGPIE_GROUNDING=evidence): the model quotes before it
+# answers. Injected into the user message like the other MODE blocks, so the
+# default arm's prompt is byte-identical to before. Mirrored in
+# server/magpie_server/prompts.py:ANSWER_EVIDENCE_BLOCK (parity-tested).
+_EVIDENCE_BLOCK = (
+    "EVIDENCE: before writing the answer, copy into `evidence` the exact "
+    "sentence(s) or table line(s) from the files that state the facts you "
+    "will use — verbatim, character for character, one span per fact. Every "
+    "number, name and date in your answer must appear in those spans (a "
+    "total you compute must have its parts quoted). If you cannot find a "
+    "span to quote, the answer is not in the files: leave `evidence` empty "
+    "and set not_found=true."
+)
+
+# Cloud output contract when evidence mode is on — five keys, evidence first.
+_FORMAT_BLOCK_CLOUD_EVIDENCE = (
+    "OUTPUT FORMAT: respond with a single raw JSON object — no markdown "
+    "fences, no prose before or after — with exactly these five keys in "
+    "this order:\n"
+    "{\"evidence\": [<verbatim span copied from a file>, ...], "
+    "\"answer\": <string>, \"sources_used\": [<file number as a string>, ...], "
+    "\"not_found\": <boolean>, \"not_found_topic\": <string>}\n"
+    "Example: {\"evidence\": [\"Department Chair: Dr. Elena Marquez\"], "
+    "\"answer\": \"The chair is Dr. Elena Marquez[1].\", "
+    "\"sources_used\": [\"2\"], "
+    "\"not_found\": false, \"not_found_topic\": \"\"}"
+)
+
 _FORMAT_BLOCK_CLOUD = (
     "OUTPUT FORMAT: respond with a single raw JSON object — no markdown "
     "fences, no prose before or after — with exactly these four keys in "
@@ -458,6 +504,20 @@ def _local_provider() -> bool:
         return False
 
 
+def _evidence_mode() -> bool:
+    """Evidence mode is on AND this provider lets us ask for quotes. The
+    magpie-cloud server composes its own prompt, so its replies carry no
+    `evidence`; there the guard falls back to the numerals check."""
+    if grounding.mode() != "evidence":
+        return False
+    try:
+        from src.llm import active_provider
+
+        return active_provider().name != "magpie-cloud"
+    except Exception:  # noqa: BLE001 — never block a query on provider lookup
+        return True
+
+
 def _needs_prompted_format() -> bool:
     """True when the active provider enforces JSON by prompt rather than
     grammar. On any doubt, include the block: the cost is ~120 tokens; the
@@ -490,7 +550,13 @@ def build_answer_agent(*, cite_inline: bool | None = None) -> ChatAgent[Answer]:
             cite_inline = effective_settings().cite_sources_inline
         except Exception:  # noqa: BLE001
             cite_inline = True  # safe default — match the original behavior
-    return build_agent(_resolve_system_prompt(cite_inline), Answer, _ANSWER_FALLBACK)
+    # `evidence` stays out of the local grammar unless evidence mode is on,
+    # so the default arm's generation is byte-for-byte what it was; the
+    # pydantic field's default ([]) covers the parsed result either way.
+    exclude = () if _evidence_mode() else ("evidence",)
+    return build_agent(
+        _resolve_system_prompt(cite_inline), Answer, _ANSWER_FALLBACK, schema_exclude=exclude
+    )
 
 
 def _strip_fragment(p: str) -> str:
@@ -824,8 +890,8 @@ async def answer_question(
                 file=sys.stderr,
             )
             LAST_ROUTE["extractive"] = 1.0
-            return Answer(answer=span, sources_used=[display], not_found=False,
-                          not_found_topic="")
+            return Answer(evidence=[span], answer=span, sources_used=[display],
+                          not_found=False, not_found_topic="")
         print("  extractive: no confident span, falling through to the reader",
               file=sys.stderr)
 
@@ -860,6 +926,9 @@ async def answer_question(
     if "Content type: llm-summary" in _flags_text:
         intro_parts.append("")
         intro_parts.append(_SUMMARY_NOTE)
+    if _evidence_mode():
+        intro_parts.append("")
+        intro_parts.append(_EVIDENCE_BLOCK)
     if _MATH_SIGNALS.search(_flags_text):
         intro_parts.append("")
         intro_parts.append(_MATH_BLOCK)
@@ -1015,7 +1084,9 @@ async def answer_question(
     # Prompt-enforced JSON contract, cloud only — the local grammar makes
     # it unnecessary (see _FORMAT_BLOCK_CLOUD for the full rationale).
     if _needs_prompted_format():
-        message.append(f"\n{_FORMAT_BLOCK_CLOUD}")
+        message.append(
+            f"\n{_FORMAT_BLOCK_CLOUD_EVIDENCE if _evidence_mode() else _FORMAT_BLOCK_CLOUD}"
+        )
 
     # Echo the question once more at the bottom (query-aware
     # contextualization). Liu et al. found this had minimal impact on
@@ -1052,51 +1123,52 @@ async def answer_question(
             )
         ans.answer = ""
         ans.sources_used = []
+        ans.evidence = []
         return ans
 
-    # Groundedness guard. Every number in the answer is checked against the
-    # text the model was actually shown; if NONE of them appear there (and
-    # none is the sum of numbers that do), the answer is a fabrication and
-    # the honest output is the not-found contract. Measured on the sem6
-    # absence probe: asked what he paid for his dorm room — a figure no file
-    # in the corpus contains — the model answered "$159.00". Deterministic,
-    # no extra model call, and deliberately conservative: an answer with one
-    # bad figure among good ones is a misreading the citations let the user
-    # check, and it passes through untouched. See src/grounding.py.
-    # The guard can only check figures against TEXT. When the model was
-    # shown an image (a photographed receipt, a scan), the figures it read
-    # live in pixels the regex never sees, and every correct total or date
-    # looked invented: 22 of 40 SROIE receipt answers were erased this way
-    # on 2026-08-29. With an image in the context the model's reading is
-    # the only reading there is, so the guard stands down.
+    # Groundedness guard — src/grounding.py. Which check runs is
+    # MAGPIE_GROUNDING (numerals | evidence | off); what a failure does is
+    # MAGPIE_GROUNDING_ACTION (refuse | warn). The guard can only compare
+    # against TEXT: when the model was shown an image (a photographed
+    # receipt, a scan without a transcript) the figures it read live in
+    # pixels no string search sees, and every correct total looked invented
+    # — 22 of 40 SROIE receipt answers were erased that way on 2026-08-29.
+    # With an image in the context the model's reading is the only reading
+    # there is, so the guard stands down.
     _saw_images = any(
         not isinstance(b, str) for _d, blocks in per_file_blocks for b in blocks
     )
-    if ans.answer and not _saw_images:
-        # Index-time LLM summaries do NOT count as support for a figure. A
-        # summary is the model's own earlier output; letting it ground a
-        # later answer is how a fabrication launders itself into a fact.
-        # Measured on the 40-question sem6 set: score-neutral (31/40 either
-        # way) and it converted two invented figures — a €2,500.00 salary and
-        # a postcode — into honest refusals. MAGPIE_STRICT_GROUNDING=0 turns
-        # it off for anyone who would rather have the guess.
+    LAST_ROUTE["grounding_flagged"] = 0.0
+    if ans.answer and not _saw_images and grounding.mode() != "off":
+        # Index-time LLM summaries do NOT count as support. A summary is the
+        # model's own earlier output; letting it ground a later answer is how
+        # a fabrication launders itself into a fact (sem6: an invented
+        # €2,500.00 salary and a postcode). MAGPIE_STRICT_GROUNDING=0 lets
+        # them count.
         _blocks = [
             b for _d, blocks in per_file_blocks for b in blocks if isinstance(b, str)
         ]
         if os.environ.get("MAGPIE_STRICT_GROUNDING", "1").strip() != "0":
             _blocks = strip_generated_blocks(_blocks)
-        context_text = "\n".join(_blocks)
-        if looks_fabricated(ans.answer, context_text):
+        verdict = grounding.check(
+            ans.answer,
+            "\n".join(_blocks),
+            evidence=list(ans.evidence) if _evidence_mode() else None,
+            question=question,
+        )
+        if not verdict.ok:
+            LAST_ROUTE["grounding_flagged"] = 1.0
             print(
-                "  note: every figure in the answer is absent from the files "
-                "read; returning not-found instead",
+                f"  grounding ({verdict.mode}, {grounding.action()}): {verdict.reason}",
                 file=sys.stderr,
             )
-            ans.not_found = True
-            ans.not_found_topic = ans.not_found_topic or question.strip().rstrip("?")
-            ans.answer = ""
-            ans.sources_used = []
-            return ans
+            if grounding.action() == "refuse":
+                ans.not_found = True
+                ans.not_found_topic = ans.not_found_topic or question.strip().rstrip("?")
+                ans.answer = ""
+                ans.sources_used = []
+                ans.evidence = []
+                return ans
 
     ans.sources_used = resolve_sources(
         ans.sources_used, [display for display, _ in ordered_blocks]

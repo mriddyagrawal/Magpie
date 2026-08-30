@@ -59,6 +59,12 @@ def isolated_app_data(
     import dotenv
     monkeypatch.setattr(dotenv, "load_dotenv", lambda *a, **kw: False)
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    # A dev machine's real src/config/bundled_key.txt (gitignored,
+    # production-build artifact) otherwise feeds the bootstrap's bundled
+    # fallback and every "unconfigured" assertion sees a real key. Must be
+    # stubbed HERE, after the reload - an earlier patch dies with it
+    # (test-suite triage 2026-08-30).
+    monkeypatch.setattr(sec, "_bundled_key", lambda: "")
 
     try:
         yield tmp_path

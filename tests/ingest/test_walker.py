@@ -235,3 +235,22 @@ def test_walker_force_reingests_unchanged_files(isolated, tmp_path: Path):
     second_md = list(sdir.glob("*_t1.md"))[0]
     # mtime should have advanced — force wrote a fresh summary
     assert second_md.stat().st_mtime >= first_mtime
+
+
+def test_root_full_of_receipt_photos_is_indexed(tmp_path):
+    """A folder the user explicitly added is never treated as an asset
+    library: thirty receipt photos and no documents is what a receipts
+    folder looks like. The same shape one level down still is one."""
+    from src.ingest.walker import find_candidates
+
+    for i in range(20):
+        (tmp_path / f"receipt_{i:03d}.jpg").write_bytes(b"\xff\xd8\xff" + b"0" * 4000)
+    sub = tmp_path / "icons"
+    sub.mkdir()
+    for i in range(20):
+        (sub / f"icon_{i:03d}.png").write_bytes(b"\x89PNG\r\n\x1a\n" + b"0" * 4000)
+    files, _ignored, asset_skipped = find_candidates(tmp_path)
+    names = {f.name for f in files}
+    assert all(f"receipt_{i:03d}.jpg" in names for i in range(20))
+    assert not any(n.startswith("icon_") for n in names)
+    assert asset_skipped == 20

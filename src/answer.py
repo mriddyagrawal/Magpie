@@ -1063,7 +1063,16 @@ async def answer_question(
     # no extra model call, and deliberately conservative: an answer with one
     # bad figure among good ones is a misreading the citations let the user
     # check, and it passes through untouched. See src/grounding.py.
-    if ans.answer:
+    # The guard can only check figures against TEXT. When the model was
+    # shown an image (a photographed receipt, a scan), the figures it read
+    # live in pixels the regex never sees, and every correct total or date
+    # looked invented: 22 of 40 SROIE receipt answers were erased this way
+    # on 2026-08-29. With an image in the context the model's reading is
+    # the only reading there is, so the guard stands down.
+    _saw_images = any(
+        not isinstance(b, str) for _d, blocks in per_file_blocks for b in blocks
+    )
+    if ans.answer and not _saw_images:
         # Index-time LLM summaries do NOT count as support for a figure. A
         # summary is the model's own earlier output; letting it ground a
         # later answer is how a fabrication launders itself into a fact.

@@ -96,19 +96,27 @@ def ensure_fast_collection(*, recreate: bool = False) -> None:
     if recreate and client.collection_exists(FAST_COLLECTION_NAME):
         client.delete_collection(FAST_COLLECTION_NAME)
     if not client.collection_exists(FAST_COLLECTION_NAME):
-        client.create_collection(
-            collection_name=FAST_COLLECTION_NAME,
-            vectors_config=VectorParams(
-                size=FAST_VECTOR_DIM,
-                distance=Distance.COSINE,
-                multivector_config=MultiVectorConfig(
-                    comparator=MultiVectorComparator.MAX_SIM,
+        try:
+            client.create_collection(
+                collection_name=FAST_COLLECTION_NAME,
+                vectors_config=VectorParams(
+                    size=FAST_VECTOR_DIM,
+                    distance=Distance.COSINE,
+                    multivector_config=MultiVectorConfig(
+                        comparator=MultiVectorComparator.MAX_SIM,
+                    ),
+                    quantization_config=_QUANT_CONFIG,
+                    on_disk=True,
+                    hnsw_config=_HNSW_CONFIG,
                 ),
-                quantization_config=_QUANT_CONFIG,
-                on_disk=True,
-                hnsw_config=_HNSW_CONFIG,
-            ),
-        )
+            )
+        except Exception as e:  # noqa: BLE001
+            # The walker's workers all reach this line at once on a fresh
+            # index; whoever loses the race gets a 409 "already exists" from
+            # Qdrant. That is success, not an error — the first SROIE index
+            # (2026-08-29) lost three receipts to it.
+            if "already exists" not in str(e):
+                raise
 
     try:
         client.create_payload_index(

@@ -371,6 +371,13 @@ def find_candidates(
             pre_accepted.append(p)
 
     asset_folders = _asset_library_folders(pre_accepted)
+    # The folder the user pointed at is never an asset library, whatever its
+    # shape: a receipts folder is thirty photographed receipts and no
+    # documents, which is exactly the signature this rule skips — the first
+    # SROIE index (2026-08-29) dropped all 60 receipts and indexed nothing.
+    # Subfolders keep the rule; the root is the user's explicit choice.
+    asset_folders.discard(root.resolve())
+    asset_folders.discard(root)
     accepted: list[Path] = []
     asset_skipped = 0
     for p in pre_accepted:

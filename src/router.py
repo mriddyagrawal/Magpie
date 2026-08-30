@@ -1202,7 +1202,13 @@ def decide(
         )
         t4_fits_budget = (t4_budget_used_mb + t4_mb) <= budget_cap
         if t4_fits_per_file and t4_fits_budget:
-            routes = ["T4"] if criticality != "critical" else ["T3", "T4"]
+            # Always T3 as well. An image routed to T4 alone has no summary,
+            # so it exists only for the ColPali visual tier — which the ask
+            # bar does not query by default. A folder of photographed
+            # receipts was therefore invisible to every ordinary question
+            # (the "it ignores images" complaint, 2026-08-29). The VL model
+            # reads a receipt fine; it just was never asked to.
+            routes = ["T3", "T4"]
             notes.append(f"image → {'+'.join(routes)}")
             return RouteDecision(
                 routes=routes, visual_score=vs, sensitivity_score=ss,

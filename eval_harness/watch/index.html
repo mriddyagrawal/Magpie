@@ -27,29 +27,51 @@
   .pill.complete { color: var(--ok); border-color: var(--ok); }
   .pill.failed, .pill.failed_isolation { color: var(--bad); border-color: var(--bad); }
   .pill.stale { color: var(--warn); border-color: var(--warn); }
-  .grid { display: flex; flex-direction: column; gap: 10px; }
-  .phase {
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 8px; padding: 12px 14px;
+
+  /* ---- stepper list ---- */
+  .steps { display: flex; flex-direction: column; }
+  .step {
+    display: grid; grid-template-columns: 26px 1fr auto;
+    gap: 0 10px; align-items: baseline;
+    padding: 9px 12px; border: 1px solid var(--line); border-top-width: 0;
+    background: var(--panel);
   }
-  .phase .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
-  .phase .name { font-weight: 600; }
-  .phase .meta { color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; }
+  .step:first-child { border-top-width: 1px; border-radius: 8px 8px 0 0; }
+  .step:last-child { border-radius: 0 0 8px 8px; }
+  .step.sub .name { padding-left: 18px; }
+  .step .name { font-weight: 600; }
+  .step .meta { color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .step .extra { grid-column: 2 / 4; }
+  /* pending: greyed out until the step starts */
+  .step.pending { opacity: .38; background: transparent; }
+  .step.pending .name { font-weight: 400; }
+  .step.done .icon { color: var(--ok); }
+  .step.running .icon { color: var(--accent); }
+  .step.waiting .icon { color: var(--warn); }
+  .step.failed .icon { color: var(--bad); }
+  .icon { text-align: center; }
+  .step.running .icon i, .step.waiting .icon i {
+    display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: currentColor; animation: pulse 1.2s ease-in-out infinite;
+  }
+  .step.waiting .icon i { background: transparent; border: 2px solid currentColor; }
+  @keyframes pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .step.running .icon i, .step.waiting .icon i { animation: none; }
+    .bar.indet > i { animation: none; width: 100%; opacity: .35; }
+  }
   .bar {
-    height: 8px; background: var(--panel2); border-radius: 4px;
-    margin-top: 9px; overflow: hidden; position: relative;
+    height: 7px; background: var(--panel2); border-radius: 4px;
+    margin-top: 8px; overflow: hidden;
   }
   .bar > i {
     display: block; height: 100%; background: var(--accent);
     border-radius: 4px; width: 0; transition: width .6s ease;
   }
-  .phase.done .bar > i { background: var(--ok); }
-  .bar.indet > i {
-    width: 30%; animation: slide 1.4s ease-in-out infinite alternate;
-  }
+  .bar.indet > i { width: 30%; animation: slide 1.4s ease-in-out infinite alternate; }
   @keyframes slide { from { margin-left: 0; } to { margin-left: 70%; } }
-  @media (prefers-reduced-motion: reduce) { .bar.indet > i { animation: none; width: 100%; opacity: .35; } }
-  .current { color: var(--dim); font-size: 12px; margin-top: 7px; overflow-wrap: anywhere; }
+  .current { color: var(--dim); font-size: 12px; margin-top: 6px; overflow-wrap: anywhere; }
+
   .logbox {
     margin-top: 18px; background: #0b0e12; border: 1px solid var(--line);
     border-radius: 8px; padding: 10px 12px;
@@ -57,7 +79,7 @@
   .logbox .cap { color: var(--dim); font-size: 11px; margin-bottom: 6px; }
   pre {
     margin: 0; font-size: 11px; line-height: 1.45; color: #a9b4c0;
-    max-height: 300px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+    max-height: 280px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
   }
   .foot { color: var(--dim); font-size: 11px; margin-top: 16px; }
   a { color: var(--accent); }
@@ -66,14 +88,15 @@
 <body>
   <h1>Magpie eval <span id="status" class="pill">connecting…</span></h1>
   <div class="sub" id="sub">looking for a run…</div>
-  <div class="grid" id="phases"></div>
+  <div class="steps" id="steps"></div>
   <div class="logbox" id="logbox" hidden>
     <div class="cap" id="logcap"></div>
     <pre id="log"></pre>
   </div>
   <div class="foot">
-    polls <code>progress.json</code> every 2s — written by the harness itself, no
-    narrator in the loop. Pin a run with <code>?run=&lt;run_id&gt;</code>.
+    harness steps stream from <code>progress.json</code> (written by the run
+    itself); agent steps flip when their artifact file lands in the run dir.
+    Polls every 2s. Pin a run with <code>?run=&lt;run_id&gt;</code>.
     <span id="runs"></span>
   </div>
 
@@ -82,10 +105,9 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const qsRun = new URLSearchParams(location.search).get("run");
-  const PHASE_ORDER = ["index", "answer", "retrieve", "enrich", "judge"];
   const PHASE_LOG = { index: "worker_index.log", answer: "worker_answer.log", retrieve: "worker_retrieve.log" };
   let runId = qsRun || null;
-  const samples = {};   // phase -> [[ms, done], ...] for client-side rate/ETA
+  const samples = {};
 
   const fmtDur = s => {
     if (!isFinite(s) || s < 0) return "—";
@@ -93,7 +115,16 @@
     const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
     return h ? `${h}h ${String(m).padStart(2,"0")}m` : m ? `${m}m ${String(sec).padStart(2,"0")}s` : `${sec}s`;
   };
+  const fmtClock = epochS => {
+    if (!epochS) return "";
+    const d = new Date(epochS * 1000);
+    return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  };
+  const fmtKB = b => b == null ? "" : b >= 1048576 ? (b/1048576).toFixed(1)+" MB" : Math.max(1, Math.round(b/1024))+" KB";
   const parseUtc = t => t ? Date.parse(t) : NaN;
+  // run.json stamps compact UTC (20260830T121044Z) — expand for Date.parse
+  const parseStamp = t => t ? Date.parse(String(t).replace(
+    /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/, "$1-$2-$3T$4:$5:$6Z")) : NaN;
 
   async function j(url) {
     const r = await fetch(url, { cache: "no-store" });
@@ -103,7 +134,7 @@
 
   async function findRun() {
     if (qsRun) { runId = qsRun; return; }
-    try { runId = (await j("/api/latest")).run_id || runId; } catch (e) { /* no run yet */ }
+    try { runId = (await j("/api/latest")).run_id || runId; } catch (e) {}
   }
 
   function eta(phase, done, total) {
@@ -114,47 +145,73 @@
     if (arr.length < 2) return null;
     const [t0, d0] = arr[0], [t1, d1] = arr[arr.length - 1];
     if (d1 <= d0 || t1 <= t0) return null;
-    const rate = (d1 - d0) / ((t1 - t0) / 1000);  // items/s
+    const rate = (d1 - d0) / ((t1 - t0) / 1000);
     return { rate, secs: (total - done) / rate };
   }
 
-  function phaseCard(name, rec, isActive) {
+  const ICONS = { done: "✓", running: "<i></i>", waiting: "<i></i>", pending: "○", failed: "✗" };
+
+  // One row of the pipeline checklist. state: pending|running|waiting|done|failed
+  function row(name, state, meta, opts = {}) {
     const div = document.createElement("div");
-    div.className = "phase" + (rec.state === "done" ? " done" : "");
-    const countable = rec.total != null;
-    let meta = "";
-    if (rec.state === "done") {
-      const w = (parseUtc(rec.last_utc) - parseUtc(rec.first_utc)) / 1000;
-      meta = (countable ? `${rec.done ?? rec.total}/${rec.total} · ` : "") + `done in ${fmtDur(w)}`;
-    } else if (countable) {
-      const e = isActive ? eta(name, rec.done ?? 0, rec.total) : null;
-      meta = `${rec.done ?? 0}/${rec.total}` +
-             (e ? ` · ${e.rate.toFixed(2)}/s · ~${fmtDur(e.secs)} left` : "");
-    } else if (isActive) {
-      const w = (Date.now() - parseUtc(rec.first_utc)) / 1000;
-      meta = `running ${fmtDur(w)}`;
+    div.className = `step ${state}` + (opts.sub ? " sub" : "");
+    div.innerHTML = `<span class="icon">${ICONS[state] || "○"}</span>` +
+      `<span class="name">${name}</span><span class="meta">${meta || ""}</span>`;
+    if (opts.bar) {
+      const e = document.createElement("div");
+      e.className = "extra";
+      e.innerHTML = `<div class="bar${opts.bar.indet ? " indet" : ""}"><i style="width:${opts.bar.pct ?? 0}%"></i></div>`;
+      div.appendChild(e);
     }
-    const pct = countable && rec.total > 0 ? (100 * (rec.done ?? 0) / rec.total) : null;
-    div.innerHTML = `
-      <div class="row"><span class="name">${name}</span><span class="meta">${meta}</span></div>
-      <div class="bar${(!countable && rec.state !== "done") ? " indet" : ""}">
-        <i style="width:${rec.state === "done" ? 100 : (pct ?? 0)}%"></i></div>`;
-    const cur = rec.current || rec.note;
-    if (cur && rec.state !== "done") {
+    if (opts.current) {
       const c = document.createElement("div");
-      c.className = "current"; c.textContent = cur;
+      c.className = "extra current"; c.textContent = opts.current;
       div.appendChild(c);
     }
     return div;
+  }
+
+  // Harness phase (index/answer/retrieve/enrich) from progress.json records.
+  function harnessStep(name, rec, isActive, failed) {
+    if (!rec) return row(name, "pending", "");
+    const countable = rec.total != null;
+    if (rec.state === "done") {
+      const w = (parseUtc(rec.last_utc) - parseUtc(rec.first_utc)) / 1000;
+      const m = (countable ? `${rec.done ?? rec.total}/${rec.total} · ` : "") + `done in ${fmtDur(w)}`;
+      return row(name, "done", m);
+    }
+    const state = failed ? "failed" : "running";
+    if (countable) {
+      const e = isActive ? eta(name, rec.done ?? 0, rec.total) : null;
+      const m = `${rec.done ?? 0}/${rec.total}` + (e ? ` · ${e.rate.toFixed(2)}/s · ~${fmtDur(e.secs)} left` : "");
+      return row(name, state, m, {
+        bar: { pct: rec.total > 0 ? 100 * (rec.done ?? 0) / rec.total : 0 },
+        current: rec.current,
+      });
+    }
+    const w = (Date.now() - parseUtc(rec.first_utc)) / 1000;
+    return row(name, state, `running ${fmtDur(w)}`, { bar: { indet: true }, current: rec.note });
+  }
+
+  // Agent step known only by its artifact file: grey until eligible,
+  // "waiting" (amber pulse) once its predecessor finished, done on file.
+  function artifactStep(name, art, eligible, opts = {}) {
+    if (art && art.exists) {
+      return row(name, "done", `${fmtKB(art.size)} · ${fmtClock(art.mtime)}`, opts);
+    }
+    return row(name, eligible ? "waiting" : "pending",
+               eligible ? "awaiting artifact…" : "", opts);
   }
 
   async function tick() {
     await findRun();
     if (!runId) { $("sub").textContent = "no run yet — waiting for latest.json…"; return; }
 
-    let prog = null, run = null;
+    let prog = null, run = null, arts = null;
     try { prog = await j(`/api/run/${runId}/progress`); } catch (e) {}
     try { run = await j(`/api/run/${runId}/run`); } catch (e) {}
+    try { arts = await j(`/api/run/${runId}/artifacts`); } catch (e) {}
+    arts = arts || {};
 
     const status = (run && run.status) || (prog && prog.status) || "unknown";
     const st = $("status");
@@ -168,20 +225,67 @@
       ? `${runId} — ${run.config_name} on ${run.dataset} (${run.questions} questions, started ${run.started_utc})`
       : runId;
 
-    const box = $("phases");
-    box.textContent = "";
     const phases = (prog && prog.phases) || {};
-    const names = [...PHASE_ORDER.filter(p => phases[p]),
-                   ...Object.keys(phases).filter(p => !PHASE_ORDER.includes(p))];
-    if (!names.length) {
-      const d = document.createElement("div");
-      d.className = "sub";
-      d.textContent = prog ? "run started — no phase yet" : "no progress.json (pre-watcher run, or not started)";
-      box.appendChild(d);
-    }
-    for (const n of names) box.appendChild(phaseCard(n, phases[n], prog && prog.phase === n));
-
     const active = prog && prog.phase;
+    const failed = status.startsWith("failed");
+    const startedMs = run ? parseStamp(run.started_utc) : NaN;
+
+    const box = $("steps");
+    box.textContent = "";
+
+    // 1. golden set — exists before the run started = reused, not created
+    const g = arts.golden || {};
+    if (g.exists) {
+      const reused = isFinite(startedMs) && g.mtime * 1000 < startedMs - 5000;
+      box.appendChild(row("golden set", "done",
+        (reused ? "reused · " : "fresh · ") + `${fmtKB(g.size)} · ${fmtClock(g.mtime)}`));
+    } else {
+      box.appendChild(row("golden set", run ? "waiting" : "pending",
+                          run ? "not found for this dataset" : ""));
+    }
+
+    // 2-5. harness phases
+    const idx = phases.index ||
+      (run && run.index_store && run.index_store.hit
+        ? { state: "done", first_utc: run.started_utc, last_utc: run.started_utc, note: "index store hit" }
+        : null);
+    if (idx && idx.note === "index store hit") {
+      box.appendChild(row("index", "done", "mounted from store"));
+    } else {
+      box.appendChild(harnessStep("index", idx, active === "index", failed && active === "index"));
+    }
+    box.appendChild(harnessStep("answer", phases.answer, active === "answer", failed && active === "answer"));
+    box.appendChild(harnessStep("retrieve", phases.retrieve, active === "retrieve", failed && active === "retrieve"));
+    box.appendChild(harnessStep("enrich", phases.enrich, active === "enrich", failed && active === "enrich"));
+
+    // 6. judge — live marks when the judge wrapper ran with the sidecar,
+    // artifact fallback otherwise
+    const jv = arts.judge_verdicts || {}, jr = arts.judge_report || {};
+    const judgeRec = phases.judge;
+    const harnessDone = phases.enrich && phases.enrich.state === "done";
+    if (judgeRec && judgeRec.state !== "done" && !jv.exists) {
+      box.appendChild(harnessStep("judge", judgeRec, active === "judge", false));
+    } else if (jv.exists || (judgeRec && judgeRec.state === "done")) {
+      box.appendChild(row("judge", "done",
+        jv.exists ? `verdicts ${fmtKB(jv.size)} · ${fmtClock(jv.mtime)}` : "done"));
+    } else {
+      box.appendChild(row("judge", harnessDone ? "waiting" : "pending",
+                          harnessDone ? "awaiting judge…" : ""));
+    }
+    const judgeDone = jv.exists || (judgeRec && judgeRec.state === "done");
+    box.appendChild(artifactStep("judge report", jr, judgeDone, { sub: true }));
+
+    // 7. report agents — eligible once the judge is done
+    const ra = arts.report_answers || {}, rr = arts.report_retrieval || {}, ri = arts.report_indexing || {};
+    box.appendChild(artifactStep("report: answers", ra, judgeDone, { sub: true }));
+    box.appendChild(artifactStep("report: retrieval", rr, judgeDone, { sub: true }));
+    box.appendChild(artifactStep("report: indexing", ri, judgeDone, { sub: true }));
+
+    // 8. supervisor synthesis — eligible once all three reports exist
+    const reportsDone = ra.exists && rr.exists && ri.exists;
+    box.appendChild(artifactStep("supervisor report", arts.supervisor_report || {}, reportsDone));
+
+    // log tail for the active harness phase
     const logName = active && phases[active] && phases[active].state !== "done" ? PHASE_LOG[active] : null;
     if (logName) {
       try {

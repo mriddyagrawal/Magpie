@@ -57,6 +57,45 @@ def safe_run_dir(run_id: str) -> Path | None:
     return d if d.is_dir() else None
 
 
+# Skill-phase artifacts (magpie-eval SKILL.md): the golden set, judge, the
+# three report agents and the supervisor synthesis all announce completion
+# by writing a file with a fixed name. Statting those files gives the watch
+# page step states for the agent-driven phases WITHOUT instrumenting the
+# skill — an agent step is done exactly when its artifact exists.
+STEP_ARTIFACTS = {
+    "judge_verdicts": "judge_verdicts.json",
+    "judge_report": "JUDGE-REPORT.md",
+    "report_answers": "REPORT-answers.md",
+    "report_retrieval": "REPORT-retrieval.md",
+    "report_indexing": "REPORT-indexing.md",
+    "supervisor_report": "SUPERVISOR-REPORT.md",
+}
+
+
+def _stat_entry(path: Path) -> dict:
+    if not path.is_file():
+        return {"exists": False}
+    st = path.stat()
+    return {"exists": True, "mtime": st.st_mtime, "size": st.st_size}
+
+
+def artifact_stats(run_dir: Path) -> dict:
+    """Existence/mtime/size for every skill-phase artifact of one run, plus
+    the dataset's golden.json (mtime vs run start tells fresh vs reused)."""
+    out = {k: _stat_entry(run_dir / name) for k, name in STEP_ARTIFACTS.items()}
+    golden: dict = {"exists": False}
+    try:
+        record = json.loads((run_dir / "run.json").read_text(encoding="utf-8"))
+        ds = record.get("dataset", "")
+        if ds and _RUN_ID.match(ds):
+            golden = _stat_entry(EVAL / "datasets" / ds / "golden.json")
+            golden["dataset"] = ds
+    except Exception:  # noqa: BLE001 — run.json mid-write or absent
+        pass
+    out["golden"] = golden
+    return out
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "magpie-eval-watch/1"
 
@@ -125,6 +164,9 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if leaf == "run":
                 self._json_file(run_dir / "run.json")
+                return
+            if leaf == "artifacts":
+                self._json(200, artifact_stats(run_dir))
                 return
             if leaf == "tail":
                 q = parse_qs(url.query)

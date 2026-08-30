@@ -9,7 +9,8 @@ Replaces the old `src/ingest/ignore.py:IgnoreRules` with a layered config:
      (`exclude_paths`), global pattern rules, category toggles.
   3. Cascade-discovered files at every directory depth:
      - `.gitignore` (toggleable: `respect_gitignore`)
-     - `.nasignore` (legacy back-compat: `respect_nasignore`)
+     - `.magpieignore` (toggleable: `respect_magpieignore`; the legacy
+       `.nasignore` filename and `respect_nasignore` JSON key stay honored)
      - `.magpieinclude` / `.magpieexclude` (on-brand: `respect_magpie_inline_rules`)
 
 Single public entry point: `IndexingRules.should_index(path) -> (bool, str)`.
@@ -43,7 +44,7 @@ from pathlib import Path
 from typing import Optional
 
 import pathspec
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -53,12 +54,14 @@ from pydantic import BaseModel, Field
 # Order matters for explain-string clarity; we report the first match in
 # the cascade by file source.
 _INLINE_FILENAMES_GITIGNORE = (".gitignore",)
-_INLINE_FILENAMES_NASIGNORE = (".nasignore",)
+# Preferred name first; the legacy .nasignore filename stays honored so
+# existing users' opt-outs never silently stop working (2026-08-30 rename).
+_INLINE_FILENAMES_MAGPIEIGNORE = (".magpieignore", ".nasignore")
 _INLINE_FILENAMES_MAGPIE_EXCLUDE = (".magpieexclude",)
 _INLINE_FILENAMES_MAGPIE_INCLUDE = (".magpieinclude",)
 _ALL_INLINE_FILENAMES = (
     *_INLINE_FILENAMES_GITIGNORE,
-    *_INLINE_FILENAMES_NASIGNORE,
+    *_INLINE_FILENAMES_MAGPIEIGNORE,
     *_INLINE_FILENAMES_MAGPIE_EXCLUDE,
     *_INLINE_FILENAMES_MAGPIE_INCLUDE,
 )
@@ -147,8 +150,15 @@ class UserRules(BaseModel):
     exclude_paths: list[str] = Field(default_factory=list)
     global_rules: GlobalRules = Field(default_factory=GlobalRules)
     respect_gitignore: bool = True
-    respect_nasignore: bool = True
+    # New name; the legacy respect_nasignore JSON key is accepted on load
+    # (validation alias) and rewritten as this name on the next save.
+    respect_magpieignore: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("respect_magpieignore", "respect_nasignore"),
+    )
     respect_magpie_inline_rules: bool = True
+
+    model_config = ConfigDict(populate_by_name=True)
     ignore_hidden: bool = True
 
 
@@ -307,7 +317,9 @@ class _CascadeEntry:
     """
 
     gitignore: Optional[pathspec.PathSpec] = None
-    nasignore: Optional[pathspec.PathSpec] = None
+    # (filename, spec) pairs so the explain-string can name the exact file
+    # that matched — .magpieignore and legacy .nasignore are both honored.
+    magpieignore: Optional[list[tuple[str, pathspec.PathSpec]]] = None
     magpie_exclude: Optional[pathspec.PathSpec] = None
     magpie_include: Optional[pathspec.PathSpec] = None
 
@@ -509,8 +521,13 @@ class IndexingRules:
             return entry
         if self.user.respect_gitignore and ".gitignore" in names:
             entry.gitignore = _to_pathspec(_read_inline_rule_file(abs_dir / ".gitignore"))
-        if self.user.respect_nasignore and ".nasignore" in names:
-            entry.nasignore = _to_pathspec(_read_inline_rule_file(abs_dir / ".nasignore"))
+        if self.user.respect_magpieignore:
+            pairs = [
+                (n, _to_pathspec(_read_inline_rule_file(abs_dir / n)))
+                for n in _INLINE_FILENAMES_MAGPIEIGNORE if n in names
+            ]
+            if pairs:
+                entry.magpieignore = pairs
         if self.user.respect_magpie_inline_rules:
             if ".magpieexclude" in names:
                 entry.magpie_exclude = _to_pathspec(
@@ -614,7 +631,7 @@ class IndexingRules:
         if (
             self.user.respect_magpie_inline_rules
             or self.user.respect_gitignore
-            or self.user.respect_nasignore
+            or self.user.respect_magpieignore
         ):
             for ancestor in [p.parent, *p.parent.parents]:
                 if not _is_under(ancestor, root) and ancestor != root:
@@ -633,8 +650,9 @@ class IndexingRules:
                     return (False, f".magpieexclude in {ancestor}")
                 if cascade.gitignore and cascade.gitignore.match_file(rel_to_anc):
                     return (False, f".gitignore in {ancestor}")
-                if cascade.nasignore and cascade.nasignore.match_file(rel_to_anc):
-                    return (False, f".nasignore in {ancestor}")
+                for _ign_name, _ign_spec in (cascade.magpieignore or []):
+                    if _ign_spec.match_file(rel_to_anc):
+                        return (False, f"{_ign_name} in {ancestor}")
                 if ancestor == root:
                     break
 
@@ -682,7 +700,7 @@ class IndexingRules:
           - Directory itself is in `exclude_paths`
           - Directory NAME matches `magpie_defaults.exclude_dirs`
           - Directory matches a cascade-discovered exclude (magpie_exclude /
-            nasignore / gitignore) at a parent level
+            magpieignore / gitignore) at a parent level
 
         We do NOT prune on `include_paths` not containing the dir, because
         the walker may still need to descend if the user has added a child

@@ -425,6 +425,7 @@ def test_gitignore_in_subdir_rejects(root: Path) -> None:
 
 
 def test_nasignore_still_respected(root: Path) -> None:
+    """Legacy filename keeps working after the .magpieignore rename."""
     (root / ".nasignore").write_text("*.lock\n")
     f = root / "x.lock"
     f.write_text("x")
@@ -432,6 +433,30 @@ def test_nasignore_still_respected(root: Path) -> None:
     ok, reason = rules.should_index(f)
     assert ok is False
     assert ".nasignore" in reason
+
+
+def test_magpieignore_preferred_name(root: Path) -> None:
+    (root / ".magpieignore").write_text("*.lock\n")
+    f = root / "x.lock"
+    f.write_text("x")
+    rules = _build(root)
+    ok, reason = rules.should_index(f)
+    assert ok is False
+    assert ".magpieignore" in reason
+
+
+def test_magpieignore_and_legacy_compose(root: Path) -> None:
+    """Both files in one dir: each contributes patterns, explain names the
+    file that actually matched."""
+    (root / ".magpieignore").write_text("*.lock\n")
+    (root / ".nasignore").write_text("*.bak\n")
+    rules = _build(root)
+    for fname, expect_src in (("x.lock", ".magpieignore"), ("y.bak", ".nasignore")):
+        f = root / fname
+        f.write_text("x")
+        ok, reason = rules.should_index(f)
+        assert ok is False
+        assert expect_src in reason
 
 
 # ---------------------------------------------------------------------------

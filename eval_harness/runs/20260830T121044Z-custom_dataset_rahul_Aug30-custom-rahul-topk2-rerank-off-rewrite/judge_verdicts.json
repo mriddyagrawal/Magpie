@@ -1,0 +1,1540 @@
+{
+  "rubric_version": "2.0",
+  "judge_model": "claude-opus-5",
+  "run_id": "20260830T121044Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-rewrite",
+  "mode": "full_context",
+  "verdicts": {
+    "viz-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'Cheerios cereal'; chart_001.jpg lists cocoa lowest at 18.81 and has no cereal-brand entry."
+    },
+    "viz-01-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "'Cocoa, 18.81' matches the chart exactly, but the only citation is arxiv_025.png rather than chart_001.jpg."
+    },
+    "viz-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'Tweet #2' after the rewriter turned the query into a clock lookup that retrieved a receipt and a slide deck."
+    },
+    "viz-02-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "'South Korea' fully answers the question asked (which country was lowest); the 72% key fact is not requested by either phrasing."
+    },
+    "viz-03-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'Tweet #2' even though chart_005.jpg was retrieved at rank 1."
+    },
+    "viz-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found on an answerable question with the correct chart at rank 1."
+    },
+    "viz-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Structured not_found although chart_037.jpg, which carries both figures, was retrieved at rank 1."
+    },
+    "viz-04-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": true,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Gave 29% for the 2014 right/far-right share; chart_037.jpg shows 29% is the center-right band and the right-to-far-right band is 20%."
+    },
+    "viz-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'Mauritania', the top bar of chart_002.jpg; the country shared with chart_036.jpg is Madagascar."
+    },
+    "viz-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": true,
+        "2": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Named 'The United States' and read back all three chart_002.jpg bars; neither chart contains the US and the shared country is Madagascar."
+    },
+    "viz-06-typed": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "'6 billion' is the annual economic cost printed on info_024.jpg and is all the typed query asks for."
+    },
+    "viz-06-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "'$6 billion' and '1 in 10 adults' both appear verbatim on info_024.jpg, but the answer cites info_015.jpg instead of the gold source."
+    },
+    "viz-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found after the rewriter replaced the query with a date lookup, so info_001.jpg was never retrieved."
+    },
+    "viz-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found even though info_001.jpg was retrieved at rank 1."
+    },
+    "viz-08-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered '31.00' from a degraded receipt after the rewriter turned the query into a date lookup."
+    },
+    "viz-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with info_020.jpg retrieved at rank 1."
+    },
+    "viz-09-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Attributed the $6 billion diabetes cost to tourism and compared it against '1.7 million people', inverting the comparison the question asks for."
+    },
+    "viz-09-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": true
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Gets the $6 billion diabetes cost and the correct direction, but quotes tourism's direct GVA of $43.4 billion where info_013.jpg puts total contribution at $98 billion."
+    },
+    "viz-10-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered \"ob means outer\"; diagram_018.jpg states the prefix refers to a blade widest near the apex."
+    },
+    "viz-10-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Reproduces both caption sentences of diagram_018.jpg verbatim in substance, but cites nothing."
+    },
+    "viz-11-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Structured not_found although two acceptable food-web diagrams were retrieved."
+    },
+    "viz-11-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Named the leopard seal only and added penguins, which diagram_005.jpg labels separately; elephant seal and 'other seals' were missed."
+    },
+    "arch-01-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with doc_10877.jpg at rank 1."
+    },
+    "arch-01-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with doc_10877.jpg at rank 1."
+    },
+    "arch-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'Bouygues Telecom' while citing table_fr_001.jpg, whose BÉNÉFICE NET COURANT PAR ACTION line reads 4,58 for 2017."
+    },
+    "arch-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Structured not_found although table_fr_001.jpg was retrieved at rank 1 and states 4,58 in a bold summary row."
+    },
+    "arch-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with scan_fybg0227.pdf retrieved at rank 1."
+    },
+    "arch-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with scan_fybg0227.pdf retrieved at rank 1."
+    },
+    "arch-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with scan_mtnh0227.pdf retrieved at rank 1."
+    },
+    "arch-04-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "'55.25' is the balance due the question asks for; the invoice number A-3088 is not requested, but the answer cites no file."
+    },
+    "arch-05-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered the abstaining prose 'Not found' on an answerable question, after the rewriter replaced the query with a clock lookup."
+    },
+    "arch-05-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with the gold leaflet doc_357.jpg retrieved at rank 1."
+    },
+    "arch-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'Fort Morgan Sugar Factory', restating the query subject instead of supplying the dissolved-solids or pH values."
+    },
+    "arch-06-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found despite a 12-document retrieval led by scan_gzyh0227.pdf."
+    },
+    "arch-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with both gold KLM Cargo tables at ranks 1 and 2."
+    },
+    "arch-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with both gold KLM Cargo tables at ranks 1 and 2."
+    },
+    "arch-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with scan_psjf0226.pdf retrieved at rank 1."
+    },
+    "arch-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with scan_psjf0226.pdf retrieved at rank 1."
+    },
+    "arch-09-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with both gold documents at ranks 1 and 2."
+    },
+    "arch-09-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with both gold documents at ranks 1 and 2."
+    },
+    "arch-10-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with table_fr_005.jpg retrieved at rank 1."
+    },
+    "arch-10-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with table_fr_005.jpg retrieved at rank 1."
+    },
+    "study-01-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with CseGyan-Cpp-Notes-1.pdf retrieved at rank 1."
+    },
+    "study-01-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": true,
+        "2": true,
+        "3": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gives 1979 and Bell Labs but omits Bjarne Stroustrup, the creator the question explicitly asks for."
+    },
+    "study-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false,
+        "7": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'C++ features'; CseGyan-Cpp-Notes-3.pdf shows a 'Concepts of OOPs' bubble with eight named branches."
+    },
+    "study-02-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false,
+        "7": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'C++ features' while citing the correct page, which legibly lists Object, Class, Inheritance, Message Passing, Polymorphism, Abstraction, Encapsulation and Dynamic Binding."
+    },
+    "study-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with deck_022.pdf as the sole retrieved document."
+    },
+    "study-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Empty answer caused by a 400 Bad Request from the local model endpoint; nothing was retrieved."
+    },
+    "study-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found after the rewriter replaced the query with a clock lookup that retrieved a slide deck and a receipt."
+    },
+    "study-04-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly calls it the ternary operator but supplies neither the written syntax line nor the int a = (b > c) ? b : c; example the question asks for."
+    },
+    "study-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Returned the electric-field-lines properties instead of the dipole torque derivation, and cited nothing."
+    },
+    "study-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": true,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "States 'Unstable when 90 degrees'; electric-charge-and-field-9.pdf marks 180 degrees as unstable and 90 degrees as maximum torque."
+    },
+    "study-06-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Correctly frames arxiv_017.png as a train/validation/test split with colour-highlighted bars but gives none of the fold assignments."
+    },
+    "study-06-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Says the brackets group columns into pairs of train and validation folds; arxiv_017.png brackets folds 1-3 as train, 4 as validation and 5 as test."
+    },
+    "study-07-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Names Attribute SBM as the winner, which arxiv_004.png supports, but offers no axis, series or value detail."
+    },
+    "study-07-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": true,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Right direction and both series named, but 'higher across all Pin/Pout values' overstates arxiv_004.png, where the two curves converge near NMI 1 from Pin/Pout 5 onward."
+    },
+    "study-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Structured not_found with deck_027.pdf as the sole retrieved document; its pie chart labels every share."
+    },
+    "study-08-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Claims biosensors 30% and 'MEMS and microfluidics 40%'; the deck_027.pdf pie reads Biosensors 8% and LC/MS 38%, with MEMs appearing only as a box on an unrelated slide."
+    },
+    "study-09-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "States Q' is the outer product of 'query matrix V and key matrix K'; arxiv_029.png shows Q' x (K')^T x V built from phi(q) and phi(k) feature maps."
+    },
+    "study-09-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Describes Res2Net/PVT backbones and IC loss, which belong to arxiv_027.png, not the linear-attention figure arxiv_029.png."
+    },
+    "study-10-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered with a receipt line item ('Plastic', RM 31.00) after the rewriter replaced the query with a clock lookup."
+    },
+    "study-10-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Dumped raw OCR of the operators pages (Notes-14/15) and never reached the type-casting pages Notes-17 to 19."
+    },
+    "study-11-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with both gold decks at ranks 1 and 2."
+    },
+    "study-11-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with both gold decks at ranks 1 and 2."
+    },
+    "rcpt-01-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with receipt_014.jpg retrieved at rank 1."
+    },
+    "rcpt-01-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found despite a 12-receipt retrieval led by receipt_014.jpg."
+    },
+    "rcpt-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Echoed the query text back as the answer and cited receipt_035.jpg, a different receipt."
+    },
+    "rcpt-02-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Lists all four items correctly from bad_receipt_009.jpg but omits the 26.60 total the question also asks for."
+    },
+    "rcpt-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with receipt_022.jpg retrieved at rank 1."
+    },
+    "rcpt-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with receipt_022.jpg retrieved at rank 1."
+    },
+    "rcpt-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with bad_receipt_019.jpg retrieved at rank 1."
+    },
+    "rcpt-04-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gives the RM 86.00 fill-up cost but not the 35.10 litres, which is half of what the question asks; no citation."
+    },
+    "rcpt-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'SAM SAM TRADING CO'; bad_receipt_014.jpg is headed ASIA MART and carries the 17 x Delicia Chocolate line."
+    },
+    "rcpt-05-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Identifies Asia Mart correctly but gives no total and cites receipt_036.jpg instead of bad_receipt_014.jpg."
+    },
+    "rcpt-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Reported 'Total Sales (Inclusive of GST): 54.50' while citing receipt_021.jpg, whose printed total is Rp224,908."
+    },
+    "rcpt-06-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Structured not_found although receipt_021.jpg, which prints every requested line, was retrieved at rank 1."
+    },
+    "rcpt-07-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'RM 15.00' from receipt_005.jpg; the gold receipt_040.jpg was never retrieved."
+    },
+    "rcpt-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found; retrieval returned receipts 005 and 007, never the gold receipt_040.jpg."
+    },
+    "rcpt-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found despite a 12-receipt retrieval that included one of the three gold Mr D.I.Y. receipts."
+    },
+    "rcpt-08-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered '33.90' to a question asking for the combined total across all Mr D.I.Y. receipts, which is RM 101.90."
+    },
+    "rcpt-09-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'Original brewed tea was pricier', naming a shared line item rather than either visit total."
+    },
+    "rcpt-09-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with both gold receipts at ranks 1 and 2."
+    },
+    "phone-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'Scoutdoors' from screen_24626.jpg; screen_24184.jpg is titled Weather Notifications / Champaign, IL."
+    },
+    "phone-01-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "'Champaign, IL' matches the subtitle on screen_24184.jpg, which is among the cited files."
+    },
+    "phone-02-typed": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "'NUC5i7RYH' is the exact model asked for, but the sole citation is bad_receipt_013.jpg rather than the scene photo."
+    },
+    "phone-02-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "'NUC5i7RYH' is exactly the model number requested, though the answer cites bad_receipt_000.jpg instead of the gold photo."
+    },
+    "phone-03-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'order, tip well, walk away', text from the retrieved info_021.jpg infographic rather than the hat photo."
+    },
+    "phone-03-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "'Biltz' is a one-letter corruption of the Blitz Weinhard label legible on 1007129816.jpg, and drops Weinhard entirely."
+    },
+    "phone-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with scene_45bed83a9fdbc6e0.jpg retrieved at rank 1."
+    },
+    "phone-04-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found with scene_45bed83a9fdbc6e0.jpg retrieved at rank 1."
+    },
+    "phone-05-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Empty answer caused by a 400 Bad Request from the local model endpoint; retrieval never ran."
+    },
+    "phone-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'Gudrun Jabra / JUST NOW', a notification string from an unrelated screenshot, with screen_24509.jpg at rank 1."
+    },
+    "phone-06-typed": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "'Laganside 10K' is the race name on the bib, which is what the query asks; no file was cited."
+    },
+    "phone-06-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "'Laganside 10K' fully answers the race-name question; the Pure Running logo is not asked for, and no file was cited."
+    },
+    "phone-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Structured not_found despite a 12-file retrieval led by the gold photo 1080230428.jpg."
+    },
+    "phone-07-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Names Crocs, Bud Light, Herbalife and Nautica; the extra 'Lift Off' is a Herbalife product banner and does not contradict the gold, but nothing was cited."
+    },
+    "phone-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Structured not_found although screen_24243.jpg, which states both facts in two bullets, was retrieved at rank 1."
+    },
+    "phone-08-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered '5 stars', text from the period-tracker popup at rank 2; screen_24243.jpg says 8 trips and Group A boarding."
+    },
+    "phone-09-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Structured not_found after the rewriter replaced the query with a clock lookup that retrieved two receipts."
+    },
+    "phone-09-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "'XX' is the logo glyph on the sign; 1167908324.jpg prints DOS EQUIS above it, which is the brand the question asks for."
+    },
+    "phone-10-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Answered 'Sizzle!' while citing the gold photo, whose label reads 'The FIRST for THIRST - Drink Kay C - DELICIOUS ROOT BEER'."
+    },
+    "phone-10-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Gets the Kay C root beer brand but not the 'FIRST for THIRST' slogan the question also asks for, and cites the wrong photo."
+    },
+    "phone-11-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Says the popup asked for a donation; screen_24479.jpg reads 'We aren't asking you for a donation' and asks for 5 stars, so the negation was inverted."
+    },
+    "phone-11-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Empty answer caused by a 400 Bad Request from the local model endpoint; retrieval never ran."
+    },
+    "nf-01-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Supplied the concrete value '31.00' for a question whose correct response is that no passport scan exists."
+    },
+    "nf-01-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Explicitly stated that no passport or driving licence scan is present, which matches the verified absence."
+    },
+    "nf-02-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly on a topic with no matching file in the corpus."
+    },
+    "nf-02-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly and was not pulled in by the wedding-photo distractor."
+    },
+    "nf-03-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly despite retrieving doc_4679.jpg, the known 'Lease Agreements' lexical trap."
+    },
+    "nf-03-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "The bare 'No' is a correct denial, not a supplied value, so this is a correct abstention rather than a false answer."
+    },
+    "nf-04-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Supplied '1 January (one day off)' instead of declining; there are no Python notes in the corpus."
+    },
+    "nf-04-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'C++ Tutorials [1]' with two C++ note pages cited, presenting them as the requested Python notes."
+    },
+    "nf-05-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Supplied the receipt value '31.00' for a transcript query that should have been declined."
+    },
+    "nf-05-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly despite retrieving the NIH-biosketch distractor scan_xhwg0227.pdf."
+    },
+    "nf-06-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly with two arXiv figure distractors retrieved."
+    },
+    "nf-06-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly despite a 12-file retrieval full of arXiv figures."
+    },
+    "nf-07-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly on a topic with no matching file."
+    },
+    "nf-07-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly on a topic with no matching file."
+    },
+    "nf-08-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined correctly on the handwritten-chemistry-notes query."
+    },
+    "nf-08-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answered 'Yes' and named two electric-charge-and-field PDFs, which are physics notes, as the requested chemistry notes."
+    }
+  },
+  "golden_issues": [
+    {
+      "qa_id": "viz-02-typed",
+      "problem": "key_facts require '72%' but neither phrasing asks for the value - both ask only which country was lowest, so a bare 'South Korea' is a complete answer that the fact list scores as incomplete."
+    },
+    {
+      "qa_id": "viz-02-full",
+      "problem": "Same over-specified key_facts as viz-02-typed: '72%' is not requested by the question."
+    },
+    {
+      "qa_id": "viz-06-typed",
+      "problem": "The typed query asks only for the annual cost, but key_facts also require '1.7 million'; chart content is correct, the fact list is broader than the question."
+    },
+    {
+      "qa_id": "arch-04-typed",
+      "problem": "key_fact 'A-3088' is the invoice number, which neither phrasing asks for; both ask only for the balance due."
+    },
+    {
+      "qa_id": "arch-04-full",
+      "problem": "Same as arch-04-typed: 'A-3088' is not requested by the question."
+    },
+    {
+      "qa_id": "phone-02-typed",
+      "problem": "key_fact 'Intel' is redundant with 'NUC5i7RYH' - answering the exact model number is a complete answer to 'which model was it'."
+    },
+    {
+      "qa_id": "phone-02-full",
+      "problem": "Same as phone-02-typed: the 'Intel' fact adds nothing beyond the model number the question asks for."
+    },
+    {
+      "qa_id": "phone-06-typed",
+      "problem": "key_fact 'Pure Running' is the timing company's logo, not the race name; the question asks only what race is on the bib."
+    },
+    {
+      "qa_id": "phone-06-full",
+      "problem": "Same as phone-06-typed: 'Pure Running' is not part of the answer the question requests."
+    },
+    {
+      "qa_id": "viz-11-typed",
+      "problem": "gold_sources names diagram_003.jpg while eight further near-duplicate Antarctic food-web diagrams (004-011) are listed as acceptable; the corpus cannot distinguish which file the user meant, so per-file citation scoring is not meaningful here."
+    },
+    {
+      "qa_id": "study-06-typed",
+      "problem": "key_facts are multi-clause descriptive sentences ('ten columns labelled 1+ through 5- (plus and minus per fold)') rather than atomic facts, so a substantively partial description scores zero facts."
+    },
+    {
+      "qa_id": "study-07-typed",
+      "problem": "Same structural issue: key_facts bundle an axis label, a series list and numeric coordinates into single strings that cannot be matched or scored atomically."
+    },
+    {
+      "qa_id": "study-09-typed",
+      "problem": "Same structural issue: six compound descriptive key_facts for a figure-interpretation question make per-fact scoring unreliable."
+    },
+    {
+      "qa_id": "viz-09-typed",
+      "problem": "Not an error, but info_013.jpg prints four candidate figures ($43.4bn direct GVA, $47.5bn direct GDP, $87bn total GVA, $98bn total GDP); the gold answer should state that 'total contribution' means the $98 billion total GDP row so a near-miss like $43.4bn is unambiguously gradeable."
+    }
+  ],
+  "summary": {
+    "n": 120,
+    "correct": 12,
+    "partial": 13,
+    "wrong": 33,
+    "false_abstain": 46,
+    "correct_abstain": 11,
+    "false_answer": 5,
+    "by_phrasing": {
+      "typed": {
+        "correct": 3,
+        "n": 60
+      },
+      "full": {
+        "correct": 9,
+        "n": 60
+      }
+    },
+    "disagreements_with_deterministic": 23
+  },
+  "judge_model_self_report": "claude-opus-5",
+  "judge_model_source": "wrapper_requested (self-report advisory)",
+  "judge_model_requested": "claude-opus-5",
+  "rubric_sha": "47e93a279e70cef9",
+  "matcher_audit": {
+    "matrix": {
+      "wrong": {
+        "n": 36,
+        "judge_agrees": 28
+      },
+      "correct": {
+        "n": 3,
+        "judge_agrees": 3
+      },
+      "partial": {
+        "n": 20,
+        "judge_agrees": 6
+      },
+      "false_abstain": {
+        "n": 45,
+        "judge_agrees": 45
+      },
+      "false_answer": {
+        "n": 6,
+        "judge_agrees": 5
+      },
+      "correct_abstain": {
+        "n": 10,
+        "judge_agrees": 10
+      }
+    },
+    "matcher_precision": 1.0,
+    "note": "precision = P(judge also says correct | deterministic said correct)"
+  }
+}

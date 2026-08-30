@@ -4,46 +4,67 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Magpie eval — live progress</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='1' y='19' font-size='19' fill='%23D97757'%3E%E2%9C%B3%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #101418; --panel: #171d24; --panel2: #1d242d;
-    --text: #d7dde4; --dim: #8b96a3; --line: #2a333e;
-    --accent: #57b3ff; --ok: #4fc38a; --warn: #e0b653; --bad: #e06c5f;
+    --bg: #F0EEE6; --panel: #FBFAF4; --panel2: #E9E6DB;
+    --text: #1F1E1D; --dim: #75746C; --line: #E3E0D4;
+    --accent: #D97757; --accent2: #C96442;
+    --ok: #6F8F5C; --warn: #C4924F; --bad: #BF4D43;
+    --logbg: #262624; --logtext: #C9C6BB; --logline: #262624;
+    --shadow: 0 1px 3px rgba(31, 30, 29, .05);
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #262624; --panel: #30302E; --panel2: #3A3936;
+      --text: #EEECE2; --dim: #A6A39A; --line: #3E3D39;
+      --accent: #D97757; --accent2: #E08B6D;
+      --ok: #8FAF7C; --warn: #D4A27F; --bad: #E0857A;
+      --logbg: #1D1C1B; --logtext: #B8B5AB; --logline: #34332F;
+      --shadow: none;
+    }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     background: var(--bg); color: var(--text);
-    font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    padding: 24px; max-width: 980px; margin: 0 auto;
+    font: 15px/1.55 var(--serif);
+    padding: 36px 24px; max-width: 880px; margin: 0 auto;
   }
-  h1 { font-size: 15px; font-weight: 600; margin: 0 0 4px; letter-spacing: .02em; }
-  .sub { color: var(--dim); font-size: 12px; margin-bottom: 18px; overflow-wrap: anywhere; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 6px; letter-spacing: .01em; }
+  .spark { color: var(--accent); font-weight: 400; }
+  .sub { color: var(--dim); font-size: 12.5px; font-family: var(--mono); margin-bottom: 22px; overflow-wrap: anywhere; }
   .pill {
-    display: inline-block; padding: 1px 10px; border-radius: 999px;
-    font-size: 12px; border: 1px solid var(--line); vertical-align: 1px;
+    display: inline-block; padding: 2px 12px; border-radius: 999px;
+    font-size: 12px; font-family: var(--mono); vertical-align: 3px;
+    background: var(--panel2); color: var(--dim); border: 1px solid transparent;
   }
-  .pill.running  { color: var(--accent); border-color: var(--accent); }
-  .pill.complete { color: var(--ok); border-color: var(--ok); }
-  .pill.failed, .pill.failed_isolation { color: var(--bad); border-color: var(--bad); }
-  .pill.stale { color: var(--warn); border-color: var(--warn); }
+  .pill.running  { color: var(--accent2); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .pill.complete { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+  .pill.failed, .pill.failed_isolation { color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, transparent); }
+  .pill.stale { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
 
   /* ---- stepper list ---- */
-  .steps { display: flex; flex-direction: column; }
+  .steps { display: flex; flex-direction: column; box-shadow: var(--shadow); border-radius: 14px; }
   .step {
-    display: grid; grid-template-columns: 26px 1fr auto;
+    display: grid; grid-template-columns: 28px 1fr auto;
     gap: 0 10px; align-items: baseline;
-    padding: 9px 12px; border: 1px solid var(--line); border-top-width: 0;
+    padding: 11px 16px; border: 1px solid var(--line); border-top-width: 0;
     background: var(--panel);
   }
-  .step:first-child { border-top-width: 1px; border-radius: 8px 8px 0 0; }
-  .step:last-child { border-radius: 0 0 8px 8px; }
-  .step.sub .name { padding-left: 18px; }
+  .step:first-child { border-top-width: 1px; border-radius: 14px 14px 0 0; }
+  .step:last-child { border-radius: 0 0 14px 14px; }
+  .step.sub .name { padding-left: 20px; }
   .step .name { font-weight: 600; }
-  .step .meta { color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .step .meta { color: var(--dim); font-size: 12px; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
   .step .extra { grid-column: 2 / 4; }
   /* pending: greyed out until the step starts */
-  .step.pending { opacity: .38; background: transparent; }
+  .step.pending { opacity: .42; background: transparent; }
   .step.pending .name { font-weight: 400; }
   .step.done .icon { color: var(--ok); }
   .step.running .icon { color: var(--accent); }
@@ -61,32 +82,34 @@
     .bar.indet > i { animation: none; width: 100%; opacity: .35; }
   }
   .bar {
-    height: 7px; background: var(--panel2); border-radius: 4px;
+    height: 6px; background: var(--panel2); border-radius: 999px;
     margin-top: 8px; overflow: hidden;
   }
   .bar > i {
     display: block; height: 100%; background: var(--accent);
-    border-radius: 4px; width: 0; transition: width .6s ease;
+    border-radius: 999px; width: 0; transition: width .6s ease;
   }
   .bar.indet > i { width: 30%; animation: slide 1.4s ease-in-out infinite alternate; }
   @keyframes slide { from { margin-left: 0; } to { margin-left: 70%; } }
-  .current { color: var(--dim); font-size: 12px; margin-top: 6px; overflow-wrap: anywhere; }
+  .current { color: var(--dim); font-size: 12px; font-family: var(--mono); margin-top: 6px; overflow-wrap: anywhere; }
 
   .logbox {
-    margin-top: 18px; background: #0b0e12; border: 1px solid var(--line);
-    border-radius: 8px; padding: 10px 12px;
+    margin-top: 20px; background: var(--logbg); border: 1px solid var(--logline);
+    border-radius: 14px; padding: 12px 14px;
   }
-  .logbox .cap { color: var(--dim); font-size: 11px; margin-bottom: 6px; }
+  .logbox .cap { color: #8F8D84; font-size: 11px; font-family: var(--mono); margin-bottom: 6px; }
   pre {
-    margin: 0; font-size: 11px; line-height: 1.45; color: #a9b4c0;
+    margin: 0; font-size: 11px; line-height: 1.45; color: var(--logtext);
+    font-family: var(--mono);
     max-height: 280px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
   }
-  .foot { color: var(--dim); font-size: 11px; margin-top: 16px; }
-  a { color: var(--accent); }
+  .foot { color: var(--dim); font-size: 11.5px; font-family: var(--mono); margin-top: 18px; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-  <h1>Magpie eval <span id="status" class="pill">connecting…</span></h1>
+  <h1><span class="spark">✳</span> Magpie eval <span id="status" class="pill">connecting…</span></h1>
   <div class="sub" id="sub">looking for a run…</div>
   <div class="steps" id="steps"></div>
   <div class="logbox" id="logbox" hidden>

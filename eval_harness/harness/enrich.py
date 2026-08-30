@@ -317,6 +317,26 @@ def enrich_run(run_dir: Path, golden: list[dict], params: dict) -> dict:
             out["retrieval"] = metrics.retrieval_row(ranked_paths, qrels)
         out["ranked_pre_gate"] = len(ranked_paths)
 
+        # end-to-end retrieval metrics from what ask() ACTUALLY returned
+        # (post-gate, top_k-truncated - so recall@k beyond top_k is not
+        # measurable on this basis). Recorded alongside the pre-gate basis
+        # because the two are known to diverge; the divergence flags make
+        # the gap per-question data instead of a report-time surprise.
+        e2e_paths = [h["path"] for h in (row.get("retrieved") or [])]
+        if qrels and e2e_paths:
+            out["retrieval_end_to_end"] = metrics.retrieval_row(e2e_paths, qrels)
+        ret_q = ((ret or {}).get("rewritten_query") or {})
+        row_q = (row.get("rewritten_query") or {})
+        out["retrieval_query_matched"] = (
+            None if not (ret_q.get("query") and row_q.get("query"))
+            else ret_q.get("query") == row_q.get("query")
+            and list(ret_q.get("keywords") or []) == list(row_q.get("keywords") or [])
+        )
+        out["retrieval_top1_matched"] = (
+            None if not (ranked_paths and e2e_paths)
+            else ranked_paths[0] == e2e_paths[0]
+        )
+
         if row.get("_retrieval_only"):
             # no generator ran: no verdicts, citations, prompt observation,
             # or gate inference — retrieval metrics + latency only
@@ -494,6 +514,18 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
         return round(sum(1 for r in rows if pred(r)) / len(rows), 3) if rows else None
 
     retrieval_agg = metrics.aggregate([e["retrieval"] for e in answerable if e.get("retrieval")])
+    retrieval_e2e_agg = metrics.aggregate(
+        [e["retrieval_end_to_end"] for e in answerable if e.get("retrieval_end_to_end")]
+    )
+    # basis divergence: how far the pre-gate pass is from what ask() saw
+    _div_rows = [e for e in answerable if e.get("retrieval_top1_matched") is not None]
+    retrieval_divergence = {
+        "n_comparable": len(_div_rows),
+        "n_top1_differs": sum(1 for e in _div_rows if e["retrieval_top1_matched"] is False),
+        "n_query_differs": sum(
+            1 for e in answerable if e.get("retrieval_query_matched") is False
+        ),
+    }
     citation_agg = metrics.aggregate([e["citations"] for e in answerable if e.get("citations")])
 
     # H1 slice: eligibility observed per row (fact-level for text gold,
@@ -570,6 +602,8 @@ def _summarize(enriched: list[dict], params: dict) -> dict:
             "false_answer_rate": rate(notfound_scored, lambda e: e.get("verdict") == "false_answer"),
         },
         "retrieval": retrieval_agg,
+        "retrieval_end_to_end": retrieval_e2e_agg,
+        "retrieval_divergence": retrieval_divergence,
         "citations": citation_agg,
         "solo_gate": {
             "fire_rate": rate(enriched, lambda e: e.get("solo_gated")),

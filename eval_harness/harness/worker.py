@@ -354,14 +354,25 @@ def phase_answer(payload: dict) -> dict:
 
 
 def phase_retrieve(payload: dict) -> dict:
-    """Retrieval-only pass (PLAN.md §3 `--retrieval-only`, composed mode).
+    """Pre-gate ranking pass at k_max (PLAN.md §3; runs AFTER the answer
+    phase in composed mode).
 
-    Mirrors pipeline.ask()'s search step exactly — same rewrite builder, same
-    run_search arguments — but WITHOUT gate_to_solo and at k_max, because
-    ask() returns the post-gate list: on solo-gated questions the answer pass
-    records one file and the true ranking is unrecoverable from it. This
-    phase is therefore the sole source of retrieval metrics, and the
-    solo-gate observation falls out of comparing the two passes.
+    ask() returns the post-gate, top_k-truncated list, so the full ranking
+    the metrics need is unrecoverable from the answer pass alone. This phase
+    supplies it — but it must rank the SAME query the answer pass searched
+    with, or the metrics describe a different run (measured 2026-08-30:
+    a second LLM rewrite diverged on 45/120 questions, partly because the
+    rewriter embeds wall-clock text, and flipped top-1 on 9/120).
+
+    Composed mode therefore REPLAYS each question's recorded
+    (query, keywords) from answers.jsonl (payload["answers_jsonl"]) instead
+    of rewriting again; `query_source` records which path produced each row.
+    Standalone --retrieval-only mode (no answer pass) still rewrites here.
+
+    Residual divergence that replay cannot remove: the answer pass fetches
+    per-tier pools sized by top_k while this pass uses k_max, and
+    approximate search can order near-ties differently at different pool
+    sizes. enrich records that divergence per row instead of hiding it.
     """
     params = payload.get("params", {})
     _write_settings(params)
@@ -375,24 +386,51 @@ def phase_retrieve(payload: dict) -> dict:
 
     import asyncio
 
-    from src.stage2.search import run_search
+    from src.stage2.search import SearchQuery, run_search
     from src.stage2.search import rewrite_query, raw_query
 
     k_max = int(params.get("top_k_retrieval_max", 12))
     rewrite = bool(params.get("rewrite", True))
     fast = bool(params.get("fast_search", False))
     enumerate_lists = bool(params.get("enumerate_lists", True))
+    # #112-adjacent fix: rerank was hardcoded True here and survived only
+    # because envctl always pins MAGPIE_RERANK; thread the param properly.
+    rerank = bool(params.get("rerank", True))
+
+    # Composed mode: replay the answer pass's exact search inputs.
+    recorded: dict[str, dict] = {}
+    replay_path = payload.get("answers_jsonl")
+    if replay_path and Path(replay_path).exists():
+        for line in Path(replay_path).read_text(encoding="utf-8").splitlines():
+            try:
+                rec = json.loads(line)
+            except Exception:  # noqa: BLE001 — malformed line = no replay for it
+                continue
+            rq = rec.get("rewritten_query") or {}
+            if rq.get("query"):
+                recorded[rec["qa_id"]] = rq
 
     rows_out = []
     for q in questions:
         t0 = time.monotonic()
         row: dict = {"qa_id": q["id"], "question": q["question"]}
         try:
-            sq = rewrite_query(q["question"]) if rewrite else raw_query(q["question"])
+            rec = recorded.get(q["id"])
+            if rec is not None:
+                sq = SearchQuery(
+                    query=rec["query"],
+                    keywords=list(rec.get("keywords") or []),
+                )
+                row["query_source"] = "replayed_from_answer_pass"
+            else:
+                # standalone retrieval-only mode, or an answer row that
+                # errored before recording its query
+                sq = rewrite_query(q["question"]) if rewrite else raw_query(q["question"])
+                row["query_source"] = "own_rewrite" if rewrite else "raw"
             t_search = time.monotonic()
             hits = run_search(
                 sq, k_max, question=q["question"], skip_fast=not fast,
-                rerank=True, enumerate_lists=enumerate_lists,
+                rerank=rerank, enumerate_lists=enumerate_lists,
             )
             row.update(
                 rewritten_query={"query": sq.query,

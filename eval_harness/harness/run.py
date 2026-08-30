@@ -228,21 +228,12 @@ def main() -> int:
                 )
             print(f"[run] index done in {run_record['phases']['index']['wall_s']}s")
 
-        if not args.index_only:
-            print(f"[run] retrieval pass ({len(questions)} questions) …")
-            t = time.monotonic()
-            ret = backend.run_worker(
-                "retrieve", run_dir, env,
-                {"params": params, "questions": questions,
-                 "retrieve_jsonl": str(raw / "retrieve.jsonl"),
-                 "expected_env": expected_env},
-                timeout_s=3600,
-            )
-            run_record["phases"]["retrieve"] = {
-                "wall_s": round(time.monotonic() - t, 1), "errors": ret["errors"],
-            }
-            save_record()
-
+        # Answer BEFORE retrieve (2026-08-30): the retrieve pass replays the
+        # answer pass's recorded queries so both phases rank the same inputs.
+        # A second LLM rewrite diverged on 45/120 questions (wall-clock text
+        # in the rewriter) and flipped top-1 on 9/120 - retrieval metrics
+        # were describing a different run than the answers.
+        answered = False
         if not args.index_only and not args.retrieval_only:
             print(f"[run] answer pass ({len(questions)} questions) …")
             t = time.monotonic()
@@ -257,6 +248,25 @@ def main() -> int:
                 "wall_s": round(time.monotonic() - t, 1),
                 "answered": ans["answered"], "errors": ans["errors"],
                 "llm_log": ans.get("llm_log"),
+            }
+            save_record()
+            answered = True
+
+        if not args.index_only:
+            print(f"[run] retrieval pass ({len(questions)} questions) …")
+            t = time.monotonic()
+            retrieve_payload = {
+                "params": params, "questions": questions,
+                "retrieve_jsonl": str(raw / "retrieve.jsonl"),
+                "expected_env": expected_env,
+            }
+            if answered:
+                retrieve_payload["answers_jsonl"] = str(raw / "answers.jsonl")
+            ret = backend.run_worker(
+                "retrieve", run_dir, env, retrieve_payload, timeout_s=3600,
+            )
+            run_record["phases"]["retrieve"] = {
+                "wall_s": round(time.monotonic() - t, 1), "errors": ret["errors"],
             }
             save_record()
         completed = True

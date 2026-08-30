@@ -43,6 +43,11 @@ INDEX_STORE = EVAL / "indexes"
 
 INDEX_SIDE_PARAMS = (
     "model_config", "index_fast_tier", "index_summary_tier", "local_n_ctx",
+    # col_model: two machines resolving "auto" differently MUST get
+    # different index keys - ColQwen and ColSmol vectors are incompatible.
+    # The hash uses the param value; the RESOLVED family additionally lands
+    # in run.json and the index store meta.
+    "col_model",
 )
 
 
@@ -207,6 +212,7 @@ def main() -> int:
                  "expected_env": expected_env},
                 timeout_s=6 * 3600,
             )
+            run_record["col_model_resolved"] = idx.get("col_model_resolved")
             run_record["phases"]["index"] = {
                 "wall_s": round(time.monotonic() - t, 1),
                 "manifest_entries": len(idx.get("manifest") or {}),

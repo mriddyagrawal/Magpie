@@ -248,6 +248,11 @@ def build_env(
     env["MAGPIE_FORCE_PROVIDER"] = provider
     env["LLM_PROVIDER"] = provider
     env["LOCAL_TEMPERATURE"] = str(params.get("temperature", 0.0))
+    # Visual retriever pin (src/stage1_fast/device.py:_apply_col_override).
+    # "auto" = this machine's resolution; the RESOLVED family is stamped
+    # into run.json from the index phase either way, so cross-machine runs
+    # are never silently compared across different retrievers.
+    env["MAGPIE_COL_MODEL"] = str(params.get("col_model", "auto"))
     env["LOCAL_SOLO_MARGIN"] = str(params.get("solo_margin", 2.0))
     # Cross-encoder rerank kill-switch (src/stage2/search.py:_rerank_enabled).
     # Independent of solo_margin, but note the coupling: rerank=false also

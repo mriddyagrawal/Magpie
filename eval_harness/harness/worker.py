@@ -200,12 +200,18 @@ def phase_index(payload: dict) -> dict:
         except Exception as e:  # noqa: BLE001
             manifest_raw = {"_parse_error": str(e)}
 
+    try:
+        from src.stage1_fast.device import detect_device
+        col_resolved = detect_device().model_family
+    except Exception:  # noqa: BLE001 - stamp is provenance, never fatal
+        col_resolved = None
     return {
         "corpus_dir": str(corpus),
         "wall_s": round(wall_s, 2),
         "summary_tier_note": summary_tier_note,
         "manifest_path": str(manifest_path),
         "manifest": manifest_raw,
+        "col_model_resolved": col_resolved,
     }
 
 

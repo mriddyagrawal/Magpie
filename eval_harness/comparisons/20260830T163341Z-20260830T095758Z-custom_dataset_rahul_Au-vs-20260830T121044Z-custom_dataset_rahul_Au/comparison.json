@@ -1,645 +1,1075 @@
 {
-  "baseline": "20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
-  "generated_utc": "20260830T163341Z",
-  "pairs": [
-    {
-      "a": "20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
-      "b": "20260830T121044Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-rewrite",
-      "meta": {
-        "generated_utc": "20260830T163341Z",
-        "pairing_mode": "full",
-        "pairing_coverage": 1.0,
-        "n_paired": 120
+ "baseline": "20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+ "generated_utc": "20260830T163341Z",
+ "pairs": [
+  {
+   "a": "20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+   "b": "20260830T121044Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-rewrite",
+   "meta": {
+    "generated_utc": "20260830T163341Z",
+    "pairing_mode": "full",
+    "pairing_coverage": 1.0,
+    "n_paired": 120
+   },
+   "axes": {
+    "changed_axes": [
+     "config"
+    ],
+    "changed_knobs": [
+     "rewrite"
+    ],
+    "confounded": false,
+    "params_diff": {
+     "rewrite": {
+      "a": false,
+      "b": true
+     }
+    },
+    "backend_git_sha": {
+     "a": "cca67570b04adce9980575d367f3cb9a6836a800",
+     "b": "cca67570b04adce9980575d367f3cb9a6836a800"
+    },
+    "backend_commits_between": [],
+    "harness_git_sha": {
+     "a": "2465ab7b99c8859d434db07662ad332e712993b0",
+     "b": "80f7c6179668dfd2575d0f07357d4c6fc75d134f"
+    },
+    "golden_sha": {
+     "a": "0ebcdcbcdf109adb",
+     "b": "0ebcdcbcdf109adb"
+    },
+    "env_snapshot_diff": {
+     "LANG": {
+      "a": "en_US.UTF-8",
+      "b": "C.UTF-8"
+     },
+     "MAGPIE_DATA_DIR": {
+      "a": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite/raw/appdata",
+      "b": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T121044Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-rewrite/raw/appdata"
+     },
+     "PATH": {
+      "a": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/ed404106fcd8/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin",
+      "b": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/e33a9ec0973a/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin"
+     }
+    },
+    "solo_gate_structurally_off": {
+     "a": true,
+     "b": true
+    },
+    "rerank_coupling_warning": null
+   },
+   "comparison": {
+    "answer_authoritative": {
+     "n": 120,
+     "a_rate": 0.1167,
+     "b_rate": 0.1917,
+     "delta": 0.075,
+     "discordant_a_only": 3,
+     "discordant_b_only": 12,
+     "concordant_both": 11,
+     "concordant_neither": 94,
+     "mcnemar_p": 0.03516,
+     "enough_discordant": true,
+     "credible": true,
+     "basis": "judge"
+    },
+    "answer_deterministic": {
+     "n": 120,
+     "a_rate": 0.0917,
+     "b_rate": 0.1083,
+     "delta": 0.0167,
+     "discordant_a_only": 4,
+     "discordant_b_only": 6,
+     "concordant_both": 7,
+     "concordant_neither": 103,
+     "mcnemar_p": 0.75391,
+     "enough_discordant": true,
+     "credible": false
+    },
+    "answer_judge": {
+     "n": 120,
+     "a_rate": 0.1167,
+     "b_rate": 0.1917,
+     "delta": 0.075,
+     "discordant_a_only": 3,
+     "discordant_b_only": 12,
+     "concordant_both": 11,
+     "concordant_neither": 94,
+     "mcnemar_p": 0.03516,
+     "enough_discordant": true,
+     "credible": true
+    },
+    "retrieval_hit1": {
+     "n": 104,
+     "a_rate": 0.9327,
+     "b_rate": 0.8558,
+     "delta": -0.0769,
+     "discordant_a_only": 9,
+     "discordant_b_only": 1,
+     "concordant_both": 88,
+     "concordant_neither": 6,
+     "mcnemar_p": 0.02148,
+     "enough_discordant": true,
+     "credible": true,
+     "basis": "end_to_end+ranked_pre_gate"
+    },
+    "abstention": {
+     "n": 120,
+     "a_rate": 0.4333,
+     "b_rate": 0.4583,
+     "delta": 0.025,
+     "discordant_a_only": 9,
+     "discordant_b_only": 12,
+     "concordant_both": 43,
+     "concordant_neither": 56,
+     "mcnemar_p": 0.66362,
+     "enough_discordant": true,
+     "credible": false,
+     "note": "outcome=abstained, not correctness"
+    },
+    "verdict_transitions": {
+     "wrong -> false_abstain": 5,
+     "wrong -> correct": 5,
+     "false_answer -> correct_abstain": 4,
+     "wrong -> partial": 4,
+     "false_abstain -> wrong": 4,
+     "partial -> correct": 3,
+     "partial -> false_abstain": 3,
+     "partial -> wrong": 3,
+     "correct_abstain -> false_answer": 2,
+     "false_abstain -> partial": 2,
+     "correct -> wrong": 1
+    },
+    "slices": {
+     "phrasing": {
+      "full": {
+       "n": 60,
+       "a_rate": 0.1667,
+       "b_rate": 0.25,
+       "delta": 0.0833,
+       "discordant_a_only": 0,
+       "discordant_b_only": 5,
+       "concordant_both": 10,
+       "concordant_neither": 45,
+       "mcnemar_p": 0.0625,
+       "enough_discordant": true,
+       "credible": false
       },
-      "axes": {
-        "changed_axes": [
-          "config"
-        ],
-        "changed_knobs": [
-          "rewrite"
-        ],
-        "confounded": false,
-        "params_diff": {
-          "rewrite": {
-            "a": false,
-            "b": true
-          }
-        },
-        "backend_git_sha": {
-          "a": "cca67570b04adce9980575d367f3cb9a6836a800",
-          "b": "cca67570b04adce9980575d367f3cb9a6836a800"
-        },
-        "backend_commits_between": [],
-        "harness_git_sha": {
-          "a": "2465ab7b99c8859d434db07662ad332e712993b0",
-          "b": "80f7c6179668dfd2575d0f07357d4c6fc75d134f"
-        },
-        "golden_sha": {
-          "a": "0ebcdcbcdf109adb",
-          "b": "0ebcdcbcdf109adb"
-        },
-        "env_snapshot_diff": {
-          "LANG": {
-            "a": "en_US.UTF-8",
-            "b": "C.UTF-8"
-          },
-          "MAGPIE_DATA_DIR": {
-            "a": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T095758Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite/raw/appdata",
-            "b": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260830T121044Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-rewrite/raw/appdata"
-          },
-          "PATH": {
-            "a": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/ed404106fcd8/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin",
-            "b": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/e33a9ec0973a/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.45.1/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin"
-          }
-        },
-        "solo_gate_structurally_off": {
-          "a": true,
-          "b": true
-        },
-        "rerank_coupling_warning": null
-      },
-      "comparison": {
-        "answer_authoritative": {
-          "n": 120,
-          "a_rate": 0.1167,
-          "b_rate": 0.1917,
-          "delta": 0.075,
-          "discordant_a_only": 3,
-          "discordant_b_only": 12,
-          "concordant_both": 11,
-          "concordant_neither": 94,
-          "mcnemar_p": 0.03516,
-          "enough_discordant": true,
-          "credible": true,
-          "basis": "judge"
-        },
-        "answer_deterministic": {
-          "n": 120,
-          "a_rate": 0.0917,
-          "b_rate": 0.1083,
-          "delta": 0.0167,
-          "discordant_a_only": 4,
-          "discordant_b_only": 6,
-          "concordant_both": 7,
-          "concordant_neither": 103,
-          "mcnemar_p": 0.75391,
-          "enough_discordant": true,
-          "credible": false
-        },
-        "answer_judge": {
-          "n": 120,
-          "a_rate": 0.1167,
-          "b_rate": 0.1917,
-          "delta": 0.075,
-          "discordant_a_only": 3,
-          "discordant_b_only": 12,
-          "concordant_both": 11,
-          "concordant_neither": 94,
-          "mcnemar_p": 0.03516,
-          "enough_discordant": true,
-          "credible": true
-        },
-        "retrieval_hit1": {
-          "n": 104,
-          "a_rate": 0.9327,
-          "b_rate": 0.8558,
-          "delta": -0.0769,
-          "discordant_a_only": 9,
-          "discordant_b_only": 1,
-          "concordant_both": 88,
-          "concordant_neither": 6,
-          "mcnemar_p": 0.02148,
-          "enough_discordant": true,
-          "credible": true,
-          "basis": "end_to_end+ranked_pre_gate"
-        },
-        "abstention": {
-          "n": 120,
-          "a_rate": 0.4333,
-          "b_rate": 0.4583,
-          "delta": 0.025,
-          "discordant_a_only": 9,
-          "discordant_b_only": 12,
-          "concordant_both": 43,
-          "concordant_neither": 56,
-          "mcnemar_p": 0.66362,
-          "enough_discordant": true,
-          "credible": false,
-          "note": "outcome=abstained, not correctness"
-        },
-        "verdict_transitions": {
-          "wrong -> false_abstain": 5,
-          "wrong -> correct": 5,
-          "false_answer -> correct_abstain": 4,
-          "wrong -> partial": 4,
-          "false_abstain -> wrong": 4,
-          "partial -> correct": 3,
-          "partial -> false_abstain": 3,
-          "partial -> wrong": 3,
-          "correct_abstain -> false_answer": 2,
-          "false_abstain -> partial": 2,
-          "correct -> wrong": 1
-        },
-        "slices": {
-          "phrasing": {
-            "full": {
-              "n": 60,
-              "a_rate": 0.1667,
-              "b_rate": 0.25,
-              "delta": 0.0833,
-              "discordant_a_only": 0,
-              "discordant_b_only": 5,
-              "concordant_both": 10,
-              "concordant_neither": 45,
-              "mcnemar_p": 0.0625,
-              "enough_discordant": true,
-              "credible": false
-            },
-            "typed": {
-              "n": 60,
-              "a_rate": 0.0667,
-              "b_rate": 0.1333,
-              "delta": 0.0667,
-              "discordant_a_only": 3,
-              "discordant_b_only": 7,
-              "concordant_both": 1,
-              "concordant_neither": 49,
-              "mcnemar_p": 0.34375,
-              "enough_discordant": true,
-              "credible": false
-            }
-          },
-          "answer_type": {
-            "enumeration": {
-              "n": 12,
-              "a_rate": 0.0833,
-              "b_rate": 0.0833,
-              "delta": 0.0,
-              "discordant_a_only": 0,
-              "discordant_b_only": 0,
-              "concordant_both": 1,
-              "concordant_neither": 11,
-              "mcnemar_p": 1.0,
-              "enough_discordant": false,
-              "credible": false
-            },
-            "extractive": {
-              "n": 70,
-              "a_rate": 0.0571,
-              "b_rate": 0.1571,
-              "delta": 0.1,
-              "discordant_a_only": 1,
-              "discordant_b_only": 8,
-              "concordant_both": 3,
-              "concordant_neither": 58,
-              "mcnemar_p": 0.03906,
-              "enough_discordant": true,
-              "credible": true
-            },
-            "not_found": {
-              "n": 16,
-              "a_rate": 0.5625,
-              "b_rate": 0.6875,
-              "delta": 0.125,
-              "discordant_a_only": 2,
-              "discordant_b_only": 4,
-              "concordant_both": 7,
-              "concordant_neither": 3,
-              "mcnemar_p": 0.6875,
-              "enough_discordant": true,
-              "credible": false
-            },
-            "synthesis": {
-              "n": 22,
-              "a_rate": 0.0,
-              "b_rate": 0.0,
-              "delta": 0.0,
-              "discordant_a_only": 0,
-              "discordant_b_only": 0,
-              "concordant_both": 0,
-              "concordant_neither": 22,
-              "mcnemar_p": 1.0,
-              "enough_discordant": false,
-              "credible": false
-            }
-          }
-        },
-        "latency_paired": {
-          "n": 120,
-          "mean_delta_s": -3.11,
-          "p50_delta_s": -0.75
-        },
-        "flips": {
-          "answer_regressions": [
-            {
-              "qa_id": "nf-01-typed",
-              "question": "passport scan",
-              "phrasing": "typed",
-              "verdict_a": "correct_abstain",
-              "verdict_b": "false_answer",
-              "det_a": "correct_abstain",
-              "det_b": "false_answer",
-              "judge_a": "correct_abstain",
-              "judge_b": "false_answer",
-              "hit1_a": null,
-              "hit1_b": null,
-              "answer_a": "",
-              "answer_b": "31.00",
-              "golden_answer": "No - there is no passport, driving licence, or national ID document anywhere in these files."
-            },
-            {
-              "qa_id": "nf-05-typed",
-              "question": "transcript",
-              "phrasing": "typed",
-              "verdict_a": "correct_abstain",
-              "verdict_b": "false_answer",
-              "det_a": "correct_abstain",
-              "det_b": "false_answer",
-              "judge_a": "correct_abstain",
-              "judge_b": "false_answer",
-              "hit1_a": null,
-              "hit1_b": null,
-              "answer_a": "",
-              "answer_b": "31.00",
-              "golden_answer": "No - there is no academic transcript, exam result slip, or degree certificate in these files."
-            },
-            {
-              "qa_id": "viz-01-typed",
-              "question": "food commodity price index chart cheapest one",
-              "phrasing": "typed",
-              "verdict_a": "correct",
-              "verdict_b": "wrong",
-              "det_a": "correct",
-              "det_b": "wrong",
-              "judge_a": "correct",
-              "judge_b": "wrong",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "The cheapest commodity is Cocoa at 18.81",
-              "answer_b": "Cheerios cereal",
-              "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
-            }
-          ],
-          "answer_wins": [
-            {
-              "qa_id": "arch-04-full",
-              "question": "On the invoice for mailing and labeling the Great Western '70 Magazine, what was the balance due after the advance payment was applied?",
-              "phrasing": "full",
-              "verdict_a": "partial",
-              "verdict_b": "correct",
-              "det_a": "partial",
-              "det_b": "partial",
-              "judge_a": "partial",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "55.25",
-              "answer_b": "55.25",
-              "golden_answer": "On the Laman for Letters, Inc. invoice A-3088 dated 8-19-70 for mailing the Great Western '70 Magazine, charges came to 325.25; after the 270.00 advance payment received August 17, the balance due was $55.25."
-            },
-            {
-              "qa_id": "nf-02-typed",
-              "question": "wedding invitation",
-              "phrasing": "typed",
-              "verdict_a": "false_answer",
-              "verdict_b": "correct_abstain",
-              "det_a": "false_answer",
-              "det_b": "correct_abstain",
-              "judge_a": "false_answer",
-              "judge_b": "correct_abstain",
-              "hit1_a": null,
-              "hit1_b": null,
-              "answer_a": "wedding invitation",
-              "answer_b": "",
-              "golden_answer": "No - there is no wedding or party invitation card in these files."
-            },
-            {
-              "qa_id": "nf-06-typed",
-              "question": "training loss curve",
-              "phrasing": "typed",
-              "verdict_a": "false_answer",
-              "verdict_b": "correct_abstain",
-              "det_a": "false_answer",
-              "det_b": "correct_abstain",
-              "judge_a": "false_answer",
-              "judge_b": "correct_abstain",
-              "hit1_a": null,
-              "hit1_b": null,
-              "answer_a": "training loss curve",
-              "answer_b": "",
-              "golden_answer": "No - no figure plots loss against epoch, iteration, or training step."
-            },
-            {
-              "qa_id": "nf-07-typed",
-              "question": "covid vaccination certificate",
-              "phrasing": "typed",
-              "verdict_a": "false_answer",
-              "verdict_b": "correct_abstain",
-              "det_a": "false_answer",
-              "det_b": "correct_abstain",
-              "judge_a": "false_answer",
-              "judge_b": "correct_abstain",
-              "hit1_a": null,
-              "hit1_b": null,
-              "answer_a": "Australia's Coverage Target is 95%",
-              "answer_b": "",
-              "golden_answer": "No - there is no COVID-19 vaccination certificate or test result in these files."
-            },
-            {
-              "qa_id": "nf-08-typed",
-              "question": "chem notes",
-              "phrasing": "typed",
-              "verdict_a": "false_answer",
-              "verdict_b": "correct_abstain",
-              "det_a": "false_answer",
-              "det_b": "correct_abstain",
-              "judge_a": "false_answer",
-              "judge_b": "correct_abstain",
-              "hit1_a": null,
-              "hit1_b": null,
-              "answer_a": "Electric field",
-              "answer_b": "",
-              "golden_answer": "No - there are no handwritten chemistry notes; the handwritten notes are C++ and physics (electrostatics) only. Chemistry content does exist elsewhere in the files, but as scanned reports and slide decks, not as your notes."
-            },
-            {
-              "qa_id": "phone-02-full",
-              "question": "In the photo where I'm holding up a small blue Intel mini-PC box, what is the exact model number printed on it?",
-              "phrasing": "full",
-              "verdict_a": "wrong",
-              "verdict_b": "correct",
-              "det_a": "wrong",
-              "det_b": "partial",
-              "judge_a": "wrong",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "palm",
-              "answer_b": "NUC5i7RYH",
-              "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
-            },
-            {
-              "qa_id": "phone-02-typed",
-              "question": "pic of the tiny intel box in its box, which model was it",
-              "phrasing": "typed",
-              "verdict_a": "wrong",
-              "verdict_b": "correct",
-              "det_a": "wrong",
-              "det_b": "partial",
-              "judge_a": "wrong",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "palm",
-              "answer_b": "NUC5i7RYH",
-              "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
-            },
-            {
-              "qa_id": "phone-06-full",
-              "question": "What race name is printed on the bib of the runner in the yellow vest who is flexing and holding a water bottle?",
-              "phrasing": "full",
-              "verdict_a": "partial",
-              "verdict_b": "correct",
-              "det_a": "partial",
-              "det_b": "partial",
-              "judge_a": "partial",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "Laganside 10K",
-              "answer_b": "Laganside 10K",
-              "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race."
-            },
-            {
-              "qa_id": "phone-06-typed",
-              "question": "runner in the yellow vest flexing with a water bottle - what race bib",
-              "phrasing": "typed",
-              "verdict_a": "partial",
-              "verdict_b": "correct",
-              "det_a": "partial",
-              "det_b": "partial",
-              "judge_a": "partial",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "Laganside 10K\" [2]",
-              "answer_b": "Laganside 10K\" [2]",
-              "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race."
-            },
-            {
-              "qa_id": "viz-01-full",
-              "question": "In that long-term food commodity price index chart, which commodity had the lowest index value, and what was it?",
-              "phrasing": "full",
-              "verdict_a": "wrong",
-              "verdict_b": "correct",
-              "det_a": "wrong",
-              "det_b": "correct",
-              "judge_a": "wrong",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "Denmark, 0.81",
-              "answer_b": "Cocoa, 18.81",
-              "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
-            },
-            {
-              "qa_id": "viz-02-full",
-              "question": "In the chart showing the share of people who agree vaccines are important for children, which country had the lowest share?",
-              "phrasing": "full",
-              "verdict_a": "wrong",
-              "verdict_b": "correct",
-              "det_a": "wrong",
-              "det_b": "partial",
-              "judge_a": "wrong",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "Spain",
-              "answer_b": "South Korea",
-              "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%."
-            },
-            {
-              "qa_id": "viz-06-typed",
-              "question": "diabetes australia infographic annual cost",
-              "phrasing": "typed",
-              "verdict_a": "wrong",
-              "verdict_b": "correct",
-              "det_a": "wrong",
-              "det_b": "partial",
-              "judge_a": "wrong",
-              "judge_b": "correct",
-              "hit1_a": 1.0,
-              "hit1_b": 1.0,
-              "answer_a": "diabetes australia infographic annual cost",
-              "answer_b": "6 billion",
-              "golden_answer": "The 'Diabetes in Australia' infographic puts the annual economic cost at $6 billion, and says diabetes affects 1.7 million Australians, or 1 in 10 adults."
-            }
-          ],
-          "retrieval_regressions": [
-            {
-              "qa_id": "arch-05-typed",
-              "question": "coke sodium leaflet tomato juice vs diet coke mg per serving",
-              "phrasing": "typed",
-              "verdict_a": "partial",
-              "verdict_b": "false_abstain",
-              "det_a": "partial",
-              "det_b": "wrong",
-              "judge_a": "partial",
-              "judge_b": "false_abstain",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "Coca-Cola and Diet Coke have similar sodium levels per serving, both containing about 35 milligrams of sodium, which is less than the 40% of total daily sodium recommended by the Food and Drug Adminis",
-              "answer_b": "Not found",
-              "golden_answer": "The Coca-Cola USA leaflet 'You Asked About Sodium in Soft Drinks' says a six-fluid ounce serving of tomato juice processed with added salt has 660 milligrams of sodium, while the same size serving of diet Coke has 35 milligrams or less."
-            },
-            {
-              "qa_id": "phone-09-typed",
-              "question": "dark bar photo neon beer sign over the arcade machines which beer",
-              "phrasing": "typed",
-              "verdict_a": "false_abstain",
-              "verdict_b": "false_abstain",
-              "det_a": "false_abstain",
-              "det_b": "false_abstain",
-              "judge_a": "false_abstain",
-              "judge_b": "false_abstain",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "",
-              "answer_b": "",
-              "golden_answer": "The neon sign is a Dos Equis \"XX\" IMPORTED BEER sign, glowing red and orange on a purple painted wall. Below it are three lit-up upright arcade / video gambling machines, with a man in a pale short-sleeved polo standing at the leftmost one."
-            },
-            {
-              "qa_id": "rcpt-08-full",
-              "question": "Adding up all my Mr D.I.Y. receipts, how much did I spend there in total?",
-              "phrasing": "full",
-              "verdict_a": "false_abstain",
-              "verdict_b": "wrong",
-              "det_a": "false_abstain",
-              "det_b": "partial",
-              "judge_a": "false_abstain",
-              "judge_b": "wrong",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "",
-              "answer_b": "33.90",
-              "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket)."
-            },
-            {
-              "qa_id": "rcpt-08-typed",
-              "question": "how much did i spend at mr diy altogether",
-              "phrasing": "typed",
-              "verdict_a": "wrong",
-              "verdict_b": "false_abstain",
-              "det_a": "wrong",
-              "det_b": "false_abstain",
-              "judge_a": "wrong",
-              "judge_b": "false_abstain",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "9.00",
-              "answer_b": "",
-              "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket)."
-            },
-            {
-              "qa_id": "study-04-typed",
-              "question": "cpp notes conditional operator ternary syntax question mark colon",
-              "phrasing": "typed",
-              "verdict_a": "wrong",
-              "verdict_b": "false_abstain",
-              "det_a": "wrong",
-              "det_b": "false_abstain",
-              "judge_a": "wrong",
-              "judge_b": "false_abstain",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "C++ Tutorials [1]",
-              "answer_b": "",
-              "golden_answer": "The notes say the conditional operator is also known as the ternary operator, symbol ( ? : ), and behaves like a shorter if-else. The syntax written down is: variable = Expression ? true statement : false statement; with the example int a = (b > c) ? b : c;"
-            },
-            {
-              "qa_id": "viz-02-typed",
-              "question": "vaccines important for children chart lowest country",
-              "phrasing": "typed",
-              "verdict_a": "wrong",
-              "verdict_b": "wrong",
-              "det_a": "wrong",
-              "det_b": "wrong",
-              "judge_a": "wrong",
-              "judge_b": "wrong",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "Australia",
-              "answer_b": "Tweet #2",
-              "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%."
-            },
-            {
-              "qa_id": "viz-07-typed",
-              "question": "condom infographic french town population 1806",
-              "phrasing": "typed",
-              "verdict_a": "false_abstain",
-              "verdict_b": "false_abstain",
-              "det_a": "false_abstain",
-              "det_b": "false_abstain",
-              "judge_a": "false_abstain",
-              "judge_b": "false_abstain",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "",
-              "answer_b": "",
-              "golden_answer": "The town of Condom, on the Via Podiensis in France, saw its population fall from 7,298 in 1806 to 7,099 in 2009. The same panel of that condoms infographic notes the town's Condom Cathedral was erected in 1506."
-            },
-            {
-              "qa_id": "viz-08-typed",
-              "question": "millenial myths infographic smartphone percentage",
-              "phrasing": "typed",
-              "verdict_a": "wrong",
-              "verdict_b": "wrong",
-              "det_a": "wrong",
-              "det_b": "wrong",
-              "judge_a": "wrong",
-              "judge_b": "wrong",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "7",
-              "answer_b": "31.00",
-              "golden_answer": "Under 'Myth 5: Millennials are always distracted by technology', the infographic says over 90% of millennials own a smartphone and 65% use it as a way to feel connected to others."
-            },
-            {
-              "qa_id": "viz-10-typed",
-              "question": "leaf diagram cordate obcordate what ob means",
-              "phrasing": "typed",
-              "verdict_a": "partial",
-              "verdict_b": "wrong",
-              "det_a": "partial",
-              "det_b": "wrong",
-              "judge_a": "partial",
-              "judge_b": "wrong",
-              "hit1_a": 1.0,
-              "hit1_b": 0.0,
-              "answer_a": "ob means the widest part of the leaf is at the apex\"[2]",
-              "answer_b": "ob means outer",
-              "golden_answer": "In that leaf shape diagram, 'cordate' means a heart-shaped leaf, and the prefix 'ob' in 'obcordate' refers to a blade that is widest near the apex. The diagram also labels the two parts of the leaf: the blade and the petiole."
-            }
-          ],
-          "retrieval_wins": [
-            {
-              "qa_id": "rcpt-05-typed",
-              "question": "that shop where i bought loads of chocolate bars total",
-              "phrasing": "typed",
-              "verdict_a": "wrong",
-              "verdict_b": "wrong",
-              "det_a": "wrong",
-              "det_b": "wrong",
-              "judge_a": "wrong",
-              "judge_b": "wrong",
-              "hit1_a": 0.0,
-              "hit1_b": 1.0,
-              "answer_a": "Hallmark",
-              "answer_b": "SAM SAM TRADING CO",
-              "golden_answer": "That was Asia Mart in Taman Sentosa, Klang on 22/12/2017 — 17 Delicia Chocolate [50G] on one line (printed amount 15.25) among 25 items in total. The bill came to RM 32.70 inclusive of GST; I paid 40.00 cash and got 7.30 change."
-            }
-          ]
-        }
+      "typed": {
+       "n": 60,
+       "a_rate": 0.0667,
+       "b_rate": 0.1333,
+       "delta": 0.0667,
+       "discordant_a_only": 3,
+       "discordant_b_only": 7,
+       "concordant_both": 1,
+       "concordant_neither": 49,
+       "mcnemar_p": 0.34375,
+       "enough_discordant": true,
+       "credible": false
       }
+     },
+     "answer_type": {
+      "enumeration": {
+       "n": 12,
+       "a_rate": 0.0833,
+       "b_rate": 0.0833,
+       "delta": 0.0,
+       "discordant_a_only": 0,
+       "discordant_b_only": 0,
+       "concordant_both": 1,
+       "concordant_neither": 11,
+       "mcnemar_p": 1.0,
+       "enough_discordant": false,
+       "credible": false
+      },
+      "extractive": {
+       "n": 70,
+       "a_rate": 0.0571,
+       "b_rate": 0.1571,
+       "delta": 0.1,
+       "discordant_a_only": 1,
+       "discordant_b_only": 8,
+       "concordant_both": 3,
+       "concordant_neither": 58,
+       "mcnemar_p": 0.03906,
+       "enough_discordant": true,
+       "credible": true
+      },
+      "not_found": {
+       "n": 16,
+       "a_rate": 0.5625,
+       "b_rate": 0.6875,
+       "delta": 0.125,
+       "discordant_a_only": 2,
+       "discordant_b_only": 4,
+       "concordant_both": 7,
+       "concordant_neither": 3,
+       "mcnemar_p": 0.6875,
+       "enough_discordant": true,
+       "credible": false
+      },
+      "synthesis": {
+       "n": 22,
+       "a_rate": 0.0,
+       "b_rate": 0.0,
+       "delta": 0.0,
+       "discordant_a_only": 0,
+       "discordant_b_only": 0,
+       "concordant_both": 0,
+       "concordant_neither": 22,
+       "mcnemar_p": 1.0,
+       "enough_discordant": false,
+       "credible": false
+      }
+     }
+    },
+    "latency_paired": {
+     "n": 120,
+     "mean_delta_s": -3.11,
+     "p50_delta_s": -0.75
+    },
+    "flips": {
+     "answer_regressions": [
+      {
+       "qa_id": "nf-01-typed",
+       "question": "passport scan",
+       "phrasing": "typed",
+       "verdict_a": "correct_abstain",
+       "verdict_b": "false_answer",
+       "det_a": "correct_abstain",
+       "det_b": "false_answer",
+       "judge_a": "correct_abstain",
+       "judge_b": "false_answer",
+       "hit1_a": null,
+       "hit1_b": null,
+       "answer_a": "",
+       "answer_b": "31.00",
+       "golden_answer": "No - there is no passport, driving licence, or national ID document anywhere in these files."
+      },
+      {
+       "qa_id": "nf-05-typed",
+       "question": "transcript",
+       "phrasing": "typed",
+       "verdict_a": "correct_abstain",
+       "verdict_b": "false_answer",
+       "det_a": "correct_abstain",
+       "det_b": "false_answer",
+       "judge_a": "correct_abstain",
+       "judge_b": "false_answer",
+       "hit1_a": null,
+       "hit1_b": null,
+       "answer_a": "",
+       "answer_b": "31.00",
+       "golden_answer": "No - there is no academic transcript, exam result slip, or degree certificate in these files."
+      },
+      {
+       "qa_id": "viz-01-typed",
+       "question": "food commodity price index chart cheapest one",
+       "phrasing": "typed",
+       "verdict_a": "correct",
+       "verdict_b": "wrong",
+       "det_a": "correct",
+       "det_b": "wrong",
+       "judge_a": "correct",
+       "judge_b": "wrong",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "The cheapest commodity is Cocoa at 18.81",
+       "answer_b": "Cheerios cereal",
+       "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
+      }
+     ],
+     "answer_wins": [
+      {
+       "qa_id": "arch-04-full",
+       "question": "On the invoice for mailing and labeling the Great Western '70 Magazine, what was the balance due after the advance payment was applied?",
+       "phrasing": "full",
+       "verdict_a": "partial",
+       "verdict_b": "correct",
+       "det_a": "partial",
+       "det_b": "partial",
+       "judge_a": "partial",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "55.25",
+       "answer_b": "55.25",
+       "golden_answer": "On the Laman for Letters, Inc. invoice A-3088 dated 8-19-70 for mailing the Great Western '70 Magazine, charges came to 325.25; after the 270.00 advance payment received August 17, the balance due was $55.25."
+      },
+      {
+       "qa_id": "nf-02-typed",
+       "question": "wedding invitation",
+       "phrasing": "typed",
+       "verdict_a": "false_answer",
+       "verdict_b": "correct_abstain",
+       "det_a": "false_answer",
+       "det_b": "correct_abstain",
+       "judge_a": "false_answer",
+       "judge_b": "correct_abstain",
+       "hit1_a": null,
+       "hit1_b": null,
+       "answer_a": "wedding invitation",
+       "answer_b": "",
+       "golden_answer": "No - there is no wedding or party invitation card in these files."
+      },
+      {
+       "qa_id": "nf-06-typed",
+       "question": "training loss curve",
+       "phrasing": "typed",
+       "verdict_a": "false_answer",
+       "verdict_b": "correct_abstain",
+       "det_a": "false_answer",
+       "det_b": "correct_abstain",
+       "judge_a": "false_answer",
+       "judge_b": "correct_abstain",
+       "hit1_a": null,
+       "hit1_b": null,
+       "answer_a": "training loss curve",
+       "answer_b": "",
+       "golden_answer": "No - no figure plots loss against epoch, iteration, or training step."
+      },
+      {
+       "qa_id": "nf-07-typed",
+       "question": "covid vaccination certificate",
+       "phrasing": "typed",
+       "verdict_a": "false_answer",
+       "verdict_b": "correct_abstain",
+       "det_a": "false_answer",
+       "det_b": "correct_abstain",
+       "judge_a": "false_answer",
+       "judge_b": "correct_abstain",
+       "hit1_a": null,
+       "hit1_b": null,
+       "answer_a": "Australia's Coverage Target is 95%",
+       "answer_b": "",
+       "golden_answer": "No - there is no COVID-19 vaccination certificate or test result in these files."
+      },
+      {
+       "qa_id": "nf-08-typed",
+       "question": "chem notes",
+       "phrasing": "typed",
+       "verdict_a": "false_answer",
+       "verdict_b": "correct_abstain",
+       "det_a": "false_answer",
+       "det_b": "correct_abstain",
+       "judge_a": "false_answer",
+       "judge_b": "correct_abstain",
+       "hit1_a": null,
+       "hit1_b": null,
+       "answer_a": "Electric field",
+       "answer_b": "",
+       "golden_answer": "No - there are no handwritten chemistry notes; the handwritten notes are C++ and physics (electrostatics) only. Chemistry content does exist elsewhere in the files, but as scanned reports and slide decks, not as your notes."
+      },
+      {
+       "qa_id": "phone-02-full",
+       "question": "In the photo where I'm holding up a small blue Intel mini-PC box, what is the exact model number printed on it?",
+       "phrasing": "full",
+       "verdict_a": "wrong",
+       "verdict_b": "correct",
+       "det_a": "wrong",
+       "det_b": "partial",
+       "judge_a": "wrong",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "palm",
+       "answer_b": "NUC5i7RYH",
+       "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
+      },
+      {
+       "qa_id": "phone-02-typed",
+       "question": "pic of the tiny intel box in its box, which model was it",
+       "phrasing": "typed",
+       "verdict_a": "wrong",
+       "verdict_b": "correct",
+       "det_a": "wrong",
+       "det_b": "partial",
+       "judge_a": "wrong",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "palm",
+       "answer_b": "NUC5i7RYH",
+       "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
+      },
+      {
+       "qa_id": "phone-06-full",
+       "question": "What race name is printed on the bib of the runner in the yellow vest who is flexing and holding a water bottle?",
+       "phrasing": "full",
+       "verdict_a": "partial",
+       "verdict_b": "correct",
+       "det_a": "partial",
+       "det_b": "partial",
+       "judge_a": "partial",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "Laganside 10K",
+       "answer_b": "Laganside 10K",
+       "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race."
+      },
+      {
+       "qa_id": "phone-06-typed",
+       "question": "runner in the yellow vest flexing with a water bottle - what race bib",
+       "phrasing": "typed",
+       "verdict_a": "partial",
+       "verdict_b": "correct",
+       "det_a": "partial",
+       "det_b": "partial",
+       "judge_a": "partial",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "Laganside 10K\" [2]",
+       "answer_b": "Laganside 10K\" [2]",
+       "golden_answer": "His race bib says LAGANSIDE 10K, with a PURE RUNNING logo on the left side of the number card. He's in a yellow and brown striped vest with a stag-head crest, holding a water bottle and flexing after the race."
+      },
+      {
+       "qa_id": "viz-01-full",
+       "question": "In that long-term food commodity price index chart, which commodity had the lowest index value, and what was it?",
+       "phrasing": "full",
+       "verdict_a": "wrong",
+       "verdict_b": "correct",
+       "det_a": "wrong",
+       "det_b": "correct",
+       "judge_a": "wrong",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "Denmark, 0.81",
+       "answer_b": "Cocoa, 18.81",
+       "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
+      },
+      {
+       "qa_id": "viz-02-full",
+       "question": "In the chart showing the share of people who agree vaccines are important for children, which country had the lowest share?",
+       "phrasing": "full",
+       "verdict_a": "wrong",
+       "verdict_b": "correct",
+       "det_a": "wrong",
+       "det_b": "partial",
+       "judge_a": "wrong",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "Spain",
+       "answer_b": "South Korea",
+       "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%."
+      },
+      {
+       "qa_id": "viz-06-typed",
+       "question": "diabetes australia infographic annual cost",
+       "phrasing": "typed",
+       "verdict_a": "wrong",
+       "verdict_b": "correct",
+       "det_a": "wrong",
+       "det_b": "partial",
+       "judge_a": "wrong",
+       "judge_b": "correct",
+       "hit1_a": 1.0,
+       "hit1_b": 1.0,
+       "answer_a": "diabetes australia infographic annual cost",
+       "answer_b": "6 billion",
+       "golden_answer": "The 'Diabetes in Australia' infographic puts the annual economic cost at $6 billion, and says diabetes affects 1.7 million Australians, or 1 in 10 adults."
+      }
+     ],
+     "retrieval_regressions": [
+      {
+       "qa_id": "arch-05-typed",
+       "question": "coke sodium leaflet tomato juice vs diet coke mg per serving",
+       "phrasing": "typed",
+       "verdict_a": "partial",
+       "verdict_b": "false_abstain",
+       "det_a": "partial",
+       "det_b": "wrong",
+       "judge_a": "partial",
+       "judge_b": "false_abstain",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "Coca-Cola and Diet Coke have similar sodium levels per serving, both containing about 35 milligrams of sodium, which is less than the 40% of total daily sodium recommended by the Food and Drug Adminis",
+       "answer_b": "Not found",
+       "golden_answer": "The Coca-Cola USA leaflet 'You Asked About Sodium in Soft Drinks' says a six-fluid ounce serving of tomato juice processed with added salt has 660 milligrams of sodium, while the same size serving of diet Coke has 35 milligrams or less."
+      },
+      {
+       "qa_id": "phone-09-typed",
+       "question": "dark bar photo neon beer sign over the arcade machines which beer",
+       "phrasing": "typed",
+       "verdict_a": "false_abstain",
+       "verdict_b": "false_abstain",
+       "det_a": "false_abstain",
+       "det_b": "false_abstain",
+       "judge_a": "false_abstain",
+       "judge_b": "false_abstain",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "",
+       "answer_b": "",
+       "golden_answer": "The neon sign is a Dos Equis \"XX\" IMPORTED BEER sign, glowing red and orange on a purple painted wall. Below it are three lit-up upright arcade / video gambling machines, with a man in a pale short-sleeved polo standing at the leftmost one."
+      },
+      {
+       "qa_id": "rcpt-08-full",
+       "question": "Adding up all my Mr D.I.Y. receipts, how much did I spend there in total?",
+       "phrasing": "full",
+       "verdict_a": "false_abstain",
+       "verdict_b": "wrong",
+       "det_a": "false_abstain",
+       "det_b": "partial",
+       "judge_a": "false_abstain",
+       "judge_b": "wrong",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "",
+       "answer_b": "33.90",
+       "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket)."
+      },
+      {
+       "qa_id": "rcpt-08-typed",
+       "question": "how much did i spend at mr diy altogether",
+       "phrasing": "typed",
+       "verdict_a": "wrong",
+       "verdict_b": "false_abstain",
+       "det_a": "wrong",
+       "det_b": "false_abstain",
+       "judge_a": "wrong",
+       "judge_b": "false_abstain",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "9.00",
+       "answer_b": "",
+       "golden_answer": "There are three Mr D.I.Y. receipts and together they come to RM 101.90: RM 33.90 at Mr DIY Tesco Terbau (12-01-19, chopping board, sprayer, windshield cleaner, BOPP tape), RM 30.90 at Mr DIY Tesco Putra Nilai (16-11-18, car wash, wax, Kleenso, handkerchief) and RM 37.10 at Mr DIY Tesco Mutiara Damansara (14-03-18, scouring pads, scissors, trailing socket)."
+      },
+      {
+       "qa_id": "study-04-typed",
+       "question": "cpp notes conditional operator ternary syntax question mark colon",
+       "phrasing": "typed",
+       "verdict_a": "wrong",
+       "verdict_b": "false_abstain",
+       "det_a": "wrong",
+       "det_b": "false_abstain",
+       "judge_a": "wrong",
+       "judge_b": "false_abstain",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "C++ Tutorials [1]",
+       "answer_b": "",
+       "golden_answer": "The notes say the conditional operator is also known as the ternary operator, symbol ( ? : ), and behaves like a shorter if-else. The syntax written down is: variable = Expression ? true statement : false statement; with the example int a = (b > c) ? b : c;"
+      },
+      {
+       "qa_id": "viz-02-typed",
+       "question": "vaccines important for children chart lowest country",
+       "phrasing": "typed",
+       "verdict_a": "wrong",
+       "verdict_b": "wrong",
+       "det_a": "wrong",
+       "det_b": "wrong",
+       "judge_a": "wrong",
+       "judge_b": "wrong",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "Australia",
+       "answer_b": "Tweet #2",
+       "golden_answer": "South Korea, at 72%. In the 2018 Our World in Data chart of the share agreeing that vaccines are important for children, South Korea is the lowest of the five countries shown, just below Armenia at 73%; the United Arab Emirates is highest at 94%."
+      },
+      {
+       "qa_id": "viz-07-typed",
+       "question": "condom infographic french town population 1806",
+       "phrasing": "typed",
+       "verdict_a": "false_abstain",
+       "verdict_b": "false_abstain",
+       "det_a": "false_abstain",
+       "det_b": "false_abstain",
+       "judge_a": "false_abstain",
+       "judge_b": "false_abstain",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "",
+       "answer_b": "",
+       "golden_answer": "The town of Condom, on the Via Podiensis in France, saw its population fall from 7,298 in 1806 to 7,099 in 2009. The same panel of that condoms infographic notes the town's Condom Cathedral was erected in 1506."
+      },
+      {
+       "qa_id": "viz-08-typed",
+       "question": "millenial myths infographic smartphone percentage",
+       "phrasing": "typed",
+       "verdict_a": "wrong",
+       "verdict_b": "wrong",
+       "det_a": "wrong",
+       "det_b": "wrong",
+       "judge_a": "wrong",
+       "judge_b": "wrong",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "7",
+       "answer_b": "31.00",
+       "golden_answer": "Under 'Myth 5: Millennials are always distracted by technology', the infographic says over 90% of millennials own a smartphone and 65% use it as a way to feel connected to others."
+      },
+      {
+       "qa_id": "viz-10-typed",
+       "question": "leaf diagram cordate obcordate what ob means",
+       "phrasing": "typed",
+       "verdict_a": "partial",
+       "verdict_b": "wrong",
+       "det_a": "partial",
+       "det_b": "wrong",
+       "judge_a": "partial",
+       "judge_b": "wrong",
+       "hit1_a": 1.0,
+       "hit1_b": 0.0,
+       "answer_a": "ob means the widest part of the leaf is at the apex\"[2]",
+       "answer_b": "ob means outer",
+       "golden_answer": "In that leaf shape diagram, 'cordate' means a heart-shaped leaf, and the prefix 'ob' in 'obcordate' refers to a blade that is widest near the apex. The diagram also labels the two parts of the leaf: the blade and the petiole."
+      }
+     ],
+     "retrieval_wins": [
+      {
+       "qa_id": "rcpt-05-typed",
+       "question": "that shop where i bought loads of chocolate bars total",
+       "phrasing": "typed",
+       "verdict_a": "wrong",
+       "verdict_b": "wrong",
+       "det_a": "wrong",
+       "det_b": "wrong",
+       "judge_a": "wrong",
+       "judge_b": "wrong",
+       "hit1_a": 0.0,
+       "hit1_b": 1.0,
+       "answer_a": "Hallmark",
+       "answer_b": "SAM SAM TRADING CO",
+       "golden_answer": "That was Asia Mart in Taman Sentosa, Klang on 22/12/2017 \u2014 17 Delicia Chocolate [50G] on one line (printed amount 15.25) among 25 items in total. The bill came to RM 32.70 inclusive of GST; I paid 40.00 cash and got 7.30 change."
+      }
+     ]
     }
-  ]
+   },
+   "synthesis": {
+    "owner_question": "Does the LLM query rewrite help or hurt retrieval and answer quality on this corpus at top_k=2 with rerank off?",
+    "verdict": "Rewrite as implemented decisively hurts retrieval (hit@1 0.933->0.856, 9A/1B, p=0.0215, decision-grade) and produces no credible change in answer quality (judged +7.5pt fails cause attribution: 3/15 boundary flips are judge_disagreement on byte-identical answers; deterministic basis coin-consistent 4A/6B p=0.754; strict correct 3=3). The harm is one implementation defect - the wall-clock line injected into every rewrite call (src/llm.py:329, SearchQuery missing from _NO_TIMESTAMP_OUTPUTS at :340) - not the rewrite concept: with echo rows excluded the retrieval effect measures 0.0 points. The one clean positive signal is full-phrasing answers (8 up / 0 down cross-arm, p=0.008, judge basis; deterministic correct-or-partial 19->23), itself distractor-lottery in mechanism.",
+    "decision_grade": {
+     "retrieval_hit1": {
+      "grade": true,
+      "discordant": "9A/1B",
+      "p": 0.02148,
+      "basis": "end_to_end (deterministic)",
+      "note": "all 10 flips cause-attributed high-confidence"
+     },
+     "answer_judge": {
+      "grade": false,
+      "discordant": "3A/12B",
+      "p": 0.03516,
+      "basis": "judge",
+      "note": "judge_disagreement = 3/15 boundary flips (20%, at judge-limited threshold); deterministic basis 4A/6B p=0.754; strict det correct 3=3"
+     },
+     "abstention": {
+      "grade": false,
+      "discordant": "9A/12B",
+      "p": 0.66362
+     }
+    },
+    "judge_limited_note": "Cross-session judge noise floor measured at 4 verdict flips on 65 byte-identical answer rows; B-session disagreed with deterministic scorer 23x vs A 11x. Judged-correct deltas under ~5 rows are inside noise on this rubric; use deterministic verdicts for regression detection.",
+    "cause_counts": {
+     "retrieval_change": 36,
+     "judge_disagreement": 4,
+     "prompt_assembly": 1
+    },
+    "retrieval_change_mechanisms": {
+     "date_echo_hijack": 11,
+     "vocab_change": 13,
+     "keyword_distractor_swap": 10,
+     "rank_swap": 1,
+     "vocab_fix": 1
+    },
+    "flip_universe": {
+     "judge_verdict_flips": 36,
+     "hit1_only_flips": 5,
+     "total_attributed": 41
+    },
+    "attributions": [
+     {
+      "qa_id": "nf-01-typed",
+      "flip": "correct_abstain->false_answer",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "Query replaced by 'current date and time Sunday 2026-08-30 08:40 EDT'; retrieval flipped to bad_receipt_005.jpg+info_034.jpg; answered '31.00' off bad_receipt_005.jpg (LLM log verified).",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "nf-05-typed",
+      "flip": "correct_abstain->false_answer",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "Query replaced by 'August 30 2026 time'; retrieval flipped to two bad_receipts; answered '31.00' citing bad_receipt_022.jpg.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-01-typed",
+      "flip": "correct->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Rank-2 swapped arxiv_025.png->diagram_001.jpg (food collage with Cheerios box) which supplied the wrong 'Cheerios cereal'; food/market keyword expansion pulled the food cluster up.",
+      "confidence": "high (cause) / med (mechanism)"
+     },
+     {
+      "qa_id": "arch-04-full",
+      "flip": "partial->correct",
+      "cause": "judge_disagreement",
+      "mechanism": null,
+      "evidence": "Same single-file retrieval, byte-identical answer '55.25'; judges apply different rules about the unrequested invoice number A-3088.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "nf-02-typed",
+      "flip": "false_answer->correct_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "Identical final_query 'wedding invitation'; clock-token keywords concatenated into the ColQwen query flipped both retrieved files to bad_receipts, killing the query-echo false answer.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "nf-06-typed",
+      "flip": "false_answer->correct_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Identical final_query; 11 real ML-vocab keywords flipped retrieval to two topically-matching arXiv figures.",
+      "confidence": "high (cause) / med (mechanism)"
+     },
+     {
+      "qa_id": "nf-07-typed",
+      "flip": "false_answer->correct_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack (class B)",
+      "evidence": "Query became 'vaccination certificate issued today 2026-08-30'; info_032.jpg, source of A's false '95%', fell out of retrieval.",
+      "confidence": "high (cause) / med (mechanism)"
+     },
+     {
+      "qa_id": "nf-08-typed",
+      "flip": "false_answer->correct_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "'chem notes' replaced by 'current date and time'; the physics PDF behind A's 'Electric field' false answer was never retrieved; model abstained on garbage.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-02-full",
+      "flip": "wrong->correct",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "Rank-1 gold scene identical; rank-2 swapped the 'palm'-source scene photo for bad_receipt_000.jpg (EDT/2026-08-30 in keywords); model then read NUC5i7RYH off the gold.",
+      "confidence": "high (cause) / med (mechanism)"
+     },
+     {
+      "qa_id": "phone-02-typed",
+      "flip": "wrong->correct",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Same distractor eviction (scene->bad_receipt_013.jpg) but zero clock tokens in keywords; swap driven by rewritten query text and intel-vocab expansion.",
+      "confidence": "high (cause) / med (mechanism)"
+     },
+     {
+      "qa_id": "phone-06-full",
+      "flip": "partial->correct",
+      "cause": "judge_disagreement",
+      "mechanism": null,
+      "evidence": "Same retrieval, byte-identical 'Laganside 10K'; judges differ only on whether the unasked 'Pure Running' fact is required.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-06-typed",
+      "flip": "partial->correct",
+      "cause": "judge_disagreement",
+      "mechanism": null,
+      "evidence": "Same retrieval, byte-identical answer including stray quote and [2] marker; only grading differs.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-01-full",
+      "flip": "wrong->correct",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Rank-2 swapped chart_030.jpg (source of 'Denmark, 0.81') for arxiv_025.png under a clock-free rewrite; model then read the gold chart: 'Cocoa, 18.81'.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-02-full",
+      "flip": "wrong->correct",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Rank-2 swapped deck_026.pdf for vaccine-topical info_032.jpg matched by 'vaccine acceptance' keywords; 'Spain' became 'South Korea' off the same rank-1 gold.",
+      "confidence": "high (cause) / med (mechanism)"
+     },
+     {
+      "qa_id": "viz-06-typed",
+      "flip": "wrong->correct",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Identical final_query; 17 clock-free vocab keywords swapped rank-2 deck_010.pdf->info_015.jpg; query-echo answer became '6 billion' read off the rank-1 gold.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "arch-04-typed",
+      "flip": "partial->false_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "Clock text embedded in kept-topic query added bad_receipt_032.jpg at rank 2, breaking A's accidental one-file prompt; '55.25' became a structured abstention.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "arch-05-typed",
+      "flip": "partial->false_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "final_query fully replaced by clock text; gold doc_357.jpg lost from all 12; prose 'Not found' answered.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "arch-08-full",
+      "flip": "wrong->false_abstain",
+      "cause": "prompt_assembly",
+      "mechanism": "timestamp_header",
+      "evidence": "Raw-log verified: both answer requests byte-identical modulo the clock line (06:55 vs 08:21 EDT); retry-pass generation diverged, A 'not specified' vs B not_found=true.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-03-full",
+      "flip": "wrong->partial",
+      "cause": "judge_disagreement",
+      "mechanism": null,
+      "evidence": "Identical retrieval set+order and byte-equal answer 'Biltz'; only the two judge sessions' grading differs.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-07-typed",
+      "flip": "wrong->false_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "'2026-08-30' prepended to kept topic changed 6 of 12 list members around the same rank-1 gold; 'Jack and Barnes' became structured not_found.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-08-typed",
+      "flip": "wrong->false_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "Clock tokens in keywords accompanied a rank-2 swap screen_24370->screen_24479; vocab also shifted (vocab_change plausible alternative).",
+      "confidence": "medium"
+     },
+     {
+      "qa_id": "phone-09-full",
+      "flip": "wrong->partial",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "Clock-suffixed query swapped out rank-2 info_021.jpg, the literal source of A's wrong answer text; B then read 'XX' off the gold Dos Equis photo.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-10-typed",
+      "flip": "partial->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "No clock tokens; marketing-vocab keyword expansion swapped the rank-2 file and 'KayC root beer' became 'Sizzle!'.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-11-typed",
+      "flip": "partial->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "rank_swap",
+      "evidence": "Same two screenshots retrieved with ranks swapped; B inverted the 'We aren't asking you for a donation' negation.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "rcpt-02-full",
+      "flip": "false_abstain->partial",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "'2026-08-30' token in kept-topic query swapped rank-2 receipt_039.jpg->info_004.jpg; with one receipt in the prompt B listed all four items.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "rcpt-04-typed",
+      "flip": "partial->false_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Clean rewrite to 'Shell V Power fuel tank capacity liters' (no clock tokens) swapped the rank-2 distractor; '2.450 RM' became abstention.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "rcpt-05-full",
+      "flip": "wrong->partial",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Clean retail-vocab rewrite swapped rank-2 scene photo->receipt_036.jpg; 'Hallmark' became the correct 'Asia Mart'.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "rcpt-06-typed",
+      "flip": "false_abstain->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "Clock text prepended to kept topic swapped rank-2 receipt_005.jpg->bad_receipt_020.jpg; B answered '54.50' against gold's Rp224,908 where A abstained.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "rcpt-07-typed",
+      "flip": "false_abstain->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "Gold receipt_040.jpg never indexed in either arm (fp16 NaN loss); clock-prefixed query changed the distractor set and B answered 'RM 15.00' off receipt_005.jpg instead of abstaining.",
+      "confidence": "high",
+      "index_dead_row": true
+     },
+     {
+      "qa_id": "rcpt-08-full",
+      "flip": "false_abstain->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Genericized 'Mr D.I.Y. receipts total spent' (no clock tokens) reshuffled the 12-file list and prompt membership; B answered single-receipt '33.90' vs the RM 101.90 sum.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "rcpt-08-typed",
+      "flip": "wrong->false_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Genericized 'total amount spent at Mr DIY' (no clock tokens) changed 7 of 12 list members; confabulated '9.00' became structured not_found.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "study-01-full",
+      "flip": "false_abstain->partial",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Rewrite rephrased the question and leaked the answer 'Bjarne Stroustrup' into keywords (no clock tokens), swapping rank-2 Notes-11->Notes-10; B produced '1979, Bell Labs'.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "study-04-typed",
+      "flip": "wrong->false_abstain",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "final_query fully replaced by clock text; retrieval returned a slide deck and a receipt; B abstained.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "study-06-typed",
+      "flip": "wrong->partial",
+      "cause": "retrieval_change",
+      "mechanism": "keyword_distractor_swap",
+      "evidence": "'current date and time' appended to kept topic swapped rank-2 arxiv_018.png (source of A's wrong description) for receipt_025.jpg; B described the correct figure.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-05-full",
+      "flip": "false_abstain->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_change",
+      "evidence": "Rewrite truncated the two-chart question to its first half (no clock tokens), evicting gold chart_036.jpg; B hallucinated 'The United States' where A abstained with both golds retrieved.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-10-typed",
+      "flip": "partial->wrong",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "final_query fully replaced by clock text; only two receipts in the prompt; 'ob means outer' is a parametric guess.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "phone-09-typed",
+      "flip": "hit@1 1->0 (verdict false_abstain both)",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "Rewrite = pure clock text; gold 1167908324.jpg absent from all 12 sweep slots; A had already abstained, so no verdict move.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-02-typed",
+      "flip": "hit@1 1->0 (verdict wrong both)",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "Pure clock query; gold chart_010.jpg absent from all 12; B confabulated 'Tweet #2' off garbage, but A was already wrong.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-07-typed",
+      "flip": "hit@1 1->0 (verdict false_abstain both)",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "Pure clock query; gold info_001.jpg absent from all 12; B top-2 = bad_receipt_005 + bad_receipt_022.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "viz-08-typed",
+      "flip": "hit@1 1->0 (verdict wrong both)",
+      "cause": "retrieval_change",
+      "mechanism": "date_echo_hijack",
+      "evidence": "Pure clock query; gold info_020.jpg absent from all 12; B answered '31.00', the printed total of retrieved bad_receipt_005.jpg.",
+      "confidence": "high"
+     },
+     {
+      "qa_id": "rcpt-05-typed",
+      "flip": "hit@1 0->1 (verdict wrong both)",
+      "cause": "retrieval_change",
+      "mechanism": "vocab_fix",
+      "evidence": "A matched 'shop' to literal shop photographs (gold sweep rank 5); B's rewrite added receipt/invoice/chocolate-bars vocabulary and gold hit rank 1 \u2014 then the reader answered off the rank-2 receipt anyway ('SAM SAM TRADING CO'), so no verdict gain. Rewrite still carries '[shop_name]' placeholder + date tokens.",
+      "confidence": "high"
+     }
+    ],
+    "regression_findings": [
+     {
+      "id": 1,
+      "title": "Wall-clock -373s is host artifact; rewrite marginal cost +1.22s/q (+146.8s)",
+      "attribution": "host",
+      "severity": "notable"
+     },
+     {
+      "id": 2,
+      "title": "Abstention churn 22 rows vs net +2; no threshold change",
+      "attribution": "rewrite (retrieval churn)",
+      "severity": "warn"
+     },
+     {
+      "id": 3,
+      "title": "recall@12 changed on 9 rows, all losses; notes_iam top-2 slots 1->0 (mechanical)",
+      "attribution": "rewrite (clock leak)",
+      "severity": "notable"
+     },
+     {
+      "id": 4,
+      "title": "Judge-session drift: disagreements 11->23; judge correct 5->12 vs det 3=3; 4/65 identical-row verdict flips",
+      "attribution": "judge-session",
+      "severity": "notable"
+     },
+     {
+      "id": 5,
+      "title": "Frozen defects both arms: citation header-parse deletions (deletes gold citations on judge-correct rows), landlord leak 12=12, query echo 7->4, solo_gate phantom 0.05->0.042, same 3 HTTP-400s, same 7 widened rows",
+      "attribution": "unchanged-defect",
+      "severity": "notable"
+     },
+     {
+      "id": 6,
+      "title": "Env diff benign (LANG/PATH/plugin hash); harness sha move bounded by 0 det-verdict diffs on identical rows",
+      "attribution": "host",
+      "severity": "info"
+     },
+     {
+      "id": 7,
+      "title": "Report errata: not_found_flag_missing row is nf-01-full not nf-03-full; s7 char-length figure unreproducible; s3 verdict-split label mix",
+      "attribution": "report-errata",
+      "severity": "warn"
+     }
+    ],
+    "recommended_next_run": {
+     "change": "Add \"SearchQuery\" to _NO_TIMESTAMP_OUTPUTS (src/llm.py:340); optionally zero-content-overlap rewrite fallback (search.py:110). Re-run custom-rahul-topk2-rerank-off-rewrite on same dataset/golden.",
+     "expected_cost": "index store 66974090bdcd62e6 cache HIT (~1s mount); answer+retrieve wall ~35 min (~2100s)",
+     "note": "Moves backend_git_sha by design (new comparability cell). Score deterministically for the A/B call; settle golden v2.1 key_facts trims before next judged arm. Orthogonal follow-up: rerank-ON arm to replace the top-2 distractor lottery with a deliberate mechanism."
+    },
+    "agents": {
+     "batch1_answer_flips": "a7a09c2b7df38ca4c",
+     "batch2_modeonly_flips": "a4da80fcdbbd519f1",
+     "batch3_retrieval_flips": "a80e7097e9e229be3",
+     "regression_hunter": "aa52ff3b0eb709ed3"
+    },
+    "supervisor_spot_checks": "8 rows re-verified against artifacts (arch-04-full, nf-01-typed, phone-11-typed, arch-08-full, viz-08-typed incl. full B sweep list, rcpt-08-full, paired latency sums, landlord/byte-identical counts) - all passed; landlord count is 12=12 on substring basis (B viz-05-full carries a trailing bracket)."
+   }
+  }
+ ]
 }

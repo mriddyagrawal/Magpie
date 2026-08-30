@@ -110,30 +110,36 @@ export async function postQuery(
 //
 //   `sources`         — fires once after retrieval. Frontend renders
 //                       the sources card with `cited: false` placeholders.
-//   `not_found_topic` — fires when the answer pipeline declares not-found.
-//                       Terminal branch: no `answer_chunk` / `sources_used`
-//                       follow. Frontend transitions to the not-found card.
-//   `answer_chunk`    — fires N times during the answer phase, each
-//                       carrying a slice of the answer text. Caller
-//                       appends `text` to its in-progress buffer.
-//                       Phase 1: this fires exactly once with the full
-//                       answer; Phase 2 will fire many times as tokens
-//                       stream from the LLM.
-//   `sources_used`    — fires once after the final `answer_chunk` with
-//                       the cited paths. Frontend reconciles the
-//                       `cited` flag on its sources state here.
+//   `answer_chunk`    — fires as the model writes the answer, each
+//                       carrying the next piece of its text. Caller
+//                       appends `text` to its in-progress buffer and
+//                       shows it. May fire zero times (a provider that
+//                       can't stream, an empty not-found answer).
+//   `not_found_topic` — fires when the answer pipeline declares not-found
+//                       (the model said so, or the grounding guard refused
+//                       what it wrote — in which case chunks preceded it
+//                       and the buffer is DISCARDED). No `answer_final` /
+//                       `sources_used` follow.
+//   `answer_final`    — fires once on the found branch with the full,
+//                       checked answer text. Authoritative: caller
+//                       replaces its buffer with it (normally identical
+//                       to the joined chunks).
+//   `sources_used`    — fires once after `answer_final` with the cited
+//                       paths. Frontend reconciles the `cited` flag on
+//                       its sources state here.
 //   `done`            — terminal. Fires last in every successful and
 //                       error stream. Carries `recent_id` for the
 //                       persisted recents entry.
 //   `error`           — retrieval or answer threw. Followed by `done`.
 //
 // Usage:
-//   const buffer: string[] = [];
+//   let answer = '';
 //   for await (const ev of postQueryStream(question)) {
 //     switch (ev.type) {
 //       case 'sources':         setSources(ev.sources); break;
+//       case 'answer_chunk':    answer += ev.text; setAnswer(answer); break;
 //       case 'not_found_topic': setView({ kind: 'not_found', topic: ev.topic }); break;
-//       case 'answer_chunk':    buffer.push(ev.text); setAnswer(buffer.join('')); break;
+//       case 'answer_final':    answer = ev.text; setAnswer(answer); break;
 //       case 'sources_used':    setCited(ev.paths); break;
 //       case 'error':           setError(ev.detail); break;
 //       case 'done':            setRecentId(ev.recentId); break;
@@ -158,6 +164,11 @@ export interface StreamAnswerChunkEvent {
   text: string;
 }
 
+export interface StreamAnswerFinalEvent {
+  type: "answer_final";
+  text: string;
+}
+
 export interface StreamSourcesUsedEvent {
   type: "sources_used";
   paths: string[];
@@ -178,6 +189,7 @@ export type StreamEvent =
   | StreamSourcesEvent
   | StreamNotFoundTopicEvent
   | StreamAnswerChunkEvent
+  | StreamAnswerFinalEvent
   | StreamSourcesUsedEvent
   | StreamDoneEvent
   | StreamErrorEvent;
@@ -221,6 +233,8 @@ function parseSseFrame(raw: string): StreamEvent | null {
       return { type: "not_found_topic", topic: payload.topic ?? "" };
     case "answer_chunk":
       return { type: "answer_chunk", text: payload.text ?? "" };
+    case "answer_final":
+      return { type: "answer_final", text: payload.text ?? "" };
     case "sources_used":
       return { type: "sources_used", paths: payload.paths ?? [] };
     case "done":

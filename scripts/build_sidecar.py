@@ -138,6 +138,9 @@ def main() -> None:
         "--hidden-import", "src.ingest.csv_stats",
         "--hidden-import", "src.ingest.tier1",
         "--hidden-import", "src.router",
+        # Answer streaming: imported inside answer_question and the
+        # /query/stream endpoint only when a client streams.
+        "--hidden-import", "src.answer_stream",
         # Local LLM via llama-server subprocess. The pool / profiles / HTTP
         # client are lazy-imported by src.llm only when LLM_PROVIDER=local,
         # so PyInstaller's static analysis doesn't see them.

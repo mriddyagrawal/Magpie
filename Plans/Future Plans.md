@@ -43,7 +43,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#31** ✅ Source-count semantics: manifest vs. retrieval vs. Qdrant *(also: UI, Diagnostics)* — *fix landed; 3 minor follow-ups deferred*
 - **#33** Sidecar `PYTHONIOENCODING=utf-8` to prevent Windows non-ASCII crashes *(also: Packaging)*
 - **#34** Sidecar PyInstaller native data assets — `--collect-data` for `pydantic_ai` and `genai_prices`, plus the Nuitka migration *(also: Packaging)*
-- **#35** Phase 2 of `/query/stream` — token-by-token answer streaming via JSON-stream substring-match parser *(also: Pipeline, Performance)*
+- **#35** ✅ Phase 2 of `/query/stream` — token-by-token answer streaming *(also: Pipeline, Performance)* — *landed 2026-08-29: `src/answer_stream.py` scans the streamed JSON for the `answer` value; local (grammar-constrained `stream: true`) and OpenRouter/Moonshot both stream; magpie-cloud still arrives whole via `answer_final`. Esc-to-stop is #27*
 - **#36** OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere *(also: UI, Platform)*
 - **#42** Content-hash dedup at the Qdrant layer — N identical files → 1 point, returned once *(also: Qdrant, Retrieval, Storage)*
 

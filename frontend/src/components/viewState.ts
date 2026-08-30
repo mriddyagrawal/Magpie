@@ -40,6 +40,12 @@ export type View =
       // wider streaming story.
       partialSources: Source[] | null;
       selectedPath: string | null;
+      // The answer so far, appended to on every `answer_chunk` event.
+      // Empty until the model starts writing (AnswerCard shows its
+      // loading dots); non-empty means the text is rendering live with
+      // a "WRITING ANSWER" label. Replaced by `answer_final` and then
+      // carried into `answering` as `result.answer` on `done`.
+      partialAnswer: string;
     }
   | {
       kind: "answering";

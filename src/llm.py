@@ -32,7 +32,7 @@ import time
 import warnings
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, Generic, Protocol, TypeVar
+from typing import TYPE_CHECKING, Callable, Generic, Protocol, TypeVar
 
 import httpx
 from pydantic import BaseModel
@@ -356,12 +356,18 @@ class ChatAgent(Protocol, Generic[T]):
     response. Local agents (Gemma 4) honor it; cloud agents currently
     no-op + warn (see Plans/Future Plans.md #16 for the cross-provider
     unification work).
+
+    `on_text`, when given to `run`, receives the model's raw output in
+    pieces as it is generated (the JSON text, not the parsed object); the
+    return value is the same parsed result as without it. Agents that
+    cannot stream (magpie-cloud) ignore it.
     """
 
     async def run(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
         kv_prefix: str | None = None,
+        on_text: Callable[[str], None] | None = None,
     ) -> T: ...
 
     def run_sync(
@@ -517,6 +523,7 @@ class _CloudAgent(Generic[T]):
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
         kv_prefix: str | None = None,  # local-only; no equivalent on cloud
+        on_text: Callable[[str], None] | None = None,
     ) -> T:
         from src.inference.llm_log import log_request, log_response
 
@@ -529,22 +536,41 @@ class _CloudAgent(Generic[T]):
             messages=body["messages"],
             system_prompt=self._system_prompt,
             temperature=temperature,
-            extra={"models_fallback": body.get("models")},
+            extra={"models_fallback": body.get("models"), "stream": on_text is not None},
         )
+        # A retry is only safe while nothing has reached the caller yet —
+        # text already streamed cannot be taken back.
+        emitted = False
+
+        def _forward(piece: str) -> None:
+            nonlocal emitted
+            emitted = True
+            assert on_text is not None
+            on_text(piece)
+
         last_err: Exception | None = None
         for attempt in range(self._CLOUD_RETRY_ATTEMPTS):
             t_start = time.monotonic()
+            emitted = False
             try:
-                async with httpx.AsyncClient(timeout=API_REQUEST_TIMEOUT_S) as client:
-                    resp = await client.post(
-                        f"{self._base_url}/chat/completions",
-                        headers={"Authorization": f"Bearer {self._api_key}"},
-                        json=body,
+                if on_text is None:
+                    async with httpx.AsyncClient(timeout=API_REQUEST_TIMEOUT_S) as client:
+                        resp = await client.post(
+                            f"{self._base_url}/chat/completions",
+                            headers={"Authorization": f"Bearer {self._api_key}"},
+                            json=body,
+                        )
+                    content, usage = self._parse_and_log(resp, request_id, t_start)
+                else:
+                    content, usage = await self._stream_completion(body, _forward)
+                    log_response(
+                        request_id=request_id, provider=self._provider_name,
+                        model=self._model, latency_s=time.monotonic() - t_start,
+                        raw_status=200, content=content, usage=usage,
                     )
-                content, usage = self._parse_and_log(resp, request_id, t_start)
                 return parse_json_with_repair(content, self._output_type, None)
             except RuntimeError as e:
-                if not self._is_retryable(e):
+                if not self._is_retryable(e) or emitted:
                     log_response(
                         request_id=request_id,
                         provider=self._provider_name,
@@ -618,6 +644,72 @@ class _CloudAgent(Generic[T]):
         )
         assert last_err is not None
         raise last_err
+
+    async def _stream_completion(
+        self, body: dict[str, Any], on_text: Callable[[str], None],
+    ) -> tuple[str, dict | None]:
+        """One `chat.completions` call with `stream: true`. Every content
+        delta goes to `on_text` as it arrives; returns the joined content
+        and the usage block (OpenRouter puts it on the last chunk, so it
+        is None on providers that don't send one).
+
+        Error shapes are raised as RuntimeError with the same wording as
+        `_parse_and_log`, so `_is_retryable` reads them the same way: a
+        non-200 status before any data, or an `{"error": ...}` object
+        arriving as a chunk mid-stream."""
+        pieces: list[str] = []
+        usage: dict | None = None
+        async with httpx.AsyncClient(timeout=API_REQUEST_TIMEOUT_S) as client:
+            async with client.stream(
+                "POST",
+                f"{self._base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {self._api_key}"},
+                json={**body, "stream": True},
+            ) as resp:
+                if resp.status_code != 200:
+                    raw = (await resp.aread()).decode("utf-8", "replace")
+                    try:
+                        payload = json.loads(raw)
+                        err = payload.get("error") if isinstance(payload, dict) else None
+                        msg = err.get("message") if isinstance(err, dict) else str(payload)
+                    except Exception:  # noqa: BLE001
+                        msg = raw[:500]
+                    raise RuntimeError(
+                        f"{self._provider_name} returned HTTP {resp.status_code}: {msg}"
+                    )
+                async for line in resp.aiter_lines():
+                    # OpenRouter interleaves `: OPENROUTER PROCESSING`
+                    # comment lines as keep-alives; only `data:` matters.
+                    if not line.startswith("data:"):
+                        continue
+                    payload_text = line[len("data:"):].strip()
+                    if payload_text == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(payload_text)
+                    except json.JSONDecodeError:
+                        continue
+                    if not isinstance(chunk, dict):
+                        continue
+                    err = chunk.get("error")
+                    if err and not chunk.get("choices"):
+                        code = err.get("code") if isinstance(err, dict) else None
+                        msg = err.get("message") if isinstance(err, dict) else str(err)
+                        raise RuntimeError(
+                            f"{self._provider_name} returned HTTP {code} mid-stream: {msg}"
+                            if isinstance(code, int)
+                            else f"{self._provider_name} returned error mid-stream: {msg}"
+                        )
+                    if isinstance(chunk.get("usage"), dict):
+                        usage = chunk["usage"]
+                    choices = chunk.get("choices") or []
+                    if not choices:
+                        continue
+                    delta = (choices[0].get("delta") or {}).get("content") or ""
+                    if delta:
+                        pieces.append(delta)
+                        on_text(delta)
+        return "".join(pieces), usage
 
     @staticmethod
     def _is_retryable(err: Exception) -> bool:
@@ -1216,6 +1308,7 @@ class LocalAgent(Generic[T]):
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
         kv_prefix: str | None = None,
+        on_text: Callable[[str], None] | None = None,
     ) -> T:
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
@@ -1246,19 +1339,37 @@ class LocalAgent(Generic[T]):
             system_prompt=self._system_prompt,
             temperature=temperature,
             response_format=self._response_format,
-            extra={"images": len(images), "thinking": thinking},
+            extra={"images": len(images), "thinking": thinking, "stream": on_text is not None},
         )
         t_start = time.monotonic()
         try:
-            raw = await llm.complete(
-                msgs,
-                thinking=thinking,
-                temperature=temperature,
-                max_tokens=LOCAL_MAX_TOKENS,
-                images=images or None,
-                response_format=self._response_format,
-                grammar=self._grammar,
-            )
+            if on_text is None:
+                raw = await llm.complete(
+                    msgs,
+                    thinking=thinking,
+                    temperature=temperature,
+                    max_tokens=LOCAL_MAX_TOKENS,
+                    images=images or None,
+                    response_format=self._response_format,
+                    grammar=self._grammar,
+                )
+            else:
+                # Same request with stream=true: each delta goes to the
+                # caller as it is generated, and the joined text is parsed
+                # exactly as the one-shot reply would have been.
+                pieces: list[str] = []
+                async for piece in await llm.stream(
+                    msgs,
+                    thinking=thinking,
+                    temperature=temperature,
+                    max_tokens=LOCAL_MAX_TOKENS,
+                    images=images or None,
+                    response_format=self._response_format,
+                    grammar=self._grammar,
+                ):
+                    pieces.append(piece)
+                    on_text(piece)
+                raw = "".join(pieces)
         except Exception as e:
             log_response(
                 request_id=request_id, provider="local",

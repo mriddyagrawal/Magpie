@@ -17,7 +17,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Callable, Sequence
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -591,8 +591,16 @@ async def answer_question(
     csv_row_hits: dict[str, list[int]] | None = None,
     enumerate_lists: bool = True,
     temperature: float | None = None,
+    on_answer_text: Callable[[str], None] | None = None,
 ) -> Answer:
     """Given a question and a list of file paths, return a grounded Answer.
+
+    `on_answer_text`, when given, receives the `answer` field's text in
+    pieces while the model is still writing it (src/answer_stream.py), so a
+    UI can show the answer as it forms. The returned Answer is still the
+    parsed and checked result, and can differ from what was streamed —
+    JSON repair, the not-found contract and the grounding guard all run on
+    the full reply — so the caller treats the return value as final.
 
     Missing or unreadable files are skipped with a stderr warning. If *every*
     path is unusable, raises SummarizeError.
@@ -1097,8 +1105,16 @@ async def answer_question(
     # content. Cheap (~15-30 tokens) for a real win on a 3B backend.
     message.append(f"\nNow answer this question: {question}")
 
+    # Only pass `on_text` when streaming was asked for: the agent protocol
+    # accepts it, but a bare test double may not.
+    run_kwargs: dict = {}
+    if on_answer_text is not None:
+        from src.answer_stream import AnswerFieldStreamer
+
+        run_kwargs["on_text"] = AnswerFieldStreamer(on_answer_text).feed
+
     _t_llm = _time.monotonic()
-    ans = await agent.run(message, temperature=temperature, kv_prefix=kv_prefix)
+    ans = await agent.run(message, temperature=temperature, kv_prefix=kv_prefix, **run_kwargs)
     from src.llm import LAST_KV_SECONDS
     LAST_SUBTIMINGS["kv"] = LAST_KV_SECONDS.get("seconds", 0.0)
     LAST_SUBTIMINGS["llm"] = _time.monotonic() - _t_llm - LAST_SUBTIMINGS["kv"]

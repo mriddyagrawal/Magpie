@@ -116,6 +116,9 @@ class LocalLLM(Protocol):
         thinking: bool = False,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        images: Optional[Sequence[bytes]] = None,
+        response_format: Optional[dict[str, Any]] = None,
+        grammar: Optional[str] = None,
     ) -> AsyncIterator[str]: ...
 
 
@@ -300,6 +303,9 @@ class LlamaServerLLM:
         thinking: bool = False,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        images: Optional[Sequence[bytes]] = None,
+        response_format: Optional[dict[str, Any]] = None,
+        grammar: Optional[str] = None,
     ) -> AsyncIterator[str]:
         """Yield response chunks as they're generated.
 
@@ -309,16 +315,30 @@ class LlamaServerLLM:
         yield. The server's terminal `data: [DONE]\\n\\n` ends the
         iterator cleanly.
 
+        Same request as `complete()` — `images`, `response_format` and
+        `grammar` mean the same thing here, so a grammar-constrained
+        structured-output call can be streamed (the answer step does
+        this; see src/answer_stream.py). `last_timings` is filled from
+        the final chunk, as it is for `complete()`.
+
         On HTTP error mid-stream we propagate the exception to the
         consumer; the caller's `except` block decides what to surface
         to the user.
         """
 
+        profile_name = self._select_profile(images)
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
-        body = self._build_request_body(prepared, temperature, max_tokens, stream=True)
-        url = self._base_url() + "/v1/chat/completions"
+        if images:
+            prepared = _attach_images_to_last_user(prepared, images)
+        body = self._build_request_body(
+            prepared, temperature, max_tokens, stream=True, thinking=thinking,
+            response_format=response_format,
+            grammar=grammar,
+        )
+        url = self._base_url(profile_name) + "/v1/chat/completions"
+        self.last_timings = None
 
         async def _gen() -> AsyncIterator[str]:
             try:
@@ -329,14 +349,21 @@ class LlamaServerLLM:
                             text = _parse_sse_chunk(line)
                             if text == _SSE_DONE:
                                 return
+                            timings = _parse_sse_timings(line)
+                            if timings is not None:
+                                self.last_timings = timings
                             if text:
                                 yield text
             except httpx.ConnectError as e:
                 # Subprocess vanished mid-stream — drop registry entry
-                # so the next call respawns cleanly.
-                get_pool().mark_dead(self.profile_name)
-                raise RuntimeError(
-                    f"llama-server connection failed mid-stream: {e}"
+                # so the next call respawns cleanly. Same exception type
+                # as `complete()` so the server maps it to the same
+                # user-facing message.
+                get_pool().mark_dead(profile_name)
+                raise LlamaServerSpawnError(
+                    f"llama-server connection failed mid-stream: {e}. "
+                    f"The subprocess may have crashed; the pool has cleared "
+                    f"its registry, so the next request will respawn it."
                 ) from e
 
         return _gen()
@@ -580,6 +607,20 @@ def _parse_sse_chunk(line: str) -> str:
         return chunk["choices"][0].get("delta", {}).get("content") or ""
     except (json.JSONDecodeError, KeyError, IndexError, TypeError):
         return ""
+
+
+def _parse_sse_timings(line: str) -> Optional[dict[str, Any]]:
+    """llama-server puts its `timings` block (prompt_n / prompt_ms /
+    predicted_n / predicted_ms) on the last streamed chunk. Returns it
+    when this line carries one, else None."""
+    if not line.startswith("data: "):
+        return None
+    try:
+        chunk = json.loads(line[len("data: "):].strip())
+    except json.JSONDecodeError:
+        return None
+    timings = chunk.get("timings") if isinstance(chunk, dict) else None
+    return timings if isinstance(timings, dict) else None
 
 
 # ---------------------------------------------------------------------------

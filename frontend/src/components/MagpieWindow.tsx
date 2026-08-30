@@ -435,6 +435,7 @@ export function MagpieWindow() {
       question: trimmed,
       partialSources: null,
       selectedPath: null,
+      partialAnswer: "",
     });
     const historyToSend = historyRef.current.slice(-HISTORY_TURNS);
 
@@ -446,7 +447,7 @@ export function MagpieWindow() {
     const searchQuery = { query: "", keywords: [] } as { query: string; keywords: string[] };
     let rewrittenQuery: string | null = null;
     let sourcesScannedCount = 0;
-    const answerChunks: string[] = [];
+    let answerText = "";
     let sourcesUsed: string[] = [];
     let notFoundTopic: string | null = null;
     let recentId: string | null = null;
@@ -476,16 +477,30 @@ export function MagpieWindow() {
               question: trimmed,
               partialSources: ev.sources,
               selectedPath: ev.sources[0]?.path ?? null,
+              partialAnswer: "",
             });
             break;
           case "not_found_topic":
             notFoundTopic = ev.topic;
             break;
-          case "answer_chunk":
-            // Phase 1: this fires exactly once with the full answer
-            // text. Phase 2 (Plan #35) will fire many times; the
-            // accumulator handles both shapes identically.
-            answerChunks.push(ev.text);
+          case "answer_chunk": {
+            // The model is writing: show the text as it arrives. Only
+            // the retrieving-with-sources view carries the partial
+            // answer; anything else means the user moved on.
+            answerText += ev.text;
+            const soFar = answerText;
+            setView((prev) =>
+              prev.kind === "retrieving" && prev.partialSources !== null
+                ? { ...prev, partialAnswer: soFar }
+                : prev,
+            );
+            break;
+          }
+          case "answer_final":
+            // The checked answer replaces whatever was streamed (same
+            // text in the normal case; the repaired text when JSON
+            // repair or a non-streaming provider was involved).
+            answerText = ev.text;
             break;
           case "sources_used":
             sourcesUsed = ev.paths;
@@ -513,7 +528,7 @@ export function MagpieWindow() {
       }
 
       const isNotFound = notFoundTopic !== null;
-      const finalAnswer = isNotFound ? "" : answerChunks.join("");
+      const finalAnswer = isNotFound ? "" : answerText;
       const citedSet = new Set(sourcesUsed);
       const finalSources: Source[] = sources.map((s) => ({
         ...s,
@@ -838,15 +853,16 @@ export function MagpieWindow() {
       {view.kind === "retrieving" && view.partialSources !== null && (
         // Retrieving-with-sources: same two-column layout as answering,
         // with the AnswerCard in `loading=true` (animated dots) until
-        // the answer event lands. Sources are clickable, the right-pane
+        // the first answer_chunk lands, then the partial answer rendering
+        // live as chunks append. Sources are clickable, the right-pane
         // PreviewCard is live — the user can browse the pulled files
-        // while the LLM thinks. Synthesized QueryResponse here is just
+        // while the LLM writes. Synthesized QueryResponse here is just
         // a shell to feed AnsweringBody; the real one is built when
         // `done` arrives and the view transitions to `answering`.
         <AnsweringBody
           result={{
             question: view.question,
-            answer: "",
+            answer: view.partialAnswer,
             sources: view.partialSources,
             search_query: { query: "", keywords: [] },
             not_found: false,
@@ -862,7 +878,8 @@ export function MagpieWindow() {
           }}
           onFollowUp={focusAndSelectInput}
           highlights={[]}
-          loading={true}
+          loading={view.partialAnswer === ""}
+          streaming={view.partialAnswer !== ""}
         />
       )}
 
@@ -906,17 +923,20 @@ function AnsweringBody({
   onFollowUp,
   highlights,
   loading,
+  streaming = false,
 }: {
   result: QueryResponse;
   selectedPath: string | null;
   onSelect: (path: string) => void;
   onFollowUp: () => void;
   highlights: string[];
-  // True during retrieving-with-sources (answer LLM still running);
-  // false once the answer has arrived and the view is `answering`.
-  // AnswerCard renders animated dots when loading, the rendered
-  // answer text otherwise.
+  // True during retrieving-with-sources before the model has written
+  // anything; false once text exists. AnswerCard renders animated dots
+  // when loading, the rendered answer text otherwise.
   loading: boolean;
+  // True while answer chunks are still arriving: the text renders with
+  // a "WRITING ANSWER" label and a cursor, and no follow-up button yet.
+  streaming?: boolean;
 }) {
   // Inline `[N]` markers are 1-based indexes into sources_used (the ordered
   // list of files the answer drew from) — NOT the full retrieval list. If a
@@ -950,6 +970,7 @@ function AnsweringBody({
           highlights={highlights}
           error={null}
           loading={loading}
+          streaming={streaming}
           onFollowUp={onFollowUp}
           onSelectSource={onSelect}
         />

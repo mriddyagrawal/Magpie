@@ -484,10 +484,10 @@ async def query(req: QueryRequest) -> QueryResponse:
 #
 # Mirrors `/query` 1:1 in inputs, but emits results as an SSE stream so
 # the ask bar can paint the sources card the moment retrieval finishes
-# (~500ms-3s), before the answer LLM call returns. The answer itself is
-# delivered as a sequence of `answer_chunk` events that the frontend
-# appends to the AnswerCard as they arrive — token-by-token UX once
-# Phase 2 lands (see below).
+# (~500ms-3s), before the answer LLM call returns, and then shows the
+# answer as the model writes it: the model's reply is a JSON object, and
+# `src/answer_stream.py` picks the `answer` string out of the token
+# stream and forwards it as `answer_chunk` events.
 #
 # Wire format (SSE, `text/event-stream`):
 #
@@ -496,22 +496,34 @@ async def query(req: QueryRequest) -> QueryResponse:
 #          "rewritten_query": "..." | null, "sources_scanned_count": N}
 #   ── fires once after retrieval, before the answer LLM call.
 #
-#   event: not_found_topic
-#   data: {"topic": "..."}
-#   ── fires only when the answer pipeline declares not-found. Terminal
-#      branch: no `answer_chunk` / `sources_used` will follow.
-#
 #   event: answer_chunk
 #   data: {"text": "..."}
-#   ── fires N times during the answer phase, each with a slice of the
-#      answer text. Caller appends `text` to its in-progress answer
-#      buffer. Newlines / Unicode preserved verbatim (JSON-encoded).
+#   ── fires as the model writes the `answer` field, each with the next
+#      piece of its text (JSON-decoded: newlines and Unicode are real).
+#      Caller appends `text` to its in-progress buffer and shows it. Zero
+#      chunks is possible: a provider that cannot stream (magpie-cloud),
+#      a not-found reply whose answer is empty.
+#
+#   event: not_found_topic
+#   data: {"topic": "..."}
+#   ── fires when the answer pipeline declares not-found — either the
+#      model said so, or the grounding guard refused the answer it wrote.
+#      In the second case `answer_chunk` events preceded it: the caller
+#      DISCARDS its buffer. No `answer_final` / `sources_used` follow.
+#
+#   event: answer_final
+#   data: {"text": "..."}
+#   ── fires once on the found branch, after the last `answer_chunk`,
+#      with the full answer text as parsed and checked. Authoritative:
+#      the caller replaces its buffer with it. Normally identical to the
+#      joined chunks; differs when JSON repair rewrote a cloud reply or
+#      the provider did not stream.
 #
 #   event: sources_used
 #   data: {"paths": [...]}
-#   ── fires once after the final `answer_chunk`, with the subset of
-#      retrieved paths the model actually cited. Frontend reconciles
-#      the `cited` flag on its sources state at this point.
+#   ── fires once after `answer_final`, with the subset of retrieved
+#      paths the model actually cited. Frontend reconciles the `cited`
+#      flag on its sources state at this point.
 #
 #   event: done
 #   data: {"recent_id": "..." | null}
@@ -521,19 +533,14 @@ async def query(req: QueryRequest) -> QueryResponse:
 #   event: error
 #   data: {"detail": "user-safe message", "phase": "retrieval"|"answer"}
 #   ── fires when retrieval or the answer step throws. Followed by
-#      `done`. No `answer_chunk` / `sources_used` will follow.
+#      `done`. `answer_chunk` events may have preceded an answer-phase
+#      error; the caller discards them.
 #
-# **Phase status (2026-05).** Phase 1 (this implementation) emits the
-# answer as **a single `answer_chunk`** containing the full answer text,
-# emitted after the agent's structured-output call returns. The wire
-# shape is correct for token-by-token streaming; Phase 2 (Plan #35)
-# replaces the single-chunk emission with real per-token chunks by:
-# (a) extracting `_build_answer_messages` from `answer_question`, and
-# (b) calling `local_llm.stream(messages, response_format=…json_schema…)`
-# instead of `agent.run`, then routing the streamed JSON bytes through
-# a substring-match parser that watches for the `"answer": "` field
-# start and emits everything between the opening and closing quotes
-# as `answer_chunk` events.
+# History: Phase 1 (2026-05) sent the whole answer as one `answer_chunk`
+# after the structured-output call returned. Phase 2 (2026-08-29, Plan
+# #35) streams it: `answer_question(on_answer_text=...)` runs the same
+# grammar-constrained request with `stream: true` and the JSON scanner in
+# `src/answer_stream.py` decodes the `answer` value as it arrives.
 
 @app.post("/query/stream")
 async def query_stream(req: QueryRequest):
@@ -541,6 +548,7 @@ async def query_stream(req: QueryRequest):
     # Inline imports mirror /query — keeps cold-start cheap when the
     # endpoint isn't called.
     from src.answer import Answer, answer_question, build_answer_agent
+    from src.answer_stream import stream_answer
     from src.manifest import Manifest
     from src.recents import add_recent
     from src.stage2.search import raw_query, rewrite_query, run_search
@@ -650,15 +658,30 @@ async def query_stream(req: QueryRequest):
             if r.path and r.chunk_index is not None:
                 csv_row_hits.setdefault(r.path, []).append(int(r.chunk_index))
 
+        # The answer call reports the `answer` field's text through a
+        # callback as the model writes it; stream_answer turns that into
+        # an iterator so each piece can be sent while generation is still
+        # running. The parsed Answer arrives last.
+        ans: Answer | None = None
         try:
             agent = build_answer_agent()
-            ans: Answer = await answer_question(
-                agent, req.question, paths,
-                history=history_pairs,
-                search_query=sq,
-                csv_row_hits=csv_row_hits or None,
-                enumerate_lists=enumerate_lists,
-            )
+
+            def start(on_answer_text):
+                return answer_question(
+                    agent, req.question, paths,
+                    history=history_pairs,
+                    search_query=sq,
+                    csv_row_hits=csv_row_hits or None,
+                    enumerate_lists=enumerate_lists,
+                    on_answer_text=on_answer_text,
+                )
+
+            async for kind, item in stream_answer(start):
+                if kind == "text":
+                    yield _frame("answer_chunk", {"text": item})
+                else:
+                    ans = item  # type: ignore[assignment]
+            assert ans is not None
         except Exception as e:  # pylint: disable=broad-except
             _, detail = _user_facing_error(e)
             yield _frame("error", {"detail": detail, "phase": "answer"})
@@ -682,25 +705,19 @@ async def query_stream(req: QueryRequest):
             print(f"[server] recents persist failed (non-fatal): {e}", file=sys.stderr)
             recent_id = None
 
-        # Not-found branch — single not_found_topic event, no answer
-        # chunks, no sources_used. Frontend transitions to the not-found
-        # card on this event without waiting for further frames.
+        # Not-found branch — a not_found_topic event, no answer_final, no
+        # sources_used. Answer chunks may already have gone out (the
+        # grounding guard refuses after the model has written); the
+        # frontend drops them and shows the not-found card.
         if ans.not_found:
             yield _frame("not_found_topic", {"topic": ans.not_found_topic})
             yield _frame("done", {"recent_id": recent_id})
             return
 
-        # Found branch.
-        # Phase 1: emit the entire answer as a single chunk. Phase 2 will
-        # replace this `for chunk in [ans.answer]:` with a true per-token
-        # iterator backed by `local_llm.stream()` + a substring-match
-        # JSON parser that watches the streamed bytes for the `"answer":
-        # "..."` field and pipes through everything between the quotes.
-        # The wire format is already correct — Phase 2 is a backend
-        # implementation swap; api.ts and MagpieWindow integration land
-        # on day one.
-        if ans.answer:
-            yield _frame("answer_chunk", {"text": ans.answer})
+        # Found branch. The checked, parsed answer is sent whole so the
+        # frontend never has to wonder whether the chunks it joined are
+        # what the pipeline settled on.
+        yield _frame("answer_final", {"text": ans.answer})
         yield _frame("sources_used", {"paths": ans.sources_used})
         yield _frame("done", {"recent_id": recent_id})
 

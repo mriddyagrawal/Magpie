@@ -7,6 +7,7 @@ shape and the SSE parsing logic.
 from __future__ import annotations
 
 import asyncio
+import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -243,6 +244,120 @@ def test_complete_marks_pool_dead_on_connection_error():
             ):
                 with pytest.raises(LlamaServerSpawnError):
                     await llm.complete(messages=[{"role": "user", "content": "hi"}])
+            mock_pool.return_value.mark_dead.assert_called_once_with(llm.profile_name)
+
+    asyncio.run(run())
+
+
+class _FakeStreamResponse:
+    """Stands in for the `async with client.stream(...) as resp` object:
+    a status, raise_for_status, and the SSE lines llama-server would send."""
+
+    def __init__(self, lines: list[str], status_code: int = 200):
+        self._lines = lines
+        self.status_code = status_code
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc):
+        return False
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
+
+    async def aiter_lines(self):
+        for line in self._lines:
+            yield line
+
+
+def test_stream_forwards_grammar_and_yields_deltas_and_timings():
+    """The streaming path is the same request as complete() with
+    stream=true: grammar / response_format ride along, each delta is
+    yielded as it arrives, and the final chunk's timings are kept."""
+    llm = LlamaServerLLM()
+    lines = [
+        "data: " + json.dumps({"choices": [{"delta": {"content": '{"answer": '}}]}),
+        "",
+        ": keep-alive comment",
+        "data: " + json.dumps({
+            "choices": [{"delta": {"content": '"hi"}'}}],
+            "timings": {"prompt_n": 12, "predicted_n": 5},
+        }),
+        "",
+        "data: [DONE]",
+    ]
+    captured: dict = {}
+
+    class FakeClient:
+        def __init__(self, *a, **kw):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        def stream(self, method, url, json):
+            captured["method"] = method
+            captured["url"] = url
+            captured["body"] = json
+            return _FakeStreamResponse(lines)
+
+    async def run():
+        with patch("src.inference.local_llm.get_pool") as mock_pool:
+            mock_pool.return_value.get_url_for.return_value = "http://127.0.0.1:9100"
+            with patch("src.inference.local_llm.httpx.AsyncClient", FakeClient):
+                it = await llm.stream(
+                    [{"role": "user", "content": "hello"}],
+                    grammar='root ::= "x"',
+                    max_tokens=64,
+                )
+                return [piece async for piece in it]
+
+    pieces = asyncio.run(run())
+    assert pieces == ['{"answer": ', '"hi"}']
+    assert captured["method"] == "POST"
+    assert captured["url"] == "http://127.0.0.1:9100/v1/chat/completions"
+    assert captured["body"]["stream"] is True
+    assert captured["body"]["grammar"] == 'root ::= "x"'
+    assert captured["body"]["max_tokens"] == 64
+    assert llm.last_timings == {"prompt_n": 12, "predicted_n": 5}
+
+
+def test_stream_marks_pool_dead_on_connection_error():
+    """Same recovery contract as complete(): a vanished subprocess drops
+    the registry entry and surfaces as LlamaServerSpawnError."""
+    import httpx
+
+    from src.inference.llama_server_pool import LlamaServerSpawnError
+
+    llm = LlamaServerLLM()
+
+    class FakeClient:
+        def __init__(self, *a, **kw):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        def stream(self, method, url, json):
+            raise httpx.ConnectError("connection refused")
+
+    async def run():
+        with patch("src.inference.local_llm.get_pool") as mock_pool:
+            mock_pool.return_value.get_url_for.return_value = "http://127.0.0.1:9100"
+            mock_pool.return_value.mark_dead = MagicMock()
+            with patch("src.inference.local_llm.httpx.AsyncClient", FakeClient):
+                it = await llm.stream([{"role": "user", "content": "hi"}])
+                with pytest.raises(LlamaServerSpawnError):
+                    async for _ in it:
+                        pass
             mock_pool.return_value.mark_dead.assert_called_once_with(llm.profile_name)
 
     asyncio.run(run())

@@ -1,0 +1,9 @@
+root ::= "{" ws "\"answer\"" ws ":" ws string ws "," ws "\"sources_used\"" ws ":" ws stringlist ws "," ws "\"not_found\"" ws ":" ws boolean ws "," ws "\"not_found_topic\"" ws ":" ws string ws "}"
+string ::= "\"" char* "\""
+char ::= [^"\\\x00-\x1F] | "\\" (["\\/bfnrt] | "u" hex hex hex hex)
+hex ::= [0-9a-fA-F]
+boolean ::= "true" | "false"
+integer ::= "-"? ("0" | [1-9] [0-9]*)
+number ::= integer ("." [0-9]+)? ([eE] [-+]? [0-9]+)?
+stringlist ::= "[" ws (string (ws "," ws string)*)? ws "]"
+ws ::= [ \t]?

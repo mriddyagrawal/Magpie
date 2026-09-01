@@ -46,6 +46,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#35** Phase 2 of `/query/stream` — token-by-token answer streaming via JSON-stream substring-match parser *(also: Pipeline, Performance)*
 - **#36** OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere *(also: UI, Platform)*
 - **#42** Content-hash dedup at the Qdrant layer — N identical files → 1 point, returned once *(also: Qdrant, Retrieval, Storage)*
+- **#43** Notion connector — "Connect Notion" OAuth button → local markdown mirror *(also: UI, Security, Connectors)*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -61,6 +62,7 @@ Settings panels, in-app warnings, anything the user sees.
 - **#30** ✅ Settings buttons that persist but don't act — wire-up audit *(also: Cross-cutting)* — *5 of 6 items done/removed; "Check for updates" gated on Plan #19*
 - **#32** Per-provider prompt-layout split (small-local vs. cloud) *(also: Models, Eval)*
 - **#36** OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere *(also: Platform)*
+- **#43** Notion connector — "Connect Notion" OAuth button *(also: Indexing, Security, Connectors)*
 
 ### 📦 Packaging, distribution & process lifecycle
 How Magpie ships and runs as an end-user app — from installer through process management.
@@ -3365,3 +3367,75 @@ Total scope sketch: ~50-80 LOC. No migration. Reversible. Picks up the
 ~80% of the win without the schema change.
 
 ---
+
+## 43. Notion connector — "Connect Notion" OAuth button → local markdown mirror
+
+**Tags:** indexing · connectors · ui · security
+
+**What:** Index the user's Notion pages by syncing them into a local
+markdown mirror that the existing pipeline indexes like any other
+folder. Onboarding is a single "Connect Notion" button (public OAuth),
+not a pasted token. (Discussed 2026-08-31.)
+
+**Architecture decision — mirror, not native source.** Magpie's whole
+pipeline (walker → router → tiers → manifest → citations) is keyed on
+local paths; keep it that way. A connector daemon/job pulls shared
+pages via the Notion API and writes:
+
+- one `.md` per page, front-matter carrying `notion_id`, `url`,
+  `last_edited_time` — routed through the normal text tier;
+- one `.csv` per database — drops straight into the existing CSV tier;
+- a mapping file (`notion_id ↔ mirror path ↔ notion.so URL`) so the UI
+  opens the real Notion page from a citation, plus incremental sync
+  (cursor on `last_edited_time`) and deletion tombstones (unshared /
+  deleted page → remove mirror file → `clean_stale` drops the row).
+
+Mirror lives under `<APP_DATA_DIR>/connectors/notion/` (or user-chosen)
+and is registered as a normal include path. **Zero retrieval/indexing
+code changes.** Teaching manifest/walker about URIs was considered and
+rejected: deep refactor, no retrieval benefit; if Drive/Slack/email
+come later, each is just another mirror-writer.
+
+**The ladder:**
+- **v0 (no code):** Notion Settings → Export workspace as Markdown/CSV
+  zip → user unzips into an indexed folder. Proof of value today.
+- **v1 — internal integration token:** user creates an internal
+  integration, shares pages with it, pastes the token (stored in
+  `secrets.json`). All the sync machinery above. A few days of work.
+- **v2 — public OAuth ("Connect Notion"):** same sync code; adds the
+  onboarding polish. This is the target UX (owner: "I'd rather people
+  don't have to paste a token").
+
+**Public OAuth facts (verified vs. Notion docs, 2026-08-31):**
+- Fully self-serve — **no Notion approval, review, or fee** to create
+  and distribute a public integration. Notion review exists only for
+  optional listing in their integrations gallery.
+- Registration requires: name/logo, company website, **privacy policy
+  URL** (+ terms / support email) — so Magpie needs a published privacy
+  policy page first (needed anyway).
+- Redirect URI must be real HTTPS (no wildcards/IPs/fragments) → one
+  small hosted callback page that deep-links back into the app, plus
+  one serverless token-exchange function (the `client_secret` lives
+  there, never in the desktop bundle). That endpoint exchanges the auth
+  code only — **page content always flows Notion → user's machine
+  directly**; nothing of the user's passes through our infrastructure.
+- Notion's OAuth consent screen doubles as the page picker: the user
+  selects exactly which pages/teamspaces Magpie can read during
+  connect. That IS the `include_paths` consent rail, for free. No
+  granular scopes to manage; configure the integration read-content-only.
+
+**Gotchas recorded up front:**
+- Rate limit ~3 req/s average — initial sync of a big workspace takes
+  a while; sync must be resumable/cursored, not one-shot.
+- Embedded images arrive as **expiring S3 URLs** (~1 h) — download at
+  sync time if the visual tier should see them; v1 may skip images.
+- Synced blocks / embeds have no markdown equivalent — render as links.
+- Huge databases: cap rows or page through; CSV tier's existing
+  row-count routing (#17) applies.
+
+**Scope:** v1 ≈ a few days (token auth, page+database pull,
+block-tree→md conversion, mirror + mapping + manual "Sync Notion",
+citation URL rewrite). v2 adds the privacy-policy page, HTTPS callback
+page, and one token-exchange function. Cohorts: #26 (BYO API key
+settings surface), #19 (keychain secrets — the Notion token belongs
+there when it lands), #42 (dedup — re-synced identical content).

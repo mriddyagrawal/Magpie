@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompt Ordering at Long Context</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body,h1,h2,h3,h4,p,ul,figure{margin:0}
+ul{padding:0}
+table{border-collapse:collapse}
+
+:root{
+  --ground:#EEF1F4; --surface:#FCFDFE; --sunk:#E3E8EC;
+  --ink:#161C23; --body:#39434F; --muted:#68737F; --hair:#CBD4DB;
+  --accent:#175A70; --accent-soft:#D6E6EC;
+  --ok:#2C6E49; --ok-soft:#D8E9DF;
+  --warn:#8A5A06; --warn-soft:#F2E5CB;
+  --stop:#9B3025; --stop-soft:#F3DAD6;
+  --f-disp:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1418; --surface:#161D23; --sunk:#1C252C;
+    --ink:#E8EDF1; --body:#BCC7D0; --muted:#8695A1; --hair:#2A353E;
+    --accent:#69B6CE; --accent-soft:#153039;
+    --ok:#7CC79B; --ok-soft:#16291F;
+    --warn:#D5A44B; --warn-soft:#2C2314;
+    --stop:#E08579; --stop-soft:#301A17;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1418; --surface:#161D23; --sunk:#1C252C;
+  --ink:#E8EDF1; --body:#BCC7D0; --muted:#8695A1; --hair:#2A353E;
+  --accent:#69B6CE; --accent-soft:#153039;
+  --ok:#7CC79B; --ok-soft:#16291F;
+  --warn:#D5A44B; --warn-soft:#2C2314;
+  --stop:#E08579; --stop-soft:#301A17;
+}
+
+body{margin:0;background:var(--ground);color:var(--body);
+  font-family:var(--f-body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 28px 100px}
+
+header{border-bottom:1px solid var(--hair);padding:56px 0 30px;margin-bottom:44px}
+.kicker{font-family:var(--f-mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+h1{font-family:var(--f-disp);font-weight:600;font-size:clamp(32px,5vw,46px);line-height:1.1;
+  color:var(--ink);margin:0 0 20px;text-wrap:balance;letter-spacing:-.015em}
+.standfirst{font-size:18.5px;line-height:1.6;color:var(--body);margin:0;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:26px;font-family:var(--f-mono);font-size:12px}
+.meta span{background:var(--sunk);border:1px solid var(--hair);color:var(--muted);padding:4px 9px;border-radius:3px}
+
+section{margin:0 0 52px}
+h2{font-family:var(--f-disp);font-weight:600;font-size:25px;color:var(--ink);margin:0 0 6px;
+  letter-spacing:-.01em;text-wrap:balance}
+h2 .num{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--accent);
+  letter-spacing:.1em;display:block;margin-bottom:9px}
+h3{font-family:var(--f-body);font-weight:600;font-size:15.5px;color:var(--ink);margin:30px 0 8px}
+p{margin:0 0 15px;max-width:70ch}
+.lede{border-left:2px solid var(--hair);padding-left:18px;margin-bottom:26px}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--sunk);border:1px solid var(--hair);
+  border-radius:3px;padding:1px 5px;color:var(--ink)}
+ul{margin:0 0 15px;padding-left:20px;max-width:70ch}
+li{margin-bottom:7px}
+li::marker{color:var(--muted)}
+
+.verdict{background:var(--surface);border:1px solid var(--hair);border-left:3px solid var(--accent);
+  border-radius:4px;padding:26px 28px;margin-bottom:34px}
+.verdict .q{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px}
+.verdict .a{font-family:var(--f-disp);font-size:23px;line-height:1.35;color:var(--ink);
+  margin:0 0 12px;font-weight:400}
+.verdict p:last-child{margin-bottom:0;font-size:15px}
+
+.scroll{overflow-x:auto;margin:0 0 10px;-webkit-overflow-scrolling:touch}
+table{width:100%;min-width:520px;background:var(--surface);font-size:14.5px}
+caption{caption-side:top;text-align:left;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);padding:0 0 9px}
+th,td{padding:9px 14px;text-align:right;border-bottom:1px solid var(--hair)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:var(--f-mono);font-size:11.5px;font-weight:500;color:var(--muted);letter-spacing:.05em;
+  text-transform:uppercase;background:var(--sunk);white-space:nowrap}
+tbody td{font-variant-numeric:tabular-nums;color:var(--body)}
+tbody td:first-child{font-family:var(--f-mono);font-weight:500;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+td.hi{color:var(--ink);font-weight:600}
+td.win{color:var(--ok);font-weight:600}
+td.bad{color:var(--stop);font-weight:600}
+.note{font-size:13.5px;color:var(--muted);margin:8px 0 0;max-width:70ch}
+
+.seqs{display:flex;flex-direction:column;gap:11px;margin:0 0 18px}
+.seq{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--surface);
+  border:1px solid var(--hair);border-radius:4px;padding:11px 14px}
+.seq .name{font-family:var(--f-mono);font-weight:600;font-size:13px;color:var(--ink);min-width:52px}
+.chip{font-family:var(--f-mono);font-size:11.5px;padding:3px 9px;border-radius:3px;
+  border:1px solid var(--hair);color:var(--body);background:var(--sunk);white-space:nowrap}
+.chip.doc{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.chip.q{background:var(--warn-soft);border-color:var(--warn);color:var(--warn);font-weight:600}
+.seq .sc{margin-left:auto;font-family:var(--f-mono);font-size:12.5px;font-weight:600;
+  color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* length-scaling chart */
+.chart{background:var(--surface);border:1px solid var(--hair);border-radius:4px;padding:24px 26px;margin-bottom:14px}
+.row{display:grid;grid-template-columns:120px 1fr 82px;gap:16px;align-items:center;margin-bottom:15px}
+.row:last-child{margin-bottom:0}
+.rl{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+.rl small{display:block;color:var(--muted);font-size:11px}
+.track{position:relative;height:26px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.seg{position:absolute;top:0;height:100%;display:flex;align-items:center;padding-left:8px;
+  font-family:var(--f-mono);font-size:11px;color:#fff}
+.seg.a{background:var(--stop);z-index:2}
+.seg.b{background:var(--accent);z-index:1}
+.delta{font-family:var(--f-mono);font-size:15px;font-weight:600;text-align:right;
+  font-variant-numeric:tabular-nums}
+.legend{display:flex;gap:18px;margin-top:16px;font-family:var(--f-mono);font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+.pair{background:var(--surface);border:1px solid var(--hair);border-radius:4px;padding:20px 24px;margin-bottom:14px}
+.pair h4{font-family:var(--f-mono);font-size:13.5px;font-weight:600;color:var(--ink);margin:0 0 3px}
+.pair .sub{font-size:13px;color:var(--muted);margin:0 0 15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px 18px}
+.stat .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:3px}
+.stat .v{font-family:var(--f-mono);font-size:18px;font-weight:500;color:var(--ink);
+  font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .v.sm{font-size:14px}
+.tag{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;padding:3px 9px;border-radius:3px;border:1px solid currentColor}
+.tag.null{color:var(--muted);background:var(--sunk)}
+.tag.sig{color:var(--ok);background:var(--ok-soft)}
+.tag.pass{color:var(--ok);background:var(--ok-soft)}
+
+.checks{display:flex;flex-direction:column;gap:1px;background:var(--hair);border:1px solid var(--hair);
+  border-radius:4px;overflow:hidden;margin-bottom:14px}
+.check{display:flex;gap:14px;align-items:baseline;background:var(--surface);padding:13px 16px;flex-wrap:wrap}
+.check .lbl{font-weight:600;color:var(--ink);font-size:14.5px;flex:1 1 200px}
+.check .res{font-family:var(--f-mono);font-size:12.5px;color:var(--body);
+  font-variant-numeric:tabular-nums;flex:1 1 250px}
+
+.callout{background:var(--warn-soft);border:1px solid var(--warn);border-radius:4px;padding:20px 24px;margin:0 0 20px}
+.callout .h{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--warn);font-weight:600;margin-bottom:8px}
+.callout p{margin-bottom:0;color:var(--body)}
+.callout.good{background:var(--accent-soft);border-color:var(--accent)}
+.callout.good .h{color:var(--accent)}
+
+footer{border-top:1px solid var(--hair);margin-top:60px;padding-top:22px;
+  font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+footer p{max-width:none;margin-bottom:5px}
+@media (max-width:640px){
+  .wrap{padding:0 18px 70px}header{padding-top:38px}
+  .verdict,.pair,.chart{padding:18px}
+  .row{grid-template-columns:88px 1fr 62px;gap:10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker">Benchmark report &middot; 2026-09-01 &middot; companion to the POPE run</p>
+  <h1>Prompt Ordering at Long Context</h1>
+  <p class="standfirst">The POPE benchmark said prompt ordering doesn&rsquo;t matter. It was right &mdash; for 156-token prompts. Re-run over documents up to 16k tokens, the same manipulation swings accuracy by <strong>30 points</strong>, and the effect scales almost linearly with context length.</p>
+  <div class="meta">
+    <span>LFM2.5-VL-3B &middot; Q6_K</span>
+    <span>llama.cpp 10502 &middot; 0adcc3bb5 &middot; CUDA</span>
+    <span>RTX 4090</span>
+    <span>LongBench HotpotQA &middot; n=500</span>
+    <span>greedy &middot; T=0</span>
+    <span>3000 generations &middot; 35 min &middot; ~$0.55</span>
+  </div>
+</header>
+
+<section>
+  <div class="verdict">
+    <p class="q">The headline</p>
+    <p class="a">Putting the question <em>before</em> a long document costs <strong>13.6 points</strong> of accuracy versus putting it after. <code>p = 1.3&times;10<sup>&minus;8</sup></code>.</p>
+    <p>And the effect is entirely a function of length. Below 4k tokens it is a clean null &mdash; 14 items flip one way, 15 the other. Above 8k tokens it is a 24-point gap with 70 of 82 discordant pairs falling the same direction. The POPE null was not wrong; it was measured in a regime where ordering has no room to matter.</p>
+  </div>
+
+  <div class="lede">
+    <p>The second finding is a negative one, and it only survived because the answers were read rather than string-matched: <strong>Magpie&rsquo;s GBNF grammar has no measurable effect on accuracy</strong> at any ordering. It reliably fixes output <em>format</em> &mdash; but the apparent accuracy gain in the raw automatic scores was an artifact of grammar producing shorter answers, which token-F1 rewards regardless of correctness.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">01</span>What was compared</h2>
+  <p>Three arrangements of system prompt (S), question (T) and document (D) inside one user turn, crossed with Magpie&rsquo;s grammar on and off &mdash; six conditions over the same 500 items.</p>
+
+  <div class="seqs">
+    <div class="seq">
+      <span class="name">STD</span>
+      <span class="chip">system</span>
+      <span class="chip q">question</span>
+      <span class="chip doc">document &middot; up to 16k tok</span>
+      <span class="sc">0.3880</span>
+    </div>
+    <div class="seq">
+      <span class="name">SDT</span>
+      <span class="chip">system</span>
+      <span class="chip doc">document &middot; up to 16k tok</span>
+      <span class="chip q">question</span>
+      <span class="sc">0.5240</span>
+    </div>
+    <div class="seq">
+      <span class="name">STDT</span>
+      <span class="chip">system</span>
+      <span class="chip q">question</span>
+      <span class="chip doc">document &middot; up to 16k tok</span>
+      <span class="chip q">question</span>
+      <span class="sc">0.5720</span>
+    </div>
+  </div>
+  <p class="note">Accuracies shown for grammar off. Components are tokenized <strong>independently and concatenated</strong>, so STD and SDT carry identical token-ID multisets and <code>STDT = STD + Q</code> exactly &mdash; the arms are anagrams by construction, not by luck at BPE boundaries.</p>
+</section>
+
+<section>
+  <h2><span class="num">02</span>Results</h2>
+  <div class="scroll">
+    <table>
+      <caption>500 HotpotQA items &middot; correctness after blind judging</caption>
+      <thead><tr><th>Ordering</th><th>Grammar</th><th>Accuracy</th><th>vs STD</th><th>n correct</th></tr></thead>
+      <tbody>
+        <tr><td>STD</td><td>off</td><td class="bad">0.3880</td><td>&mdash;</td><td>194</td></tr>
+        <tr><td>STD</td><td>on</td><td class="bad">0.3940</td><td>+0.0060</td><td>197</td></tr>
+        <tr><td>SDT</td><td>off</td><td class="hi">0.5240</td><td>+0.1360</td><td>262</td></tr>
+        <tr><td>SDT</td><td>on</td><td class="hi">0.5340</td><td>+0.1460</td><td>267</td></tr>
+        <tr><td>STDT</td><td>off</td><td class="win">0.5720</td><td>+0.1840</td><td>286</td></tr>
+        <tr><td>STDT</td><td>on</td><td class="win">0.5640</td><td>+0.1760</td><td>282</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Paired comparisons</h3>
+
+  <div class="pair">
+    <h4>STD &rarr; SDT &nbsp;&middot;&nbsp; move the question after the document</h4>
+    <p class="sub">grammar off</p>
+    <div class="grid">
+      <div class="stat"><div class="k">&Delta; accuracy</div><div class="v">+0.1360</div></div>
+      <div class="stat"><div class="k">Discordant</div><div class="v">144 <span style="color:var(--muted);font-size:12px">(38 / 106)</span></div></div>
+      <div class="stat"><div class="k">McNemar</div><div class="v sm">p = 1.3e&minus;08</div></div>
+      <div class="stat"><div class="k">95% CI</div><div class="v sm">[+0.092, +0.184]</div></div>
+      <div class="stat"><div class="k">Verdict</div><div class="v"><span class="tag sig">Significant</span></div></div>
+    </div>
+  </div>
+
+  <div class="pair">
+    <h4>SDT &rarr; STDT &nbsp;&middot;&nbsp; also repeat the question before the document</h4>
+    <p class="sub">grammar off &mdash; the comparison that was a flat null on POPE</p>
+    <div class="grid">
+      <div class="stat"><div class="k">&Delta; accuracy</div><div class="v">+0.0480</div></div>
+      <div class="stat"><div class="k">Discordant</div><div class="v">98 <span style="color:var(--muted);font-size:12px">(37 / 61)</span></div></div>
+      <div class="stat"><div class="k">McNemar</div><div class="v sm">p = 0.0197</div></div>
+      <div class="stat"><div class="k">95% CI</div><div class="v sm">[+0.010, +0.086]</div></div>
+      <div class="stat"><div class="k">Verdict</div><div class="v"><span class="tag sig">Significant</span></div></div>
+    </div>
+  </div>
+  <p class="note">With grammar on, the same comparison gives <code>+0.030, p = 0.155</code> &mdash; null. So the STDT advantage over SDT is real but modest, and not robust across both grammar settings. The STD&rarr;SDT effect, by contrast, replicates at <code>+0.140, p = 5.8&times;10<sup>&minus;9</sup></code> with grammar on.</p>
+</section>
+
+<section>
+  <h2><span class="num">03</span>The effect is a function of context length</h2>
+  <p>This is the result that reconciles everything. Splitting the same 500 items by document length:</p>
+
+  <div class="chart">
+    <div class="row">
+      <div class="rl">0&ndash;4k words<small>~4,515 tokens &middot; n=117</small></div>
+      <div class="track">
+        <div class="seg b" style="width:66.67%">STDT 0.667</div>
+        <div class="seg a" style="width:64.96%">STD 0.650</div>
+      </div>
+      <div class="delta" style="color:var(--muted)">+1.7</div>
+    </div>
+    <div class="row">
+      <div class="rl">4&ndash;8k words<small>~9,423 tokens &middot; n=140</small></div>
+      <div class="track">
+        <div class="seg b" style="width:52.86%">STDT 0.529</div>
+        <div class="seg a" style="width:40.00%">STD 0.400</div>
+      </div>
+      <div class="delta" style="color:var(--warn)">+12.9</div>
+    </div>
+    <div class="row">
+      <div class="rl">8k+ words<small>~15,183 tokens &middot; n=243</small></div>
+      <div class="track">
+        <div class="seg b" style="width:55.14%">STDT 0.551</div>
+        <div class="seg a" style="width:25.51%">STD 0.255</div>
+      </div>
+      <div class="delta" style="color:var(--ok)">+29.6</div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--stop)"></i>STD &mdash; question before document</span>
+      <span><i style="background:var(--accent)"></i>STDT &mdash; question on both sides</span>
+      <span>grammar off &middot; percentage-point gap at right</span>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>STD vs SDT significance, per length bin (grammar off)</caption>
+      <thead><tr><th>Bin</th><th>n</th><th>discordant</th><th>split</th><th>McNemar p</th><th>verdict</th></tr></thead>
+      <tbody>
+        <tr><td>0&ndash;4k</td><td>117</td><td>29</td><td>14 / 15</td><td>1.00</td><td>null</td></tr>
+        <tr><td>4&ndash;8k</td><td>140</td><td>33</td><td>12 / 21</td><td>0.163</td><td>null</td></tr>
+        <tr><td>8k+</td><td>243</td><td>82</td><td class="hi">12 / 70</td><td class="hi">4.1e&minus;11</td><td>significant</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>At short context the discordant pairs split <strong>14 against 15</strong> &mdash; about as perfect a null as a coin can produce. The entire effect lives in the long bin, where 70 of 82 disagreements go the same way.</p>
+
+  <p><strong>Notice what STD does as documents grow.</strong> It falls from 0.650 to 0.255 &mdash; losing 40 points. SDT falls only from 0.658 to 0.494. Both degrade with length, as any model does; but question-first degrades roughly twice as fast. Long context does not merely dilute the question, it appears to strand it.</p>
+
+  <div class="callout good">
+    <div class="h">Reconciling the two experiments</div>
+    <p>POPE prompts were 156 tokens, of which 120 were the image and 8 the question. That sits far below even the 0&ndash;4k bin here &mdash; and the 0&ndash;4k bin is itself a null. The POPE result and this one are not in conflict; they are two points on the same curve. Ordering is free when everything fits comfortably in attention&rsquo;s working range, and expensive when it does not.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">04</span>Grammar: no effect on accuracy, real effect on format</h2>
+
+  <div class="scroll">
+    <table>
+      <caption>Grammar off &rarr; on, held within each ordering</caption>
+      <thead><tr><th>Ordering</th><th>&Delta; accuracy</th><th>discordant</th><th>McNemar p</th><th>verdict</th></tr></thead>
+      <tbody>
+        <tr><td>STD</td><td>+0.0060</td><td>5 (1/4)</td><td>0.375</td><td>null</td></tr>
+        <tr><td>SDT</td><td>+0.0100</td><td>19 (7/12)</td><td>0.359</td><td>null</td></tr>
+        <tr><td>STDT</td><td>&minus;0.0080</td><td>12 (8/4)</td><td>0.388</td><td>null</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>All three null, one of them negative. Constraining generation to Magpie&rsquo;s <code>Answer</code> schema does not make the model understand the document better &mdash; which is what you would expect, since a grammar restricts <em>what can be emitted</em>, not what was comprehended.</p>
+
+  <p>What it unambiguously does fix is structure:</p>
+
+  <div class="scroll">
+    <table>
+      <caption>Outputs that are valid JSON</caption>
+      <thead><tr><th>Ordering</th><th>grammar off</th><th>grammar on</th></tr></thead>
+      <tbody>
+        <tr><td>STD</td><td>500 / 500</td><td>500 / 500</td></tr>
+        <tr><td>SDT</td><td class="bad">407 / 500</td><td class="win">500 / 500</td></tr>
+        <tr><td>STDT</td><td class="bad">454 / 500</td><td class="win">500 / 500</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Left unconstrained, the model drops out of JSON on <strong>19% of SDT</strong> and <strong>9% of STDT</strong> responses &mdash; and never on STD, which emits well-formed JSON unprompted 500 times out of 500. That last row is why STD&rsquo;s two grammar arms produce byte-identical answer fields: the grammar has nothing to correct, so it never intervenes.</p>
+
+  <div class="callout">
+    <div class="h">The artifact that nearly became a finding</div>
+    <p>On raw token-F1 the grammar looked like a <strong>+3.6 point</strong> win at SDT. It isn&rsquo;t. Grammar-off answers are verbose &mdash; <em>&ldquo;Based on the provided text, Brent Roger Wilkes was connected to the scandal involving Randy &lsquo;Duke&rsquo; Cunningham&rdquo;</em> scores F1 <code>0.07</code> against gold <em>&ldquo;Duke Cunningham&rdquo;</em>, while the grammar-constrained <em>&ldquo;Randy &lsquo;Duke&rsquo; Cunningham&rdquo;</em> scores <code>0.80</code>. Both are correct. Grammar-off had 27 such verbose-but-correct answers at SDT against grammar-on&rsquo;s 9. Automatic scoring alone would have reported a grammar effect that is purely about answer length.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">05</span>How the answers were scored</h2>
+  <p>Free-text answers cannot be string-matched honestly, and the verbosity asymmetry above is exactly why.</p>
+  <ul>
+    <li><strong>1,072 clear hits</strong> (token-F1 &ge; 0.8) scored automatically correct.</li>
+    <li><strong>1,352 clear misses</strong> (F1 &le; 0.2 <em>and</em> the gold answer absent as a substring) scored automatically wrong.</li>
+    <li><strong>576 escalated</strong> (19.2%) &mdash; everything ambiguous, plus 82 low-F1 answers that nonetheless contained the gold string. Those 82 would otherwise have been silently marked wrong, and 27 of them were in a single arm.</li>
+  </ul>
+  <p>The escalated set was judged by six independent Sonnet 5 readers working from byte-identical instructions, on shuffled batches with the ordering and grammar labels stripped &mdash; so no judge ever saw a single condition, and judging noise could not correlate with an arm. <strong>416 of 576 were judged correct.</strong> I then audited 14 verdicts by hand and agreed with all 14; two were borderline-lenient (accepting <em>&ldquo;tennis players&rdquo;</em> for gold <em>&ldquo;former tennis player&rdquo;</em>) but defensible.</p>
+</section>
+
+<section>
+  <h2><span class="num">06</span>Is this really measuring ordering?</h2>
+
+  <div class="checks">
+    <div class="check">
+      <div class="lbl">Anagram assertion</div>
+      <div class="res">STD = SDT token count on <strong>500/500</strong> items, both grammar arms</div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+    <div class="check">
+      <div class="lbl">STDT length accounting</div>
+      <div class="res"><code>STDT = STD + Q</code> exactly, on <strong>500/500</strong></div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+    <div class="check">
+      <div class="lbl">Complete design</div>
+      <div class="res">500/500 items have all 6 condition cells; 0 errors, 0 empty outputs</div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+    <div class="check">
+      <div class="lbl">Platform cross-check</div>
+      <div class="res">CUDA chunk dump byte-identical to the Metal run: <code>[30][120][6]=156</code></div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+  </div>
+
+  <h3>What the design rules out</h3>
+  <ul>
+    <li><strong>Content differences.</strong> Components tokenized independently and concatenated &mdash; identical token-ID multisets between STD and SDT, verified per item.</li>
+    <li><strong>Sampling noise.</strong> Greedy argmax; no top-k, top-p or penalties in the chain. Every discordant pair is attributable to the prompt.</li>
+    <li><strong>Batching non-determinism.</strong> Six independent worker processes, each single-stream with identical context and batch parameters. Separate processes do not share batching, so floating-point reduction order is fixed within every arm.</li>
+    <li><strong>Scoring bias against verbosity.</strong> Corrected by the escalation rule and blind judging, as above.</li>
+    <li><strong>Judge bias.</strong> Arm labels stripped, batches shuffled and arm-mixed, instructions byte-identical, verdicts sampled and audited.</li>
+    <li><strong>Prompt tuning.</strong> One system prompt, identical across all six conditions, written before any results were seen.</li>
+  </ul>
+
+  <h3>What remains uncertain</h3>
+  <ul>
+    <li><strong>Backend.</strong> Run on CUDA rather than the Metal build Mac users get. The chunk dump matched exactly and all arms shared the backend, so the comparison is unaffected &mdash; but absolute numbers could shift by a fraction of a point on Metal.</li>
+    <li><strong>One dataset, one task shape.</strong> HotpotQA is multi-hop retrieval over Wikipedia paragraphs. Whether the same curve holds for summarisation or code is untested.</li>
+    <li><strong>Length bins are confounded with difficulty.</strong> Longer HotpotQA contexts contain more distractor passages, so some of the degradation with length is the task getting harder, not just the question getting distant. The <em>relative</em> gap between orderings within each bin is still a fair comparison, but the curve&rsquo;s steepness mixes both.</li>
+    <li><strong>The STDT advantage is not robust.</strong> Significant with grammar off, null with grammar on. Treat it as suggestive.</li>
+    <li><strong>Greedy only.</strong> Magpie ships at non-zero temperature; ordering effects under sampling are untested.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="num">07</span>What this means for Magpie</h2>
+  <p><strong>Put the question after the document.</strong> On documents past ~8k tokens this is worth roughly 24 accuracy points, which is a larger effect than most model upgrades would buy. It is also the arrangement that lets a KV prefix cache be reused across many questions about the same files &mdash; so the fastest-to-serve ordering and the most accurate ordering are the same one. There is no trade-off to manage.</p>
+  <p><strong>Consider repeating the question before the document as well.</strong> STDT adds ~5 points over SDT with grammar off, at a cost of a few dozen tokens. The evidence is weaker &mdash; it did not replicate with grammar on &mdash; so this is worth an A/B in production rather than an unconditional change.</p>
+  <p><strong>Keep the grammar, but not for accuracy.</strong> It buys nothing measurable in correctness. It does guarantee parseable output on the 19% of long-context responses where the model would otherwise drift into prose, and a response Magpie cannot parse is a failed answer regardless of whether the model knew the answer. That is reason enough.</p>
+  <p><strong>The context-window ceiling is a quality question, not a resource one.</strong> KV cache measured at ~16 KB/token, and prefill time depends on tokens actually processed, not window allocated &mdash; so a wider window is nearly free in memory and time. What degrades is the answer: STD collapses from 0.650 to 0.255 as documents grow, and even the best ordering falls from 0.667 to 0.551. Whatever window you open, expect accuracy to fall with what you actually put in it.</p>
+</section>
+
+<footer>
+  <p>LFM2.5-VL-3B Q6_K &middot; llama.cpp b10502 (0adcc3bb5) built with CUDA &middot; RTX 4090, 6 concurrent single-stream workers</p>
+  <p>LongBench HotpotQA: disjoint union of hotpotqa (200) and hotpotqa_e (300), seed 0 &middot; 117 / 140 / 243 items across 0&ndash;4k / 4&ndash;8k / 8k+ bins</p>
+  <p>Greedy argmax, 128-token budget, n_ctx 24576 &middot; 3,000 generations in 35 min at 16,366 tok/s prefill &middot; 0 errors</p>
+  <p>Grammar: Magpie&rsquo;s Answer schema compiled by src/inference/gbnf.py &middot; 576 answers judged blind by Sonnet 5, 14 audited by hand</p>
+  <p>Per-item outputs preserved in final.json for re-analysis without re-running.</p>
+</footer>
+
+</div>
+</body>
+</html>

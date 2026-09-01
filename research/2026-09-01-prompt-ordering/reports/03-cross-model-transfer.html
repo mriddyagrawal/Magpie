@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ordering Doesn't Transfer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body,h1,h2,h3,h4,p,ul,figure{margin:0}
+ul{padding:0}
+table{border-collapse:collapse}
+
+:root{
+  --ground:#EEF1F4; --surface:#FCFDFE; --sunk:#E3E8EC;
+  --ink:#161C23; --body:#39434F; --muted:#68737F; --hair:#CBD4DB;
+  --accent:#175A70; --accent-soft:#D6E6EC;
+  --ok:#2C6E49; --ok-soft:#D8E9DF;
+  --warn:#8A5A06; --warn-soft:#F2E5CB;
+  --stop:#9B3025; --stop-soft:#F3DAD6;
+  --f-disp:"IBM Plex Serif",Georgia,serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1418; --surface:#161D23; --sunk:#1C252C;
+    --ink:#E8EDF1; --body:#BCC7D0; --muted:#8695A1; --hair:#2A353E;
+    --accent:#69B6CE; --accent-soft:#153039;
+    --ok:#7CC79B; --ok-soft:#16291F;
+    --warn:#D5A44B; --warn-soft:#2C2314;
+    --stop:#E08579; --stop-soft:#301A17;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1418; --surface:#161D23; --sunk:#1C252C;
+  --ink:#E8EDF1; --body:#BCC7D0; --muted:#8695A1; --hair:#2A353E;
+  --accent:#69B6CE; --accent-soft:#153039;
+  --ok:#7CC79B; --ok-soft:#16291F;
+  --warn:#D5A44B; --warn-soft:#2C2314;
+  --stop:#E08579; --stop-soft:#301A17;
+}
+
+body{background:var(--ground);color:var(--body);font-family:var(--f-body);
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 28px 100px}
+
+header{border-bottom:1px solid var(--hair);padding:56px 0 30px;margin-bottom:44px}
+.kicker{font-family:var(--f-mono);font-size:11.5px;font-weight:500;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+h1{font-family:var(--f-disp);font-weight:600;font-size:clamp(32px,5vw,46px);line-height:1.1;
+  color:var(--ink);margin:0 0 20px;text-wrap:balance;letter-spacing:-.015em}
+.standfirst{font-size:18.5px;line-height:1.6;margin:0;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:26px;font-family:var(--f-mono);font-size:12px}
+.meta span{background:var(--sunk);border:1px solid var(--hair);color:var(--muted);padding:4px 9px;border-radius:3px}
+
+section{margin:0 0 52px}
+h2{font-family:var(--f-disp);font-weight:600;font-size:25px;color:var(--ink);margin:0 0 6px;
+  letter-spacing:-.01em;text-wrap:balance}
+h2 .num{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--accent);
+  letter-spacing:.1em;display:block;margin-bottom:9px}
+h3{font-family:var(--f-body);font-weight:600;font-size:15.5px;color:var(--ink);margin:30px 0 8px}
+p{margin:0 0 15px;max-width:70ch}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--sunk);border:1px solid var(--hair);
+  border-radius:3px;padding:1px 5px;color:var(--ink)}
+ul{margin:0 0 15px;padding-left:20px;max-width:70ch}
+li{margin-bottom:7px}
+li::marker{color:var(--muted)}
+
+.verdict{background:var(--surface);border:1px solid var(--hair);border-left:3px solid var(--accent);
+  border-radius:4px;padding:26px 28px;margin-bottom:34px}
+.verdict .q{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px}
+.verdict .a{font-family:var(--f-disp);font-size:23px;line-height:1.35;color:var(--ink);
+  margin:0 0 12px;font-weight:400}
+.verdict p:last-child{margin-bottom:0;font-size:15px}
+
+.scroll{overflow-x:auto;margin:0 0 10px}
+table{width:100%;min-width:520px;background:var(--surface);font-size:14.5px}
+caption{caption-side:top;text-align:left;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);padding:0 0 9px}
+th,td{padding:9px 14px;text-align:right;border-bottom:1px solid var(--hair)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:var(--f-mono);font-size:11.5px;font-weight:500;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;background:var(--sunk);white-space:nowrap}
+tbody td{font-variant-numeric:tabular-nums}
+tbody td:first-child{font-family:var(--f-mono);font-weight:500;color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+td.win{color:var(--ok);font-weight:600}
+td.bad{color:var(--stop);font-weight:600}
+td.hi{color:var(--ink);font-weight:600}
+.note{font-size:13.5px;color:var(--muted);margin:8px 0 0;max-width:70ch}
+
+.flip{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.fl{background:var(--surface);border:1px solid var(--hair);border-radius:4px;padding:20px 22px}
+.fl h4{font-family:var(--f-mono);font-size:13px;font-weight:600;color:var(--ink);margin:0 0 3px}
+.fl .sub{font-size:12.5px;color:var(--muted);margin:0 0 16px}
+.fl .d{font-family:var(--f-mono);font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;
+  line-height:1;margin-bottom:6px}
+.fl .p{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.up{color:var(--ok)} .dn{color:var(--stop)}
+
+.chart{background:var(--surface);border:1px solid var(--hair);border-radius:4px;padding:24px 26px;margin-bottom:14px}
+.row{display:grid;grid-template-columns:108px 1fr 74px;gap:14px;align-items:center;margin-bottom:13px}
+.row:last-child{margin-bottom:0}
+.rl{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+.rl small{display:block;color:var(--muted);font-size:11px}
+.track{position:relative;height:24px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.seg{position:absolute;top:0;height:100%;display:flex;align-items:center;padding-left:8px;
+  font-family:var(--f-mono);font-size:11px;color:#fff}
+.seg.g{background:var(--accent);z-index:1}
+.seg.l{background:var(--stop);z-index:2}
+.legend{display:flex;gap:18px;margin-top:16px;font-family:var(--f-mono);font-size:11.5px;
+  color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.delta{font-family:var(--f-mono);font-size:14px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+.callout{background:var(--warn-soft);border:1px solid var(--warn);border-radius:4px;padding:20px 24px;margin:0 0 20px}
+.callout .h{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--warn);font-weight:600;margin-bottom:8px}
+.callout p{margin-bottom:0}
+.callout.stop{background:var(--stop-soft);border-color:var(--stop)}
+.callout.stop .h{color:var(--stop)}
+
+footer{border-top:1px solid var(--hair);margin-top:60px;padding-top:22px;
+  font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+footer p{max-width:none;margin-bottom:5px}
+@media (max-width:700px){.flip{grid-template-columns:1fr}}
+@media (max-width:640px){.wrap{padding:0 18px 70px}header{padding-top:38px}
+  .verdict,.fl,.chart{padding:18px}.row{grid-template-columns:80px 1fr 58px;gap:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker">Benchmark report &middot; 2026-09-01 &middot; third in the ordering series</p>
+  <h1>Ordering Doesn&rsquo;t Transfer</h1>
+  <p class="standfirst">The same 500 questions, the same three arrangements, a different model &mdash; and the optimal ordering <strong>flips</strong>. What gained LFM2.5-VL-3B thirteen points costs Gemma 4 nine. A finding measured on one model is not a fact about prompts.</p>
+  <div class="meta">
+    <span>Gemma 4 26B A4B &middot; bf16-class</span>
+    <span>OpenRouter &middot; DeepInfra pinned</span>
+    <span>LongBench HotpotQA &middot; n=500</span>
+    <span>greedy &middot; T=0 &middot; seed 0</span>
+    <span>1500 requests &middot; 6.3 min &middot; $1.22</span>
+  </div>
+</header>
+
+<section>
+  <div class="verdict">
+    <p class="q">The finding</p>
+    <p class="a">For LFM2.5-VL-3B, moving the question <em>after</em> the document was worth <strong>+13.6 points</strong>. For Gemma 4 26B A4B, the identical change costs <strong>&minus;9.2 points</strong>.</p>
+    <p>Both results are strongly significant &mdash; <code>p = 1.3&times;10<sup>&minus;8</sup></code> and <code>p = 7.4&times;10<sup>&minus;6</sup></code>. Same items, same system prompt, same decoding, same anagram guarantee. The two models simply want opposite arrangements.</p>
+  </div>
+
+  <div class="flip">
+    <div class="fl">
+      <h4>LFM2.5-VL-3B</h4>
+      <p class="sub">STD &rarr; SDT &nbsp;(question first &rarr; document first)</p>
+      <div class="d up">+13.6</div>
+      <p class="p">discordant 144 (38/106) &middot; p = 1.3e&minus;08<br>prefers the question <strong>last</strong></p>
+    </div>
+    <div class="fl">
+      <h4>Gemma 4 26B A4B</h4>
+      <p class="sub">STD &rarr; SDT &nbsp;(question first &rarr; document first)</p>
+      <div class="d dn">&minus;9.2</div>
+      <p class="p">discordant 104 (75/29) &middot; p = 7.4e&minus;06<br>prefers the question <strong>first</strong></p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">01</span>Results</h2>
+  <div class="scroll">
+    <table>
+      <caption>500 HotpotQA items &middot; correctness after blind judging &middot; grammar off in both</caption>
+      <thead><tr><th>Ordering</th><th>Gemma 4 26B A4B</th><th>LFM2.5-VL-3B</th><th>difference</th></tr></thead>
+      <tbody>
+        <tr><td>STD &mdash; question first</td><td class="win">0.7240</td><td class="bad">0.3880</td><td>+0.3360</td></tr>
+        <tr><td>SDT &mdash; document first</td><td>0.6320</td><td>0.5240</td><td>+0.1080</td></tr>
+        <tr><td>STDT &mdash; question both ends</td><td class="hi">0.7180</td><td class="win">0.5720</td><td>+0.1460</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Each model&rsquo;s best arrangement is bolded in its own column. Gemma&rsquo;s <em>worst</em> ordering (0.632) still beats LFM&rsquo;s <em>best</em> (0.572).</p>
+
+  <h3>Gemma paired comparisons</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>comparison</th><th>&Delta;</th><th>discordant</th><th>McNemar p</th><th>95% CI</th><th>verdict</th></tr></thead>
+      <tbody>
+        <tr><td>STD &rarr; SDT</td><td class="bad">&minus;0.0920</td><td>104 (75/29)</td><td>7.4e&minus;06</td><td>[&minus;0.130, &minus;0.052]</td><td>significant</td></tr>
+        <tr><td>SDT &rarr; STDT</td><td class="win">+0.0860</td><td>89 (23/66)</td><td>5.7e&minus;06</td><td>[+0.050, +0.122]</td><td>significant</td></tr>
+        <tr><td>STD &rarr; STDT</td><td>&minus;0.0060</td><td>41 (22/19)</td><td>0.755</td><td>[&minus;0.032, +0.020]</td><td>null</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">The third row is the tell: for Gemma, STD and STDT are statistically indistinguishable. Both put the question <em>before</em> the document; the repeat at the end adds nothing. What matters to Gemma is that the question comes first &mdash; the mirror image of LFM, for which the question arriving last was the whole effect.</p>
+</section>
+
+<section>
+  <h2><span class="num">02</span>Why: Gemma barely degrades with length</h2>
+  <p>The length breakdown explains the reversal. Each model at its own best ordering:</p>
+
+  <div class="chart">
+    <div class="row">
+      <div class="rl">0&ndash;4k<small>n=117</small></div>
+      <div class="track">
+        <div class="seg g" style="width:81.20%">Gemma 0.812</div>
+        <div class="seg l" style="width:66.67%">LFM 0.667</div>
+      </div>
+      <div class="delta" style="color:var(--muted)">+14.5</div>
+    </div>
+    <div class="row">
+      <div class="rl">4&ndash;8k<small>n=140</small></div>
+      <div class="track">
+        <div class="seg g" style="width:67.86%">Gemma 0.679</div>
+        <div class="seg l" style="width:52.86%">LFM 0.529</div>
+      </div>
+      <div class="delta" style="color:var(--muted)">+15.0</div>
+    </div>
+    <div class="row">
+      <div class="rl">8k+<small>n=243</small></div>
+      <div class="track">
+        <div class="seg g" style="width:72.02%">Gemma 0.720</div>
+        <div class="seg l" style="width:55.14%">LFM 0.551</div>
+      </div>
+      <div class="delta" style="color:var(--muted)">+16.9</div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Gemma 4 26B A4B, best ordering</span>
+      <span><i style="background:var(--stop)"></i>LFM2.5-VL-3B, best ordering</span>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <caption>Question-first (STD) accuracy as documents grow</caption>
+      <thead><tr><th>bin</th><th>Gemma STD</th><th>LFM STD</th></tr></thead>
+      <tbody>
+        <tr><td>0&ndash;4k</td><td>0.8120</td><td>0.6496</td></tr>
+        <tr><td>4&ndash;8k</td><td>0.6571</td><td>0.4000</td></tr>
+        <tr><td>8k+</td><td class="win">0.7202</td><td class="bad">0.2551</td></tr>
+        <tr><td><strong>drop 0&ndash;4k &rarr; 8k+</strong></td><td class="win">&minus;9 pts</td><td class="bad">&minus;39 pts</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>This is the mechanism.</strong> LFM&rsquo;s question-first collapse &mdash; 0.650 to 0.255 &mdash; is what made document-first so valuable to it: putting the question next to the generation point rescued a question that was otherwise being stranded 12,000 tokens back. Gemma doesn&rsquo;t have that problem. Its question-first accuracy is essentially flat across the whole length range, and at 8k+ it is actually <em>higher</em> than at 4&ndash;8k.</p>
+
+  <p>Once a model can hold the question across long context, the trade reverses: seeing the question before reading the document lets it read <em>for</em> the answer, which is worth more than recency. LFM never gets to collect that benefit because it can&rsquo;t retain the question that far.</p>
+</section>
+
+<section>
+  <h2><span class="num">03</span>The confound I can&rsquo;t remove</h2>
+
+  <div class="callout stop">
+    <div class="h">Read the cross-model gap with caution</div>
+    <p>Gemma&rsquo;s answers average <strong>114 characters</strong>; LFM&rsquo;s average <strong>34</strong>. Because the escalation rule sends verbose answers to the LLM judge, <strong>66.7% of Gemma&rsquo;s answers were judged, against 20.3% of LFM&rsquo;s.</strong> If the judge is even slightly generous toward a fluent sentence that contains the right entity, Gemma collects that benefit three times as often. Some unknown part of the +14 to +17 point cross-model gap is judge leniency rather than comprehension.</p>
+  </div>
+
+  <p><strong>This does not affect the ordering findings</strong>, which are the point of the report. Within each model, all three arms have identical verbosity, identical escalation rates, and identical judging &mdash; so the reversal is clean. It is only the <em>Gemma vs LFM absolute comparison</em> that carries this asymmetry.</p>
+
+  <p>Fixing it properly would mean a head-to-head where both models&rsquo; answers are judged at the same rate &mdash; either by forcing terse output from Gemma, or by judging all 3,000 answers from both. Neither is expensive; neither has been done.</p>
+
+  <h3>Other limits</h3>
+  <ul>
+    <li><strong>No token-level verification.</strong> Locally I could dump token IDs and prove the arms were anagrams. Through a chat API I can only guarantee identical bytes rearranged &mdash; though the provider&rsquo;s reported input token counts came back identical for STD and SDT on all 500 items, which is strong circumstantial support.</li>
+    <li><strong>Different serving stacks.</strong> LFM ran on llama.cpp Q6_K that we built; Gemma ran on DeepInfra&rsquo;s infrastructure at their quantization. Pinning the provider held quantization constant <em>within</em> the Gemma run (all 1,500 requests served by DeepInfra), but the two models are not on matched hardware.</li>
+    <li><strong>One dataset.</strong> HotpotQA multi-hop only. Whether the reversal holds for summarization or single-hop extraction is untested.</li>
+    <li><strong>Two models is not a trend.</strong> We now know the effect is not universal. We do not know which of the two is typical.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="num">04</span>What this changes</h2>
+
+  <p><strong>The headline finding of the previous report is now scoped, not overturned.</strong> &ldquo;Put the question after the document&rdquo; remains correct for LFM2.5-VL-3B, which is what Magpie ships, and the +13.6 points still stand. What&rsquo;s gone is any claim that this is a fact about prompting in general.</p>
+
+  <p><strong>Prompt-ordering choices must be re-measured whenever the model changes.</strong> If Magpie ever swaps its local model &mdash; as it already did once, Gemma 4 E4B to LFM2.5-VL-3B in August &mdash; the prompt assembly needs re-testing, not porting. Carrying the ordering forward on the assumption that it&rsquo;s a property of prompts would silently cost around nine points on a Gemma-family model.</p>
+
+  <p><strong>The capability gap is real and large.</strong> Even discounting for the judging asymmetry, Gemma 4 26B A4B is well clear of LFM2.5-VL-3B at every length, and its worst ordering beats LFM&rsquo;s best. It is also multimodal and activates only 3.8B parameters per token out of 25.2B &mdash; roughly LFM&rsquo;s active compute. The blocker is the 25.2B of weights that must be resident, not the compute. That makes it a genuine question rather than a closed one: what would it take to ship?</p>
+
+  <p><strong>And a cheaper immediate option:</strong> Gemma&rsquo;s robustness to context length is exactly the weakness LFM shows. If Magpie has a cloud escalation path, long documents are precisely where it earns its cost &mdash; LFM at 8k+ scores 0.255 question-first, where Gemma scores 0.720.</p>
+</section>
+
+<footer>
+  <p>Gemma 4 26B A4B (25.2B total / 3.8B active, MoE, multimodal) via OpenRouter, provider pinned to DeepInfra with allow_fallbacks disabled &mdash; all 1500 requests confirmed served by DeepInfra</p>
+  <p>LongBench HotpotQA, disjoint union of hotpotqa (200) + hotpotqa_e (300), seed 0 &mdash; the identical 500 items used in the LFM run, rebuilt and id-verified</p>
+  <p>temperature 0, seed 0, max_tokens 128, 12 concurrent &middot; 1500 requests, 0 errors, 6.3 min, $1.2186 &middot; input token counts identical for STD and SDT on 500/500 items</p>
+  <p>1001 escalated answers judged blind by six Sonnet 5 readers on shuffled arm-mixed batches; 914 judged correct</p>
+  <p>Per-item outputs in or_final.json; LFM comparison data in final.json</p>
+</footer>
+
+</div>
+</body>
+</html>

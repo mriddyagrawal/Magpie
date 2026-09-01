@@ -1,0 +1,451 @@
+<title>Prompt Ordering on LFM2.5-VL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+:root{
+  --ground:#EEF1F4; --surface:#FCFDFE; --sunk:#E3E8EC;
+  --ink:#161C23; --body:#39434F; --muted:#68737F; --hair:#CBD4DB;
+  --accent:#175A70; --accent-soft:#D6E6EC;
+  --ok:#2C6E49; --ok-soft:#D8E9DF;
+  --warn:#8A5A06; --warn-soft:#F2E5CB;
+  --stop:#9B3025; --stop-soft:#F3DAD6;
+  --f-disp:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1418; --surface:#161D23; --sunk:#1C252C;
+    --ink:#E8EDF1; --body:#BCC7D0; --muted:#8695A1; --hair:#2A353E;
+    --accent:#69B6CE; --accent-soft:#153039;
+    --ok:#7CC79B; --ok-soft:#16291F;
+    --warn:#D5A44B; --warn-soft:#2C2314;
+    --stop:#E08579; --stop-soft:#301A17;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1418; --surface:#161D23; --sunk:#1C252C;
+  --ink:#E8EDF1; --body:#BCC7D0; --muted:#8695A1; --hair:#2A353E;
+  --accent:#69B6CE; --accent-soft:#153039;
+  --ok:#7CC79B; --ok-soft:#16291F;
+  --warn:#D5A44B; --warn-soft:#2C2314;
+  --stop:#E08579; --stop-soft:#301A17;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--body);
+  font-family:var(--f-body); font-size:16px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px; margin:0 auto; padding:0 28px 100px}
+.col{max-width:70ch}
+
+/* ---- masthead ---- */
+header{border-bottom:1px solid var(--hair); padding:56px 0 30px; margin-bottom:44px}
+.kicker{
+  font-family:var(--f-mono); font-size:11.5px; font-weight:500;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 18px;
+}
+h1{
+  font-family:var(--f-disp); font-weight:600; font-size:clamp(32px,5vw,46px);
+  line-height:1.1; color:var(--ink); margin:0 0 20px; text-wrap:balance;
+  letter-spacing:-.015em;
+}
+.standfirst{font-size:18.5px; line-height:1.6; color:var(--body); margin:0; max-width:62ch}
+.meta{
+  display:flex; flex-wrap:wrap; gap:8px 10px; margin-top:26px;
+  font-family:var(--f-mono); font-size:12px;
+}
+.meta span{
+  background:var(--sunk); border:1px solid var(--hair); color:var(--muted);
+  padding:4px 9px; border-radius:3px;
+}
+
+/* ---- sections ---- */
+section{margin:0 0 52px}
+h2{
+  font-family:var(--f-disp); font-weight:600; font-size:25px; color:var(--ink);
+  margin:0 0 6px; letter-spacing:-.01em; text-wrap:balance;
+}
+h2 .num{
+  font-family:var(--f-mono); font-size:12px; font-weight:500; color:var(--accent);
+  letter-spacing:.1em; display:block; margin-bottom:9px;
+}
+h3{
+  font-family:var(--f-body); font-weight:600; font-size:15.5px; color:var(--ink);
+  margin:30px 0 8px;
+}
+p{margin:0 0 15px; max-width:70ch}
+.lede{border-left:2px solid var(--hair); padding-left:18px; margin-bottom:26px}
+strong{color:var(--ink); font-weight:600}
+em{font-style:italic}
+code{
+  font-family:var(--f-mono); font-size:.88em; background:var(--sunk);
+  border:1px solid var(--hair); border-radius:3px; padding:1px 5px; color:var(--ink);
+}
+a{color:var(--accent)}
+ul{margin:0 0 15px; padding-left:20px; max-width:70ch}
+li{margin-bottom:7px}
+li::marker{color:var(--muted)}
+
+/* ---- verdict ---- */
+.verdict{
+  background:var(--surface); border:1px solid var(--hair);
+  border-left:3px solid var(--accent); border-radius:4px;
+  padding:26px 28px; margin-bottom:34px;
+}
+.verdict .q{
+  font-family:var(--f-mono); font-size:11.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 10px;
+}
+.verdict .a{
+  font-family:var(--f-disp); font-size:23px; line-height:1.35; color:var(--ink);
+  margin:0 0 12px; font-weight:400;
+}
+.verdict p:last-child{margin-bottom:0; font-size:15px}
+
+/* ---- tables ---- */
+.scroll{overflow-x:auto; margin:0 0 10px; -webkit-overflow-scrolling:touch}
+table{
+  border-collapse:collapse; width:100%; min-width:520px;
+  background:var(--surface); font-size:14.5px;
+}
+caption{
+  caption-side:top; text-align:left; font-family:var(--f-mono); font-size:11.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+  padding:0 0 9px;
+}
+th,td{padding:9px 14px; text-align:right; border-bottom:1px solid var(--hair)}
+th:first-child,td:first-child{text-align:left}
+thead th{
+  font-family:var(--f-mono); font-size:11.5px; font-weight:500; color:var(--muted);
+  letter-spacing:.05em; text-transform:uppercase;
+  border-bottom:1px solid var(--hair); background:var(--sunk); white-space:nowrap;
+}
+tbody td{font-variant-numeric:tabular-nums; color:var(--body)}
+tbody td:first-child{font-family:var(--f-mono); font-weight:500; color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+tr.gold td{color:var(--muted); font-style:italic; background:var(--sunk)}
+td.hi{color:var(--ink); font-weight:600}
+.note{font-size:13.5px; color:var(--muted); margin:8px 0 0; max-width:70ch}
+
+/* ---- ordering diagram ---- */
+.seqs{display:flex; flex-direction:column; gap:11px; margin:0 0 18px}
+.seq{
+  display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--hair); border-radius:4px;
+  padding:11px 14px;
+}
+.seq .name{
+  font-family:var(--f-mono); font-weight:600; font-size:13px; color:var(--ink);
+  min-width:46px;
+}
+.chip{
+  font-family:var(--f-mono); font-size:11.5px; padding:3px 9px; border-radius:3px;
+  border:1px solid var(--hair); color:var(--body); background:var(--sunk);
+  white-space:nowrap;
+}
+.chip.img{background:var(--accent-soft); border-color:var(--accent); color:var(--accent); font-weight:600}
+.chip.q{background:var(--warn-soft); border-color:var(--warn); color:var(--warn); font-weight:600}
+.seq .tot{
+  margin-left:auto; font-family:var(--f-mono); font-size:12px; color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---- stat cards ---- */
+.pair{
+  background:var(--surface); border:1px solid var(--hair); border-radius:4px;
+  padding:22px 24px; margin-bottom:16px;
+}
+.pair h4{
+  font-family:var(--f-mono); font-size:14px; font-weight:600; color:var(--ink);
+  margin:0 0 4px; letter-spacing:.02em;
+}
+.pair .sub{font-size:13.5px; color:var(--muted); margin:0 0 16px}
+.grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:16px 20px;
+}
+.stat .k{
+  font-family:var(--f-mono); font-size:10.5px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:3px;
+}
+.stat .v{
+  font-family:var(--f-mono); font-size:19px; font-weight:500; color:var(--ink);
+  font-variant-numeric:tabular-nums; line-height:1.3;
+}
+.stat .v.sm{font-size:15px}
+.tag{
+  display:inline-block; font-family:var(--f-mono); font-size:11px; font-weight:600;
+  letter-spacing:.07em; text-transform:uppercase; padding:3px 9px; border-radius:3px;
+  border:1px solid currentColor;
+}
+.tag.null{color:var(--muted); background:var(--sunk)}
+.tag.pass{color:var(--ok); background:var(--ok-soft)}
+.tag.flag{color:var(--warn); background:var(--warn-soft)}
+
+/* ---- checks ---- */
+.checks{display:flex; flex-direction:column; gap:1px; background:var(--hair);
+  border:1px solid var(--hair); border-radius:4px; overflow:hidden; margin-bottom:14px}
+.check{
+  display:flex; gap:14px; align-items:baseline; background:var(--surface);
+  padding:13px 16px; flex-wrap:wrap;
+}
+.check .lbl{font-weight:600; color:var(--ink); font-size:14.5px; flex:1 1 210px}
+.check .res{font-family:var(--f-mono); font-size:13px; color:var(--body);
+  font-variant-numeric:tabular-nums; flex:1 1 260px}
+
+/* ---- callout ---- */
+.callout{
+  background:var(--warn-soft); border:1px solid var(--warn); border-radius:4px;
+  padding:20px 24px; margin:0 0 20px;
+}
+.callout .h{
+  font-family:var(--f-mono); font-size:11.5px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--warn); font-weight:600; margin-bottom:8px;
+}
+.callout p{margin-bottom:0; color:var(--body)}
+
+footer{
+  border-top:1px solid var(--hair); margin-top:60px; padding-top:22px;
+  font-family:var(--f-mono); font-size:12px; color:var(--muted);
+}
+footer p{max-width:none; margin-bottom:5px}
+@media (max-width:640px){
+  .wrap{padding:0 18px 70px}
+  header{padding-top:38px}
+  .verdict,.pair{padding:18px}
+}
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="kicker">Benchmark report &middot; 2026-09-01</p>
+  <h1>Prompt Ordering on LFM2.5-VL</h1>
+  <p class="standfirst">Does moving the question before the image, or repeating it after, change what a 3B vision&ndash;language model gets right? Across 500 paired POPE items, no &mdash; and the one ordering that did move something moved the wrong thing.</p>
+  <div class="meta">
+    <span>LFM2.5-VL-3B &middot; Q6_K</span>
+    <span>llama.cpp 10502 &middot; 0adcc3bb5</span>
+    <span>Metal &middot; M1 Max</span>
+    <span>POPE random &middot; n=500</span>
+    <span>greedy &middot; T=0</span>
+    <span>1500 generations &middot; 18.9 min</span>
+  </div>
+</header>
+
+<section>
+  <div class="verdict">
+    <p class="q">The comparison that mattered</p>
+    <p class="a"><code>SIT &rarr; STIT</code> is a null result. Repeating the question after the image changed accuracy by <strong>exactly zero</strong>.</p>
+    <p>Six of 500 items flipped, three in each direction, cancelling perfectly. McNemar <code>p&nbsp;=&nbsp;1.0000</code>; bootstrap 95% CI <code>[&minus;0.010,&nbsp;+0.010]</code>. This is the outcome you predicted, and it is consistent with three of the five models in arXiv 2607.15565.</p>
+  </div>
+
+  <div class="lede">
+    <p><code>STI &rarr; SIT</code> is also null &mdash; but worth reading, because the sign runs <em>against</em> the hypothesis. Putting the question first, the arrangement that is supposed to let attention pre-select the relevant image regions, scored <strong>lower</strong> (0.8960 vs 0.9080), not higher. The gap is not statistically distinguishable from zero, so the honest reading is &ldquo;no effect,&rdquo; not &ldquo;question-first hurts.&rdquo; But nothing here supports question-first helping.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">01</span>What was compared</h2>
+  <p>Three arrangements of the same three components inside one user turn, generation beginning after the last element. Content is byte-identical across arms; only position changes.</p>
+
+  <div class="seqs">
+    <div class="seq">
+      <span class="name">STI</span>
+      <span class="chip">system</span>
+      <span class="chip q">question</span>
+      <span class="chip img">image &middot; 120&ndash;256 tok</span>
+      <span class="tot">156 tokens</span>
+    </div>
+    <div class="seq">
+      <span class="name">SIT</span>
+      <span class="chip">system</span>
+      <span class="chip img">image &middot; 120&ndash;256 tok</span>
+      <span class="chip q">question</span>
+      <span class="tot">156 tokens</span>
+    </div>
+    <div class="seq">
+      <span class="name">STIT</span>
+      <span class="chip">system</span>
+      <span class="chip q">question</span>
+      <span class="chip img">image &middot; 120&ndash;256 tok</span>
+      <span class="chip q">question</span>
+      <span class="tot">164 tokens</span>
+    </div>
+  </div>
+  <p class="note">Token totals shown for a representative item. STI and SIT are exact anagrams; STIT carries the 8-token question twice. One fixed system prompt throughout: <code>Answer the user with a single word: yes or no.</code> &mdash; deliberately silent about images, questions, and their order, so it cannot favour an arrangement.</p>
+</section>
+
+<section>
+  <h2><span class="num">02</span>Results</h2>
+  <div class="scroll">
+    <table>
+      <caption>500 POPE random items, greedy decoding, per-item paired</caption>
+      <thead>
+        <tr><th>Ordering</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Yes-rate</th><th>Unparseable</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>STI</td><td class="hi">0.8960</td><td>0.9660</td><td>0.8156</td><td>0.8844</td><td>0.4120</td><td>0</td></tr>
+        <tr><td>SIT</td><td class="hi">0.9080</td><td>0.9626</td><td>0.8443</td><td>0.8996</td><td>0.4280</td><td>0</td></tr>
+        <tr><td>STIT</td><td class="hi">0.9080</td><td>0.9626</td><td>0.8443</td><td>0.8996</td><td>0.4280</td><td>0</td></tr>
+        <tr class="gold"><td>gold</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>0.4880</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">SIT and STIT match on every aggregate metric. That is not a duplication bug &mdash; they disagree on six individual items, three each way, and the errors cancel exactly. Per-item outputs are preserved so this is checkable.</p>
+
+  <h3>Paired statistics</h3>
+
+  <div class="pair">
+    <h4>SIT &rarr; STIT</h4>
+    <p class="sub">Does repeating the question after the image help?</p>
+    <div class="grid">
+      <div class="stat"><div class="k">&Delta; accuracy</div><div class="v">+0.0000</div></div>
+      <div class="stat"><div class="k">Discordant</div><div class="v">6 <span style="color:var(--muted);font-size:13px">(3 / 3)</span></div></div>
+      <div class="stat"><div class="k">McNemar exact</div><div class="v">p = 1.0000</div></div>
+      <div class="stat"><div class="k">Bootstrap 95% CI</div><div class="v sm">[&minus;0.0100, +0.0100]</div></div>
+      <div class="stat"><div class="k">Verdict</div><div class="v"><span class="tag null">Null</span></div></div>
+    </div>
+  </div>
+
+  <div class="pair">
+    <h4>STI &rarr; SIT</h4>
+    <p class="sub">Does seeing the question before the image help?</p>
+    <div class="grid">
+      <div class="stat"><div class="k">&Delta; accuracy</div><div class="v">+0.0120</div></div>
+      <div class="stat"><div class="k">Discordant</div><div class="v">18 <span style="color:var(--muted);font-size:13px">(6 / 12)</span></div></div>
+      <div class="stat"><div class="k">McNemar exact</div><div class="v">p = 0.2379</div></div>
+      <div class="stat"><div class="k">Bootstrap 95% CI</div><div class="v sm">[&minus;0.0040, +0.0300]</div></div>
+      <div class="stat"><div class="k">Verdict</div><div class="v"><span class="tag null">Null</span></div></div>
+    </div>
+  </div>
+
+  <p class="note">Both intervals straddle zero. Two-sided exact McNemar on discordant pairs; bootstrap over 5000 resamples of items, paired so the same item contributes its three arms together. A third comparison, <code>STI&nbsp;&rarr;&nbsp;STIT</code>, gives <code>+0.0120</code>, 12 discordant (3&nbsp;/&nbsp;9), <code>p&nbsp;=&nbsp;0.1460</code> &mdash; also null.</p>
+</section>
+
+<section>
+  <h2><span class="num">03</span>Is this really measuring ordering?</h2>
+  <p>Four checks, run before and during the benchmark, that would each have invalidated the numbers had they failed.</p>
+
+  <div class="checks">
+    <div class="check">
+      <div class="lbl">Anagram assertion</div>
+      <div class="res">STI = SIT token count on <strong>500 / 500</strong> items; identical token-ID multisets</div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+    <div class="check">
+      <div class="lbl">Image reaches the model</div>
+      <div class="res">real 0.958 vs blank-grey 0.458; grey yes-rate 0.000 on 24 items</div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+    <div class="check">
+      <div class="lbl">Image constant across arms</div>
+      <div class="res">image-token count identical in all 3 arms on <strong>500 / 500</strong> items</div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+    <div class="check">
+      <div class="lbl">Question actually moved</div>
+      <div class="res">question token IDs in chunk&nbsp;0 for STI, chunk&nbsp;2 for SIT &mdash; verified in the dump</div>
+      <div><span class="tag pass">Pass</span></div>
+    </div>
+  </div>
+
+  <p>The blank-image control is the load-bearing one. A silently dropped image would produce a plausible-looking table where all three arms scored the same &mdash; a null result for entirely the wrong reason. Substituting a grey frame collapses accuracy to 0.458 and drives the model to answer &ldquo;no&rdquo; to every question, which is the correct behaviour when there is nothing in the picture. The image is doing the work.</p>
+
+  <p>Token order was controlled at the chunk level through llama.cpp's <code>mtmd</code> library rather than through a chat template, so the image sits exactly where the marker was placed. The template was inspected too: LFM2.5-VL's <code>parse_content</code> macro iterates the content list in order and concatenates, with no image hoisting &mdash; so the model card's written example and the code samples were never in conflict, they simply show two different orderings.</p>
+</section>
+
+<section>
+  <h2><span class="num">04</span>The ordering did change the model &mdash; just not its answers</h2>
+
+  <div class="callout">
+    <div class="h">The most interesting number in this report</div>
+    <p>STI produced a capitalized <code>Yes</code>/<code>No</code> on <strong>96.4%</strong> of items. SIT produced capitalized output on <strong>2.0%</strong>. STIT landed in between at <strong>25.0%</strong>. Same system prompt, same question, same image &mdash; only position changed.</p>
+  </div>
+
+  <p>This matters for interpreting the null. A sceptic's first objection to &ldquo;ordering doesn't matter&rdquo; is that the manipulation never really took hold &mdash; that 156 tokens rearranged is too weak an intervention to shift a 3B model. The capitalization split refutes that directly. Moving the question across the image swings the surface form of the answer almost completely, from 96% capitalized to 2%. The intervention is potent. It simply expends its effect on formatting rather than on correctness.</p>
+
+  <p>A useful way to hold the result: prompt ordering here is a <strong>style</strong> variable, not a <strong>grounding</strong> variable. If you are parsing model output with a case-sensitive matcher, ordering will absolutely break you. If you are relying on it to make the model see the picture better, it will not.</p>
+
+  <div class="scroll">
+    <table>
+      <caption>Where the arms agree and diverge</caption>
+      <thead><tr><th>Pair</th><th>Identical output</th><th>Discordant on correctness</th></tr></thead>
+      <tbody>
+        <tr><td>STI vs SIT</td><td>482 / 500 &nbsp;(0.964)</td><td>18 &nbsp;(0.036)</td></tr>
+        <tr><td>STI vs STIT</td><td>488 / 500 &nbsp;(0.976)</td><td>12 &nbsp;(0.024)</td></tr>
+        <tr><td>SIT vs STIT</td><td>494 / 500 &nbsp;(0.988)</td><td>6 &nbsp;(0.012)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Ordering changes the answer on at most 3.6% of items. Whatever the arrangement does, it is operating at the margin.</p>
+</section>
+
+<section>
+  <h2><span class="num">05</span>Outliers: what the 18 flips have in common</h2>
+
+  <p>The <code>STI &rarr; SIT</code> discordant set is small but strikingly lopsided. <strong>15 of 18 have gold answer &ldquo;yes.&rdquo;</strong> The dominant failure is STI answering &ldquo;no&rdquo; about an object that is genuinely present.</p>
+
+  <div class="scroll">
+    <table>
+      <caption>Error composition by arm</caption>
+      <thead><tr><th>Ordering</th><th>False positives<br><span style="font-weight:400;text-transform:none;letter-spacing:0">said yes, gold no</span></th><th>False negatives<br><span style="font-weight:400;text-transform:none;letter-spacing:0">said no, gold yes</span></th><th>Yes-bias vs gold</th></tr></thead>
+      <tbody>
+        <tr><td>STI</td><td>7</td><td class="hi">45</td><td>&minus;0.0760</td></tr>
+        <tr><td>SIT</td><td>8</td><td>38</td><td>&minus;0.0600</td></tr>
+        <tr><td>STIT</td><td>8</td><td>38</td><td>&minus;0.0600</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The entire STI deficit is false negatives &mdash; 45 against SIT's 38, with false positives essentially unchanged at 7 vs 8. Reading the question first made the model <em>more conservative</em>, not more perceptive. It says &ldquo;no&rdquo; more often, and since POPE's gold set is 48.8% yes, extra conservatism costs accuracy.</p>
+
+  <p>The objects concentrate tellingly: <strong>dining table</strong> (4 of 18), <strong>truck</strong> (3), <strong>chair</strong> (2). These are the large, backgrounded, partially-occluded category &mdash; things present in a scene without being its subject. A dining table is often visible only as an edge under the plates. That is exactly the population where a marginal shift in visual attention tips a borderline logit, and where the question-first arrangement apparently primes the model to look for a salient, foregrounded instance and answer &ldquo;no&rdquo; when it doesn't find one.</p>
+
+  <p>Worth noting against over-reading this: all 18 flips sit on 18 <em>distinct</em> images, so no single photo is driving the pattern. But 18 items is a small set, and the object concentration could easily be chance. It is a hypothesis for a follow-up, not a finding.</p>
+
+  <p>All three arms show a <em>negative</em> yes-bias &mdash; they under-predict &ldquo;yes&rdquo; relative to gold. This is worth flagging because it inverts POPE's best-known failure mode, where models typically over-answer &ldquo;yes.&rdquo; LFM2.5-VL-3B at Q6_K is unusually conservative on this benchmark.</p>
+</section>
+
+<section>
+  <h2><span class="num">06</span>What else could explain these numbers</h2>
+
+  <h3>What the design rules out</h3>
+  <ul>
+    <li><strong>Content differences between arms.</strong> Ruled out by the anagram assertion holding on all 500 items at the token-ID level, not merely the count.</li>
+    <li><strong>Image preprocessing drift.</strong> Image-token counts vary across items (128&ndash;256, dynamic resolution) but are identical across arms within every item.</li>
+    <li><strong>Sampling noise.</strong> Greedy decoding with a bare argmax sampler; no top-k, top-p, or penalties in the chain. Every discordant pair is attributable to the prompt.</li>
+    <li><strong>Batching non-determinism.</strong> Single stream, fixed <code>n_batch</code>/<code>n_ubatch</code>, identical context params across all three arms, KV cleared between items. Floating-point reduction order is held constant, so no flips come from the scheduler.</li>
+    <li><strong>Scoring error.</strong> Zero escalations: the complete set of distinct outputs across all 1500 generations is <code>{Yes, No, yes, no}</code>. Nothing required interpretation, so no judging bias could enter.</li>
+    <li><strong>Prompt tuning toward a winner.</strong> One system prompt, written once before any results were seen, never revised.</li>
+  </ul>
+
+  <h3>What remains genuinely uncertain</h3>
+  <ul>
+    <li><strong>Statistical power.</strong> This is the real limitation. At the observed discordance rates, n=500 can only resolve differences of roughly <strong>&plusmn;0.012 to &plusmn;0.024</strong>. Effects smaller than about two points are invisible here. &ldquo;No detectable effect&rdquo; is the correct claim; &ldquo;no effect&rdquo; is stronger than the data supports. For scale, three of the five reference models had effects inside that blind spot (&minus;0.001, &minus;0.003, +0.010).</li>
+    <li><strong>Quantization.</strong> Run at Q6_K, deliberately, because that is what ships. Quantization noise is roughly the same magnitude as the effect being hunted, so a bf16 run could plausibly land differently.</li>
+    <li><strong>POPE's binary format.</strong> A 50% floor compresses effect sizes. If ordering helps by sharpening <em>localization</em>, a yes/no task may be too coarse to register it. A short free-form set &mdash; GQA or TextVQA &mdash; would give an ordering effect more room to appear.</li>
+    <li><strong>Annotation error.</strong> POPE is known to carry label noise (see RePOPE, arXiv 2504.15707). Some of the 45 STI &ldquo;false negatives&rdquo; may be correct answers against wrong labels, which adds noise to an already small discordant set.</li>
+    <li><strong>Image-level correlation.</strong> 500 questions drew on 333 unique images, up to 4 questions each. The bootstrap resamples questions rather than images, so its interval is very slightly optimistic.</li>
+    <li><strong>Greedy only.</strong> Ordering effects could differ once sampling smears the distribution &mdash; and greedy is not what Magpie ships.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="num">07</span>What this means</h2>
+  <p>On LFM2.5-VL-3B at Q6_K, <strong>prompt ordering is not an accuracy lever.</strong> Neither moving the question ahead of the image nor repeating it afterwards produced a change distinguishable from zero, and the one directional hint present runs opposite to the attention-priming hypothesis.</p>
+  <p>That has a practical consequence worth more than the accuracy numbers. Since ordering costs nothing in accuracy, the arrangement is free to be chosen on <em>engineering</em> grounds &mdash; and image-first (<code>SIT</code>) is the one that lets an image prefix be KV-cached across many questions about the same picture. The ordering that is cheapest to serve is also, here, the one that scored highest. There is no trade-off to manage.</p>
+  <p>The finding that should actually change behaviour is the capitalization split: if anything downstream matches on <code>"Yes"</code> case-sensitively, prompt ordering will silently break it.</p>
+</section>
+
+<footer>
+  <p>LFM2.5-VL-3B Q6_K + mmproj Q8_0 &middot; llama.cpp build 10502 (0adcc3bb5) via libmtmd &middot; Metal, Apple M1 Max</p>
+  <p>lmms-lab/POPE, Full/random split &middot; seed 0 &middot; n=500 (244 yes / 256 no, 333 unique images)</p>
+  <p>Greedy argmax, 16-token budget &middot; 1500 generations in 18.9 min (0.75 s/generation) &middot; 0 unparseable, 0 token-count mismatches</p>
+  <p>Per-item outputs preserved in results.jsonl and per_item.json for re-analysis without re-running.</p>
+</footer>
+
+</div>

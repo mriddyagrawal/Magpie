@@ -35,6 +35,24 @@ LLAMA_SERVER_COMMIT = "0adcc3bb5"
 # the two equal.
 QDRANT_VERSION = "v1.17.1"
 
+# Hugging Face revision (commit sha) of each model repo we download from.
+# Without a pin `hf_hub_download` follows `main`, and on 2026-09-03 the
+# drift guard's own probe pulled Liquid's 2026-08-31 "Update GGUFs" commit
+# onto a machine mid-session - a file whose header declares a different
+# context length than the one every eval, the 23-size image calibration
+# and the judge runs used. The pinned sha is that validated file. Bumping
+# it is an upgrade: `just check-drift` + an eval arm, then merge.
+MODEL_REVISIONS: dict[str, str] = {
+    "LiquidAI/LFM2.5-VL-3B-GGUF": "3e0e828198e2abb75a957ad823f5d691c13f0f28",
+}
+
+
+def model_revision(repo_id: str) -> "str | None":
+    """Pinned HF revision for `repo_id`, or None (unpinned repos - e.g. a
+    LOCAL_MODEL override - follow `main`, and provenance records what they
+    resolved to so the drift is at least visible)."""
+    return MODEL_REVISIONS.get(repo_id)
+
 
 def check_pins(provenance: dict) -> list[dict]:
     """Compare a provenance fingerprint (see `provenance.runtime_fingerprint`)
@@ -61,6 +79,20 @@ def check_pins(provenance: dict) -> list[dict]:
                 "placement were verified on the pinned build; run "
                 "`just check-drift` after any change"
             ),
+        })
+
+    models = provenance.get("models") or {}
+    repo = models.get("repo")
+    pinned = MODEL_REVISIONS.get(repo) if repo else None
+    resolved = models.get("snapshot")
+    if pinned and resolved and resolved != pinned:
+        out.append({
+            "component": f"model {repo}",
+            "pinned": pinned[:12],
+            "installed": str(resolved)[:12],
+            "note": "the served GGUF is not the validated revision - re-run the "
+                    "installer/prefetch (it pins the revision) or bump the pin "
+                    "through `just check-drift` + an eval arm",
         })
 
     qd = provenance.get("qdrant") or {}

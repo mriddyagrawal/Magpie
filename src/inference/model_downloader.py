@@ -30,6 +30,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 # Importing this triggers the HF_HOME redirect set up in src/manifest.py.
 # Models land under APP_DATA_DIR/cache/hub/, NOT in the user's shared
@@ -103,8 +104,26 @@ def _mmproj_filename_for(repo_id: str, variant: str) -> str:
     return pattern.format(variant=variant)
 
 
-def ensure_model(repo_id: str, quant: str) -> Path:
+def _pinned(repo_id: str, revision: Optional[str]) -> Optional[str]:
+    """Explicit revision wins; else the validated pin from src/drift/pins;
+    else None (= HF main, recorded by provenance as unpinned)."""
+    if revision:
+        return revision
+    try:
+        from src.drift.pins import model_revision
+
+        return model_revision(repo_id)
+    except Exception:  # noqa: BLE001 - the guard is never load-bearing
+        return None
+
+
+def ensure_model(repo_id: str, quant: str, revision: Optional[str] = None) -> Path:
     """Return the local path to a GGUF, downloading if missing.
+
+    `revision` pins the Hugging Face commit; when None the validated pin
+    from src/drift/pins.py applies. Never follow `main` silently: the
+    2026-08-31 "Update GGUFs" commit changed the LFM2.5-VL header's
+    context_length underneath a machine mid-session.
 
     First call on a new (repo_id, quant) triggers a multi-GB download
     with a progress bar to stderr. Subsequent calls hit the cache and
@@ -131,11 +150,12 @@ def ensure_model(repo_id: str, quant: str) -> Path:
     # Unsloth ships derivative quants under their own license-compliant
     # repo). If LOCAL_MODEL is later pointed at a gated repo, the user's
     # `HF_TOKEN` env var is read automatically by huggingface_hub.
-    path = hf_hub_download(repo_id=repo_id, filename=filename)
+    path = hf_hub_download(repo_id=repo_id, filename=filename,
+                           revision=_pinned(repo_id, revision))
     return Path(path)
 
 
-def ensure_mmproj(repo_id: str, variant: str = "BF16") -> Path:
+def ensure_mmproj(repo_id: str, variant: str = "BF16", revision: Optional[str] = None) -> Path:
     """Return the local path to a multi-modal projector .gguf, downloading
     if missing.
 
@@ -160,5 +180,6 @@ def ensure_mmproj(repo_id: str, variant: str = "BF16") -> Path:
         f"(first run downloads ~900 MB to {os.environ.get('HF_HUB_CACHE', '<cache>')})",
         file=sys.stderr,
     )
-    path = hf_hub_download(repo_id=repo_id, filename=filename)
+    path = hf_hub_download(repo_id=repo_id, filename=filename,
+                           revision=_pinned(repo_id, revision))
     return Path(path)

@@ -355,14 +355,20 @@ class LlamaServerPool:
         from src.inference.model_downloader import ensure_model, ensure_mmproj
 
         override = _path_override("LLAMA_SERVER_MODEL_PATH")
-        gguf = override or ensure_model(profile.args.repo_id, profile.args.quant)
+        gguf = override or ensure_model(profile.args.repo_id, profile.args.quant,
+                                        profile.args.revision)
+        # Same clamp the server applies to -c, done here so the answer
+        # budget (profiles.effective_ctx_size) and argv agree - the served
+        # file's header is the only honest ceiling (see gguf_meta).
+        from src.inference.profiles import clamp_ctx_to_model
+        ctx_size = clamp_ctx_to_model(profile.args.ctx_size, gguf, label=profile.args.repo_id)
         argv: list[str] = [
             str(self._binary),
             "--model", str(gguf),
             "--port", str(port),
             "--host", "127.0.0.1",
             "-ngl", str(profile.args.ngl),
-            "-c", str(profile.args.ctx_size),
+            "-c", str(ctx_size),
             "--temp", str(profile.args.temperature),
             # Liquid's recommended sampler set rides alongside the
             # temperature — see profiles.DEFAULT_MIN_P. These are the
@@ -393,6 +399,7 @@ class LlamaServerPool:
                 ensure_mmproj(
                     profile.args.mmproj_repo_id,
                     profile.args.mmproj_variant,
+                    profile.args.revision,
                 )
             )
         if mmproj_path:

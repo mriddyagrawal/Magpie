@@ -78,16 +78,14 @@ def test_n_ctx_explicit_value_wins(monkeypatch):
     assert profiles.resolve_n_ctx() == 8192
 
 
-def test_n_ctx_above_trained_context_is_clamped_with_warning(monkeypatch, capsys):
-    """A .env left at 65536 must not reopen the budget/server mismatch."""
+def test_n_ctx_resolver_does_not_clamp_by_constant(monkeypatch):
+    """The ceiling is the served GGUF's declared context (see
+    clamp_ctx_to_model / gguf_meta), not a number baked into the resolver:
+    the same repo declared 128,000 in August and 32,768 in September."""
     from src.inference import profiles
 
-    profiles._WARNED_CTX_CLAMP.clear()
     monkeypatch.setenv("LOCAL_N_CTX", "65536")
-    assert profiles.resolve_n_ctx() == profiles.LFM25_MAX_N_CTX == 32768
-    assert "exceeds the model's trained context" in capsys.readouterr().err
-    profiles.resolve_n_ctx()                       # warned once, not per call
-    assert capsys.readouterr().err == ""
+    assert profiles.resolve_n_ctx() == 65536
 
 
 def test_n_ctx_garbage_falls_back_to_default(monkeypatch, capsys):

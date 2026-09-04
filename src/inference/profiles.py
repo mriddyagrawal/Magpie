@@ -58,31 +58,24 @@ DEFAULT_QUANT = "Q6_K"
 DEFAULT_N_CTX = 16384
 
 
-# What the LFM2.5 family was trained to attend over. llama-server clamps -c
-# to n_ctx_train, so anything above this is a window the budget in
-# src/answer.py would size prompts for and the server would then reject
-# (observed 2026-09-03: -c 49152 requested, /props reported 32768, every
-# prompt between the two would have been an HTTP 400). The drift guard's
-# context_window oracle checks the served window against this at runtime.
-LFM25_MAX_N_CTX = 32768
-
-_WARNED_CTX_CLAMP: set[int] = set()
+_WARNED_CTX_CLAMP: set[tuple[str, int]] = set()
 
 
-def resolve_n_ctx(default: int = DEFAULT_N_CTX, max_ctx: int = LFM25_MAX_N_CTX) -> int:
-    """The context window for the local profile: LOCAL_N_CTX when set,
-    else `default` - the same 16K on every machine.
+def resolve_n_ctx(default: int = DEFAULT_N_CTX) -> int:
+    """The REQUESTED context window: LOCAL_N_CTX when set, else `default` -
+    the same 16K on every machine.
 
     Until 2026-09-03 an unset LOCAL_N_CTX sized the window to total RAM
     (8K/16K/32K/49K tiers). That shipped a different system than the evals
-    measure (the harness pins 16K), made the model's answers depend on the
-    buyer's RAM, and on 32 GB machines asked for more than the model was
-    trained for. Owner decision: one window everywhere; a larger tier
+    measure (the harness pins 16K) and made answers depend on the buyer's
+    RAM. Owner decision: one window everywhere; a larger tier
     (LOCAL_N_CTX_BIG) only after an eval arm at that size shows a win.
 
-    An explicit value above `max_ctx` is clamped with a one-time warning -
-    a .env left at 65536 must not silently reopen the budget/server mismatch.
-    Unparseable values fall back to the default.
+    The ceiling is NOT a constant here: llama-server clamps -c to the
+    served GGUF's declared context_length, and that value changed between
+    two Hugging Face revisions of the same repo in one week. See
+    effective_ctx_size(), which reads the header of the file that will
+    actually be served. Unparseable values fall back to the default.
     """
     raw = os.environ.get("LOCAL_N_CTX", "").strip()
     try:
@@ -91,15 +84,57 @@ def resolve_n_ctx(default: int = DEFAULT_N_CTX, max_ctx: int = LFM25_MAX_N_CTX) 
         print(f"  warning: LOCAL_N_CTX={raw!r} is not an integer; using {default}",
               file=sys.stderr)
         n = default
-    if n > max_ctx:
-        if n not in _WARNED_CTX_CLAMP:
-            _WARNED_CTX_CLAMP.add(n)
-            print(f"  warning: LOCAL_N_CTX={n} exceeds the model's trained context "
-                  f"({max_ctx}); llama-server would clamp it and the answer budget "
-                  f"would overshoot the real window - using {max_ctx}",
-                  file=sys.stderr)
-        n = max_ctx
     return max(2048, n)
+
+
+def clamp_ctx_to_model(requested: int, gguf_path: "Path | str | None", *, label: str = "") -> int:
+    """min(requested, the GGUF's declared context_length) - the exact rule
+    llama-server applies to -c, applied on OUR side so the answer budget
+    (src/answer.py) and the server agree. Warns once per (file, value)."""
+    if gguf_path is None:
+        return requested
+    from src.inference.gguf_meta import declared_context_length
+
+    declared = declared_context_length(gguf_path)
+    if declared is None or requested <= declared:
+        return requested
+    key = (str(gguf_path), requested)
+    if key not in _WARNED_CTX_CLAMP:
+        _WARNED_CTX_CLAMP.add(key)
+        print(f"  warning: LOCAL_N_CTX={requested} exceeds the served model's declared "
+              f"context ({declared}{' - ' + label if label else ''}); llama-server would "
+              f"clamp it and the answer budget would overshoot the real window - "
+              f"using {declared}", file=sys.stderr)
+    return declared
+
+
+def _cached_gguf_path(args: "LaunchArgs") -> "Path | None":
+    """Path of the profile's GGUF if it is already in the HF cache (never
+    downloads; the pool downloads at spawn)."""
+    try:
+        from huggingface_hub import try_to_load_from_cache
+
+        from src.inference.model_downloader import _filename_for, _pinned
+
+        hit = try_to_load_from_cache(
+            repo_id=args.repo_id, filename=_filename_for(args.repo_id, args.quant),
+            revision=_pinned(args.repo_id, args.revision),
+        )
+        return Path(hit) if isinstance(hit, str) else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def effective_ctx_size(profile_name: Optional[str] = None) -> int:
+    """The context window the server will really run for this profile:
+    args.ctx_size clamped to the cached GGUF's declared context_length.
+    Used by the answer budget so it never assumes a window the model
+    cannot open; the pool applies the same clamp from the resolved path
+    at spawn. Before the model is downloaded there is nothing to clamp
+    against (and no server either), so the requested size is returned."""
+    prof = get_profile(profile_name or default_text_profile())
+    return clamp_ctx_to_model(prof.args.ctx_size, _cached_gguf_path(prof.args),
+                              label=prof.args.repo_id)
 
 
 # Sampling defaults come from Liquid's own model card for the LFM2.5
@@ -187,6 +222,11 @@ class LaunchArgs:
     mmproj: Optional[str] = None
     mmproj_repo_id: Optional[str] = None
     mmproj_variant: str = "BF16"
+
+    # Hugging Face revision (commit sha) for repo_id / mmproj_repo_id. None
+    # = the validated pin in src/drift/pins.py (or HF main for repos that
+    # have no pin, e.g. a LOCAL_MODEL override).
+    revision: Optional[str] = None
 
     # `-ngl` — layers offloaded to GPU. 999 = all (recommended on
     # Metal/CUDA), 0 = pure CPU.

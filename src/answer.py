@@ -67,9 +67,11 @@ def _context_budget_chars() -> int | None:
 
         if active_provider().name != "local":
             return None
-        from src.inference.profiles import default_text_profile, get_profile
+        from src.inference.profiles import effective_ctx_size
 
-        ctx = get_profile(default_text_profile()).args.ctx_size
+        # the window the server will REALLY run: requested size clamped to
+        # the served GGUF's declared context_length (profiles.clamp_ctx_to_model)
+        ctx = effective_ctx_size()
     except Exception:  # noqa: BLE001 — the budget is protective, never fatal
         ctx = 16_384
     usable_tokens = max(2_000, ctx - _ANSWER_RESERVE_TOKENS)

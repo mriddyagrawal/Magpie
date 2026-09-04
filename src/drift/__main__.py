@@ -58,7 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     base_url = None
     # This process is about to run the oracles itself; claim the fingerprint
     # so the pool's on-spawn idle hook does not start a second, concurrent run.
-    oracles._scheduled.add(prov["fingerprint"])
+    oracles.claim(prov["fingerprint"])
     try:
         from src.inference.llama_server_pool import get_pool
         from src.inference.profiles import default_vision_profile

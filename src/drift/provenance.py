@@ -34,6 +34,10 @@ from src.manifest import APP_DATA_DIR
 
 DRIFT_DIR = APP_DATA_DIR / "drift"
 _HASH_CACHE = DRIFT_DIR / "hashes.json"
+# In a PyInstaller bundle this resolves inside the extraction temp dir: there
+# is no .git and no uv.lock there, so `magpie.git_sha` and `deps` come back
+# None and the fingerprint rests on the binary + model hashes alone. Fine -
+# a packaged build's dependency set is frozen by construction.
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 _lock = threading.Lock()
@@ -48,7 +52,11 @@ def _now() -> str:
 
 def _sha256_file(path: Path) -> Optional[str]:
     """Full sha256 of a file, cached by (size, mtime) so multi-GB model
-    files are read once per install, not once per launch."""
+    files are read once per install, not once per launch.
+
+    The cache is read-modify-replaced whole, unlocked: two processes hashing
+    at the same moment (sidecar startup + an eval worker) can lose one
+    entry, which is simply recomputed next time. Benign by design."""
     try:
         st = path.stat()
     except OSError:
@@ -83,9 +91,14 @@ def _sha256_file(path: Path) -> Optional[str]:
 
 def _git_sha() -> Optional[str]:
     try:
+        from src.subproc import no_window_kwargs
+
         r = subprocess.run(
             ["git", "-C", str(_REPO_ROOT), "rev-parse", "HEAD"],
             capture_output=True, text=True, timeout=3, check=False,
+            # runs in the sidecar's startup event: without this, Windows pops
+            # a console window at every launch when git is installed
+            **no_window_kwargs(),
         )
         sha = r.stdout.strip()
         return sha if r.returncode == 0 and sha else None
@@ -240,14 +253,18 @@ def runtime_fingerprint(*, hash_models: bool = True, refresh: bool = False) -> d
 
 
 def fingerprint_of(prov: dict) -> str:
-    """Stable 16-hex digest over the inputs the oracles depend on. The
-    Magpie git sha is deliberately excluded (it changes every commit; the
-    checks are about the world underneath the code, not the code)."""
+    """Stable 16-hex digest over the inputs the oracles depend on.
+
+    Deliberately excluded: the Magpie git sha (changes every commit; the
+    checks are about the world underneath the code) and the Qdrant version
+    (its probe depends on whether Qdrant happened to be up - the sidecar's
+    startup probe races Tauri's Qdrant spawn - and it cannot move the token
+    math or grammar behaviour; vector_dims reads the live collections
+    anyway). Both stay in the provenance record for display and pins."""
     models = prov.get("models") or {}
     stable = {
         "llama_build": (prov.get("llama_server") or {}).get("build"),
         "llama_commit": (prov.get("llama_server") or {}).get("commit"),
-        "qdrant": (prov.get("qdrant") or {}).get("version"),
         "gguf": ((models.get("gguf") or {}).get("sha256")) or ((models.get("gguf") or {}).get("path")),
         "mmproj": ((models.get("mmproj") or {}).get("sha256")) or ((models.get("mmproj") or {}).get("path")),
         "col": (prov.get("col_model") or {}).get("model_id"),

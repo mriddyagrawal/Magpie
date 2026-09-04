@@ -23,8 +23,9 @@ bump merges - see README "Drift guard".
 from __future__ import annotations
 
 # llama.cpp release the current mirrored assumptions were verified against
-# (image token math token-exact on 23 sizes, json_schema honoured for the
-# LFM2 family, chat-template image placement). Tag form for the installer.
+# (image token math token-exact on 23 sizes, the GBNF grammar enforced by
+# the sampler for the LFM2 family, chat-template image placement). Tag form
+# for the installer.
 LLAMA_SERVER_BUILD = 10502
 LLAMA_SERVER_TAG = f"b{LLAMA_SERVER_BUILD}"
 LLAMA_SERVER_COMMIT = "0adcc3bb5"

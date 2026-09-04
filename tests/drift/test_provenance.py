@@ -40,10 +40,18 @@ def test_fingerprint_ignores_magpie_git_sha() -> None:
     assert a == b and len(a) == 16
 
 
+def test_fingerprint_ignores_qdrant_reachability_and_version() -> None:
+    """The startup probe races Tauri's Qdrant spawn: down at startup, up
+    when the pool hook fingerprints later. Both must hash identically or
+    every install runs the oracles twice and keeps two cache files."""
+    base = provenance.fingerprint_of(_prov())
+    assert provenance.fingerprint_of(_prov(qdrant={"version": None, "reachable": False})) == base
+    assert provenance.fingerprint_of(_prov(qdrant={"version": "1.18.0"})) == base
+
+
 def test_fingerprint_changes_with_each_runtime_input() -> None:
     base = provenance.fingerprint_of(_prov())
     assert provenance.fingerprint_of(_prov(llama_server={"build": 10600, "commit": "x"})) != base
-    assert provenance.fingerprint_of(_prov(qdrant={"version": "1.18.0"})) != base
     models = _prov()["models"]
     models = {**models, "gguf": {"sha256": "d" * 64, "path": "/x/model.gguf"}}
     assert provenance.fingerprint_of(_prov(models=models)) != base

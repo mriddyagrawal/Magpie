@@ -7,9 +7,12 @@ Qdrant) whether the behaviour our code assumes still holds:
                       LFM2 tiling math - measure a few synthetic sizes and
                       require estimate >= measured (an under-estimate is
                       the HTTP-400 failure)
-  grammar             llama-server honours `response_format: json_schema`
-                      for the loaded model - pre-#24377 builds silently
-                      ignored it for the LFM2 family
+  grammar             llama-server's sampler enforces the GBNF grammar
+                      LocalLLM sends (compiled from the output schema by
+                      src/inference/gbnf.py) - the load-bearing constraint
+                      behind every answer/summary/rewrite; a build that
+                      ignores it returns prose that only the repair path
+                      can salvage
   vector_dims         the stored Qdrant collections' vector widths match
                       the encoders we would write with
 
@@ -281,6 +284,13 @@ def ensure_for_fingerprint(fingerprint: str, base_url: Optional[str], *, force: 
 # ---- idle auto-run ----------------------------------------------------------
 
 _scheduled: set[str] = set()
+
+
+def claim(fingerprint: str) -> None:
+    """Mark a fingerprint as being handled by the caller (the CLI, a
+    /drift/check run) so the pool's on-spawn hook does not schedule a
+    second, concurrent probe run for it."""
+    _scheduled.add(fingerprint)
 
 
 def schedule_after_idle(

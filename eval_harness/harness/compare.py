@@ -205,6 +205,9 @@ def git_log_between(sha_a: str, sha_b: str, pathspec: str) -> list[str]:
 
 
 def _provenance_summary(run: dict) -> dict | None:
+    """Deliberate near-copy of src.drift.provenance.summary: compare.py must
+    stay importable without src (the harness contract - only the worker
+    imports the backend), so it cannot call the original. Keep in step."""
     prov = run.get("provenance")
     if not prov:
         return None

@@ -393,16 +393,30 @@ class LlamaServerLLM:
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
         body = self._build_request_body(prepared, temperature, max_tokens, stream=True)
+        # Drift tripwire coverage on the streaming path: llama-server only
+        # emits `usage` on a stream when asked. The final chunk (empty
+        # choices, usage present) feeds _tripwire_after exactly like the
+        # non-streaming path, so a future switch of /query/stream to this
+        # method cannot silently drop the guard (review sidenote, #35).
+        body["stream_options"] = {"include_usage": True}
         url = self._base_url() + "/v1/chat/completions"
+        profile_name = self.profile_name
 
         async def _gen() -> AsyncIterator[str]:
+            usage: Optional[dict] = None
             try:
                 async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
                     async with client.stream("POST", url, json=body) as resp:
                         resp.raise_for_status()
                         async for line in resp.aiter_lines():
+                            found = _parse_sse_usage(line)
+                            if found is not None:
+                                usage = found
                             text = _parse_sse_chunk(line)
                             if text == _SSE_DONE:
+                                if usage is not None:
+                                    self._tripwire_after(profile_name, prepared, None,
+                                                         {"usage": usage})
                                 return
                             if text:
                                 yield text
@@ -646,6 +660,22 @@ def _attach_images_to_last_user(
 
 
 _SSE_DONE = "<<DONE>>"  # internal sentinel — never appears in real chunks
+
+
+def _parse_sse_usage(line: str) -> Optional[dict]:
+    """The `usage` object from an SSE data line, or None. With
+    `stream_options.include_usage` llama-server sends it on the final
+    chunk (empty `choices`); OpenAI-shaped servers do the same."""
+    if not line.startswith("data: "):
+        return None
+    payload = line[len("data: "):].strip()
+    if payload == "[DONE]":
+        return None
+    try:
+        usage = json.loads(payload).get("usage")
+        return usage if isinstance(usage, dict) and "prompt_tokens" in usage else None
+    except (json.JSONDecodeError, AttributeError, TypeError):
+        return None
 
 
 def _parse_sse_chunk(line: str) -> str:

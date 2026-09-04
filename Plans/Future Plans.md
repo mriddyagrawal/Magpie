@@ -3477,6 +3477,9 @@ its own failures):**
   `run.json`; `compare.py` gained a fourth axis, `runtime`, so a bump
   between runs is a changed knob (old unstamped runs never count).
 - `oracles.py` — executable checks against the REAL component:
+  `context_window` (`/props` per-slot `n_ctx` ≥ the profile `ctx_size`
+  the answer budget assumes — `-np` raised without `-c` would 400 every
+  multi-file answer; review suggestion, 2026-09-03),
   `image_tokens` (4 synthetic sizes vs `estimate_image_tokens`, fail on
   any under-count), `grammar` (ask for prose under a schema; prose back =
   server ignores json_schema), `vector_dims` (stored collection widths vs

@@ -198,8 +198,8 @@ def test_vector_dims_missing_collections_pass_with_note() -> None:
 def test_run_all_without_server_skips_server_oracles() -> None:
     results = oracles.run_all(None, client=_FakeClient())
     names = [r.name for r in results]
-    assert names == ["image_tokens", "grammar", "vector_dims"]
-    assert results[0].data.get("skipped") and results[0].ok
+    assert names == ["context_window", "image_tokens", "grammar", "vector_dims"]
+    assert all(r.data.get("skipped") and r.ok for r in results[:3])
 
 
 def test_cache_round_trip_and_ensure(tmp_path: Path, monkeypatch) -> None:
@@ -254,3 +254,40 @@ def test_schedule_gives_up_when_server_evicted(monkeypatch) -> None:
                                        min_idle_s=0.05) is True
     time.sleep(0.2)
     assert ran == [] and "fp3" not in oracles._scheduled
+
+
+# ---- context_window --------------------------------------------------------
+
+
+def _props_server(monkeypatch, props: dict):
+    def fake_urlopen(req, timeout=0):
+        url = req if isinstance(req, str) else req.full_url
+        assert url.endswith("/props")
+        return _FakeResp(json.dumps(props).encode())
+    monkeypatch.setattr(oracles.urllib.request, "urlopen", fake_urlopen)
+
+
+def test_context_window_passes_when_slot_covers_budget(monkeypatch) -> None:
+    from src.inference.profiles import default_text_profile, get_profile
+
+    assumed = get_profile(default_text_profile()).args.ctx_size
+    _props_server(monkeypatch, {"default_generation_settings": {"n_ctx": assumed}, "total_slots": 1})
+    r = oracles.oracle_context_window("http://fake")
+    assert r.ok and r.data["slot_n_ctx"] == assumed and r.data["total_slots"] == 1
+
+
+def test_context_window_fails_when_parallelism_shrinks_the_slot(monkeypatch) -> None:
+    """-np 4 on the same -c quarters every slot: the budget's assumption is
+    now four times the real window and every multi-file answer 400s."""
+    from src.inference.profiles import default_text_profile, get_profile
+
+    assumed = get_profile(default_text_profile()).args.ctx_size
+    _props_server(monkeypatch, {"default_generation_settings": {"n_ctx": assumed // 4}, "total_slots": 4})
+    r = oracles.oracle_context_window("http://fake")
+    assert not r.ok and "400" in r.detail and "4 slot" in r.detail
+
+
+def test_context_window_fails_when_props_lacks_n_ctx(monkeypatch) -> None:
+    _props_server(monkeypatch, {"total_slots": 1})
+    r = oracles.oracle_context_window("http://fake")
+    assert not r.ok and "cannot verify" in r.detail

@@ -13,6 +13,10 @@ Qdrant) whether the behaviour our code assumes still holds:
                       behind every answer/summary/rewrite; a build that
                       ignores it returns prose that only the repair path
                       can salvage
+  context_window      the server's PER-SLOT window (/props n_ctx, i.e.
+                      -c divided by -np) covers the ctx_size the answer
+                      budget is sized from - raising parallelism without
+                      raising -c would 400 every multi-file answer
   vector_dims         the stored Qdrant collections' vector widths match
                       the encoders we would write with
 
@@ -218,14 +222,49 @@ def oracle_vector_dims(client: Any = None) -> OracleResult:
         return OracleResult("vector_dims", False, f"probe failed: {e}", {})
 
 
+def oracle_context_window(base_url: str) -> OracleResult:
+    """The context budget (answer.py) is sized from profile.args.ctx_size,
+    but the server's real PER-SLOT window is n_ctx / n_parallel. The pool
+    passes -np 1 today and invites GPU boxes to raise it via extra_args -
+    the moment someone does, every multi-file answer 400s again and nothing
+    else notices. /props reports the per-slot window
+    (default_generation_settings.n_ctx) and total_slots; assert the slot
+    window covers what the budget assumes."""
+    try:
+        from src.inference.profiles import default_text_profile, get_profile
+
+        assumed = int(get_profile(default_text_profile()).args.ctx_size)
+        with urllib.request.urlopen(base_url.rstrip("/") + "/props", timeout=30) as r:
+            props = json.load(r)
+        slot_ctx = (props.get("default_generation_settings") or {}).get("n_ctx")
+        slots = props.get("total_slots")
+        data = {"slot_n_ctx": slot_ctx, "total_slots": slots, "budget_ctx_size": assumed}
+        if not isinstance(slot_ctx, int):
+            return OracleResult("context_window", False,
+                                "/props carries no default_generation_settings.n_ctx - "
+                                "cannot verify the per-slot window", data)
+        if slot_ctx < assumed:
+            return OracleResult("context_window", False,
+                                f"per-slot window {slot_ctx} < budget assumption {assumed} "
+                                f"({slots} slot(s)) - multi-file answers will 400; lower the "
+                                f"profile ctx_size or raise -c / lower -np", data)
+        return OracleResult("context_window", True,
+                            f"per-slot window {slot_ctx} >= budget assumption {assumed} "
+                            f"({slots} slot(s))", data)
+    except Exception as e:  # noqa: BLE001
+        return OracleResult("context_window", False, f"probe failed: {e}", {})
+
+
 def run_all(base_url: Optional[str], client: Any = None) -> list[OracleResult]:
     """Run every oracle. `base_url` None skips the llama-server ones (they
     report as not-run rather than failed)."""
     out: list[OracleResult] = []
     if base_url:
+        out.append(oracle_context_window(base_url))
         out.append(oracle_image_tokens(base_url))
         out.append(oracle_grammar(base_url))
     else:
+        out.append(OracleResult("context_window", True, "skipped: no llama-server available", {"skipped": True}))
         out.append(OracleResult("image_tokens", True, "skipped: no llama-server available", {"skipped": True}))
         out.append(OracleResult("grammar", True, "skipped: no llama-server available", {"skipped": True}))
     out.append(oracle_vector_dims(client))

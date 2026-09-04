@@ -20,6 +20,7 @@ unless the owner explicitly asks for a fix.
 |---|---|---|
 | **pins** (`src/drift/pins.py`) | installed llama-server build / Qdrant version vs the validated constants | a binary that is not the one we tested on |
 | **provenance** (`provenance.py`) | fingerprint over llama-server build+commit, GGUF + mmproj sha256, col model, `uv.lock` hash, platform | *anything* in that set changed since the last check (keys the oracle cache; stamped into every eval `run.json`) |
+| **oracle `context_window`** | `/props` per-slot `n_ctx` and `total_slots` vs the profile `ctx_size` the answer budget is sized from | parallelism (`-np`) raised without raising `-c` - every multi-file answer 400s |
 | **oracle `image_tokens`** | 4 synthetic sizes against the live server vs `estimate_image_tokens` | llama.cpp's LFM2 tiling math moved (under-estimate = HTTP 400s in production) |
 | **oracle `grammar`** | product-exact GBNF probe | the sampler no longer enforces the grammar (structured output silently broken) |
 | **oracle `vector_dims`** | stored Qdrant collection widths vs encoder constants | an encoder swap that left stale vectors behind |

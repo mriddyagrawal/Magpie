@@ -155,3 +155,44 @@ def test_drift_check_is_single_flight(monkeypatch) -> None:
     client = TestClient(server.app)
     r = client.post("/drift/check")
     assert r.status_code == 202 and r.json()["status"] == "already running"
+
+
+# ---- streaming path keeps tripwire coverage ---------------------------------
+
+
+def test_stream_body_requests_usage_and_usage_line_parses() -> None:
+    from src.inference.local_llm import _parse_sse_usage
+
+    assert _parse_sse_usage('data: {"choices": [], "usage": {"prompt_tokens": 1234, "completion_tokens": 7}}') \
+        == {"prompt_tokens": 1234, "completion_tokens": 7}
+    assert _parse_sse_usage('data: {"choices": [{"delta": {"content": "hi"}}]}') is None
+    assert _parse_sse_usage("data: [DONE]") is None
+    assert _parse_sse_usage(": heartbeat") is None
+    assert _parse_sse_usage("data: not json") is None
+
+
+def test_stream_requests_include_usage(monkeypatch) -> None:
+    """The streaming request must ask llama-server for the usage chunk, or
+    the tripwire is blind on that path."""
+    import asyncio
+
+    from src.inference.local_llm import LlamaServerLLM
+
+    llm = LlamaServerLLM.__new__(LlamaServerLLM)
+    llm.model_id = "test::Q0"
+    llm.profile_name = "text"
+    llm.request_timeout_s = 1.0
+    built: dict = {}
+
+    def fake_build(prepared, temperature, max_tokens, *, stream, thinking=False,
+                   response_format=None, grammar=None):
+        built.update({"messages": prepared, "stream": stream})
+        return built                                   # same dict the method mutates
+    monkeypatch.setattr(llm, "_build_request_body", fake_build, raising=False)
+    monkeypatch.setattr(llm, "_base_url", lambda profile=None: "http://127.0.0.1:1", raising=False)
+    monkeypatch.setattr("src.inference.local_llm.apply_thinking_to_messages",
+                        lambda m, thinking=False, model_repo_or_path=None: m)
+
+    asyncio.run(llm.stream([{"role": "user", "content": "hi"}]))   # body built eagerly
+    assert built["stream"] is True
+    assert built["stream_options"] == {"include_usage": True}

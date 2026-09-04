@@ -284,6 +284,22 @@ def _block_cost_chars(block: object) -> int:
     return int(tokens * _CHARS_PER_TOKEN)
 
 
+# Tokens the assembled message list does not show: chat-template framing,
+# the timestamp line, the JSON-only hint. Measured ~30 on llama-server for
+# a bare user turn; padded.
+_PROMPT_OVERHEAD_TOKENS = 80
+
+
+def _predict_prompt_tokens(message: list) -> int:
+    """What we expect llama-server to count for this prompt: text by the
+    same chars-per-token the budget uses, images by the mirrored tiling
+    math, plus the system prompt and framing. Fed to the drift tripwire,
+    which compares it with the server's `usage.prompt_tokens`."""
+    chars = sum(_block_cost_chars(b) for b in message)
+    system_tokens = len(SYSTEM_PROMPT) / _CHARS_PER_TOKEN
+    return int(chars / _CHARS_PER_TOKEN + system_tokens + _PROMPT_OVERHEAD_TOKENS)
+
+
 def _trim_blocks_to_budget(
     per_file_blocks: list[tuple[str, list]], budget_chars: int
 ) -> list[tuple[str, list]]:
@@ -1025,7 +1041,10 @@ async def answer_question(
     # content. Cheap (~15-30 tokens) for a real win on a 3B backend.
     message.append(f"\nNow answer this question: {question}")
 
-    ans = await agent.run(message, temperature=temperature)
+    ans = await agent.run(
+        message, temperature=temperature,
+        expected_prompt_tokens=_predict_prompt_tokens(message),
+    )
 
     # If the model declared not_found, normalize the rest of the payload so the
     # downstream consumer doesn't have to think about partial fills. Some small

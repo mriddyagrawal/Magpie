@@ -210,8 +210,14 @@ class LlamaServerLLM:
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
         grammar: Optional[str] = None,
+        expected_prompt_tokens: Optional[int] = None,
     ) -> str:
         """Run a non-streaming chat completion. Returns the response text.
+
+        `expected_prompt_tokens`, when the caller predicted the prompt's
+        size (answer.py's context budget), is compared with the
+        `usage.prompt_tokens` llama-server reports - the drift tripwire
+        (src/drift/tripwire.py). Purely observational.
 
         `thinking=True` injects the Gemma 4 `<|think|>` token via
         `apply_thinking_to_messages`. For non-Gemma-4 models, that
@@ -246,7 +252,9 @@ class LlamaServerLLM:
         url = self._base_url(profile_name) + "/v1/chat/completions"
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
             resp = await self._post_with_pool_recovery(client, url, body, profile_name)
-        return self._extract_content(resp.json())
+        data = resp.json()
+        _tripwire_check(expected_prompt_tokens, data)
+        return self._extract_content(data)
 
     def complete_sync(
         self,
@@ -258,6 +266,7 @@ class LlamaServerLLM:
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
         grammar: Optional[str] = None,
+        expected_prompt_tokens: Optional[int] = None,
     ) -> str:
         """Synchronous variant. Used by `LocalAgent.run_sync` from
         non-async paths (`src.stage2.search.rewrite_query`).
@@ -281,7 +290,9 @@ class LlamaServerLLM:
         url = self._base_url(profile_name) + "/v1/chat/completions"
         with httpx.Client(timeout=self.request_timeout_s) as client:
             resp = self._post_with_pool_recovery_sync(client, url, body, profile_name)
-        return self._extract_content(resp.json())
+        data = resp.json()
+        _tripwire_check(expected_prompt_tokens, data)
+        return self._extract_content(data)
 
     # ----- stream ------------------------------------------------------------
 
@@ -491,6 +502,23 @@ def _detect_image_media_type(data: bytes) -> str:
     if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
         return "image/webp"
     return "image/png"
+
+
+def _tripwire_check(expected: Optional[int], payload: Any) -> None:
+    """Feed the drift tripwire when the caller predicted the prompt size.
+    Best-effort: a malformed usage block or an import problem must never
+    touch the answer path."""
+    if not expected:
+        return
+    try:
+        usage = payload.get("usage") if isinstance(payload, dict) else None
+        actual = usage.get("prompt_tokens") if isinstance(usage, dict) else None
+        if isinstance(actual, int):
+            from src.drift import tripwire
+
+            tripwire.record(expected, actual, context="chat.completions")
+    except Exception:  # noqa: BLE001 - observational only
+        pass
 
 
 def _attach_images_to_last_user(

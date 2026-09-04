@@ -108,17 +108,31 @@ def _context_budget_chars() -> int | None:
 # tokens against llama-server (8 tiles × 256 + 256 thumbnail + text).
 # Under-budgeting made the planner think 7 images fit a 16K window when
 # they didn't: three eval questions died as HTTP 400s at 16.5-17.8K
-# tokens. The estimate below mirrors the observed tiling math and errs
-# HIGH (5% pad, conservative fallbacks) — the failure mode of guessing
-# high is one fewer file in the prompt, not a rejected request.
+# tokens. The estimator below is an exact mirror of llama.cpp's mtmd LFM2
+# tiling (a first cut that rounded each side to a tile count under-counted
+# common 4:3 and square sizes by 18-55% — review, 2026-09-03), verified
+# token-exact on 23 sizes, and errs HIGH only via a 5% pad and a
+# ceiling-valued fallback — the failure mode of guessing high is one fewer
+# file in the prompt, not a rejected request.
 # ---------------------------------------------------------------------------
 
-_IMG_TILE_PX = 512          # mmproj tile edge (LFM2-VL: native up to 512×512)
-_IMG_TOKENS_PER_TILE = 256  # (512/16)² patches / 4 (pixel unshuffle)
-_IMG_TOKEN_PAD = 1.05       # estimate errs high on purpose
-# Dimensions unreadable → assume a large image. 2,560 tokens ≈ a 9-tile
-# 1080p-class image; worst case we drop one file too many, never a 400.
-_IMG_FALLBACK_TOKENS = 2_560
+# Constants mirror llama.cpp tools/mtmd (build 10502, commit 0adcc3bb5) for
+# PROJECTOR_TYPE_LFM2 with LFM2.5-VL's processor_config: tile 512, patch 16,
+# n_merge 2 (so align = 32 and 256 tokens per 512² tile), 2..10 tiles,
+# image_max_pixels 512² with tolerance 2.0, thumbnail bounded to
+# [64K, 256K] px. Re-verify with eval_harness/scripts/calibrate_image_tokens.py
+# whenever the llama-server build or the model changes.
+_IMG_TILE_PX = 512
+_IMG_ALIGN = 32                       # patch_size × n_merge
+_IMG_TOKENS_PER_TILE = 256            # (512/32)²
+_IMG_MIN_TILES, _IMG_MAX_TILES = 2, 10
+_IMG_TILE_AREA_TRIGGER = _IMG_TILE_PX * _IMG_TILE_PX * 2.0   # image_max_pixels × tolerance
+_IMG_THUMB_MIN_PX = 64 * 1024         # image_min_pixels
+_IMG_THUMB_MAX_PX = 256 * 1024        # image_max_pixels
+_IMG_TOKEN_PAD = 1.05                 # insurance against upstream drift only
+# Unparseable bytes → charge the true ceiling: 10 tiles + max thumbnail +
+# markers (2,560 + 256 + 13). Worst case we drop one file too many, never a 400.
+_IMG_FALLBACK_TOKENS = _IMG_MAX_TILES * _IMG_TOKENS_PER_TILE + 256 + _IMG_MAX_TILES + 3
 
 
 def _image_dimensions(data: bytes) -> tuple[int, int] | None:
@@ -183,43 +197,71 @@ def _image_dimensions(data: bytes) -> tuple[int, int] | None:
     return None
 
 
-# The encoder downscales anything above ~2 MP before tiling — a 37 MP
-# scan measured 7 tiles, not 96. Derived from calibration, not docs.
-_IMG_MAX_PIXELS = 2_000_000
+def _thumbnail_size(width: int, height: int) -> tuple[int, int]:
+    """mtmd's calc_size_preserved_ratio for the overview image: round each
+    side to the 32-px grid, then scale into [64K, 256K] px preserving
+    aspect (floor when shrinking, ceil when growing)."""
+    import math
+    rnd = lambda x: max(_IMG_ALIGN, int(round(x / _IMG_ALIGN)) * _IMG_ALIGN)  # noqa: E731
+    w_bar, h_bar = rnd(width), rnd(height)
+    if w_bar * h_bar > _IMG_THUMB_MAX_PX:
+        beta = math.sqrt(width * height / _IMG_THUMB_MAX_PX)
+        w_bar = max(_IMG_ALIGN, int(math.floor(width / beta / _IMG_ALIGN)) * _IMG_ALIGN)
+        h_bar = max(_IMG_ALIGN, int(math.floor(height / beta / _IMG_ALIGN)) * _IMG_ALIGN)
+    elif w_bar * h_bar < _IMG_THUMB_MIN_PX:
+        beta = math.sqrt(_IMG_THUMB_MIN_PX / (width * height))
+        w_bar = int(math.ceil(width * beta / _IMG_ALIGN)) * _IMG_ALIGN
+        h_bar = int(math.ceil(height * beta / _IMG_ALIGN)) * _IMG_ALIGN
+    return w_bar, h_bar
+
+
+def _best_grid(width: int, height: int) -> tuple[int, int]:
+    """mtmd's find_closest_aspect_ratio over every (cols, rows) with
+    2 <= cols*rows <= 10: closest aspect ratio wins; on an exact tie the
+    larger grid wins only if the image covers more than half its area."""
+    aspect = width / height
+    area = width * height
+    best, best_diff = (1, 1), float("inf")
+    candidates: list[tuple[int, int]] = []
+    for n in range(_IMG_MIN_TILES, _IMG_MAX_TILES + 1):
+        for cols in range(1, n + 1):
+            for rows in range(1, n + 1):
+                if _IMG_MIN_TILES <= cols * rows <= _IMG_MAX_TILES and (cols, rows) not in candidates:
+                    candidates.append((cols, rows))
+    candidates.sort(key=lambda g: g[0] * g[1])
+    for cols, rows in candidates:
+        diff = abs(aspect - cols / rows)
+        if diff < best_diff:
+            best, best_diff = (cols, rows), diff
+        elif diff == best_diff and area > 0.5 * _IMG_TILE_PX * _IMG_TILE_PX * cols * rows:
+            best = (cols, rows)
+    return best
 
 
 def estimate_image_tokens(width: int, height: int) -> int:
-    """Predicted LM token cost of one image through the LFM2.5-VL mmproj.
+    """Predicted LM token cost of one image through the LFM2.5-VL mmproj —
+    an exact mirror of llama.cpp's LFM2 tiling, plus a 5% pad.
 
-    Model: downscale to <= _IMG_MAX_PIXELS preserving aspect ratio, then
-    each dimension resolves to its NEAREST whole tile count (not ceil —
-    mtmd snaps toward the grid), 256 tokens per tile, plus one 256-token
-    thumbnail whenever the image actually tiles.
+    Untiled (rounded area <= 512² × 2): one overview image costing
+    thumbnail tokens + 2 markers (79..258 tokens). Tiled: the closest-aspect
+    grid of 2..10 tiles at 256 tokens each, plus the thumbnail, plus one
+    marker per tile and 3 more.
 
-    Calibrated against llama-server 2026-09-03 (this machine, LFM2.5-VL-3B
-    Q6_K + Q8_0 mmproj), estimate/measured with the 5% pad:
-        184×326   →   268 /   79   (tiny images cost a floor tile; 3.4×
-                                    over but ~600 chars absolute — fine)
-        591×688   →   268 /  240   1.12
-        1024×1024 →  1344 / 1287   1.04
-        2016×1103 →  2419 / 2290   1.06
-        6913×5382 →  1881 / 1797   1.05  (downscale rule)
-    Always errs high past the single-tile floor — the failure mode is one
-    fewer file in the prompt, never a rejected request.
+    Verified token-exact against llama-server on 23 sizes from 184×326 to
+    6913×5382 (2026-09-03; see calibrate_image_tokens.py). E.g. 1080×1920 =
+    8×256 + 252 + 11 = 2,311; 1024×768 = 6×256 + 234 + 9 = 1,779;
+    800×600 = 234 + 2 = 236.
     """
     if width <= 0 or height <= 0:
         return int(_IMG_FALLBACK_TOKENS * _IMG_TOKEN_PAD)
-    pixels = width * height
-    if pixels > _IMG_MAX_PIXELS:
-        scale = (_IMG_MAX_PIXELS / pixels) ** 0.5
-        width = width * scale
-        height = height * scale
-    cols = max(1, round(width / _IMG_TILE_PX))
-    rows = max(1, round(height / _IMG_TILE_PX))
+    tw, th = _thumbnail_size(width, height)
+    thumb = (tw // _IMG_ALIGN) * (th // _IMG_ALIGN)
+    rnd = lambda x: max(_IMG_ALIGN, int(round(x / _IMG_ALIGN)) * _IMG_ALIGN)  # noqa: E731
+    if rnd(width) * rnd(height) <= _IMG_TILE_AREA_TRIGGER:
+        return int((thumb + 2) * _IMG_TOKEN_PAD)
+    cols, rows = _best_grid(width, height)
     tiles = cols * rows
-    tokens = tiles * _IMG_TOKENS_PER_TILE
-    if tiles > 1:
-        tokens += _IMG_TOKENS_PER_TILE  # thumbnail tile for global context
+    tokens = tiles * _IMG_TOKENS_PER_TILE + thumb + tiles + 3
     return int(tokens * _IMG_TOKEN_PAD)
 
 

@@ -356,13 +356,11 @@ class ChatAgent(Protocol, Generic[T]):
     async def run(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
-        expected_prompt_tokens: int | None = None,
     ) -> T: ...
 
     def run_sync(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
-        expected_prompt_tokens: int | None = None,
     ) -> T: ...
 
 
@@ -511,7 +509,6 @@ class _CloudAgent(Generic[T]):
     async def run(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
-        expected_prompt_tokens: int | None = None,  # local-only tripwire; ignored here
     ) -> T:
         from src.inference.llm_log import log_request, log_response
 
@@ -564,7 +561,6 @@ class _CloudAgent(Generic[T]):
     def run_sync(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
-        expected_prompt_tokens: int | None = None,  # local-only tripwire; ignored here
     ) -> T:
         from src.inference.llm_log import log_request, log_response
 
@@ -1175,7 +1171,6 @@ class LocalAgent(Generic[T]):
     async def run(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
-        expected_prompt_tokens: int | None = None,
     ) -> T:
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
@@ -1211,7 +1206,6 @@ class LocalAgent(Generic[T]):
                 images=images or None,
                 response_format=self._response_format,
                 grammar=self._grammar,
-                expected_prompt_tokens=expected_prompt_tokens,
             )
         except Exception as e:
             log_response(
@@ -1230,7 +1224,6 @@ class LocalAgent(Generic[T]):
     def run_sync(
         self, message: list, *, thinking: bool = False,
         temperature: float | None = None,
-        expected_prompt_tokens: int | None = None,
     ) -> T:
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
@@ -1263,7 +1256,6 @@ class LocalAgent(Generic[T]):
                 images=images or None,
                 response_format=self._response_format,
                 grammar=self._grammar,
-                expected_prompt_tokens=expected_prompt_tokens,
             )
         except Exception as e:
             log_response(

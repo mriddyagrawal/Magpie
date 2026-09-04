@@ -210,14 +210,13 @@ class LlamaServerLLM:
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
         grammar: Optional[str] = None,
-        expected_prompt_tokens: Optional[int] = None,
     ) -> str:
         """Run a non-streaming chat completion. Returns the response text.
 
-        `expected_prompt_tokens`, when the caller predicted the prompt's
-        size (answer.py's context budget), is compared with the
-        `usage.prompt_tokens` llama-server reports - the drift tripwire
-        (src/drift/tripwire.py). Purely observational.
+        Every response also feeds the drift tripwire (src/drift/tripwire.py):
+        the prompt's cost is re-predicted off the critical path (text via
+        /tokenize, images via the mirrored tiling math) and compared with
+        the `usage.prompt_tokens` the server reported. Observational only.
 
         `thinking=True` injects the Gemma 4 `<|think|>` token via
         `apply_thinking_to_messages`. For non-Gemma-4 models, that
@@ -253,7 +252,7 @@ class LlamaServerLLM:
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
             resp = await self._post_with_pool_recovery(client, url, body, profile_name)
         data = resp.json()
-        _tripwire_check(expected_prompt_tokens, data)
+        self._tripwire_after(profile_name, prepared, images, data)
         return self._extract_content(data)
 
     def complete_sync(
@@ -266,7 +265,6 @@ class LlamaServerLLM:
         images: Optional[Sequence[bytes]] = None,
         response_format: Optional[dict[str, Any]] = None,
         grammar: Optional[str] = None,
-        expected_prompt_tokens: Optional[int] = None,
     ) -> str:
         """Synchronous variant. Used by `LocalAgent.run_sync` from
         non-async paths (`src.stage2.search.rewrite_query`).
@@ -291,8 +289,82 @@ class LlamaServerLLM:
         with httpx.Client(timeout=self.request_timeout_s) as client:
             resp = self._post_with_pool_recovery_sync(client, url, body, profile_name)
         data = resp.json()
-        _tripwire_check(expected_prompt_tokens, data)
+        self._tripwire_after(profile_name, prepared, images, data)
         return self._extract_content(data)
+
+    # ----- drift tripwire ------------------------------------------------------
+
+    def _count_tokens(self, profile_name: str, text: str) -> Optional[int]:
+        """Exact token count of `text` from the resident server's /tokenize.
+        None on any failure - the caller falls back to a chars/token guess."""
+        try:
+            url = self._base_url(profile_name) + "/tokenize"
+            with httpx.Client(timeout=30.0) as client:
+                r = client.post(url, json={"content": text, "add_special": False})
+            r.raise_for_status()
+            toks = r.json().get("tokens")
+            return len(toks) if isinstance(toks, list) else None
+        except Exception:  # noqa: BLE001 - observational only
+            return None
+
+    def _tripwire_after(
+        self,
+        profile_name: str,
+        prepared: list[dict],
+        images: Optional[Sequence[bytes]],
+        payload: Any,
+        *,
+        run_async: bool = True,
+    ) -> Optional[bool]:
+        """Feed the drift tripwire for one completed request: re-predict the
+        prompt's cost (text exact via /tokenize, images via the mirrored
+        tiling math, plus framing) and compare with usage.prompt_tokens.
+
+        Runs on a daemon thread by default so the answer path never waits
+        on the tokenize round-trip; `run_async=False` (tests) returns the
+        verdict inline. Everything is best-effort: a malformed usage block,
+        a dead server or an import problem must never touch answering."""
+        try:
+            usage = payload.get("usage") if isinstance(payload, dict) else None
+            actual = usage.get("prompt_tokens") if isinstance(usage, dict) else None
+            if not isinstance(actual, int):
+                return None
+        except Exception:  # noqa: BLE001
+            return None
+
+        text = _prompt_text(prepared)
+        blobs = list(images or [])
+
+        def _work() -> Optional[bool]:
+            try:
+                from src.drift import tripwire
+                from src.inference.image_tokens import (
+                    _IMG_FALLBACK_TOKENS, _IMG_TOKEN_PAD, _image_dimensions,
+                    estimate_image_tokens,
+                )
+
+                counted = self._count_tokens(profile_name, text) if text else 0
+                exact = counted is not None
+                text_tokens = counted if exact else int(len(text) / 4.0)
+                image_tokens = 0
+                for blob in blobs:
+                    dims = _image_dimensions(blob)
+                    image_tokens += (estimate_image_tokens(*dims) if dims
+                                     else int(_IMG_FALLBACK_TOKENS * _IMG_TOKEN_PAD))
+                expected = text_tokens + image_tokens
+                return tripwire.record(
+                    expected, actual,
+                    context=f"chat.completions[{profile_name}]"
+                            + ("" if exact else " (text estimated)"),
+                    exact_text=exact,
+                )
+            except Exception:  # noqa: BLE001
+                return None
+
+        if not run_async:
+            return _work()
+        threading.Thread(target=_work, name="drift-tripwire", daemon=True).start()
+        return None
 
     # ----- stream ------------------------------------------------------------
 
@@ -504,21 +576,19 @@ def _detect_image_media_type(data: bytes) -> str:
     return "image/png"
 
 
-def _tripwire_check(expected: Optional[int], payload: Any) -> None:
-    """Feed the drift tripwire when the caller predicted the prompt size.
-    Best-effort: a malformed usage block or an import problem must never
-    touch the answer path."""
-    if not expected:
-        return
-    try:
-        usage = payload.get("usage") if isinstance(payload, dict) else None
-        actual = usage.get("prompt_tokens") if isinstance(usage, dict) else None
-        if isinstance(actual, int):
-            from src.drift import tripwire
-
-            tripwire.record(expected, actual, context="chat.completions")
-    except Exception:  # noqa: BLE001 - observational only
-        pass
+def _prompt_text(messages: list[dict]) -> str:
+    """Every text part of a prepared message list, joined - what /tokenize
+    should count. Image parts are priced separately by the tiling math."""
+    parts: list[str] = []
+    for m in messages:
+        content = m.get("content")
+        if isinstance(content, str):
+            parts.append(content)
+        elif isinstance(content, list):
+            for p in content:
+                if isinstance(p, dict) and p.get("type") == "text":
+                    parts.append(str(p.get("text", "")))
+    return "\n".join(parts)
 
 
 def _attach_images_to_last_user(

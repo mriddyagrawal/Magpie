@@ -3500,8 +3500,12 @@ touched (compare.py attributes any delta to `runtime` automatically).
 
 **Still open:** Settings → Diagnostics panel (provenance block, oracle
 statuses, tripwire count, "run drift checks" button — #31 is the
-precedent); a `just bump-llama-server <build>` recipe that edits the pin,
-reinstalls, invalidates the oracle cache and runs the gate.
+precedent; the button's copy must say it will load the 3B vision model if
+it is not resident and takes ~10 s, since `/drift/check` probes the real
+server); a `just bump-llama-server <build>` recipe that edits the pin,
+reinstalls, invalidates the oracle cache and runs the gate; one packaged
+(PyInstaller) build verified with `src.drift.*` in `hiddenimports` before
+the next release.
 
 **Deliberately not done:** blocking startup on a pin mismatch; running
 oracles on every launch (per-fingerprint cache); pinning models (env

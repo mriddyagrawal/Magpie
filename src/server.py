@@ -227,6 +227,7 @@ def _startup_auto_resume() -> None:
 # ---------------------------------------------------------------------------
 
 _drift_state: dict[str, Any] = {"provenance": None, "pins": None, "checking": False, "error": None}
+_drift_check_lock = threading.Lock()
 
 
 def _start_drift_probe() -> None:
@@ -294,11 +295,15 @@ def drift_status() -> JSONResponse:
 def drift_check(force: bool = False) -> JSONResponse:
     """Run the oracles now (spawning the vision llama-server if needed) on a
     background thread. Poll GET /drift for the verdict."""
-    if _drift_state.get("checking"):
-        return JSONResponse({"status": "already running"}, status_code=202)
+    # claim the flag under a lock BEFORE starting the thread: two quick POSTs
+    # must not both spawn a run (the oracle run itself is serialized, but a
+    # second refresh + pool spawn attempt is wasted work)
+    with _drift_check_lock:
+        if _drift_state.get("checking"):
+            return JSONResponse({"status": "already running"}, status_code=202)
+        _drift_state["checking"] = True
 
     def _run() -> None:
-        _drift_state["checking"] = True
         try:
             from src.drift import oracles, provenance
             from src.inference.llama_server_pool import get_pool

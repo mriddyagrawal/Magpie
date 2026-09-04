@@ -74,6 +74,22 @@ judge model + rubric sha; see [judge/rubric.md](judge/rubric.md). Do not act
 on judged numbers until the golden set is human-verified (silver→gold review,
 PLAN §6) and the judge is calibrated (PLAN §7 Phase 3).
 
+## Drift guard (what happens when upstream moves)
+
+Every run stamps `run.json` with a `provenance` block (llama-server build,
+Qdrant version, GGUF/mmproj hashes, col model, lockfile hash) and
+`compare.py` treats a changed fingerprint as a fourth comparability axis,
+`runtime`, so a metric that moved because a binary was bumped is
+attributed, not guessed. The checks themselves live in `src/drift/`:
+
+```bash
+just drift-status     # installed vs pinned, cached oracle verdicts, tripwire counts
+just check-drift      # oracles against the real llama-server + Qdrant, then eval-smoke
+```
+
+Run `check-drift` after ANY llama-server / Qdrant / model / lockfile bump,
+before merging it. Pins are in `src/drift/pins.py`.
+
 ## Review protocol
 
 On the machine where this branch is being developed, commits are reviewed in

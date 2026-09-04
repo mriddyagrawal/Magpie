@@ -223,7 +223,20 @@ def phase_index(payload: dict) -> dict:
         "manifest_path": str(manifest_path),
         "manifest": manifest_raw,
         "col_model_resolved": col_resolved,
+        "provenance": _provenance(),
     }
+
+
+def _provenance() -> dict | None:
+    """Drift-guard fingerprint of the binaries/models this worker ran with
+    (src/drift/provenance.py). Stamped into run.json by run.py so a moved
+    metric can be attributed to a runtime bump. Never fatal."""
+    try:
+        from src.drift.provenance import runtime_fingerprint
+
+        return runtime_fingerprint()
+    except Exception as e:  # noqa: BLE001
+        return {"error": str(e)[:200]}
 
 
 def phase_answer(payload: dict) -> dict:
@@ -375,6 +388,7 @@ def phase_answer(payload: dict) -> dict:
         "errors": n_err,
         "skipped_done": len(done),
         "llm_log": str(llm_log) if llm_log else None,
+        "provenance": _provenance(),
     }
 
 

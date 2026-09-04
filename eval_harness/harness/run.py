@@ -227,6 +227,8 @@ def main() -> int:
                 timeout_s=6 * 3600,
             )
             run_record["col_model_resolved"] = idx.get("col_model_resolved")
+            if idx.get("provenance"):
+                run_record["provenance"] = idx["provenance"]
             run_record["phases"]["index"] = {
                 "wall_s": round(time.monotonic() - t, 1),
                 "manifest_entries": len(idx.get("manifest") or {}),
@@ -274,6 +276,10 @@ def main() -> int:
                 "answered": ans["answered"], "errors": ans["errors"],
                 "llm_log": ans.get("llm_log"),
             }
+            # mounted runs never run the index phase - the answer worker
+            # is the first (and authoritative: same process family) stamp
+            if ans.get("provenance"):
+                run_record["provenance"] = ans["provenance"]
             save_record()
             progress.phase_done(raw, "answer", errors=ans["errors"])
             answered = True

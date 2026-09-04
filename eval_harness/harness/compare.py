@@ -204,12 +204,39 @@ def git_log_between(sha_a: str, sha_b: str, pathspec: str) -> list[str]:
         return [f"(git log unavailable: {e})"]
 
 
+def _provenance_summary(run: dict) -> dict | None:
+    """Deliberate near-copy of src.drift.provenance.summary: compare.py must
+    stay importable without src (the harness contract - only the worker
+    imports the backend), so it cannot call the original. Keep in step."""
+    prov = run.get("provenance")
+    if not prov:
+        return None
+    ls = prov.get("llama_server") or {}
+    models = prov.get("models") or {}
+    return {
+        "fingerprint": prov.get("fingerprint"),
+        "llama_server": f"b{ls['build']}" if isinstance(ls.get("build"), int) else None,
+        "qdrant": (prov.get("qdrant") or {}).get("version"),
+        "model": f"{models.get('repo')}:{models.get('quant')}" if models.get("repo") else None,
+        "gguf_sha256": ((models.get("gguf") or {}).get("sha256") or "")[:12] or None,
+        "mmproj_sha256": ((models.get("mmproj") or {}).get("sha256") or "")[:12] or None,
+        "col_model": (prov.get("col_model") or {}).get("model_id"),
+    }
+
+
 def axes(a: dict, b: dict) -> dict:
     ra, rb = a["run"], b["run"]
     params_diff = dict_diff(ra.get("params", {}), rb.get("params", {}))
     params_diff.pop("_notes", None)
     backend_changed = ra.get("backend_git_sha") != rb.get("backend_git_sha")
     golden_changed = ra.get("golden_sha") != rb.get("golden_sha")
+    # Runtime axis (drift guard): the binaries, model files and lockfile
+    # underneath the code. Stamped by the worker as run.json "provenance";
+    # runs that predate the stamp compare as "unknown" and never count as
+    # a change, so old comparisons keep their verdicts.
+    fp_a = (ra.get("provenance") or {}).get("fingerprint")
+    fp_b = (rb.get("provenance") or {}).get("fingerprint")
+    runtime_changed = bool(fp_a and fp_b and fp_a != fp_b)
     changed = []
     if params_diff:
         changed.append("config")
@@ -217,18 +244,27 @@ def axes(a: dict, b: dict) -> dict:
         changed.append("code")
     if golden_changed:
         changed.append("questions")
+    if runtime_changed:
+        changed.append("runtime")
     env_diff = dict_diff(ra.get("env_snapshot", {}) or {}, rb.get("env_snapshot", {}) or {})
     # #115: a comparison is confounded whenever MORE THAN ONE KNOB moved,
     # not just when more than one axis category moved - a config diff of
     # {top_k, rewrite} is a two-factor change even though it is one "axis".
-    n_knobs = len(params_diff) + int(backend_changed) + int(golden_changed)
+    n_knobs = (len(params_diff) + int(backend_changed) + int(golden_changed)
+               + int(runtime_changed))
     return {
         "changed_axes": changed or ["none"],
         "changed_knobs": sorted(params_diff)
         + (["<code>"] if backend_changed else [])
-        + (["<questions>"] if golden_changed else []),
+        + (["<questions>"] if golden_changed else [])
+        + (["<runtime>"] if runtime_changed else []),
         "confounded": n_knobs > 1,
         "params_diff": params_diff,
+        "runtime": {
+            "a": _provenance_summary(ra), "b": _provenance_summary(rb),
+            "changed": runtime_changed,
+            "known": bool(fp_a and fp_b),
+        },
         "backend_git_sha": {"a": ra.get("backend_git_sha"), "b": rb.get("backend_git_sha")},
         "backend_commits_between": (
             git_log_between(ra.get("backend_git_sha"), rb.get("backend_git_sha"), "src/")

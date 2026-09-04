@@ -55,7 +55,9 @@ from src.subproc import no_window_kwargs
 # to carry every summarize call — degraded extraction, no error anywhere.
 # That is precisely the "model swap that doesn't honor the parameter" case
 # `src.llm.LocalAgent` warns about.
-DEFAULT_VERSION = "b10502"
+# Single source of truth is src/drift/pins.py - the startup drift probe
+# compares the installed binary against the same constant.
+from src.drift.pins import LLAMA_SERVER_TAG as DEFAULT_VERSION  # noqa: E402
 
 # NOTE: there is deliberately no DEFAULT_MMPROJ_REPO / default-quant constant
 # here any more. Those duplicated what src/inference/profiles.py already

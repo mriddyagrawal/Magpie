@@ -169,3 +169,54 @@ def test_cli_end_to_end(tmp_path):
     md = (out / "COMPARISON.md").read_text()
     assert compare.AGENT_MARKER in md
     assert "Answer wins" in md
+
+
+def _stamp_provenance(run_dir, fingerprint, build=10502):
+    import json as _json
+    p = run_dir / "run.json"
+    rec = _json.loads(p.read_text(encoding="utf-8"))
+    rec["provenance"] = {
+        "fingerprint": fingerprint,
+        "llama_server": {"build": build},
+        "qdrant": {"version": "1.17.1"},
+        "models": {"repo": "LiquidAI/LFM2.5-VL-3B-GGUF", "quant": "Q6_K",
+                   "gguf": {"sha256": "a" * 64}, "mmproj": {"sha256": "b" * 64}},
+        "col_model": {"model_id": "vidore/colqwen2.5-v0.2"},
+    }
+    p.write_text(_json.dumps(rec), encoding="utf-8")
+
+
+def test_axes_runtime_fingerprint_is_a_knob(tmp_path):
+    """Drift guard: a binary/model bump between runs is a changed knob."""
+    a = _mk_run(tmp_path, "pA", "g1", {"q1": "correct"}, params={"top_k": 2})
+    b = _mk_run(tmp_path, "pB", "g1", {"q1": "correct"}, params={"top_k": 2})
+    _stamp_provenance(a, "fp-old", build=10502)
+    _stamp_provenance(b, "fp-new", build=10600)
+    ax = compare.axes(compare.load_run(a, False), compare.load_run(b, False))
+    assert ax["changed_axes"] == ["runtime"]
+    assert ax["changed_knobs"] == ["<runtime>"]
+    assert ax["confounded"] is False          # exactly one knob moved
+    assert ax["runtime"]["changed"] is True and ax["runtime"]["known"] is True
+    assert ax["runtime"]["a"]["llama_server"] == "b10502"
+    assert ax["runtime"]["b"]["llama_server"] == "b10600"
+
+
+def test_axes_runtime_plus_config_is_confounded(tmp_path):
+    a = _mk_run(tmp_path, "cA", "g1", {"q1": "correct"}, params={"top_k": 2})
+    b = _mk_run(tmp_path, "cB", "g1", {"q1": "correct"}, params={"top_k": 3})
+    _stamp_provenance(a, "fp-old")
+    _stamp_provenance(b, "fp-new")
+    ax = compare.axes(compare.load_run(a, False), compare.load_run(b, False))
+    assert ax["changed_axes"] == ["config", "runtime"]
+    assert ax["confounded"] is True
+
+
+def test_axes_runtime_unknown_never_counts(tmp_path):
+    """Runs from before the stamp (or one side missing) must not become a
+    phantom knob - old comparisons keep their verdicts."""
+    a = _mk_run(tmp_path, "uA", "g1", {"q1": "correct"}, params={"top_k": 2})
+    b = _mk_run(tmp_path, "uB", "g1", {"q1": "correct"}, params={"top_k": 2})
+    _stamp_provenance(a, "fp-old")            # only one side stamped
+    ax = compare.axes(compare.load_run(a, False), compare.load_run(b, False))
+    assert ax["changed_axes"] == ["none"]
+    assert ax["runtime"]["known"] is False and ax["runtime"]["b"] is None

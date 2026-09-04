@@ -159,6 +159,18 @@ def main() -> None:
         "--hidden-import", "src.config",
         "--hidden-import", "src.config.indexing_rules",
         "--hidden-import", "src.backup",
+        # Drift guard (src/drift/): reached from the startup probe, the pool's
+        # on-spawn hook, /drift routes and the local_llm tripwire - all lazy
+        # imports inside function bodies. install_llama_server imports
+        # src.drift.pins at module level, and the tripwire prices images via
+        # src.inference.image_tokens.
+        "--hidden-import", "src.drift",
+        "--hidden-import", "src.drift.pins",
+        "--hidden-import", "src.drift.provenance",
+        "--hidden-import", "src.drift.oracles",
+        "--hidden-import", "src.drift.tripwire",
+        "--hidden-import", "src.inference.image_tokens",
+        "--hidden-import", "src.subproc",
         # Bundle the src package so relative imports resolve at runtime
         "--add-data", f"src{sep}src",
         # Packages that call importlib.metadata.version() on themselves at import

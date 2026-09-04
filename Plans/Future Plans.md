@@ -47,6 +47,7 @@ File classification into tiers, summarization, manifest lifecycle, ingest robust
 - **#36** OS-native file previews — Quick Look on macOS, platform-equivalents elsewhere *(also: UI, Platform)*
 - **#42** Content-hash dedup at the Qdrant layer — N identical files → 1 point, returned once *(also: Qdrant, Retrieval, Storage)*
 - **#43** Notion connector — "Connect Notion" OAuth button → local markdown mirror *(also: UI, Security, Connectors)*
+- **#44** ✅ Drift guard — pins, provenance fingerprint, mirrored-assumption oracles, prompt-budget tripwire *(also: Packaging, Evaluation, Diagnostics)* — *core shipped 2026-09-03 (branch drift-guard); Settings → Diagnostics panel still open*
 
 ### 🖥 User experience / UI
 Settings panels, in-app warnings, anything the user sees.
@@ -3439,3 +3440,76 @@ citation URL rewrite). v2 adds the privacy-policy page, HTTPS callback
 page, and one token-exchange function. Cohorts: #26 (BYO API key
 settings surface), #19 (keychain secrets — the Notion token belongs
 there when it lands), #42 (dedup — re-synced identical content).
+
+---
+
+## 44. Drift guard — pins, provenance, oracles, tripwire
+
+**Tags:** packaging · evaluation · diagnostics · inference
+
+**What:** Make it visible when the open-source pieces Magpie stands on —
+llama.cpp, Qdrant, the GGUF weights, the col encoders, the Python
+lockfile — move underneath code that mirrors their behaviour. Shipped
+2026-09-03 as `src/drift/` (branch `drift-guard`).
+
+**Why:** the failures are silent. The image token budget copies
+llama.cpp's LFM2 tiling math (a first cut under-counted 6 of 18 common
+sizes and would have kept producing HTTP 400s); pre-#24377 builds
+accepted `json_schema` and ignored it (structured output "worked" while
+the grammar never applied); a changed embedding width becomes an empty
+search. None of these raise. They show up weeks later in an eval, if at
+all.
+
+**Design (four pieces, none load-bearing — every entry point swallows
+its own failures):**
+
+- `pins.py` — the versions validated against (`LLAMA_SERVER_BUILD =
+  10502`, `QDRANT_VERSION`). Installers read them; a test keeps the
+  justfile's literal equal. Mismatch = warning on /status + logs, never a
+  refusal (packaged builds bundle binaries; developers on newer builds
+  should be told, not blocked). Models deliberately not pinned — profiles
+  own them; provenance hashes the resolved files instead.
+- `provenance.py` — `runtime_fingerprint()`: llama-server build/commit,
+  Qdrant version, GGUF + mmproj sha256 (cached by size/mtime), col-model
+  family from the device cache (no torch import), `uv.lock` hash,
+  platform. `fingerprint` excludes the Magpie git sha on purpose: the
+  checks are about the world under the code. Stamped into every eval
+  `run.json`; `compare.py` gained a fourth axis, `runtime`, so a bump
+  between runs is a changed knob (old unstamped runs never count).
+- `oracles.py` — executable checks against the REAL component:
+  `context_window` (`/props` per-slot `n_ctx` ≥ the profile `ctx_size`
+  the answer budget assumes — `-np` raised without `-c` would 400 every
+  multi-file answer; review suggestion, 2026-09-03),
+  `image_tokens` (4 synthetic sizes vs `estimate_image_tokens`, fail on
+  any under-count), `grammar` (ask for prose under a schema; prose back =
+  server ignores json_schema), `vector_dims` (stored collection widths vs
+  encoders). Cached per fingerprint under `<APP_DATA_DIR>/drift/`; run
+  on demand (`just check-drift`, `POST /drift/check`) or automatically
+  the first time the vision server sits idle ≥20 s after a new
+  fingerprint — never in a user's request path.
+- `tripwire.py` — `answer.py` predicts the prompt's token count and
+  passes it down; `local_llm` compares with llama-server's
+  `usage.prompt_tokens` on every response. >1.10× logs a warning, appends
+  to `drift/tripwires.jsonl`, counts on /status. Production becomes a
+  continuous calibration.
+
+**Surfaces:** `GET /status` (`drift` summary), `GET /drift`, `POST
+/drift/check`, `python -m src.drift status|check`, `just drift-status`,
+`just check-drift` (= oracles + eval-smoke, the upgrade gate).
+
+**Upgrade workflow this enables:** bump one dependency per branch → pin →
+`just check-drift` → eval acceptance arm if inference/indexing is
+touched (compare.py attributes any delta to `runtime` automatically).
+
+**Still open:** Settings → Diagnostics panel (provenance block, oracle
+statuses, tripwire count, "run drift checks" button — #31 is the
+precedent; the button's copy must say it will load the 3B vision model if
+it is not resident and takes ~10 s, since `/drift/check` probes the real
+server); a `just bump-llama-server <build>` recipe that edits the pin,
+reinstalls, invalidates the oracle cache and runs the gate; one packaged
+(PyInstaller) build verified with `src.drift.*` in `hiddenimports` before
+the next release.
+
+**Deliberately not done:** blocking startup on a pin mismatch; running
+oracles on every launch (per-fingerprint cache); pinning models (env
+overrides are a supported swap path).

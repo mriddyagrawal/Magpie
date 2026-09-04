@@ -211,6 +211,20 @@ def main() -> int:
         grpc_port=ports.qdrant_grpc, log_path=raw / "qdrant.log",
     )
 
+    # Drift-guard provenance stamp: its own worker phase, run BEFORE the
+    # clock starts and before any timed phase, because the first run on a
+    # machine hashes the model files (~3 GB, 10-20 s) and that must not be
+    # charged to phases.index.wall_s. Never fatal to the run.
+    try:
+        prov = backend.run_worker(
+            "provenance", run_dir, env,
+            {"params": params, "expected_env": expected_env}, timeout_s=600,
+        )
+        run_record["provenance"] = prov.get("provenance")
+    except Exception as e:  # noqa: BLE001 - a missing stamp is not a failed run
+        run_record["provenance"] = {"error": str(e)[:200]}
+    save_record()
+
     t0 = time.monotonic()
     completed = False
     try:

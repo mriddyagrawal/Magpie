@@ -218,6 +218,112 @@ def _startup_auto_resume() -> None:
         _maybe_auto_resume_on_startup()
     except Exception as e:  # noqa: BLE001 — never crash the sidecar on auto-resume
         print(f"[server] auto-resume hook failed: {e}", file=sys.stderr)
+    _start_drift_probe()
+
+
+# ---------------------------------------------------------------------------
+# Drift guard (src/drift/): provenance + pin check at startup, oracle
+# verdicts and tripwire counters on /drift, on-demand oracle runs.
+# ---------------------------------------------------------------------------
+
+_drift_state: dict[str, Any] = {"provenance": None, "pins": None, "checking": False, "error": None}
+_drift_check_lock = threading.Lock()
+
+
+def _start_drift_probe() -> None:
+    """Compute the runtime fingerprint and compare it with the pins on a
+    daemon thread - the llama-server --version probe and first-time model
+    hashing can take seconds and must not delay binding or the first
+    request. Mismatches are logged and surfaced on /status and /drift."""
+    def _probe() -> None:
+        try:
+            from src.drift import pins, provenance
+
+            prov = provenance.runtime_fingerprint()
+            mismatches = pins.check_pins(prov)
+            _drift_state["provenance"] = prov
+            _drift_state["pins"] = mismatches
+            summ = provenance.summary(prov)
+            print(f"[drift] runtime {summ['fingerprint']}: llama-server {summ['llama_server']}, "
+                  f"qdrant {summ['qdrant']}, model {summ['model']}, col {summ['col_model']}",
+                  file=sys.stderr)
+            for m in mismatches:
+                print(f"[drift] WARNING {m['component']}: installed {m['installed']} != "
+                      f"pinned {m['pinned']} - {m['note']}", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001 - observational only
+            _drift_state["error"] = str(e)[:200]
+            print(f"[drift] probe failed: {e}", file=sys.stderr)
+
+    threading.Thread(target=_probe, name="drift-probe", daemon=True).start()
+
+
+def _drift_summary() -> dict[str, Any] | None:
+    """Short form for /status: None until the startup probe has finished."""
+    prov = _drift_state.get("provenance")
+    if not prov:
+        return None
+    from src.drift import oracles, provenance, tripwire
+
+    cached = oracles.load_cached(prov["fingerprint"])
+    return {
+        **provenance.summary(prov),
+        "pin_mismatches": len(_drift_state.get("pins") or []),
+        "oracles": (None if cached is None else ("ok" if cached.get("ok") else "failed")),
+        "tripwire_trips": tripwire.summary()["trips"],
+    }
+
+
+@app.get("/drift")
+def drift_status() -> JSONResponse:
+    """Full drift-guard state: provenance, pin mismatches, cached oracle
+    results for the current fingerprint, tripwire counters."""
+    prov = _drift_state.get("provenance")
+    from src.drift import oracles, tripwire
+
+    return JSONResponse({
+        "ready": prov is not None,
+        "error": _drift_state.get("error"),
+        "provenance": prov,
+        "pin_mismatches": _drift_state.get("pins"),
+        "oracles": oracles.load_cached(prov["fingerprint"]) if prov else None,
+        "checking": _drift_state.get("checking"),
+        "tripwire": tripwire.summary(),
+    })
+
+
+@app.post("/drift/check", status_code=202)
+def drift_check(force: bool = False) -> JSONResponse:
+    """Run the oracles now (spawning the vision llama-server if needed) on a
+    background thread. Poll GET /drift for the verdict."""
+    # claim the flag under a lock BEFORE starting the thread: two quick POSTs
+    # must not both spawn a run (the oracle run itself is serialized, but a
+    # second refresh + pool spawn attempt is wasted work)
+    with _drift_check_lock:
+        if _drift_state.get("checking"):
+            return JSONResponse({"status": "already running"}, status_code=202)
+        _drift_state["checking"] = True
+
+    def _run() -> None:
+        try:
+            from src.drift import oracles, provenance
+            from src.inference.llama_server_pool import get_pool
+            from src.inference.profiles import default_vision_profile
+
+            prov = provenance.runtime_fingerprint(refresh=True)
+            _drift_state["provenance"] = prov
+            base_url = None
+            prof = default_vision_profile()
+            if prof:
+                base_url = get_pool().get_url_for(prof)
+            oracles.ensure_for_fingerprint(prov["fingerprint"], base_url, force=force)
+        except Exception as e:  # noqa: BLE001
+            _drift_state["error"] = str(e)[:200]
+            print(f"[drift] check failed: {e}", file=sys.stderr)
+        finally:
+            _drift_state["checking"] = False
+
+    threading.Thread(target=_run, name="drift-check", daemon=True).start()
+    return JSONResponse({"status": "started"}, status_code=202)
 
 # Permissive CORS so the Vite dev server (typically localhost:5173) can hit
 # the sidecar on localhost:<port> without friction. In production, the
@@ -892,6 +998,10 @@ class StatusResponse(BaseModel):
     provider: str = "local"  # "local" | "cloud"
     model: str = ""          # human-readable model name
     size_mb: int | None = None  # on-disk Qdrant collection size; null if unknown
+    # Drift guard summary (src/drift): fingerprint, installed versions,
+    # pin mismatch count, cached oracle verdict, tripwire trips. None until
+    # the startup probe completes. Full detail on GET /drift.
+    drift: dict[str, Any] | None = None
 
 
 @app.get("/status", response_model=StatusResponse)
@@ -959,6 +1069,11 @@ def status() -> StatusResponse:
     except Exception:  # pylint: disable=broad-except
         size_mb = None
 
+    try:
+        drift = _drift_summary()
+    except Exception:  # pylint: disable=broad-except
+        drift = None
+
     payload = StatusResponse(
         ready=ready,
         indexed_count=indexed_count,
@@ -966,6 +1081,7 @@ def status() -> StatusResponse:
         provider=provider,
         model=model,
         size_mb=size_mb,
+        drift=drift,
     )
     _status_cache["payload"] = payload
     _status_cache["ts"] = now

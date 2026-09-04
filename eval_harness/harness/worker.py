@@ -226,6 +226,23 @@ def phase_index(payload: dict) -> dict:
     }
 
 
+def phase_provenance(payload: dict) -> dict:
+    """Drift-guard fingerprint of the binaries/models this run will use
+    (src/drift/provenance.py), stamped into run.json by run.py so a moved
+    metric can be attributed to a runtime bump. Its own untimed phase: the
+    first run on a machine hashes ~3 GB of GGUF, which must not land inside
+    the index/answer wall-clock. Never fatal."""
+    _write_settings(payload.get("params", {}))
+    from src import manifest  # noqa: F401 - load_dotenv before the env check
+    _assert_controlled_env(payload)
+    try:
+        from src.drift.provenance import runtime_fingerprint
+
+        return {"provenance": runtime_fingerprint()}
+    except Exception as e:  # noqa: BLE001
+        return {"provenance": {"error": str(e)[:200]}}
+
+
 def phase_answer(payload: dict) -> dict:
     """Answer golden questions through the REAL pipeline (pipeline mode).
 
@@ -510,6 +527,7 @@ def phase_retrieve(payload: dict) -> dict:
 
 PHASES = {
     "boot": phase_boot,
+    "provenance": phase_provenance,
     "index": phase_index,
     "retrieve": phase_retrieve,
     "answer": phase_answer,

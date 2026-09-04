@@ -22,16 +22,15 @@ from __future__ import annotations
 import argparse
 import base64
 import json
-import struct
 import sys
 import urllib.request
-import zlib
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 
 from src.answer import estimate_image_tokens  # noqa: E402
+from src.drift.oracles import synthetic_png  # noqa: E402  (same PNG the runtime oracle sends)
 
 # Sizes chosen to cover: untiled (< 512²×2 px), each grid family up to 10
 # tiles, both orientations, extreme aspects, common screen/scan/photo sizes.
@@ -46,20 +45,6 @@ DEFAULT_SIZES: list[tuple[int, int]] = [
     (1275, 1650), (1240, 1754), (2016, 1103), (1025, 300),
     (6913, 5382), (2560, 1440), (3840, 2160), (512, 512), (1024, 1025),
 ]
-
-
-def synthetic_png(w: int, h: int) -> bytes:
-    """A valid RGB PNG of the given size (content is irrelevant to token
-    count; a cheap deterministic pattern keeps the file small)."""
-    def chunk(tag: bytes, body: bytes) -> bytes:
-        return (struct.pack(">I", len(body)) + tag + body
-                + struct.pack(">I", zlib.crc32(tag + body) & 0xFFFFFFFF))
-    row = bytes([0]) + bytes((x * 7 + 13) & 0xFF for x in range(w * 3))
-    raw = row * h
-    return (b"\x89PNG\r\n\x1a\n"
-            + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
-            + chunk(b"IDAT", zlib.compress(raw, 1))
-            + chunk(b"IEND", b""))
 
 
 def prompt_tokens(port: int, content: list) -> int:

@@ -150,6 +150,29 @@ def step_claude(check: bool) -> bool:  # noqa: ARG001 - same in both modes
     return False
 
 
+def step_provenance(check: bool) -> bool:
+    """Pre-warm the drift-guard fingerprint (src/drift/provenance.py): the
+    first fingerprint on a machine hashes ~3 GB of GGUF + mmproj. Doing it
+    here means no eval run ever pays those 10-20 s, and the pins are checked
+    once at prep time. Warn-only: a mismatch is reported, never fatal."""
+    _hr("drift fingerprint")
+    try:
+        from src.drift import pins, provenance
+
+        prov = provenance.runtime_fingerprint(hash_models=not check)
+        summ = provenance.summary(prov)
+        print(f"  fingerprint {summ['fingerprint']}: llama-server {summ['llama_server']}, "
+              f"model {summ['model']}, col {summ['col_model']}")
+        for m in pins.check_pins(prov):
+            print(f"  WARN {m['component']}: installed {m['installed']} != pinned {m['pinned']}")
+        if check:
+            print("  (hash cache not warmed in --check mode)")
+        return True
+    except Exception as e:  # noqa: BLE001 - prep must not fail on the guard
+        print(f"  skipped: {e}")
+        return True
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="report only, change nothing")
@@ -165,6 +188,7 @@ def main() -> None:
         "col model": step_col_model(args.check, args.col),
         "answer llm": step_llm(args.check, llms),
         "claude cli": step_claude(args.check),
+        "drift fingerprint": step_provenance(args.check),
     }
     _hr("summary")
     for k, v in results.items():

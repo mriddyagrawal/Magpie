@@ -213,6 +213,11 @@ class LlamaServerLLM:
     ) -> str:
         """Run a non-streaming chat completion. Returns the response text.
 
+        Every response also feeds the drift tripwire (src/drift/tripwire.py):
+        the prompt's cost is re-predicted off the critical path (text via
+        /tokenize, images via the mirrored tiling math) and compared with
+        the `usage.prompt_tokens` the server reported. Observational only.
+
         `thinking=True` injects the Gemma 4 `<|think|>` token via
         `apply_thinking_to_messages`. For non-Gemma-4 models, that
         helper is a no-op — the kwarg is preserved across model swaps
@@ -246,7 +251,9 @@ class LlamaServerLLM:
         url = self._base_url(profile_name) + "/v1/chat/completions"
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
             resp = await self._post_with_pool_recovery(client, url, body, profile_name)
-        return self._extract_content(resp.json())
+        data = resp.json()
+        self._tripwire_after(profile_name, prepared, images, data)
+        return self._extract_content(data)
 
     def complete_sync(
         self,
@@ -281,7 +288,83 @@ class LlamaServerLLM:
         url = self._base_url(profile_name) + "/v1/chat/completions"
         with httpx.Client(timeout=self.request_timeout_s) as client:
             resp = self._post_with_pool_recovery_sync(client, url, body, profile_name)
-        return self._extract_content(resp.json())
+        data = resp.json()
+        self._tripwire_after(profile_name, prepared, images, data)
+        return self._extract_content(data)
+
+    # ----- drift tripwire ------------------------------------------------------
+
+    def _count_tokens(self, profile_name: str, text: str) -> Optional[int]:
+        """Exact token count of `text` from the resident server's /tokenize.
+        None on any failure - the caller falls back to a chars/token guess."""
+        try:
+            url = self._base_url(profile_name) + "/tokenize"
+            with httpx.Client(timeout=30.0) as client:
+                r = client.post(url, json={"content": text, "add_special": False})
+            r.raise_for_status()
+            toks = r.json().get("tokens")
+            return len(toks) if isinstance(toks, list) else None
+        except Exception:  # noqa: BLE001 - observational only
+            return None
+
+    def _tripwire_after(
+        self,
+        profile_name: str,
+        prepared: list[dict],
+        images: Optional[Sequence[bytes]],
+        payload: Any,
+        *,
+        run_async: bool = True,
+    ) -> Optional[bool]:
+        """Feed the drift tripwire for one completed request: re-predict the
+        prompt's cost (text exact via /tokenize, images via the mirrored
+        tiling math, plus framing) and compare with usage.prompt_tokens.
+
+        Runs on a daemon thread by default so the answer path never waits
+        on the tokenize round-trip; `run_async=False` (tests) returns the
+        verdict inline. Everything is best-effort: a malformed usage block,
+        a dead server or an import problem must never touch answering."""
+        try:
+            usage = payload.get("usage") if isinstance(payload, dict) else None
+            actual = usage.get("prompt_tokens") if isinstance(usage, dict) else None
+            if not isinstance(actual, int):
+                return None
+        except Exception:  # noqa: BLE001
+            return None
+
+        text = _prompt_text(prepared)
+        blobs = list(images or [])
+
+        def _work() -> Optional[bool]:
+            try:
+                from src.drift import tripwire
+                from src.inference.image_tokens import (
+                    _IMG_FALLBACK_TOKENS, _IMG_TOKEN_PAD, _image_dimensions,
+                    estimate_image_tokens,
+                )
+
+                counted = self._count_tokens(profile_name, text) if text else 0
+                exact = counted is not None
+                text_tokens = counted if exact else int(len(text) / 4.0)
+                image_tokens = 0
+                for blob in blobs:
+                    dims = _image_dimensions(blob)
+                    image_tokens += (estimate_image_tokens(*dims) if dims
+                                     else int(_IMG_FALLBACK_TOKENS * _IMG_TOKEN_PAD))
+                expected = text_tokens + image_tokens
+                return tripwire.record(
+                    expected, actual,
+                    context=f"chat.completions[{profile_name}]"
+                            + ("" if exact else " (text estimated)"),
+                    exact_text=exact,
+                )
+            except Exception:  # noqa: BLE001
+                return None
+
+        if not run_async:
+            return _work()
+        threading.Thread(target=_work, name="drift-tripwire", daemon=True).start()
+        return None
 
     # ----- stream ------------------------------------------------------------
 
@@ -310,16 +393,30 @@ class LlamaServerLLM:
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
         body = self._build_request_body(prepared, temperature, max_tokens, stream=True)
+        # Drift tripwire coverage on the streaming path: llama-server only
+        # emits `usage` on a stream when asked. The final chunk (empty
+        # choices, usage present) feeds _tripwire_after exactly like the
+        # non-streaming path, so a future switch of /query/stream to this
+        # method cannot silently drop the guard (review sidenote, #35).
+        body["stream_options"] = {"include_usage": True}
         url = self._base_url() + "/v1/chat/completions"
+        profile_name = self.profile_name
 
         async def _gen() -> AsyncIterator[str]:
+            usage: Optional[dict] = None
             try:
                 async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
                     async with client.stream("POST", url, json=body) as resp:
                         resp.raise_for_status()
                         async for line in resp.aiter_lines():
+                            found = _parse_sse_usage(line)
+                            if found is not None:
+                                usage = found
                             text = _parse_sse_chunk(line)
                             if text == _SSE_DONE:
+                                if usage is not None:
+                                    self._tripwire_after(profile_name, prepared, None,
+                                                         {"usage": usage})
                                 return
                             if text:
                                 yield text
@@ -493,6 +590,21 @@ def _detect_image_media_type(data: bytes) -> str:
     return "image/png"
 
 
+def _prompt_text(messages: list[dict]) -> str:
+    """Every text part of a prepared message list, joined - what /tokenize
+    should count. Image parts are priced separately by the tiling math."""
+    parts: list[str] = []
+    for m in messages:
+        content = m.get("content")
+        if isinstance(content, str):
+            parts.append(content)
+        elif isinstance(content, list):
+            for p in content:
+                if isinstance(p, dict) and p.get("type") == "text":
+                    parts.append(str(p.get("text", "")))
+    return "\n".join(parts)
+
+
 def _attach_images_to_last_user(
     messages: list[dict],
     images: Sequence[bytes],
@@ -548,6 +660,22 @@ def _attach_images_to_last_user(
 
 
 _SSE_DONE = "<<DONE>>"  # internal sentinel — never appears in real chunks
+
+
+def _parse_sse_usage(line: str) -> Optional[dict]:
+    """The `usage` object from an SSE data line, or None. With
+    `stream_options.include_usage` llama-server sends it on the final
+    chunk (empty `choices`); OpenAI-shaped servers do the same."""
+    if not line.startswith("data: "):
+        return None
+    payload = line[len("data: "):].strip()
+    if payload == "[DONE]":
+        return None
+    try:
+        usage = json.loads(payload).get("usage")
+        return usage if isinstance(usage, dict) and "prompt_tokens" in usage else None
+    except (json.JSONDecodeError, AttributeError, TypeError):
+        return None
 
 
 def _parse_sse_chunk(line: str) -> str:

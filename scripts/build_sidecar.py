@@ -172,7 +172,13 @@ def main() -> None:
         "--hidden-import", "src.inference.image_tokens",
         "--hidden-import", "src.subproc",
         # Bundle the src package so relative imports resolve at runtime
-        "--add-data", f"src{sep}src",
+        # ABSOLUTE source path: PyInstaller resolves --add-data sources
+        # relative to the SPEC file's directory, not the working directory.
+        # With --specpath build/pyinstaller (c2d5b47) a relative "src" meant
+        # build/pyinstaller/src and every CI build since failed with
+        # "Unable to find .../build/pyinstaller/src". The entry script is not
+        # affected (makespec absolutises script paths, not data paths).
+        "--add-data", f"{ROOT / 'src'}{sep}src",
         # Packages that call importlib.metadata.version() on themselves at import
         # time — PyInstaller strips .dist-info by default, so the lookup crashes.
         # NOTE: pydantic-ai metapackage was replaced by pydantic-ai-slim in

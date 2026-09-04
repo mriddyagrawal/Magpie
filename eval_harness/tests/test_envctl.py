@@ -66,6 +66,17 @@ def test_params_reach_env():
         envctl.Ports.for_slot(1),
     )
     assert env_off["MAGPIE_RERANK"] == "0"
+    # grounding knobs default on and are ALWAYS pinned (a .env value must
+    # never leak into a run); params flip them independently.
+    assert env["MAGPIE_GROUNDING_GUARD"] == "1"
+    assert env["MAGPIE_STRICT_GROUNDING"] == "1"
+    env_guard_off = envctl.build_env(
+        Path("/tmp/x"),
+        {"provider": "local", "grounding_guard": False},
+        envctl.Ports.for_slot(1),
+    )
+    assert env_guard_off["MAGPIE_GROUNDING_GUARD"] == "0"
+    assert env_guard_off["MAGPIE_STRICT_GROUNDING"] == "1"
 
 
 def test_snapshot_redacts_secrets_stably():
@@ -87,6 +98,7 @@ def test_base_passthrough_minimal():
         "LLAMA_SERVER_BASE_PORT", "LLAMA_SERVER_PATH", "LLM_PROVIDER",
         "MAGPIE_FORCE_PROVIDER", "LOCAL_TEMPERATURE", "LOCAL_SOLO_MARGIN",
         "MAGPIE_RERANK", "MAGPIE_COL_MODEL", "LOCAL_N_CTX",
+        "MAGPIE_GROUNDING_GUARD", "MAGPIE_STRICT_GROUNDING",
         "LLAMA_SERVER_STARTUP_TIMEOUT_S",
     }
     for key in env:

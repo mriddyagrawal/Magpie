@@ -259,6 +259,14 @@ def build_env(
     # structurally disables the solo gate (its margin threshold is on
     # cross-encoder score scale). Production default is on.
     env["MAGPIE_RERANK"] = "1" if params.get("rerank", True) else "0"
+    # Groundedness guard (src/answer.py:_apply_grounding_guard). Two knobs,
+    # both pinned so a .env value can never leak into a run: grounding_guard
+    # (off = the numeral guard is skipped entirely - the arm that measures
+    # how many "false abstentions" the guard itself manufactures on image
+    # corpora) and strict_grounding (off = index-time summaries may count as
+    # support). Production defaults are on/on.
+    env["MAGPIE_GROUNDING_GUARD"] = "1" if params.get("grounding_guard", True) else "0"
+    env["MAGPIE_STRICT_GROUNDING"] = "1" if params.get("strict_grounding", True) else "0"
     # ALWAYS set: "leave unset for the backend default" is a lie whenever the
     # repo .env defines the var - load_dotenv (manifest.py:63) fills unset
     # vars, so an omitted knob would silently inherit this machine's dotfile

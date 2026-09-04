@@ -1053,29 +1053,8 @@ async def answer_question(
     # bad figure among good ones is a misreading the citations let the user
     # check, and it passes through untouched. See src/grounding.py.
     if ans.answer:
-        # Index-time LLM summaries do NOT count as support for a figure. A
-        # summary is the model's own earlier output; letting it ground a
-        # later answer is how a fabrication launders itself into a fact.
-        # Measured on the 40-question sem6 set: score-neutral (31/40 either
-        # way) and it converted two invented figures — a €2,500.00 salary and
-        # a postcode — into honest refusals. MAGPIE_STRICT_GROUNDING=0 turns
-        # it off for anyone who would rather have the guess.
-        _blocks = [
-            b for _d, blocks in per_file_blocks for b in blocks if isinstance(b, str)
-        ]
-        if os.environ.get("MAGPIE_STRICT_GROUNDING", "1").strip() != "0":
-            _blocks = strip_generated_blocks(_blocks)
-        context_text = "\n".join(_blocks)
-        if looks_fabricated(ans.answer, context_text):
-            print(
-                "  note: every figure in the answer is absent from the files "
-                "read; returning not-found instead",
-                file=sys.stderr,
-            )
-            ans.not_found = True
-            ans.not_found_topic = ans.not_found_topic or question.strip().rstrip("?")
-            ans.answer = ""
-            ans.sources_used = []
+        ans, converted = _apply_grounding_guard(ans, per_file_blocks, question)
+        if converted:
             return ans
 
     # Defensive: drop any path the model invented that wasn't in our input.
@@ -1100,6 +1079,56 @@ async def answer_question(
         print(f"  warn: dropped hallucinated source paths: {dropped}", file=sys.stderr)
     ans.sources_used = filtered
     return ans
+
+
+def grounding_guard_enabled() -> bool:
+    """MAGPIE_GROUNDING_GUARD=0 disables the numeral guard entirely.
+
+    Until 2026-09-03 there was no off-switch: MAGPIE_STRICT_GROUNDING only
+    decides whether index-time summaries may count as support, so it could
+    not save an answer read off an IMAGE - image blocks contribute no text
+    to the support set, and a correct "$55.25" read from a receipt photo was
+    converted to not_found by construction (31 conversions per run on the
+    all-image custom_dataset_rahul evals, ~two thirds of every "false
+    abstention"). The eval harness pins this knob per run (params
+    `grounding_guard`); the fix that makes the guard image-aware is separate."""
+    return os.environ.get("MAGPIE_GROUNDING_GUARD", "1").strip() != "0"
+
+
+def _apply_grounding_guard(
+    ans: "Answer", per_file_blocks: list[tuple[str, list]], question: str
+) -> tuple["Answer", bool]:
+    """Groundedness guard: if EVERY number in the answer is absent from the
+    text the model was shown, the answer is a fabrication and the honest
+    output is the not-found contract. Returns (answer, converted).
+
+    Index-time LLM summaries do NOT count as support for a figure. A summary
+    is the model's own earlier output; letting it ground a later answer is
+    how a fabrication launders itself into a fact. Measured on the
+    40-question sem6 set: score-neutral (31/40 either way) and it converted
+    two invented figures - a EUR 2,500.00 salary and a postcode - into honest
+    refusals. MAGPIE_STRICT_GROUNDING=0 lets summaries count for anyone who
+    would rather have the guess; MAGPIE_GROUNDING_GUARD=0 skips the guard."""
+    if not grounding_guard_enabled():
+        return ans, False
+    _blocks = [
+        b for _d, blocks in per_file_blocks for b in blocks if isinstance(b, str)
+    ]
+    if os.environ.get("MAGPIE_STRICT_GROUNDING", "1").strip() != "0":
+        _blocks = strip_generated_blocks(_blocks)
+    context_text = "\n".join(_blocks)
+    if not looks_fabricated(ans.answer, context_text):
+        return ans, False
+    print(
+        "  note: every figure in the answer is absent from the files "
+        "read; returning not-found instead",
+        file=sys.stderr,
+    )
+    ans.not_found = True
+    ans.not_found_topic = ans.not_found_topic or question.strip().rstrip("?")
+    ans.answer = ""
+    ans.sources_used = []
+    return ans, True
 
 
 def _normalize_path_for_match(p: str) -> str:

@@ -8,6 +8,8 @@
     "temperature": 0.0,
     "solo_margin": 0,
     "rerank": false,
+    "grounding_guard": true,
+    "strict_grounding": true,
     "local_n_ctx": 16384,
     "top_k": 5,
     "top_k_retrieval_max": 12,
@@ -24,7 +26,9 @@
       "local_n_ctx": "pinned: .env.example fresh-clone value & shipped-beta ctx; this machine's .env says 65536 and must not leak (PLAN 3)",
       "rerank": "MAGPIE_RERANK kill-switch; production default is ON - this baseline deliberately diverges (owner decision 2026-08-29): the cross-encoder scores visual hits against a constant placeholder (product bug #1), so rerank off = ColQwen's own ranking. false also structurally disables the solo gate (margin is on cross-encoder score scale); solo_margin is pinned 0 here to make gate-off explicit rather than implied",
       "solo_margin": "0 = gate off (owner decision 2026-08-29, paired with rerank=false above); production default is 2.0",
-      "col_model": "auto = this machine resolves (ColQwen needs >=8GB VRAM or >=24GB unified; else ColSmol). Pin colqwen|colsmol for cross-machine comparability; resolved family stamped in run.json; part of the index key"
+      "col_model": "auto = this machine resolves (ColQwen needs >=8GB VRAM or >=24GB unified; else ColSmol). Pin colqwen|colsmol for cross-machine comparability; resolved family stamped in run.json; part of the index key",
+      "grounding_guard": "Numeral guard (src/answer.py:_apply_grounding_guard): an answer whose EVERY number is absent from the TEXT shown is converted to not_found. ON = production. Measured 2026-09-03 on the all-image custom_dataset_rahul runs: 31 conversions per run, ~two thirds of all false abstentions, because image blocks contribute no text support - a correct figure read off a receipt photo is killed by construction. false = skip the guard (the arm that measures what it costs); the image-aware fix is a separate src change. Pinned as MAGPIE_GROUNDING_GUARD.",
+      "strict_grounding": "Whether index-time LLM summaries may count as support for a figure. ON (production) = they do not - a summary is the model's own earlier output and letting it ground a later answer is how a fabrication launders itself into a fact. Pinned as MAGPIE_STRICT_GROUNDING; independent of grounding_guard."
     }
   }
 }

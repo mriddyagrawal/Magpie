@@ -491,6 +491,26 @@ def _display_path(abs_path: Path) -> str:
         return str(abs_path.resolve())
 
 
+def _captioned(blocks: list, file_no: int) -> list:
+    """A file's blocks with a one-line caption before each image when the
+    file carries more than one (a scanned PDF's pages). Every transport
+    now places images in order right under the `--- File N ---` header
+    (see src.inference.image_slots), so a lone image needs no caption;
+    several do, so the model can tell page 3 from page 1 and cite the
+    file rather than guessing which picture it was looking at."""
+    n_images = sum(1 for b in blocks if not isinstance(b, str))
+    if n_images < 2:
+        return list(blocks)
+    out: list = []
+    k = 0
+    for b in blocks:
+        if not isinstance(b, str):
+            k += 1
+            out.append(f"[File {file_no}, image {k} of {n_images}]")
+        out.append(b)
+    return out
+
+
 async def answer_question(
     agent: ChatAgent[Answer],
     question: str,
@@ -857,7 +877,7 @@ async def answer_question(
     message: list = ["\n".join(intro_parts)]
     for i, (display, blocks) in enumerate(ordered_blocks, 1):
         message.append(f"\n--- File {i}: {display} ---")
-        message.extend(blocks)
+        message.extend(_captioned(blocks, i))
 
     # Prompt-enforced JSON contract, cloud only — the local grammar makes
     # it unnecessary (see _FORMAT_BLOCK_CLOUD for the full rationale).

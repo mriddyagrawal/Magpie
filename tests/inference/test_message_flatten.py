@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import pytest
 
+from src.inference.image_slots import split_slots
 from src.llm import _flatten_message_for_local
 
 
@@ -47,6 +48,42 @@ def test_image_binary_blocks_are_collected() -> None:
     assert "PNG" not in user_content
     # And they show up in the second return value verbatim.
     assert images == [b"\x89PNG\r\n\x1a\nfake-png-bytes"]
+    # The image's POSITION survives as a slot marker between its
+    # neighbours, so the transport can put it back under its file header.
+    pieces = split_slots(user_content)
+    assert pieces[0] == "framing text\n\n" and pieces[1] == 0
+    assert pieces[2].startswith("\n\nmore text")
+
+
+def test_images_keep_document_order_across_files() -> None:
+    class Img:
+        media_type = "image/png"
+
+        def __init__(self, data: bytes) -> None:
+            self.data = data
+
+    msgs, images = _flatten_message_for_local(
+        ["q", "--- File 1 ---", Img(b"one"), "--- File 2 ---", Img(b"two"), "again q"],
+        system_prompt="sys",
+    )
+    assert images == [b"one", b"two"]
+    pieces = split_slots(msgs[1]["content"])
+    assert [p for p in pieces if isinstance(p, int)] == [0, 1]
+    assert pieces.index(0) < pieces.index("\n\n--- File 2 ---\n\n") < pieces.index(1)
+
+
+def test_inline_images_off_leaves_no_markers() -> None:
+    """Transports that drop the images (OpenRouter raw HTTP) must not
+    ship a stray marker to the cloud model."""
+    class Img:
+        data = b"x"
+        media_type = "image/png"
+
+    msgs, images = _flatten_message_for_local(
+        ["a", Img(), "b"], system_prompt="sys", inline_images=False,
+    )
+    assert images == [b"x"]
+    assert "\x00" not in msgs[1]["content"]
 
 
 def test_non_image_binary_blocks_are_dropped_with_warning() -> None:

@@ -484,7 +484,8 @@ class _CloudAgent(Generic[T]):
             _prepend_timestamp(message)
             if _wants_timestamp(self._output_type)
             else message,
-            self._system_prompt
+            self._system_prompt,
+            inline_images=False,
         )
         body: dict[str, Any] = {
             "model": self._model,
@@ -1034,6 +1035,8 @@ _local_image_drop_warned = False
 def _flatten_message_for_local(
     message: list,
     system_prompt: str,
+    *,
+    inline_images: bool = True,
 ) -> tuple[list[dict], list[bytes]]:
     """Convert the desktop-side message list into chat-completion format.
 
@@ -1041,17 +1044,24 @@ def _flatten_message_for_local(
     with `BinaryContent` for image-bearing T3 calls. We:
 
       - Pull the system prompt out as its own message
-      - Concatenate all string parts into one user message
+      - Concatenate all string parts into one user message, IN ORDER
       - Collect image bytes from `BinaryContent` blocks (via duck-typed
-        `data` + `media_type` attributes) for the LocalLLM `images` kwarg
+        `data` + `media_type` attributes) for the LocalLLM `images` kwarg,
+        leaving a slot marker (src.inference.image_slots) in the text
+        where each image sat so the transport can put it back there
       - Drop any non-image binary blocks with a one-time warning
+
+    `inline_images=False` omits the slot markers (for transports that
+    drop the images entirely - a marker would just be noise there).
 
     Returns `(messages, images)`. `images` is `[]` when the file is text-only.
     The caller decides whether to forward `images` based on whether a
-    vision profile is registered.
+    vision profile is registered; if it drops them, the transport drops
+    the orphaned slots too.
     """
 
     global _local_image_drop_warned
+    from src.inference.image_slots import slot
 
     text_parts: list[str] = []
     image_blobs: list[bytes] = []
@@ -1065,6 +1075,8 @@ def _flatten_message_for_local(
         data = getattr(block, "data", None)
         media = getattr(block, "media_type", "") or ""
         if isinstance(data, (bytes, bytearray)) and media.startswith("image/"):
+            if inline_images:
+                text_parts.append(slot(len(image_blobs)))
             image_blobs.append(bytes(data))
         else:
             n_dropped += 1

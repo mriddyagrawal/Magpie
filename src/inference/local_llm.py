@@ -14,8 +14,10 @@ Vision (PR 2): when `complete(...)` is called with `images=[...]`, the
 client transparently switches to the registered vision profile (default
 `lfm25-vl-vision`) for that call only — the pool handles spawn /
 LRU eviction. With the shipped single-profile setup the instance is
-already vision-bound, so no switch actually occurs. Image bytes are base64-encoded and sent as OpenAI-style
-`image_url` content blocks attached to the last user message. With
+already vision-bound, so no switch actually occurs. Image bytes are
+base64-encoded and sent as OpenAI-style `image_url` content blocks on
+the last user message, each at the position its slot marker held in the
+text (see src.inference.image_slots) - i.e. under its file header. With
 `MAX_LOADED_MODELS=1`, switching between text and vision profiles
 incurs a model-reload cost; raise the cap if both are hot.
 
@@ -241,8 +243,10 @@ class LlamaServerLLM:
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
-        if images:
-            prepared = _attach_images_to_last_user(prepared, images)
+        # Always: with images this interleaves them at their slots; without
+        # (vision profile missing, caller dropped them) it strips the
+        # orphaned slot markers so the model never sees them.
+        prepared = _attach_images_to_last_user(prepared, images or [])
         body = self._build_request_body(
             prepared, temperature, max_tokens, stream=False, thinking=thinking,
             response_format=response_format,
@@ -278,8 +282,10 @@ class LlamaServerLLM:
         prepared = apply_thinking_to_messages(
             messages, thinking=thinking, model_repo_or_path=self.model_id
         )
-        if images:
-            prepared = _attach_images_to_last_user(prepared, images)
+        # Always: with images this interleaves them at their slots; without
+        # (vision profile missing, caller dropped them) it strips the
+        # orphaned slot markers so the model never sees them.
+        prepared = _attach_images_to_last_user(prepared, images or [])
         body = self._build_request_body(
             prepared, temperature, max_tokens, stream=False, thinking=thinking,
             response_format=response_format,
@@ -599,10 +605,20 @@ def _prompt_text(messages: list[dict]) -> str:
         if isinstance(content, str):
             parts.append(content)
         elif isinstance(content, list):
-            for p in content:
-                if isinstance(p, dict) and p.get("type") == "text":
-                    parts.append(str(p.get("text", "")))
+            # Text parts of one message are contiguous in the rendered
+            # prompt (only the media marker sits between them), so join
+            # them with nothing - a separator per part would over-count.
+            parts.append("".join(
+                str(p.get("text", "")) for p in content
+                if isinstance(p, dict) and p.get("type") == "text"
+            ))
     return "\n".join(parts)
+
+
+def _image_part(blob: bytes) -> dict[str, Any]:
+    media = _detect_image_media_type(blob)
+    b64 = base64.b64encode(blob).decode("ascii")
+    return {"type": "image_url", "image_url": {"url": f"data:{media};base64,{b64}"}}
 
 
 def _attach_images_to_last_user(
@@ -615,13 +631,17 @@ def _attach_images_to_last_user(
     typed parts on user messages: `{"type": "text", "text": ...}` and
     `{"type": "image_url", "image_url": {"url": "data:<media>;base64,..."}}`.
     We promote the last user message's plain string content into that
-    list and append one `image_url` block per image. Earlier messages
-    (system, prior user/assistant turns) are left as plain strings.
+    list. Where the text carries slot markers (src.inference.image_slots,
+    left by `_flatten_message_for_local`) each image goes IN PLACE of its
+    marker, so it lands right under its file header; llama-server renders
+    content parts in order. Images no marker refers to are appended after
+    the text (the pre-slot behaviour, kept for callers that pass bare
+    `images=`); a marker with no matching image is dropped. Earlier
+    messages (system, prior user/assistant turns) are left as plain strings.
 
     Returns a NEW list — does not mutate `messages`.
     """
-    if not images:
-        return messages
+    from src.inference.image_slots import split_slots, strip_slots
 
     # Find the index of the last user message — that's where vision input
     # belongs. If there isn't one (a system-only request, very unusual),
@@ -637,18 +657,32 @@ def _attach_images_to_last_user(
     new_messages = list(messages)
     user = dict(new_messages[last_user_idx])
     text = user.get("content", "") or ""
+    if not isinstance(text, str):
+        return messages  # already typed parts - nothing to promote
+    if not images:
+        if text != (clean := strip_slots(text)):
+            user["content"] = clean
+            new_messages[last_user_idx] = user
+            return new_messages
+        return messages
+
     parts: list[dict[str, Any]] = []
-    if text:
-        parts.append({"type": "text", "text": text})
-    for blob in images:
-        media = _detect_image_media_type(blob)
-        b64 = base64.b64encode(blob).decode("ascii")
-        parts.append(
-            {
-                "type": "image_url",
-                "image_url": {"url": f"data:{media};base64,{b64}"},
-            }
-        )
+    placed: set[int] = set()
+    for piece in split_slots(text):
+        if isinstance(piece, int):
+            if 0 <= piece < len(images) and piece not in placed:
+                parts.append(_image_part(images[piece]))
+                placed.add(piece)
+            continue
+        if not piece:
+            continue
+        if parts and parts[-1]["type"] == "text":      # dropped slot between two runs
+            parts[-1]["text"] += piece
+        else:
+            parts.append({"type": "text", "text": piece})
+    for n, blob in enumerate(images):
+        if n not in placed:
+            parts.append(_image_part(blob))
     user["content"] = parts
     new_messages[last_user_idx] = user
     return new_messages

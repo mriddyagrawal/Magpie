@@ -2360,6 +2360,16 @@ work needs a streaming substrate to attach to.
 
 ---
 
+**Sidenote (review, 2026-09-03) — streaming will silently drop drift-tripwire
+coverage.** Today `/query/stream` still goes through `agent.run` and emits one
+chunk, so the tripwire in `src/inference/local_llm.py` sees every answer. The
+comment at `server.py:638` documents this plan switching to `local_llm.stream()`.
+`stream()` has no tripwire hook, and llama-server only emits `usage` on a stream
+when `stream_options.include_usage` is set, which the request body does not
+send. When this lands: send `stream_options: {"include_usage": true}` and feed
+the final chunk's `usage.prompt_tokens` to `_tripwire_after` — or hook it now so
+the coverage cannot regress unnoticed.
+
 ## 36. OS-native file previews for the right-pane PreviewCard
 
 **Tags:** ui · platform · preview

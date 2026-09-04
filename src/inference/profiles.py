@@ -53,35 +53,55 @@ DEFAULT_QUANT = "Q6_K"
 # by default: KV-cache grows linearly with context, and a 3B model does not
 # reason well across 128K anyway (Liquid explicitly does not recommend it for
 # long-context work). 16K comfortably fits the answer step's top-k file
-# payload while keeping the cache small. Pin via LOCAL_N_CTX.
+# payload while keeping the cache small, and it is what every eval run
+# measures (envctl pins it). Pin another value via LOCAL_N_CTX.
 DEFAULT_N_CTX = 16384
 
 
-def _auto_n_ctx() -> int:
-    """Context window sized to this machine's RAM (2026-08-24, see
-    IO/IO - context-window.md). An explicit LOCAL_N_CTX always wins.
+# What the LFM2.5 family was trained to attend over. llama-server clamps -c
+# to n_ctx_train, so anything above this is a window the budget in
+# src/answer.py would size prompts for and the server would then reject
+# (observed 2026-09-03: -c 49152 requested, /props reported 32768, every
+# prompt between the two would have been an HTTP 400). The drift guard's
+# context_window oracle checks the served window against this at runtime.
+LFM25_MAX_N_CTX = 32768
 
-    Keyed off TOTAL RAM, not free RAM — free flaps run-to-run and a window
-    that changes between launches would make answer quality feel random.
-    Tiers are deliberately conservative: the KV cache is reserved up front
-    at model spawn, and on CPU a genuinely full window also means minutes
-    of prompt-reading before the first generated token. Boundaries sit
-    slightly under the nominal sizes (15/30 GB) because the OS reports
-    total RAM minus hardware reservations (a "16 GB" machine reports ~15.4).
+_WARNED_CTX_CLAMP: set[int] = set()
+
+
+def resolve_n_ctx(default: int = DEFAULT_N_CTX, max_ctx: int = LFM25_MAX_N_CTX) -> int:
+    """The context window for the local profile: LOCAL_N_CTX when set,
+    else `default` - the same 16K on every machine.
+
+    Until 2026-09-03 an unset LOCAL_N_CTX sized the window to total RAM
+    (8K/16K/32K/49K tiers). That shipped a different system than the evals
+    measure (the harness pins 16K), made the model's answers depend on the
+    buyer's RAM, and on 32 GB machines asked for more than the model was
+    trained for. Owner decision: one window everywhere; a larger tier
+    (LOCAL_N_CTX_BIG) only after an eval arm at that size shows a win.
+
+    An explicit value above `max_ctx` is clamped with a one-time warning -
+    a .env left at 65536 must not silently reopen the budget/server mismatch.
+    Unparseable values fall back to the default.
     """
+    raw = os.environ.get("LOCAL_N_CTX", "").strip()
     try:
-        import psutil
+        n = int(raw) if raw else default
+    except ValueError:
+        print(f"  warning: LOCAL_N_CTX={raw!r} is not an integer; using {default}",
+              file=sys.stderr)
+        n = default
+    if n > max_ctx:
+        if n not in _WARNED_CTX_CLAMP:
+            _WARNED_CTX_CLAMP.add(n)
+            print(f"  warning: LOCAL_N_CTX={n} exceeds the model's trained context "
+                  f"({max_ctx}); llama-server would clamp it and the answer budget "
+                  f"would overshoot the real window - using {max_ctx}",
+                  file=sys.stderr)
+        n = max_ctx
+    return max(2048, n)
 
-        total_gb = psutil.virtual_memory().total / (1024**3)
-    except Exception:  # noqa: BLE001 — sizing must never break a spawn
-        return DEFAULT_N_CTX
-    if total_gb >= 30:
-        return 49152
-    if total_gb >= 15:
-        return 32768
-    if total_gb >= 7.5:
-        return 16384
-    return 8192
+
 # Sampling defaults come from Liquid's own model card for the LFM2.5
 # family: temperature 0.1, min_p 0.15, repetition_penalty 1.05. Magpie ran
 # 0.7 with llama.cpp's stock samplers until 2026-08-27, which is a Gemma-era
@@ -295,9 +315,9 @@ register(
             mmproj_repo_id=os.environ.get("LOCAL_MMPROJ_REPO", _env_model_repo()),
             mmproj_variant=os.environ.get("LOCAL_MMPROJ_VARIANT", "Q8_0"),
             ngl=DEFAULT_NGL,
-            # Explicit LOCAL_N_CTX (even in .env) pins the window; blank or
-            # unset lets _auto_n_ctx() size it to this machine's RAM.
-            ctx_size=int(os.environ.get("LOCAL_N_CTX", "").strip() or _auto_n_ctx()),
+            # One window everywhere (16K) unless LOCAL_N_CTX pins another;
+            # clamped to the model's trained context. See resolve_n_ctx.
+            ctx_size=resolve_n_ctx(),
             temperature=float(os.environ.get("LOCAL_TEMPERATURE", DEFAULT_TEMPERATURE)),
             # Env-readable like LOCAL_TEMPERATURE above, for the same
             # reason: an A/B run has to be able to reproduce the old

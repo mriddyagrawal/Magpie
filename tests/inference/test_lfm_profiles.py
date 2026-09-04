@@ -59,3 +59,46 @@ def test_mmproj_filename_convention():
 def test_unknown_repo_error_names_the_wired_repos():
     with pytest.raises(ValueError, match="LiquidAI/LFM2.5-VL-3B-GGUF"):
         _filename_for("nobody/unknown-model-GGUF", "Q4_0")
+
+
+# ---- context window: one size everywhere, clamped to the model ------------
+
+
+def test_n_ctx_defaults_to_16k_regardless_of_machine(monkeypatch):
+    from src.inference import profiles
+
+    monkeypatch.delenv("LOCAL_N_CTX", raising=False)
+    assert profiles.resolve_n_ctx() == 16384
+
+
+def test_n_ctx_explicit_value_wins(monkeypatch):
+    from src.inference import profiles
+
+    monkeypatch.setenv("LOCAL_N_CTX", "8192")
+    assert profiles.resolve_n_ctx() == 8192
+
+
+def test_n_ctx_above_trained_context_is_clamped_with_warning(monkeypatch, capsys):
+    """A .env left at 65536 must not reopen the budget/server mismatch."""
+    from src.inference import profiles
+
+    profiles._WARNED_CTX_CLAMP.clear()
+    monkeypatch.setenv("LOCAL_N_CTX", "65536")
+    assert profiles.resolve_n_ctx() == profiles.LFM25_MAX_N_CTX == 32768
+    assert "exceeds the model's trained context" in capsys.readouterr().err
+    profiles.resolve_n_ctx()                       # warned once, not per call
+    assert capsys.readouterr().err == ""
+
+
+def test_n_ctx_garbage_falls_back_to_default(monkeypatch, capsys):
+    from src.inference import profiles
+
+    monkeypatch.setenv("LOCAL_N_CTX", "lots")
+    assert profiles.resolve_n_ctx() == 16384
+    assert "not an integer" in capsys.readouterr().err
+
+
+def test_auto_ram_tiers_are_gone():
+    from src.inference import profiles
+
+    assert not hasattr(profiles, "_auto_n_ctx")

@@ -223,20 +223,24 @@ def phase_index(payload: dict) -> dict:
         "manifest_path": str(manifest_path),
         "manifest": manifest_raw,
         "col_model_resolved": col_resolved,
-        "provenance": _provenance(),
     }
 
 
-def _provenance() -> dict | None:
-    """Drift-guard fingerprint of the binaries/models this worker ran with
-    (src/drift/provenance.py). Stamped into run.json by run.py so a moved
-    metric can be attributed to a runtime bump. Never fatal."""
+def phase_provenance(payload: dict) -> dict:
+    """Drift-guard fingerprint of the binaries/models this run will use
+    (src/drift/provenance.py), stamped into run.json by run.py so a moved
+    metric can be attributed to a runtime bump. Its own untimed phase: the
+    first run on a machine hashes ~3 GB of GGUF, which must not land inside
+    the index/answer wall-clock. Never fatal."""
+    _write_settings(payload.get("params", {}))
+    from src import manifest  # noqa: F401 - load_dotenv before the env check
+    _assert_controlled_env(payload)
     try:
         from src.drift.provenance import runtime_fingerprint
 
-        return runtime_fingerprint()
+        return {"provenance": runtime_fingerprint()}
     except Exception as e:  # noqa: BLE001
-        return {"error": str(e)[:200]}
+        return {"provenance": {"error": str(e)[:200]}}
 
 
 def phase_answer(payload: dict) -> dict:
@@ -388,7 +392,6 @@ def phase_answer(payload: dict) -> dict:
         "errors": n_err,
         "skipped_done": len(done),
         "llm_log": str(llm_log) if llm_log else None,
-        "provenance": _provenance(),
     }
 
 
@@ -524,6 +527,7 @@ def phase_retrieve(payload: dict) -> dict:
 
 PHASES = {
     "boot": phase_boot,
+    "provenance": phase_provenance,
     "index": phase_index,
     "retrieve": phase_retrieve,
     "answer": phase_answer,

@@ -211,6 +211,20 @@ def main() -> int:
         grpc_port=ports.qdrant_grpc, log_path=raw / "qdrant.log",
     )
 
+    # Drift-guard provenance stamp: its own worker phase, run BEFORE the
+    # clock starts and before any timed phase, because the first run on a
+    # machine hashes the model files (~3 GB, 10-20 s) and that must not be
+    # charged to phases.index.wall_s. Never fatal to the run.
+    try:
+        prov = backend.run_worker(
+            "provenance", run_dir, env,
+            {"params": params, "expected_env": expected_env}, timeout_s=600,
+        )
+        run_record["provenance"] = prov.get("provenance")
+    except Exception as e:  # noqa: BLE001 - a missing stamp is not a failed run
+        run_record["provenance"] = {"error": str(e)[:200]}
+    save_record()
+
     t0 = time.monotonic()
     completed = False
     try:
@@ -227,8 +241,6 @@ def main() -> int:
                 timeout_s=6 * 3600,
             )
             run_record["col_model_resolved"] = idx.get("col_model_resolved")
-            if idx.get("provenance"):
-                run_record["provenance"] = idx["provenance"]
             run_record["phases"]["index"] = {
                 "wall_s": round(time.monotonic() - t, 1),
                 "manifest_entries": len(idx.get("manifest") or {}),
@@ -276,10 +288,6 @@ def main() -> int:
                 "answered": ans["answered"], "errors": ans["errors"],
                 "llm_log": ans.get("llm_log"),
             }
-            # mounted runs never run the index phase - the answer worker
-            # is the first (and authoritative: same process family) stamp
-            if ans.get("provenance"):
-                run_record["provenance"] = ans["provenance"]
             save_record()
             progress.phase_done(raw, "answer", errors=ans["errors"])
             answered = True

@@ -140,15 +140,27 @@ def _qdrant() -> dict:
         return {"endpoint": endpoint, "version": None, "reachable": False}
 
 
-def _cached_model_file(repo_id: str, filename: str) -> Optional[Path]:
-    """Path of an already-downloaded HF file, or None. Never downloads."""
+def _cached_model_file(repo_id: str, filename: str, revision: Optional[str] = None) -> Optional[Path]:
+    """Path of an already-downloaded HF file at `revision` (the pinned one
+    when None), or None. Never downloads."""
     try:
         from huggingface_hub import try_to_load_from_cache
 
-        hit = try_to_load_from_cache(repo_id=repo_id, filename=filename)
+        from src.inference.model_downloader import _pinned
+
+        hit = try_to_load_from_cache(repo_id=repo_id, filename=filename,
+                                     revision=_pinned(repo_id, revision))
         return Path(hit) if isinstance(hit, str) else None
     except Exception:  # noqa: BLE001
         return None
+
+
+def _snapshot_of(path: Optional[Path]) -> Optional[str]:
+    """The HF snapshot (commit sha) a cached file belongs to, from its path."""
+    if path is None:
+        return None
+    parts = path.parts
+    return parts[parts.index("snapshots") + 1] if "snapshots" in parts else None
 
 
 def _file_record(path: Optional[Path], hash_models: bool) -> dict:
@@ -173,18 +185,38 @@ def _models(hash_models: bool) -> dict:
         name = default_text_profile()
         prof = get_profile(name)
         args = prof.args
-        gguf = _cached_model_file(args.repo_id, _filename_for(args.repo_id, args.quant))
+        from src.inference.gguf_meta import identity
+        from src.inference.model_downloader import _pinned
+        from src.inference.profiles import clamp_ctx_to_model
+
+        gguf = _cached_model_file(args.repo_id, _filename_for(args.repo_id, args.quant), args.revision)
         out: dict[str, Any] = {
             "profile": name,
             "repo": args.repo_id,
             "quant": args.quant,
-            "gguf": _file_record(gguf, hash_models),
+            # the revision we ASK for and the snapshot the cached file IS
+            # (they differ when a pin was added after an unpinned download)
+            "revision": _pinned(args.repo_id, args.revision),
+            "snapshot": _snapshot_of(gguf),
+            "gguf": {**_file_record(gguf, hash_models),
+                     "identity": identity(gguf) if gguf else None},
+            # launch args that reach llama-server argv: the runtime the
+            # mirrored assumptions execute in (a LOCAL_N_CTX change must
+            # re-run the oracles once)
+            "launch": {
+                "ctx_size_requested": args.ctx_size,
+                "ctx_size": clamp_ctx_to_model(args.ctx_size, gguf),
+                "ngl": args.ngl,
+                "extra_args": list(getattr(args, "extra_args", []) or []),
+            },
         }
         if args.mmproj_repo_id:
             mm = _cached_model_file(
-                args.mmproj_repo_id, _mmproj_filename_for(args.mmproj_repo_id, args.mmproj_variant)
+                args.mmproj_repo_id, _mmproj_filename_for(args.mmproj_repo_id, args.mmproj_variant),
+                args.revision,
             )
-            out["mmproj"] = {"variant": args.mmproj_variant, **_file_record(mm, hash_models)}
+            out["mmproj"] = {"variant": args.mmproj_variant, "snapshot": _snapshot_of(mm),
+                             **_file_record(mm, hash_models)}
         else:
             out["mmproj"] = None
         return out
@@ -266,6 +298,8 @@ def fingerprint_of(prov: dict) -> str:
         "llama_build": (prov.get("llama_server") or {}).get("build"),
         "llama_commit": (prov.get("llama_server") or {}).get("commit"),
         "gguf": ((models.get("gguf") or {}).get("sha256")) or ((models.get("gguf") or {}).get("path")),
+        "gguf_identity": (models.get("gguf") or {}).get("identity"),
+        "launch": models.get("launch"),
         "mmproj": ((models.get("mmproj") or {}).get("sha256")) or ((models.get("mmproj") or {}).get("path")),
         "col": (prov.get("col_model") or {}).get("model_id"),
         "deps": (prov.get("deps") or {}).get("uv_lock_sha256"),
@@ -285,6 +319,8 @@ def summary(prov: dict) -> dict:
         "llama_server": f"b{ls['build']}" if isinstance(ls.get("build"), int) else None,
         "qdrant": (prov.get("qdrant") or {}).get("version"),
         "model": f"{models.get('repo')}:{models.get('quant')}" if models.get("repo") else None,
+        "snapshot": (models.get("snapshot") or "")[:12] or None,
+        "ctx_size": (models.get("launch") or {}).get("ctx_size"),
         "gguf_sha256": (gguf.get("sha256") or "")[:12] or None,
         "mmproj_sha256": (mm.get("sha256") or "")[:12] or None,
         "col_model": (prov.get("col_model") or {}).get("model_id"),

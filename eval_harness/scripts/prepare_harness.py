@@ -124,8 +124,10 @@ def step_llm(check: bool, llms: list[str]) -> bool:
             # ensure_model downloads on miss; in check mode just report the
             # cache state via a local-only snapshot probe.
             from huggingface_hub import snapshot_download
+
+            from src.drift.pins import model_revision
             try:
-                snapshot_download(repo, local_files_only=True,
+                snapshot_download(repo, local_files_only=True, revision=model_revision(repo),
                                   allow_patterns=[f"*{quant}*"])
                 print(f"present: {repo} [{quant}]")
             except Exception:

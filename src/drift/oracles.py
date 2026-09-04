@@ -231,9 +231,9 @@ def oracle_context_window(base_url: str) -> OracleResult:
     (default_generation_settings.n_ctx) and total_slots; assert the slot
     window covers what the budget assumes."""
     try:
-        from src.inference.profiles import default_text_profile, get_profile
+        from src.inference.profiles import effective_ctx_size
 
-        assumed = int(get_profile(default_text_profile()).args.ctx_size)
+        assumed = int(effective_ctx_size())   # what the answer budget assumes
         with urllib.request.urlopen(base_url.rstrip("/") + "/props", timeout=30) as r:
             props = json.load(r)
         slot_ctx = (props.get("default_generation_settings") or {}).get("n_ctx")
@@ -316,8 +316,22 @@ def ensure_for_fingerprint(fingerprint: str, base_url: Optional[str], *, force: 
         if not force:
             cached = load_cached(fingerprint)
             if cached is not None:
-                return cached
+                return _refresh_live(cached, base_url)
         return save(fingerprint, run_all(base_url))
+
+
+def _refresh_live(record: dict, base_url: Optional[str]) -> dict:
+    """context_window is one GET to /props and moves with launch config
+    (LOCAL_N_CTX, extra_args) - re-run it on every read instead of trusting
+    the cached verdict; the model-bound oracles stay cached."""
+    if not base_url:
+        return record
+    live = asdict(oracle_context_window(base_url))
+    results = [live if r.get("name") == "context_window" else r for r in record.get("results", [])]
+    if not any(r.get("name") == "context_window" for r in results):
+        results.insert(0, live)
+    record = {**record, "results": results, "ok": all(r.get("ok") for r in results)}
+    return record
 
 
 # ---- idle auto-run ----------------------------------------------------------

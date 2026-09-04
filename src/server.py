@@ -264,7 +264,7 @@ def _drift_summary() -> dict[str, Any] | None:
         return None
     from src.drift import oracles, provenance, tripwire
 
-    cached = oracles.load_cached(prov["fingerprint"])
+    cached = oracles.load_cached(prov["oracle_key"])
     return {
         **provenance.summary(prov),
         "pin_mismatches": len(_drift_state.get("pins") or []),
@@ -285,7 +285,7 @@ def drift_status() -> JSONResponse:
         "error": _drift_state.get("error"),
         "provenance": prov,
         "pin_mismatches": _drift_state.get("pins"),
-        "oracles": oracles.load_cached(prov["fingerprint"]) if prov else None,
+        "oracles": oracles.load_cached(prov["oracle_key"]) if prov else None,
         "checking": _drift_state.get("checking"),
         "tripwire": tripwire.summary(),
     })
@@ -315,7 +315,7 @@ def drift_check(force: bool = False) -> JSONResponse:
             prof = default_vision_profile()
             if prof:
                 base_url = get_pool().get_url_for(prof)
-            oracles.ensure_for_fingerprint(prov["fingerprint"], base_url, force=force)
+            oracles.ensure_for_fingerprint(prov["oracle_key"], base_url, force=force)
         except Exception as e:  # noqa: BLE001
             _drift_state["error"] = str(e)[:200]
             print(f"[drift] check failed: {e}", file=sys.stderr)

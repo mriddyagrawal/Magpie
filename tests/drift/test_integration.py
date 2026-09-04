@@ -103,7 +103,8 @@ def test_on_server_ready_only_schedules_for_the_vision_profile(monkeypatch) -> N
     monkeypatch.setattr(oracles, "schedule_after_idle",
                         lambda fp, prof, url, idle, **kw: scheduled.append(prof) or True)
     monkeypatch.setattr("src.inference.profiles.default_vision_profile", lambda: "vision-prof")
-    monkeypatch.setattr("src.drift.provenance.runtime_fingerprint", lambda: {"fingerprint": "fp"})
+    monkeypatch.setattr("src.drift.provenance.runtime_fingerprint",
+                        lambda: {"fingerprint": "fp", "oracle_key": "ok1"})
     oracles.on_server_ready("text-only-prof", "http://s", lambda p: 0.0)
     oracles.on_server_ready("vision-prof", "http://s", lambda p: 0.0)
     for _ in range(50):
@@ -129,11 +130,11 @@ def test_drift_routes_before_and_after_probe(monkeypatch, tmp_path) -> None:
     assert r.status_code == 200 and r.json()["ready"] is False
     assert r.json()["oracles"] is None and r.json()["tripwire"]["checks"] == 0
 
-    prov = {"fingerprint": "abc", "llama_server": {"build": 10502},
+    prov = {"fingerprint": "abc", "oracle_key": "abc-launch", "llama_server": {"build": 10502},
             "qdrant": {"version": None}, "models": {}, "col_model": {}, "magpie": {}}
     server._drift_state["provenance"] = prov
     server._drift_state["pins"] = []
-    oracles.save("abc", [oracles.OracleResult("x", True, "ok", {})])
+    oracles.save("abc-launch", [oracles.OracleResult("x", True, "ok", {})])
 
     r = client.get("/drift")
     body = r.json()

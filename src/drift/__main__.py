@@ -25,13 +25,13 @@ def _print_status(prov: dict) -> list[dict]:
     print(f"pins: {'all match' if not mismatches else str(len(mismatches)) + ' mismatch(es)'}")
     for m in mismatches:
         print(f"  {m['component']}: pinned {m['pinned']}, installed {m['installed']} - {m['note']}")
-    cached = oracles.load_cached(prov["fingerprint"])
+    cached = oracles.load_cached(prov["oracle_key"])
     if cached:
         print(f"oracles (cached {cached['ran_utc']}): {'OK' if cached['ok'] else 'FAILED'}")
         for r in cached["results"]:
             print(f"  {'✓' if r['ok'] else '✗'} {r['name']}: {r['detail']}")
     else:
-        print("oracles: not yet run for this fingerprint (`python -m src.drift check`)")
+        print("oracles: not yet run for this runtime (`python -m src.drift check`)")
     t = tripwire.summary()
     print(f"tripwire: {t['trips']} trip(s) / {t['checks']} checks this process; log {t['log']}")
     return mismatches
@@ -48,7 +48,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "status":
         if args.json:
             print(json.dumps({"provenance": prov, "pins": pins.check_pins(prov),
-                              "oracles": oracles.load_cached(prov["fingerprint"]),
+                              "oracles": oracles.load_cached(prov["oracle_key"]),
                               "tripwire": tripwire.summary()}, indent=2))
             return 0
         _print_status(prov)
@@ -58,7 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     base_url = None
     # This process is about to run the oracles itself; claim the fingerprint
     # so the pool's on-spawn idle hook does not start a second, concurrent run.
-    oracles.claim(prov["fingerprint"])
+    oracles.claim(prov["oracle_key"])
     try:
         from src.inference.llama_server_pool import get_pool
         from src.inference.profiles import default_vision_profile
@@ -69,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
             base_url = get_pool().get_url_for(prof)
     except Exception as e:  # noqa: BLE001
         print(f"  llama-server unavailable ({e}); server oracles will be skipped")
-    rec = oracles.ensure_for_fingerprint(prov["fingerprint"], base_url, force=args.force)
+    rec = oracles.ensure_for_fingerprint(prov["oracle_key"], base_url, force=args.force)
     print(f"\noracles ({rec['ran_utc']}): {'OK' if rec['ok'] else 'FAILED'}")
     for r in rec["results"]:
         print(f"  {'✓' if r['ok'] else '✗'} {r['name']}: {r['detail']}")

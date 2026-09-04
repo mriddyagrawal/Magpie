@@ -220,3 +220,27 @@ def test_axes_runtime_unknown_never_counts(tmp_path):
     ax = compare.axes(compare.load_run(a, False), compare.load_run(b, False))
     assert ax["changed_axes"] == ["none"]
     assert ax["runtime"]["known"] is False and ax["runtime"]["b"] is None
+
+
+def test_context_window_ablation_is_a_single_knob(tmp_path):
+    """The experiment the 16K decision says to run next: local_n_ctx differs
+    as a param AND the runtime launch args differ - that is ONE knob.
+    Provenance keeps launch args out of the fingerprint for exactly this."""
+    import sys as _sys
+    _sys.path.insert(0, str(HARNESS.parents[1]))
+    from src.drift.provenance import fingerprint_of
+
+    def prov(ctx):
+        return {"llama_server": {"build": 10502, "commit": "x"}, "qdrant": {"version": "1.17.1"},
+                "models": {"repo": "r", "quant": "q", "gguf": {"sha256": "a" * 64},
+                           "mmproj": {"sha256": "b" * 64},
+                           "launch": {"ctx_size": ctx, "ngl": 999, "extra_args": []}},
+                "col_model": {"model_id": "c"}, "deps": {"uv_lock_sha256": "d" * 64},
+                "platform": {"system": "Darwin", "machine": "arm64"}}
+    a = _mk_run(tmp_path, "kA", "g1", {"q1": "correct"}, params={"local_n_ctx": 16384})
+    b = _mk_run(tmp_path, "kB", "g1", {"q1": "correct"}, params={"local_n_ctx": 32768})
+    pa, pb = prov(16384), prov(32768)
+    _stamp_provenance(a, fingerprint_of(pa)); _stamp_provenance(b, fingerprint_of(pb))
+    ax = compare.axes(compare.load_run(a, False), compare.load_run(b, False))
+    assert ax["changed_knobs"] == ["local_n_ctx"]
+    assert ax["confounded"] is False

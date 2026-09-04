@@ -412,7 +412,7 @@ def on_server_ready(
         try:
             from src.drift.provenance import runtime_fingerprint
 
-            fp = runtime_fingerprint()["fingerprint"]
+            fp = runtime_fingerprint()["oracle_key"]
             schedule_after_idle(fp, profile_name, base_url, idle_seconds)
         except Exception as e:  # noqa: BLE001
             print(f"  drift: could not schedule oracles: {e}", file=sys.stderr)

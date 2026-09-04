@@ -280,12 +280,21 @@ def runtime_fingerprint(*, hash_models: bool = True, refresh: bool = False) -> d
             "deps": _deps(),
         }
         prov["fingerprint"] = fingerprint_of(prov)
+        prov["oracle_key"] = oracle_key_of(prov)
         _cached = prov
         return prov
 
 
 def fingerprint_of(prov: dict) -> str:
-    """Stable 16-hex digest over the inputs the oracles depend on.
+    """Stable 16-hex digest over the RUNTIME underneath the code: binaries,
+    model files and their declared identity, encoders, lockfile, platform.
+    This is the key eval comparisons use (`runtime` axis in compare.py).
+
+    Launch args (ctx_size, ngl, extra_args) are deliberately NOT here: the
+    harness already pins them as params (local_n_ctx), so including them
+    would count one context-window ablation as two knobs and mark a clean
+    single-knob experiment confounded (review, 2026-09-04). They live in
+    oracle_key_of() instead, which keys the oracle cache.
 
     Deliberately excluded: the Magpie git sha (changes every commit; the
     checks are about the world underneath the code) and the Qdrant version
@@ -299,12 +308,20 @@ def fingerprint_of(prov: dict) -> str:
         "llama_commit": (prov.get("llama_server") or {}).get("commit"),
         "gguf": ((models.get("gguf") or {}).get("sha256")) or ((models.get("gguf") or {}).get("path")),
         "gguf_identity": (models.get("gguf") or {}).get("identity"),
-        "launch": models.get("launch"),
         "mmproj": ((models.get("mmproj") or {}).get("sha256")) or ((models.get("mmproj") or {}).get("path")),
         "col": (prov.get("col_model") or {}).get("model_id"),
         "deps": (prov.get("deps") or {}).get("uv_lock_sha256"),
         "platform": prov.get("platform"),
     }
+    return hashlib.sha256(json.dumps(stable, sort_keys=True).encode()).hexdigest()[:16]
+
+
+def oracle_key_of(prov: dict) -> str:
+    """Cache key for the oracle verdicts: the runtime fingerprint PLUS the
+    launch args that reach llama-server argv. A LOCAL_N_CTX or extra_args
+    change re-runs the oracles once without becoming an eval knob."""
+    launch = (prov.get("models") or {}).get("launch") or {}
+    stable = {"fingerprint": prov.get("fingerprint") or fingerprint_of(prov), "launch": launch}
     return hashlib.sha256(json.dumps(stable, sort_keys=True).encode()).hexdigest()[:16]
 
 
@@ -316,6 +333,7 @@ def summary(prov: dict) -> dict:
     mm = models.get("mmproj") or {}
     return {
         "fingerprint": prov.get("fingerprint"),
+        "oracle_key": prov.get("oracle_key"),
         "llama_server": f"b{ls['build']}" if isinstance(ls.get("build"), int) else None,
         "qdrant": (prov.get("qdrant") or {}).get("version"),
         "model": f"{models.get('repo')}:{models.get('quant')}" if models.get("repo") else None,

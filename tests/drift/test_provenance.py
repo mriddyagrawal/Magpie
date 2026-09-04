@@ -107,3 +107,23 @@ def test_runtime_fingerprint_is_offline_safe(monkeypatch: pytest.MonkeyPatch) ->
     assert prov["llama_server"]["build"] is None
     # second call is served from the in-process cache
     assert provenance.runtime_fingerprint() is prov
+
+
+def test_launch_args_change_the_oracle_key_but_not_the_fingerprint() -> None:
+    """A LOCAL_N_CTX change must re-run the oracles once (oracle_key) without
+    becoming an eval knob (fingerprint) - the harness already pins
+    local_n_ctx as a param, so counting it twice would mark a clean
+    context-window ablation confounded."""
+    a = _prov()
+    b = _prov()
+    a["models"]["launch"] = {"ctx_size": 16384, "ngl": 999, "extra_args": []}
+    b["models"]["launch"] = {"ctx_size": 32768, "ngl": 999, "extra_args": []}
+    assert provenance.fingerprint_of(a) == provenance.fingerprint_of(b)
+    assert provenance.oracle_key_of(a) != provenance.oracle_key_of(b)
+
+
+def test_model_identity_change_moves_the_fingerprint() -> None:
+    a = _prov(); b = _prov()
+    a["models"]["gguf"]["identity"] = {"architecture": "lfm2", "context_length": 128000}
+    b["models"]["gguf"]["identity"] = {"architecture": "lfm2", "context_length": 32768}
+    assert provenance.fingerprint_of(a) != provenance.fingerprint_of(b)

@@ -86,3 +86,24 @@ def test_truncated_header_is_an_error(tmp_path: Path) -> None:
     p.write_bytes(p.read_bytes()[:20])
     with pytest.raises(gguf_meta.GGUFError):
         gguf_meta.read_metadata(p)
+
+
+def test_context_lookup_is_memoized_and_stops_early(tmp_path: Path) -> None:
+    """The answer budget asks for the ceiling on every query: the header must
+    be walked once per (path, size, mtime) and the walk must stop before the
+    tokenizer arrays even when optional identity keys are absent."""
+    p = _gguf(tmp_path, [
+        _kv_str("general.architecture", "lfm2"),
+        _kv_u32("lfm2.context_length", 32768),       # no basename / size_label
+        _kv_arr_str("tokenizer.ggml.tokens", [f"t{i}" for i in range(5000)]),
+    ])
+    gguf_meta._MEMO.clear()
+    walks = gguf_meta._HEADER_WALKS
+    assert gguf_meta.declared_context_length(p) == 32768
+    assert gguf_meta.declared_context_length(p) == 32768
+    assert gguf_meta._HEADER_WALKS == walks + 1                   # second call served from memo
+    meta = gguf_meta.read_metadata(p, gguf_meta._CONTEXT_KEYS)
+    assert "tokenizer.ggml.tokens" not in meta                     # early stop before the vocab
+    p.write_bytes(p.read_bytes() + b"x")                            # size change invalidates
+    assert gguf_meta.declared_context_length(p) == 32768
+    assert gguf_meta._HEADER_WALKS == walks + 2

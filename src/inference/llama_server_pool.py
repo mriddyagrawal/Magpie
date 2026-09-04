@@ -177,6 +177,16 @@ class LlamaServerPool:
 
             return self._spawn_locked(profile_name)
 
+    def idle_seconds(self, profile_name: str) -> Optional[float]:
+        """Seconds since the instance for `profile_name` last served a
+        request, or None when it is not loaded / no longer alive. Used by the
+        drift oracles to run only against an idle server."""
+        with self._lock:
+            inst = self._instances.get(profile_name)
+            if inst is None or not self._is_alive(inst):
+                return None
+            return time.monotonic() - inst.last_used
+
     def mark_dead(self, profile_name: str) -> None:
         """Caller observed a connection error against a known instance.
         Drop the registry entry so the next `get_url_for` respawns."""
@@ -308,6 +318,16 @@ class LlamaServerPool:
                         f"(pid {process.pid}, {time.monotonic() - inst.spawned_at:.1f}s)",
                         file=sys.stderr,
                     )
+                    # Drift guard: once per new (binary, model) fingerprint,
+                    # run the mirrored-assumption oracles against this server -
+                    # in a daemon thread, only after it has sat idle, never
+                    # while a request is waiting. Best-effort by contract.
+                    try:
+                        from src.drift.oracles import on_server_ready
+
+                        on_server_ready(profile_name, base_url, self.idle_seconds)
+                    except Exception as e:  # noqa: BLE001
+                        print(f"  drift: hook skipped ({e})", file=sys.stderr)
                     return base_url
             except OSError as e:
                 last_err = str(e)

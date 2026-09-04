@@ -664,3 +664,20 @@ eval-smoke:
 # polls it (plus a log tail). Read-only; safe to leave running across runs.
 eval-watch port="8765":
     uv run python eval_harness/scripts/eval_watch.py --port {{port}} --open
+
+# ----------------------------------------------------------------------------
+# Drift guard (src/drift/): pins, provenance, oracles, tripwire
+# ----------------------------------------------------------------------------
+
+# What is installed vs what we validated against, cached oracle verdicts,
+# tripwire counters. No model loads; seconds.
+drift-status:
+    uv run python -m src.drift status
+
+# The upgrade gate: run every mirrored-assumption oracle against the real
+# llama-server + Qdrant (spawns the vision model if needed), then the
+# end-to-end smoke eval. Run after ANY llama-server / Qdrant / model /
+# lockfile bump, before merging it. Non-zero exit on failure.
+check-drift:
+    uv run python -m src.drift check
+    just eval-smoke

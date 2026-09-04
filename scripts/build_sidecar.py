@@ -95,6 +95,12 @@ def main() -> None:
         sys.executable, "-m", "PyInstaller",
         "src/server.py",
         "--name", "magpie-sidecar",
+        # PyInstaller writes a .spec next to wherever it runs. Left at the
+        # repo root it looks like a source of truth and is not (it is
+        # regenerated from THIS argv every build, and *.spec is gitignored) -
+        # two people edited it in one week and lost the change. Keep it in
+        # the build tree so nothing at the root invites editing.
+        "--specpath", str(ROOT / "build" / "pyinstaller"),
         "--onefile",
         "--noconsole",
         "--noconfirm",

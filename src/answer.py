@@ -100,12 +100,146 @@ def _context_budget_chars() -> int | None:
     return int(usable_tokens * _CHARS_PER_TOKEN)
 
 
+# ---------------------------------------------------------------------------
+# Image token estimation (2026-09-03). The old flat 6,000-char guess
+# (~1,875 tokens) undershot reality: LFM2.5-VL's mmproj tiles images into
+# 512px patches (SigLIP2-NaFlex + pixel-unshuffle), so the token bill is
+# resolution-DEPENDENT — a 1080×1920 screenshot measured 2,341 prompt
+# tokens against llama-server (8 tiles × 256 + 256 thumbnail + text).
+# Under-budgeting made the planner think 7 images fit a 16K window when
+# they didn't: three eval questions died as HTTP 400s at 16.5-17.8K
+# tokens. The estimate below mirrors the observed tiling math and errs
+# HIGH (5% pad, conservative fallbacks) — the failure mode of guessing
+# high is one fewer file in the prompt, not a rejected request.
+# ---------------------------------------------------------------------------
+
+_IMG_TILE_PX = 512          # mmproj tile edge (LFM2-VL: native up to 512×512)
+_IMG_TOKENS_PER_TILE = 256  # (512/16)² patches / 4 (pixel unshuffle)
+_IMG_TOKEN_PAD = 1.05       # estimate errs high on purpose
+# Dimensions unreadable → assume a large image. 2,560 tokens ≈ a 9-tile
+# 1080p-class image; worst case we drop one file too many, never a 400.
+_IMG_FALLBACK_TOKENS = 2_560
+
+
+def _image_dimensions(data: bytes) -> tuple[int, int] | None:
+    """(width, height) from raw image bytes, header-only — no decoder.
+
+    Covers the formats build_content_blocks emits (content.IMAGE_EXTS:
+    png/jpeg/webp/gif) plus the PNGs render_pdf_pages_as_png produces.
+    Returns None when the header doesn't parse; callers fall back to a
+    conservative constant."""
+    try:
+        if len(data) < 24:
+            return None
+        # PNG: 8-byte signature, then IHDR chunk — width/height at 16..24.
+        if data[:8] == b"\x89PNG\r\n\x1a\n":
+            w = int.from_bytes(data[16:20], "big")
+            h = int.from_bytes(data[20:24], "big")
+            return (w, h) if w and h else None
+        # GIF: "GIF87a"/"GIF89a", then 16-bit LE logical screen size.
+        if data[:6] in (b"GIF87a", b"GIF89a"):
+            w = int.from_bytes(data[6:8], "little")
+            h = int.from_bytes(data[8:10], "little")
+            return (w, h) if w and h else None
+        # WEBP: RIFF container; VP8X carries 24-bit LE dims minus one.
+        if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+            chunk = data[12:16]
+            if chunk == b"VP8X" and len(data) >= 30:
+                w = int.from_bytes(data[24:27], "little") + 1
+                h = int.from_bytes(data[27:30], "little") + 1
+                return (w, h)
+            if chunk == b"VP8 " and len(data) >= 30:
+                w = int.from_bytes(data[26:28], "little") & 0x3FFF
+                h = int.from_bytes(data[28:30], "little") & 0x3FFF
+                return (w, h) if w and h else None
+            if chunk == b"VP8L" and len(data) >= 25:
+                bits = int.from_bytes(data[21:25], "little")
+                w = (bits & 0x3FFF) + 1
+                h = ((bits >> 14) & 0x3FFF) + 1
+                return (w, h)
+            return None
+        # JPEG: walk the marker segments to the first SOFn frame header.
+        if data[:2] == b"\xff\xd8":
+            i = 2
+            n = len(data)
+            while i + 9 < n:
+                if data[i] != 0xFF:
+                    i += 1
+                    continue
+                marker = data[i + 1]
+                if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
+                    i += 2
+                    continue
+                seg_len = int.from_bytes(data[i + 2 : i + 4], "big")
+                # SOF0-15 minus DHT(C4)/JPG(C8)/DAC(CC): frame header with dims
+                if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+                    h = int.from_bytes(data[i + 5 : i + 7], "big")
+                    w = int.from_bytes(data[i + 7 : i + 9], "big")
+                    return (w, h) if w and h else None
+                i += 2 + seg_len
+            return None
+    except Exception:  # noqa: BLE001 — a parse failure must never break answering
+        return None
+    return None
+
+
+# The encoder downscales anything above ~2 MP before tiling — a 37 MP
+# scan measured 7 tiles, not 96. Derived from calibration, not docs.
+_IMG_MAX_PIXELS = 2_000_000
+
+
+def estimate_image_tokens(width: int, height: int) -> int:
+    """Predicted LM token cost of one image through the LFM2.5-VL mmproj.
+
+    Model: downscale to <= _IMG_MAX_PIXELS preserving aspect ratio, then
+    each dimension resolves to its NEAREST whole tile count (not ceil —
+    mtmd snaps toward the grid), 256 tokens per tile, plus one 256-token
+    thumbnail whenever the image actually tiles.
+
+    Calibrated against llama-server 2026-09-03 (this machine, LFM2.5-VL-3B
+    Q6_K + Q8_0 mmproj), estimate/measured with the 5% pad:
+        184×326   →   268 /   79   (tiny images cost a floor tile; 3.4×
+                                    over but ~600 chars absolute — fine)
+        591×688   →   268 /  240   1.12
+        1024×1024 →  1344 / 1287   1.04
+        2016×1103 →  2419 / 2290   1.06
+        6913×5382 →  1881 / 1797   1.05  (downscale rule)
+    Always errs high past the single-tile floor — the failure mode is one
+    fewer file in the prompt, never a rejected request.
+    """
+    if width <= 0 or height <= 0:
+        return int(_IMG_FALLBACK_TOKENS * _IMG_TOKEN_PAD)
+    pixels = width * height
+    if pixels > _IMG_MAX_PIXELS:
+        scale = (_IMG_MAX_PIXELS / pixels) ** 0.5
+        width = width * scale
+        height = height * scale
+    cols = max(1, round(width / _IMG_TILE_PX))
+    rows = max(1, round(height / _IMG_TILE_PX))
+    tiles = cols * rows
+    tokens = tiles * _IMG_TOKENS_PER_TILE
+    if tiles > 1:
+        tokens += _IMG_TOKENS_PER_TILE  # thumbnail tile for global context
+    return int(tokens * _IMG_TOKEN_PAD)
+
+
 def _block_cost_chars(block: object) -> int:
-    """Budget cost of one message block. Non-text blocks (images on the
-    vision path) get a flat cost — an image is ~1-2K tokens once encoded."""
+    """Budget cost of one message block, in the same char units as
+    `_context_budget_chars` (tokens × _CHARS_PER_TOKEN).
+
+    Text blocks cost their length. Image blocks (BinaryContent) cost their
+    PREDICTED encoder token bill — resolution-dependent via
+    estimate_image_tokens, replacing the flat 6,000-char guess that let
+    over-budget prompts through as llama-server HTTP 400s."""
     if isinstance(block, str):
         return len(block)
-    return 6_000
+    data = getattr(block, "data", None)
+    dims = _image_dimensions(data) if isinstance(data, (bytes, bytearray)) else None
+    if dims is None:
+        tokens = int(_IMG_FALLBACK_TOKENS * _IMG_TOKEN_PAD)
+    else:
+        tokens = estimate_image_tokens(*dims)
+    return int(tokens * _CHARS_PER_TOKEN)
 
 
 def _trim_blocks_to_budget(

@@ -315,33 +315,21 @@ def build_chat_model(*, provider_override: str | None = None) -> OpenAIChatModel
 T = TypeVar("T", bound=BaseModel)
 
 
-def _timestamp_prefix() -> str:
-    """Short 'Current date and time: ...' line prepended to every LLM call.
+def _timestamp_line() -> str:
+    """The one wall-clock line any prompt may carry: local time with zone so
+    the model can reason about 'today', 'this semester', 'is this receipt
+    recent'. Evaluated per call, never baked into a system prompt.
 
-    Local time with timezone so the model can reason about 'today', 'this
-    semester', 'is this receipt recent', etc. Evaluated per-call, not baked
-    into the system prompt.
+    Nothing in this module adds it. Until 2026-09-06 every agent got it
+    prepended by default unless opted out, and two of the three agents
+    turned out to copy it: the summariser wrote the run date into file
+    identifiers (FileSummary fence, 2026-08-27) and the rewriter wrote it
+    into search queries (12 of 59 typed searches on the 2026-08-30 arm).
+    Now the only caller is the answer step, which places it itself
+    (src.answer._build_answer_message) directly above the question.
     """
     now = datetime.now().astimezone()
-    return f"Current date and time: {now.strftime('%A, %Y-%m-%d %H:%M %Z')}"
-
-
-def _prepend_timestamp(message: list) -> list:
-    return [_timestamp_prefix(), *message]
-
-
-# Agents whose output describes a FILE, not a conversation. The timestamp is
-# there so the answer step can resolve "this semester" or "is this receipt
-# recent" — at index time it is just a plausible-looking date sitting in the
-# context, and a 3B copies it. Measured on sem_4 after the prompt-example fix:
-# `2026-08-27` (the run date) turned up as a claimed *document identifier* in
-# a Cursor invoice, a finance handout and a VR storyboard, none of which
-# contain it. Same copying failure as the Jane Doe example, different source.
-_NO_TIMESTAMP_OUTPUTS = {"FileSummary"}
-
-
-def _wants_timestamp(output_type: type | None) -> bool:
-    return getattr(output_type, "__name__", "") not in _NO_TIMESTAMP_OUTPUTS
+    return f"Today: {now.strftime('%A, %Y-%m-%d %H:%M %Z')}"
 
 
 class ChatAgent(Protocol, Generic[T]):
@@ -481,10 +469,9 @@ class _CloudAgent(Generic[T]):
         # not wired today), concatenates text into one user message,
         # appends the JSON-shape reminder.
         msgs, _images_dropped = _flatten_message_for_local(
-            _prepend_timestamp(message)
-            if _wants_timestamp(self._output_type)
-            else message,
-            self._system_prompt
+            message,
+            self._system_prompt,
+            inline_images=False,
         )
         body: dict[str, Any] = {
             "model": self._model,
@@ -1034,6 +1021,8 @@ _local_image_drop_warned = False
 def _flatten_message_for_local(
     message: list,
     system_prompt: str,
+    *,
+    inline_images: bool = True,
 ) -> tuple[list[dict], list[bytes]]:
     """Convert the desktop-side message list into chat-completion format.
 
@@ -1041,24 +1030,39 @@ def _flatten_message_for_local(
     with `BinaryContent` for image-bearing T3 calls. We:
 
       - Pull the system prompt out as its own message
-      - Concatenate all string parts into one user message
-      - Collect image bytes from `BinaryContent` blocks (via duck-typed
-        `data` + `media_type` attributes) for the LocalLLM `images` kwarg
+      - Keep DOCUMENT ORDER: adjacent strings merge into one text run, and
+        each image becomes an `{"type": "image", "data": bytes,
+        "media_type": ...}` part sitting exactly where the block was, so
+        the transport can render it under its file header (the cloud
+        transport preserved this order all along; the local one used to
+        pull every image out and append them after all the text)
       - Drop any non-image binary blocks with a one-time warning
 
-    Returns `(messages, images)`. `images` is `[]` when the file is text-only.
-    The caller decides whether to forward `images` based on whether a
-    vision profile is registered.
+    `inline_images=False` omits the image parts (the OpenRouter raw-HTTP
+    body drops images; a `LocalAgent` with no vision profile does too).
+    The user message is a plain string when it carries no image parts,
+    so text-only requests keep the shape every log reader expects.
+
+    Returns `(messages, images)`. `images` is every image block's bytes
+    in order — the ones inlined and, with `inline_images=False`, the ones
+    dropped — so the caller can log the count either way.
     """
 
     global _local_image_drop_warned
 
-    text_parts: list[str] = []
+    parts: list[dict] = []          # text / image parts in document order
     image_blobs: list[bytes] = []
     n_dropped = 0
+
+    def _add_text(text: str) -> None:
+        if parts and parts[-1]["type"] == "text":
+            parts[-1]["text"] += "\n\n" + text
+        else:
+            parts.append({"type": "text", "text": text})
+
     for block in message:
         if isinstance(block, str):
-            text_parts.append(block)
+            _add_text(block)
             continue
         # BinaryContent is duck-typed here so we don't import pydantic_ai —
         # the local backend keeps that dep optional.
@@ -1066,6 +1070,8 @@ def _flatten_message_for_local(
         media = getattr(block, "media_type", "") or ""
         if isinstance(data, (bytes, bytearray)) and media.startswith("image/"):
             image_blobs.append(bytes(data))
+            if inline_images:
+                parts.append({"type": "image", "data": bytes(data), "media_type": media})
         else:
             n_dropped += 1
 
@@ -1082,13 +1088,22 @@ def _flatten_message_for_local(
     # Add a hint that the model should output JSON only — small models often
     # don't otherwise. parse_json_with_repair handles failures, but a clean
     # JSON-only response is faster + less noisy.
-    user_text = "\n\n".join(text_parts).strip() + (
-        "\n\nRespond with a single valid JSON object that matches the "
+    _add_text(
+        "Respond with a single valid JSON object that matches the "
         "requested schema. Do not include any prose before or after."
     )
+    if parts[0]["type"] == "text":
+        parts[0]["text"] = parts[0]["text"].lstrip()
+    parts[-1]["text"] = parts[-1]["text"].rstrip()
+
+    content: str | list[dict]
+    if all(p["type"] == "text" for p in parts):
+        content = parts[0]["text"]
+    else:
+        content = parts
     return [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_text},
+        {"role": "user", "content": content},
     ], image_blobs
 
 
@@ -1175,16 +1190,16 @@ class LocalAgent(Generic[T]):
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
 
-        msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message)
-            if _wants_timestamp(self._output_type)
-            else message,
-            self._system_prompt
-        )
         # Drop images when no vision profile is registered (rather than
         # raising), so users without the mmproj installed still get a
         # text-only summary instead of a hard failure.
-        if images and default_vision_profile() is None:
+        has_vision = default_vision_profile() is not None
+        msgs, images = _flatten_message_for_local(
+            message,
+            self._system_prompt,
+            inline_images=has_vision,
+        )
+        if not has_vision:
             images = []
         llm = get_local_llm()
         request_id = log_request(
@@ -1203,7 +1218,6 @@ class LocalAgent(Generic[T]):
                 thinking=thinking,
                 temperature=temperature,
                 max_tokens=LOCAL_MAX_TOKENS,
-                images=images or None,
                 response_format=self._response_format,
                 grammar=self._grammar,
             )
@@ -1228,13 +1242,13 @@ class LocalAgent(Generic[T]):
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
 
+        has_vision = default_vision_profile() is not None
         msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message)
-            if _wants_timestamp(self._output_type)
-            else message,
-            self._system_prompt
+            message,
+            self._system_prompt,
+            inline_images=has_vision,
         )
-        if images and default_vision_profile() is None:
+        if not has_vision:
             images = []
         llm = get_local_llm()
         request_id = log_request(
@@ -1253,7 +1267,6 @@ class LocalAgent(Generic[T]):
                 thinking=thinking,
                 temperature=temperature,
                 max_tokens=LOCAL_MAX_TOKENS,
-                images=images or None,
                 response_format=self._response_format,
                 grammar=self._grammar,
             )

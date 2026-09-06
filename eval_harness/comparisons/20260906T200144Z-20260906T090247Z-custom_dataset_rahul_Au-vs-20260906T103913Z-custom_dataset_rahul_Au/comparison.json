@@ -1,0 +1,1141 @@
+{
+  "baseline": "20260906T090247Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+  "generated_utc": "20260906T200144Z",
+  "pairs": [
+    {
+      "a": "20260906T090247Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+      "b": "20260906T103913Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+      "meta": {
+        "generated_utc": "20260906T200144Z",
+        "pairing_mode": "full",
+        "pairing_coverage": 1.0,
+        "n_paired": 120
+      },
+      "axes": {
+        "changed_axes": [
+          "code"
+        ],
+        "changed_knobs": [
+          "<code>"
+        ],
+        "confounded": false,
+        "params_diff": {},
+        "runtime": {
+          "a": {
+            "fingerprint": "2bd85ac1c6a9fd99",
+            "llama_server": "b10502",
+            "qdrant": null,
+            "model": "LiquidAI/LFM2.5-VL-3B-GGUF:Q6_K",
+            "gguf_sha256": "3753883a6b93",
+            "mmproj_sha256": "8ba27050dc88",
+            "col_model": "vidore/colqwen2.5-v0.2"
+          },
+          "b": {
+            "fingerprint": "2bd85ac1c6a9fd99",
+            "llama_server": "b10502",
+            "qdrant": null,
+            "model": "LiquidAI/LFM2.5-VL-3B-GGUF:Q6_K",
+            "gguf_sha256": "3753883a6b93",
+            "mmproj_sha256": "8ba27050dc88",
+            "col_model": "vidore/colqwen2.5-v0.2"
+          },
+          "changed": false,
+          "known": true
+        },
+        "backend_git_sha": {
+          "a": "92f9ba9472620033a839576d5765693b73044c36",
+          "b": "4ce90a80d874c4826e3f0f586927f2d07f795f1f"
+        },
+        "backend_commits_between": [
+          "4ce90a8 prompt: the clock sits above the question, and only the answer step places one",
+          "dab1867 prompt: system -> documents -> query; the wall-clock line closes the turn",
+          "14cd9c9 prompt: typed content parts replace the NUL-slot round trip for inline images",
+          "03ba954 prompt: images go under their file header on the local transport, not after all the text"
+        ],
+        "harness_git_sha": {
+          "a": "92f9ba9472620033a839576d5765693b73044c36",
+          "b": "0fd316bc6d6ce4411d5b334cb6e2c871ab45205c"
+        },
+        "golden_sha": {
+          "a": "0ebcdcbcdf109adb",
+          "b": "0ebcdcbcdf109adb"
+        },
+        "env_snapshot_diff": {
+          "MAGPIE_DATA_DIR": {
+            "a": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260906T090247Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite/raw/appdata",
+            "b": "~/Documents/GitHub/NotAnotherSpotlight/eval_harness/runs/20260906T103913Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite/raw/appdata"
+          },
+          "PATH": {
+            "a": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/85cce0381e78/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.48.0/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin:~/.claude/plugins/cache/runpod/runpod/1.2.0/bin",
+            "b": "~/Documents/GitHub/NotAnotherSpotlight/.venv/bin:~/.local/bin:/opt/homebrew/opt/ffmpeg-full/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/opt/homebrew/bin:/Applications/quarto/bin:~/.cargo/bin:~/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown/bin:~/.claude/plugins/cache/claude-plugins-official/vercel/0.48.0/bin:~/.claude/plugins/cache/claude-plugins-official/supabase/0.1.15/bin:~/.claude/plugins/cache/runpod/runpod/1.2.0/bin"
+          }
+        },
+        "solo_gate_structurally_off": {
+          "a": true,
+          "b": true
+        },
+        "rerank_coupling_warning": null
+      },
+      "comparison": {
+        "answer_authoritative": {
+          "n": 120,
+          "a_rate": 0.125,
+          "b_rate": 0.275,
+          "delta": 0.15,
+          "discordant_a_only": 2,
+          "discordant_b_only": 20,
+          "concordant_both": 13,
+          "concordant_neither": 85,
+          "mcnemar_p": 0.00012,
+          "enough_discordant": true,
+          "credible": true,
+          "basis": "judge"
+        },
+        "answer_deterministic": {
+          "n": 120,
+          "a_rate": 0.1,
+          "b_rate": 0.25,
+          "delta": 0.15,
+          "discordant_a_only": 2,
+          "discordant_b_only": 20,
+          "concordant_both": 10,
+          "concordant_neither": 88,
+          "mcnemar_p": 0.00012,
+          "enough_discordant": true,
+          "credible": true
+        },
+        "answer_judge": {
+          "n": 120,
+          "a_rate": 0.125,
+          "b_rate": 0.275,
+          "delta": 0.15,
+          "discordant_a_only": 2,
+          "discordant_b_only": 20,
+          "concordant_both": 13,
+          "concordant_neither": 85,
+          "mcnemar_p": 0.00012,
+          "enough_discordant": true,
+          "credible": true
+        },
+        "retrieval_hit1": {
+          "n": 104,
+          "a_rate": 0.9327,
+          "b_rate": 0.9327,
+          "delta": 0.0,
+          "discordant_a_only": 0,
+          "discordant_b_only": 0,
+          "concordant_both": 97,
+          "concordant_neither": 7,
+          "mcnemar_p": 1.0,
+          "enough_discordant": false,
+          "credible": false,
+          "basis": "end_to_end"
+        },
+        "abstention": {
+          "n": 120,
+          "a_rate": 0.4417,
+          "b_rate": 0.4167,
+          "delta": -0.025,
+          "discordant_a_only": 19,
+          "discordant_b_only": 16,
+          "concordant_both": 34,
+          "concordant_neither": 51,
+          "mcnemar_p": 0.73588,
+          "enough_discordant": true,
+          "credible": false,
+          "note": "outcome=abstained, not correctness"
+        },
+        "verdict_transitions": {
+          "wrong -> partial": 10,
+          "false_abstain -> wrong": 9,
+          "wrong -> false_abstain": 9,
+          "wrong -> correct": 8,
+          "false_answer -> correct_abstain": 6,
+          "false_abstain -> partial": 5,
+          "false_abstain -> correct": 4,
+          "partial -> wrong": 3,
+          "partial -> correct": 2,
+          "correct_abstain -> false_answer": 1,
+          "correct -> partial": 1
+        },
+        "slices": {
+          "phrasing": {
+            "full": {
+              "n": 60,
+              "a_rate": 0.1833,
+              "b_rate": 0.35,
+              "delta": 0.1667,
+              "discordant_a_only": 0,
+              "discordant_b_only": 10,
+              "concordant_both": 11,
+              "concordant_neither": 39,
+              "mcnemar_p": 0.00195,
+              "enough_discordant": true,
+              "credible": true
+            },
+            "typed": {
+              "n": 60,
+              "a_rate": 0.0667,
+              "b_rate": 0.2,
+              "delta": 0.1333,
+              "discordant_a_only": 2,
+              "discordant_b_only": 10,
+              "concordant_both": 2,
+              "concordant_neither": 46,
+              "mcnemar_p": 0.03857,
+              "enough_discordant": true,
+              "credible": true
+            }
+          },
+          "answer_type": {
+            "enumeration": {
+              "n": 12,
+              "a_rate": 0.1667,
+              "b_rate": 0.5833,
+              "delta": 0.4167,
+              "discordant_a_only": 0,
+              "discordant_b_only": 5,
+              "concordant_both": 2,
+              "concordant_neither": 5,
+              "mcnemar_p": 0.0625,
+              "enough_discordant": true,
+              "credible": false
+            },
+            "extractive": {
+              "n": 70,
+              "a_rate": 0.0571,
+              "b_rate": 0.1714,
+              "delta": 0.1143,
+              "discordant_a_only": 1,
+              "discordant_b_only": 9,
+              "concordant_both": 3,
+              "concordant_neither": 57,
+              "mcnemar_p": 0.02148,
+              "enough_discordant": true,
+              "credible": true
+            },
+            "not_found": {
+              "n": 16,
+              "a_rate": 0.5625,
+              "b_rate": 0.875,
+              "delta": 0.3125,
+              "discordant_a_only": 1,
+              "discordant_b_only": 6,
+              "concordant_both": 8,
+              "concordant_neither": 1,
+              "mcnemar_p": 0.125,
+              "enough_discordant": true,
+              "credible": false
+            },
+            "synthesis": {
+              "n": 22,
+              "a_rate": 0.0,
+              "b_rate": 0.0,
+              "delta": 0.0,
+              "discordant_a_only": 0,
+              "discordant_b_only": 0,
+              "concordant_both": 0,
+              "concordant_neither": 22,
+              "mcnemar_p": 1.0,
+              "enough_discordant": false,
+              "credible": false
+            }
+          }
+        },
+        "latency_paired": {
+          "n": 120,
+          "mean_delta_s": 0.99,
+          "p50_delta_s": 0.92
+        },
+        "flips": {
+          "answer_regressions": [
+            {
+              "qa_id": "nf-03-typed",
+              "question": "lease agreement",
+              "phrasing": "typed",
+              "verdict_a": "correct_abstain",
+              "verdict_b": "false_answer",
+              "det_a": "correct_abstain",
+              "det_b": "false_answer",
+              "judge_a": "correct_abstain",
+              "judge_b": "false_answer",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "",
+              "answer_b": "R.J. Reynolds Tobacco Company Growers Questionnaire",
+              "golden_answer": "No - there is no lease, rental, or tenancy agreement in these files."
+            },
+            {
+              "qa_id": "viz-01-typed",
+              "question": "food commodity price index chart cheapest one",
+              "phrasing": "typed",
+              "verdict_a": "correct",
+              "verdict_b": "partial",
+              "det_a": "correct",
+              "det_b": "partial",
+              "judge_a": "correct",
+              "judge_b": "partial",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "The cheapest commodity is Cocoa at 18.81",
+              "answer_b": "Cocoa",
+              "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
+            }
+          ],
+          "answer_wins": [
+            {
+              "qa_id": "nf-02-typed",
+              "question": "wedding invitation",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "wedding invitation",
+              "answer_b": "",
+              "golden_answer": "No - there is no wedding or party invitation card in these files."
+            },
+            {
+              "qa_id": "nf-04-full",
+              "question": "Pull up my Python notes from last semester.",
+              "phrasing": "full",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "C++ Tutorials [1], C++ Tutorials [2]",
+              "answer_b": "",
+              "golden_answer": "No - there are no Python notes. The handwritten programming notes are C++ only (the other handwritten series is physics/electrostatics)."
+            },
+            {
+              "qa_id": "nf-04-typed",
+              "question": "python notes",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "CseGyan-Cpp-Notes-11.pdf",
+              "answer_b": "",
+              "golden_answer": "No - there are no Python notes. The handwritten programming notes are C++ only (the other handwritten series is physics/electrostatics)."
+            },
+            {
+              "qa_id": "nf-06-typed",
+              "question": "training loss curve",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "training loss curve",
+              "answer_b": "",
+              "golden_answer": "No - no figure plots loss against epoch, iteration, or training step."
+            },
+            {
+              "qa_id": "nf-07-typed",
+              "question": "covid vaccination certificate",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "Australia's Coverage Target is 95%",
+              "answer_b": "",
+              "golden_answer": "No - there is no COVID-19 vaccination certificate or test result in these files."
+            },
+            {
+              "qa_id": "nf-08-typed",
+              "question": "chem notes",
+              "phrasing": "typed",
+              "verdict_a": "false_answer",
+              "verdict_b": "correct_abstain",
+              "det_a": "false_answer",
+              "det_b": "correct_abstain",
+              "judge_a": "false_answer",
+              "judge_b": "correct_abstain",
+              "hit1_a": null,
+              "hit1_b": null,
+              "answer_a": "Electric field",
+              "answer_b": "",
+              "golden_answer": "No - there are no handwritten chemistry notes; the handwritten notes are C++ and physics (electrostatics) only. Chemistry content does exist elsewhere in the files, but as scanned reports and slide decks, not as your notes."
+            },
+            {
+              "qa_id": "phone-01-typed",
+              "question": "that weather alerts settings screenshot what city was it",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Scoutdoors",
+              "answer_b": "Champaign, IL",
+              "golden_answer": "The Weather Notifications settings screen is set to Champaign, IL. Every toggle on it (Severe Weather Alerts, Lightning Alerts, KPLC 7 Alerts, Precipitation Alerts, Temperature Display) is switched on."
+            },
+            {
+              "qa_id": "phone-02-full",
+              "question": "In the photo where I'm holding up a small blue Intel mini-PC box, what is the exact model number printed on it?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "partial",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "palm",
+              "answer_b": "NUC5i7RYH",
+              "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
+            },
+            {
+              "qa_id": "phone-02-typed",
+              "question": "pic of the tiny intel box in its box, which model was it",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "palm",
+              "answer_b": "Intel NUC NUC5i7RYH",
+              "golden_answer": "It's an Intel NUC, model NUC5i7RYH. The blue retail box has the tagline \"The Shape that Fits the Future.\" and carries Intel Core i7 and Iris Graphics badges."
+            },
+            {
+              "qa_id": "phone-05-typed",
+              "question": "workout app screenshot with the numbered exercise list, what were the exercises",
+              "phrasing": "typed",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Turkey Cackle, STOP, Turkey Cluck 1, Turkey Cluck 2, Turkey Cutt 1, Turkey Cutt 2, STOP, Turkey Fighting Purr, Turkey Fly Down Cackle",
+              "answer_b": "Jumping Jacks, Wall Sit, Pushups, Abdominal Crunch, Step up onto chair, Squat, Triceps dip on chair",
+              "golden_answer": "The routine is called \"Original\" and the visible list runs: 1 Jumping Jacks, 2 Wall Sit, 3 Pushups, 4 Abdominal Crunch, 5 Step up onto chair, 6 Squat, 7 Triceps dip on chair. A teal bar at the bottom says \"Slide to start workout\"."
+            },
+            {
+              "qa_id": "phone-08-full",
+              "question": "On the bus app's rewards sign-up screen I saved, how many trips did you have to take to earn a free ticket, and what boarding perk did members get?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "partial",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "0 trips; priority (Group A) boarding",
+              "answer_b": "8 trips; priority (Group A) boarding as a rewards member",
+              "golden_answer": "The BoltBus \"My Bolt Rewards\" screen says you get a free one-way ticket for every 8 trips traveled (fees and taxes may apply), plus priority Group A boarding as a rewards member."
+            },
+            {
+              "qa_id": "phone-09-full",
+              "question": "In the dim bar photo where a neon beer sign hangs on a purple wall above a row of three lit arcade machines, which beer brand is the neon sign advertising?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "ORDER, TIP WELL, WALK AWAY.",
+              "answer_b": "Dos Equis",
+              "golden_answer": "The neon sign is a Dos Equis \"XX\" IMPORTED BEER sign, glowing red and orange on a purple painted wall. Below it are three lit-up upright arcade / video gambling machines, with a man in a pale short-sleeved polo standing at the leftmost one."
+            },
+            {
+              "qa_id": "phone-09-typed",
+              "question": "dark bar photo neon beer sign over the arcade machines which beer",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "correct",
+              "det_a": "false_abstain",
+              "det_b": "correct",
+              "judge_a": "false_abstain",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "",
+              "answer_b": "Dos Equis",
+              "golden_answer": "The neon sign is a Dos Equis \"XX\" IMPORTED BEER sign, glowing red and orange on a purple painted wall. Below it are three lit-up upright arcade / video gambling machines, with a man in a pale short-sleeved polo standing at the leftmost one."
+            },
+            {
+              "qa_id": "phone-10-full",
+              "question": "What brand and slogan are on the label of the old empty glass soda bottle I photographed on a concrete ledge next to a brick wall?",
+              "phrasing": "full",
+              "verdict_a": "partial",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "partial",
+              "judge_a": "partial",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "KayC, Delicious Root Beer",
+              "answer_b": "KayC, The FIRST for THIRST",
+              "golden_answer": "It's an old empty Kay C root beer bottle sitting on a concrete ledge against a brick wall. The red-and-white paper label reads \"The FIRST for THIRST \u2014 Drink Kay C \u2014 DELICIOUS ROOT BEER\"."
+            },
+            {
+              "qa_id": "rcpt-02-full",
+              "question": "What did I order on that McDonald's breakfast receipt with the two ChicMcMuffins, and what was the total?",
+              "phrasing": "full",
+              "verdict_a": "false_abstain",
+              "verdict_b": "correct",
+              "det_a": "false_abstain",
+              "det_b": "correct",
+              "judge_a": "false_abstain",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "",
+              "answer_b": "2 ChicMcMuffins, 11.00; 1 M Porridge, 5.60; 1 BM 2HotCakes, 10.00; 1 L Coke, 10.00; Total: 26.60",
+              "golden_answer": "That McDonald's takeout (McDonald's BHP Taman Melawati, 18/01/2018) was 2 ChicMcMuffin at 11.00, 1 M Porridge at 5.60, 1 BM 2HotCakes at 10.00 and 1 L Coke. TakeOut Total incl GST was 26.60."
+            },
+            {
+              "qa_id": "study-02-full",
+              "question": "Which OOP concepts did I list on the mind map I drew in my C++ notes?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "C++ features",
+              "answer_b": "message passing, polymorphism, abstraction, encapsulation, inheritance, dynamic binding, object, class, object is an instance of a class, class is a collection of objects, class is a \"passive\" entity,",
+              "golden_answer": "The OOPs concepts diagram in the C++ notes has eight branches around a \"Concepts of OOPs\" bubble: Object, Class, Inheritance, Message Passing, Polymorphism, Abstraction, Encapsulation and Dynamic Binding."
+            },
+            {
+              "qa_id": "viz-01-full",
+              "question": "In that long-term food commodity price index chart, which commodity had the lowest index value, and what was it?",
+              "phrasing": "full",
+              "verdict_a": "wrong",
+              "verdict_b": "correct",
+              "det_a": "wrong",
+              "det_b": "correct",
+              "judge_a": "wrong",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "Denmark, 0.81",
+              "answer_b": "Cocoa, 18.81",
+              "golden_answer": "Cocoa, at 18.81. In the Our World in Data chart 'Long-term price index in food commodities, 1850-2015', cocoa has the lowest index value of the fourteen commodities shown; lamb is highest at 103.7."
+            },
+            {
+              "qa_id": "viz-08-full",
+              "question": "In the millennials myths infographic, what share of millennials own a smartphone, and what share use it to feel connected to others?",
+              "phrasing": "full",
+              "verdict_a": "false_abstain",
+              "verdict_b": "correct",
+              "det_a": "false_abstain",
+              "det_b": "correct",
+              "judge_a": "false_abstain",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "",
+              "answer_b": "90%, 65%",
+              "golden_answer": "Under 'Myth 5: Millennials are always distracted by technology', the infographic says over 90% of millennials own a smartphone and 65% use it as a way to feel connected to others."
+            },
+            {
+              "qa_id": "viz-11-full",
+              "question": "In that Antarctic marine food web diagram, which seals are shown?",
+              "phrasing": "full",
+              "verdict_a": "partial",
+              "verdict_b": "correct",
+              "det_a": "partial",
+              "det_b": "correct",
+              "judge_a": "partial",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "leopard seal and penguins",
+              "answer_b": "leopard seal, penguins, elephant seal, other seals",
+              "golden_answer": "Three seal labels appear in that marine food web diagram: leopard seal, elephant seal, and a general 'other seals' group. The rest of the labelled organisms are baleen whale, smaller toothed whales, penguins, birds, fish, krill, carnivorous zooplankton, other herbivorous zooplankton, and phytoplankton."
+            },
+            {
+              "qa_id": "viz-11-typed",
+              "question": "antarctic food web diagram which seals were on it",
+              "phrasing": "typed",
+              "verdict_a": "false_abstain",
+              "verdict_b": "correct",
+              "det_a": "false_abstain",
+              "det_b": "correct",
+              "judge_a": "false_abstain",
+              "judge_b": "correct",
+              "hit1_a": 1.0,
+              "hit1_b": 1.0,
+              "answer_a": "",
+              "answer_b": "baleen whale, other seals, penguins, fish, krill, leopard seal, elephant seal, smaller toothed whales",
+              "golden_answer": "Three seal labels appear in that marine food web diagram: leopard seal, elephant seal, and a general 'other seals' group. The rest of the labelled organisms are baleen whale, smaller toothed whales, penguins, birds, fish, krill, carnivorous zooplankton, other herbivorous zooplankton, and phytoplankton."
+            }
+          ],
+          "retrieval_regressions": [],
+          "retrieval_wins": []
+        }
+      }
+    }
+  ],
+  "synthesis": {
+    "verdict": "The prompt-image-order change worked. Paired answer quality 0.125 -> 0.275 (delta +0.15), 22 discordant (2A/20B), McNemar p=0.00012 on the judge basis. Decision-grade: >=5 discordant, p<0.05, and 58/58 flips cause-attributed. Comparison is clean (single axis: code, 92f9ba9 -> 4ce90a8); params, golden_sha, index mount, judge model, rubric sha and provenance fingerprint all identical.",
+    "question_answered": "Did the prompt-image-order change work, and did it regress anything?",
+    "decision_grade": true,
+    "axes_changed": [
+      "code"
+    ],
+    "confounded": false,
+    "headline": {
+      "metric": "answer good (judge)",
+      "a": 0.125,
+      "b": 0.275,
+      "delta": 0.15,
+      "discordant_a": 2,
+      "discordant_b": 20,
+      "mcnemar_p": 0.00012,
+      "basis": "judge"
+    },
+    "flips_total": 58,
+    "cause_counts": {
+      "prompt_assembly": {
+        "n": 44,
+        "improve": 37,
+        "regress": 7,
+        "headline_discordant": 22
+      },
+      "guard": {
+        "n": 14,
+        "improve": 7,
+        "regress": 7,
+        "headline_discordant": 0
+      },
+      "retrieval_change": {
+        "n": 0,
+        "improve": 0,
+        "regress": 0,
+        "headline_discordant": 0
+      },
+      "model_variance": {
+        "n": 0,
+        "improve": 0,
+        "regress": 0,
+        "headline_discordant": 0
+      },
+      "judge_disagreement": {
+        "n": 0,
+        "improve": 0,
+        "regress": 0,
+        "headline_discordant": 0
+      },
+      "infra_error": {
+        "n": 0,
+        "improve": 0,
+        "regress": 0,
+        "headline_discordant": 0
+      }
+    },
+    "headline_binary_attribution": "all 22 discordant pairs are prompt_assembly; the 14 guard flips contribute 0 (they move within the bad-verdict set and never cross the good/bad boundary)",
+    "dominant_mechanism": "inline image placement under the --- File N --- header (change a); arm A shipped images out-of-band after all text so no image was bound to a header. Secondary: question-position move (change b), verbatim query echoes 5 -> 0, explains only 2 of 7 nf-* flips.",
+    "model_variance_note": "structurally unmeasurable: the user turn differs on 120/120 rows, so no row received identical inputs. Zero here means 'not assessable', not 'measured zero'.",
+    "judge_limited": false,
+    "judge_disagreement_fraction": 0.0,
+    "guard_finding": "14 guard flips split 7 improve / 7 regress - pure label noise, zero net and zero headline contribution. Guard causes 92% (33/36) of run B false abstentions vs 69% (31/45) in A. On an all-image corpus looks_fabricated() reduces to 'contains a numeral >= MIN_INTERESTING (100)'. Three verified defects: trailing-comma tokens silently dropped (float('1979,') raises); French decimal comma read as thousands separator (numerals('4,58') -> ['458']); threshold admits/destroys by currency denomination.",
+    "artifacts_not_regressions": [
+      "citation regression is a filter artifact at src/answer.py:971-987 - corrected, precision A 0.2885 / B 0.3846 and zero-citation rate 23.7% vs 23.5% (B better or flat, direction reverses)",
+      "answer length did not move: paired median +0.5 chars on the 50 rows non-empty in both arms",
+      "degenerate generation is 1 row per arm; phone-07-full already repeated 'Bud Light' in arm A"
+    ],
+    "unattributed": [
+      "latency residual: B slower on 78/119 rows (binomial p=4.4e-4), +4.4% excl. outlier, all inside the LLM call; every candidate cause tested and rejected; no same-code repeat run so host-noise floor unbounded",
+      "4ce90a8's prompt-cache rationale is untestable in this harness: 0/120 prompts carry history, 20/119 consecutive requests share a file list, and those 20 got slower"
+    ],
+    "slices_decision_grade": {
+      "phrasing=full": {
+        "delta": 0.1667,
+        "discordant_a": 0,
+        "discordant_b": 10,
+        "p": 0.00195
+      },
+      "phrasing=typed": {
+        "delta": 0.1333,
+        "discordant_a": 2,
+        "discordant_b": 10,
+        "p": 0.03857
+      },
+      "answer_type=extractive": {
+        "delta": 0.1143,
+        "discordant_a": 1,
+        "discordant_b": 9,
+        "p": 0.02148
+      }
+    },
+    "slices_not_decision_grade": {
+      "answer_type=enumeration": {
+        "delta": 0.4167,
+        "discordant_b": 5,
+        "p": 0.0625,
+        "reason": "p>=0.05"
+      },
+      "answer_type=not_found": {
+        "delta": 0.3125,
+        "discordant_a": 1,
+        "discordant_b": 6,
+        "p": 0.125,
+        "reason": "p>=0.05"
+      },
+      "answer_type=synthesis": {
+        "delta": 0.0,
+        "discordant": 0,
+        "reason": "nothing moved"
+      }
+    },
+    "recommended_next_run": {
+      "change": "re-run this arm with MAGPIE_GROUNDING_GUARD=0, nothing else",
+      "rationale": "the guard is the only thing between the measured +0.15 and the change's true effect; it causes 92% of B's false abstentions and deleted >=4 answers this change made correct",
+      "projected": "false_abstain 36 -> ~3, correct ~19 -> ~32",
+      "cost": "index store HIT (66974090bdcd62e6, ~0.2s mount, no index-side param change); answer phase ~2300-2400s; ~40 min plus judge",
+      "one_knob": true
+    },
+    "per_flip": {
+      "arch-02-typed": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "guard",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "arch-05-typed": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "guard",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "arch-06-typed": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "guard",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "arch-09-typed": {
+        "from": "false_abstain",
+        "to": "partial",
+        "cause": "guard",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "study-01-full": {
+        "from": "false_abstain",
+        "to": "partial",
+        "cause": "guard",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "study-05-full": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "guard",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "study-06-typed": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "guard",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "study-11-full": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "guard",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "study-11-typed": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "guard",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-04-full": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "guard",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "viz-04-typed": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "guard",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-05-full": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "guard",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "rcpt-07-typed": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "guard",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "rcpt-09-typed": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "guard",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "arch-01-typed": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "arch-08-full": {
+        "from": "false_abstain",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "arch-08-typed": {
+        "from": "false_abstain",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "study-02-full": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "study-04-full": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "study-04-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "study-07-full": {
+        "from": "partial",
+        "to": "wrong",
+        "cause": "prompt_assembly",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "study-08-full": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "prompt_assembly",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "study-10-full": {
+        "from": "wrong",
+        "to": "false_abstain",
+        "cause": "prompt_assembly",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "viz-01-full": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "viz-01-typed": {
+        "from": "correct",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "regress",
+        "crosses_headline_binary": true
+      },
+      "viz-02-full": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-02-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-03-full": {
+        "from": "false_abstain",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-03-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-05-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-06-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-07-typed": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "viz-08-full": {
+        "from": "false_abstain",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "viz-09-full": {
+        "from": "partial",
+        "to": "wrong",
+        "cause": "prompt_assembly",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "viz-09-typed": {
+        "from": "partial",
+        "to": "wrong",
+        "cause": "prompt_assembly",
+        "direction": "regress",
+        "crosses_headline_binary": false
+      },
+      "viz-11-full": {
+        "from": "partial",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "viz-11-typed": {
+        "from": "false_abstain",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "nf-02-typed": {
+        "from": "false_answer",
+        "to": "correct_abstain",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "nf-03-typed": {
+        "from": "correct_abstain",
+        "to": "false_answer",
+        "cause": "prompt_assembly",
+        "direction": "regress",
+        "crosses_headline_binary": true
+      },
+      "nf-04-full": {
+        "from": "false_answer",
+        "to": "correct_abstain",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "nf-04-typed": {
+        "from": "false_answer",
+        "to": "correct_abstain",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "nf-06-typed": {
+        "from": "false_answer",
+        "to": "correct_abstain",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "nf-07-typed": {
+        "from": "false_answer",
+        "to": "correct_abstain",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "nf-08-typed": {
+        "from": "false_answer",
+        "to": "correct_abstain",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-01-typed": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-02-full": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-02-typed": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-03-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "phone-05-typed": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-08-full": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-08-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "phone-09-full": {
+        "from": "wrong",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-09-typed": {
+        "from": "false_abstain",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "phone-10-full": {
+        "from": "partial",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "rcpt-02-full": {
+        "from": "false_abstain",
+        "to": "correct",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": true
+      },
+      "rcpt-02-typed": {
+        "from": "wrong",
+        "to": "partial",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "rcpt-08-full": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      },
+      "rcpt-08-typed": {
+        "from": "false_abstain",
+        "to": "wrong",
+        "cause": "prompt_assembly",
+        "direction": "improve",
+        "crosses_headline_binary": false
+      }
+    }
+  }
+}

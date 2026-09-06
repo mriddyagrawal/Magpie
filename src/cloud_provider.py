@@ -118,20 +118,26 @@ def _join_text(message: list) -> str:
 _FILE_HEADER = re.compile(r"^---\s*File\s+\d+:\s*(.+?)\s*---\s*$")
 
 
+_QUESTION_PREFIX = "Now answer this question:"
+# First lines of the query zone that follows the last file (see
+# src.answer._build_answer_message). Anything from here on is not snippet text.
+_QUERY_ZONE_PREFIXES = ("Previous conversation turns:", "Answer the question below")
+
+
 def _parse_answer_message(message: list) -> tuple[str, list[dict]]:
     """Split the answer-call message into (question, snippets[]).
 
-    The desktop builds messages like:
-        ["Current date and time: ...",
-         "Question: <user question>",
-         "--- File 1: /path/to/foo.pdf ---",
-         "<file content>",
-         "--- File 2: /path/to/bar.docx ---",
-         "<file content>",
-         ...]
+    The desktop builds (src.answer._build_answer_message, 2026-09-06):
+        ["\n--- File 1: /path/to/foo.pdf ---", "<file content>", ...,
+         "\n--- File N: /path/to/bar.docx ---", "<file content>",
+         "\n<history + guidance>",      # query zone
+         "\n<cloud JSON contract>",     # optional
+         "\nToday: <clock>",
+         "Now answer this question: <user question>"]
 
-    We slice it on the `--- File N: <path> ---` markers to recover the
-    structured form the cloud expects.
+    We slice on the `--- File N: <path> ---` markers to recover the
+    structured form the cloud expects, stop collecting at the query zone,
+    and take the question from its `Now answer this question:` line.
     """
     parts = _strings_only(message)
     question = ""
@@ -145,21 +151,28 @@ def _parse_answer_message(message: list) -> tuple[str, list[dict]]:
             snippets.append({"path": current_path, "text": "\n".join(current_buf).strip()})
 
     for part in parts:
-        for line in part.splitlines():
-            m = _FILE_HEADER.match(line.strip())
-            if m:
-                flush()
-                current_path = m.group(1)
-                current_buf = []
-                continue
-            if current_path is not None:
-                current_buf.append(line)
-            elif line.startswith("Question:"):
-                question = line[len("Question:"):].strip()
+        stripped = part.strip()
+        m = _FILE_HEADER.match(stripped)
+        if m:
+            flush()
+            current_path = m.group(1)
+            current_buf = []
+            continue
+        if stripped.startswith(_QUESTION_PREFIX):
+            flush()
+            current_path = None
+            question = stripped[len(_QUESTION_PREFIX):].strip()
+            continue
+        if stripped.startswith(_QUERY_ZONE_PREFIXES):
+            flush()
+            current_path = None
+            continue
+        if current_path is not None:
+            current_buf.append(part)
 
     flush()
-    # If we never saw a "Question:" prefix, fall back to using the first
-    # non-header text block as the question (defensive).
+    # Defensive fallback for a layout we don't recognise: the first
+    # non-header text block's first line.
     if not question and parts:
         for p in parts:
             stripped = p.strip()

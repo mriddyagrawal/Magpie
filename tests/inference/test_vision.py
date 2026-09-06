@@ -24,6 +24,8 @@ from src.inference.local_llm import (
     LlamaServerLLM,
     _attach_images_to_last_user,
     _detect_image_media_type,
+    _prepare,
+    _prompt_text,
 )
 from src.inference.profiles import (
     LaunchArgs,
@@ -125,6 +127,61 @@ def test_attach_images_empty_text_skips_text_block():
     parts = out[0]["content"]
     assert len(parts) == 1
     assert parts[0]["type"] == "image_url"
+
+
+def test_prepare_renders_inline_image_parts_in_place():
+    """The whole point: an image lands under ITS file header, not after
+    every file's text (the pre-2026-09 tail placement)."""
+    msgs = [
+        {"role": "system", "content": "S"},
+        {"role": "user", "content": [
+            {"type": "text", "text": "Q\n--- File 1: a.png ---"},
+            {"type": "image", "data": b"\x89PNG\r\n\x1a\none", "media_type": "image/png"},
+            {"type": "text", "text": "--- File 2: b.jpg ---"},
+            {"type": "image", "data": b"\xff\xd8\xfftwo", "media_type": "image/jpeg"},
+            {"type": "text", "text": "Now answer: Q"},
+        ]},
+    ]
+    out, blobs = _prepare(msgs)
+    assert out[0] == msgs[0]
+    parts = out[1]["content"]
+    assert [p["type"] for p in parts] == ["text", "image_url", "text", "image_url", "text"]
+    assert parts[1]["image_url"]["url"].startswith("data:image/png;base64,")
+    assert parts[3]["image_url"]["url"].startswith("data:image/jpeg;base64,")
+    assert blobs == [b"\x89PNG\r\n\x1a\none", b"\xff\xd8\xfftwo"]
+    # input untouched, and no raw bytes left in what goes on the wire
+    assert msgs[1]["content"][1]["type"] == "image"
+    assert not any(isinstance(p.get("data"), bytes) for p in parts)
+
+
+def test_prepare_kwarg_images_go_to_the_tail_after_inline_ones():
+    msgs = [{"role": "user", "content": [
+        {"type": "image", "data": b"\x89PNG\r\n\x1a\ninline", "media_type": "image/png"},
+        {"type": "text", "text": "t"},
+    ]}]
+    out, blobs = _prepare(msgs, [b"\x89PNG\r\n\x1a\nbare"])
+    parts = out[0]["content"]
+    assert [p["type"] for p in parts] == ["image_url", "text", "image_url"]
+    assert blobs == [b"\x89PNG\r\n\x1a\ninline", b"\x89PNG\r\n\x1a\nbare"]
+
+
+def test_prepare_plain_string_messages_pass_through_unchanged():
+    msgs = [{"role": "user", "content": "plain"}]
+    out, blobs = _prepare(msgs)
+    assert out == msgs and blobs == []
+    assert _attach_images_to_last_user(msgs, []) is msgs
+
+
+def test_prompt_text_joins_parts_of_one_message_without_separator():
+    msgs = [
+        {"role": "system", "content": "S"},
+        {"role": "user", "content": [
+            {"type": "text", "text": "a"},
+            {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAAA"}},
+            {"type": "text", "text": "b"},
+        ]},
+    ]
+    assert _prompt_text(msgs) == "S\nab"
 
 
 # ---------------------------------------------------------------------------

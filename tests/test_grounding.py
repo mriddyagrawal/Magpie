@@ -158,19 +158,20 @@ def test_scrubber_counts_the_filename_as_evidence(tmp_path, monkeypatch):
     assert "2025" in scrub_invented_numbers(s, src).summary
 
 
-def test_summarizer_gets_no_timestamp_but_the_answer_step_does():
-    """The 'Current date and time' line lets the ANSWER step resolve 'this
-    semester' or 'is this receipt recent'. At index time it is just a
-    plausible date sitting in the context, and a 3B copies it: after the
-    prompt-example fix, `2026-08-27` (the run date) showed up as a claimed
-    document identifier in a Cursor invoice, a finance handout and a VR
-    storyboard, none of which contain it."""
-    from src.answer import Answer
-    from src.llm import _wants_timestamp
-    from src.stage1.summarize import FileSummary
+def test_summarizer_and_rewriter_get_no_clock_but_the_answer_step_does():
+    """The 'Today:' line lets the ANSWER step resolve 'this semester' or 'is
+    this receipt recent'. At index time it is just a plausible date sitting
+    in the context, and a 3B copies it: `2026-08-27` (the run date) showed
+    up as a claimed document identifier in a Cursor invoice, a finance
+    handout and a VR storyboard. The rewriter did the same into search
+    queries (12 of 59 typed searches on the 2026-08-30 arm). So the clock is
+    placed by the answer step only (src.answer._build_answer_message)."""
+    from src.answer import _build_answer_message
+    from src.stage2.search import _build_rewrite_prompt
 
-    assert _wants_timestamp(FileSummary) is False
-    assert _wants_timestamp(Answer) is True
+    ans = _build_answer_message("q", [("a.txt", ["Content type: txt\n\n---\nx"])], None, False)
+    assert any(isinstance(m, str) and m.lstrip().startswith("Today:") for m in ans)
+    assert "Today:" not in _build_rewrite_prompt("q", None)
 
 
 def test_control_characters_are_stripped_from_extracted_text(tmp_path, monkeypatch):

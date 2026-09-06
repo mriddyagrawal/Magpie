@@ -1,0 +1,1512 @@
+{
+  "rubric_version": "2.0",
+  "judge_model": "claude-opus-5",
+  "run_id": "20260906T090247Z-custom_dataset_rahul_Aug30-custom-rahul-topk2-rerank-off-norewrite",
+  "mode": "full_context",
+  "verdicts": {
+    "viz-01-typed": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "States Cocoa at 18.81 and cites chart_001.jpg, matching the gold exactly."
+    },
+    "viz-01-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'Denmark, 0.81', a value from the rank-2 chart_030.jpg rather than the food-commodity index chart."
+    },
+    "viz-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "chart_010.jpg lists only UAE 94, Mauritania 91, Spain 88, Armenia 73, South Korea 72; Australia is not on the chart at all."
+    },
+    "viz-02-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Spain is on chart_010.jpg but at 88%, the third-highest bar; the lowest is South Korea at 72%."
+    },
+    "viz-03-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returns 'Tweet #2', content from an unrelated file, and names no emotion or NET value."
+    },
+    "viz-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with the structured not_found flag even though chart_005.jpg was retrieved at rank 1."
+    },
+    "viz-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Declined although chart_037.jpg, which carries the 1979 and 2014 rows, was retrieved at rank 1."
+    },
+    "viz-04-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": true,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "chart_037.jpg shows right-wing to far right at 20% in 2014; the answer's 29% is the adjacent center-right segment, so it contradicts the file."
+    },
+    "viz-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "chart_036.jpg contains Egypt, Tunisia, Madagascar and Mozambique, so naming Mauritania and Fiji as appearing in both charts contradicts the files."
+    },
+    "viz-05-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Declined although both gold charts (chart_002.jpg, chart_036.jpg) were retrieved at ranks 1 and 2."
+    },
+    "viz-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "The answer is a verbatim echo of the query string and states no value from info_024.jpg."
+    },
+    "viz-06-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "info_024.jpg prints '1.7 MILLION / 1 in 10 adults' as one figure and '$6 BILLION' annual cost; the answer gives both, though it cites info_015.jpg instead of the gold source."
+    },
+    "viz-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with info_001.jpg retrieved at rank 1."
+    },
+    "viz-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with info_001.jpg retrieved at rank 1."
+    },
+    "viz-08-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers '7', which is neither the 90% smartphone-ownership figure nor the 65% connection figure."
+    },
+    "viz-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with info_020.jpg retrieved at rank 1."
+    },
+    "viz-09-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Gets the comparison direction right (tourism bigger) and cites both gold infographics, but supplies neither the $98 billion nor the $6 billion figure."
+    },
+    "viz-09-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": true
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "The $6 billion diabetes cost and the direction are right, but info_013.jpg gives total contribution as $98 billion; the quoted $43.4 billion is the Tourism GVA line, not the total the question asked for."
+    },
+    "viz-10-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Explains the 'ob' prefix as widest-at-the-apex but never says what cordate itself means."
+    },
+    "viz-10-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gives cordate = heart-shaped and the 'ob' prefix = blade widest near the apex, matching the gold; it cites no file despite not abstaining."
+    },
+    "viz-11-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Declined although diagram_011.jpg, a duplicate of the gold food-web figure, was retrieved at rank 1."
+    },
+    "viz-11-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "diagram_011.jpg labels leopard seal, elephant seal and other seals; the answer names only the leopard seal and then miscounts penguins as a seal."
+    },
+    "arch-01-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with doc_10877.jpg retrieved at rank 1."
+    },
+    "arch-01-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with doc_10877.jpg retrieved at rank 1."
+    },
+    "arch-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers with a company name, 'Bouygues Telecom', instead of the 4,58 euro per-share figure."
+    },
+    "arch-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with table_fr_001.jpg retrieved at rank 1."
+    },
+    "arch-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with scan_fybg0227.pdf retrieved at rank 1."
+    },
+    "arch-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with scan_fybg0227.pdf retrieved at rank 1."
+    },
+    "arch-04-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gives the 55.25 balance the question asks for but not the A-3088 invoice number, and cites nothing."
+    },
+    "arch-04-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gives the 55.25 balance but not the A-3088 invoice number, and cites nothing."
+    },
+    "arch-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": true
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "doc_357.jpg states tomato juice with added salt at 660 mg versus diet Coke at 35 mg or less; the answer claims both are about 35 mg, contradicting the leaflet."
+    },
+    "arch-05-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Declined although doc_357.jpg, which carries both figures in one paragraph, was retrieved at rank 1."
+    },
+    "arch-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers only 'Fort Morgan Sugar Factory', restating the question's subject and giving neither the 1506.0 ppm solids nor the 7.8 pH."
+    },
+    "arch-06-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined after retrieving twelve candidates including scan_gzyh0227.pdf at rank 1."
+    },
+    "arch-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with both gold KLM tables retrieved at ranks 1 and 2."
+    },
+    "arch-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with both gold KLM tables retrieved at ranks 1 and 2."
+    },
+    "arch-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with scan_psjf0226.pdf retrieved at rank 1."
+    },
+    "arch-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined with scan_psjf0226.pdf retrieved at rank 1."
+    },
+    "arch-09-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on a two-document comparison question."
+    },
+    "arch-09-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on a two-document comparison question."
+    },
+    "arch-10-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the French airline income statement question."
+    },
+    "arch-10-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the French airline income statement question."
+    },
+    "study-01-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on an easy first-page lookup in the C++ notes."
+    },
+    "study-01-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on an easy first-page lookup in the C++ notes."
+    },
+    "study-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false,
+        "7": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'C++ features', the heading of the rank-1 page CseGyan-Cpp-Notes-7.pdf, and lists none of the eight OOP branches."
+    },
+    "study-02-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false,
+        "7": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Same 'C++ features' non-answer from the wrong page; no OOP concept is named."
+    },
+    "study-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the solar economics slide."
+    },
+    "study-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the solar economics slide."
+    },
+    "study-04-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'C++ Tutorials [1]', a document title rather than the ternary operator's syntax or example."
+    },
+    "study-04-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Reproduces the relational and logical operator sections from CseGyan-Cpp-Notes-14.pdf instead of the conditional-operator page."
+    },
+    "study-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Returns the properties of electric field lines from a different page of the electrostatics notes; the torque page (electric-charge-and-field-9.pdf) is not used."
+    },
+    "study-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": true,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "electric-charge-and-field-9.pdf marks 180 degrees unstable and 90 degrees as tau_max = PE; the answer says unstable at 90 degrees, contradicting the page."
+    },
+    "study-06-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Describes magnitude/redshift distributions (arxiv_018.png), not the 1+/1- fold-split figure in arxiv_017.png."
+    },
+    "study-06-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "arxiv_017.png brackets folds 1-3 as train, 4 as validation and 5 as test; the answer's 1=train, 2=validation, 3-5=test contradicts the brackets."
+    },
+    "study-07-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "'Attribute SBM wins' is the right conclusion for arxiv_004.png but states none of the axes, series or NMI values."
+    },
+    "study-07-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": true,
+        "2": false,
+        "3": false,
+        "4": true
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Names both series and the saturation near NMI 1.00 correctly; 'outperforms across all Pin/Pout' overstates a curve where the two meet at Pin/Pout 5, and no early-recovery numbers are given."
+    },
+    "study-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": null,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Declined although deck_027.pdf contains the pie chart on its last page."
+    },
+    "study-08-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "The pie chart in deck_027.pdf reads Biosensors 8% and LC/MS 38%; the answer's 30% and 'MEMS and microfluidics 40%' come from the unrelated prototype-integration slide."
+    },
+    "study-09-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Asserts Q' = V K^T with V as the query matrix, which inverts the figure's Q'(K')^T V decomposition."
+    },
+    "study-09-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Defines phi(q) as an integral of E.dS over a cylinder, i.e. Gauss's law from the physics notes, not the ReLU(Wu+b) feature map in the figure."
+    },
+    "study-10-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers with two document titles and cites the operator pages (Notes-14/15) rather than the type-casting pages (Notes-17/18/19)."
+    },
+    "study-10-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Names implicit and explicit casting but then reproduces the ternary/relational/logical operator pages it cited; neither conversion chain nor either code example appears."
+    },
+    "study-11-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the two mobile decks."
+    },
+    "study-11-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the two mobile decks."
+    },
+    "rcpt-01-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the Bornga receipt."
+    },
+    "rcpt-01-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the Bornga receipt."
+    },
+    "rcpt-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'McDonalds', the merchant already named in the question, and enumerates no line item or total."
+    },
+    "rcpt-02-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined although the typed variant of the same question reached bad_receipt_009.jpg."
+    },
+    "rcpt-03-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the RedVelvet Nutella cake receipt."
+    },
+    "rcpt-03-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the RedVelvet Nutella cake receipt."
+    },
+    "rcpt-04-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": true,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returns the 2.450 RM unit price only; the litres, the grade and the 86.00 total are missing and nothing is cited."
+    },
+    "rcpt-04-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": true,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returns the 2.450 RM unit price only; neither the 35.10 litres nor the 86.00 total is given."
+    },
+    "rcpt-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "bad_receipt_014.jpg is headed ASIA MART, Taman Sentosa, Klang, with 17 Delicia Chocolate and RM 32.70 total; 'Hallmark' appears nowhere on it."
+    },
+    "rcpt-05-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Again names 'Hallmark' and then denies the receipt states a shop, though bad_receipt_014.jpg prints ASIA MART in its header."
+    },
+    "rcpt-06-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the sliders-set receipt."
+    },
+    "rcpt-06-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the sliders-set receipt."
+    },
+    "rcpt-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the Korean BBQ group bill."
+    },
+    "rcpt-07-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the Korean BBQ group bill."
+    },
+    "rcpt-08-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the three-receipt Mr D.I.Y. aggregation."
+    },
+    "rcpt-08-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the three-receipt Mr D.I.Y. aggregation."
+    },
+    "rcpt-09-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "'Original brewed tea was pricier' compares a line item rather than the two visits, and gives neither bill total."
+    },
+    "rcpt-09-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the two-visit comparison."
+    },
+    "phone-01-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'Scoutdoors' and cites screen_24626.jpg, a different screenshot from the gold weather-notifications screen."
+    },
+    "phone-01-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers Champaign, IL and cites screen_24184.jpg."
+    },
+    "phone-02-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'palm' from an unrelated scene photo instead of the NUC5i7RYH model number."
+    },
+    "phone-02-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Same 'palm' answer from scene_52b557c0cff76f70.jpg; the Intel model number is not given."
+    },
+    "phone-03-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Returns the bar-sign text 'order, tip well, walk away' from a different photo rather than the beer brand on the crocheted hat."
+    },
+    "phone-03-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "1007129816.jpg shows 'Blitz Weinhard' carton panels; the answer 'Biltz' transposes the letters and drops Weinhard, so it identifies the brand only approximately."
+    },
+    "phone-04-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the Teignmouth cigarette-butt poster."
+    },
+    "phone-04-full": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the Teignmouth cigarette-butt poster."
+    },
+    "phone-05-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Lists turkey call names from an unrelated app screenshot instead of the seven exercises."
+    },
+    "phone-05-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true,
+        "4": true,
+        "5": true,
+        "6": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Lists all seven exercises in the right order; it cites no file despite not abstaining."
+    },
+    "phone-06-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "scene_4952cc3277229b18.jpg shows both LAGANSIDE 10K and the PURE RUNNING logo; the answer gives the race name only (see golden_issues)."
+    },
+    "phone-06-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Gives LAGANSIDE 10K, which fully answers the question asked, but omits the PURE RUNNING key fact (see golden_issues)."
+    },
+    "phone-07-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined although the full-phrasing twin enumerated the banners correctly."
+    },
+    "phone-07-full": {
+      "verdict": "correct",
+      "facts": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Names Crocs, Bud Light, Herbalife and Nautica; the repeated entries and 'Lift Off' are harmless additions but nothing is cited."
+    },
+    "phone-08-typed": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": false
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "screen_24243.jpg reads 'free one-way ticket for every 8 trips traveled'; the answer '0' contradicts it."
+    },
+    "phone-08-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false,
+        "1": true
+      },
+      "citation_ok": false,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Group A boarding is right, but '0 trips' contradicts the 8 trips printed on screen_24243.jpg."
+    },
+    "phone-09-typed": {
+      "verdict": "false_abstain",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Declined on the neon beer sign photo."
+    },
+    "phone-09-full": {
+      "verdict": "wrong",
+      "facts": {
+        "0": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returns the bar sign 'ORDER, TIP WELL, WALK AWAY' instead of the Dos Equis neon brand."
+    },
+    "phone-10-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "scene_40882a42d8d66b36.jpg reads 'The FIRST for THIRST / Drink Kay C / DELICIOUS ROOT BEER'; the answer gives the brand but not the slogan the question asked for."
+    },
+    "phone-10-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false
+      },
+      "citation_ok": true,
+      "source_consulted": true,
+      "undecidable": false,
+      "reason": "Gives Kay C and the 'Delicious Root Beer' strapline but not the 'The FIRST for THIRST' slogan printed above it."
+    },
+    "phone-11-typed": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": false,
+        "2": true
+      },
+      "citation_ok": true,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gets the 30-day cycle and the 5-star pop-up request across both screenshots but omits the 5-day period duration."
+    },
+    "phone-11-full": {
+      "verdict": "partial",
+      "facts": {
+        "0": true,
+        "1": true,
+        "2": false
+      },
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Gives both settings values but ignores the second half of the question about the pop-up, and cites nothing."
+    },
+    "nf-01-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined; no passport or licence exists in the corpus."
+    },
+    "nf-01-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined; no passport or licence exists in the corpus."
+    },
+    "nf-02-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Echoes 'wedding invitation' as an affirmative answer rather than declining."
+    },
+    "nf-02-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined on the wedding-invitation question."
+    },
+    "nf-03-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined; the lease distractors were not surfaced as an answer."
+    },
+    "nf-03-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined on the lease-agreement question."
+    },
+    "nf-04-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Offers CseGyan-Cpp-Notes-11.pdf as the Python notes; the handwritten programming notes are C++ only."
+    },
+    "nf-04-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Returns two C++ tutorial pages in response to a request for Python notes."
+    },
+    "nf-05-typed": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined; no academic transcript exists in the corpus."
+    },
+    "nf-05-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined; no transcript or degree certificate exists in the corpus."
+    },
+    "nf-06-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Echoes 'training loss curve' and cites arxiv_027.png, exactly the lexical distractor the item was built around."
+    },
+    "nf-06-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Correctly declined; no figure plots loss against epoch or step."
+    },
+    "nf-07-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Supplies a concrete figure, \"Australia's Coverage Target is 95%\", for a certificate that does not exist."
+    },
+    "nf-07-full": {
+      "verdict": "correct_abstain",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'No', which is a correct decline in prose even though the structured not_found flag was not set."
+    },
+    "nf-08-typed": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": null,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Answers 'Electric field', surfacing the physics notes as if they were the requested chemistry notes."
+    },
+    "nf-08-full": {
+      "verdict": "false_answer",
+      "facts": {},
+      "citation_ok": false,
+      "source_consulted": false,
+      "undecidable": false,
+      "reason": "Affirms 'Yes' and names a physics PDF and a C++ PDF as the handwritten chemistry notes."
+    }
+  },
+  "golden_issues": [
+    {
+      "qa_id": "phone-06-typed",
+      "problem": "key_facts includes 'Pure Running', the timing sponsor's logo on the bib, but neither phrasing asks for it - both ask only for the race name. Verified on scene_4952cc3277229b18.jpg: both strings are genuinely printed, so the gold is factually right but over-specified, and an answer that fully answers the question ('Laganside 10K') is forced to partial."
+    },
+    {
+      "qa_id": "phone-06-full",
+      "problem": "Same over-specified key_facts as phone-06-typed: 'Pure Running' is not part of what the question asks ('What race name is printed on the bib'), so a complete answer scores partial."
+    },
+    {
+      "qa_id": "arch-04-typed",
+      "problem": "key_facts includes the invoice number 'A-3088', which neither phrasing asks for - both ask only for the balance due. An answer giving the correct 55.25 balance is therefore capped at partial."
+    },
+    {
+      "qa_id": "arch-04-full",
+      "problem": "Same as arch-04-typed: 'A-3088' is not requested by 'what was the balance due after the advance payment was applied'."
+    },
+    {
+      "qa_id": "viz-06-full",
+      "problem": "key_facts lists '$6 billion' and '1.7 million', but info_024.jpg prints '1.7 MILLION' and '1 in 10 adults' as a single affected-population figure and the golden_answer itself equates them ('1.7 million Australians, or 1 in 10 adults'). A string matcher marks the equivalent phrasing as a miss; the key_facts entry should accept either form."
+    },
+    {
+      "qa_id": "viz-11-typed",
+      "problem": "gold_sources names diagram_003.jpg, but diagram_011.jpg (listed under acceptable_sources) is a visually identical copy of the same Antarctic food-web figure - verified by opening both. The corpus contains duplicate images, so the single 'gold' designation is arbitrary and any citation metric over this item measures duplicate selection, not correctness."
+    },
+    {
+      "qa_id": "viz-11-full",
+      "problem": "Same duplicate-source issue as viz-11-typed: diagram_003.jpg and diagram_011.jpg are the same figure, so retrieval cannot meaningfully prefer one."
+    }
+  ],
+  "summary": {
+    "n": 120,
+    "correct": 6,
+    "partial": 17,
+    "wrong": 36,
+    "false_abstain": 45,
+    "correct_abstain": 9,
+    "false_answer": 7,
+    "by_phrasing": {
+      "typed": {
+        "correct": 1,
+        "n": 60
+      },
+      "full": {
+        "correct": 5,
+        "n": 60
+      }
+    },
+    "disagreements_with_deterministic": 13
+  },
+  "judge_model_self_report": "claude-opus-5",
+  "judge_model_source": "wrapper_requested (self-report advisory)",
+  "judge_model_requested": "claude-opus-5",
+  "rubric_sha": "47e93a279e70cef9",
+  "matcher_audit": {
+    "matrix": {
+      "correct": {
+        "n": 4,
+        "judge_agrees": 4
+      },
+      "wrong": {
+        "n": 38,
+        "judge_agrees": 32
+      },
+      "false_abstain": {
+        "n": 45,
+        "judge_agrees": 45
+      },
+      "partial": {
+        "n": 17,
+        "judge_agrees": 11
+      },
+      "correct_abstain": {
+        "n": 8,
+        "judge_agrees": 8
+      },
+      "false_answer": {
+        "n": 8,
+        "judge_agrees": 7
+      }
+    },
+    "matcher_precision": 1.0,
+    "note": "precision = P(judge also says correct | deterministic said correct)"
+  }
+}

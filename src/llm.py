@@ -315,8 +315,8 @@ def build_chat_model(*, provider_override: str | None = None) -> OpenAIChatModel
 T = TypeVar("T", bound=BaseModel)
 
 
-def _timestamp_prefix() -> str:
-    """Short 'Current date and time: ...' line prepended to every LLM call.
+def _timestamp_line() -> str:
+    """Short 'Current date and time: ...' line appended to every LLM call.
 
     Local time with timezone so the model can reason about 'today', 'this
     semester', 'is this receipt recent', etc. Evaluated per-call, not baked
@@ -326,8 +326,12 @@ def _timestamp_prefix() -> str:
     return f"Current date and time: {now.strftime('%A, %Y-%m-%d %H:%M %Z')}"
 
 
-def _prepend_timestamp(message: list) -> list:
-    return [_timestamp_prefix(), *message]
+def _append_timestamp(message: list) -> list:
+    """The wall-clock line as the LAST element of the user turn (2026-09-06;
+    it used to open the turn). Everything before it - system prompt, files
+    - is then a stable prefix that llama-server's prompt cache can reuse
+    across turns, and the date is no longer the first thing a 3B reads."""
+    return [*message, _timestamp_line()]
 
 
 # Agents whose output describes a FILE, not a conversation. The timestamp is
@@ -481,7 +485,7 @@ class _CloudAgent(Generic[T]):
         # not wired today), concatenates text into one user message,
         # appends the JSON-shape reminder.
         msgs, _images_dropped = _flatten_message_for_local(
-            _prepend_timestamp(message)
+            _append_timestamp(message)
             if _wants_timestamp(self._output_type)
             else message,
             self._system_prompt,
@@ -1209,7 +1213,7 @@ class LocalAgent(Generic[T]):
         # text-only summary instead of a hard failure.
         has_vision = default_vision_profile() is not None
         msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message)
+            _append_timestamp(message)
             if _wants_timestamp(self._output_type)
             else message,
             self._system_prompt,
@@ -1260,7 +1264,7 @@ class LocalAgent(Generic[T]):
 
         has_vision = default_vision_profile() is not None
         msgs, images = _flatten_message_for_local(
-            _prepend_timestamp(message)
+            _append_timestamp(message)
             if _wants_timestamp(self._output_type)
             else message,
             self._system_prompt,

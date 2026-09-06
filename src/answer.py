@@ -511,6 +511,172 @@ def _captioned(blocks: list, file_no: int) -> list:
     return out
 
 
+def _build_answer_message(
+    question: str,
+    per_file_blocks: list[tuple[str, list]],
+    history: list[tuple[str, str]] | None,
+    enumerate_lists: bool,
+) -> list:
+    """The answer-step user turn, as the heterogeneous list src.llm flattens.
+
+    Order (2026-09-06): files first, best-ranked LAST, images inline under
+    their headers; then the query zone — history, guidance, the cloud
+    JSON contract, the question — and src.llm appends the wall-clock line
+    after that. Rationale, in order of payoff:
+
+      1. llama-server's prompt cache matches on the longest common
+         prefix. With the question and a minute-granular timestamp at the
+         top, that prefix ended at the system prompt and every follow-up
+         re-prefilled the files. Now system + files is the prefix.
+      2. The bottom question copy is the one that matters for a 3B model
+         (Liu et al.); the top copy was a hedge that cost the cache.
+      3. The timestamp is no longer the first thing the model reads
+         before any document (the same copy-the-date failure the
+         FileSummary fence addressed, at answer time).
+
+    Pure: no I/O, no model. `per_file_blocks` must already be budgeted.
+    """
+    # Guidance lives in the query zone AFTER the files (see the order
+    # note on _build_answer_message), so it refers to "the files above".
+    intro_parts: list[str] = []
+    # One line, not a paragraph: the terminology and citation rules already
+    # live in the system prompt — re-explaining them here cost ~100 tokens
+    # per question and taught the model nothing new.
+    intro_parts.append(
+        "Answer the question below from the files above. If a file uses "
+        "a different word for the same concept, that still counts — see "
+        "the terminology rule."
+    )
+
+    # Situational guidance — injected only when the content that triggers
+    # it is actually in the message (see the block constants above).
+    _flags_text = "\n".join(
+        b for _d, _blocks in per_file_blocks for b in _blocks
+        if isinstance(b, str)
+    )
+    if "Content type: llm-summary" in _flags_text:
+        intro_parts.append("")
+        intro_parts.append(_SUMMARY_NOTE)
+    if _MATH_SIGNALS.search(_flags_text):
+        intro_parts.append("")
+        intro_parts.append(_MATH_BLOCK)
+    if "## PDF page" in _flags_text:
+        intro_parts.append("")
+        intro_parts.append(_PAGE_REF_BLOCK)
+
+    # If the user is asking an enumeration ("all my receipts" / "list every
+    # X" / "what stuff did I do in Y") query, the strict-grounding rules
+    # alone cause the LLM to cherry-pick a few "safe" representative items
+    # and drop borderline matches. Enumeration questions need the opposite
+    # stance: be exhaustive, include every file that plausibly fits, and
+    # let borderline cases in with a short hedge rather than dropping them.
+    # B1's classifier is the existing mechanism — re-run it here so the
+    # answer stage sees the same class the search layer used. Pure regex,
+    # no LLM call, cheap to run.
+    # SYNTHESIS MODE — targeted, not global (2026-08-24). A first attempt
+    # put a "multi-file answers are normal" permission into the SYSTEM
+    # prompt; cross-doc refusals improved (two first-ever wins) but
+    # single-doc questions started overthinking themselves into refusals —
+    # the previously-perfect q01 sentinel regressed on BOTH providers
+    # (Evaluations/college_data/REPORT.md). Injecting per-question, exactly
+    # like ENUMERATION MODE below, scopes the permission to the questions
+    # shaped like comparisons and leaves single-doc questions untouched.
+    import re as _re
+    _COMPARATIVE_RE = _re.compile(
+        r"\b(compare|versus|vs\.?|difference between|connects?|links?|"
+        r"in common|both .{0,40}\b(essays?|files?|documents?|letters?)|"
+        r"same (file|document|content)|are (these|those|they) .{0,20}same)\b",
+        _re.IGNORECASE,
+    )
+    if _COMPARATIVE_RE.search(question):
+        intro_parts.append("")
+        intro_parts.append(
+            "SYNTHESIS MODE: this question compares or connects things that "
+            "may live in DIFFERENT files. Assembling the answer from several "
+            "of the provided files is expected and correct: take fact A from "
+            "one file, fact B from another, state the comparison plainly, "
+            "and cite every file used in `sources_used`. Structure the "
+            "answer as one short labeled part per side (e.g. 'Rochester: … "
+            "Swarthmore: …'). The absence of a single file containing the "
+            "whole comparison is NOT a not-found case — declare not_found "
+            "only if a needed side is missing from EVERY provided file, and "
+            "name that missing side in `not_found_topic`."
+        )
+
+    # Off by default until measured; the arm that tests it sets
+    # MAGPIE_MULTIPART=1. Same escape-hatch shape as LOCAL_GRAMMAR.
+    if os.environ.get("MAGPIE_MULTIPART", "0").strip() == "1" and (
+        _MULTIPART_RE.search(question)
+    ):
+        intro_parts.append("")
+        intro_parts.append(_MULTIPART_BLOCK)
+
+    from src.stage2.query_classify import QueryClass, classify as _classify_q
+    if enumerate_lists and _classify_q(question) is QueryClass.LIST_ALL:
+        intro_parts.append(
+            ""
+        )
+        intro_parts.append(
+            "ENUMERATION MODE: this is a 'list all' / 'give me every X' "
+            "question. Be EXHAUSTIVE — include every file in the input "
+            "that plausibly fits the user's category. Do NOT cherry-pick "
+            "a few representative examples and drop the rest. If a file's "
+            "membership in the category is uncertain, include it with a "
+            "short hedge (e.g. '(possibly also a receipt)' / 'related: ...') "
+            "rather than omitting. The strict grounding rules still apply "
+            "— every line you write must be supported by visible file "
+            "text — but for enumeration queries, err on the side of "
+            "INCLUDING borderline matches rather than excluding them. "
+            "List every contributing file in `sources_used`, not just the "
+            "headline few."
+        )
+
+    # Reverse so the highest-ranked retrieval result lands closest to
+    # generation. Liu et al. (2023, "Lost in the Middle") found that
+    # smaller decoder-only models are heavily recency-biased
+    # (Llama-2 7B is "solely recency-biased"); Gemma 4 E4B sits in the
+    # same size class. Position effect is large — up to 20 points of
+    # accuracy and worse-than-closed-book in the worst case. The
+    # "File N" header is just an identifier — citation numbers
+    # (`[1]`, `[2]`) are 1-based into `sources_used`, which the model
+    # assembles itself, so reversing the prompt order doesn't affect
+    # the citation contract.
+    ordered_blocks = list(reversed(per_file_blocks))
+    message: list = []
+    for i, (display, blocks) in enumerate(ordered_blocks, 1):
+        message.append(f"\n--- File {i}: {display} ---")
+        message.extend(_captioned(blocks, i))
+
+    # Query zone: everything that changes per turn goes after the files —
+    # history, guidance, the JSON contract, the question. (The wall-clock
+    # line is appended after all of this by src.llm, see _append_timestamp.)
+    query_zone: list[str] = []
+    if history:
+        query_zone.append("Previous conversation turns:")
+        for i, (q, a) in enumerate(history, 1):
+            query_zone.append(f"[Turn {i}] Q: {q}")
+            query_zone.append(f"[Turn {i}] A: {a}")
+        query_zone.append("")
+    query_zone.extend(intro_parts)
+    message.append("\n" + "\n".join(query_zone))
+
+    # Prompt-enforced JSON contract, cloud only — the local grammar makes
+    # it unnecessary (see _FORMAT_BLOCK_CLOUD for the full rationale).
+    if _needs_prompted_format():
+        message.append(f"\n{_FORMAT_BLOCK_CLOUD}")
+
+    # The question, once, in the recency zone right before generation.
+    # Liu et al. found query-at-the-end had minimal impact on 30B+ models,
+    # but small recency-biased models benefit — otherwise the question is
+    # effectively "forgotten" after thousands of tokens of file content.
+    # Until 2026-09-06 a second copy also opened the message; it was
+    # dropped so the prefix (system + files) is identical across turns
+    # over the same files and llama-server's prompt cache can reuse it.
+    message.append(f"\nNow answer this question: {question}")
+    return message
+
+
+
 async def answer_question(
     agent: ChatAgent[Answer],
     question: str,
@@ -761,137 +927,7 @@ async def answer_question(
     if _budget is not None:
         per_file_blocks = _trim_blocks_to_budget(per_file_blocks, _budget)
 
-    # Assemble the chat message
-    intro_parts: list[str] = []
-    if history:
-        intro_parts.append("Previous conversation turns:")
-        for i, (q, a) in enumerate(history, 1):
-            intro_parts.append(f"[Turn {i}] Q: {q}")
-            intro_parts.append(f"[Turn {i}] A: {a}")
-        intro_parts.append("")
-    intro_parts.append(f"Current question: {question}")
-    intro_parts.append("")
-    # One line, not a paragraph: the terminology and citation rules already
-    # live in the system prompt — re-explaining them here cost ~100 tokens
-    # per question and taught the model nothing new.
-    intro_parts.append(
-        "Answer the current question from the files below. If a file uses "
-        "a different word for the same concept, that still counts — see "
-        "the terminology rule."
-    )
-
-    # Situational guidance — injected only when the content that triggers
-    # it is actually in the message (see the block constants above).
-    _flags_text = "\n".join(
-        b for _d, _blocks in per_file_blocks for b in _blocks
-        if isinstance(b, str)
-    )
-    if "Content type: llm-summary" in _flags_text:
-        intro_parts.append("")
-        intro_parts.append(_SUMMARY_NOTE)
-    if _MATH_SIGNALS.search(_flags_text):
-        intro_parts.append("")
-        intro_parts.append(_MATH_BLOCK)
-    if "## PDF page" in _flags_text:
-        intro_parts.append("")
-        intro_parts.append(_PAGE_REF_BLOCK)
-
-    # If the user is asking an enumeration ("all my receipts" / "list every
-    # X" / "what stuff did I do in Y") query, the strict-grounding rules
-    # alone cause the LLM to cherry-pick a few "safe" representative items
-    # and drop borderline matches. Enumeration questions need the opposite
-    # stance: be exhaustive, include every file that plausibly fits, and
-    # let borderline cases in with a short hedge rather than dropping them.
-    # B1's classifier is the existing mechanism — re-run it here so the
-    # answer stage sees the same class the search layer used. Pure regex,
-    # no LLM call, cheap to run.
-    # SYNTHESIS MODE — targeted, not global (2026-08-24). A first attempt
-    # put a "multi-file answers are normal" permission into the SYSTEM
-    # prompt; cross-doc refusals improved (two first-ever wins) but
-    # single-doc questions started overthinking themselves into refusals —
-    # the previously-perfect q01 sentinel regressed on BOTH providers
-    # (Evaluations/college_data/REPORT.md). Injecting per-question, exactly
-    # like ENUMERATION MODE below, scopes the permission to the questions
-    # shaped like comparisons and leaves single-doc questions untouched.
-    import re as _re
-    _COMPARATIVE_RE = _re.compile(
-        r"\b(compare|versus|vs\.?|difference between|connects?|links?|"
-        r"in common|both .{0,40}\b(essays?|files?|documents?|letters?)|"
-        r"same (file|document|content)|are (these|those|they) .{0,20}same)\b",
-        _re.IGNORECASE,
-    )
-    if _COMPARATIVE_RE.search(question):
-        intro_parts.append("")
-        intro_parts.append(
-            "SYNTHESIS MODE: this question compares or connects things that "
-            "may live in DIFFERENT files. Assembling the answer from several "
-            "of the provided files is expected and correct: take fact A from "
-            "one file, fact B from another, state the comparison plainly, "
-            "and cite every file used in `sources_used`. Structure the "
-            "answer as one short labeled part per side (e.g. 'Rochester: … "
-            "Swarthmore: …'). The absence of a single file containing the "
-            "whole comparison is NOT a not-found case — declare not_found "
-            "only if a needed side is missing from EVERY provided file, and "
-            "name that missing side in `not_found_topic`."
-        )
-
-    # Off by default until measured; the arm that tests it sets
-    # MAGPIE_MULTIPART=1. Same escape-hatch shape as LOCAL_GRAMMAR.
-    if os.environ.get("MAGPIE_MULTIPART", "0").strip() == "1" and (
-        _MULTIPART_RE.search(question)
-    ):
-        intro_parts.append("")
-        intro_parts.append(_MULTIPART_BLOCK)
-
-    from src.stage2.query_classify import QueryClass, classify as _classify_q
-    if enumerate_lists and _classify_q(question) is QueryClass.LIST_ALL:
-        intro_parts.append(
-            ""
-        )
-        intro_parts.append(
-            "ENUMERATION MODE: this is a 'list all' / 'give me every X' "
-            "question. Be EXHAUSTIVE — include every file in the input "
-            "that plausibly fits the user's category. Do NOT cherry-pick "
-            "a few representative examples and drop the rest. If a file's "
-            "membership in the category is uncertain, include it with a "
-            "short hedge (e.g. '(possibly also a receipt)' / 'related: ...') "
-            "rather than omitting. The strict grounding rules still apply "
-            "— every line you write must be supported by visible file "
-            "text — but for enumeration queries, err on the side of "
-            "INCLUDING borderline matches rather than excluding them. "
-            "List every contributing file in `sources_used`, not just the "
-            "headline few."
-        )
-
-    # Reverse so the highest-ranked retrieval result lands closest to
-    # generation. Liu et al. (2023, "Lost in the Middle") found that
-    # smaller decoder-only models are heavily recency-biased
-    # (Llama-2 7B is "solely recency-biased"); Gemma 4 E4B sits in the
-    # same size class. Position effect is large — up to 20 points of
-    # accuracy and worse-than-closed-book in the worst case. The
-    # "File N" header is just an identifier — citation numbers
-    # (`[1]`, `[2]`) are 1-based into `sources_used`, which the model
-    # assembles itself, so reversing the prompt order doesn't affect
-    # the citation contract.
-    ordered_blocks = list(reversed(per_file_blocks))
-    message: list = ["\n".join(intro_parts)]
-    for i, (display, blocks) in enumerate(ordered_blocks, 1):
-        message.append(f"\n--- File {i}: {display} ---")
-        message.extend(_captioned(blocks, i))
-
-    # Prompt-enforced JSON contract, cloud only — the local grammar makes
-    # it unnecessary (see _FORMAT_BLOCK_CLOUD for the full rationale).
-    if _needs_prompted_format():
-        message.append(f"\n{_FORMAT_BLOCK_CLOUD}")
-
-    # Echo the question once more at the bottom (query-aware
-    # contextualization). Liu et al. found this had minimal impact on
-    # multi-document QA for 30B+ models, but small recency-biased models
-    # benefit from having the question text in the recency zone right
-    # before generation — otherwise the question can effectively be
-    # "forgotten" after the model reads thousands of tokens of file
-    # content. Cheap (~15-30 tokens) for a real win on a 3B backend.
-    message.append(f"\nNow answer this question: {question}")
+    message = _build_answer_message(question, per_file_blocks, history, enumerate_lists)
 
     ans = await agent.run(message, temperature=temperature)
 

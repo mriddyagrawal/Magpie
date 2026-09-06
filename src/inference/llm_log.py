@@ -94,6 +94,10 @@ def _truncate(value: Any, max_chars: int = 50_000) -> Any:
     """Cap pathologically large strings so the log file doesn't
     explode. 50 KB is large enough for any realistic prompt + response;
     file-content blocks above that get tail-truncated with a marker."""
+    if isinstance(value, (bytes, bytearray)):
+        # Inline image parts carry raw bytes; the log records their size,
+        # never the pixels (the harness mines this file for prompt text).
+        return f"<{len(value)} bytes>"
     if isinstance(value, str) and len(value) > max_chars:
         return (
             value[: max_chars // 2]

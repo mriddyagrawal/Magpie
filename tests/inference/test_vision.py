@@ -20,11 +20,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.inference.image_slots import slot
 from src.inference.local_llm import (
     LlamaServerLLM,
     _attach_images_to_last_user,
     _detect_image_media_type,
+    _prepare,
     _prompt_text,
 )
 from src.inference.profiles import (
@@ -129,56 +129,47 @@ def test_attach_images_empty_text_skips_text_block():
     assert parts[0]["type"] == "image_url"
 
 
-def test_attach_images_interleaves_at_slots():
-    """The whole point of the slots: an image lands under ITS file header,
-    not after every file's text (the pre-slot tail placement)."""
-    text = f"Q\n--- File 1: a.png ---{slot(0)}\n--- File 2: b.jpg ---{slot(1)}\nNow answer: Q"
-    out = _attach_images_to_last_user(
-        [{"role": "user", "content": text}],
-        [b"\x89PNG\r\n\x1a\none", b"\xff\xd8\xfftwo"],
-    )
-    parts = out[0]["content"]
+def test_prepare_renders_inline_image_parts_in_place():
+    """The whole point: an image lands under ITS file header, not after
+    every file's text (the pre-2026-09 tail placement)."""
+    msgs = [
+        {"role": "system", "content": "S"},
+        {"role": "user", "content": [
+            {"type": "text", "text": "Q\n--- File 1: a.png ---"},
+            {"type": "image", "data": b"\x89PNG\r\n\x1a\none", "media_type": "image/png"},
+            {"type": "text", "text": "--- File 2: b.jpg ---"},
+            {"type": "image", "data": b"\xff\xd8\xfftwo", "media_type": "image/jpeg"},
+            {"type": "text", "text": "Now answer: Q"},
+        ]},
+    ]
+    out, blobs = _prepare(msgs)
+    assert out[0] == msgs[0]
+    parts = out[1]["content"]
     assert [p["type"] for p in parts] == ["text", "image_url", "text", "image_url", "text"]
-    assert parts[0]["text"] == "Q\n--- File 1: a.png ---"
-    assert parts[1]["image_url"]["url"].startswith("data:image/png;")
-    assert parts[2]["text"] == "\n--- File 2: b.jpg ---"
-    assert parts[3]["image_url"]["url"].startswith("data:image/jpeg;")
-    assert parts[4]["text"] == "\nNow answer: Q"
-    assert not any("\x00" in p.get("text", "") for p in parts)
+    assert parts[1]["image_url"]["url"].startswith("data:image/png;base64,")
+    assert parts[3]["image_url"]["url"].startswith("data:image/jpeg;base64,")
+    assert blobs == [b"\x89PNG\r\n\x1a\none", b"\xff\xd8\xfftwo"]
+    # input untouched, and no raw bytes left in what goes on the wire
+    assert msgs[1]["content"][1]["type"] == "image"
+    assert not any(isinstance(p.get("data"), bytes) for p in parts)
 
 
-def test_attach_images_unslotted_images_still_go_to_the_tail():
-    """One slotted, one bare: the bare one keeps the old tail placement."""
-    out = _attach_images_to_last_user(
-        [{"role": "user", "content": f"a{slot(1)}b"}],
-        [b"\x89PNG\r\n\x1a\nzero", b"\x89PNG\r\n\x1a\none"],
-    )
+def test_prepare_kwarg_images_go_to_the_tail_after_inline_ones():
+    msgs = [{"role": "user", "content": [
+        {"type": "image", "data": b"\x89PNG\r\n\x1a\ninline", "media_type": "image/png"},
+        {"type": "text", "text": "t"},
+    ]}]
+    out, blobs = _prepare(msgs, [b"\x89PNG\r\n\x1a\nbare"])
     parts = out[0]["content"]
-    assert [p["type"] for p in parts] == ["text", "image_url", "text", "image_url"]
-    assert "one" in parts[1]["image_url"]["url"] or True  # base64, checked by order below
-    import base64
-    assert base64.b64decode(parts[1]["image_url"]["url"].split(",", 1)[1]).endswith(b"one")
-    assert base64.b64decode(parts[3]["image_url"]["url"].split(",", 1)[1]).endswith(b"zero")
+    assert [p["type"] for p in parts] == ["image_url", "text", "image_url"]
+    assert blobs == [b"\x89PNG\r\n\x1a\ninline", b"\x89PNG\r\n\x1a\nbare"]
 
 
-def test_attach_images_dangling_and_duplicate_slots_are_dropped():
-    out = _attach_images_to_last_user(
-        [{"role": "user", "content": f"a{slot(0)}b{slot(0)}c{slot(7)}d"}],
-        [b"\x89PNG\r\n\x1a\n"],
-    )
-    parts = out[0]["content"]
-    assert [p["type"] for p in parts] == ["text", "image_url", "text"]
-    assert parts[2]["text"] == "bcd"
-
-
-def test_attach_images_no_images_strips_orphaned_slots():
-    """Images dropped upstream (no vision profile): the markers must not
-    reach the model, and a slot-free message must come back untouched."""
-    msgs = [{"role": "user", "content": f"a{slot(0)}b"}]
-    out = _attach_images_to_last_user(msgs, [])
-    assert out[0]["content"] == "ab"
-    plain = [{"role": "user", "content": "plain"}]
-    assert _attach_images_to_last_user(plain, []) is plain
+def test_prepare_plain_string_messages_pass_through_unchanged():
+    msgs = [{"role": "user", "content": "plain"}]
+    out, blobs = _prepare(msgs)
+    assert out == msgs and blobs == []
+    assert _attach_images_to_last_user(msgs, []) is msgs
 
 
 def test_prompt_text_joins_parts_of_one_message_without_separator():

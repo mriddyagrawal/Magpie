@@ -15,9 +15,9 @@ client transparently switches to the registered vision profile (default
 `lfm25-vl-vision`) for that call only — the pool handles spawn /
 LRU eviction. With the shipped single-profile setup the instance is
 already vision-bound, so no switch actually occurs. Image bytes are
-base64-encoded and sent as OpenAI-style `image_url` content blocks on
-the last user message, each at the position its slot marker held in the
-text (see src.inference.image_slots) - i.e. under its file header. With
+base64-encoded and sent as OpenAI-style `image_url` content parts, each
+at the position the desktop gave it (under its file header) - see
+`_prepare`. With
 `MAX_LOADED_MODELS=1`, switching between text and vision profiles
 incurs a model-reload cost; raise the cap if both are hot.
 
@@ -239,14 +239,11 @@ class LlamaServerLLM:
         repair. None means "no constraint" (free-form chat).
         """
 
-        profile_name = self._select_profile(images)
+        prepared, blobs = _prepare(messages, images)
+        profile_name = self._select_profile(blobs)
         prepared = apply_thinking_to_messages(
-            messages, thinking=thinking, model_repo_or_path=self.model_id
+            prepared, thinking=thinking, model_repo_or_path=self.model_id
         )
-        # Always: with images this interleaves them at their slots; without
-        # (vision profile missing, caller dropped them) it strips the
-        # orphaned slot markers so the model never sees them.
-        prepared = _attach_images_to_last_user(prepared, images or [])
         body = self._build_request_body(
             prepared, temperature, max_tokens, stream=False, thinking=thinking,
             response_format=response_format,
@@ -256,7 +253,7 @@ class LlamaServerLLM:
         async with httpx.AsyncClient(timeout=self.request_timeout_s) as client:
             resp = await self._post_with_pool_recovery(client, url, body, profile_name)
         data = resp.json()
-        self._tripwire_after(profile_name, prepared, images, data)
+        self._tripwire_after(profile_name, prepared, blobs, data)
         return self._extract_content(data)
 
     def complete_sync(
@@ -278,14 +275,11 @@ class LlamaServerLLM:
         match `complete()` — see that docstring.
         """
 
-        profile_name = self._select_profile(images)
+        prepared, blobs = _prepare(messages, images)
+        profile_name = self._select_profile(blobs)
         prepared = apply_thinking_to_messages(
-            messages, thinking=thinking, model_repo_or_path=self.model_id
+            prepared, thinking=thinking, model_repo_or_path=self.model_id
         )
-        # Always: with images this interleaves them at their slots; without
-        # (vision profile missing, caller dropped them) it strips the
-        # orphaned slot markers so the model never sees them.
-        prepared = _attach_images_to_last_user(prepared, images or [])
         body = self._build_request_body(
             prepared, temperature, max_tokens, stream=False, thinking=thinking,
             response_format=response_format,
@@ -295,7 +289,7 @@ class LlamaServerLLM:
         with httpx.Client(timeout=self.request_timeout_s) as client:
             resp = self._post_with_pool_recovery_sync(client, url, body, profile_name)
         data = resp.json()
-        self._tripwire_after(profile_name, prepared, images, data)
+        self._tripwire_after(profile_name, prepared, blobs, data)
         return self._extract_content(data)
 
     # ----- drift tripwire ------------------------------------------------------
@@ -621,27 +615,61 @@ def _image_part(blob: bytes) -> dict[str, Any]:
     return {"type": "image_url", "image_url": {"url": f"data:{media};base64,{b64}"}}
 
 
+def _prepare(
+    messages: list[dict],
+    images: Optional[Sequence[bytes]] = None,
+) -> tuple[list[dict], list[bytes]]:
+    """Wire-shape the message list and collect every image blob it carries.
+
+    Two sources of images, both honoured:
+
+      - Inline `{"type": "image", "data": bytes}` parts inside a list-valued
+        `content` (what `_flatten_message_for_local` emits) become OpenAI
+        `image_url` data-URL parts IN PLACE, so each image is rendered where
+        the desktop put it - under its file header. llama-server rewrites
+        each `image_url` part into its media marker at that position.
+      - The legacy `images=` kwarg: bare blobs appended after the last user
+        message's text (`_attach_images_to_last_user`).
+
+    Returns `(prepared, blobs)`; `blobs` (inline first, then kwarg) is what
+    profile selection and the drift tripwire price. Never mutates input.
+    """
+    blobs: list[bytes] = []
+    out: list[dict] = []
+    for m in messages:
+        content = m.get("content")
+        if not isinstance(content, list):
+            out.append(m)
+            continue
+        parts: list[dict[str, Any]] = []
+        for part in content:
+            if isinstance(part, dict) and part.get("type") == "image" \
+                    and isinstance(part.get("data"), (bytes, bytearray)):
+                blob = bytes(part["data"])
+                blobs.append(blob)
+                parts.append(_image_part(blob))
+            else:
+                parts.append(part)
+        out.append({**m, "content": parts})
+    if images:
+        blobs.extend(bytes(b) for b in images)
+        out = _attach_images_to_last_user(out, images)
+    return out, blobs
+
+
 def _attach_images_to_last_user(
     messages: list[dict],
     images: Sequence[bytes],
 ) -> list[dict]:
-    """Re-shape the message list to include image content blocks.
-
-    OpenAI / llama-server's chat completions API accepts a content list of
-    typed parts on user messages: `{"type": "text", "text": ...}` and
-    `{"type": "image_url", "image_url": {"url": "data:<media>;base64,..."}}`.
-    We promote the last user message's plain string content into that
-    list. Where the text carries slot markers (src.inference.image_slots,
-    left by `_flatten_message_for_local`) each image goes IN PLACE of its
-    marker, so it lands right under its file header; llama-server renders
-    content parts in order. Images no marker refers to are appended after
-    the text (the pre-slot behaviour, kept for callers that pass bare
-    `images=`); a marker with no matching image is dropped. Earlier
-    messages (system, prior user/assistant turns) are left as plain strings.
+    """Append one `image_url` part per blob to the last user message,
+    promoting a plain-string content to a typed-parts list first. This is
+    the tail placement for callers that pass bare `images=`; ordered
+    placement comes from inline image parts (see `_prepare`).
 
     Returns a NEW list — does not mutate `messages`.
     """
-    from src.inference.image_slots import split_slots, strip_slots
+    if not images:
+        return messages
 
     # Find the index of the last user message — that's where vision input
     # belongs. If there isn't one (a system-only request, very unusual),
@@ -656,33 +684,13 @@ def _attach_images_to_last_user(
 
     new_messages = list(messages)
     user = dict(new_messages[last_user_idx])
-    text = user.get("content", "") or ""
-    if not isinstance(text, str):
-        return messages  # already typed parts - nothing to promote
-    if not images:
-        if text != (clean := strip_slots(text)):
-            user["content"] = clean
-            new_messages[last_user_idx] = user
-            return new_messages
-        return messages
-
+    content = user.get("content", "") or ""
     parts: list[dict[str, Any]] = []
-    placed: set[int] = set()
-    for piece in split_slots(text):
-        if isinstance(piece, int):
-            if 0 <= piece < len(images) and piece not in placed:
-                parts.append(_image_part(images[piece]))
-                placed.add(piece)
-            continue
-        if not piece:
-            continue
-        if parts and parts[-1]["type"] == "text":      # dropped slot between two runs
-            parts[-1]["text"] += piece
-        else:
-            parts.append({"type": "text", "text": piece})
-    for n, blob in enumerate(images):
-        if n not in placed:
-            parts.append(_image_part(blob))
+    if isinstance(content, list):
+        parts.extend(content)
+    elif content:
+        parts.append({"type": "text", "text": content})
+    parts.extend(_image_part(blob) for blob in images)
     user["content"] = parts
     new_messages[last_user_idx] = user
     return new_messages

@@ -495,7 +495,7 @@ def _captioned(blocks: list, file_no: int) -> list:
     """A file's blocks with a one-line caption before each image when the
     file carries more than one (a scanned PDF's pages). Every transport
     now places images in order right under the `--- File N ---` header
-    (see src.inference.image_slots), so a lone image needs no caption;
+    (see `_prepare` in src.inference.local_llm), so a lone image needs no caption;
     several do, so the model can tell page 3 from page 1 and cite the
     file rather than guessing which picture it was looking at."""
     n_images = sum(1 for b in blocks if not isinstance(b, str))

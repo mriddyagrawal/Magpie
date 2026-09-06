@@ -1044,40 +1044,48 @@ def _flatten_message_for_local(
     with `BinaryContent` for image-bearing T3 calls. We:
 
       - Pull the system prompt out as its own message
-      - Concatenate all string parts into one user message, IN ORDER
-      - Collect image bytes from `BinaryContent` blocks (via duck-typed
-        `data` + `media_type` attributes) for the LocalLLM `images` kwarg,
-        leaving a slot marker (src.inference.image_slots) in the text
-        where each image sat so the transport can put it back there
+      - Keep DOCUMENT ORDER: adjacent strings merge into one text run, and
+        each image becomes an `{"type": "image", "data": bytes,
+        "media_type": ...}` part sitting exactly where the block was, so
+        the transport can render it under its file header (the cloud
+        transport preserved this order all along; the local one used to
+        pull every image out and append them after all the text)
       - Drop any non-image binary blocks with a one-time warning
 
-    `inline_images=False` omits the slot markers (for transports that
-    drop the images entirely - a marker would just be noise there).
+    `inline_images=False` omits the image parts (the OpenRouter raw-HTTP
+    body drops images; a `LocalAgent` with no vision profile does too).
+    The user message is a plain string when it carries no image parts,
+    so text-only requests keep the shape every log reader expects.
 
-    Returns `(messages, images)`. `images` is `[]` when the file is text-only.
-    The caller decides whether to forward `images` based on whether a
-    vision profile is registered; if it drops them, the transport drops
-    the orphaned slots too.
+    Returns `(messages, images)`. `images` is every image block's bytes
+    in order — the ones inlined and, with `inline_images=False`, the ones
+    dropped — so the caller can log the count either way.
     """
 
     global _local_image_drop_warned
-    from src.inference.image_slots import slot
 
-    text_parts: list[str] = []
+    parts: list[dict] = []          # text / image parts in document order
     image_blobs: list[bytes] = []
     n_dropped = 0
+
+    def _add_text(text: str) -> None:
+        if parts and parts[-1]["type"] == "text":
+            parts[-1]["text"] += "\n\n" + text
+        else:
+            parts.append({"type": "text", "text": text})
+
     for block in message:
         if isinstance(block, str):
-            text_parts.append(block)
+            _add_text(block)
             continue
         # BinaryContent is duck-typed here so we don't import pydantic_ai —
         # the local backend keeps that dep optional.
         data = getattr(block, "data", None)
         media = getattr(block, "media_type", "") or ""
         if isinstance(data, (bytes, bytearray)) and media.startswith("image/"):
-            if inline_images:
-                text_parts.append(slot(len(image_blobs)))
             image_blobs.append(bytes(data))
+            if inline_images:
+                parts.append({"type": "image", "data": bytes(data), "media_type": media})
         else:
             n_dropped += 1
 
@@ -1094,13 +1102,22 @@ def _flatten_message_for_local(
     # Add a hint that the model should output JSON only — small models often
     # don't otherwise. parse_json_with_repair handles failures, but a clean
     # JSON-only response is faster + less noisy.
-    user_text = "\n\n".join(text_parts).strip() + (
-        "\n\nRespond with a single valid JSON object that matches the "
+    _add_text(
+        "Respond with a single valid JSON object that matches the "
         "requested schema. Do not include any prose before or after."
     )
+    if parts[0]["type"] == "text":
+        parts[0]["text"] = parts[0]["text"].lstrip()
+    parts[-1]["text"] = parts[-1]["text"].rstrip()
+
+    content: str | list[dict]
+    if all(p["type"] == "text" for p in parts):
+        content = parts[0]["text"]
+    else:
+        content = parts
     return [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_text},
+        {"role": "user", "content": content},
     ], image_blobs
 
 
@@ -1187,16 +1204,18 @@ class LocalAgent(Generic[T]):
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
 
+        # Drop images when no vision profile is registered (rather than
+        # raising), so users without the mmproj installed still get a
+        # text-only summary instead of a hard failure.
+        has_vision = default_vision_profile() is not None
         msgs, images = _flatten_message_for_local(
             _prepend_timestamp(message)
             if _wants_timestamp(self._output_type)
             else message,
-            self._system_prompt
+            self._system_prompt,
+            inline_images=has_vision,
         )
-        # Drop images when no vision profile is registered (rather than
-        # raising), so users without the mmproj installed still get a
-        # text-only summary instead of a hard failure.
-        if images and default_vision_profile() is None:
+        if not has_vision:
             images = []
         llm = get_local_llm()
         request_id = log_request(
@@ -1215,7 +1234,6 @@ class LocalAgent(Generic[T]):
                 thinking=thinking,
                 temperature=temperature,
                 max_tokens=LOCAL_MAX_TOKENS,
-                images=images or None,
                 response_format=self._response_format,
                 grammar=self._grammar,
             )
@@ -1240,13 +1258,15 @@ class LocalAgent(Generic[T]):
         from src.inference import default_vision_profile, get_local_llm
         from src.inference.llm_log import log_request, log_response
 
+        has_vision = default_vision_profile() is not None
         msgs, images = _flatten_message_for_local(
             _prepend_timestamp(message)
             if _wants_timestamp(self._output_type)
             else message,
-            self._system_prompt
+            self._system_prompt,
+            inline_images=has_vision,
         )
-        if images and default_vision_profile() is None:
+        if not has_vision:
             images = []
         llm = get_local_llm()
         request_id = log_request(
@@ -1265,7 +1285,6 @@ class LocalAgent(Generic[T]):
                 thinking=thinking,
                 temperature=temperature,
                 max_tokens=LOCAL_MAX_TOKENS,
-                images=images or None,
                 response_format=self._response_format,
                 grammar=self._grammar,
             )

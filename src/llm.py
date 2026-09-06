@@ -316,36 +316,20 @@ T = TypeVar("T", bound=BaseModel)
 
 
 def _timestamp_line() -> str:
-    """Short 'Current date and time: ...' line appended to every LLM call.
+    """The one wall-clock line any prompt may carry: local time with zone so
+    the model can reason about 'today', 'this semester', 'is this receipt
+    recent'. Evaluated per call, never baked into a system prompt.
 
-    Local time with timezone so the model can reason about 'today', 'this
-    semester', 'is this receipt recent', etc. Evaluated per-call, not baked
-    into the system prompt.
+    Nothing in this module adds it. Until 2026-09-06 every agent got it
+    prepended by default unless opted out, and two of the three agents
+    turned out to copy it: the summariser wrote the run date into file
+    identifiers (FileSummary fence, 2026-08-27) and the rewriter wrote it
+    into search queries (12 of 59 typed searches on the 2026-08-30 arm).
+    Now the only caller is the answer step, which places it itself
+    (src.answer._build_answer_message) directly above the question.
     """
     now = datetime.now().astimezone()
-    return f"Current date and time: {now.strftime('%A, %Y-%m-%d %H:%M %Z')}"
-
-
-def _append_timestamp(message: list) -> list:
-    """The wall-clock line as the LAST element of the user turn (2026-09-06;
-    it used to open the turn). Everything before it - system prompt, files
-    - is then a stable prefix that llama-server's prompt cache can reuse
-    across turns, and the date is no longer the first thing a 3B reads."""
-    return [*message, _timestamp_line()]
-
-
-# Agents whose output describes a FILE, not a conversation. The timestamp is
-# there so the answer step can resolve "this semester" or "is this receipt
-# recent" — at index time it is just a plausible-looking date sitting in the
-# context, and a 3B copies it. Measured on sem_4 after the prompt-example fix:
-# `2026-08-27` (the run date) turned up as a claimed *document identifier* in
-# a Cursor invoice, a finance handout and a VR storyboard, none of which
-# contain it. Same copying failure as the Jane Doe example, different source.
-_NO_TIMESTAMP_OUTPUTS = {"FileSummary"}
-
-
-def _wants_timestamp(output_type: type | None) -> bool:
-    return getattr(output_type, "__name__", "") not in _NO_TIMESTAMP_OUTPUTS
+    return f"Today: {now.strftime('%A, %Y-%m-%d %H:%M %Z')}"
 
 
 class ChatAgent(Protocol, Generic[T]):
@@ -485,9 +469,7 @@ class _CloudAgent(Generic[T]):
         # not wired today), concatenates text into one user message,
         # appends the JSON-shape reminder.
         msgs, _images_dropped = _flatten_message_for_local(
-            _append_timestamp(message)
-            if _wants_timestamp(self._output_type)
-            else message,
+            message,
             self._system_prompt,
             inline_images=False,
         )
@@ -1213,9 +1195,7 @@ class LocalAgent(Generic[T]):
         # text-only summary instead of a hard failure.
         has_vision = default_vision_profile() is not None
         msgs, images = _flatten_message_for_local(
-            _append_timestamp(message)
-            if _wants_timestamp(self._output_type)
-            else message,
+            message,
             self._system_prompt,
             inline_images=has_vision,
         )
@@ -1264,9 +1244,7 @@ class LocalAgent(Generic[T]):
 
         has_vision = default_vision_profile() is not None
         msgs, images = _flatten_message_for_local(
-            _append_timestamp(message)
-            if _wants_timestamp(self._output_type)
-            else message,
+            message,
             self._system_prompt,
             inline_images=has_vision,
         )

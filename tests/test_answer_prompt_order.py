@@ -11,7 +11,6 @@ import os
 import pytest
 
 from src.answer import _build_answer_message
-from src.llm import _append_timestamp
 
 
 class _Img:
@@ -37,7 +36,8 @@ def test_files_come_first_and_the_question_only_at_the_end() -> None:
     assert msg[0].lstrip().startswith("--- File 1: second.txt ---")   # best-ranked LAST
     assert "--- File 2: best.pdf ---" in joined
     assert joined.count("What is X?") == 1                            # no top copy
-    assert msg[-1] == "\nNow answer this question: What is X?"
+    assert msg[-1] == "Now answer this question: What is X?"          # the task is last
+    assert msg[-2].startswith("\nToday: ")                            # clock directly above it
     assert "Current question:" not in joined
     # guidance sits AFTER the last file and speaks of "the files above"
     guidance_at = joined.index("Answer the question below from the files above")
@@ -50,6 +50,16 @@ def test_history_is_in_the_query_zone_after_the_files() -> None:
     joined = "\n".join(_texts(msg))
     assert joined.index("Previous conversation turns:") > joined.index("--- File 1: a.txt ---")
     assert joined.index("[Turn 1] Q: q1") < joined.index("Now answer this question")
+
+
+def test_only_the_answer_step_carries_a_clock() -> None:
+    """The summariser copied the run date into file identifiers and the
+    rewriter copied it into search queries, so src.llm no longer adds a
+    clock to anything; the answer step places its own."""
+    import src.llm as llm
+    from src.stage2.search import _build_rewrite_prompt
+    assert not hasattr(llm, "_append_timestamp") and not hasattr(llm, "_wants_timestamp")
+    assert "Today:" not in _build_rewrite_prompt("receipts from last month", None)
 
 
 def test_images_stay_inline_under_their_header_with_captions_for_multi_image_files() -> None:
@@ -65,7 +75,7 @@ def test_images_stay_inline_under_their_header_with_captions_for_multi_image_fil
     assert msg[i_scan + 4] == "[File 2, image 2 of 2]" and msg[i_scan + 5] is p2
     # the last image precedes the whole query zone
     last_img = max(i for i, m in enumerate(msg) if not isinstance(m, str))
-    assert last_img < msg.index("\nNow answer this question: q")
+    assert last_img < msg.index("Now answer this question: q")
 
 
 def test_prefix_is_identical_across_questions_over_the_same_files() -> None:
@@ -75,9 +85,17 @@ def test_prefix_is_identical_across_questions_over_the_same_files() -> None:
     m2 = _build_answer_message("second?", blocks, None, enumerate_lists=False)
     assert m1[:2] == m2[:2]            # header + block identical
     assert m1[-1] != m2[-1]
+    assert m1[-2].startswith("\nToday: ") and m2[-2].startswith("\nToday: ")
 
 
-def test_timestamp_is_the_last_element_of_the_turn() -> None:
-    out = _append_timestamp(["files", "\nNow answer this question: q"])
-    assert out[:2] == ["files", "\nNow answer this question: q"]
-    assert out[-1].startswith("Current date and time: ")
+def test_clock_sits_between_guidance_and_question() -> None:
+    blocks = [("a.txt", ["Content type: txt\n\n---\nbody"])]
+    msg = _build_answer_message("q?", blocks, None, enumerate_lists=False)
+    texts = _texts(msg)
+    i_clock = next(i for i, t in enumerate(texts) if t.startswith("\nToday: "))
+    # the element before the clock is the tail of the query zone: guidance,
+    # or the cloud JSON contract when the active provider is not local
+    assert texts[i_clock - 1].lstrip().startswith(
+        ("Answer the question below", "Previous conversation", "OUTPUT FORMAT"))
+    assert texts[i_clock + 1] == "Now answer this question: q?"
+    assert i_clock + 1 == len(texts) - 1

@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field
 from src.content import SummarizeError, build_content_blocks
 from src.grounding import looks_fabricated, strip_generated_blocks
 from src.ingest.ripgrep import format_hits_block, search_file as ripgrep_search
-from src.llm import ChatAgent, build_agent
+from src.llm import ChatAgent, _timestamp_line, build_agent
 from src.manifest import APP_DATA_DIR, Manifest
 
 if TYPE_CHECKING:
@@ -521,8 +521,8 @@ def _build_answer_message(
 
     Order (2026-09-06): files first, best-ranked LAST, images inline under
     their headers; then the query zone — history, guidance, the cloud
-    JSON contract, the question — and src.llm appends the wall-clock line
-    after that. Rationale, in order of payoff:
+    JSON contract, the wall-clock line, the question. Rationale, in order
+    of payoff:
 
       1. llama-server's prompt cache matches on the longest common
          prefix. With the question and a minute-granular timestamp at the
@@ -648,8 +648,7 @@ def _build_answer_message(
         message.extend(_captioned(blocks, i))
 
     # Query zone: everything that changes per turn goes after the files —
-    # history, guidance, the JSON contract, the question. (The wall-clock
-    # line is appended after all of this by src.llm, see _append_timestamp.)
+    # history, guidance, the JSON contract, the clock, the question.
     query_zone: list[str] = []
     if history:
         query_zone.append("Previous conversation turns:")
@@ -672,7 +671,11 @@ def _build_answer_message(
     # Until 2026-09-06 a second copy also opened the message; it was
     # dropped so the prefix (system + files) is identical across turns
     # over the same files and llama-server's prompt cache can reuse it.
-    message.append(f"\nNow answer this question: {question}")
+    # The clock sits directly above the question: past the files (cache-
+    # neutral), and not the last thing read before generation (a date in
+    # that slot is copy bait for a 3B; the task belongs there).
+    message.append(f"\n{_timestamp_line()}")
+    message.append(f"Now answer this question: {question}")
     return message
 
 
